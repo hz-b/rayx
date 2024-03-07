@@ -3,7 +3,24 @@
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+Paraboloid:
+- Arm Length
+- Parameter P
+- Parameter P Type
+- Grazing Inc Angle
+- Parameter 
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
 
 ## RML Object
 

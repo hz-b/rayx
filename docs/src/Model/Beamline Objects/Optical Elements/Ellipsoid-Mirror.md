@@ -3,7 +3,26 @@
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+Ellipoid:
+- Entrance Arm Length
+- Exit Arm Length
+- Short Half Axis B
+- Long Half Axis A
+- Design Grazing Inc Angle
+- Figure Rotation
+- Parameter A11
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
 
 ## RML Object
 

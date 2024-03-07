@@ -30,6 +30,50 @@ Surfaces in RAYX are defined as either a plane, a quadric, or a toroid.
 We use mathematical formulas to represent them internally, which means they are not necessarily bounded in size.
 Optical elements are often subtly curved; to the human eye, they might appear indistinguishable from planar elements.
 
+There are two ways to describe the reflectivity of the Surface. The User can choose between reflectivity Type '100%' and 'derived by material'.
+If you want the second option you need to specify the following parameter:
+- Material Substrate
+- Roughness Substrate
+- Density Substrate
+- Surface Coating
+- Coating File
+- Number Layer
+- Material Coating 1
+- Thickness Coating 1
+- Roughness Coating 1
+- Density Coating 1
+- Material Coating 2
+- Thickness Coating 2
+- Roughness Coating 2
+- Density Coating 2
+- Material Top Layer
+- Thickness Top Layer
+- Roughness Top Layer
+- Density Top Layer
+
+An example of the RML input looks like this:
+
+```XML
+    <param id="reflectivityType" comment="Derived by Material" enabled="T">1</param>
+    <param id="materialSubstrate" enabled="T">Au</param>
+    <param id="roughnessSubstrate" enabled="T">0</param>
+    <param id="densitySubstrate" auto="T" enabled="T">19.300000000000001</param>
+    <param id="surfaceCoating" comment="Substrate only" enabled="T">0</param>
+    <param id="coatingFile" absolute="" enabled="F"></param>
+    <param id="numberLayer" enabled="F">2</param>
+    <param id="materialCoating1" enabled="F"></param>
+    <param id="thicknessCoating1" enabled="F">0</param>
+    <param id="roughnessCoating1" enabled="F">0</param>
+    <param id="densityCoating1" auto="T" enabled="F">0</param>
+    <param id="materialCoating2" enabled="F"></param>
+    <param id="thicknessCoating2" enabled="F">0</param>
+    <param id="roughnessCoating2" enabled="F">0</param>
+    <param id="densityCoating2" auto="T" enabled="F">0</param>
+    <param id="materialTopLayer" enabled="F"></param>
+    <param id="thicknessTopLayer" enabled="F">0</param>
+    <param id="roughnessTopLayer" enabled="F">0</param>
+    <param id="densityTopLayer" auto="T" enabled="F">0</param>
+```
 ### Cutout
 
 The cutout defines the boundaries of the OpticalElement, by cutting a shape out of the Surface.

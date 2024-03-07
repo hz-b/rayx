@@ -8,7 +8,33 @@ Literature:<br/>
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+RZP:
+- Fresnel Z Offset
+- Design Alpha Angle
+- Design Beta Angle
+- Design Order Diffraction
+- Design Energy
+- Entrance Arm Length Sag
+- Exit Arm Length Sag
+- Entrance Arm Length Sag
+- Exit Arm Length Mer
+- Order Diffraction
+- Additional Order
+- Curvature Type
+- Long Radius
+- Image Type
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
 
 ## RML Object
 

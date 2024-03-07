@@ -3,7 +3,24 @@
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+Cylinder:
+- Bending Radius
+- Radius
+- Grazing Inc Angle
+- Entrance Arm Length
+- Exit Arm Length
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
 
 ## RML Object
 

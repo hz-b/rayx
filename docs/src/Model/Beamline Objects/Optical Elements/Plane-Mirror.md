@@ -4,7 +4,18 @@ A Plane Mirror is amongst the simplest Elements you can include in your beamline
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
+
 
 ## RML Object
 
