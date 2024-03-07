@@ -40,7 +40,8 @@ extern char** GLOBAL_ARGV;
 const int PREC = 17;
 
 // declare invocation state globally
-extern InvocationState inv;
+using HostMemSpace = Kokkos::OpenMP::memory_space;
+extern InvocationState<HostMemSpace> inv;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
 /// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.
