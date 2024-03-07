@@ -32,6 +32,19 @@ if(Vulkan_FOUND)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         GLM_FORCE_RADIANS
         GLM_FORCE_DEPTH_ZERO_TO_ONE)
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets)
+    else()
+        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets)
+    endif()
+
+    message(STATUS "Resource directory: ${RESOURCE_DIR}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/res
+        ${RESOURCE_DIR}
+    )
     # -----------------
 
 
@@ -42,10 +55,16 @@ if(Vulkan_FOUND)
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
                 DESTINATION ./bin
                 FILES_MATCHING PATTERN "*_*.spv")
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*")
     else()
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
                 DESTINATION ./bin
                 FILES_MATCHING PATTERN "*_*.spv")
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*")
     endif()
     include(InstallRequiredSystemLibraries)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")

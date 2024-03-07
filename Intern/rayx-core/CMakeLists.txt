@@ -158,12 +158,31 @@ add_custom_command(
 )
 # -----------------
 
+# ---- Scripts ----
+# Define the source and destination paths
+set(SCRIPT_SRC_DIR "${CMAKE_SOURCE_DIR}/Scripts/plot.py")
+# Set the destination directory for the Scripts directory based on the build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(SCRIPT_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Scripts/plot.py")
+else()
+    set(SCRIPT_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Scripts/plot.py")
+endif()
+
+# Copy the Scripts directory to the binary output directory after building
+message(STATUS "Copying Scripts directory from ${SCRIPT_SRC_DIR} to ${SCRIPT_DST_DIR}")
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${SCRIPT_SRC_DIR} ${SCRIPT_DST_DIR}
+    COMMENT "Copying Scripts directory to build output directory..."
+)
+# -----------------
+
 # ---- CPack ----
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
-install(DIRECTORY ${DATA_SRC_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${SCRIPT_SRC_DIR} DESTINATION bin/Scripts)
 
 include(CPack)
 

@@ -26,7 +26,7 @@ Texture::Texture(Device& device) : m_Device{device} {
     // Read in image
     int texWidth, texHeight, _;
     // STBI_rgb_alpha hopefully always forces 4 channels
-    std::filesystem::path path = RAYX::canonicalizeRepositoryPath("Intern/rayx-ui/res/textures/default.png");
+    std::filesystem::path path = getExecutablePath() / "Assets" / "textures" / "default.png";
     stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &_, STBI_rgb_alpha);
     if (!pixels) {
         RAYX_ERR << "Failed to load texture image";

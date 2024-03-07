@@ -127,10 +127,9 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     // Upload fonts
     {
         // Setup style
-        m_smallFont =
-            m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 16.0f);
-        m_largeFont =
-            m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 24.0f);
+        const std::filesystem::path fontPath = getExecutablePath() / "Assets/fonts/Roboto-Regular.ttf";
+        m_smallFont = m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f);
+        m_largeFont = m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 24.0f);
 
         ImGui_ImplVulkan_CreateFontsTexture();
     }
