@@ -34,3 +34,78 @@ The light polarisation impacts the reflective properties of the ray. The polariz
 
 ## Struct Ray
 In RAYX we transfer all the generated information from the light sources to the optical elements via the struct Ray. 
+
+## Tracing Parameter
+
+- Energy Distribution
+- Photon Flux
+- Electron Energy Orientation
+- Source Pulse Type
+- Bending Radius (Double)
+- Electron Energy
+- Photon Energy
+- Vertical Ebeam Divergence
+- Energy Spread
+- Energy Spread Unit
+- Horizontal Divergence
+- Source Height
+- Source Width
+- Energy
+- Energy Spread
+- Energy Spread Type
+- Energy Distribution Type
+- Energy Distribution File
+
+
+
+## RML Object
+
+To trace a Dipole Source through an RML File, utilize an XML Object to encompass all pertinent information for the light source. The default configuration for the light source from RAY-UI is presented here for your ease of use. It is recommended to include an Imageplane at the end for clearer results.
+
+```XML
+<object name="Dipole Source" type="Dipole Source">
+    <param id="numberRays" enabled="T">200</param>
+    <param id="sourceWidth" enabled="T">0.065</param>
+    <param id="sourceHeight" enabled="T">0.04</param>
+    <param id="verEbeamDiv" enabled="T">1</param>
+    <param id="horDiv" enabled="T">1</param>
+    <param id="electronEnergy" enabled="T">1.7</param>
+    <param id="electronEnergyOrientation" comment="clockwise" enabled="T">0</param>
+    <param id="bendingRadius" enabled="T">4.35</param>
+    <param id="alignmentError" comment="No" enabled="T">1</param>
+    <param id="translationXerror" enabled="F">0</param>
+    <param id="translationYerror" enabled="F">0</param>
+    <param id="rotationXerror" enabled="F">0</param>
+    <param id="rotationYerror" enabled="F">0</param>
+    <param id="worldPosition" enabled="F">
+     <x>0.0000000000000000</x>
+     <y>0.0000000000000000</y>
+     <z>0.0000000000000000</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+     <x>1.0000000000000000</x>
+     <y>0.0000000000000000</y>
+     <z>0.0000000000000000</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+     <x>0.0000000000000000</x>
+     <y>1.0000000000000000</y>
+     <z>0.0000000000000000</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+     <x>0.0000000000000000</x>
+     <y>0.0000000000000000</y>
+     <z>1.0000000000000000</z>
+    </param>
+    <param id="energyDistributionType" comment="Values" enabled="T">1</param>
+    <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
+    <param id="photonEnergy" enabled="T">100</param>
+    <param id="energySpreadType" comment="white band" enabled="T">0</param>
+    <param id="energySpreadUnit" comment="eV" enabled="T">0</param>
+    <param id="energySpread" enabled="T">0</param>
+    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
+    <param id="sourcePulseLength" enabled="F">0</param>
+    <param id="photonFlux" enabled="T">2.76089e+12</param>
+  </object>
+
+  ```

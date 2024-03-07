@@ -1,0 +1,154 @@
+# Reflection Zone Plate
+
+Information about RZP
+
+Literature:<br/>
+[PhD_JensRehanek_2014.pdf](uploads/45bc7d1c0044bc7dbf5b65bd126881f5/RehanekJens_2014_Doktorarbeit.pdf)<br/>
+[PhD_HeikeLöchel_2016.pdf](/docs/src/uploads/0d9a389a4e5f548ec89c174338bccbc6/Löchel_Doktorarbeit_3+++.pdf)<br/>
+
+## Tracing Parameter
+
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+RZP:
+- Fresnel Z Offset
+- Design Alpha Angle
+- Design Beta Angle
+- Design Order Diffraction
+- Design Energy
+- Entrance Arm Length Sag
+- Exit Arm Length Sag
+- Entrance Arm Length Sag
+- Exit Arm Length Mer
+- Order Diffraction
+- Additional Order
+- Curvature Type
+- Long Radius
+- Image Type
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
+
+## RML Object
+
+If you want to follow a RZP using an RML File, you'll need an XML Object that contains all the RZP details. The default RZP from RAY-UI is available for use. Just remember, tracing only works if you set up a Light Source first. It's a good idea to add an Imageplane Object at the end for clearer results.
+
+```XML
+  <object name="Reflection Zoneplate" type="Reflection Zoneplate">
+    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+    <param id="totalWidth" enabled="T">50</param>
+    <param id="totalLength" enabled="T">200</param>
+    <param id="gratingMount" comment="constant incidence angle" enabled="T">1</param>
+    <param id="grazingIncAngle" auto="T" enabled="T">1</param>
+    <param id="deviationAngle" enabled="F">170</param>
+    <param id="distancePreceding" enabled="T">10000</param>
+    <param id="azimuthalAngle" enabled="T">0</param>
+    <param id="elementOffsetZType" comment="manual" enabled="T">0</param>
+    <param id="elementOffsetZ" enabled="T">0</param>
+    <param id="meridionalIncidenceBeamDivergence" enabled="F">0</param>
+    <param id="meridionalIncidenceFocusDistance" enabled="F">0</param>
+    <param id="orderDiffraction" auto="T" enabled="T">-1</param>
+    <param id="betaDiffraction" auto="T" enabled="T">1</param>
+    <param id="derivationMethod" comment="Formulas" enabled="T">0</param>
+    <param id="coefficientsFile" relative="" enabled="F"></param>
+    <param id="designEnergy" enabled="T">100</param>
+    <param id="designOrderDiffraction" auto="T" enabled="T">-1</param>
+    <param id="entranceArmLengthSag" enabled="T">100</param>
+    <param id="entranceArmLengthMer" enabled="T">100</param>
+    <param id="designAlphaAngle" enabled="T">1</param>
+    <param id="exitArmLengthSag" enabled="T">500</param>
+    <param id="exitArmLengthMer" enabled="T">500</param>
+    <param id="curvatureType" comment="planar" enabled="T">0</param>
+    <param id="longRadius" enabled="F">0</param>
+    <param id="shortRadius" enabled="F">0</param>
+    <param id="designType" comment="use Fresnel Center Offset" enabled="T">0</param>
+    <param id="FresnelZOffset" enabled="T">0</param>
+    <param id="designBetaAngle" enabled="F">1</param>
+    <param id="imageType" comment="point to point" enabled="T">0</param>
+    <param id="stretchXdirection" enabled="F">1</param>
+    <param id="rzpType" comment="elliptical (standard)" enabled="T">0</param>
+    <param id="zDcalc" enabled="T">0</param>
+    <param id="xDcalc" enabled="T">0</param>
+    <param id="Dz" enabled="T">0</param>
+    <param id="Dx" enabled="T">0</param>
+    <param id="refracMethod" comment="2D (new)" enabled="T">1</param>
+    <param id="additionalOrder" comment="off" enabled="T">0</param>
+    <param id="lineProfile" comment="unknown" enabled="T">3</param>
+    <param id="fullEfficiency" comment="off" enabled="T">0</param>
+    <param id="gratingEfficiency" enabled="T">0.5</param>
+    <param id="blazeAngle" enabled="F">4</param>
+    <param id="aspectAngle" enabled="F">90</param>
+    <param id="grooveDepth" enabled="F">10</param>
+    <param id="grooveRatio" enabled="F">0.65</param>
+    <param id="multilayerFourierCoefficients" auto="T" enabled="F">11</param>
+    <param id="multilayerIntegrationSteps" auto="T" enabled="F">50</param>
+    <param id="reflectivityType" comment="Derived by Material" enabled="T">1</param>
+    <param id="materialSubstrate" enabled="T">Au</param>
+    <param id="roughnessSubstrate" enabled="T">0</param>
+    <param id="densitySubstrate" auto="T" enabled="T">19.3</param>
+    <param id="surfaceCoating" comment="Substrate only" enabled="T">0</param>
+    <param id="numberLayer" enabled="F">2</param>
+    <param id="materialCoating1" enabled="F"></param>
+    <param id="thicknessCoating1" enabled="F">0</param>
+    <param id="densityCoating1" auto="T" enabled="F">0</param>
+    <param id="materialCoating2" enabled="F"></param>
+    <param id="thicknessCoating2" enabled="F">0</param>
+    <param id="densityCoating2" auto="T" enabled="F">0</param>
+    <param id="materialTopLayer" enabled="F"></param>
+    <param id="thicknessTopLayer" enabled="F">0</param>
+    <param id="densityTopLayer" auto="T" enabled="F">0</param>
+    <param id="lateralThicknessGradientCoating1" comment="No" enabled="F">0</param>
+    <param id="gradientC1B1" enabled="F">0</param>
+    <param id="gradientC1B2" enabled="F">0</param>
+    <param id="gradientC1B3" enabled="F">0</param>
+    <param id="gradientC1B4" enabled="F">0</param>
+    <param id="gradientC1B5" enabled="F">0</param>
+    <param id="gradientC1B6" enabled="F">0</param>
+    <param id="gradientC1B7" enabled="F">0</param>
+    <param id="gradientC1B8" enabled="F">0</param>
+    <param id="alignmentError" comment="No" enabled="T">1</param>
+    <param id="translationXerror" enabled="F">0</param>
+    <param id="translationYerror" enabled="F">0</param>
+    <param id="translationZerror" enabled="F">0</param>
+    <param id="rotationXerror" enabled="F">0</param>
+    <param id="rotationYerror" enabled="F">0</param>
+    <param id="rotationZerror" enabled="F">0</param>
+    <param id="slopeError" comment="No" enabled="T">1</param>
+    <param id="profileKind" comment="no Profile" enabled="F">2</param>
+    <param id="profileFile" relative="" enabled="F"></param>
+    <param id="slopeErrorSag" enabled="F">0</param>
+    <param id="slopeErrorMer" enabled="F">0</param>
+    <param id="thermalDistortionAmp" enabled="F">0</param>
+    <param id="thermalDistortionSigmaX" enabled="F">0</param>
+    <param id="thermalDistortionSigmaZ" enabled="F">0</param>
+    <param id="cylindricalBowingAmp" enabled="F">0</param>
+    <param id="cylindricalBowingRadius" enabled="F">0</param>
+    <param id="worldPosition" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>10000</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>1</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>0</x>
+      <y>0.99984769515639127</y>
+      <z>-0.017452406437283512</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>0</x>
+      <y>0.017452406437283512</y>
+      <z>0.99984769515639127</z>
+    </param>
+  </object>
+  ```
