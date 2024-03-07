@@ -103,4 +103,22 @@ They are ordered for Elements and Sources and roughly in their order of importan
 | additionalOrder| |
 | slopeError| slopeErrorSag, slopeErrorMer, thermalDistortionAmp, thermalDistortionSigmaX, thermalDistortionSigmaZ, cylindricalBowingAmp, cylindricalBowingRadius|
 |vlsParameter | vlsParameterB2 - vlsParameterB7|
-| | |
+| Reflectivity Type| |
+| Material Substrate   | |
+| Roughness Substrate | |
+| Density Substrate | |
+| Surface Coating | |
+| Coating File | |
+| Number Layer | |
+| Material Coating 1 | |
+| Thickness Coating 1 | |
+| Roughness Coating 1 | |
+| Density Coating 1 | |
+| Material Coating 2 | |
+| Thickness Coating 2 | |
+| Roughness Coating 2 | |
+| Density Coating 2 | |
+| Material Top Layer | |
+| Thickness Top Layer | |
+| Roughness Top Layer | |
+| Density Top Layer | |

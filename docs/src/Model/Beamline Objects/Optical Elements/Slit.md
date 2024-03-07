@@ -4,7 +4,21 @@ TBA
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+Cutout:
+- Opening Shape
+- Opening Width
+- Opening Height
+- Central Beamstop
+- Total Width Stop
+- Total Height Stop
+
+
 
 ## RML Object
 

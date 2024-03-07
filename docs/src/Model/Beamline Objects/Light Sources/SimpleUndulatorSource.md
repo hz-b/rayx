@@ -19,6 +19,24 @@ light properties:
 
 The Origin for each Ray is described by x, y and z Position. 
 
+## Tracing Parameter
+
+- sourceDepth
+- linearPol0
+- linearPol45
+- circularPol
+- undulatorLength
+- photonEnergy
+- sigmaType
+- electronSigmaX
+- electronSigmaXs
+- electronSigmaY
+- electronSigmaYs
+- Energy
+- Energy Spread
+- Energy Spread Type
+- Energy Distribution Type
+- Energy Distribution File
 
 ## RML Object
 

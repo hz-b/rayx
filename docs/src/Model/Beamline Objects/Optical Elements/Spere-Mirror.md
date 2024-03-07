@@ -2,8 +2,20 @@
 
 
 ## Tracing Parameter
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
 
-TBA
+Sphere:
+- Radius
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
 
 ## RML Object
 

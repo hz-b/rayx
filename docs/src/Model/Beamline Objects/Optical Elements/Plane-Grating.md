@@ -4,7 +4,22 @@ A Plane Grating is amongst the simplest Elements you can include in your beamlin
 
 ## Tracing Parameter
 
-TBA
+Mandatory:
+- Reflectivity Type (see more in chapter Optical Elements)
+- Slope Error
+- World Position
+- Misalignment
+
+Grating:
+- vls parameter
+- Line Density
+- Order Of Diffraction
+
+Cutout:
+- Geometrical Shape
+- Total Width
+- Total Length
+
 
 ## RML Object
 

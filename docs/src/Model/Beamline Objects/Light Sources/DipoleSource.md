@@ -35,6 +35,28 @@ The light polarisation impacts the reflective properties of the ray. The polariz
 ## Struct Ray
 In RAYX we transfer all the generated information from the light sources to the optical elements via the struct Ray. 
 
+## Tracing Parameter
+
+- Energy Distribution
+- Photon Flux
+- Electron Energy Orientation
+- Source Pulse Type
+- Bending Radius (Double)
+- Electron Energy
+- Photon Energy
+- Vertical Ebeam Divergence
+- Energy Spread
+- Energy Spread Unit
+- Horizontal Divergence
+- Source Height
+- Source Width
+- Energy
+- Energy Spread
+- Energy Spread Type
+- Energy Distribution Type
+- Energy Distribution File
+
+
 
 ## RML Object
 
