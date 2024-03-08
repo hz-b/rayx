@@ -52,7 +52,7 @@ Collision findCollisionWith(Ray r, uint id, Inv<MemSpace>& inv) {
 // Returns the next collision for the ray `_ray`.
 template <typename MemSpace>
 RAYX_FUNC_INLINE
-Collision findCollision(Inv<MemSpace>& inv) {
+Collision findCollision(const Ray& _ray, Inv<MemSpace>& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {
         if (_ray.m_lastElement >= inv.elements.size() - 1) {
