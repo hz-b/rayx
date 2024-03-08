@@ -96,6 +96,11 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
+# Only build gpu tracer when CUDA is enabled
+if(NOT ${Kokkos_ENABLE_CUDA})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_GPU_TRACER)
+endif()
+
 # -----------------
 
 # ---- Dependencies ----
@@ -109,8 +114,6 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${Kokkos_INCLUDE_DIRS_RET}
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC Kokkos::kokkos)
-# TODO(Sven): rethink Separate Compilation and Linking
-#set(KOKKOS_CXXFLAGS "${KOKKOS_CXXFLAGS} --device-c")
 
 # ------------------------
 

@@ -40,7 +40,7 @@ extern char** GLOBAL_ARGV;
 const int PREC = 17;
 
 // declare invocation state globally
-using HostMemSpace = Kokkos::OpenMP::memory_space;
+using HostMemSpace = Kokkos::DefaultHostExecutionSpace::memory_space;
 extern InvocationState<HostMemSpace> inv;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
@@ -167,7 +167,11 @@ class TestSuite : public testing::Test {
         if (cpu) {
             tracer = std::make_unique<RAYX::CpuTracer>();
         } else {
+#ifdef NO_GPU_TRACER
+            RAYX_ERR << "Gpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
+#else
             tracer = std::make_unique<RAYX::GpuTracer>();
+#endif
         }
     }
 

@@ -2,16 +2,18 @@
 
 #include <Kokkos_Core.hpp>
 
-template <typename KokkosMemorySpace>
+template <typename MemSpace>
 struct KokkosUtils {
-    static constexpr bool transferRequired =
-        std::is_same_v<Kokkos::CudaSpace, KokkosMemorySpace>
-        // || std::is_same_v<Kokkos::HIPSpace, KokkosMemorySpace>
-    ;
+
+#ifndef NO_GPU_TRACER
+    static constexpr bool transferRequired = std::is_same_v<Kokkos::CudaSpace, MemSpace>;
+#else
+    static constexpr bool transferRequired = false;
+#endif
 
     template <typename T>
     static auto createView(const std::string& name, int size) {
-        return Kokkos::View<T*, KokkosMemorySpace>(name, size);
+        return Kokkos::View<T*, MemSpace>(name, size);
     }
 
     template <typename T>
@@ -35,7 +37,7 @@ struct KokkosUtils {
     }
 
     template <typename T>
-    static auto createVector(const Kokkos::View<T*, KokkosMemorySpace> view) {
+    static auto createVector(const Kokkos::View<T*, MemSpace> view) {
         auto v = std::vector<T>(view.size());
 
         if constexpr (transferRequired) {

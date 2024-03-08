@@ -25,7 +25,7 @@ public:
     void setPushConstants(const PushConstants*) override;
 
 private:
-    using ExecSpace = Kokkos::OpenMP;
+    using ExecSpace = Kokkos::DefaultHostExecutionSpace;
     using MemSpace = ExecSpace::memory_space;
 
     InvocationState<MemSpace> inv;

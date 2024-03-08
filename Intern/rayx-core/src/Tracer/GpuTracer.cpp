@@ -1,3 +1,5 @@
+#ifndef NO_GPU_TRACER
+
 #include "GpuTracer.h"
 
 #include <cmath>
@@ -65,3 +67,5 @@ std::vector<Ray> GpuTracer::traceRaw(const TraceRawConfig& cfg) {
 void GpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv.pushConstants, p, sizeof(PushConstants)); }
 
 }  // namespace RAYX
+
+#endif // NO_GPU_TRACER

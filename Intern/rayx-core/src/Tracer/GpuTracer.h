@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef NO_GPU_TRACER
+
 #include "Core.h"
 #include "Tracer.h"
 #include "Shader/InvocationState.h"
@@ -32,3 +34,5 @@ private:
 };
 
 }  // namespace RAYX
+
+#endif // NO_GPU_TRACER

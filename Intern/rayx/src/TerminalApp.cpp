@@ -168,7 +168,11 @@ void TerminalApp::run() {
     if (m_CommandParser->m_args.m_cpuFlag) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
+#ifdef NO_GPU_TRACER
+        RAYX_ERR << "Gpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
+#else
         m_Tracer = std::make_unique<RAYX::GpuTracer>();
+#endif
     }
 
     // Trace, export and plot
