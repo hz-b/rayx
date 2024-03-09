@@ -40,7 +40,7 @@ std::vector<Ray> GpuTracer::traceRaw(const TraceRawConfig& cfg) {
     const auto& materialTables = cfg.m_materialTables;
 
     using ExecSpace = Kokkos::Cuda;
-    using MemSpace = Kokkos::SharedSpace;
+    using MemSpace = ExecSpace::memory_space;
     using Util = KokkosUtils<MemSpace>;
 
     auto inv = Inv<MemSpace> {

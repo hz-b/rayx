@@ -18,17 +18,21 @@ struct KokkosUtils {
 
     template <typename T>
     static auto createView(const std::string& name, int size, const T* data) {
-        auto view = createView<T>(name, size);
-
         if constexpr (transferRequired) {
+            // TODO(Sven): eliminate unnecessary copy before transfer
+            // auto host_view = Kokkos::View<const T*, HostSpace>(data, size);
+            auto view = createView<T>(name, size);
             auto host_view = Kokkos::create_mirror(view);
             std::memcpy(host_view.data(), data, size * sizeof(T));
             Kokkos::deep_copy(view, host_view);
+            return view;
         } else {
+            // TODO(Sven): eliminate unnecessary copy
+            // auto view = Kokkos::View<const T*, MemSpace>(data, size);
+            auto view = createView<T>(name, size);
             std::memcpy(view.data(), data, size * sizeof(T));
+            return view;
         }
-
-        return view;
     }
 
     template <typename T>
@@ -42,7 +46,7 @@ struct KokkosUtils {
 
         if constexpr (transferRequired) {
             auto host_view = Kokkos::create_mirror(view);
-            Kokkos::deep_copy(view, host_view);
+            Kokkos::deep_copy(host_view, view);
             std::memcpy(v.data(), host_view.data(), host_view.size() * sizeof(T));
         } else {
             std::memcpy(v.data(), view.data(), view.size() * sizeof(T));
