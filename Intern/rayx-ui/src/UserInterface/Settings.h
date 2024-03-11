@@ -17,8 +17,8 @@ struct UIRayInfo {
 };
 
 struct UISimulationInfo {
-    int startEventID = 0;
-    int maxEvents = 0;
+    int startEventID = 0;  // unused right now
+    int maxEvents = 0;     // unused right now
     int maxBatchSize = 100000;
     int tracer = 1;
     bool sequential = false;
