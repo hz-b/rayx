@@ -228,6 +228,20 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
             printf("Error: %s\n", NFD_GetError());
         }
     }
+    if (uiParams.rmlPath != "") {
+        ImGui::SameLine();
+        if (ImGui::Button("Retrace current file")) {
+            m_showH5NotExistPopup = false;
+            m_showRMLNotExistPopup = false;
+            uiParams.rmlReady = true;
+            uiParams.runSimulation = true;
+        }
+    } else {
+        ImGui::SameLine();
+        ImGui::BeginDisabled();
+        ImGui::Button("Retrace current file");
+        ImGui::EndDisabled();
+    }
 
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
