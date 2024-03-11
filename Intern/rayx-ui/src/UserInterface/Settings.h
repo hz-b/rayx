@@ -19,21 +19,25 @@ struct UIRayInfo {
 struct UISimulationInfo {
     int startEventID = 0;
     int maxEvents = 0;
-    int maxBatchSize = 1000000;
+    int maxBatchSize = 100000;
     int tracer = 1;
     bool sequential = false;
     std::vector<std::string> availableDevices;
     int deviceIndex = 0;
+    bool fixedSeed = false;
+    int seed;
 
     UISimulationInfo(int startEventID, int maxEvents, int maxBatchSize, int tracer, bool sequential, const std::vector<std::string>& availableDevices,
-                     int deviceIndex)
+                     int deviceIndex, bool fixedSeed = false, int seed = 0)
         : startEventID(startEventID),
           maxEvents(maxEvents),
           maxBatchSize(maxBatchSize),
           tracer(tracer),
           sequential(sequential),
           availableDevices(availableDevices),
-          deviceIndex(deviceIndex) {}
+          deviceIndex(deviceIndex),
+          fixedSeed(fixedSeed),
+          seed(seed) {}
 };
 
 struct UIParameters {
@@ -59,7 +63,7 @@ struct UIParameters {
           simulationInfo({
               0,
               0,
-              1000000,
+              100000,
               0,
               false,
               availableDevices,

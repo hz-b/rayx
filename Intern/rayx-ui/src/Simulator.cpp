@@ -1,5 +1,6 @@
 #include "Simulator.h"
 
+#include "Random.h"
 #include "Tracer/VulkanTracer.h"
 #include "Writer/H5Writer.h"
 #include "Writer/Writer.h"
@@ -73,18 +74,27 @@ void Simulator::runSimulation() {
     writeH5(rays, path, fmt, names, startEventID);
 }
 
-void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, uint64_t max_batch_size, int tracer, bool sequential,
-                                        unsigned int deviceIndex) {
+void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, UISimulationInfo simulationInfo) {
     m_RMLPath = RMLPath;
     m_Beamline = std::move(beamline);
-    m_max_batch_size = max_batch_size;
-    if (tracer == 0) {
+    m_max_batch_size = simulationInfo.maxBatchSize;
+    if (simulationInfo.tracer == 0) {
         m_Tracer = std::make_unique<RAYX::CpuTracer>();
     } else {
         m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     }
-    m_seq = sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-    m_deviceIndex = deviceIndex;
+    m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+    m_deviceIndex = simulationInfo.deviceIndex;
+
+    if (simulationInfo.fixedSeed) {
+        if (simulationInfo.seed != -1) {
+            RAYX::fixSeed(simulationInfo.seed);
+        } else
+            RAYX::fixSeed(RAYX::FIXED_SEED);
+
+    } else {
+        RAYX::randomSeed();
+    }
 }
 
 std::vector<std::string> Simulator::getAvailableDevices() { return m_availableDevices; }

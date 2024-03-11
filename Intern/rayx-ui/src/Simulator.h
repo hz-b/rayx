@@ -1,13 +1,13 @@
 
 #include <Tracer/CpuTracer.h>
 #include <Tracer/Tracer.h>
+#include <UserInterface/Settings.h>
 
 class Simulator {
   public:
     Simulator();
     void runSimulation();
-    void setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, uint64_t m_max_batch_size = 1000000, int tracer = 0,
-                                 bool sequential = false, unsigned int deviceIndex = 0);
+    void setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, UISimulationInfo simulationInfo);
     std::vector<std::string> getAvailableDevices();
 
   private:

@@ -140,8 +140,7 @@ void Application::run() {
                         if (m_UIParams.runSimulation) {
                             if (m_UIParams.simulationSettingsReady) {
                                 // open simulation dialog
-                                m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo.maxBatchSize,
-                                                                    m_UIParams.simulationInfo.tracer, m_UIParams.simulationInfo.sequential);
+                                m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo);
                                 m_UIParams.simulationSettingsReady = false;
                                 m_State = State::InitializeSimulation;
                             }

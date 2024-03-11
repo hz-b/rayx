@@ -314,23 +314,23 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
 
             ImGui::SetCursorPosX(buttonsStartPos);
 
-            if (ImGui::Button("No", ImVec2(120, 40))) {  // Make the button a bit larger
-                m_showH5NotExistPopup = false;
-                m_showRMLNotExistPopup = false;
-                uiParams.runSimulation = false;  // Do not start the simulation
-                ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
-            }
-
-            ImGui::SameLine();  // Keep on the same line to ensure proper spacing
-
-            ImGui::SetCursorPosX(buttonsStartPos + 120 + spaceBetweenButtons);  // Adjust for the next button
-
             if (ImGui::Button("Yes", ImVec2(120, 40))) {  // Make the button a bit larger
                 m_showH5NotExistPopup = false;
                 m_showRMLNotExistPopup = false;
                 uiParams.rmlReady = true;
                 uiParams.runSimulation = true;
                 ImGui::CloseCurrentPopup();  // Close the popup when an option is selected
+            }
+
+            ImGui::SameLine();  // Keep on the same line to ensure proper spacing
+
+            ImGui::SetCursorPosX(buttonsStartPos + 120 + spaceBetweenButtons);  // Adjust for the next button
+
+            if (ImGui::Button("No", ImVec2(120, 40))) {  // Make the button a bit larger
+                m_showH5NotExistPopup = false;
+                m_showRMLNotExistPopup = false;
+                uiParams.runSimulation = false;  // Do not start the simulation
+                ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
             }
 
             // Revert to original font size
@@ -347,7 +347,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(410, 230), ImGuiCond_Always);
 
         if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
@@ -370,6 +370,17 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], deviceItems.size());
                 ImGui::EndDisabled();
             }
+
+            if (!uiParams.simulationInfo.fixedSeed) {
+                ImGui::BeginDisabled();
+                ImGui::InputInt("Seed", &uiParams.simulationInfo.seed);
+                ImGui::EndDisabled();
+            } else {
+                ImGui::InputInt("Seed", &uiParams.simulationInfo.seed);
+            }
+            ImGui::SameLine();
+            ImGui::Checkbox("Fixed Seed", &uiParams.simulationInfo.fixedSeed);
+
             ImGui::Separator();
 
             // Push buttons to the bottom
@@ -379,14 +390,14 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
             // Centering buttons
             float windowWidth = ImGui::GetWindowSize().x;
-            float buttonsWidth = 2 * 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
+            float buttonsWidth = /* 2* */ 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
             ImGui::SetCursorPosX((windowWidth - buttonsWidth) / 2.0f);
 
             if (uiParams.simulationInfo.deviceIndex >= uiParams.simulationInfo.availableDevices.size()) {
                 ImGui::BeginDisabled();
             }
 
-            if (ImGui::Button("OK", ImVec2(120, buttonHeight))) {
+            if (ImGui::Button("Start Simulation", ImVec2(120, buttonHeight))) {
                 uiParams.simulationSettingsReady = true;
                 ImGui::CloseCurrentPopup();
             }
@@ -395,12 +406,12 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::EndDisabled();
             }
 
-            ImGui::SameLine();
+            // ImGui::SameLine();
 
-            if (ImGui::Button("Cancel", ImVec2(120, buttonHeight))) {
-                uiParams.runSimulation = false;
-                ImGui::CloseCurrentPopup();
-            }
+            // if (ImGui::Button("Cancel", ImVec2(120, buttonHeight))) {
+            //     uiParams.runSimulation = false;
+            //     ImGui::CloseCurrentPopup();
+            // }
 
             ImGui::EndPopup();
         }
