@@ -61,9 +61,8 @@ struct RAYX_API Ray {
     // 7. check whether alignment requirements are still satisfied (should be done by the static_assert below).
 };
 
-// TODO(Sven): ensure this
-// static_assert(std::is_trivially_copyable_v<dvec3>);
-// static_assert(std::is_trivially_copyable_v<Ray>);
+// make sure Ray does not introduce cost on copy or default construction
+static_assert(std::is_trivially_copyable_v<Ray>);
 
 // Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
 // Further, the number of doubles in a Ray need to be divisible by four at all times, as we want to store multiple Rays after each other without

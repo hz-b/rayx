@@ -56,4 +56,7 @@ struct Element {
     double m_padding[1];
 };
 
+// make sure Element does not introduce cost on copy or default construction
+static_assert(std::is_trivially_copyable_v<Element>);
+
 #endif
