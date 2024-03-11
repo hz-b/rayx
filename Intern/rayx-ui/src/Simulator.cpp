@@ -2,16 +2,18 @@
 
 #include "Random.h"
 #include "Tracer/VulkanTracer.h"
+#include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
 #include "Writer/Writer.h"
 
 // constructor
 Simulator::Simulator() {
-    m_maxEvents = 0;
-    m_max_batch_size = 1000000;
-    m_Tracer = std::make_unique<RAYX::VulkanTracer>();
     m_seq = RAYX::Sequential::No;
-    auto deviceList = dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->getPhysicalDevices();
+    std::vector<VkPhysicalDevice> deviceList;
+    {
+        RAYX::VulkanTracer VkTracer;
+        deviceList = VkTracer.getPhysicalDevices();
+    }
     for (const auto& device : deviceList) {
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -21,9 +23,13 @@ Simulator::Simulator() {
 }
 
 void Simulator::runSimulation() {
+    if (!m_readyForSimulation) {
+        RAYX_ERR << "Simulator is not ready for simulation!";
+        return;
+    }
     // Run rayx core
-    m_maxEvents = m_Beamline.m_OpticalElements.size() + 2;
-    int startEventID = 0;
+    m_maxEvents = static_cast<unsigned int>(m_Beamline.m_OpticalElements.size() + 2);
+    unsigned int startEventID = 0;
 
     auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, startEventID);
 
@@ -33,7 +39,7 @@ void Simulator::runSimulation() {
 
     for (auto& ray : rays) {
         if (ray.size() > (maxEventID)) {
-            maxEventID = ray.size() + startEventID;
+            maxEventID = static_cast<unsigned int>(ray.size()) + startEventID;
         }
 
         for (auto& event : ray) {
@@ -71,10 +77,15 @@ void Simulator::runSimulation() {
     }
 
     path += ".h5";
+#ifndef NO_H5
     writeH5(rays, path, fmt, names, startEventID);
+#else
+    writeCSV(rays, path, fmt, startEventID);
+#endif
 }
 
-void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Beamline beamline, UISimulationInfo simulationInfo) {
+void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, const RAYX::Beamline& beamline,
+                                        const UISimulationInfo& simulationInfo) {
     m_RMLPath = RMLPath;
     m_Beamline = std::move(beamline);
     m_max_batch_size = simulationInfo.maxBatchSize;
@@ -95,6 +106,7 @@ void Simulator::setSimulationParameters(std::filesystem::path RMLPath, RAYX::Bea
     } else {
         RAYX::randomSeed();
     }
+    m_readyForSimulation = true;
 }
 
 std::vector<std::string> Simulator::getAvailableDevices() { return m_availableDevices; }

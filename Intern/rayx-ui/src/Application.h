@@ -71,13 +71,8 @@ class Application {
     std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
     RAYX::BundleHistory m_rays;                  ///< Ray cache
 
-        void init();
-
-    void runSimulation();
+    void init();
 
     void loadRays(const std::filesystem::path& rmlPath);
     void loadBeamline(const std::filesystem::path& rmlPath);
-
-    void createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo);
-    void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, UIRayInfo& rayInfo);
 };

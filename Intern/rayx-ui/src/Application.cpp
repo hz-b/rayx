@@ -23,13 +23,13 @@
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
-    : m_Window(width, height, name),                          //
-      m_CommandParser(argc, argv),                            //
-      m_Device(m_Window, m_CommandParser.m_args.m_deviceID),  //
-      m_Renderer(m_Window, m_Device),                         //
-      m_Camera(),                                             //
-      m_CamController(),
+    : m_Window(width, height, name),                                   //
+      m_CommandParser(argc, argv),                                     //
+      m_Device(m_Window, m_CommandParser.m_args.m_deviceID),           //
+      m_Renderer(m_Window, m_Device),                                  //
       m_Simulator(),                                                   //
+      m_Camera(),                                                      //
+      m_CamController(),                                               //
       m_UIParams(m_CamController, m_Simulator.getAvailableDevices()),  //
       m_UIHandler(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
                   m_Renderer.getSwapChainImageCount()) {
@@ -237,8 +237,8 @@ void Application::run() {
             FrameInfo frameInfo{m_Camera, frameIndex, commandBuffer, descriptorSets[frameIndex]};
 
             // Scene
-            if (m_State != State::RunningWithoutScene && m_State != State::LoadingRays && m_State != State::Simulating &&
-                m_State != State::LoadingBeamline && m_State != State::InitializeSimulation) {
+            // only LoadingRays check really necessary but this is for better user experience
+            if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
                 objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
                 if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
             }

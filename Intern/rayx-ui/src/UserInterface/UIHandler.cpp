@@ -321,10 +321,10 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             ImGui::Spacing();
 
             // Calculate center position for buttons. Assuming 120 pixels width for each button and 10 pixels space between them
-            float windowWidth = 400;         // Popup window width
-            float buttonsWidth = 240;        // Total buttons width (120 * 2)
-            float spaceBetweenButtons = 10;  // Space between buttons
-            float buttonsStartPos = (windowWidth - buttonsWidth - spaceBetweenButtons) * 0.5f;
+            constexpr float windowWidth = 400;         // Popup window width
+            constexpr float buttonsWidth = 240;        // Total buttons width (120 * 2)
+            constexpr float spaceBetweenButtons = 10;  // Space between buttons
+            constexpr float buttonsStartPos = (windowWidth - buttonsWidth - spaceBetweenButtons) * 0.5f;
 
             ImGui::SetCursorPosX(buttonsStartPos);
 
@@ -378,10 +378,10 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
             // Device selection combo box
             if (uiParams.simulationInfo.tracer == 1) {  // If not CPU Tracer, enable device selection
-                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], deviceItems.size());
+                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], static_cast<int>(deviceItems.size()));
             } else {
                 ImGui::BeginDisabled();  // Disable combo box if CPU Tracer is selected
-                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], deviceItems.size());
+                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], static_cast<int>(deviceItems.size()));
                 ImGui::EndDisabled();
             }
 
@@ -407,7 +407,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
             float buttonsWidth = /* 2* */ 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
             ImGui::SetCursorPosX((windowWidth - buttonsWidth) / 2.0f);
 
-            if (uiParams.simulationInfo.deviceIndex >= uiParams.simulationInfo.availableDevices.size()) {
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<int>(uiParams.simulationInfo.availableDevices.size())) {
                 ImGui::BeginDisabled();
             }
 
@@ -416,7 +416,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::CloseCurrentPopup();
             }
 
-            if (uiParams.simulationInfo.deviceIndex >= uiParams.simulationInfo.availableDevices.size()) {
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<int>(uiParams.simulationInfo.availableDevices.size())) {
                 ImGui::EndDisabled();
             }
 
