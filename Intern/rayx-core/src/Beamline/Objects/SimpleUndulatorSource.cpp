@@ -8,28 +8,26 @@
 
 namespace RAYX {
 
-SimpleUndulatorSource::SimpleUndulatorSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_sigmaType = dobj.parseSigmaType();
-    m_photonEnergy = dobj.parsePhotonEnergy();
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& deso) : LightSource(deso) {
+    m_sigmaType = deso.getSigmaType();
+    m_photonEnergy = deso.getEnergy();
     m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
-    m_undulatorLength = dobj.parseUndulatorLength();
+    m_undulatorLength = deso.getUndulatorLength();
     m_undulatorSigma = calcUndulatorSigma();
     m_undulatorSigmaS = calcUndulatorSigmaS();
-    m_electronSigmaX = dobj.parseElectronSigmaX();
-    m_electronSigmaXs = dobj.parseElectronSigmaXs();
-    m_electronSigmaY = dobj.parseElectronSigmaY();
-    m_electronSigmaYs = dobj.parseElectronSigmaYs();
+    m_electronSigmaX = deso.getElectronSigmaX();
+    m_electronSigmaXs = deso.getElectronSigmaXs();
+    m_electronSigmaY = deso.getElectronSigmaY();
+    m_electronSigmaYs = deso.getElectronSigmaYs();
 
     m_horDivergence = getHorDivergence();
     m_verDivergence = getVerDivergence();
 
-    m_sourceDepth = dobj.parseSourceDepth();
+    m_sourceDepth = deso.getSourceDepth();
     m_sourceHeight = getSourceHeight();
     m_sourceWidth = getSourceWidth();
 
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
+    m_pol = deso.getStokes();
 
     
 }
@@ -75,9 +73,8 @@ std::vector<Ray> SimpleUndulatorSource::getRays([[maybe_unused]] int thread_coun
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }

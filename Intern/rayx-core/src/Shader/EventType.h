@@ -32,4 +32,8 @@ const double ETYPE_BEYOND_HORIZON = 5;
 // This error code is typically generated using `_throw`.
 const double ETYPE_FATAL_ERROR = 6;
 
+// These rays have just been emitted and not had any other events
+// If there are no other elements the ray has this eventtype
+const double ETYPE_EMITTED = 7;
+
 #endif

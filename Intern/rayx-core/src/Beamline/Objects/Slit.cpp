@@ -26,7 +26,7 @@ Cutout mkBeamstopCutout(const DesignElement& dele) {
     } else if (centralBeamstop == CentralBeamstop::Rectangle) {
         return serializeRect({
             .m_width = dele.getStopWidth(),
-            .m_length =dele.getStopHeight(),
+            .m_length = dele.getStopHeight(),
         });
     } else {
         RAYX_ERR << "unsupported CentralBeamstop type!";
@@ -43,7 +43,7 @@ Element makeSlit(const DesignElement& dele) {
         .m_openingCutout = openingCutout,
         .m_beamstopCutout = beamstopCutout,
     });
-    Element el = makeElement(dele, behaviour, surface, {}, DesignPlane::XY);
+    Element el = makeElement(dele, behaviour, surface, serializeUnlimited(), DesignPlane::XY);
     Cutout globalCutout = el.m_cutout;
 
     // the opening needs to be a subset of the whole object.

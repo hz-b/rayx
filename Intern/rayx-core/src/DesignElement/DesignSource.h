@@ -92,6 +92,35 @@ struct DesignSource {
     void setWorldOrientation(glm::dmat4x4 o);
     glm::dmat4x4 getWorldOrientation() const;
 
+    void setNumOfCircles(int value);
+    int getNumOfCircles() const;
+
+    void setMaxOpeningAngle(Rad value);
+    Rad getMaxOpeningAngle() const;
+
+    void setMinOpeningAngle(Rad value);
+    Rad getMinOpeningAngle() const;
+
+    void setDeltaOpeningAngle(Rad value);
+    Rad getDeltaOpeningAngle() const;
+
+    void setSigmaType(SigmaType value);
+    SigmaType getSigmaType() const;
+
+    void setUndulatorLength(double value);
+    double getUndulatorLength() const;
+
+    void setElectronSigmaX(double value);
+    double getElectronSigmaX() const;
+
+    void setElectronSigmaXs(double value);
+    double getElectronSigmaXs() const;
+
+    void setElectronSigmaY(double value);
+    double getElectronSigmaY() const;
+
+    void setElectronSigmaYs(double value);
+    double getElectronSigmaYs() const;
     
 
 };

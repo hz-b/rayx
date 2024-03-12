@@ -95,10 +95,50 @@ void setDipoleSource(xml::Parser parser, DesignSource* ds) {
     ds->setVerEBeamDivergence(parser.parseVerEbeamDivergence());
     ds->setEnergy(parser.parsePhotonEnergy());
     ds->setEnergySpreadUnit(parser.parseEnergySpreadUnit());
+    ds->setEnergyDistributionType(parser.parseEnergyDistributionType());
     ds->setHorDivergence(parser.parseHorDiv());
 }
 
+void setPixelSource(xml::Parser parser, DesignSource* ds) {
 
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+    setDefaultPosition(parser, ds);
+    setDefaultOrientation(parser, ds);
+
+
+}
+
+void setCircleSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+    setDefaultPosition(parser, ds);
+
+    ds->setNumOfCircles(parser.parseNumOfEquidistantCircles());
+    ds->setMaxOpeningAngle(parser.parseMaxOpeningAngle());
+    ds->setMinOpeningAngle(parser.parseMinOpeningAngle());
+    ds->setDeltaOpeningAngle(parser.parseDeltaOpeningAngle());
+}
+
+void setSimpleUndulatorSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+
+    ds->setSourceDepth(parser.parseSourceDepth());
+
+    ds->setSigmaType(parser.parseSigmaType());
+
+    ds->setUndulatorLength(parser.parseUndulatorLength());
+    ds->setElectronSigmaX(parser.parseElectronSigmaX());
+    ds->setElectronSigmaXs(parser.parseElectronSigmaXs());
+    ds->setElectronSigmaY(parser.parseElectronSigmaY());
+    ds->setElectronSigmaYs(parser.parseElectronSigmaYs());
+}
 
 
 }  // namespace RAYX
