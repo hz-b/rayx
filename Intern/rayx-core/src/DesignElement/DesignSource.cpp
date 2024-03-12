@@ -21,6 +21,18 @@ std::vector<Ray> DesignSource::compile(int i) const {
         DipoleSource ds(*this);
         ray = ds.getRays(i);
         std::cout << getName() << std::endl;
+    }else if (getName() == "Pixel Source") {
+        PixelSource ps(*this);
+        ray = ps.getRays(i);
+        std::cout << getName() << std::endl;
+    }else if (getName() == "Circle Source") {
+        CircleSource cs(*this);
+        ray = cs.getRays(i);
+        std::cout << getName() << std::endl;
+    }else if (getName() == "Simple Undulator") {
+        SimpleUndulatorSource su(*this);
+        ray = su.getRays(i);
+        std::cout << getName() << std::endl;
     }
 
     return ray;
@@ -176,8 +188,8 @@ ElectronEnergyOrientation DesignSource::getElectronEnergyOrientation() const { r
 void DesignSource::setEnergySpread(double value) { v["energySpread"] = value; }
 double DesignSource::getEnergySpread() const { return v["energySpread"].as_double(); }
 
-void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { v["energySpread"] = value; }
-EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return v["energySpread"].as_energySpreadUnit(); }
+void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { v["energySpreadUnit"] = value; }
+EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return v["energySpreadUnit"].as_energySpreadUnit(); }
 
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { v["energyDistributionType"] = value; }
 void DesignSource::setEnergyDistributionFile(std::string value) { v["photonEnergyDistributionFile"] = value; }
@@ -197,11 +209,11 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
     
     
     if (energyDistributionType == EnergyDistributionType::File) {
-        std::string filename = ("../../../Intern/rayx-core/tests/input/") + v["photonEnergyDistributionFile"].as_string();
+        std::string filename = ("Intern/rayx-core/tests/input/") + v["photonEnergyDistributionFile"].as_string();
         //std::filesystem::path path = std::filesystem::canonical(rmlFile);
         //path.replace_filename(filename);  // this makes the path `filename` be relative to the
                                           // path of the rml file
-
+        std::cout << std::filesystem::current_path() << std::endl;
         DatFile df;
         DatFile::load(filename, &df);
 
@@ -242,6 +254,88 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
 
 void DesignSource::setNumberOfRays(double value) { v["numberOfRays"] = value; }
 double DesignSource::getNumberOfRays() const { return v["numberOfRays"].as_double(); }
+
+void DesignSource::setNumOfCircles(int value) {
+    v["numOfCircles"] = value;
+}
+
+int DesignSource::getNumOfCircles() const {
+    return v["numOfCircles"].as_int();
+}
+
+void DesignSource::setMaxOpeningAngle(Rad value) {
+    v["maxOpeningAngle"] = value;
+}
+
+Rad DesignSource::getMaxOpeningAngle() const {
+    return v["maxOpeningAngle"].as_rad();
+}
+
+void DesignSource::setMinOpeningAngle(Rad value) {
+    v["minOpeningAngle"] = value;
+}
+
+Rad DesignSource::getMinOpeningAngle() const {
+    return v["minOpeningAngle"].as_rad();
+}
+
+void DesignSource::setDeltaOpeningAngle(Rad value) {
+    v["deltaOpeningAngle"] = value;
+}
+
+Rad DesignSource::getDeltaOpeningAngle() const {
+    return v["deltaOpeningAngle"].as_rad();
+}
+
+
+void DesignSource::setSigmaType(SigmaType value) {
+    v["sigmaType"] = value;
+}
+
+SigmaType DesignSource::getSigmaType() const {
+    return v["sigmaType"].as_sigmaType();
+}
+
+void DesignSource::setUndulatorLength(double value) {
+    v["undulatorLength"] = value;
+}
+
+double DesignSource::getUndulatorLength() const {
+    return v["undulatorLength"].as_double();
+}
+
+void DesignSource::setElectronSigmaX(double value) {
+    v["electronSigmaX"] = value;
+}
+
+double DesignSource::getElectronSigmaX() const {
+    return v["electronSigmaX"].as_double();
+}
+
+void DesignSource::setElectronSigmaXs(double value) {
+    v["electronSigmaXs"] = value;
+}
+
+double DesignSource::getElectronSigmaXs() const {
+    return v["electronSigmaXs"].as_double();
+}
+
+void DesignSource::setElectronSigmaY(double value) {
+    v["electronSigmaY"] = value;
+}
+
+double DesignSource::getElectronSigmaY() const {
+    return v["electronSigmaY"].as_double();
+}
+
+void DesignSource::setElectronSigmaYs(double value) {
+    v["electronSigmaYs"] = value;
+}
+
+double DesignSource::getElectronSigmaYs() const {
+    return v["electronSigmaYs"].as_double();
+}
+
 
 
 }

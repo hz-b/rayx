@@ -37,6 +37,7 @@ struct DesignElement {
 
     void setCutout(Cutout c);
     Cutout getCutout() const;
+    Cutout getGlobalCutout() const;
 
     void setVLSParameters(const std::array<double, 6>& values);
     std::array<double, 6> getVLSParameters() const;

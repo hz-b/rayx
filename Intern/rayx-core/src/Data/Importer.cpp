@@ -41,7 +41,6 @@ void parseElement(xml::Parser parser, DesignElement* de) {
     } else if (strcmp(type, "Paraboloid") == 0) {
         getParaboloid(parser, de);
     } else if (strcmp(type, "Plane Grating") == 0) {
-        RAYX_LOG << "import Planegrating";
         getPlaneGrating(parser, de);
     } else if (strcmp(type, "Plane Mirror") == 0) {
         getPlaneMirror(parser, de);
@@ -86,31 +85,27 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     if (strcmp(type, "Point Source") == 0) {
         setPointSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        RAYX_LOG << "in importer PS";
     } else if (strcmp(type, "Matrix Source") == 0) {
         setMatrixSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        RAYX_LOG << "in importer MS";
     } else if (strcmp(type, "Dipole") == 0) {
         setDipoleSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        RAYX_LOG << "in importer DS";
     } else if (strcmp(type, "Dipole Source") == 0) {
         setDipoleSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        RAYX_LOG << "in importer DS";
     } else if (strcmp(type, "Pixel Source") == 0) {
-        RAYX_LOG << "import none";
-        //addLightSource(std::make_shared<PixelSource>(parser), node);
+        setPixelSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Circle Source") == 0) {
-        RAYX_LOG << "import none";
-        //addLightSource(std::make_shared<CircleSource>(parser), node);
+        setCircleSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Simple Undulator") == 0) {
-        RAYX_LOG << "import none";
+        setSimpleUndulatorSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
         //addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
         parseElement(parser, &de);
-        RAYX_LOG << "import " << de.getName();
         beamline->m_DesignElements.push_back(de);
     }
 

@@ -48,7 +48,7 @@ MaterialTables Beamline::calcMinimalMaterialTables() const {
     relevantMaterials.fill(false);
 
     for (const auto& e : m_DesignElements) {
-        int material = 0;  // in [1, 92]
+        int material = static_cast<int>(e.getMaterial());  // in [1, 92]
         // TODO material = "extract the chosen material from `e`".
         if (1 <= material && material <= 92) {
             relevantMaterials[material - 1] = true;
