@@ -104,12 +104,23 @@ struct DesignSource {
     void setDeltaOpeningAngle(Rad value);
     Rad getDeltaOpeningAngle() const;
 
-    /*
-    m_numOfCircles = dobj.parseNumOfEquidistantCircles();
-    m_maxOpeningAngle = dobj.parseMaxOpeningAngle();
-    m_minOpeningAngle = dobj.parseMinOpeningAngle();
-    m_deltaOpeningAngle = dobj.parseDeltaOpeningAngle();
-    */
+    void setSigmaType(SigmaType value);
+    SigmaType getSigmaType() const;
+
+    void setUndulatorLength(double value);
+    double getUndulatorLength() const;
+
+    void setElectronSigmaX(double value);
+    double getElectronSigmaX() const;
+
+    void setElectronSigmaXs(double value);
+    double getElectronSigmaXs() const;
+
+    void setElectronSigmaY(double value);
+    double getElectronSigmaY() const;
+
+    void setElectronSigmaYs(double value);
+    double getElectronSigmaYs() const;
     
 
 };

@@ -29,6 +29,10 @@ std::vector<Ray> DesignSource::compile(int i) const {
         CircleSource cs(*this);
         ray = cs.getRays(i);
         std::cout << getName() << std::endl;
+    }else if (getName() == "Simple Undulator") {
+        SimpleUndulatorSource su(*this);
+        ray = su.getRays(i);
+        std::cout << getName() << std::endl;
     }
 
     return ray;
@@ -282,5 +286,56 @@ void DesignSource::setDeltaOpeningAngle(Rad value) {
 Rad DesignSource::getDeltaOpeningAngle() const {
     return v["deltaOpeningAngle"].as_rad();
 }
+
+
+void DesignSource::setSigmaType(SigmaType value) {
+    v["sigmaType"] = value;
+}
+
+SigmaType DesignSource::getSigmaType() const {
+    return v["sigmaType"].as_sigmaType();
+}
+
+void DesignSource::setUndulatorLength(double value) {
+    v["undulatorLength"] = value;
+}
+
+double DesignSource::getUndulatorLength() const {
+    return v["undulatorLength"].as_double();
+}
+
+void DesignSource::setElectronSigmaX(double value) {
+    v["electronSigmaX"] = value;
+}
+
+double DesignSource::getElectronSigmaX() const {
+    return v["electronSigmaX"].as_double();
+}
+
+void DesignSource::setElectronSigmaXs(double value) {
+    v["electronSigmaXs"] = value;
+}
+
+double DesignSource::getElectronSigmaXs() const {
+    return v["electronSigmaXs"].as_double();
+}
+
+void DesignSource::setElectronSigmaY(double value) {
+    v["electronSigmaY"] = value;
+}
+
+double DesignSource::getElectronSigmaY() const {
+    return v["electronSigmaY"].as_double();
+}
+
+void DesignSource::setElectronSigmaYs(double value) {
+    v["electronSigmaYs"] = value;
+}
+
+double DesignSource::getElectronSigmaYs() const {
+    return v["electronSigmaYs"].as_double();
+}
+
+
 
 }

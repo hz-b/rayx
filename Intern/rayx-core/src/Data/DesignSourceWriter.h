@@ -123,4 +123,22 @@ void setCircleSource(xml::Parser parser, DesignSource* ds) {
     ds->setDeltaOpeningAngle(parser.parseDeltaOpeningAngle());
 }
 
+void setSimpleUndulatorSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+
+    ds->setSourceDepth(parser.parseSourceDepth());
+
+    ds->setSigmaType(parser.parseSigmaType());
+
+    ds->setUndulatorLength(parser.parseUndulatorLength());
+    ds->setElectronSigmaX(parser.parseElectronSigmaX());
+    ds->setElectronSigmaXs(parser.parseElectronSigmaXs());
+    ds->setElectronSigmaY(parser.parseElectronSigmaY());
+    ds->setElectronSigmaYs(parser.parseElectronSigmaYs());
+}
+
+
 }  // namespace RAYX

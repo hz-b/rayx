@@ -101,7 +101,8 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
         setCircleSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Simple Undulator") == 0) {
-        RAYX_LOG << "import none";
+        setSimpleUndulatorSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
         //addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
         parseElement(parser, &de);

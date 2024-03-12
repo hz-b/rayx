@@ -28,6 +28,7 @@ enum class ValueType {
     EnergyDistributionType,
     EnergySpreadUnit,
     ElectronEnergyOrientation,
+    SigmaType
 };
 
 class Undefined {};
@@ -58,6 +59,7 @@ class Value {
     Value(SpreadType x) : m_variant(x) {}
     Value(EnergyDistributionType x) : m_variant(x) {}
     Value(EnergySpreadUnit x) : m_variant(x) {}
+    Value(SigmaType x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -80,6 +82,7 @@ class Value {
     void operator=(EnergyDistributionType x) { m_variant = x; }
     void operator=(EnergySpreadUnit x) { m_variant = x; }
     void operator=(ElectronEnergyOrientation x) { m_variant = x; }
+    void operator=(SigmaType x) { m_variant = x; }
 
 
 
@@ -90,7 +93,7 @@ class Value {
             ValueType::Rad,       ValueType::Material,   ValueType::Misalignment,  ValueType::CentralBeamStop,
             ValueType::Cutout,    ValueType::Bool,       ValueType::FigureRotation,ValueType::CurvatureType,
             ValueType::Surface,   ValueType::SourceDist, ValueType::SpreadType,    ValueType::EnergyDistributionType,
-            ValueType::Dmat4x4,   ValueType::ElectronEnergyOrientation
+            ValueType::Dmat4x4,   ValueType::SigmaType,  ValueType::ElectronEnergyOrientation           
         };
         return types[m_variant.index()];
     }
@@ -221,6 +224,12 @@ class Value {
         return *x;
     }
 
+    inline SigmaType as_sigmaType() const {
+        auto* x = std::get_if<SigmaType>(&m_variant);
+        if (!x) throw std::runtime_error("as_sigmaType() called on non-sigmaType!");
+        return *x;
+    }
+
     const Value& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
@@ -242,7 +251,7 @@ class Value {
                  Misalignment,     CentralBeamstop, Cutout,  CylinderDirection, 
                  FigureRotation,   Map,             Surface, CurvatureType,
                  SourceDist,       SpreadType,      Rad,     Material,
-                 EnergySpreadUnit, std::string
+                 EnergySpreadUnit, std::string,     SigmaType
                 > m_variant;
 };
 }  // namespace RAYX
