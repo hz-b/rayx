@@ -203,7 +203,6 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
 void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential seq) {
     auto rayx_list = rayUiCompat(filename, seq);
     auto rayui_list = loadCSVRayUI(filename);
-    RAYX_LOG << "compareLastAgainstRayUI start ";
 
     writeToOutputCSV(convertToBundleHistory(rayx_list), filename + ".rayx");
     writeToOutputCSV(convertToBundleHistory(rayui_list), filename + ".rayui");
@@ -212,7 +211,6 @@ void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential 
 
     auto itRayX = rayx_list.begin();
     auto itRayXEnd = rayx_list.end();
-    RAYX_LOG << "compareLastAgainstRayUI middle ";
 
     auto itRayUI = rayui_list.begin();
 
@@ -228,7 +226,6 @@ void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential 
         ++itRayX;
         ++itRayUI;
     }
-    RAYX_LOG << "compareLastAgainstRayUI finished ";
 }
 
 void compareAgainstCorrect(std::string filename, double tolerance) {

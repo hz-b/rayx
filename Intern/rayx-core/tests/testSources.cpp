@@ -148,17 +148,15 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     DesignSource src = beamline.m_DesignSources[0];
-    //auto* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+    DipoleSource dipolesource(src);
 
     for (auto values : inouts) {
-        //TODO: reintegrate test
-        //auto result = dipolesource->getInterpolation(values.in);
-        //CHECK_EQ(result, values.out, 0.01);
+        auto result = dipolesource.getInterpolation(values.in);
+        CHECK_EQ(result, values.out, 0.01);
     }
 }
 
-    //TODO: reintegrate test
-/*TEST_F(TestSuite, testVerDivergenceDipole) {
+TEST_F(TestSuite, testVerDivergenceDipole) {
     struct InOutPair {
         double energy;
         double sigv;
@@ -172,13 +170,13 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     DesignSource src = beamline.m_DesignSources[0];
-    auto* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+    DipoleSource dipolesource(src);
 
     for (auto values : inouts) {
-        auto result = dipolesource->vDivergence(values.energy, values.sigv);
+        auto result = dipolesource.vDivergence(values.energy, values.sigv);
         CHECK_EQ(result, values.out, 0.1);
     }
-}*/
+}
 
 TEST_F(TestSuite, testLightsourceGetters) {
     struct RmlInput {
@@ -202,20 +200,18 @@ TEST_F(TestSuite, testLightsourceGetters) {
         .sourceWidth = 0.22173963435440763,
         .sourceDepth = 1,
     }};
-    //TODO: reintegrate test
-    /*for (auto values : rmlinputs) {
+    for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
-        DesingSource src = beamline.m_DesignSources[0];
-        auto* lightSource = dynamic_cast<LightSource*>(&*src);
+        DesignSource src = beamline.m_DesignSources[0];
 
-        auto horResult = lightSource->getHorDivergence();
-        auto heightResult = lightSource->getSourceHeight();
-        auto widthResult = lightSource->getSourceWidth();
+        auto horResult = src.getHorDivergence();
+        auto heightResult = src.getSourceHeight();
+        auto widthResult = src.getSourceWidth();
 
         CHECK_EQ(horResult, values.horDivergence);
         CHECK_EQ(heightResult, values.sourceHeight);
         CHECK_EQ(widthResult, values.sourceWidth);
-    }*/
+    }
 }
 
 

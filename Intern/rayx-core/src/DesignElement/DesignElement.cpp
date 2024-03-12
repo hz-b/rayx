@@ -201,6 +201,10 @@ Cutout DesignElement::getCutout() const {
     return c;
 }
 
+Cutout DesignElement::getGlobalCutout() const {
+    return serializeUnlimited();
+}
+
 void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
     v["vlsParams"] = Map();
 

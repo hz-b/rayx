@@ -7,10 +7,10 @@ namespace RAYX{
 }
 
 // Light Sources
-//#include "Beamline/Objects/CircleSource.h"
+#include "Beamline/Objects/CircleSource.h"
 #include "Beamline/Objects/DipoleSource.h"
 #include "Beamline/Objects/MatrixSource.h"
-//#include "Beamline/Objects/PixelSource.h"
+#include "Beamline/Objects/PixelSource.h"
 #include "Beamline/Objects/PointSource.h"
 //#include "Beamline/Objects/SimpleUndulatorSource.h"
 

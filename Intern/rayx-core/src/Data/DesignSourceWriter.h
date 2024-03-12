@@ -95,10 +95,32 @@ void setDipoleSource(xml::Parser parser, DesignSource* ds) {
     ds->setVerEBeamDivergence(parser.parseVerEbeamDivergence());
     ds->setEnergy(parser.parsePhotonEnergy());
     ds->setEnergySpreadUnit(parser.parseEnergySpreadUnit());
+    ds->setEnergyDistributionType(parser.parseEnergyDistributionType());
     ds->setHorDivergence(parser.parseHorDiv());
 }
 
+void setPixelSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+    setDefaultPosition(parser, ds);
+    setDefaultOrientation(parser, ds);
 
 
+}
+
+void setCircleSource(xml::Parser parser, DesignSource* ds) {
+
+    setAllMandatory(parser, ds);
+    setStokes(parser, ds);
+    setDefaultEnergy(parser, ds);
+    setDefaultPosition(parser, ds);
+
+    ds->setNumOfCircles(parser.parseNumOfEquidistantCircles());
+    ds->setMaxOpeningAngle(parser.parseMaxOpeningAngle());
+    ds->setMinOpeningAngle(parser.parseMinOpeningAngle());
+    ds->setDeltaOpeningAngle(parser.parseDeltaOpeningAngle());
+}
 
 }  // namespace RAYX

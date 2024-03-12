@@ -6,21 +6,16 @@ namespace RAYX {
 
 class RAYX_API PixelSource : public LightSource {
   public:
-    PixelSource(const DesignObject&);
+    PixelSource(const DesignSource&);
     virtual ~PixelSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
-    double getHorDivergence() const override;
-    double getSourceHeight() const override;
-    double getSourceWidth() const override;
 
   private:
     // Geometric Params
     SourcePulseType m_sourceDistributionType;  // TODO unused.
 
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
+    glm::dvec4 m_pol;
 
     double m_verDivergence;
     double m_sourceDepth;
