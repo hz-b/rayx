@@ -16,9 +16,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
 }
 TEST_F(TestSuite, PlaneMirrorMis) { compareLastAgainstRayUI("PlaneMirrorMis"); }
 
-TEST_F(TestSuite, SphereMirrorDefault) {
-    compareLastAgainstRayUI("SphereMirrorDefault",
-                            1e-7);  // TODO(Rudi) this tolerance is not so great.
+TEST_F(TestSuite, SphereMirrorDefault) { compareLastAgainstRayUI("SphereMirrorDefault", 1e-7);  // TODO(Rudi) this tolerance is not so great. 
 }
 
 // In these tests the ray would hit the ImagePlane before the PlaneGrating, if we trace dynamically.
@@ -46,7 +44,7 @@ TEST_F(TestSuite, ReflectionZonePlateMis) { compareLastAgainstRayUI("ReflectionZ
 TEST_F(TestSuite, globalCoordinates_20rays) { compareLastAgainstRayUI("globalCoordinates_20rays"); }
 TEST_F(TestSuite, pm_ell_ip_200mirrormis) { compareLastAgainstRayUI("pm_ell_ip_200mirrormis"); }
 
-TEST_F(TestSuite, Ellipsoid) {
+TEST_F(TestSuite, Ellipsoid) { 
     auto rayx = traceRML("Ellipsoid");
 
     writeToOutputCSV(rayx, "Ellipsoid.rayx");
