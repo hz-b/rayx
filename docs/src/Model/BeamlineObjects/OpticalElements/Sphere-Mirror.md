@@ -1,4 +1,4 @@
-# Spere Mirror
+# Sphere Mirror
 
 
 ## Tracing Parameter
