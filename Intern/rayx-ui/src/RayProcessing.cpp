@@ -103,18 +103,17 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
 
     return rays;
 }
-
-std::vector<RAYX::Ray> getRaysOfElement(const RAYX::BundleHistory& rays, size_t elementIndex) {
+void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    std::vector<RAYX::Ray> returnRays;
-    for (const auto& rayHist : rays) {
-        for (const auto& ray : rayHist) {
-            if (ray.m_lastElement == elementIndex) {
-                returnRays.push_back(ray);
-            }
+
+    sortedRays.resize(numElements);
+
+    // Iterate over all rays in the bundle history
+    for (const auto& rayBundle : rays) {
+        for (const auto& ray : rayBundle) {
+            sortedRays[ray.m_lastElement].push_back(ray);
         }
     }
-    return returnRays;
 }
 
 std::vector<std::vector<float>> extractFeatures(const RAYX::BundleHistory& bundleHist, size_t eventIndex) {

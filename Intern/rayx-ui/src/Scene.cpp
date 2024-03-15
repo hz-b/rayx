@@ -92,6 +92,10 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
 std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::OpticalElement> elements,
                                                               const RAYX::BundleHistory& rays) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
+
+    std::vector<std::vector<RAYX::Ray>> sortedRays;
+    sortRaysByElement(rays, sortedRays, elements.size());
+
     std::vector<RenderObjectInput> rObjectsInput;
     for (uint32_t i = 0; i < elements.size(); i++) {
         std::vector<TextureVertex> vertices;
@@ -104,8 +108,8 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
         if (vertices.size() == 4) {
             auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
 
-            std::vector<std::vector<uint32_t>> footprint = makeFootprint(getRaysOfElement(rays, i), -width / 2, width / 2, -height / 2, height / 2,
-                                                                         (uint32_t)(width * 10), (uint32_t)(height * 10));
+            std::vector<std::vector<uint32_t>> footprint =
+                makeFootprint(sortedRays[i], -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));
 
             uint32_t footprintWidth, footprintHeight;
             std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);

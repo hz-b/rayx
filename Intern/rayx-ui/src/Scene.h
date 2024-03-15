@@ -4,8 +4,8 @@
 #include <optional>
 #include <vector>
 
-#include "RenderObject.h"
 #include "Beamline/Beamline.h"
+#include "RenderObject.h"
 #include "Tracer/Tracer.h"
 #include "UserInterface/Settings.h"
 
