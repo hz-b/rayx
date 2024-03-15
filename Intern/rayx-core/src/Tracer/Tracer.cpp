@@ -17,11 +17,15 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
     RAYX_VERB << "maxEvents: " << maxEvents;
 
     auto rays = b.getInputRays(thread_count);
-
     // don't trace if there are no optical elements
     if (b.m_DesignElements.size() == 0) {
         // an empty history suffices, nothing is happening to the rays!
         BundleHistory result;
+        for (auto r : rays) {
+            auto ray = r;
+            ray.m_eventType = ETYPE_EMITTED;
+            result.push_back({ray});
+        }
         return result;
     }
 
