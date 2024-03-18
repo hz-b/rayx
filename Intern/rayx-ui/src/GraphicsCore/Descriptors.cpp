@@ -14,7 +14,7 @@ DescriptorSetLayout::Builder& DescriptorSetLayout::Builder::addBinding(uint32_t 
     return *this;
 }
 
-std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::build() const {
+std::shared_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::build() const {
     return std::make_unique<DescriptorSetLayout>(m_Device, m_bindings);
 }
 

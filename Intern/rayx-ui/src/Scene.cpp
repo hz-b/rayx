@@ -134,7 +134,9 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     for (const auto& input : inputs) {
         std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
         if (input.textureInput.has_value()) {
-            Texture texture(m_Device, input.textureInput->data.get(), input.textureInput->footprintWidth, input.textureInput->footprintHeight);
+            Texture texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+                            VK_IMAGE_ASPECT_COLOR_BIT, {input.textureInput->width, input.textureInput->height});
+            texture.updateFromData(input.textureInput->data.get(), input.textureInput->width, input.textureInput->height);
             m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, std::move(texture), setLayout,
                                            descriptorPool);
         } else {

@@ -13,7 +13,7 @@ class DescriptorSetLayout {
         explicit Builder(Device& Device) : m_Device{Device} {}
 
         Builder& addBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags, uint32_t count = 1);
-        std::unique_ptr<DescriptorSetLayout> build() const;
+        std::shared_ptr<DescriptorSetLayout> build() const;
 
       private:
         Device& m_Device;

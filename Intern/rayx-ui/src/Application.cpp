@@ -37,7 +37,7 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .build();
-    m_TexturePool = nullptr;
+    m_TexturePool = DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000).setMaxSets(1000).build();
 
     init();
 }
@@ -81,25 +81,21 @@ void Application::run() {
         uboBuffer->map();
     }
 
-    // Descriptor set layouts
     auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
                                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
-                               .build();                                                                      //
+                               .build();
     std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (unsigned long i = 0; i < descriptorSets.size(); i++) {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
         DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
-    std::shared_ptr<DescriptorSetLayout> texSetLayout =
-        DescriptorSetLayout::Builder(m_Device)                                                       //
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)  //
-            .build();
-    std::vector<VkDescriptorSetLayout> setLayouts{globalSetLayout->getDescriptorSetLayout(), texSetLayout->getDescriptorSetLayout()};
-
-    // Render systems
-    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), setLayouts);
-    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+    auto textureSetLayout =
+        DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
+    // Init render systems
+    std::vector<VkDescriptorSetLayout> layouts = {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()};
+    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), layouts);
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<glm::dvec3> rSourcePositions;
@@ -111,9 +107,8 @@ void Application::run() {
     std::future<void> buildRayCacheFuture;
     std::future<void> simulationFuture;
     std::future<std::vector<Scene::RenderObjectInput>> getRObjInputsFuture;
-
     // Main loop
-    m_State = State::RunningWithoutScene;
+    VkExtent2D sceneExtent = {1920, 1080};
     while (!m_Window.shouldClose()) {
         // Skip rendering when minimized
         if (m_Window.isMinimized()) {
@@ -121,7 +116,7 @@ void Application::run() {
         }
         glfwPollEvents();
 
-        if (auto commandBuffer = m_Renderer.beginFrame()) {
+        if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
             // Params to pass to UI
             auto newTime = std::chrono::high_resolution_clock::now();
             m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
@@ -192,11 +187,6 @@ void Application::run() {
                             rSourcePositions.push_back(source->getPosition());
                         }
 
-                        m_TexturePool = DescriptorPool::Builder(m_Device)
-                                            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, static_cast<uint32_t>(elements.size()) + 1)
-                                            .setMaxSets(static_cast<uint32_t>(elements.size()) + 1)
-                                            .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
-                                            .build();
                         m_Scene = std::make_unique<Scene>(m_Device);
 
                         buildRayCacheFuture =
@@ -209,7 +199,7 @@ void Application::run() {
                     break;
                 case State::BuildingRays:
                     if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, texSetLayout, m_TexturePool);
+                        m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
                         if (m_Scene->getState() == Scene::State::Complete) {
                             m_State = State::Running;
                         } else {
@@ -219,7 +209,7 @@ void Application::run() {
                     break;
                 case State::BuildingElements:
                     if (getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), texSetLayout, m_TexturePool);
+                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), textureSetLayout, m_TexturePool);
                         m_State = State::Running;
                     }
                     break;
@@ -248,18 +238,27 @@ void Application::run() {
 
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
-
-            FrameInfo frameInfo{m_Camera, frameIndex, commandBuffer, descriptorSets[frameIndex]};
-
-            // Scene
-            // only LoadingRays check really necessary but this is for better user experience
+            FrameInfo frameInfo = {
+                .camera = m_Camera,                          //
+                .frameIndex = frameIndex,                    //
+                .sceneExtent = m_UIParams.sceneExtent,       //
+                .commandBuffer = VK_NULL_HANDLE,             //
+                .descriptorSet = descriptorSets[frameIndex]  //
+            };
+            if (m_UIParams.sceneExtent.height != 0 && m_UIParams.sceneExtent.width != 0) {
+                if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
+                    sceneExtent = m_UIParams.sceneExtent;
+                    m_Renderer.resizeOffscreenResources(sceneExtent);
+                    m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
+                }
+            }
+            m_Renderer.beginOffscreenRenderPass(frameInfo);
             if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
                 objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
                 if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
             }
-
-            // Grid
             gridRenderSystem.render(frameInfo);
+            m_Renderer.endOffscreenRenderPass(frameInfo);
 
             // UI
             m_UIHandler.beginUIRender();
