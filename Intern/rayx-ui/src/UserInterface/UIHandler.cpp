@@ -1,5 +1,6 @@
 #include "UIHandler.h"
 
+#include <imgui_internal.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 #include <nfd.h>
@@ -36,13 +37,18 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     VkDescriptorPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    poolInfo.maxSets = 1000;
+    poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);
     poolInfo.poolSizeCount = (uint32_t)std::size(poolSizes);
     poolInfo.pPoolSizes = poolSizes;
 
     if (vkCreateDescriptorPool(m_Device.device(), &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create imgui descriptor pool");
     }
+
+    m_AssetManager = std::make_unique<AssetManager>(m_Device, m_DescriptorPool);
+    std::filesystem::path dummyTexturePath = getExecutablePath() / "Assets/textures/default.png";
+    std::string dummyTextureId = "defaultTexture";
+    m_AssetManager->add<Texture>(dummyTextureId, dummyTexturePath);
 
     // Create render pass for IMGUI
     VkAttachmentDescription colorAttachment = {};
@@ -133,6 +139,9 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
 
         ImGui_ImplVulkan_CreateFontsTexture();
     }
+
+    // Enable docking
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
 UIHandler::~UIHandler() {
@@ -162,12 +171,66 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
         ImGui::PushFont(m_smallFont);
     }
 
+    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    window_flags |= ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) window_flags |= ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 0.0f));
+    ImGui::Begin("Root", nullptr, window_flags);
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar(2);
+
+    // Dockspace
+    auto& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+        ImGuiID dockspace_id = ImGui::GetID("Root");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+
+        static auto first_time = true;
+        if (first_time) {
+            first_time = false;
+
+            ImGui::DockBuilderRemoveNode(dockspace_id);
+            ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags | ImGuiDockNodeFlags_DockSpace);
+            ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+            auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+            auto dock_id_right_top = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Up, 0.5f, nullptr, &dock_id_right);
+            auto dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.5f, nullptr, &dock_id_right);
+
+            ImGui::DockBuilderDockWindow("Render View", dockspace_id);
+            ImGui::DockBuilderDockWindow("Properties Manager", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("Settings", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("Beamline Outline", dock_id_right_bottom);
+            ImGui::DockBuilderDockWindow("Hotkeys", dock_id_right_bottom);
+            ImGui::DockBuilderFinish(dockspace_id);
+        }
+    }
+
+    // Render View Dummy
+    ImGui::Begin("Render View");
+    ImGui::Image((ImTextureID)m_AssetManager->getDescriptorSet("defaultTexture"), ImVec2(800, 600));
+    ImGui::End();
+
     showSceneEditorWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
-    showHotkeysWindow();
     m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elemets, rSourcePositions);
+    showHotkeysWindow();
+    ImGui::End();
 
     ImGui::PopFont();
 }
@@ -187,9 +250,6 @@ void UIHandler::endUIRender(VkCommandBuffer commandBuffer) {
 }
 
 void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Once);
-
     ImGui::Begin("Properties Manager");
 
     if (ImGui::Button("Open File Dialog")) {
@@ -269,9 +329,6 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
 }
 
 void UIHandler::showSettingsWindow() {
-    ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
-
     ImGui::Begin("Settings");
 
     ImGui::Checkbox("Large Font", &m_useLargeFont);
@@ -280,9 +337,6 @@ void UIHandler::showSettingsWindow() {
 }
 
 void UIHandler::showHotkeysWindow() {
-    ImGui::SetNextWindowPos(ImVec2(0, 550), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 210), ImGuiCond_Once);
-
     ImGui::Begin("Hotkeys");
 
     ImGui::Text("Keyboard Hotkeys:");

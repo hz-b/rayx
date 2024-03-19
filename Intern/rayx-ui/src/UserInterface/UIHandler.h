@@ -7,6 +7,7 @@
 #include "Beamline/OpticalElement.h"
 #include "BeamlineOutliner.h"
 #include "FrameInfo.h"
+#include "GraphicsCore/AssetManager.h"
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
 #include "Settings.h"
@@ -33,6 +34,7 @@ class UIHandler {
   private:
     const Window& m_Window;
     const Device& m_Device;
+    std::unique_ptr<AssetManager> m_AssetManager;
 
     float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
@@ -50,6 +52,7 @@ class UIHandler {
 
     BeamlineOutliner m_BeamlineOutliner;
 
+    void initializeDockingLayout();
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showHotkeysWindow();

@@ -117,9 +117,6 @@ void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filen
 
 void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elements,
                                                  std::vector<glm::dvec3>& rSourcePositions) {
-    ImGui::SetNextWindowPos(ImVec2(0, 760), ImGuiCond_Once);  // Position it below the Settings window
-    ImGui::SetNextWindowSize(ImVec2(450, 300), ImGuiCond_Once);
-
     ImGui::Begin("Beamline Outline");
 
     if (uiParams.rmlReady) {

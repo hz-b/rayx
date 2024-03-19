@@ -11,9 +11,9 @@ class Buffer;
 
 class Texture {
   public:
-    Texture(Device& device, const std::filesystem::path& path);
-    Texture(Device& device, const unsigned char* data, uint32_t width, uint32_t height);
-    Texture(Device& device);
+    Texture(const Device& device, const std::filesystem::path& path);
+    Texture(const Device& device, const unsigned char* data, uint32_t width, uint32_t height);
+    Texture(const Device& device);
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
     Texture(Texture&& other) noexcept;
@@ -40,7 +40,7 @@ class Texture {
     void createTextureSampler();
     void cleanup();
 
-    Device& m_Device;
+    const Device& m_Device;
     std::unique_ptr<Buffer> m_stagingBuffer;
 
     VkImage m_textureImage;

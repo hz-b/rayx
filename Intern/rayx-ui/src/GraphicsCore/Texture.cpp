@@ -6,7 +6,7 @@
 #include "Buffer.h"
 #include "CanonicalizePath.h"
 
-Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{device} {
+Texture::Texture(const Device& device, const std::filesystem::path& path) : m_Device{device} {
     // Read in image
     int texWidth, texHeight, texChannels;  // Do not use texChannels for memory stuff (not always 4 for rgba images)
     RAYX_LOG << "Loading texture: " << path.string();
@@ -20,9 +20,9 @@ Texture::Texture(Device& device, const std::filesystem::path& path) : m_Device{d
     stbi_image_free(pixels);
 }
 
-Texture::Texture(Device& device, const unsigned char* data, uint32_t width, uint32_t height) : m_Device{device} { init(data, width, height); }
+Texture::Texture(const Device& device, const unsigned char* data, uint32_t width, uint32_t height) : m_Device{device} { init(data, width, height); }
 
-Texture::Texture(Device& device) : m_Device{device} {
+Texture::Texture(const Device& device) : m_Device{device} {
     // Read in image
     int texWidth, texHeight, _;
     // STBI_rgb_alpha hopefully always forces 4 channels
