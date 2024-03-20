@@ -4,7 +4,7 @@
 #ifndef ADAPT_H
 #define ADAPT_H
 
-#include <alpaka/alpaka.hpp>
+#include <alpaka/core/Common.hpp>
 #define RAYX_FUNC ALPAKA_FN_ACC
 
 // glm definitions need to be directly accessible in c++.

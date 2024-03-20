@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstring>
 
+#include <alpaka/alpaka.hpp>
+
 #include "Beamline/OpticalElement.h"
 #include "Material/Material.h"
 #include "RAY-Core.h"
@@ -68,6 +70,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     using Cpu = alpaka::DevCpu;
     const auto [cpu_platform, cpu] = pickFirstDevice<Cpu>();
+    // using Acc = alpaka::AccGpuCudaRt<Dim, Idx>;
     using Acc = alpaka::AccCpuSerial<Dim, Idx>;
     const auto [d_platform, acc] = pickFirstDevice<Acc>();
 
