@@ -97,7 +97,7 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 # Only build gpu tracer when CUDA is enabled
-if(NOT ${Kokkos_ENABLE_CUDA})
+if(NOT ${alpaka_ACC_GPU_CUDA_ENABLE})
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_GPU_TRACER)
 endif()
 
@@ -111,9 +111,9 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
-    ${Kokkos_INCLUDE_DIRS_RET}
+    ${PROJECT_SOURCE_DIR}/../../Extern/alpaka/include/
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC Kokkos::kokkos)
+target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka)
 
 # ------------------------
 

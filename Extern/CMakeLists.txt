@@ -20,11 +20,4 @@ set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
-# set(Kokkos_ENABLE_EXAMPLES OFF)
-# set(Kokkos_ENABLE_SERIAL ON)
-# set(Kokkos_ENABLE_THREADS OFF)
-# set(Kokkos_ENABLE_OPENMP OFF)
-# set(Kokkos_ENABLE_CUDA OFF)
-# TODO: this hack enables position independent code (fPIC) for kokkos. can we do better?
-#set(BUILD_SHARED_LIBS ON)
-add_subdirectory(kokkos)
+add_subdirectory(alpaka)
