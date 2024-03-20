@@ -37,25 +37,19 @@ std::vector<Ray> GpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     auto numInputRays = cfg.m_rays.size();
     auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
-    const auto& materialTables = cfg.m_materialTables;
 
     using ExecSpace = Kokkos::Cuda;
     using MemSpace = ExecSpace::memory_space;
     using Util = KokkosUtils<MemSpace>;
 
-    auto inv = Inv<MemSpace> {
-        .globalInvocationId = {},
-        .finalized = {},
-        .ctr = {},
-        .nextEventIndex = {},
-        .rayData = Util::createView("GpuTracer_rayData", cfg.m_rays),
-        .outputData = Util::createView<Ray>("GpuTracer_outputData", numOutputRays),
-        .elements = Util::createView("GpuTracer_elements", cfg.m_elements),
-        .xyznull = {},
-        .matIdx = Util::createView("GpuTracer_matIdx", materialTables.indexTable),
-        .mat = Util::createView("GpuTracer_mat", materialTables.materialTable),
-        .pushConstants = m_pushConstants,
-    };
+    inv.rayData = Util::createView("GpuTracer_rayData", cfg.m_rays);
+    inv.elements = Util::createView("GpuTracer_elements", cfg.m_elements);
+
+    const auto& materialTables = cfg.m_materialTables;
+    inv.mat = Util::createView("GpuTracer_mat", materialTables.materialTable);
+    inv.matIdx = Util::createView("GpuTracer_matIdx", materialTables.indexTable);
+
+    inv.outputData = Util::createView<Ray>("GpuTracer_outputData", numOutputRays);
 
     auto ex = ExecSpace();
     Kokkos::parallel_for(
@@ -72,9 +66,7 @@ std::vector<Ray> GpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return Util::createVector(inv.outputData);
 }
 
-void GpuTracer::setPushConstants(const PushConstants* p) {
-    std::memcpy(&m_pushConstants, p, sizeof(PushConstants));
-}
+void GpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv.pushConstants, p, sizeof(PushConstants)); }
 
 }  // namespace RAYX
 

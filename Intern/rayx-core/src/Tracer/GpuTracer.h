@@ -27,7 +27,10 @@ public:
     void setPushConstants(const PushConstants*) override;
 
 private:
-    PushConstants m_pushConstants;
+    using ExecSpace = Kokkos::Cuda;
+    using MemSpace = Kokkos::SharedSpace;
+
+    InvocationState<MemSpace> inv;
 };
 
 }  // namespace RAYX

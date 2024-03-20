@@ -31,11 +31,9 @@ void dynamicElements(int gid, Inv<MemSpace> inv) {
     nextElement.m_inTrans = dmat4(1);
     nextElement.m_outTrans = dmat4(1);
 
-    Ray _ray = inv.rayData[inv.globalInvocationId];
-
     // Iterate through all bounces
     while (true) {
-        Collision col = findCollision(_ray, inv);
+        Collision col = findCollision(inv);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
