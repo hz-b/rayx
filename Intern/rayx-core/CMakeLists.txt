@@ -18,8 +18,20 @@ add_subdirectory(tests)
 # ---- Project ----
 project(rayx-core VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
-add_library(${PROJECT_NAME} ${SOURCE})
+alpaka_add_library(${PROJECT_NAME} ${SOURCE})
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include)
+
+if(alpaka_ACC_GPU_CUDA_ENABLE)
+    enable_language(CUDA)
+    foreach(_file ${SOURCE})
+        set_source_files_properties(${_file} PROPERTIES LANGUAGE CUDA)
+    endforeach()
+    if(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL ON)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+    elseif(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL OFF)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_SEPARABLE_COMPILATION OFF)
+    endif()
+endif()
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
@@ -48,7 +60,7 @@ if(MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     message(STATUS "GCC")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra) # -pedantic -Werror)
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
@@ -76,6 +88,7 @@ endif()
 # ---- PCH ----
 target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
+target_compile_options(${PROJECT_NAME} PUBLIC -include ${CMAKE_SOURCE_DIR}/Intern/rayx-core/raycorePCH.h)
 
 # -------------
 
@@ -89,6 +102,7 @@ else()
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
+    PRIVATE RAYX_CORE
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
     RAYX_PROJECT_DIR="${CMAKE_SOURCE_DIR}"

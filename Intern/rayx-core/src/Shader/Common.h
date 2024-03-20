@@ -4,8 +4,12 @@
 #ifndef ADAPT_H
 #define ADAPT_H
 
+#ifdef RAYX_CORE
 #include <alpaka/core/Common.hpp>
 #define RAYX_FUNC ALPAKA_FN_ACC
+#else
+#define RAYX_FUNC
+#endif
 
 // glm definitions need to be directly accessible in c++.
 #define GLM_ENABLE_EXPERIMENTAL

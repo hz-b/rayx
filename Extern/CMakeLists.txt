@@ -20,4 +20,4 @@ set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
-add_subdirectory(alpaka)
+# add_subdirectory(alpaka)

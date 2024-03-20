@@ -7,7 +7,7 @@ enable_testing()
 set(BINARY rayx-core-tst)
 file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)
 set(SOURCES ${TEST_SOURCES})
-add_executable(${BINARY} ${TEST_SOURCES})
+alpaka_add_executable(${BINARY} ${TEST_SOURCES})
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 # -----------------
 

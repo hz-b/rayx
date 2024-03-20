@@ -10,8 +10,8 @@ namespace RAYX {
 
 class RAYX_API GpuTracer : public Tracer {
   public:
-    GpuTracer();
-    ~GpuTracer();
+    GpuTracer() {}
+    ~GpuTracer() {}
 
     std::vector<Ray> traceRaw(const TraceRawConfig&) override { return {}; }
     void setPushConstants(const PushConstants*) {};

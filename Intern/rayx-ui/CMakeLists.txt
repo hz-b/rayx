@@ -25,7 +25,7 @@ if(Vulkan_FOUND)
     if(MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "$<$<CONFIG:RELEASE>:/O2>")
     else()
-        target_compile_options(${PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "-pedantic" "$<$<CONFIG:RELEASE>:-O3>")
+        target_compile_options(${PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "$<$<CONFIG:RELEASE>:-O3>") # "-pedantic"
     endif()
 
     target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)

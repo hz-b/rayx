@@ -241,13 +241,16 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     compareBundleHistories(a, b, tolerance);
 }
 
+// store materialTables statically, to ensure lifetime while invocation state references it.
+MaterialTables materialTables;
+
 void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
     std::array<bool, 92> mats;
     mats.fill(false);
     for (auto m : mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
-    auto materialTables = loadMaterialTables(mats);
+    materialTables = loadMaterialTables(mats);
     inv.mat = materialTables.materialTable;
     inv.matIdx = materialTables.indexTable;
 }

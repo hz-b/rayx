@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -----------------
 
 # ---- Subdirectories ----
+add_subdirectory(Extern/alpaka)
 add_subdirectory(Intern)
 add_subdirectory(Extern)
 
