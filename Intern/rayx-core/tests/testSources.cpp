@@ -61,7 +61,7 @@ TEST_F(TestSuite, MatrixSourceMoved) {
 TEST_F(TestSuite, MatrixSourceTracedRayUI) {
     auto a = traceRML("MatrixSource");
     for (auto hist : a) {
-        CHECK(hist.empty());
+        CHECK(!hist.empty());
     }
 }
 
@@ -193,17 +193,20 @@ TEST_F(TestSuite, testLightsourceGetters) {
         .sourceHeight = 0.04,
         .sourceWidth = 0.065,
         .sourceDepth = 1,
-    },{
+    }/*,{ //simple undulator no longer got the methods used here
         .rmlFile = "simpleUndulator",
         .horDivergence = 4.6528002321182891e-05,  // conversion /1000 in the parser
         .sourceHeight = 0.053499116288275229,
         .sourceWidth = 0.22173963435440763,
         .sourceDepth = 1,
-    }};
+    }*/};
     for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
         DesignSource src = beamline.m_DesignSources[0];
-
+        
+        auto test2 = values.horDivergence;
+        auto test4 = values.sourceDepth;
+        auto test6 = values.sourceWidth;
         auto horResult = src.getHorDivergence();
         auto heightResult = src.getSourceHeight();
         auto widthResult = src.getSourceWidth();
