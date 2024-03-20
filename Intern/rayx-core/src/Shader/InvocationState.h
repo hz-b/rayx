@@ -32,29 +32,30 @@ struct _debug_struct {
 // we don't require forward declarations in GLSL, hence we only do them in C++:
 
 // TODO(Sven): restore RAYX_API attributes for members
-template <typename MemSpace>
 struct RAYX_API InvocationState {
     int globalInvocationId;
     bool finalized;
     uint64_t ctr;
     uint64_t nextEventIndex;
 
-    Kokkos::View<Ray*, MemSpace> rayData;
-    Kokkos::View<Ray*, MemSpace> outputData;
-    Kokkos::View<Element*, MemSpace> elements;
-    Kokkos::View<dvec4*, MemSpace> xyznull;
-    Kokkos::View<int*, MemSpace> matIdx;
-    Kokkos::View<double*, MemSpace> mat;
+    // TODO: fix this shortcut
+    using KokkosMemorySpace = Kokkos::SharedSpace;
+
+    Kokkos::View<Ray*, KokkosMemorySpace> rayData;
+    Kokkos::View<Ray*, KokkosMemorySpace> outputData;
+    Kokkos::View<Element*, KokkosMemorySpace> elements;
+    Kokkos::View<dvec4*, KokkosMemorySpace> xyznull;
+    Kokkos::View<int*, KokkosMemorySpace> matIdx;
+    Kokkos::View<double*, KokkosMemorySpace> mat;
 
 #ifdef RAYX_DEBUG_MODE
-    Kokkos::View<_debug_struct*, MemSpace> d_struct;
+    Kokkos::View<_debug_struct*, KokkosMemorySpace> d_struct;
 #endif
 
     PushConstants pushConstants;
 };
 
-template <typename MemSpace>
-using Inv = InvocationState<MemSpace>;
+using Inv = InvocationState;
 
 // Every shader execution calculates the route for a single ray.
 // `_ray` is that ray, it's always in world coordinates (!).

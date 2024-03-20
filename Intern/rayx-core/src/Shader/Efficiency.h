@@ -3,8 +3,6 @@
 
 #include "Common.h"
 #include "InvocationState.h"
-#include "Approx.h"
-#include "RefractiveIndex.h"
 
 /** calculates cosinus of transmittance angle with snell's law
  * cosinus is needed in fresnel formula
@@ -43,38 +41,15 @@ RAYX_FUNC void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2
  * @return complex_S			complex s-polarization
  * @return complex_P			complex p-polarization
  */
-template <typename MemSpace>
-RAYX_FUNC_INLINE
-void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv<MemSpace>& inv) {
-    dvec2 cos_incidence = dvec2(r8_cos(incidence_angle),
-                                0.0);  // complex number, initialization only for first layer, the
-                                       // others are then derived from this with snell's law
-
-    const int vacuum_material = -1;
-
-    // todo number of layers: loop over layers from top to bottom, transmittance
-    // angle for each layer, so far only one layer (substrate?) store cosinuses
-    // in array, bc needed in later loop for fresnel (or maybe only one loop is
-    // enough?) todo refractive indices of materials in extra buffer?
-    dvec2 cn1 = getRefractiveIndex(energy, vacuum_material, inv);
-    dvec2 cn2 = getRefractiveIndex(energy, material, inv);
-    dvec2 cos_transmittance = snell(cos_incidence, cn1, cn2);
-
-    // todo again iterate over layers but from bottom to top, update s and p
-    // polarization in each iteration:
-    fresnel(cn2, cn1, cos_transmittance, cos_incidence, complex_S, complex_P);
-    // todo roughness (uses wavelength/energy)
-    // todo other calculations for layers that are not substrate (which is the
-    // first layer)
-    return;
-}
-
+RAYX_FUNC void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv& inv);
 /**
  * computes complex number a + i*b in euler form:
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi =
  * atan2(a,b) = (absolute) phase
  */
 RAYX_FUNC dvec2 RAYX_API cartesian_to_euler(dvec2 complex);
+
+
 
 /** computes the difference in the phases of 2 complex number written in euler
  * form: r * e^(i * phi)
@@ -99,18 +74,7 @@ RAYX_FUNC double phase_difference(dvec2 euler1, dvec2 euler2);
  * @param material				material the photon collides with
  * @param others
  */
-template <typename MemSpace>
-RAYX_FUNC_INLINE
-void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv<MemSpace>& inv) {
-    dvec2 complex_S, complex_P;
-    reflectance(r.m_energy, incidence_angle, complex_S, complex_P, material, inv);
+RAYX_FUNC void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv& inv);
 
-    dvec2 euler_P = cartesian_to_euler(complex_P);
-    dvec2 euler_S = cartesian_to_euler(complex_S);
-
-    delta = phase_difference(euler_S, euler_P);
-    real_S = euler_S.x;
-    real_P = euler_P.x;
-}
 
 #endif

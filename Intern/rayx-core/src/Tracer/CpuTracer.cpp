@@ -10,9 +10,10 @@
 #include "Shader/DynamicElements.h"
 #include "Shader/InvocationState.h"
 
-template <typename MemSpace>
+using uint = unsigned int;
+
 struct Kernel {
-    Inv<MemSpace> inv;
+    Inv inv;
 
     KOKKOS_INLINE_FUNCTION
     void operator() (int gid) const {
@@ -36,7 +37,9 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     auto numInputRays = cfg.m_rays.size();
     auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
 
-    using Util = KokkosUtils<MemSpace>;
+    using ExecSpace = Kokkos::DefaultHostExecutionSpace;
+    using MemorySpace = Kokkos::SharedSpace;
+    using Util = KokkosUtils<MemorySpace>;
 
     inv.rayData = Util::createView("CpuTracer_rayData", cfg.m_rays);
     inv.elements = Util::createView("CpuTracer_elements", cfg.m_elements);
@@ -54,7 +57,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
             0,           // begin
             numInputRays // end
         ),
-        Kernel<MemSpace> { inv }
+        Kernel { inv }
     );
     ex.fence();
 

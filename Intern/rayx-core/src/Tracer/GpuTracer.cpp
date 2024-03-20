@@ -12,9 +12,10 @@
 #include "Shader/DynamicElements.h"
 #include "Shader/InvocationState.h"
 
-template <typename MemSpace>
+using uint = unsigned int;
+
 struct Kernel {
-    Inv<MemSpace> inv;
+    Inv inv;
 
     KOKKOS_INLINE_FUNCTION
     void operator() (int gid) const {
@@ -58,7 +59,7 @@ std::vector<Ray> GpuTracer::traceRaw(const TraceRawConfig& cfg) {
             0,           // begin
             numInputRays // end
         ),
-        Kernel<MemSpace> { inv }
+        Kernel { inv }
     );
     ex.fence();
 
