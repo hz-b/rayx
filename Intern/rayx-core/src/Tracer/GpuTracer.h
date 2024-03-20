@@ -26,6 +26,7 @@ class RAYX_API GpuTracer : public Tracer {
     void setPushConstants(const PushConstants*) override;
 
     InvocationState inv;
+    PushConstants m_pushConstants;
 };
 
 }  // namespace RAYX

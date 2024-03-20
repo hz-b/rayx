@@ -456,7 +456,7 @@ Collision findCollisionWith(Ray r, uint id, Inv& inv) {
 
 // Returns the next collision for the ray `_ray`.
 RAYX_FUNC
-Collision findCollision(Inv& inv) {
+Collision findCollision(const Ray& _ray, Inv& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {
         if (_ray.m_lastElement >= inv.elements.size() - 1) {

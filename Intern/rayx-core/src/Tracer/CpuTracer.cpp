@@ -36,19 +36,25 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     auto numInputRays = cfg.m_rays.size();
     auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
+    const auto& materialTables = cfg.m_materialTables;
 
     using ExecSpace = Kokkos::DefaultHostExecutionSpace;
-    using MemorySpace = Kokkos::SharedSpace;
-    using Util = KokkosUtils<MemorySpace>;
+    using MemSpace = ExecSpace::memory_space;
+    using Util = KokkosUtils<MemSpace>;
 
-    inv.rayData = Util::createView("CpuTracer_rayData", cfg.m_rays);
-    inv.elements = Util::createView("CpuTracer_elements", cfg.m_elements);
-
-    const auto& materialTables = cfg.m_materialTables;
-    inv.mat = Util::createView("CpuTracer_mat", materialTables.materialTable);
-    inv.matIdx = Util::createView("CpuTracer_matIdx", materialTables.indexTable);
-
-    inv.outputData = Util::createView<Ray>("CpuTracer_outputData", numOutputRays);
+    auto inv = Inv<MemSpace> {
+        .globalInvocationId = {},
+        .finalized = {},
+        .ctr = {},
+        .nextEventIndex = {},
+        .rayData = Util::createView("CpuTracer_rayData", cfg.m_rays),
+        .outputData = Util::createView<Ray>("CpuTracer_outputData", numOutputRays),
+        .elements = Util::createView("CpuTracer_elements", cfg.m_elements),
+        .xyznull = {},
+        .matIdx = Util::createView("CpuTracer_matIdx", materialTables.indexTable),
+        .mat = Util::createView("CpuTracer_mat", materialTables.materialTable),
+        .pushConstants = m_pushConstants,
+    };
 
     auto ex = ExecSpace();
     Kokkos::parallel_for(
@@ -65,6 +71,8 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return Util::createVector(inv.outputData);
 }
 
-void CpuTracer::setPushConstants(const PushConstants* p) { std::memcpy(&inv.pushConstants, p, sizeof(PushConstants)); }
+void CpuTracer::setPushConstants(const PushConstants* p) {
+    std::memcpy(&m_pushConstants, p, sizeof(PushConstants));
+}
 
 }  // namespace RAYX

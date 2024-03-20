@@ -33,32 +33,28 @@ struct _debug_struct {
 
 // TODO(Sven): restore RAYX_API attributes for members
 struct RAYX_API InvocationState {
+
+    // these variables are only used during shader invocation
     int globalInvocationId;
     bool finalized;
     uint64_t ctr;
     uint64_t nextEventIndex;
 
-    // TODO: fix this shortcut
-    using KokkosMemorySpace = Kokkos::SharedSpace;
-
-    Kokkos::View<Ray*, KokkosMemorySpace> rayData;
-    Kokkos::View<Ray*, KokkosMemorySpace> outputData;
-    Kokkos::View<Element*, KokkosMemorySpace> elements;
-    Kokkos::View<dvec4*, KokkosMemorySpace> xyznull;
-    Kokkos::View<int*, KokkosMemorySpace> matIdx;
-    Kokkos::View<double*, KokkosMemorySpace> mat;
+    Kokkos::View<const Ray*, MemSpace> rayData;
+    Kokkos::View<Ray*, MemSpace> outputData;
+    Kokkos::View<const Element*, MemSpace> elements;
+    Kokkos::View<const dvec4*, MemSpace> xyznull;
+    Kokkos::View<const int*, MemSpace> matIdx;
+    Kokkos::View<const double*, MemSpace> mat;
 
 #ifdef RAYX_DEBUG_MODE
     Kokkos::View<_debug_struct*, KokkosMemorySpace> d_struct;
 #endif
 
+    // TODO(Sven): make all inputs const
     PushConstants pushConstants;
 };
 
 using Inv = InvocationState;
-
-// Every shader execution calculates the route for a single ray.
-// `_ray` is that ray, it's always in world coordinates (!).
-#define _ray (inv.rayData[uint(inv.globalInvocationId)])
 
 #endif

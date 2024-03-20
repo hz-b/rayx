@@ -24,6 +24,7 @@ class RAYX_API CpuTracer : public Tracer {
     void setPushConstants(const PushConstants*) override;
 
     InvocationState inv;
+    PushConstants m_pushConstants;
 };
 
 }  // namespace RAYX
