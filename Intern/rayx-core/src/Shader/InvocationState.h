@@ -12,6 +12,8 @@
 #ifndef INVOCATION_STATE_H
 #define INVOCATION_STATE_H
 
+#include <span>
+
 #include "Common.h"
 #include "Ray.h"
 
@@ -40,15 +42,15 @@ struct RAYX_API InvocationState {
     uint64_t ctr;
     uint64_t nextEventIndex;
 
-    Kokkos::View<const Ray*, MemSpace> rayData;
-    Kokkos::View<Ray*, MemSpace> outputData;
-    Kokkos::View<const Element*, MemSpace> elements;
-    Kokkos::View<const dvec4*, MemSpace> xyznull;
-    Kokkos::View<const int*, MemSpace> matIdx;
-    Kokkos::View<const double*, MemSpace> mat;
+    std::span<const Ray> rayData;
+    std::span<Ray> outputData;
+    std::span<const Element> elements;
+    std::span<const dvec4> xyznull;
+    std::span<const int> matIdx;
+    std::span<const double> mat;
 
 #ifdef RAYX_DEBUG_MODE
-    Kokkos::View<_debug_struct*, KokkosMemorySpace> d_struct;
+    std::span<_debug_struct> d_struct;
 #endif
 
     // TODO(Sven): make all inputs const

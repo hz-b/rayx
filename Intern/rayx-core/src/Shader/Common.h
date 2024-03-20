@@ -4,10 +4,8 @@
 #ifndef ADAPT_H
 #define ADAPT_H
 
-#include <Kokkos_Core.hpp>
-
-#define RAYX_FUNC KOKKOS_FUNCTION
-#define RAYX_FUNC_INLINE KOKKOS_INLINE_FUNCTION
+#include <alpaka/alpaka.hpp>
+#define RAYX_FUNC ALPAKA_FN_ACC
 
 // glm definitions need to be directly accessible in c++.
 #define GLM_ENABLE_EXPERIMENTAL

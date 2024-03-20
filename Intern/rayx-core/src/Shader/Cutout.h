@@ -34,8 +34,8 @@ struct RectCutout {
     double m_length; // in Z direction
 };
 
-RAYX_FUNC_INLINE
-Cutout serializeRect(RectCutout cut) {
+RAYX_FUNC
+inline Cutout serializeRect(RectCutout cut) {
     Cutout ser;
     ser.m_type = CTYPE_RECT;
     ser.m_private_serialization_params[0] = cut.m_width;
@@ -43,8 +43,8 @@ Cutout serializeRect(RectCutout cut) {
     return ser;
 }
 
-RAYX_FUNC_INLINE
-RectCutout deserializeRect(Cutout ser) {
+RAYX_FUNC
+inline RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
     cut.m_width = ser.m_private_serialization_params[0];
     cut.m_length = ser.m_private_serialization_params[1];

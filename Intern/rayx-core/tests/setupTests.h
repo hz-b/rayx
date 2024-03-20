@@ -40,6 +40,7 @@ extern char** GLOBAL_ARGV;
 const int PREC = 17;
 
 // declare invocation state globally
+// TODO(Sven): do we really need invocation state here, or just material tables individually?
 extern InvocationState inv;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
@@ -151,8 +152,6 @@ inline void add_failure() { ADD_FAILURE(); }
 class TestSuite : public testing::Test {
   protected:
     static void SetUpTestSuite() {
-        Kokkos::initialize();
-
         RAYX::error_fn = add_failure;
 
         bool cpu = false;
@@ -179,8 +178,6 @@ class TestSuite : public testing::Test {
 
     static void TearDownTestSuite() {
         tracer = nullptr;
-        inv = {}; // destroy and deallocate buffers in invocation state
-        Kokkos::finalize();
     }
 };
 

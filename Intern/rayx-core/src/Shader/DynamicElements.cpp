@@ -5,7 +5,7 @@
 #include "Helper.h"
 
 RAYX_FUNC
-void dynamicElements(int gid, Inv inv) {
+void dynamicElements(int gid, Inv& inv) {
     // initializes the global state.
     inv.globalInvocationId = gid;
     init(inv);
@@ -18,6 +18,8 @@ void dynamicElements(int gid, Inv inv) {
     // #endif
     #endif
 
+    Ray _ray = inv.rayData[gid];
+
     Element nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
     nextElement.m_inTrans = dmat4(1);
@@ -25,7 +27,7 @@ void dynamicElements(int gid, Inv inv) {
 
     // Iterate through all bounces
     while (true) {
-        Collision col = findCollision(inv);
+        Collision col = findCollision(_ray, inv);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
