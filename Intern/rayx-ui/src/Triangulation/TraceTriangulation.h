@@ -14,7 +14,7 @@
  *
  * @return RenderObject containing the vertices and indices needed for rendering the triangulated rays.
  *
- * @note This function uses the RAYX::CpuTracer for ray tracing and relies on a grid-based approach for tracing rays.
+ * @note This function uses the RAYX::SimpleTracer for ray tracing and relies on a grid-based approach for tracing rays.
  *
  * Example usage:
  * @code{cpp}

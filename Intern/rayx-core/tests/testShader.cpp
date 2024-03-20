@@ -1,6 +1,6 @@
 #include <numeric>
 
-#include "Tracer/CpuTracer.h"
+#include "Tracer/SimpleTracer.h"
 #include "setupTests.h"
 
 #include "Shader/Utils.h"

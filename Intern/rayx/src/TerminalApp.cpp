@@ -8,8 +8,7 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Random.h"
-#include "Tracer/CpuTracer.h"
-#include "Tracer/GpuTracer.h"
+#include "Tracer/SimpleTracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
@@ -161,12 +160,16 @@ void TerminalApp::run() {
 
     // Choose Hardware
     if (m_CommandParser->m_args.m_cpuFlag) {
-        m_Tracer = std::make_unique<RAYX::CpuTracer>();
+#ifdef NO_GPU_TRACER
+        m_Tracer = std::make_unique<RAYX::SimpleTracer>();
+#else
+        RAYX_ERR << "Cpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
+#endif
     } else {
 #ifdef NO_GPU_TRACER
         RAYX_ERR << "Gpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
 #else
-        m_Tracer = std::make_unique<RAYX::GpuTracer>();
+        m_Tracer = std::make_unique<RAYX::SimpleTracer>();
 #endif
     }
 

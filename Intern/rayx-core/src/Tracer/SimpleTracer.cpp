@@ -1,9 +1,10 @@
-#include "CpuTracer.h"
+#include "SimpleTracer.h"
 
 #include <cmath>
 #include <cstring>
 
 #include <alpaka/alpaka.hpp>
+#include <alpaka/example/ExampleDefaultAcc.hpp>
 
 #include "Beamline/OpticalElement.h"
 #include "Material/Material.h"
@@ -52,17 +53,17 @@ auto bufToSpan(TBuf& buf) {
     return std::span(alpaka::getPtrNative(buf), alpaka::getExtents(buf)[0]);
 }
 
-}
+} // unnamed namespace
 
 namespace RAYX {
 
-CpuTracer::CpuTracer() {
+SimpleTracer::SimpleTracer() {
     RAYX_VERB << "Initializing Cpu Tracer..";
 }
 
-CpuTracer::~CpuTracer() = default;
+SimpleTracer::~SimpleTracer() = default;
 
-std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
+std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     using Dim = alpaka::DimInt<1>;
@@ -70,8 +71,10 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
 
     using Cpu = alpaka::DevCpu;
     const auto [cpu_platform, cpu] = pickFirstDevice<Cpu>();
-    using Acc = alpaka::AccGpuCudaRt<Dim, Idx>;
+
+    // using Acc = alpaka::AccGpuCudaRt<Dim, Idx>;
     // using Acc = alpaka::AccCpuSerial<Dim, Idx>;
+    using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
     const auto [d_platform, acc] = pickFirstDevice<Acc>();
 
     using QueueProperty = alpaka::NonBlocking;
@@ -130,7 +133,7 @@ std::vector<Ray> CpuTracer::traceRaw(const TraceRawConfig& cfg) {
     return output;
 }
 
-void CpuTracer::setPushConstants(const PushConstants* p) {
+void SimpleTracer::setPushConstants(const PushConstants* p) {
     std::memcpy(&m_pushConstants, p, sizeof(PushConstants));
 }
 

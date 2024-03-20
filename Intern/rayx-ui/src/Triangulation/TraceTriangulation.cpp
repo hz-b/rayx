@@ -3,7 +3,7 @@
 #include "Beamline/Beamline.h"
 #include "Colors.h"
 #include "Shader/Collision.h"
-#include "Tracer/CpuTracer.h"
+#include "Tracer/SimpleTracer.h"
 #include "Triangulation/GeometryUtils.h"
 
 /**
@@ -48,7 +48,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
 void traceTriangulation(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
-    RAYX::CpuTracer tracer;
+    RAYX::SimpleTracer tracer;
 
     constexpr size_t gridSize = 20;
     auto [width, length] = getRectangularDimensions(element.m_element.m_cutout);

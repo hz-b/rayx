@@ -19,8 +19,7 @@
 #include "Shader/Efficiency.h"
 #include "Shader/Diffraction.h"
 
-#include "Tracer/CpuTracer.h"
-#include "Tracer/GpuTracer.h"
+#include "Tracer/SimpleTracer.h"
 #include "Writer/CSVWriter.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -163,12 +162,16 @@ class TestSuite : public testing::Test {
         }
 
         if (cpu) {
-            tracer = std::make_unique<RAYX::CpuTracer>();
+#ifdef NO_GPU_TRACER
+            tracer = std::make_unique<RAYX::SimpleTracer>();
+#else
+            RAYX_ERR << "Cpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
+#endif
         } else {
 #ifdef NO_GPU_TRACER
             RAYX_ERR << "Gpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
 #else
-            tracer = std::make_unique<RAYX::GpuTracer>();
+            tracer = std::make_unique<RAYX::SimpleTracer>();
 #endif
         }
     }
