@@ -9,6 +9,7 @@
 #include "Beamline/OpticalElement.h"
 #include "Material/Material.h"
 #include "RAY-Core.h"
+
 #include "Shader/DynamicElements.h"
 #include "Shader/InvocationState.h"
 
@@ -19,7 +20,9 @@ struct Kernel {
     RAYX_FUNC
     void operator() (const TAcc& acc, Inv inv) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-        dynamicElements(gid, inv);
+
+        if (gid < inv.rayData.size())
+            dynamicElements(gid, inv);
     }
 };
 
@@ -27,11 +30,11 @@ template <typename Dev>
 auto pickFirstDevice() {
     const auto platform = alpaka::Platform<Dev>();
     const auto dev = alpaka::getDevByIdx(platform, 0);
-    std::cout << "found " << alpaka::getDevCount(platform) << ""
-        << " device(s) for platform '" << alpaka::getAccName<Dev>() << "'."
-        << " picking '" << alpaka::getName(dev) << "'"
-        << std::endl
-    ;
+    // std::cout << "found " << alpaka::getDevCount(platform) << ""
+    //     << " device(s) for platform '" << alpaka::getAccName<Dev>() << "'."
+    //     << " picking '" << alpaka::getName(dev) << "'"
+    //     << std::endl
+    // ;
     return std::make_tuple(platform, dev);
 };
 
@@ -51,6 +54,38 @@ auto createBuffer(TQueue& queue, const std::vector<T>& data, const Cpu& cpu) {
 template <typename TBuf>
 auto bufToSpan(TBuf& buf) {
     return std::span(alpaka::getPtrNative(buf), alpaka::getExtents(buf)[0]);
+}
+
+template <typename TAcc, typename TDim, typename TIdx>
+constexpr auto getBlockSize() {
+#if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
+    if constexpr (std::is_same_v<TAcc, alpaka::AccGpuCudaRt<TDim, TIdx>>) {
+        return 128;
+    }
+#endif
+
+#if defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
+    if constexpr (std::is_same_v<TAcc, alpaka::AccCpuSerial<TDim, TIdx>>) {
+        return 1;
+    }
+#endif
+
+    return 0;
+}
+
+template <typename TAcc, typename TDim, typename TIdx>
+auto getWorkDivForAcc(TIdx numElements) {
+    constexpr int blockSize = getBlockSize<TAcc, TDim, TIdx>();
+    static_assert(blockSize != 0);
+
+    const int gridSize = (numElements - 1) / blockSize + 1;
+
+    using Vec = alpaka::Vec<TDim, TIdx>;
+    return alpaka::WorkDivMembers<TDim, TIdx> {
+        Vec{gridSize},
+        Vec{blockSize},
+        Vec{1},
+    };
 }
 
 } // unnamed namespace
@@ -86,7 +121,6 @@ std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
     const auto& materialTables = cfg.m_materialTables;
 
     using Vec = alpaka::Vec<Dim, Idx>;
-    const auto numShaderInstances = Vec{numInputRays};
 
     auto rayData = createBuffer<Idx, Vec, Ray>(queue, cfg.m_rays, cpu);
     auto outputRays = createBuffer<Idx, Ray>(queue, Vec{numOutputRays});
@@ -113,13 +147,15 @@ std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
         .pushConstants = m_pushConstants,
     };
 
+    auto workDiv = getWorkDivForAcc<Acc, Dim, Idx>(numInputRays);
+    printf("%d %d\n",
+        workDiv.m_gridBlockExtent[0],
+        workDiv.m_blockThreadExtent[0]
+    );
+
     alpaka::exec<Acc>(
         queue,
-        alpaka::getValidWorkDiv<Acc>(
-            acc,
-            numShaderInstances,
-            Vec{1}
-        ),
+        workDiv,
         Kernel{},
         inv
     );
