@@ -58,25 +58,37 @@ auto bufToSpan(TBuf& buf) {
 
 template <typename TAcc, typename TDim, typename TIdx>
 constexpr auto getBlockSize() {
+    auto impl = [] () -> TIdx {
 #if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
-    if constexpr (std::is_same_v<TAcc, alpaka::AccGpuCudaRt<TDim, TIdx>>) {
-        return 128;
-    }
+        if constexpr (std::is_same_v<TAcc, alpaka::AccGpuCudaRt<TDim, TIdx>>) {
+            return 128;
+        }
+#endif
+
+#if defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED)
+        if constexpr (std::is_same_v<TAcc, alpaka::AccCpuOmp2Blocks<TDim, TIdx>>) {
+            return 2048;
+        }
 #endif
 
 #if defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
-    if constexpr (std::is_same_v<TAcc, alpaka::AccCpuSerial<TDim, TIdx>>) {
-        return 1;
-    }
+        if constexpr (std::is_same_v<TAcc, alpaka::AccCpuSerial<TDim, TIdx>>) {
+            return 1;
+        }
 #endif
 
-    return 0;
+        return 0;
+    };
+
+    constexpr TIdx blockSize = impl();
+    static_assert(blockSize != static_cast<TIdx>(0));
+
+    return blockSize;
 }
 
 template <typename TAcc, typename TDim, typename TIdx>
 auto getWorkDivForAcc(TIdx numElements) {
     constexpr int blockSize = getBlockSize<TAcc, TDim, TIdx>();
-    static_assert(blockSize != 0);
 
     const int gridSize = (numElements - 1) / blockSize + 1;
 
@@ -107,8 +119,6 @@ std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
     using Cpu = alpaka::DevCpu;
     const auto [cpu_platform, cpu] = pickFirstDevice<Cpu>();
 
-    // using Acc = alpaka::AccGpuCudaRt<Dim, Idx>;
-    // using Acc = alpaka::AccCpuSerial<Dim, Idx>;
     using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
     const auto [d_platform, acc] = pickFirstDevice<Acc>();
 
