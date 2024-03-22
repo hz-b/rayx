@@ -221,7 +221,13 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
 
     // Render View Dummy
     ImGui::Begin("Render View");
-    ImGui::Image((ImTextureID)m_AssetManager->getDescriptorSet("defaultTexture"), ImVec2(800, 600));
+    if (uiParams.sceneRender != nullptr) {
+        m_AssetManager->addOrReplace<Texture>("sceneRender", std::move(*uiParams.sceneRender.get()));
+    }
+    VkDescriptorSet sceneRenderDescriptorSet = m_AssetManager->getDescriptorSet("sceneRender");
+    if (sceneRenderDescriptorSet != VK_NULL_HANDLE) {
+        ImGui::Image((ImTextureID)sceneRenderDescriptorSet, ImVec2(1920, 1080));
+    }
     ImGui::End();
 
     showSceneEditorWindow(uiParams);

@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "Camera.h"
+#include "GraphicsCore/Texture.h"
 
 /**
  * UI Parameters such as toggles, paths, etc.
@@ -41,6 +42,7 @@ struct UISimulationInfo {
 };
 
 struct UIParameters {
+    std::shared_ptr<Texture> sceneRender;
     CameraController& camController;
     std::filesystem::path rmlPath;
     bool rmlReady;
@@ -52,7 +54,8 @@ struct UIParameters {
     UISimulationInfo simulationInfo;
 
     UIParameters(CameraController& camController, const std::vector<std::string>& availableDevices)
-        : camController(camController),
+        : sceneRender(nullptr),
+          camController(camController),
           rmlPath(""),
           rmlReady(false),
           h5Ready(false),

@@ -17,6 +17,12 @@ class AssetManager {
     VkDescriptorSet add(const std::string& id, const std::filesystem::path& path);
 
     template <typename T>
+    VkDescriptorSet add(const std::string& id, T&& texture);
+
+    template <typename T>
+    VkDescriptorSet addOrReplace(const std::string& id, T&& texture);
+
+    template <typename T>
     std::shared_ptr<T> get(const std::string& id) const;
 
     void remove(const std::string& id);

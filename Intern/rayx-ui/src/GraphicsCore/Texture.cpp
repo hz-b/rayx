@@ -22,6 +22,18 @@ Texture::Texture(const Device& device, const std::filesystem::path& path) : m_De
 
 Texture::Texture(const Device& device, const unsigned char* data, uint32_t width, uint32_t height) : m_Device{device} { init(data, width, height); }
 
+Texture::Texture(const Device& device, VkImage image, VkDeviceMemory mem, VkFormat format) : m_Device{device} {
+    m_textureImage = image;
+    m_textureMemory = mem;
+    createImageView(format);
+    createTextureSampler();
+
+    m_imageInfo = std::make_shared<VkDescriptorImageInfo>();
+    m_imageInfo->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    m_imageInfo->imageView = m_textureImageView;
+    m_imageInfo->sampler = m_textureSampler;
+}
+
 Texture::Texture(const Device& device) : m_Device{device} {
     // Read in image
     int texWidth, texHeight, _;

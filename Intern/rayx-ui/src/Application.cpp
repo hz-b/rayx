@@ -68,12 +68,29 @@ void Application::init() {
 }
 
 void Application::run() {
+    // Create UBOs (Uniform Buffer Object)
+    std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
+    for (auto& uboBuffer : uboBuffers) {
+        uboBuffer = std::make_unique<Buffer>(m_Device, "uboBuffer", sizeof(Camera), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        uboBuffer->map();
+    }
+
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<glm::dvec3> rSourcePositions;  // TODO: how to handle these two?
     std::vector<RAYX::OpticalElement> elements;
 
+    auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
+                               .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
+                               .build();                                                                      //
+    m_Renderer.initRenderSystems(*globalSetLayout);
+    std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
+    for (unsigned long i = 0; i < descriptorSets.size(); i++) {
+        auto bufferInfo = uboBuffers[i]->descriptorInfo();
+        DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
+    }
+
     // Main loop
-    m_State = State::RunningWithoutScene;
     while (!m_Window.shouldClose()) {
         // Skip rendering when minimized
         if (m_Window.isMinimized()) {
@@ -81,14 +98,26 @@ void Application::run() {
         }
         glfwPollEvents();
 
-        if (auto commandBuffer = m_Renderer.beginFrame()) {
+        if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
             // Params to pass to UI
             auto newTime = std::chrono::high_resolution_clock::now();
             m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
+            // Update UBO
+            uint32_t frameIndex = m_Renderer.getFrameIndex();
+            m_CamController.update(m_Camera, m_Renderer.getAspectRatio());
+            uboBuffers[frameIndex]->writeToBuffer(&m_Camera);
+
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
+            FrameInfo frameInfo = {
+                .commandBuffer = VK_NULL_HANDLE,                             //
+                .descriptorSet = descriptorSets[m_Renderer.getFrameIndex()]  //
+            };
+            m_Renderer.renderOffscreen(frameInfo);
+            Texture renderedImage = m_Renderer.getRenderedImage();
+            m_UIParams.sceneRender = std::make_shared<Texture>(std::move(renderedImage));
 
             // UI
             m_UIHandler.beginUIRender();

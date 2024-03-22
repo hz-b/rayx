@@ -4,8 +4,12 @@
 #include <vector>
 
 #include "Device.h"
+#include "GraphicsCore/Descriptors.h"
+#include "RenderSystem/GridRenderSystem.h"
 #include "Swapchain.h"
 #include "Window.h"
+
+class Texture;
 
 /**
  * @brief The Renderer class manages the rendering process, including the swapchain, command buffers, and ImGui integration.
@@ -22,6 +26,8 @@ class Renderer {
 
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
+
+    void initRenderSystems(const DescriptorSetLayout& globalSetLayout);
 
     VkRenderPass getSwapChainRenderPass() const { return m_SwapChain->getRenderPass(); }
     VkFormat getSwapChainImageFormat() const { return m_SwapChain->getImageFormat(); }
@@ -64,16 +70,36 @@ class Renderer {
      */
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
+    void renderOffscreen(FrameInfo& frameInfo);
+    Texture getRenderedImage() const;
+
   private:
     void createCommandBuffers();
     void freeCommandBuffers();
     void recreateSwapChain();
+    void initializeOffscreenRendering();
+    void destroyOffscreenResources();
 
     Window& m_Window;
     Device& m_Device;
 
+    std::unique_ptr<GridRenderSystem> m_GridRenderSystem;
+
     std::unique_ptr<SwapChain> m_SwapChain;
     std::vector<VkCommandBuffer> m_commandBuffers;
+
+    // Off screen rendering
+    VkImage m_offscreenImage;
+    VkImage m_offscreenDepthImage;
+    VkImageView m_offscreenImageView;
+    VkImageView m_offscreenDepthImageView;
+    VkDeviceMemory m_offscreenImageMemory;
+    VkDeviceMemory m_offscreenDepthImageMemory;
+    VkFramebuffer m_offscreenFramebuffer;
+    VkRenderPass m_offscreenRenderPass;
+    void createOffscreenResources();
+    void createOffscreenRenderPass();
+    void createOffscreenFramebuffer();
 
     uint32_t m_currentImageIndex;     // Index of the current swap chain image.
     uint32_t m_currentFrameIndex{0};  // Index of the current frame.

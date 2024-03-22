@@ -13,6 +13,7 @@ class Texture {
   public:
     Texture(const Device& device, const std::filesystem::path& path);
     Texture(const Device& device, const unsigned char* data, uint32_t width, uint32_t height);
+    Texture(const Device& device, VkImage image, VkDeviceMemory mem, VkFormat format);
     Texture(const Device& device);
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;

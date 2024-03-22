@@ -37,18 +37,6 @@ class Application {
 
     void run();
 
-    enum class State {
-        Initializing,
-        InitializeSimulation,
-        Simulating,
-        LoadingBeamline,
-        LoadingRays,
-        BuildingRays,
-        BuildingElements,
-        Running,
-        RunningWithoutScene
-    } m_State{State::Initializing};
-
   private:
     // --- Order matters ---
     Window m_Window;                ///< Application window

@@ -7,8 +7,8 @@
 #include "Camera.h"
 
 struct FrameInfo {
-    Camera& camera;
-    uint32_t frameIndex;
+    // Camera& camera;
+    // uint32_t frameIndex;
     VkCommandBuffer commandBuffer;
     VkDescriptorSet descriptorSet;
 };

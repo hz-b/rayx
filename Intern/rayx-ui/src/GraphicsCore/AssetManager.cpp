@@ -74,6 +74,26 @@ VkDescriptorSet AssetManager::add<Texture>(const std::string& id, const std::fil
 }
 
 template <>
+VkDescriptorSet AssetManager::add<Texture>(const std::string& id, Texture&& texture) {
+    if (m_textures.find(id) == m_textures.end()) {
+        m_textures[id] = std::make_shared<Texture>(std::move(texture));
+        auto descriptorSet = createDescriptorSetForTexture(*m_textures[id]);
+        m_textureDescriptorSets[id] = descriptorSet;
+        return descriptorSet;
+    }
+    RAYX_VERB << "Texture with id " << id << " already exists";
+    return m_textureDescriptorSets[id];
+}
+
+template <>
+VkDescriptorSet AssetManager::addOrReplace<Texture>(const std::string& id, Texture&& texture) {
+    if (m_textures.find(id) != m_textures.end()) {
+        remove(id);
+    }
+    return add<Texture>(id, std::move(texture));
+}
+
+template <>
 std::shared_ptr<Texture> AssetManager::get<Texture>(const std::string& id) const {
     auto it = m_textures.find(id);
     if (it != m_textures.end()) {
