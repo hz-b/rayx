@@ -19,7 +19,7 @@ class UIHandler {
     ~UIHandler();
 
     void beginUIRender();
-    void setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
+    void setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
     void endUIRender(VkCommandBuffer commandBuffer);
 
     VkClearValue getClearValue() const {
