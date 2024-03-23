@@ -89,7 +89,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             if (event.m_lastElement >= beamline.m_DesignElements.size()) {
                 RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
-            glm::vec4 worldPos = beamline.m_DesignElements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
+            glm::vec4 worldPos = beamline.m_DesignElements[(size_t)event.m_lastElement].compile().m_outTrans * glm::vec4(event.m_position, 1.0f);
             const glm::vec4 WHITE = {1.0f, 1.0f, 1.0f, 0.7f};
 
             glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
