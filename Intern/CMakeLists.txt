@@ -17,7 +17,7 @@ add_subdirectory(rayx)
 # Don't build rayx-ui without Vulkan
 if(NOT VULKAN STREQUAL "NO")
     # TODO re-enable
-    # add_subdirectory(rayx-ui)
+    add_subdirectory(rayx-ui)
 endif()
 
 # ------------------------

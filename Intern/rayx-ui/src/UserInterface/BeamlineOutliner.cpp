@@ -8,7 +8,7 @@ BeamlineOutliner::BeamlineOutliner(/* args */) {}
 
 BeamlineOutliner::~BeamlineOutliner() {}
 
-void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraController& camController, std::vector<RAYX::OpticalElement>& elements,
+void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraController& camController, std::vector<RAYX::DesignElement>& elements,
                                        std::vector<glm::dvec3>& rSourcePositions) const {
     for (auto& child : treeNode.children) {
         if (child.children.empty()) {
@@ -18,8 +18,8 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
                 // Handle selection logic here
                 RAYX_VERB << "Selected object: " << child.name << " with index " << child.index;
                 if (child.category == "Optical Element") {
-                    glm::vec3 translationVec = {elements[child.index].m_element.m_outTrans[3][0], elements[child.index].m_element.m_outTrans[3][1],
-                                                elements[child.index].m_element.m_outTrans[3][2]};
+                    glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
+                                                elements[child.index].compile().m_outTrans[3][2]};
                     camController.lookAtPoint(translationVec);
                 } else if (child.category == "Light Source") {
                     camController.lookAtPoint(rSourcePositions[child.index]);
@@ -68,7 +68,7 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
 }
 
 void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController,
-                                              std::vector<RAYX::OpticalElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
+                                              std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -115,7 +115,7 @@ void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filen
     renderImGuiTree(*m_pTreeRoot, camController, elements, rSourcePositions);
 }
 
-void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elements,
+void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements,
                                                  std::vector<glm::dvec3>& rSourcePositions) {
     ImGui::Begin("Beamline Outline");
 

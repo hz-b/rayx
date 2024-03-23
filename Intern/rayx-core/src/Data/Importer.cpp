@@ -14,12 +14,7 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 
-void extractInfo(xml::Parser parser, DesignElement* de) {
-    //getBehaviourType
-    //getSurfaceType
-    //getCutoutType
-    //combine
-}
+
 
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
@@ -27,7 +22,6 @@ void parseElement(xml::Parser parser, DesignElement* de) {
 
     if (strcmp(type, "ImagePlane") == 0) {
         getImageplane(parser, de);
-        extractInfo(parser, de);
     } else if (strcmp(type, "Cone") == 0) {
         getCone(parser, de);
     } else if (strcmp(type, "Cylinder") == 0) {

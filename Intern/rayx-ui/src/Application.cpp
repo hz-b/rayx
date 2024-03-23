@@ -105,8 +105,8 @@ void Application::run() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<glm::dvec3> rSourcePositions;
-    std::vector<RAYX::OpticalElement> elements;
-    std::vector<std::shared_ptr<RAYX::LightSource>> sources;
+    std::vector<RAYX::DesignElement> elements;
+    std::vector<RAYX::DesignSource> sources;
 
     std::future<void> beamlineFuture;
     std::future<void> raysFuture;
@@ -187,11 +187,11 @@ void Application::run() {
 
                         RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
 
-                        elements = m_Beamline->m_OpticalElements;
-                        sources = m_Beamline->m_LightSources;
+                        elements = m_Beamline->m_DesignElements;
+                        sources = m_Beamline->m_DesignSources;
                         rSourcePositions.clear();
                         for (auto& source : sources) {
-                            rSourcePositions.push_back(source->getPosition());
+                            rSourcePositions.push_back(source.getWorldPosition());
                         }
 
                         m_Scene = std::make_unique<Scene>(m_Device);

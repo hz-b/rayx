@@ -29,7 +29,7 @@ void Simulator::runSimulation() {
     }
     // Run rayx core
     if (!m_maxEvents) {
-        m_maxEvents = static_cast<unsigned int>(m_Beamline.m_OpticalElements.size() + 2);
+        m_maxEvents = static_cast<unsigned int>(m_Beamline.m_DesignElements.size() + 2);
     }
 
     auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, m_startEventID);
@@ -71,10 +71,10 @@ void Simulator::runSimulation() {
     Format fmt = formatFromString(defaultFormatString());
 
     std::vector<std::string> names;
-    names.reserve(m_Beamline.m_OpticalElements.size());
+    names.reserve(m_Beamline.m_DesignElements.size());
 
-    for (const auto& opticalElement : m_Beamline.m_OpticalElements) {
-        names.push_back(opticalElement.m_name);
+    for (const auto& opticalElement : m_Beamline.m_DesignElements) {
+        names.push_back(opticalElement.getName());
     }
 
     path += ".h5";
