@@ -220,8 +220,8 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
 
 TEST_F(TestSuite, groupTransform2) {
     auto b = loadBeamline("groupTransform2");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignElements.size(), 1);
 
     glm::dmat4x4 yz_swap = {
         1, 0, 0, 0,
@@ -247,8 +247,8 @@ TEST_F(TestSuite, groupTransform2) {
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
 
-    glm::dmat4x4 inTrans = b.m_OpticalElements[0].m_element.m_inTrans * yz_swap;
-    glm::dmat4x4 outTrans = b.m_OpticalElements[0].m_element.m_outTrans * yz_swap;
+    glm::dmat4x4 inTrans = b.m_DesignElements[0].compile().m_inTrans * yz_swap;
+    glm::dmat4x4 outTrans = b.m_DesignElements[0].compile().m_outTrans * yz_swap;
 
     glm::dmat4x4 orientationResult = glm::dmat4x4(glm::dmat3x3(inTrans));
     glm::dvec4 positionResult = outTrans * glm::dvec4(0, 0, 0, 1);
