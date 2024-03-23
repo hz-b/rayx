@@ -72,8 +72,8 @@ void Simulator::runSimulation() {
     std::vector<std::string> names;
     names.reserve(m_Beamline.m_DesignElements.size());
 
-    for (const auto& opticalElement : m_Beamline.m_DesignElements) {
-        names.push_back(opticalElement.getName());
+    for (const auto& designElement : m_Beamline.m_DesignElements) {
+        names.push_back(designElement.getName());
     }
 
     path += ".h5";
