@@ -1,5 +1,4 @@
-#ifndef HELPER_H
-#define HELPER_H
+#pragma once
 
 #include "Common.h"
 #include "Ray.h"
@@ -10,5 +9,3 @@ RAYX_FUNC uint64_t rayId(Inv& inv);
 RAYX_FUNC uint output_index(uint i, Inv& inv);
 RAYX_FUNC void recordEvent(Ray r, double w, Inv& inv);
 RAYX_FUNC void recordFinalEvent(Ray r, double w, Inv& inv);
-
-#endif

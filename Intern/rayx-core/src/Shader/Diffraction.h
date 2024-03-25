@@ -1,5 +1,4 @@
-#ifndef DIFFRACTION_H
-#define DIFFRACTION_H
+#pragma once
 
 #include "Common.h"
 #include "InvocationState.h"
@@ -29,5 +28,3 @@ RAYX_FUNC void bessel_diff(double radius, double wl, double& dphi, double& dpsi,
  * @return result stored in dAngle
  */
 RAYX_FUNC void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
-
-#endif

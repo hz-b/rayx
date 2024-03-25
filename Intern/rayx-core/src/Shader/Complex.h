@@ -1,5 +1,4 @@
-#ifndef COMPLEX_H
-#define COMPLEX_H
+#pragma once
 
 #include "Common.h"
 
@@ -34,5 +33,3 @@ RAYX_FUNC dvec2 cx_to_polar(dvec2 a);
 
 // Complex power
 RAYX_FUNC dvec2 cx_pow(dvec2 a, int n);
-
-#endif

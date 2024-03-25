@@ -1,5 +1,4 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include "Common.h"
 #include "Ray.h"
@@ -15,5 +14,3 @@ RAYX_FUNC Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m);
 
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FUNC double RAYX_API getIncidenceAngle(Ray r, dvec3 normal);
-
-#endif

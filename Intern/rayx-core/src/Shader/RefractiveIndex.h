@@ -1,5 +1,4 @@
-#ifndef REFRACTIVE_INDEX_H
-#define REFRACTIVE_INDEX_H
+#pragma once
 
 #include "Common.h"
 #include "InvocationState.h"
@@ -37,5 +36,3 @@ RAYX_FUNC dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& in
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 RAYX_FUNC dvec2 RAYX_API getAtomicMassAndRho(int material);
-
-#endif

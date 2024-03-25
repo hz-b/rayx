@@ -1,5 +1,4 @@
-#ifndef CUTOUT_FNS_H
-#define CUTOUT_FNS_H
+#pragma once
 
 #include "Common.h"
 
@@ -17,6 +16,3 @@ RAYX_FUNC dvec2 RAYX_API cutoutBoundingBox(Cutout cutout);
 // might not find all subset-violations, but should find most of them.
 // (might not find all Ellipsoid vs Trapezoid violations)
 RAYX_FUNC void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2);
-
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef UPDATE_STOKES_H
-#define UPDATE_STOKES_H
+#pragma once
 
 #include "Common.h"
 #include "InvocationState.h"
@@ -23,5 +22,3 @@ RAYX_FUNC dmat4 mullerMatrix(double R_s, double R_p, double delta);
  * @returns `true`, if ray should be absorbed
  */
 RAYX_FUNC bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv);
-
-#endif

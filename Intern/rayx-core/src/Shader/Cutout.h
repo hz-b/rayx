@@ -1,5 +1,4 @@
-#ifndef CUTOUT_H
-#define CUTOUT_H
+#pragma once
 
 #include "Common.h"
 
@@ -132,6 +131,3 @@ inline Cutout serializeUnlimited() {
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
-
-
-#endif

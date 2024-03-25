@@ -1,8 +1,7 @@
 // This file is intended to bridge the gap between the GLSL and the c++ languages by defining a common API for both languages.
 // Every header file in the shader needs to include Common.h (first!) in order to be safely used by C++ and GLSL.
 
-#ifndef ADAPT_H
-#define ADAPT_H
+#pragma once
 
 #ifdef RAYX_CORE
 #include <alpaka/core/Common.hpp>
@@ -35,5 +34,3 @@ using glm::sign;
 
 // This way I don't have to worry about namespaces..
 using namespace RAYX;
-
-#endif

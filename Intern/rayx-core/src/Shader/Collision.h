@@ -1,5 +1,4 @@
-#ifndef COLLISION_H
-#define COLLISION_H
+#pragma once
 
 #include "Common.h"
 #include "InvocationState.h"
@@ -26,5 +25,3 @@ RAYX_FUNC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTrian
 RAYX_FUNC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
 RAYX_FUNC Collision findCollisionWith(Ray r, uint id, Inv& inv);
 RAYX_FUNC Collision findCollision(const Ray& _ray, Inv& inv);
-
-#endif

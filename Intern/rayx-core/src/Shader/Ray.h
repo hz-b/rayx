@@ -1,5 +1,4 @@
-#ifndef RAY_H
-#define RAY_H
+#pragma once
 
 #include "Common.h"
 
@@ -71,5 +70,3 @@ static_assert(std::is_trivially_copyable_v<Ray>);
 static_assert(sizeof(Ray) % alignof(dvec3) == 0);
 
 }  // namespace RAYX
-
-#endif

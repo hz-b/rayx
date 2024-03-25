@@ -1,5 +1,4 @@
-#ifndef BEHAVE_H
-#define BEHAVE_H
+#pragma once
 
 #include "Common.h"
 #include "Collision.h"
@@ -20,5 +19,3 @@ RAYX_FUNC Ray behaveRZP(Ray r, int id, Collision col, Inv& inv);
 RAYX_FUNC Ray behaveGrating(Ray r, int id, Collision col, Inv& inv);
 RAYX_FUNC Ray behaveMirror(Ray r, int id, Collision col, Inv& inv);
 RAYX_FUNC Ray behaveImagePlane(Ray r, int id, Collision col, Inv& inv);
-
-#endif

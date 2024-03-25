@@ -1,5 +1,4 @@
-#ifndef CUBIC_H
-#define CUBIC_H
+#pragma once
 
 #include "Common.h"
 
@@ -7,5 +6,3 @@
 RAYX_FUNC dvec3 RAYX_API cubicPosition(Ray r, double alpha);
 
 RAYX_FUNC dvec3 RAYX_API cubicDirection(Ray r, double alpha);
-
-#endif

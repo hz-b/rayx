@@ -1,5 +1,4 @@
-#ifndef RAND_H
-#define RAND_H
+#pragma once
 
 #include "Common.h"
 
@@ -19,5 +18,3 @@ RAYX_FUNC double RAYX_API squaresDoubleRNG(uint64_t& ctr);
 // creates (via the Box-Muller transform) a normal distributed double with mean
 // mu and standard deviation sigma
 RAYX_FUNC double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma);
-
-#endif

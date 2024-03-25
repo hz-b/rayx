@@ -1,5 +1,4 @@
-#ifndef LINE_DENSITY_H
-#define LINE_DENSITY_H
+#pragma once
 
 #include "Common.h"
 
@@ -19,5 +18,3 @@ given direction on the grating
 @returns: (inplace) DX, DZ
 */
 RAYX_FUNC void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ);
-
-#endif

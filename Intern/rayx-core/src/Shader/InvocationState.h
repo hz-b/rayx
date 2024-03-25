@@ -9,8 +9,7 @@
 // In other words, `inv.elements` probably needs to be a global variable, as `GLSL` has to declare it as a global variable using `layout`.
 // This problem requires further thought...
 
-#ifndef INVOCATION_STATE_H
-#define INVOCATION_STATE_H
+#pragma once
 
 #include <span>
 
@@ -58,5 +57,3 @@ struct RAYX_API InvocationState {
 };
 
 using Inv = InvocationState;
-
-#endif

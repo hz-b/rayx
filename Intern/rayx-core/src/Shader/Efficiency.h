@@ -1,5 +1,4 @@
-#ifndef EFFICIENCY_H
-#define EFFICIENCY_H
+#pragma once
 
 #include "Common.h"
 #include "InvocationState.h"
@@ -75,6 +74,3 @@ RAYX_FUNC double phase_difference(dvec2 euler1, dvec2 euler2);
  * @param others
  */
 RAYX_FUNC void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv& inv);
-
-
-#endif

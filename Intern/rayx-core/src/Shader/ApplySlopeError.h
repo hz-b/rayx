@@ -1,5 +1,4 @@
-#ifndef APPLY_SLOPE_ERROR_H
-#define APPLY_SLOPE_ERROR_H
+#pragma once
 
 #include "Common.h"
 #include "InvocationState.h"
@@ -32,5 +31,3 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FUNC dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv);
-
-#endif

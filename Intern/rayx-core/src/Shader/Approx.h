@@ -1,5 +1,4 @@
-#ifndef APPROX_H
-#define APPROX_H
+#pragma once
 
 #include "Common.h"
 
@@ -26,5 +25,3 @@ RAYX_FUNC double RAYX_API r8_acos(const double x);
 RAYX_FUNC double RAYX_API r8_sinh(const double x);
 RAYX_FUNC double RAYX_API r8_cosh(const double x);
 RAYX_FUNC double RAYX_API dpow(double a, int b);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef SPHERICAL_COORDS_H
-#define SPHERICAL_COORDS_H
+#pragma once
 
 #include "Common.h"
 
@@ -10,5 +9,3 @@
 
 RAYX_FUNC void RAYX_API sphericalCoordsToDirection(double phi, double psi, dvec3& out_direction);
 RAYX_FUNC void RAYX_API directionToSphericalCoords(dvec3 direction, double& out_phi, double& out_psi);
-
-#endif

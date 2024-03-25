@@ -1,5 +1,4 @@
-#ifndef ELEMENTS_H
-#define ELEMENTS_H
+#pragma once
 
 #include "Common.h"
 #include "Behaviour.h"
@@ -58,5 +57,3 @@ struct Element {
 
 // make sure Element does not introduce cost on copy or default construction
 static_assert(std::is_trivially_copyable_v<Element>);
-
-#endif
