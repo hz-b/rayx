@@ -8,28 +8,28 @@
 
 namespace RAYX {
 
-SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& deso) : LightSource(deso) {
-    m_sigmaType = deso.getSigmaType();
-    m_photonEnergy = deso.getEnergy();
-    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
-    m_undulatorLength = deso.getUndulatorLength();
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& deso) : LightSource(deso),
+    m_sourceDepth(deso.getSourceDepth()),
+    m_sigmaType(deso.getSigmaType()),
+    m_undulatorLength(deso.getUndulatorLength()),
+    m_photonEnergy(deso.getEnergy()),
+    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+    m_electronSigmaX(deso.getElectronSigmaX()),
+    m_electronSigmaXs(deso.getElectronSigmaXs()),
+    m_electronSigmaY(deso.getElectronSigmaY()),
+    m_electronSigmaYs(deso.getElectronSigmaYs()),
+    m_pol(deso.getStokes()) 
+    
+    {
+        
     m_undulatorSigma = calcUndulatorSigma();
     m_undulatorSigmaS = calcUndulatorSigmaS();
-    m_electronSigmaX = deso.getElectronSigmaX();
-    m_electronSigmaXs = deso.getElectronSigmaXs();
-    m_electronSigmaY = deso.getElectronSigmaY();
-    m_electronSigmaYs = deso.getElectronSigmaYs();
-
     m_horDivergence = getHorDivergence();
     m_verDivergence = getVerDivergence();
 
-    m_sourceDepth = deso.getSourceDepth();
     m_sourceHeight = getSourceHeight();
     m_sourceWidth = getSourceWidth();
-
-    m_pol = deso.getStokes();
-
-    
+  
 }
 
 /**

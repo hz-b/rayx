@@ -209,10 +209,8 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
     
     
     if (energyDistributionType == EnergyDistributionType::File) {
-        std::string filename = ("Intern/rayx-core/tests/input/") + v["photonEnergyDistributionFile"].as_string();
-        //std::filesystem::path path = std::filesystem::canonical(rmlFile);
-        //path.replace_filename(filename);  // this makes the path `filename` be relative to the
-                                          // path of the rml file
+        std::string filename = v["photonEnergyDistributionFile"].as_string();
+        
         std::cout << std::filesystem::current_path() << std::endl;
         DatFile df;
         DatFile::load(filename, &df);

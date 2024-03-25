@@ -58,7 +58,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
         std::string rmlFile;
         double energy;
     };
-
+    
     std::vector<testInput> testinput = {
         {
             .rmlFile = "PointSourceSeperateEnergies",
@@ -211,7 +211,7 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
     DesignSource pointsource = beamline.m_DesignSources[1];
 
     CHECK_EQ(100, dipolesource.getEnergy());
-    CHECK_EQ(151, pointsource.getEnergy(), 0.1);//TODO Fanny check if true (148.8)
+    CHECK_EQ(150.24724068638105, pointsource.getEnergyDistribution().selectEnergy());
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
     //CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);

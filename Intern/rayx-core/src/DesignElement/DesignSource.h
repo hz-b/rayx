@@ -1,7 +1,6 @@
 #pragma once
 
-//#include "Beamline/Objects/Objects.h"
-//#include "Beamline/LightSource.h"
+
 #include "Value.h"
 
 namespace RAYX {

@@ -24,16 +24,14 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setMaterial(parser.parseMaterial());
     de->setCurvatureType(CurvatureType::Plane);
 
-    if(de->getType() != "ImagePlane"){ 
+    if (de->getType() != "ImagePlane") {
         de->setCutout(parser.parseCutout(dp));
     } else {
         de->setCutout(serializeUnlimited());
     }
 }
 
-void getImageplane(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de, DesignPlane::XY);
-}
+void getImageplane(xml::Parser parser, DesignElement* de) { setAllMandatory(parser, de, DesignPlane::XY); }
 
 void getSlit(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY);
@@ -48,7 +46,6 @@ void getSlit(xml::Parser parser, DesignElement* de) {
     de->setTotalHeight(parser.parseTotalHeight());
     de->setDistancePreceding(parser.parseDistancePreceding());
 }
-
 
 void getCone(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
@@ -80,7 +77,6 @@ void getEllipsoid(xml::Parser parser, DesignElement* de) {
 
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-
 }
 
 void getParaboloid(xml::Parser parser, DesignElement* de) {
@@ -91,11 +87,9 @@ void getParaboloid(xml::Parser parser, DesignElement* de) {
     de->setParameterPType(parser.parseParameterPType());
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setParameterA11(parser.parseParameterA11());
-
 }
 
 void getGrating(xml::Parser parser, DesignElement* de) {
-
     de->setVLSParameters(parser.parseVls());
     de->setLineDensity(parser.parseLineDensity());
     de->setOrderOfDiffraction(parser.parseOrderDiffraction());
@@ -106,7 +100,6 @@ void getPlaneGrating(xml::Parser parser, DesignElement* de) {
     getGrating(parser, de);
 }
 
-
 void getSphereGrating(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
 
@@ -114,9 +107,7 @@ void getSphereGrating(xml::Parser parser, DesignElement* de) {
     getGrating(parser, de);
 }
 
-void getPlaneMirror(xml::Parser parser, DesignElement* de) {
-    setAllMandatory(parser, de, DesignPlane::XZ);
-}
+void getPlaneMirror(xml::Parser parser, DesignElement* de) { setAllMandatory(parser, de, DesignPlane::XZ); }
 
 void getSphereMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
@@ -152,7 +143,7 @@ void getRZP(xml::Parser parser, DesignElement* de) {
     de->setAdditionalOrder(parser.parseAdditionalOrder());
     de->setShortRadius(parser.parseShortRadius());
     de->setLongRadius(parser.parseLongRadius());
-    de->setCurvatureType(parser.parseCurvatureType());    
+    de->setCurvatureType(parser.parseCurvatureType());
 }
 
 void getExpertsCubic(xml::Parser parser, DesignElement* de) {

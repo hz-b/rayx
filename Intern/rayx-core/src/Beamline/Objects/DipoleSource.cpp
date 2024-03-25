@@ -44,29 +44,27 @@ double get_factorTotalPowerDipol() {
     return totalPower;
 }
 
-DipoleSource::DipoleSource(const DesignSource& deso) : LightSource(deso) {
-    m_energySpreadType = deso.getEnergyDistribution();
-    m_photonFlux = deso.getPhotonFlux();
-    m_electronEnergyOrientation = deso.getElectronEnergyOrientation();
-    //m_sourcePulseType = deso.parseSourcePulseType();
-    m_bendingRadius = deso.getBendingRadius();
-    m_electronEnergy = deso.getElectronEnergy();
-    m_photonEnergy = deso.getEnergy();
-    m_verEbeamDivergence = deso.getVerEBeamDivergence();
-    m_energySpread = deso.getEnergySpread();
-    m_energySpreadUnit = deso.getEnergySpreadUnit();
+DipoleSource::DipoleSource(const DesignSource& deso) : LightSource(deso), 
+    m_bendingRadius(deso.getBendingRadius()),
+    m_electronEnergyOrientation(deso.getElectronEnergyOrientation()),
+    m_photonFlux(deso.getPhotonFlux()),
+    m_sourceHeight(deso.getSourceHeight()),
+    m_sourceWidth(deso.getSourceWidth()),
+    m_electronEnergy(deso.getElectronEnergy()),
+    m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
+    m_photonEnergy(deso.getEnergy()),
+    m_verEbeamDivergence(deso.getVerEBeamDivergence()),
+    m_bandwidth(1.0e-3),
+    m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
+    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+    m_energySpread(deso.getEnergySpread()),
+    m_energySpreadUnit(deso.getEnergySpreadUnit())
+{   
+    
     m_horDivergence = deso.getHorDivergence();
-    m_sourceHeight = deso.getSourceHeight();
-    m_sourceWidth = deso.getSourceWidth();
-
-    m_criticalEnergy = RAYX::get_factorCriticalEnergy();
-    m_bandwidth = 1.0e-3;
     m_verDivergence = DipoleSource::vDivergence(m_photonEnergy, m_verEbeamDivergence);
     m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
 
-    m_gamma = std::fabs(m_electronEnergy) * get_factorElectronEnergy();
-
-    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
     setLogInterpolation();
     setMaxIntensity();
     setMaxFlux();
