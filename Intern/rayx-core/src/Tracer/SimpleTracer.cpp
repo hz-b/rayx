@@ -26,15 +26,15 @@ struct Kernel {
     }
 };
 
-template <typename Dev>
+template <typename Acc>
 auto pickFirstDevice() {
-    const auto platform = alpaka::Platform<Dev>();
+    const auto platform = alpaka::Platform<Acc>();
     const auto dev = alpaka::getDevByIdx(platform, 0);
-    // std::cout << "found " << alpaka::getDevCount(platform) << ""
-    //     << " device(s) for platform '" << alpaka::getAccName<Dev>() << "'."
-    //     << " picking '" << alpaka::getName(dev) << "'"
-    //     << std::endl
-    // ;
+    std::cout << "found " << alpaka::getDevCount(platform) << ""
+        << " device(s) for platform '" << alpaka::getAccName<Acc>() << "'."
+        << " picking '" << alpaka::getName(dev) << "'"
+        << std::endl
+    ;
     return std::make_tuple(platform, dev);
 };
 
@@ -56,23 +56,38 @@ auto bufToSpan(TBuf& buf) {
     return std::span(alpaka::getPtrNative(buf), alpaka::getExtents(buf)[0]);
 }
 
-template <typename TAcc, typename TDim, typename TIdx>
+template <typename Acc>
 constexpr auto getBlockSize() {
-    auto impl = [] () -> TIdx {
+    using Idx = alpaka::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+
+    auto impl = [] () -> Idx {
 #if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
-        if constexpr (std::is_same_v<TAcc, alpaka::AccGpuCudaRt<TDim, TIdx>>) {
+        if constexpr (std::is_same_v<Acc, alpaka::AccGpuCudaRt<Dim, Idx>>) {
             return 128;
         }
 #endif
 
+#if defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED)
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuThreads<Dim, Idx>>) {
+            return 1;
+        }
+#endif
+
 #if defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED)
-        if constexpr (std::is_same_v<TAcc, alpaka::AccCpuOmp2Blocks<TDim, TIdx>>) {
-            return 2048;
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Blocks<Dim, Idx>>) {
+            return 1;
+        }
+#endif
+
+#if defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED)
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Threads<Dim, Idx>>) {
+            return 1;
         }
 #endif
 
 #if defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
-        if constexpr (std::is_same_v<TAcc, alpaka::AccCpuSerial<TDim, TIdx>>) {
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuSerial<Dim, Idx>>) {
             return 1;
         }
 #endif
@@ -80,46 +95,72 @@ constexpr auto getBlockSize() {
         return 0;
     };
 
-    constexpr TIdx blockSize = impl();
-    static_assert(blockSize != static_cast<TIdx>(0));
+    constexpr Idx blockSize = impl();
+    static_assert(blockSize != static_cast<Idx>(0));
 
     return blockSize;
 }
 
-template <typename TAcc, typename TDim, typename TIdx>
-auto getWorkDivForAcc(TIdx numElements) {
-    constexpr int blockSize = getBlockSize<TAcc, TDim, TIdx>();
+template <typename Acc>
+auto getWorkDivForAcc(alpaka::Idx<Acc> numElements) {
+    using Idx = alpaka::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
 
+    constexpr int blockSize = getBlockSize<Acc>();
     const int gridSize = (numElements - 1) / blockSize + 1;
 
-    using Vec = alpaka::Vec<TDim, TIdx>;
-    return alpaka::WorkDivMembers<TDim, TIdx> {
+    using Vec = alpaka::Vec<Dim, Idx>;
+    return alpaka::WorkDivMembers<Dim, Idx> {
         Vec{gridSize},
         Vec{blockSize},
         Vec{1},
     };
 }
 
-} // unnamed namespace
+template <typename Dim, typename Idx>
+struct PlatformNotSupported;
 
-namespace RAYX {
+    template <typename Dim, typename Idx>
+#if defined(ALPAKA_ACC_GPU_CUDA_ENABLED) || defined(ALPAKA_ACC_GPU_HIP_ENABLED)
+    using GpuAcc = alpaka::AccGpuCudaRt<Dim, Idx>;
+#else
+    using GpuAcc = PlatformNotSupported<Dim, Idx>;
+#endif
 
-SimpleTracer::SimpleTracer() {
-    RAYX_VERB << "Initializing Cpu Tracer..";
+    template <typename Dim, typename Idx>
+#if defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED)
+    using CpuAcc = alpaka::AccCpuOmp2Blocks<Dim, Idx>;
+#elif defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED)
+    using CpuAcc = alpaka::AccCpuOmp2Threads<Dim, Idx>;
+#elif defined(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED)
+    using CpuAcc = alpaka::AccCpuTbbBlocks<Dim, Idx>;
+#elif defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED)
+    using CpuAcc = alpaka::AccCpuThreads<Dim, Idx>;
+#elif defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
+    using CpuAcc = alpaka::AccCpuSerial<Dim, Idx>;
+#else
+    using CpuAcc = PlatformNotSupported<Dim, Idx>;
+#endif
+
+template <typename Dim, typename Idx>
+constexpr bool isPlatformSupported(TracerPlatform platform) {
+    if (platform == TracerPlatform::Cpu) {
+        return !std::is_same_v<CpuAcc<Dim, Idx>, PlatformNotSupported<Dim, Idx>>;
+    } else {
+        return !std::is_same_v<GpuAcc<Dim, Idx>, PlatformNotSupported<Dim, Idx>>;
+    }
 }
 
-SimpleTracer::~SimpleTracer() = default;
+template <typename Acc>
+std::vector<Ray> traceWithAcc(const TraceRawConfig& cfg, const PushConstants& pushConstants) {
+    static_assert(alpaka::isAccelerator<Acc>);
 
-std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
-    using Dim = alpaka::DimInt<1>;
-    using Idx = int;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     using Cpu = alpaka::DevCpu;
     const auto [cpu_platform, cpu] = pickFirstDevice<Cpu>();
 
-    using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
     const auto [d_platform, acc] = pickFirstDevice<Acc>();
 
     using QueueProperty = alpaka::NonBlocking;
@@ -154,15 +195,10 @@ std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
         .mat = bufToSpan(mat),
 
         // CFG meta passed through pushConstants
-        .pushConstants = m_pushConstants,
+        .pushConstants = pushConstants,
     };
 
-    auto workDiv = getWorkDivForAcc<Acc, Dim, Idx>(numInputRays);
-    printf("%d %d\n",
-        workDiv.m_gridBlockExtent[0],
-        workDiv.m_blockThreadExtent[0]
-    );
-
+    auto workDiv = getWorkDivForAcc<Acc>(numInputRays);
     alpaka::exec<Acc>(
         queue,
         workDiv,
@@ -177,6 +213,49 @@ std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
     alpaka::wait(queue);
 
     return output;
+}
+
+using Dim = alpaka::DimInt<1>;
+using Idx = int;
+
+} // unnamed namespace
+
+namespace RAYX {
+
+SimpleTracer::SimpleTracer(TracerPlatform platform) {
+    RAYX_VERB << "Initializing Tracer..";
+    m_platform = platform;
+
+    switch (m_platform) {
+    case TracerPlatform::Cpu:
+        if constexpr (!isPlatformSupported<Dim, Idx>(TracerPlatform::Cpu))
+            RAYX_ERR << "Cpu tracer was not enabled during build.";
+        break;
+    case TracerPlatform::Gpu:
+        if constexpr (!isPlatformSupported<Dim, Idx>(TracerPlatform::Gpu))
+            RAYX_ERR << "Gpu tracer was not enabled during build.";
+        break;
+    }
+}
+
+SimpleTracer::~SimpleTracer() = default;
+
+std::vector<Ray> SimpleTracer::traceRaw(const TraceRawConfig& cfg) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    switch (m_platform) {
+    case TracerPlatform::Cpu:
+        if constexpr (isPlatformSupported<Dim, Idx>(TracerPlatform::Cpu))
+            return traceWithAcc<CpuAcc<Dim, Idx>>(cfg, m_pushConstants);
+        break;
+    case TracerPlatform::Gpu:
+        if constexpr (isPlatformSupported<Dim, Idx>(TracerPlatform::Gpu))
+            return traceWithAcc<GpuAcc<Dim, Idx>>(cfg, m_pushConstants);
+        break;
+    }
+
+    assert(false);
+    return {}; // TODO(Sven): check unreachable
 }
 
 void SimpleTracer::setPushConstants(const PushConstants* p) {
