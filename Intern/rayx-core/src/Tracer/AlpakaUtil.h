@@ -2,6 +2,7 @@
 
 // -------- Accelerator --------
 
+// declare invalid Acc
 struct AccNull {};
 
 template <typename Dim, typename Idx>
@@ -38,6 +39,10 @@ constexpr bool isAccAvailable() {
     return alpaka::isAccelerator<Acc>;
 }
 
+// test if we have minimum required Acc
+static_assert(isAccAvailable<DefaultCpuAcc<alpaka::DimInt<1>, int>>()); // test if any Cpu Acc is available.
+static_assert(isAccAvailable<DefaultAcc<alpaka::DimInt<1>, int>>()); // test if any Acc is available.
+
 // -------- Accelerator Specifics --------
 
 template <typename Acc>
@@ -52,12 +57,6 @@ constexpr inline auto getBlockSize() {
         }
 #endif
 
-#if defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccCpuThreads<Dim, Idx>>) {
-            return 1;
-        }
-#endif
-
 #if defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED)
         if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Blocks<Dim, Idx>>) {
             return 1;
@@ -66,7 +65,19 @@ constexpr inline auto getBlockSize() {
 
 #if defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED)
         if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Threads<Dim, Idx>>) {
-            return 1;
+            return 20;
+        }
+#endif
+
+#if defined(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED)
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuTbbBlocks<Dim, Idx>>) {
+            return 1024;
+        }
+#endif
+
+#if defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED)
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuThreads<Dim, Idx>>) {
+            return 20;
         }
 #endif
 
@@ -80,7 +91,7 @@ constexpr inline auto getBlockSize() {
     };
 
     constexpr Idx blockSize = impl();
-    static_assert(blockSize != static_cast<Idx>(0));
+    static_assert(blockSize != static_cast<Idx>(0)); // getBlockSize() is not implemented for Acc
 
     return blockSize;
 }
@@ -108,9 +119,9 @@ inline auto pickFirstDevice() {
     const auto platform = alpaka::Platform<Acc>();
     const auto dev = alpaka::getDevByIdx(platform, 0);
     RAYX_VERB
-        << "found " << alpaka::getDevCount(platform) << ""
-        << "device(s) for platform '" << alpaka::getAccName<Acc>() << "'."
-        << "picking '" << alpaka::getName(dev) << "'"
+        << "found " << alpaka::getDevCount(platform)
+        << " device(s) for platform '" << alpaka::getAccName<Acc>() << "'."
+        << " picking '" << alpaka::getName(dev) << "'"
     ;
     return std::make_tuple(platform, dev);
 };
