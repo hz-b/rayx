@@ -7,18 +7,18 @@
 
 namespace RAYX {
 
-PointSource::PointSource(const DesignSource& deso) : LightSource(deso) {
-    m_widthDist = deso.getWidthDist();
-    m_heightDist = deso.getHeightDist();
-    m_horDist = deso.getHorDist();
-    m_verDist = deso.getVerDist();
+PointSource::PointSource(const DesignSource& deso) : LightSource(deso),
+    m_widthDist(deso.getWidthDist()),
+    m_heightDist(deso.getHeightDist()),
+    m_horDist(deso.getHorDist()),
+    m_verDist(deso.getVerDist()),
+    m_pol(deso.getStokes()),
+    m_verDivergence(deso.getVerDivergence()),
+    m_sourceDepth(deso.getSourceDepth()),
+    m_sourceHeight(deso.getSourceHeight()),
+    m_sourceWidth(deso.getSourceWidth())
+     {
     m_horDivergence = deso.getHorDivergence();
-    m_verDivergence = deso.getVerDivergence();
-    m_sourceDepth = deso.getSourceDepth();
-    m_sourceHeight = deso.getSourceHeight();
-    m_sourceWidth = deso.getSourceWidth();
-
-    m_pol = deso.getStokes();
 }
 
 /**

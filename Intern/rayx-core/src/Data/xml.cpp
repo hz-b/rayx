@@ -144,8 +144,7 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
         xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
         xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
 
-
-        //keep in mind, rotation on the x-Axis changes the psi and y rotation changes phi
+        // keep in mind, rotation on the x-Axis changes the psi and y rotation changes phi
         double x_mrad = 0;
         xml::paramDouble(node, "rotationXerror", &x_mrad);
         out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
@@ -176,6 +175,23 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     *out = glm::dvec4(position3, 1);
 
     return true;
+}
+
+std::filesystem::path Parser::parseEnergyDistributionFile() const { 
+    
+    std::filesystem::path datpath = Parser::parseStr("photonEnergyDistributionFile");
+    std::filesystem::path combinedPath = rmlFile.parent_path() / datpath;
+    try
+    {
+        combinedPath = std::filesystem::canonical(combinedPath);   
+    }
+    catch(const std::exception& e)
+    {
+        RAYX_ERR << "Failed to canonicalize datfile path: " << e.what();
+    }
+    
+    RAYX_VERB << "Combined datfile path: " << combinedPath;
+    return combinedPath;
 }
 
 // analoguous to paramPositionNoGroup but for orientation.
@@ -458,7 +474,7 @@ Parser::Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context
 
 const char* Parser::name() const { return node->first_attribute("name")->value(); }
 
-const char* Parser::type() const {return node->first_attribute("type")->value();}
+const char* Parser::type() const { return node->first_attribute("type")->value(); }
 
 // parsers for fundamental types
 double Parser::parseDouble(const char* paramname) const {
@@ -597,7 +613,7 @@ Cutout Parser::parseCutout(DesignPlane plane) const {
 
 QuadricSurface Parser::parseQuadricParameters() const {
     QuadricSurface s;
-    s.m_icurv = parseDouble("surfaceBending"); //icurv
+    s.m_icurv = parseInt("surfaceBending");  // icurv
     s.m_a11 = parseDouble("A11");
     s.m_a12 = parseDouble("A12");
     s.m_a13 = parseDouble("A13");
@@ -614,7 +630,7 @@ QuadricSurface Parser::parseQuadricParameters() const {
 
 CubicSurface Parser::parseCubicParameters() const {
     CubicSurface c;
-    c.m_icurv = parseDouble("surfaceBending"); //icurv
+    c.m_icurv = parseInt("surfaceBending");  // icurv
     c.m_a11 = parseDouble("A11");
     c.m_a12 = parseDouble("A12");
     c.m_a13 = parseDouble("A13");
@@ -679,7 +695,5 @@ double Parser::parseAdditionalOrder() const {
     paramDouble(node, "additionalOrder", &additionalZeroOrder);
     return additionalZeroOrder;
 }
-
-
 
 }  // namespace RAYX::xml

@@ -8,15 +8,14 @@
 
 namespace RAYX {
 
-PixelSource::PixelSource(const DesignSource& deso) : LightSource(deso) {
-    m_pol = deso.getStokes();
+PixelSource::PixelSource(const DesignSource& deso) : LightSource(deso),
+    m_pol(deso.getStokes()),
+    m_verDivergence(deso.getVerDivergence()),
+    m_sourceDepth(deso.getSourceDepth()),
+    m_sourceHeight(deso.getSourceHeight()),
+    m_sourceWidth(deso.getSourceWidth())
+{ 
     m_horDivergence = deso.getHorDivergence();
-    m_verDivergence = deso.getVerDivergence();
-    m_sourceDepth = deso.getSourceDepth();
-    m_sourceHeight = deso.getSourceHeight();
-    m_sourceWidth = deso.getSourceWidth();
-    
-
 }
 
 /**

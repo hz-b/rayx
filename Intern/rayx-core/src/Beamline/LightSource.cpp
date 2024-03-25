@@ -9,7 +9,7 @@ LightSource::LightSource(const DesignSource& deso) {
     m_name = deso.getName();
     m_EnergyDistribution = deso.getEnergyDistribution();
     m_misalignmentParams = deso.getMisalignment();
-    m_numberOfRays = deso.getNumberOfRays();
+    m_numberOfRays = (uint32_t) deso.getNumberOfRays();
     m_orientation = deso.getWorldOrientation();
     m_position = deso.getWorldPosition();
     m_verDivergence = 0.0;

@@ -112,6 +112,7 @@ struct RAYX_API Parser {
     double parseImageType() const;
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
+    std::filesystem::path parseEnergyDistributionFile() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.
@@ -181,9 +182,7 @@ struct RAYX_API Parser {
     inline double parseEnergySpread() const { return parseDouble("energySpread"); }
     inline SpreadType parseEnergySpreadType() const { return static_cast<SpreadType>(parseInt("energySpreadType")); }
     inline EnergyDistributionType parseEnergyDistributionType() const { return static_cast<EnergyDistributionType>(parseInt("energyDistributionType")); }
-    inline std::string parseEnergyDistributionFile() const { return parseStr("photonEnergyDistributionFile"); }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
-
     inline int parseNumOfEquidistantCircles() const { return parseDouble("numberCircles"); }
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
     inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }

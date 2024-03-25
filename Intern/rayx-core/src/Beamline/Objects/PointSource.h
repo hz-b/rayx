@@ -3,21 +3,16 @@
 #include "Beamline/LightSource.h"
 #include "Data/xml.h"
 
-
 namespace RAYX {
-struct DesignSource; //TODO Fanny see where the forward declaration has to go
-class LightSource;//TODO Fanny see where the forward declaration has to go
+struct DesignSource;  // TODO Fanny see where the forward declaration has to go
+class LightSource;    // TODO Fanny see where the forward declaration has to go
 
 class RAYX_API PointSource : public LightSource {
   public:
     PointSource(const DesignSource&);
     virtual ~PointSource() = default;
 
-    std::vector<Ray> getRays(int thread_count = 1) const ;
-
-    //double getHorDivergence() const override;
-    //double getSourceHeight() const override;
-    //double getSourceWidth() const override;
+    std::vector<Ray> getRays(int thread_count = 1) const;
 
   private:
     // Geometric Params

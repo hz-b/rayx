@@ -20,7 +20,7 @@ class RAYX_API SimpleUndulatorSource : public LightSource {
 
     double getVerDivergence() const;
 
-    double getCoord( double extent) const;
+    double getCoord(double extent) const;
 
   private:
     // Geometric Params

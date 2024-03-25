@@ -34,7 +34,7 @@ enum class ValueType {
 class Undefined {};
 
 class Value;
-using Map = std::unordered_map<std::string, Value>;
+using Map = std::unordered_map<std::string, std::shared_ptr<Value>>;
 
 class Value {
   public:
@@ -233,7 +233,8 @@ class Value {
     const Value& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map!");
-        return (*m).at(s);  // TODO return undefined on missing
+
+        return *m->at(s).get();  // TODO return undefined on missing
     }
 
     Value& operator[](std::string s) {
@@ -241,7 +242,11 @@ class Value {
         if (!m) {
             throw std::runtime_error("Indexing into non-map!");
         }
-        return (*m)[s];
+
+        if (!m->contains(s)){
+            (*m)[s] = std::make_shared<Value>();
+        }
+        return *((*m)[s].get());
     }
 
   private:

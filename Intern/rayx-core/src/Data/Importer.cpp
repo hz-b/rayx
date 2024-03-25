@@ -3,8 +3,8 @@
 #include <cstring>
 #include <memory>
 #include <rapidxml.hpp>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/Objects.h"
@@ -13,8 +13,6 @@
 #include "Debug/Instrumentor.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-
-
 
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
@@ -97,12 +95,11 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Simple Undulator") == 0) {
         setSimpleUndulatorSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        //addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
+        // addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
         parseElement(parser, &de);
         beamline->m_DesignElements.push_back(de);
     }
-
 }
 
 // `collection` is an xml object, over whose children-objects we want to

@@ -8,46 +8,32 @@ Element DesignElement::compile() const {
     Element e;
     if (getType() == "ImagePlane") {
         e = makeImagePlane(*this);
-        //std::cout << "compile element:" << getName() << std::endl;
     } else if (getType() == "Slit") {
         e = makeSlit(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Cone") {
         e = makeCone(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Cylinder") {
         e = makeCylinder(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Ellipsoid") {
         e = makeEllipsoid(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Paraboloid") {
         e = makeParaboloid(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Plane Grating") {
         e = makePlaneGrating(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Plane Mirror") {
         e = makePlaneMirror(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Spherical Grating") {
         e = makeSphereGrating(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Spherical Mirror" || getType() == "Sphere") {
         e = makeSphereMirror(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Toroid") {
         e = makeToroidMirror(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Reflection Zoneplate") {
         e = makeReflectionZonePlate(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Experts Optics") {
         e = makeExperts(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }else if (getType() == "Experts Cubic") {
         e = makeExpertsCubic(*this);
-        //std::cout << "compile element:" << v["name"].as_string() << std::endl;
     }
     return e;
 }
@@ -60,6 +46,9 @@ void DesignElement::setType(std::string s) {
 }
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 std::string DesignElement::getType() const { return v["type"].as_string(); }
+
+
+
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
     v["worldPosition"] = Map();
@@ -454,8 +443,8 @@ double DesignElement::getDesignMeridionalExitArmLength() const { return v["Desig
 void DesignElement::setOrderOfDiffraction(double value) { v["OrderDiffraction"] = value; }
 double DesignElement::getOrderOfDiffraction() const { return v["OrderDiffraction"].as_double(); }
 
-void DesignElement::setAdditionalOrder(int value) {v["additionalOrder"] = value;}
-int DesignElement::getAdditionalOrder() const { return v["additionalOrder"].as_int();}
+void DesignElement::setAdditionalOrder(double value) {v["additionalOrder"] = value;}
+double DesignElement::getAdditionalOrder() const { return v["additionalOrder"].as_double();}
 
 void DesignElement::setImageType(double value) {v["imageType"] = value;}
 double DesignElement::getImageType() const {return v["imageType"].as_double();}

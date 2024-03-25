@@ -179,8 +179,8 @@ struct DesignElement {
     void setOrderOfDiffraction(double value);
     double getOrderOfDiffraction() const;
 
-    void setAdditionalOrder(int value);
-    int getAdditionalOrder() const;
+    void setAdditionalOrder(double value);
+    double getAdditionalOrder() const;
 
     void setImageType(double value);
     double getImageType() const;
