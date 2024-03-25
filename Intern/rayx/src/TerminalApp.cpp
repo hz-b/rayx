@@ -159,15 +159,11 @@ void TerminalApp::run() {
     }
 
     // Choose Hardware
-    if (m_CommandParser->m_args.m_cpuFlag) {
-        m_Tracer = std::make_unique<RAYX::SimpleTracer>(RAYX::TracerPlatform::Cpu);
-    } else {
-#ifdef NO_GPU_TRACER
-        RAYX_ERR << "Gpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
-#else
-        m_Tracer = std::make_unique<RAYX::SimpleTracer>(RAYX::TracerPlatform::Gpu);
-#endif
-    }
+    auto platform = m_CommandParser->m_args.m_cpuFlag
+        ? RAYX::SimpleTracer::Platform::Cpu
+        : RAYX::SimpleTracer::Platform::Gpu
+    ;
+    m_Tracer = std::make_unique<RAYX::SimpleTracer>(platform);
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);

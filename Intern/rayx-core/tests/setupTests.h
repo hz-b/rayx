@@ -161,15 +161,12 @@ class TestSuite : public testing::Test {
             }
         }
 
-        if (cpu) {
-            tracer = std::make_unique<RAYX::SimpleTracer>(RAYX::TracerPlatform::Cpu);
-        } else {
-#ifdef NO_GPU_TRACER
-            RAYX_ERR << "Gpu Tracer was disabled during build. add '-x' flag on launch to use the Cpu Tracer";
-#else
-            tracer = std::make_unique<RAYX::SimpleTracer>(RAYX::TracerPlatform::Gpu);
-#endif
-        }
+        // Choose Hardware
+        auto platform = cpu
+            ? RAYX::SimpleTracer::Platform::Cpu
+            : RAYX::SimpleTracer::Platform::Gpu
+        ;
+        tracer = std::make_unique<RAYX::SimpleTracer>(platform);
     }
 
     // called before every test invocation.
