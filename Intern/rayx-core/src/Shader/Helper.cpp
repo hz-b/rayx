@@ -44,7 +44,7 @@ void recordEvent(Ray r, double w, Inv& inv) {
 
     // recording of event type ETYPE_UINIT is forbidden.
     if (w == ETYPE_UNINIT) {
-        RAYX_ERR << "recordEvent failed: weight UNINIT is invalid in recordEvent";
+        _throw("recordEvent failed: weight UNINIT is invalid in recordEvent");
 
         return;
     }
@@ -57,7 +57,7 @@ void recordEvent(Ray r, double w, Inv& inv) {
         uint idx = output_index(uint(inv.pushConstants.maxEvents - 1), inv);
         inv.outputData[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
 
-        RAYX_ERR << "recordEvent failed: too many events!";
+        _throw("recordEvent failed: too many events!");
 
         return;
     }
