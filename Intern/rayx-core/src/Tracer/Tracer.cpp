@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Beamline/OpticalElement.h"
+#include "DesignElement/DesignElement.h"
 #include "RAY-Core.h"
 #include "Random.h"
 #include "Shader/Constants.h"
@@ -16,11 +17,15 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
     RAYX_VERB << "maxEvents: " << maxEvents;
 
     auto rays = b.getInputRays(thread_count);
-
     // don't trace if there are no optical elements
-    if (b.m_OpticalElements.size() == 0) {
+    if (b.m_DesignElements.size() == 0) {
         // an empty history suffices, nothing is happening to the rays!
         BundleHistory result;
+        for (auto r : rays) {
+            auto ray = r;
+            ray.m_eventType = ETYPE_EMITTED;
+            result.push_back({ray});
+        }
         return result;
     }
 
@@ -43,11 +48,10 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         // The number of input-rays that we put into this batch.
         // Typically equal to max_batch_size, except for the last batch.
         auto batch_size = (max_batch_size < remaining_rays) ? max_batch_size : remaining_rays;
-
         std::vector<Element> elements;
-        elements.reserve(b.m_OpticalElements.size());
-        for (const auto& e : b.m_OpticalElements) {
-            elements.push_back(e.m_element);
+        elements.reserve(b.m_DesignElements.size());
+        for (const auto& e : b.m_DesignElements) {
+            elements.push_back(e.compile());
         }
 
         // create a TraceRawConfig.
@@ -76,7 +80,6 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatch = traceRaw(cfg);
-            RAYX_LOG << "Traced " << rawBatch.size() << " events.";
             assert(rawBatch.size() == batch_size * (maxEvents - startEventID));
         }
 
@@ -130,6 +133,7 @@ BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
     BundleHistory out;
     for (auto r : rays) {
         out.push_back({r});
+
     }
     return out;
 }

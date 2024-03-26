@@ -6,7 +6,7 @@ namespace RAYX {
 
 class RAYX_API SimpleUndulatorSource : public LightSource {
   public:
-    SimpleUndulatorSource(const DesignObject&);
+    SimpleUndulatorSource(const DesignSource&);
     virtual ~SimpleUndulatorSource() = default;
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
@@ -14,13 +14,13 @@ class RAYX_API SimpleUndulatorSource : public LightSource {
     double calcUndulatorSigma() const;
     double calcUndulatorSigmaS() const;
 
-    double getHorDivergence() const override;
-    double getSourceHeight() const override;
-    double getSourceWidth() const override;
+    double getHorDivergence() const;
+    double getSourceHeight() const;
+    double getSourceWidth() const;
 
     double getVerDivergence() const;
 
-    double getCoord( double extent) const;
+    double getCoord(double extent) const;
 
   private:
     // Geometric Params
@@ -42,9 +42,7 @@ class RAYX_API SimpleUndulatorSource : public LightSource {
 
     SourcePulseType m_sourceDistributionType;  // TODO unused.
 
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
+    glm::dvec4 m_pol;
 
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };

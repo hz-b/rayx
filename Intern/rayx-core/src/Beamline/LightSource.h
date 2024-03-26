@@ -6,6 +6,7 @@
 
 #include "Core.h"
 #include "Data/xml.h"
+#include "DesignElement/DesignSource.h"
 #include "EnergyDistribution.h"
 #include "Shader/Ray.h"
 
@@ -16,10 +17,11 @@ enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
+struct DesignSource;  // TODO Fanny see where the forward declaration has to go
 
 class RAYX_API LightSource {
   public:
-    LightSource(const DesignObject&);
+    LightSource(const DesignSource&);
     virtual ~LightSource() = default;
 
     // Setter (Only used in frontend)
@@ -28,9 +30,9 @@ class RAYX_API LightSource {
 
     // Getter
     Misalignment getMisalignmentParams() const;
-    virtual double getHorDivergence() const { return m_horDivergence; }
-    virtual double getSourceHeight() const { return m_sourceHeight; }
-    virtual double getSourceWidth() const { return m_sourceWidth; }
+    // virtual double getHorDivergence() const { return m_horDivergence; }
+    // virtual double getSourceHeight() const { return m_sourceHeight; }
+    // virtual double getSourceWidth() const { return m_sourceWidth; }
     glm::dvec4 getPosition() const { return m_position; }
 
     /** yields the average energy of the energy distribution

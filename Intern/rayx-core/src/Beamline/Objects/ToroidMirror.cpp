@@ -7,10 +7,10 @@
 
 namespace RAYX {
 
-Element makeToroidMirror(const DesignObject& dobj) {
-    auto surface = makeToroid(dobj);
+Element makeToroidMirror(const DesignElement& dele) {
+    auto surface = makeToroid(dele);
     auto behaviour = serializeMirror();
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

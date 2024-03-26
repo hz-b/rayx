@@ -7,7 +7,7 @@ TEST_F(TestSuite, ImagePlane) { compareLastAgainstRayUI("ImagePlane"); }
 TEST_F(TestSuite, PlaneMirror) { compareLastAgainstRayUI("PlaneMirror"); }
 TEST_F(TestSuite, PlaneMirrorDef) {
     compareLastAgainstRayUI("PlaneMirrorDef");
-
+    RAYX_LOG << "planemirrdef ";
     // additional path length test
     auto rays = extractLastEvents(traceRML("PlaneMirrorDef"));
     for (auto r : rays) {
@@ -42,7 +42,7 @@ TEST_F(TestSuite, ReflectionZonePlateMis) { compareLastAgainstRayUI("ReflectionZ
 TEST_F(TestSuite, globalCoordinates_20rays) { compareLastAgainstRayUI("globalCoordinates_20rays"); }
 TEST_F(TestSuite, pm_ell_ip_200mirrormis) { compareLastAgainstRayUI("pm_ell_ip_200mirrormis"); }
 
-TEST_F(TestSuite, Ellipsoid) {
+TEST_F(TestSuite, Ellipsoid) { 
     auto rayx = traceRML("Ellipsoid");
 
     writeToOutputCSV(rayx, "Ellipsoid.rayx");

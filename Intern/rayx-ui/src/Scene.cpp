@@ -89,7 +89,7 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
     }
 }
 
-std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::OpticalElement> elements,
+std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
                                                               const RAYX::BundleHistory& rays) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
@@ -103,10 +103,10 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
 
         triangulateObject(elements[i], vertices, indices);
 
-        glm::mat4 modelMatrix = elements[i].m_element.m_outTrans;
+        glm::mat4 modelMatrix = elements[i].compile().m_outTrans;
 
         if (vertices.size() == 4) {
-            auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
+            auto [width, height] = getRectangularDimensions(elements[i].compile().m_cutout);
 
             std::vector<std::vector<uint32_t>> footprint =
                 makeFootprint(sortedRays[i], -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));

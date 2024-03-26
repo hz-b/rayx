@@ -9,21 +9,19 @@
 
 namespace RAYX {
 
-CircleSource::CircleSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_sourceDepth = dobj.parseSourceDepth();
-    m_sourceWidth = dobj.parseSourceWidth();
-    m_sourceHeight = dobj.parseSourceHeight();
+CircleSource::CircleSource(const DesignSource& deso) : LightSource(deso) {
+    m_pol = deso.getStokes();
 
-    m_misalignment = getMisalignmentParams();
+    m_sourceDepth = deso.getSourceDepth();
+    m_sourceHeight = deso.getSourceHeight();
+    m_sourceWidth = deso.getSourceWidth();
 
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
+    m_misalignment = deso.getMisalignment();
 
-    m_numOfCircles = dobj.parseNumOfEquidistantCircles();
-    m_maxOpeningAngle = dobj.parseMaxOpeningAngle();
-    m_minOpeningAngle = dobj.parseMinOpeningAngle();
-    m_deltaOpeningAngle = dobj.parseDeltaOpeningAngle();
+    m_numOfCircles = deso.getNumOfCircles();
+    m_maxOpeningAngle = deso.getMaxOpeningAngle();
+    m_minOpeningAngle = deso.getMinOpeningAngle();
+    m_deltaOpeningAngle = deso.getDeltaOpeningAngle();
 }
 /**
  * Creates random rays from circle source with specified num. of circles and
@@ -57,9 +55,8 @@ std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const 
         // get corresponding direction to create circles
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirection();
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }
@@ -95,10 +92,5 @@ glm::dvec3 CircleSource::getDirection() const {
     return glm::dvec3(al, am, an);
 }
 
-double CircleSource::getHorDivergence() const { return m_horDivergence; }
-
-double CircleSource::getSourceHeight() const { return m_sourceHeight; }
-
-double CircleSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

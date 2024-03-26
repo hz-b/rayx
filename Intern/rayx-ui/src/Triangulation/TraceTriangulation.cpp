@@ -47,11 +47,11 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
-void traceTriangulation(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void traceTriangulation(const RAYX::DesignElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     RAYX::CpuTracer tracer;
 
     constexpr size_t gridSize = 20;
-    auto [width, length] = getRectangularDimensions(element.m_element.m_cutout);
+    auto [width, length] = getRectangularDimensions(element.compile().m_cutout);
     RAYX::BundleHistory rayGrid = createRayGrid(gridSize, width, length);
 
     Collision coll;
@@ -60,7 +60,7 @@ void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Texture
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
-            Collision collision = findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout, true);
+            Collision collision = findCollisionInElementCoords(rayGrid[i][j], element.compile().m_surface, element.compile().m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }

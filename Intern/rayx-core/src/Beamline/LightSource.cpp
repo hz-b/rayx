@@ -5,13 +5,13 @@
 #include "EnergyDistribution.h"
 
 namespace RAYX {
-LightSource::LightSource(const DesignObject& dobj) {
-    m_name = dobj.name();
-    m_EnergyDistribution = dobj.parseEnergyDistribution();
-    m_misalignmentParams = dobj.parseMisalignment();
-    m_numberOfRays = dobj.parseNumberRays();
-    m_orientation = dobj.parseOrientation();
-    m_position = dobj.parsePosition();
+LightSource::LightSource(const DesignSource& deso) {
+    m_name = deso.getName();
+    m_EnergyDistribution = deso.getEnergyDistribution();
+    m_misalignmentParams = deso.getMisalignment();
+    m_numberOfRays = (uint32_t) deso.getNumberOfRays();
+    m_orientation = deso.getWorldOrientation();
+    m_position = deso.getWorldPosition();
     m_verDivergence = 0.0;
 }
 
@@ -30,7 +30,7 @@ double LightSource::selectEnergy() const { return m_EnergyDistribution.selectEne
 
 double LightSource::calcPhotonWavelength(double photonEnergy) {
     // Energy Distribution Type : Values only
-    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy; //i nm to eV
+    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy;  // i nm to eV
     return photonWaveLength;
 }
 

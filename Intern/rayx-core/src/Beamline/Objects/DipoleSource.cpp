@@ -44,29 +44,27 @@ double get_factorTotalPowerDipol() {
     return totalPower;
 }
 
-DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_energySpreadType = dobj.parseEnergyDistribution();
-    m_photonFlux = dobj.parsePhotonFlux();
-    m_electronEnergyOrientation = dobj.parseElectronEnergyOrientation();
-    m_sourcePulseType = dobj.parseSourcePulseType();
-    m_bendingRadius = dobj.parseBendingRadiusDouble();
-    m_electronEnergy = dobj.parseElectronEnergy();
-    m_photonEnergy = dobj.parsePhotonEnergy();
-    m_verEbeamDivergence = dobj.parseVerEbeamDivergence();
-    m_energySpread = dobj.parseEnergySpread();
-    m_energySpreadUnit = dobj.parseEnergySpreadUnit();
-    m_horDivergence = dobj.parseHorDiv();
-    m_sourceHeight = dobj.parseSourceHeight();
-    m_sourceWidth = dobj.parseSourceWidth();
-
-    m_criticalEnergy = RAYX::get_factorCriticalEnergy();
-    m_bandwidth = 1.0e-3;
+DipoleSource::DipoleSource(const DesignSource& deso) : LightSource(deso), 
+    m_bendingRadius(deso.getBendingRadius()),
+    m_electronEnergyOrientation(deso.getElectronEnergyOrientation()),
+    m_photonFlux(deso.getPhotonFlux()),
+    m_sourceHeight(deso.getSourceHeight()),
+    m_sourceWidth(deso.getSourceWidth()),
+    m_electronEnergy(deso.getElectronEnergy()),
+    m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
+    m_photonEnergy(deso.getEnergy()),
+    m_verEbeamDivergence(deso.getVerEBeamDivergence()),
+    m_bandwidth(1.0e-3),
+    m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
+    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+    m_energySpread(deso.getEnergySpread()),
+    m_energySpreadUnit(deso.getEnergySpreadUnit())
+{   
+    
+    m_horDivergence = deso.getHorDivergence();
     m_verDivergence = DipoleSource::vDivergence(m_photonEnergy, m_verEbeamDivergence);
     m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
 
-    m_gamma = std::fabs(m_electronEnergy) * get_factorElectronEnergy();
-
-    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
     setLogInterpolation();
     setMaxIntensity();
     setMaxFlux();
@@ -487,10 +485,10 @@ void DipoleSource::setMaxFlux() {
     }
 }
 
-double DipoleSource::getHorDivergence() const { return m_horDivergence; }
+/*double DipoleSource::getHorDivergence() const { return m_horDivergence; }
 
 double DipoleSource::getSourceHeight() const { return m_sourceHeight; }
 
 double DipoleSource::getSourceWidth() const { return m_sourceWidth; }
-
+*/
 }  // namespace RAYX

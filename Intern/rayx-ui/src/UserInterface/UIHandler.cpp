@@ -155,7 +155,7 @@ void UIHandler::beginUIRender() {
  * @param uiParams
  * @param rObjects
  */
-void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
+void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
     if (m_useLargeFont) {
         ImGui::PushFont(m_largeFont);
     } else {

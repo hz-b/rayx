@@ -5,6 +5,7 @@
 #include "Beamline/OpticalElement.h"
 
 namespace RAYX {
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
 
 enum class CurvatureType {
     Plane,
@@ -14,6 +15,6 @@ enum class CurvatureType {
     // newton iteration
 enum class RZPType { Elliptical, Meriodional };
 
-Element makeReflectionZonePlate(const DesignObject& dobj);
+Element makeReflectionZonePlate(const DesignElement& dele);
 
 }  // namespace RAYX

@@ -9,10 +9,15 @@
 #include "Beamline/OpticalElement.h"
 #include "Core.h"
 #include "Shader/Ray.h"
+#include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 
 namespace RAYX {
-struct OpticalElement;
 class LightSource;
+struct OpticalElement;
+struct DesignElement; //TODO Fanny see where the forward declaration has to go
+struct DesignSource; //TODO Fanny see where the forward declaration has to go
+
 
 /*
  * The Beamline class is a container for OpticalElements and LightSources.
@@ -34,8 +39,8 @@ class RAYX_API Beamline {
      */
     MaterialTables calcMinimalMaterialTables() const;
 
-    std::vector<OpticalElement> m_OpticalElements;
-    std::vector<std::shared_ptr<LightSource>> m_LightSources;
+    std::vector<DesignElement> m_DesignElements;
+    std::vector<DesignSource> m_DesignSources;
 };
 
 }  // namespace RAYX

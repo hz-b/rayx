@@ -12,6 +12,8 @@
 #include "Debug/Debug.h"
 #include "Material/Material.h"
 #include "Random.h"
+#include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 
 #include "Shader/Constants.h"
 #include "Shader/Ray.h"

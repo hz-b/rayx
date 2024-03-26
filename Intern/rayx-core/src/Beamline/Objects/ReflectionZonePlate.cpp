@@ -8,38 +8,39 @@
 
 namespace RAYX {
 
-Element makeReflectionZonePlate(const DesignObject& dobj) {
-    auto fresnelZOffset = dobj.parseFresnelZOffset();
-    auto designAlphaAngle = dobj.parseDesignAlphaAngle();
-    auto designBetaAngle = dobj.parseDesignBetaAngle();
-    auto designOrderOfDiffraction = dobj.parseDesignOrderDiffraction();
-    auto designEnergy = dobj.parseDesignEnergy();
-    auto designSagittalEntranceArmLength = dobj.parseEntranceArmLengthSag();
-    auto designSagittalExitArmLength = dobj.parseExitArmLengthSag();
-    auto designMeridionalEntranceArmLength = dobj.parseEntranceArmLengthSag();
-    auto designMeridionalExitArmLength = dobj.parseExitArmLengthMer();
-    auto orderOfDiffraction = dobj.parseOrderDiffraction();
+Element makeReflectionZonePlate(const DesignElement& dele) {
+    auto fresnelZOffset = dele.getFresnelZOffset();
+    auto designAlphaAngle = dele.getDesignAlphaAngle();
+    auto designBetaAngle = dele.getDesignBetaAngle();
+    auto designOrderOfDiffraction = dele.getDesignOrderOfDiffraction();
+    auto designEnergy = dele.getDesignEnergy();
+    auto designSagittalEntranceArmLength = dele.getDesignSagittalEntranceArmLength();
+    auto designSagittalExitArmLength = dele.getDesignSagittalExitArmLength();
+    auto designMeridionalEntranceArmLength = dele.getDesignMeridionalEntranceArmLength();  // Assuming it should be the same as sagittal
+    auto designMeridionalExitArmLength = dele.getDesignMeridionalExitArmLength();
+    auto orderOfDiffraction = dele.getOrderOfDiffraction();  // Assuming this getter is available
+
 
     // designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else designEnergy = designEnergy
     auto designWavelength = designEnergy == 0 ? 0 : hvlam(designEnergy);
-    auto additionalOrder = double(dobj.parseAdditionalOrder());
+    auto additionalOrder = double(dele.getAdditionalOrder());
 
-    auto curvatureType = dobj.parseCurvatureType();
+    auto curvatureType = dele.getCurvatureType();
     Surface surface;
 
     // set parameters in Quadric class
     if (curvatureType == CurvatureType::Plane) {
         surface = makePlane();
     } else if (curvatureType == CurvatureType::Toroidal) {
-        surface = makeToroid(dobj);
+        surface = makeToroid(dele);
     } else if (curvatureType == CurvatureType::Spherical) {
-        surface = makeSphere(dobj.parseLongRadius());
+        surface = makeSphere(dele.getLongRadius());
     } else {
         RAYX_ERR << "invalid curvature Type";
     }
 
-    auto imageType = dobj.parseImageType();
+    auto imageType = dele.getImageType();
 
     auto behaviour = serializeRZP({.m_imageType = (double) imageType,
                                    .m_rzpType = (double)RZPType::Elliptical,
@@ -55,7 +56,7 @@ Element makeReflectionZonePlate(const DesignObject& dobj) {
                                    .m_designAlphaAngle = designAlphaAngle.rad,
                                    .m_designBetaAngle = designBetaAngle.rad,
                                    .m_additionalOrder = (double)additionalOrder});
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX
