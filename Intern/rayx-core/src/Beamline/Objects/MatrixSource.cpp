@@ -8,12 +8,14 @@
 
 namespace RAYX {
 
-MatrixSource::MatrixSource(const DesignSource& deso) : LightSource(deso),
-    m_pol(deso.getStokes()),
-    m_verDivergence(deso.getVerDivergence()),
-    m_sourceDepth(deso.getSourceDepth()),
-    m_sourceHeight(deso.getSourceHeight()),
-    m_sourceWidth(deso.getSourceWidth()) { m_horDivergence = deso.getHorDivergence(); }
+MatrixSource::MatrixSource(const DesignSource& dSource) : LightSource(dSource),
+    m_pol(dSource.getStokes()),
+    m_verDivergence(dSource.getVerDivergence()),
+    m_sourceDepth(dSource.getSourceDepth()),
+    m_sourceHeight(dSource.getSourceHeight()),
+    m_sourceWidth(dSource.getSourceWidth()) 
+{ 
+    m_horDivergence = dSource.getHorDivergence(); }
 
 /**
  * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as
@@ -85,11 +87,5 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
     }
     return returnList;
 }
-/*
-double MatrixSource::getHorDivergence() const { return m_horDivergence; }
 
-double MatrixSource::getSourceHeight() const { return m_sourceHeight; }
-
-double MatrixSource::getSourceWidth() const { return m_sourceWidth; }
-*/
 }  // namespace RAYX

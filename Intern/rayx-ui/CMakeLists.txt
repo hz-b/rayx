@@ -4,7 +4,7 @@ find_package(Vulkan) # TODO: rayx-ui gets vulkan from rayx-core, this is a hack 
 
 if(Vulkan_FOUND)
     # ---- Add tests ----
-    # add_subdirectory(tests)
+    add_subdirectory(tests)
     # -------------------
 
     # ---- Project ----

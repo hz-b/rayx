@@ -1131,13 +1131,12 @@ TEST_F(TestSuite, testBesselDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     DesignSource src = beamline.m_DesignSources[0];
-    //TODO: reintegrate test
-    //DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*src);
+    DipoleSource dipolesource(src);
 
 
     for (auto values : inouts) {
-        //auto result = dipolesource->bessel(values.proportion, values.zeta);
-        //CHECK_EQ(result, values.out, 0.1);
+        auto result = dipolesource.bessel(values.proportion, values.zeta);
+        CHECK_EQ(result, values.out, 0.1);
     }
 }
 

@@ -16,9 +16,9 @@ Element makeReflectionZonePlate(const DesignElement& dele) {
     auto designEnergy = dele.getDesignEnergy();
     auto designSagittalEntranceArmLength = dele.getDesignSagittalEntranceArmLength();
     auto designSagittalExitArmLength = dele.getDesignSagittalExitArmLength();
-    auto designMeridionalEntranceArmLength = dele.getDesignMeridionalEntranceArmLength();  // Assuming it should be the same as sagittal
+    auto designMeridionalEntranceArmLength = dele.getDesignMeridionalEntranceArmLength();
     auto designMeridionalExitArmLength = dele.getDesignMeridionalExitArmLength();
-    auto orderOfDiffraction = dele.getOrderOfDiffraction();  // Assuming this getter is available
+    auto orderOfDiffraction = dele.getOrderOfDiffraction();
 
 
     // designEnergy = designEnergy; // if Auto == true, take energy of Source

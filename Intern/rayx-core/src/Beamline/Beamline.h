@@ -14,10 +14,6 @@
 
 namespace RAYX {
 class LightSource;
-struct OpticalElement;
-struct DesignElement; //TODO Fanny see where the forward declaration has to go
-struct DesignSource; //TODO Fanny see where the forward declaration has to go
-
 
 /*
  * The Beamline class is a container for OpticalElements and LightSources.

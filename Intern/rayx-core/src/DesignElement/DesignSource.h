@@ -5,7 +5,7 @@
 
 namespace RAYX {
 
-struct DesignSource {
+struct RAYX_API DesignSource {
     Value v;
     std::vector<Ray> compile(int thread_count) const;
 

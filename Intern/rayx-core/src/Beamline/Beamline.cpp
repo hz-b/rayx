@@ -18,8 +18,8 @@ std::vector<Ray> Beamline::getInputRays(int thread_count) const {
     // count number of rays.
     uint32_t raycount = 0;
 
-    for (DesignSource lsPtr : m_DesignSources) {
-        raycount += (uint32_t) lsPtr.getNumberOfRays();
+    for (DesignSource dSource : m_DesignSources) {
+        raycount += (uint32_t) dSource.getNumberOfRays();
     }
 
     // We add all remaining rays into the rays of the first light source.
@@ -49,7 +49,6 @@ MaterialTables Beamline::calcMinimalMaterialTables() const {
 
     for (const auto& e : m_DesignElements) {
         int material = static_cast<int>(e.getMaterial());  // in [1, 92]
-        // TODO material = "extract the chosen material from `e`".
         if (1 <= material && material <= 92) {
             relevantMaterials[material - 1] = true;
         }

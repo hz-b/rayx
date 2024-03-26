@@ -7,7 +7,7 @@
 
 namespace RAYX {
 
-struct DesignElement {
+struct RAYX_API DesignElement {
     Value v;
     Element compile() const;
 
