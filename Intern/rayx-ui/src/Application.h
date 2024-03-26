@@ -3,6 +3,8 @@
 #include <optional>
 
 #include "CommandParser.h"
+#include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"
 #include "RayProcessing.h"
@@ -19,6 +21,8 @@ const bool enableValidationLayers = true;
 class Window;
 class Device;
 class RenderObject;
+struct DesignElement;
+struct DesignSource;
 
 class Application {
   public:
