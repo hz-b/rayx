@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "Core.h"
 #include "Tracer.h"
@@ -9,9 +10,7 @@
 namespace RAYX {
 
 /**
- * @brief The CPU tracer can replace the Vulkan tracer to run all shader compute
- * locally on CPU and RAM. |CPU| --> |SHADER(OnCPU)|--> |CPU|
- *
+ * @brief SimpleTracer sequentially executes tracing in batches the CPU or GPU
  */
 class RAYX_API SimpleTracer : public Tracer {
   public:
@@ -21,22 +20,28 @@ class RAYX_API SimpleTracer : public Tracer {
     };
 
     /**
-     * @brief Constructs a new *CPU* Tracer object that utlizes the compute
-     * shader code.
-     *
+     * @brief Constructs SimpleTracer for the desired platform
+     * @param platform provide the desired platform
      */
     SimpleTracer(Platform platform);
     ~SimpleTracer();
 
-    std::vector<Ray> traceRaw(const TraceRawConfig&) override;
+    BundleHistory trace(
+        const Beamline&,
+        Sequential sequential,
+        uint64_t max_batch_size,
+        int THREAD_COUNT = 1,
+        unsigned int maxEvents = 1,
+        int startEventID = 0
+    ) override;
 
     void setPushConstants(const PushConstants*) override;
 
-protected:
+  protected:
     PushConstants m_pushConstants;
 
-    using TraceFn = std::vector<Ray>(const TraceRawConfig&, const PushConstants&);
-    std::function<TraceFn> m_traceFn;
+    using TraceBatchOnPlatformFn = std::vector<Ray>(const TraceRawConfig&, const PushConstants&);
+    std::function<TraceBatchOnPlatformFn> m_traceBatchOnPlatformFn;
 };
 
 }  // namespace RAYX
