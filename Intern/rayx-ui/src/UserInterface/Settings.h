@@ -1,9 +1,11 @@
 #pragma once
 
 #include <filesystem>
+#include <vulkan/vulkan.h>
 
 #include "Camera.h"
-#include "GraphicsCore/Texture.h"
+
+// TODO: Divide this into passed and returned parameters
 
 /**
  * UI Parameters such as toggles, paths, etc.
@@ -42,7 +44,8 @@ struct UISimulationInfo {
 };
 
 struct UIParameters {
-    std::shared_ptr<Texture> sceneRender;
+    VkExtent2D sceneExtent;
+    VkDescriptorSet sceneDescriptorSet;
     CameraController& camController;
     std::filesystem::path rmlPath;
     bool rmlReady;
@@ -54,7 +57,8 @@ struct UIParameters {
     UISimulationInfo simulationInfo;
 
     UIParameters(CameraController& camController, const std::vector<std::string>& availableDevices)
-        : sceneRender(nullptr),
+        : sceneExtent({0, 0}),
+          sceneDescriptorSet(VK_NULL_HANDLE),
           camController(camController),
           rmlPath(""),
           rmlReady(false),

@@ -45,11 +45,6 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
         throw std::runtime_error("Failed to create imgui descriptor pool");
     }
 
-    m_AssetManager = std::make_unique<AssetManager>(m_Device, m_DescriptorPool);
-    std::filesystem::path dummyTexturePath = getExecutablePath() / "Assets/textures/default.png";
-    std::string dummyTextureId = "defaultTexture";
-    m_AssetManager->add<Texture>(dummyTextureId, dummyTexturePath);
-
     // Create render pass for IMGUI
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = imageFormat;  // same as in main render pass
@@ -221,12 +216,11 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
 
     // Render View Dummy
     ImGui::Begin("Render View");
-    if (uiParams.sceneRender != nullptr) {
-        m_AssetManager->addOrReplace<Texture>("sceneRender", std::move(*uiParams.sceneRender.get()));
-    }
-    VkDescriptorSet sceneRenderDescriptorSet = m_AssetManager->getDescriptorSet("sceneRender");
-    if (sceneRenderDescriptorSet != VK_NULL_HANDLE) {
-        ImGui::Image((ImTextureID)sceneRenderDescriptorSet, ImVec2(1920, 1080));
+    ImVec2 size = ImGui::GetContentRegionAvail();
+    uiParams.sceneExtent = {static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y)};
+    if (uiParams.sceneDescriptorSet != VK_NULL_HANDLE) {
+        ImGui::Image((ImTextureID)uiParams.sceneDescriptorSet, ImVec2(size.x, size.y), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1),
+                     ImVec4(1, 1, 1, 0));
     }
     ImGui::End();
 

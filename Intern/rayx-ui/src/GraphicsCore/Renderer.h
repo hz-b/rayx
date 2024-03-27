@@ -71,14 +71,16 @@ class Renderer {
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
     void renderOffscreen(FrameInfo& frameInfo);
-    Texture getRenderedImage() const;
+    std::shared_ptr<Texture> getOffscreenColorTexture() const { return m_offscreenColorTexture; }
+
+    void offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, const DescriptorPool& pool, VkDescriptorSet& descriptorSet);
+    void resizeOffscreenResources(const VkExtent2D& extent);
 
   private:
     void createCommandBuffers();
     void freeCommandBuffers();
     void recreateSwapChain();
     void initializeOffscreenRendering();
-    void destroyOffscreenResources();
 
     Window& m_Window;
     Device& m_Device;
@@ -89,14 +91,12 @@ class Renderer {
     std::vector<VkCommandBuffer> m_commandBuffers;
 
     // Off screen rendering
-    VkImage m_offscreenImage;
-    VkImage m_offscreenDepthImage;
-    VkImageView m_offscreenImageView;
-    VkImageView m_offscreenDepthImageView;
-    VkDeviceMemory m_offscreenImageMemory;
-    VkDeviceMemory m_offscreenDepthImageMemory;
+    VkExtent2D m_offscreenExtent = {1920, 1080};
+    std::shared_ptr<Texture> m_offscreenColorTexture;
+    std::shared_ptr<Texture> m_offscreenDepthTexture;
     VkFramebuffer m_offscreenFramebuffer;
     VkRenderPass m_offscreenRenderPass;
+
     void createOffscreenResources();
     void createOffscreenRenderPass();
     void createOffscreenFramebuffer();

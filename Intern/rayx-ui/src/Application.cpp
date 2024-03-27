@@ -37,7 +37,7 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .build();
-    m_TexturePool = nullptr;
+    m_TexturePool = DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000).setMaxSets(1000).build();
 
     init();
 }
@@ -89,8 +89,11 @@ void Application::run() {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
         DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
+    auto textureSetLayout =
+        DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
 
     // Main loop
+    VkExtent2D sceneExtent = {1920, 1080};
     while (!m_Window.shouldClose()) {
         // Skip rendering when minimized
         if (m_Window.isMinimized()) {
@@ -112,12 +115,20 @@ void Application::run() {
             // Render
             m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
             FrameInfo frameInfo = {
-                .commandBuffer = VK_NULL_HANDLE,                             //
-                .descriptorSet = descriptorSets[m_Renderer.getFrameIndex()]  //
+                .camera = m_Camera,                          //
+                .frameIndex = frameIndex,                    //
+                .sceneExtent = m_UIParams.sceneExtent,       //
+                .commandBuffer = VK_NULL_HANDLE,             //
+                .descriptorSet = descriptorSets[frameIndex]  //
             };
+            if (m_UIParams.sceneExtent.height != 0 && m_UIParams.sceneExtent.width != 0) {
+                if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
+                    sceneExtent = m_UIParams.sceneExtent;
+                    m_Renderer.resizeOffscreenResources(sceneExtent);
+                    m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
+                }
+            }
             m_Renderer.renderOffscreen(frameInfo);
-            Texture renderedImage = m_Renderer.getRenderedImage();
-            m_UIParams.sceneRender = std::make_shared<Texture>(std::move(renderedImage));
 
             // UI
             m_UIHandler.beginUIRender();

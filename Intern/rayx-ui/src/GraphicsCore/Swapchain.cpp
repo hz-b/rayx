@@ -150,8 +150,9 @@ void SwapChain::createSwapChain() {
 
     createInfo.oldSwapchain = m_oldSwapChain == nullptr ? VK_NULL_HANDLE : m_oldSwapChain->m_SwapChain;
 
-    if (vkCreateSwapchainKHR(m_Device.device(), &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create swap chain!");
+    VkResult result = vkCreateSwapchainKHR(m_Device.device(), &createInfo, nullptr, &m_SwapChain);
+    if (result != VK_SUCCESS) {
+        throw std::runtime_error("failed to create swap chain! Error code: " + std::to_string(result));
     }
 
     // we only specified a minimum number of images in the swap chain, so the implementation is
