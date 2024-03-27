@@ -28,7 +28,7 @@ struct ShaderEntryPoint {
     void operator() (const TAcc& acc, Inv inv) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
-        if (gid < inv.pushConstants.numRays)
+        if (gid < inv.rayData.size())
             dynamicElements(gid, inv);
     }
 };
