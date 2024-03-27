@@ -4,6 +4,7 @@ RAYX_FUNC
 void init(Inv& inv) {
     inv.finalized = false;
 
+    // TODO(Sven): dont waste time with initializing
     // sets all output rays controlled by this shader call to ETYPE_UNINIT.
     for (uint i = uint(inv.pushConstants.startEventID); i < inv.pushConstants.maxEvents; i++) {
         inv.outputData[output_index(i, inv)].m_eventType = ETYPE_UNINIT;

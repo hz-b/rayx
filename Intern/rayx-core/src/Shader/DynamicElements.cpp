@@ -31,7 +31,7 @@ void dynamicElements(int gid, Inv& inv) {
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
-            return;
+            break;
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
@@ -64,11 +64,15 @@ void dynamicElements(int gid, Inv& inv) {
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (inv.finalized) { return; }
+        if (inv.finalized) { break; }
 
         recordEvent(elem_ray, ETYPE_JUST_HIT_ELEM, inv);
 
         // transform back to WORLD coordinates
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
+
+    auto eventsCount = static_cast<int>(inv.nextEventIndex - inv.pushConstants.startEventID);
+    eventsCount = std::max(0, std::min(static_cast<int>(inv.pushConstants.maxEvents) - 1, eventsCount));
+    inv.outputRayCounts[gid] = eventsCount;
 }

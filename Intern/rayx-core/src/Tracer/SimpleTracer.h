@@ -19,6 +19,13 @@ class RAYX_API SimpleTracer : public Tracer {
         Gpu,
     };
 
+    struct TraceResult {
+        RayHistory events;
+        std::vector<int> offsets;
+        std::vector<int> sizes;
+        int count;
+    };
+
     /**
      * @brief Constructs SimpleTracer for the desired platform
      * @param platform provide the desired platform
@@ -40,7 +47,7 @@ class RAYX_API SimpleTracer : public Tracer {
   protected:
     PushConstants m_pushConstants;
 
-    using TraceBatchOnPlatformFn = std::vector<Ray>(const TraceRawConfig&, const PushConstants&);
+    using TraceBatchOnPlatformFn = TraceResult(const TraceRawConfig&, const PushConstants&);
     std::function<TraceBatchOnPlatformFn> m_traceBatchOnPlatformFn;
 };
 
