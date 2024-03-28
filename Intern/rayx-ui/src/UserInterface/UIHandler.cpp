@@ -220,7 +220,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
     uiParams.sceneExtent = {static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y)};
     if (uiParams.sceneDescriptorSet != VK_NULL_HANDLE) {
         ImGui::Image((ImTextureID)uiParams.sceneDescriptorSet, ImVec2(size.x, size.y), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1),
-                     ImVec4(1, 1, 1, 0));
+                     ImVec4(0, 0, 0, 0));
     }
     ImGui::End();
 

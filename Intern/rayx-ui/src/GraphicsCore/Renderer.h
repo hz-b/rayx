@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "Device.h"
+#include "FrameInfo.h"
 #include "GraphicsCore/Descriptors.h"
-#include "RenderSystem/GridRenderSystem.h"
 #include "Swapchain.h"
 #include "Window.h"
 
@@ -27,13 +27,12 @@ class Renderer {
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    void initRenderSystems(const DescriptorSetLayout& globalSetLayout);
-
     VkRenderPass getSwapChainRenderPass() const { return m_SwapChain->getRenderPass(); }
     VkFormat getSwapChainImageFormat() const { return m_SwapChain->getImageFormat(); }
     VkFormat getSwapChainDepthFormat() const { return m_SwapChain->getDepthFormat(); }
     uint32_t getSwapChainImageCount() const { return m_SwapChain->getImageCount(); }
     float getAspectRatio() const { return m_SwapChain->extentAspectRatio(); }
+    VkRenderPass getOffscreenRenderPass() const { return m_offscreenRenderPass; }
 
     bool isFrameInProgress() const { return m_isFrameStarted; }
 
@@ -70,7 +69,8 @@ class Renderer {
      */
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
-    void renderOffscreen(FrameInfo& frameInfo);
+    void beginOffscreenRenderPass(FrameInfo& frameInfo);
+    void endOffscreenRenderPass(FrameInfo& frameInfo);
     std::shared_ptr<Texture> getOffscreenColorTexture() const { return m_offscreenColorTexture; }
 
     void offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, const DescriptorPool& pool, VkDescriptorSet& descriptorSet);
@@ -84,8 +84,6 @@ class Renderer {
 
     Window& m_Window;
     Device& m_Device;
-
-    std::unique_ptr<GridRenderSystem> m_GridRenderSystem;
 
     std::unique_ptr<SwapChain> m_SwapChain;
     std::vector<VkCommandBuffer> m_commandBuffers;

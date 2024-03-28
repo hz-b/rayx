@@ -63,8 +63,9 @@ class Texture {
                                 VkAccessFlags& dstAccessMask, VkPipelineStageFlags& sourceStage, VkPipelineStageFlags& destinationStage);
     VkImageAspectFlags determineAspectMask() const;
 
+    std::vector<uint8_t> dataFromPath(const std::filesystem::path& path);
     void copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height);
-    void createImage(VkExtent2D extent, VkImageTiling tiling, VkMemoryPropertyFlags properties);
+    void createImage(VkImageTiling tiling, VkMemoryPropertyFlags properties);
     void createImageView();
     void createSampler();
     void cleanup();

@@ -65,6 +65,11 @@ void Application::init() {
 
     m_UIParams.updatePath(rmlPathCli);
     m_UIParams.rayInfo = rayInfo;
+
+    glfwSetKeyCallback(m_Window.window(), keyCallback);
+    glfwSetMouseButtonCallback(m_Window.window(), mouseButtonCallback);
+    glfwSetCursorPosCallback(m_Window.window(), cursorPosCallback);
+    glfwSetWindowUserPointer(m_Window.window(), &m_CamController);
 }
 
 void Application::run() {
@@ -76,14 +81,9 @@ void Application::run() {
         uboBuffer->map();
     }
 
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    std::vector<glm::dvec3> rSourcePositions;  // TODO: how to handle these two?
-    std::vector<RAYX::OpticalElement> elements;
-
     auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
                                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
-                               .build();                                                                      //
-    m_Renderer.initRenderSystems(*globalSetLayout);
+                               .build();
     std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (unsigned long i = 0; i < descriptorSets.size(); i++) {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
@@ -91,7 +91,22 @@ void Application::run() {
     }
     auto textureSetLayout =
         DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
+    // Init render systems
+    std::vector<VkDescriptorSetLayout> layouts = {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()};
+    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), layouts);
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
 
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    std::vector<glm::dvec3> rSourcePositions;
+    std::vector<RAYX::OpticalElement> elements;
+    std::vector<std::shared_ptr<RAYX::LightSource>> sources;
+
+    std::future<void> beamlineFuture;
+    std::future<void> raysFuture;
+    std::future<void> buildRayCacheFuture;
+    std::future<void> simulationFuture;
+    std::future<std::vector<Scene::RenderObjectInput>> getRObjInputsFuture;
     // Main loop
     VkExtent2D sceneExtent = {1920, 1080};
     while (!m_Window.shouldClose()) {
@@ -106,6 +121,100 @@ void Application::run() {
             auto newTime = std::chrono::high_resolution_clock::now();
             m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
+
+            if (m_UIParams.rmlReady) {
+                m_RMLPath = m_UIParams.rmlPath.string();
+                beamlineFuture = std::async(std::launch::async, &Application::loadBeamline, this, m_RMLPath);
+                m_State = State::LoadingBeamline;
+                m_UIParams.rmlReady = false;
+            }
+
+            switch (m_State) {
+                case State::LoadingBeamline:
+                    if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        if (m_UIParams.runSimulation) {
+                            if (m_UIParams.simulationSettingsReady) {
+                                // open simulation dialog
+                                m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo);
+                                m_UIParams.simulationSettingsReady = false;
+                                m_State = State::InitializeSimulation;
+                            }
+                        } else {
+                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
+                            m_State = State::LoadingRays;
+                        }
+                    }
+                    break;
+
+                case State::InitializeSimulation:
+                    simulationFuture = std::async(std::launch::async, std::bind(&Simulator::runSimulation, &m_Simulator));
+                    m_State = State::Simulating;
+                    m_UIParams.runSimulation = false;
+                    break;
+
+                case State::Simulating:
+                    if (simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
+                        m_State = State::LoadingRays;
+                    }
+                    break;
+                case State::LoadingRays:
+                    if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready &&
+                        raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        // Wait for loadBeamline and loadRays to finish
+                        RAYX_VERB << "Loaded RML file: " << m_RMLPath;
+                        RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
+
+                        elements = m_Beamline->m_OpticalElements;
+                        sources = m_Beamline->m_LightSources;
+                        rSourcePositions.clear();
+                        for (auto& source : sources) {
+                            rSourcePositions.push_back(source->getPosition());
+                        }
+
+                        m_Scene = std::make_unique<Scene>(m_Device);
+
+                        buildRayCacheFuture =
+                            std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                        getRObjInputsFuture =
+                            std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(elements), std::ref(m_rays));
+
+                        m_State = State::BuildingRays;
+                    }
+                    break;
+                case State::BuildingRays:
+                    if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
+                        if (m_Scene->getState() == Scene::State::Complete) {
+                            m_State = State::Running;
+                        } else {
+                            m_State = State::BuildingElements;
+                        }
+                    }
+                    break;
+                case State::BuildingElements:
+                    if (getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), textureSetLayout, m_TexturePool);
+                        m_State = State::Running;
+                    }
+                    break;
+                case State::Running:
+                    break;
+                default:
+                    break;
+            }
+
+            if (m_UIParams.rayInfo.cacheChanged) {
+                buildRayCacheFuture =
+                    std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                m_State = State::BuildingRays;
+                m_UIParams.rayInfo.cacheChanged = false;
+            }
+
+            if (m_UIParams.rayInfo.raysChanged) {
+                m_State = State::BuildingRays;
+                m_UIParams.rayInfo.raysChanged = false;
+            }
 
             // Update UBO
             uint32_t frameIndex = m_Renderer.getFrameIndex();
@@ -128,7 +237,13 @@ void Application::run() {
                     m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
                 }
             }
-            m_Renderer.renderOffscreen(frameInfo);
+            m_Renderer.beginOffscreenRenderPass(frameInfo);
+            if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
+                objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
+                if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
+            }
+            gridRenderSystem.render(frameInfo);
+            m_Renderer.endOffscreenRenderPass(frameInfo);
 
             // UI
             m_UIHandler.beginUIRender();

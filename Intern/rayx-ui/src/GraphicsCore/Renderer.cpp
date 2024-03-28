@@ -25,10 +25,6 @@ Renderer::~Renderer() {
     freeCommandBuffers();
 }
 
-void Renderer::initRenderSystems(const DescriptorSetLayout& globalSetLayout) {
-    m_GridRenderSystem = std::make_unique<GridRenderSystem>(m_Device, m_offscreenRenderPass, globalSetLayout.getDescriptorSetLayout());
-}
-
 void Renderer::recreateSwapChain() {
     auto extent = m_Window.getExtent();
     while (extent.width == 0 || extent.height == 0) {
@@ -160,9 +156,9 @@ void Renderer::initializeOffscreenRendering() {
     createOffscreenFramebuffer();
 }
 
-void Renderer::renderOffscreen(FrameInfo& frameInfo) {
+void Renderer::beginOffscreenRenderPass(FrameInfo& frameInfo) {
     // Single time command buffer for offscreen rendering
-    VkCommandBuffer commandBuffer = m_Device.beginSingleTimeCommands();
+    frameInfo.commandBuffer = m_Device.beginSingleTimeCommands();
 
     // Begin the offscreen render pass
     VkRenderPassBeginInfo renderPassInfo{};
@@ -173,36 +169,33 @@ void Renderer::renderOffscreen(FrameInfo& frameInfo) {
     renderPassInfo.renderArea.extent.height = m_offscreenExtent.height;
 
     VkClearValue clearValues[2];
-    clearValues[0].color = {{0.2f, 0.2f, 0.2f, 1.0f}};
+    clearValues[0].color = {{0.25f, 0.25f, 0.25f, 1.0f}};
     clearValues[1].depthStencil = {1.0f, 0};
     renderPassInfo.clearValueCount = 2;
     renderPassInfo.pClearValues = clearValues;
 
-    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(frameInfo.commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     // Set dynamic viewport
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = m_offscreenExtent.width;
-    viewport.height = m_offscreenExtent.height;
+    viewport.width = static_cast<float>(m_offscreenExtent.width);
+    viewport.height = static_cast<float>(m_offscreenExtent.height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
-    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+    vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
 
     // Set dynamic scissor
     VkRect2D scissor = {};
     scissor.offset = {0, 0};
     scissor.extent = m_offscreenExtent;
-    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+    vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
+}
 
-    frameInfo.commandBuffer = commandBuffer;
-    m_GridRenderSystem->render(frameInfo);
-
-    vkCmdEndRenderPass(commandBuffer);
-
-    // End command buffer recording
-    m_Device.endSingleTimeCommands(commandBuffer);
+void Renderer::endOffscreenRenderPass(FrameInfo& frameInfo) {
+    vkCmdEndRenderPass(frameInfo.commandBuffer);
+    m_Device.endSingleTimeCommands(frameInfo.commandBuffer);
 }
 
 void Renderer::offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, const DescriptorPool& pool, VkDescriptorSet& descriptorSet) {
