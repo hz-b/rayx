@@ -82,7 +82,8 @@ void RenderObject::rebuild(const std::vector<VertexVariant> vertices, const std:
 }
 
 void RenderObject::updateTexture(const std::filesystem::path& path) {
-    m_Texture = Texture(m_Device, path);
+    m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT, {0, 0});
+    m_Texture.updateFromPath(path);
 
     createDescriptorSet();
 }
@@ -90,7 +91,8 @@ void RenderObject::updateTexture(const std::filesystem::path& path) {
 void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint32_t height) {
     if (data == nullptr) RAYX_ERR << "Texture data is null";
 
-    m_Texture = Texture(m_Device, data, width, height);
+    m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT, {width, height});
+    m_Texture.updateFromData(data, width, height);
 
     createDescriptorSet();
 }
@@ -127,14 +129,14 @@ void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {
 }
 
 void RenderObject::createDescriptorSet() {
-    std::shared_ptr<VkDescriptorImageInfo> descrInfo = m_Texture.descriptorInfo();
+    VkDescriptorImageInfo descrInfo = m_Texture.getDescriptorInfo();
 
     if (m_descrSet != VK_NULL_HANDLE) {
         vkFreeDescriptorSets(m_Device.device(), m_descriptorPool->getDescriptorPool(), 1, &m_descrSet);
     }
 
     DescriptorWriter writer(*m_setLayout, *m_descriptorPool);
-    writer.writeImage(0, descrInfo.get());
+    writer.writeImage(0, &descrInfo);
 
     if (!writer.build(m_descrSet)) {
         RAYX_ERR << "Failed to build descriptor set for texture";

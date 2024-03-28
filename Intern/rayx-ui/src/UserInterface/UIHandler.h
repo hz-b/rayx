@@ -34,7 +34,7 @@ class UIHandler {
     const Window& m_Window;
     const Device& m_Device;
 
-    float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
+    float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 0.00f};
 
     bool m_useLargeFont = false;
     ImFont* m_smallFont;
@@ -44,12 +44,15 @@ class UIHandler {
     bool m_showH5NotExistPopup = false;
     bool m_pathValidState = false;
 
+    VkDescriptorSet m_sceneDescriptorSet;
+
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
     ImGuiIO m_IO;
 
     BeamlineOutliner m_BeamlineOutliner;
 
+    void initializeDockingLayout();
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showHotkeysWindow();

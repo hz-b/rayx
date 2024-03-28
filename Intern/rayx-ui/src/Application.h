@@ -37,7 +37,7 @@ class Application {
 
     void run();
 
-    enum class State {
+    enum class State {  // TODO: make this private
         Initializing,
         InitializeSimulation,
         Simulating,
