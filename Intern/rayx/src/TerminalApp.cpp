@@ -160,10 +160,10 @@ void TerminalApp::run() {
 
     // Choose Hardware
     auto platform = m_CommandParser->m_args.m_cpuFlag
-        ? RAYX::SimpleTracer::Platform::Cpu
-        : RAYX::SimpleTracer::Platform::Gpu
+        ? RAYX::Tracer::Platform::Cpu
+        : RAYX::Tracer::Platform::Gpu
     ;
-    m_Tracer = std::make_unique<RAYX::SimpleTracer>(platform);
+    m_Tracer = std::make_unique<RAYX::Tracer>(platform);
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);

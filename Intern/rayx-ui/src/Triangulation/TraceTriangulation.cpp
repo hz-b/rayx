@@ -48,7 +48,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
 void traceTriangulation(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
-    RAYX::SimpleTracer tracer(RAYX::SimpleTracer::Platform::Cpu);
+    RAYX::Tracer tracer(RAYX::Tracer::Platform::Cpu);
 
     constexpr size_t gridSize = 20;
     auto [width, length] = getRectangularDimensions(element.m_element.m_cutout);

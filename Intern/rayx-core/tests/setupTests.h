@@ -163,10 +163,10 @@ class TestSuite : public testing::Test {
 
         // Choose Hardware
         auto platform = cpu
-            ? RAYX::SimpleTracer::Platform::Cpu
-            : RAYX::SimpleTracer::Platform::Gpu
+            ? RAYX::Tracer::Platform::Cpu
+            : RAYX::Tracer::Platform::Gpu
         ;
-        tracer = std::make_unique<RAYX::SimpleTracer>(platform);
+        tracer = std::make_unique<RAYX::Tracer>(platform);
     }
 
     // called before every test invocation.

@@ -2,11 +2,107 @@
 
 #include <algorithm>
 
-using uint = unsigned int;
+#include "Platform.h"
+#include "SimpleTracer.h"
+
+namespace {
+
+using Dim = alpaka::DimInt<1>;
+using Idx = int32_t;
+using GpuAcc = DefaultGpuAcc<Dim, Idx>;
+using CpuAcc = DefaultCpuAcc<Dim, Idx>;
+
+inline int getDeviceCountForPlatform(Tracer::Platform platform) {
+    switch (platform) {
+    case Tracer::Platform::Gpu:
+#ifdef GPU_TRACER
+        return alpaka::getDevCount(alpaka::Platform<GpuAcc>());
+#else
+        return 0;
+#endif
+
+    default: // case Tracer::Platform::Cpu
+        return alpaka::getDevCount(alpaka::Platform<CpuAcc>());
+    }
+}
+
+inline std::string getDeviceName(Tracer::Platform platform, int deviceIndex) {
+    switch (platform) {
+        case Tracer::Platform::Gpu: {
+#ifdef GPU_TRACER
+            auto dev = pickDevice<GpuAcc>(deviceIndex);
+            return alpaka::getName(dev);
+#else
+            assert(false && "Gpu support was disabled during build. Cannot get device name");
+            break;
+#endif
+
+        }
+        default: { // case Tracer::Platform::Cpu
+            auto dev = pickDevice<CpuAcc>(deviceIndex);
+            return alpaka::getName(dev);
+        }
+    }
+}
+
+inline std::shared_ptr<DeviceTracer> createDeviceTracer(Tracer::Platform platform, int deviceIndex) {
+    switch (platform) {
+    case Tracer::Platform::Gpu:
+#ifdef GPU_TRACER
+            return std::make_shared<SimpleTracer<GpuAcc>>(deviceIndex);
+#else
+            RAYX_WARN
+                << "Gpu Tracer was disabled during build."
+                << " Falling back to Cpu Tracer."
+                << " Add '-x' flag on launch to use the Cpu Tracer directly"
+            ;
+            [[fallthrough]];
+#endif
+    default: // case Tracer::Platform::Cpu
+        return std::make_shared<SimpleTracer<CpuAcc>>(deviceIndex);
+    }
+}
+
+} // unnamed namespace
 
 namespace RAYX {
 
-void Tracer::setDevice(int deviceID) { m_deviceID = deviceID; }
+Tracer::Tracer(Platform platform, int deviceIndex) :
+    m_platform(platform),
+    m_deviceIndex(deviceIndex)
+{
+    m_deviceTracer = createDeviceTracer(platform, deviceIndex);
+}
+
+BundleHistory Tracer::trace(
+    const Beamline& beamline,
+    Sequential sequential,
+    uint64_t max_batch_size,
+    int THREAD_COUNT,
+    unsigned int maxEvents,
+    int startEventID
+) {
+    return m_deviceTracer->trace(
+        beamline,
+        sequential,
+        max_batch_size,
+        THREAD_COUNT,
+        maxEvents,
+        startEventID
+    );
+}
+
+void Tracer::setPushConstants(const PushConstants* p) {
+    m_deviceTracer->setPushConstants(p);
+}
+
+int Tracer::deviceCount(Platform platform) {
+    return getDeviceCountForPlatform(platform);
+}
+
+std::string Tracer::deviceName(Platform platform, int deviceIndex) {
+    return getDeviceName(platform, deviceIndex);
+}
 
 /// Get the last event for each ray of the bundle.
 std::vector<Ray> extractLastEvents(const BundleHistory& hist) {
