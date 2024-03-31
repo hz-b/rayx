@@ -8,7 +8,7 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Random.h"
-#include "Tracer/SimpleTracer.h"
+#include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
