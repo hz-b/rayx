@@ -6,6 +6,7 @@
 #include "DeviceTracer.h"
 #include "RAY-Core.h"
 #include "Random.h"
+#include "Common.h"
 #include "Accelerator.h"
 #include "Util.h"
 #include "Beamline/Beamline.h"
@@ -14,7 +15,7 @@
 
 namespace {
 
-struct ShaderEntryPoint {
+struct DynamicElementsKernel {
     template <typename Acc>
     RAYX_FUNC
     void operator() (const Acc& acc, Inv inv) const {
@@ -26,57 +27,39 @@ struct ShaderEntryPoint {
     }
 };
 
-template <typename T>
-inline T scan_sum(std::vector<T>& dst, const std::vector<T>& src) {
-    RAYX_PROFILE_SCOPE_STDOUT("scan");
-    assert(dst.size() == src.size());
-    T sum = 0;
-    for (int i = 0; i < (int)dst.size(); ++i) {
-        dst[i] = sum;
-        sum += src[i];
-        // printf("scan %d: %d %d, sum: %d\n", i, src[i], dst[i], sum);
-    }
-    return sum;
-}
-
-// TODO: could store as uint32_t bitmap for 32 elements, since output is bool for each event
-struct FilterRayEventsKernel {
+struct PredicateKernel {
     template <typename Acc>
     RAYX_FUNC
     void operator() (
         const Acc& acc,
-        std::span<int> eventPass,
-        std::span<const int> numEvents,
-        int maxEvents
+        alpaka::Idx<Acc>* predicates,
+        const alpaka::Idx<Acc>* src,
+        const alpaka::Idx<Acc> numPredicatesPerElement
     ) const {
-        const auto rayIdx = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
-        for (int rayEventIdx = 0; rayEventIdx < maxEvents; ++rayEventIdx) {
-            int globalEventIdx = rayIdx * maxEvents + rayEventIdx;
-
-            // let recorded events pass. filter out empty slots
-            auto pass = rayEventIdx < numEvents[rayIdx];
-            // printf("... %d %d, %d %d, %d\n", (int)rayIdx, (int)globalEventIdx, (int)(rayEventIdx), (int)numEvents[rayIdx], (int)pass);
-            eventPass[globalEventIdx] = pass ? 1 : 0;
+        for (int i = 0; i < numPredicatesPerElement; ++i) {
+            int idx = gid * numPredicatesPerElement + i;
+            auto pass = i < src[gid];
+            predicates[idx] = pass ? 1 : 0;
         }
     }
 };
 
-struct PackGlobalEventsKernel {
-    template <typename Acc>
+struct ScatterKernel {
+    template <typename Acc, typename T>
     RAYX_FUNC
     void operator() (
         const Acc& acc,
-        std::span<Ray> dst,
-        std::span<const Ray> src,
-        std::span<int> eventPass,
-        std::span<int> globalEventIndex
+        T* dst,
+        const T* src,
+        const alpaka::Idx<Acc>* predicates,
+        const alpaka::Idx<Acc>* indices
     ) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
-        // printf("pack gid(%d) eventPass(%d) globalEventIndex(%d)\n", gid, eventPass[gid], globalEventIndex[gid]);
-        if (eventPass[gid])
-            dst[globalEventIndex[gid]] = src[gid];
+        if (predicates[gid])
+            dst[indices[gid]] = src[gid];
     }
 };
 
@@ -89,9 +72,11 @@ namespace RAYX {
 /**
  * @brief SimpleTracer sequentially executes tracing in batches the CPU or GPU
  */
-template <typename Acc>
+template <typename TAcc>
 class SimpleTracer : public DeviceTracer {
   private:
+    using Acc = TAcc;
+    using AccDev = alpaka::Dev<Acc>;
     using Cpu = alpaka::DevCpu;
 
     using CpuPlatform = alpaka::Platform<Cpu>;
@@ -99,6 +84,15 @@ class SimpleTracer : public DeviceTracer {
 
     using Dim = alpaka::Dim<Acc>;
     using Idx = alpaka::Idx<Acc>;
+    static_assert(std::is_same_v<Idx, int>); // TODO(Sven): ensure TraceResult has the same Idx type as SimpleTracer
+    using Vec = alpaka::Vec<Dim, Idx>;
+
+    using Seq = alpaka::AccCpuSerial<Dim, Idx>;
+
+    // template <typename T>
+    // using AccBuf = alpaka::Buf<Acc, T, Dim, Idx>;
+    // template <typename T>
+    // using CpuBuf = alpaka::Buf<Cpu, T, Dim, Idx>;
 
     using QueueProperty = alpaka::NonBlocking;
     using Queue = alpaka::Queue<Acc, QueueProperty>;
@@ -116,7 +110,15 @@ class SimpleTracer : public DeviceTracer {
     ) override;
 
   private:
-    inline TraceResult traceBatch(const TraceRawConfig& cfg);
+    TraceResult traceBatch(const TraceRawConfig& cfg);
+
+    template <typename T>
+    Idx scan_sum(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, const Idx n);
+
+    template <typename T>
+    void scatter(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& indices, const Idx n);
+
+    void createFilterPredicates(Queue queue, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& src, const Idx numPredicatesPerElement, const Idx n);
 
     const int m_deviceIndex;
 };
@@ -194,7 +196,6 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             traceResult = traceBatch(cfg);
             RAYX_LOG << "Traced " << traceResult.count << " events.";
-            // assert(rawBatch.size() == batch_size * (maxEvents - startEventID));
         }
 
         // put all events from the rawBatch to unified `BundleHistory result`.
@@ -218,9 +219,77 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
 }
 
 template <typename Acc>
-inline TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
-    auto host = pickDevice<Cpu>();
-    auto acc = pickDevice<Acc>(m_deviceIndex);
+void SimpleTracer<Acc>::createFilterPredicates(Queue queue, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& src, const Idx numPredicatesPerElement, const Idx n) {
+    alpaka::exec<Acc>(
+        queue,
+        getWorkDivForAcc<Acc>(n),
+        PredicateKernel{},
+        alpaka::getPtrNative(predicates),
+        alpaka::getPtrNative(src),
+        numPredicatesPerElement
+    );
+}
+
+template <typename Acc>
+template <typename T>
+alpaka::Idx<Acc> SimpleTracer<Acc>::scan_sum(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, const Idx n) {
+    RAYX_PROFILE_SCOPE_STDOUT("scan");
+
+    auto seq = getDevice<Seq>();
+
+    auto h_src = std::vector<T>(n);
+    auto h_dst = std::vector<T>(n);
+
+    auto h_srcView = alpaka::createView(seq, h_src);
+    auto h_dstView = alpaka::createView(seq, h_dst);
+
+    alpaka::memcpy(queue, h_srcView, src, Vec{n});
+
+    Idx sum;
+    alpaka::exec<Seq>(
+        queue,
+        alpaka::WorkDivMembers<Dim, Idx> { Vec{1}, Vec{1}, Vec{1}, },
+        [] ALPAKA_FN_HOST (const auto&, Idx* sum, T* dst, const T* src, const Idx n) {
+            *sum = 0;
+            for (Idx i = 0; i < n; ++i) {
+                dst[i] = *sum;
+                *sum += src[i];
+            }
+        },
+        &sum,
+        alpaka::getPtrNative(h_dst),
+        alpaka::getPtrNative(h_src),
+        n
+    );
+
+    // wait because the above kernel is not guaranteed to finish before the next task
+    alpaka::wait(queue);
+
+    alpaka::memcpy(queue, dst, h_dst, Vec{n});
+
+    // wait for all operations to finish, before destructing buffers
+    alpaka::wait(queue);
+    return sum;
+}
+
+template <typename Acc>
+template <typename T>
+void SimpleTracer<Acc>::scatter(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& indices, const Idx n) {
+    alpaka::exec<Acc>(
+        queue,
+        getWorkDivForAcc<Acc>(n),
+        ScatterKernel{},
+        alpaka::getPtrNative(dst),
+        alpaka::getPtrNative(src),
+        alpaka::getPtrNative(predicates),
+        alpaka::getPtrNative(indices)
+    );
+}
+
+template <typename Acc>
+TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
+    auto host = getDevice<Cpu>();
+    auto acc = getDevice<Acc>(m_deviceIndex);
 
     auto queue = Queue(acc);
 
@@ -228,11 +297,9 @@ inline TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
     const auto numOutputRays = numInputRays * ((size_t)cfg.m_maxEvents - (size_t)cfg.m_startEventID);
     const auto& materialTables = cfg.m_materialTables;
 
-    using Vec = alpaka::Vec<Dim, Idx>;
-
     auto rayData = createBuffer<Idx, Vec, Ray>(queue, cfg.m_rays, host);
     auto outputRays = createBuffer<Idx, Ray>(queue, Vec{numOutputRays});
-    auto outputRayCounts = createBuffer<Idx, int>(queue, Vec{numInputRays});
+    auto outputRayCounts = createBuffer<Idx, Idx>(queue, Vec{numInputRays});
     auto elements = createBuffer<Idx, Vec, Element>(queue, cfg.m_elements, host);
     auto matIdx = createBuffer<Idx, Vec, int>(queue, materialTables.indexTable, host);
     auto mat = createBuffer<Idx, Vec, double>(queue, materialTables.materialTable, host);
@@ -261,122 +328,49 @@ inline TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
         .pushConstants = m_pushConstants,
     };
 
-    auto workDiv = getWorkDivForAcc<Acc>(numInputRays);
+    // execute dynamic elements shader
+
     alpaka::exec<Acc>(
         queue,
-        workDiv,
-        ShaderEntryPoint{},
+        getWorkDivForAcc<Acc>(numInputRays),
+        DynamicElementsKernel{},
         inv
     );
 
-    // auto h_outputRays = std::vector<Ray>(numOutputRays);
-    // auto h_outputRaysView = alpaka::createView(host, h_outputRays);
-    // alpaka::memcpy(queue, h_outputRaysView, outputRays, Vec{numOutputRays});
-    // alpaka::wait(queue);
+    // make output events compact
 
-    // for (int i = 0; i < numOutputRays; ++i) {
-    //     bool e = h_outputRays[i].m_eventType != ETYPE_UNINIT;
-    //     printf("%d", (int)e);
-    // }
-    // printf("\n");
+    auto globalEventFilterPredicates = createBuffer<Idx, Idx>(queue, Vec{numOutputRays});
+    createFilterPredicates(queue, globalEventFilterPredicates, outputRayCounts, cfg.m_maxEvents, numInputRays);
 
+    auto globalEventIndices = createBuffer<Idx, Idx>(queue, Vec{numOutputRays});
+    auto globalEventsCount = scan_sum<Idx>(queue, globalEventIndices, globalEventFilterPredicates, numOutputRays);
 
+    auto compactGlobalEvents = createBuffer<Idx, Ray>(queue, Vec{globalEventsCount});
+    scatter<Ray>(queue, compactGlobalEvents, outputRays, globalEventFilterPredicates, globalEventIndices, numOutputRays);
 
-    auto h_outputRayCounts = std::vector<int>(numInputRays);
+    auto compactRayOffsets = createBuffer<Idx, Idx>(queue, Vec{numInputRays});
+    auto globalEventsCount2 = scan_sum<Idx>(queue, compactRayOffsets, outputRayCounts, numInputRays);
+    assert(globalEventsCount == globalEventsCount2);
+
+    // transfer
+
+    auto h_compactRayOffsets = std::vector<Idx>(numInputRays);
+    auto h_compactRayOffsetsView = alpaka::createView(host, h_compactRayOffsets);
+    alpaka::memcpy(queue, h_compactRayOffsets, compactRayOffsets, Vec{numInputRays});
+
+    auto h_compactGlobalEvents = std::vector<Ray>(globalEventsCount);
+    auto h_compactGlobalEventsView = alpaka::createView(host, h_compactGlobalEvents);
+    alpaka::memcpy(queue, h_compactGlobalEventsView, compactGlobalEvents, Vec{globalEventsCount});
+
+    auto h_outputRayCounts = std::vector<Idx>(numInputRays);
     auto h_outputRayCountsView = alpaka::createView(host, h_outputRayCounts);
-    alpaka::wait(queue);
     alpaka::memcpy(queue, h_outputRayCountsView, outputRayCounts, Vec{numInputRays});
+
     alpaka::wait(queue);
-
-    // alpaka::wait(queue);
-    // for (int i = 0; i < numInputRays; ++i) {
-    //     int e = h_outputRayCounts[i];
-    //     if (e < 0)
-    //         printf("x %d %d\n", i, e);
-    // }
-    // printf("\n");
-
-
-
-    auto globalEventPass = createBuffer<Idx, int>(queue, Vec{numOutputRays});
-    alpaka::exec<Acc>(
-        queue,
-        workDiv,
-        FilterRayEventsKernel{},
-        bufToSpan(globalEventPass),
-        bufToSpan(outputRayCounts),
-        cfg.m_maxEvents
-    );
-
-    auto h_globalEventPass = std::vector<int>(numOutputRays);
-    auto h_globalEventPassView = alpaka::createView(host, h_globalEventPass);
-    alpaka::memcpy(queue, h_globalEventPassView, globalEventPass, Vec{numOutputRays});
-    alpaka::wait(queue);
-
-    // alpaka::wait(queue);
-    // for (int i = 0; i < numOutputRays; ++i) {
-    //     bool e = h_globalEventPass[i];
-    //     printf("%d", (int)e);
-    // }
-    // printf("\n");
-
-
-
-    auto h_globalEventIndices = std::vector<int>(numOutputRays);
-    auto h_globalEventIndicesView = alpaka::createView(host, h_globalEventIndices);
-    int globalEventsCount = scan_sum(h_globalEventIndices, h_globalEventPass);
-    auto packedGlobalEvents = createBuffer<Idx, Ray>(queue, Vec{globalEventsCount});
-
-    // for (int i = 0; i < numOutputRays; ++i) {
-    //     int e = h_globalEventIndices[i];
-    //     printf("%d ", (int)e);
-    // }
-    // printf("\n");
-
-    // printf("numOutputRays: %d, packed: %d, ratio: %f\n",
-    //     (int)numOutputRays,
-    //     (int)globalEventsCount,
-    //     (globalEventsCount / static_cast<float>(numOutputRays))
-    // );
-
-    auto globalEventIndices = createBuffer<Idx, int>(queue, Vec{numOutputRays});
-    alpaka::memcpy(queue, globalEventIndices, h_globalEventIndicesView, Vec{numOutputRays});
-    alpaka::wait(queue);
-
-    alpaka::exec<Acc>(
-        queue,
-        getWorkDivForAcc<Acc>(numOutputRays),
-        PackGlobalEventsKernel{},
-        bufToSpan(packedGlobalEvents),
-        bufToSpan(outputRays),
-        bufToSpan(globalEventPass),
-        bufToSpan(globalEventIndices)
-    );
-    auto h_packedGlobalEvents = std::vector<Ray>(globalEventsCount);
-    auto h_packedGlobalEventsView = alpaka::createView(host, h_packedGlobalEvents);
-    alpaka::memcpy(queue, h_packedGlobalEventsView, packedGlobalEvents, Vec{globalEventsCount});
-    alpaka::wait(queue);
-
-    // alpaka::wait(queue);
-    // for (int i = 0, j = 0; i < numOutputRays; ++i) {
-    //     if (h_outputRays[i].m_eventType != ETYPE_UNINIT) {
-    //         printf(".");
-    //         assert(i < numOutputRays);
-    //         assert(j < globalEventsCount);
-    //         auto eq = h_outputRays[i].m_eventType == h_packedGlobalEvents[j].m_eventType;
-    //         if (!eq)
-    //             printf("%d %d, %d %d\n", i, j, (int)h_outputRays[i].m_eventType, (int)h_packedGlobalEvents[j].m_eventType);
-    //
-    //         ++j;
-    //     }
-    // }
-
-    auto h_packedGlobalEventOffsets = std::vector<int>(numInputRays);
-    scan_sum(h_packedGlobalEventOffsets, h_outputRayCounts);
 
     return TraceResult {
-        std::move(h_packedGlobalEvents),
-        std::move(h_packedGlobalEventOffsets),
+        std::move(h_compactGlobalEvents),
+        std::move(h_compactRayOffsets),
         std::move(h_outputRayCounts),
         globalEventsCount,
     };

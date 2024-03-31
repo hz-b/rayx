@@ -30,7 +30,7 @@ inline std::string getDeviceName(Tracer::Platform platform, int deviceIndex) {
     switch (platform) {
         case Tracer::Platform::Gpu: {
 #ifdef GPU_TRACER
-            auto dev = pickDevice<GpuAcc>(deviceIndex);
+            auto dev = getDevice<GpuAcc>(deviceIndex);
             return alpaka::getName(dev);
 #else
             assert(false && "Gpu support was disabled during build. Cannot get device name");
@@ -39,7 +39,7 @@ inline std::string getDeviceName(Tracer::Platform platform, int deviceIndex) {
 
         }
         default: { // case Tracer::Platform::Cpu
-            auto dev = pickDevice<CpuAcc>(deviceIndex);
+            auto dev = getDevice<CpuAcc>(deviceIndex);
             return alpaka::getName(dev);
         }
     }

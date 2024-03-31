@@ -3,7 +3,7 @@
 #include <alpaka/alpaka.hpp>
 
 template <typename Acc>
-inline auto pickDevice(int deviceIndex = 0) {
+inline auto getDevice(int deviceIndex = 0) {
     const auto platform = alpaka::Platform<Acc>();
     const auto dev = alpaka::getDevByIdx(platform, deviceIndex);
     RAYX_VERB
