@@ -113,12 +113,12 @@ class SimpleTracer : public DeviceTracer {
     TraceResult traceBatch(const TraceRawConfig& cfg);
 
     template <typename T>
-    Idx scan_sum(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, const Idx n);
+    Idx scan_sum(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, const Idx n);
 
     template <typename T>
-    void scatter(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& indices, const Idx n);
+    void scatter(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, Buf<Acc, Idx> predicates, Buf<Acc, Idx> indices, const Idx n);
 
-    void createFilterPredicates(Queue queue, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& src, const Idx numPredicatesPerElement, const Idx n);
+    void createFilterPredicates(Queue queue, Buf<Acc, Idx> predicates, Buf<Acc, Idx> src, const Idx numPredicatesPerElement, const Idx n);
 
     const int m_deviceIndex;
 };
@@ -219,7 +219,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
 }
 
 template <typename Acc>
-void SimpleTracer<Acc>::createFilterPredicates(Queue queue, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& src, const Idx numPredicatesPerElement, const Idx n) {
+void SimpleTracer<Acc>::createFilterPredicates(Queue queue, Buf<Acc, Idx> predicates, Buf<Acc, Idx> src, const Idx numPredicatesPerElement, const Idx n) {
     alpaka::exec<Acc>(
         queue,
         getWorkDivForAcc<Acc>(n),
@@ -230,9 +230,10 @@ void SimpleTracer<Acc>::createFilterPredicates(Queue queue, Buf<Acc, Idx>& predi
     );
 }
 
+// TODO(Sven): implement parallel scan
 template <typename Acc>
 template <typename T>
-alpaka::Idx<Acc> SimpleTracer<Acc>::scan_sum(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, const Idx n) {
+alpaka::Idx<Acc> SimpleTracer<Acc>::scan_sum(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, const Idx n) {
     RAYX_PROFILE_SCOPE_STDOUT("scan");
 
     auto seq = getDevice<Seq>();
@@ -274,7 +275,7 @@ alpaka::Idx<Acc> SimpleTracer<Acc>::scan_sum(Queue queue, Buf<Acc, T>& dst, Buf<
 
 template <typename Acc>
 template <typename T>
-void SimpleTracer<Acc>::scatter(Queue queue, Buf<Acc, T>& dst, Buf<Acc, T>& src, Buf<Acc, Idx>& predicates, Buf<Acc, Idx>& indices, const Idx n) {
+void SimpleTracer<Acc>::scatter(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, Buf<Acc, Idx> predicates, Buf<Acc, Idx> indices, const Idx n) {
     alpaka::exec<Acc>(
         queue,
         getWorkDivForAcc<Acc>(n),
@@ -353,6 +354,7 @@ TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
     assert(globalEventsCount == globalEventsCount2);
 
     // transfer
+    // TODO(Sven): make transfer a noop for cpu accelerators
 
     auto h_compactRayOffsets = std::vector<Idx>(numInputRays);
     auto h_compactRayOffsetsView = alpaka::createView(host, h_compactRayOffsets);
