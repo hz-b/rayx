@@ -2,6 +2,8 @@
 
 #include <alpaka/alpaka.hpp>
 
+namespace RAYX {
+
 template <typename Acc>
 inline auto getDevice(int deviceIndex = 0) {
     const auto platform = alpaka::Platform<Acc>();
@@ -80,3 +82,5 @@ inline auto getWorkDivForAcc(alpaka::Idx<Acc> numElements) {
         Vec{1},
     };
 }
+
+} // namespace RAYX

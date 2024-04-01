@@ -2,6 +2,8 @@
 
 #include <alpaka/alpaka.hpp>
 
+namespace RAYX {
+
 template <typename Idx, typename T, typename Queue, typename Extent>
 inline auto createBuffer(Queue& queue, Extent size) {
     return alpaka::allocAsyncBufIfSupported<T, Idx>(queue, size);
@@ -22,3 +24,5 @@ inline auto bufToSpan(TBuf& buf) {
 
 template <typename T>
 using printTypeAsCompileError = typename T::printTypeAsCompileError;
+
+} // namespace RAYX

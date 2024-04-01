@@ -2,6 +2,8 @@
 
 #include <alpaka/alpaka.hpp>
 
+namespace RAYX {
+
 // declare invalid Acc
 struct AccNull {};
 
@@ -42,3 +44,5 @@ constexpr bool isAccAvailable() {
 
 // test if we have a minimum required Accelerator
 static_assert(isAccAvailable<DefaultCpuAcc<alpaka::DimInt<1>, int>>()); // test if at least one Cpu Acc is available.
+
+} // namespace RAYX
