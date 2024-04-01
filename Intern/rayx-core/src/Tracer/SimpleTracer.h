@@ -4,11 +4,12 @@
 #include <cstring>
 
 #include "DeviceTracer.h"
+#include "Gather.h"
+#include "Scan.h"
+#include "Util.h"
+
 #include "RAY-Core.h"
 #include "Random.h"
-#include "Common.h"
-#include "Accelerator.h"
-#include "Util.h"
 #include "Beamline/Beamline.h"
 #include "Material/Material.h"
 #include "Shader/DynamicElements.h"
@@ -27,38 +28,7 @@ struct DynamicElementsKernel {
     }
 };
 
-struct GatherKernel {
-    template <typename Acc, typename T>
-    RAYX_FUNC
-    void operator() (
-        const Acc& acc,
-        T* dst,
-        const T* src,
-        const alpaka::Idx<Acc>* srcOffsets,
-        const alpaka::Idx<Acc>* srcSizes,
-        const alpaka::Idx<Acc> srcMaxSize,
-        const alpaka::Idx<Acc> n
-    ) const {
-        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-
-        if (gid < n) {
-            using Idx = alpaka::Idx<Acc>;
-
-            auto offset = srcOffsets[gid];
-            auto size = srcSizes[gid];
-
-            for (int i = 0; i < size; ++i) {
-                const auto idst = offset + i;
-                const auto isrc = gid * srcMaxSize + i;
-                dst[idst] = src[isrc];
-            }
-        }
-    }
-};
-
 } // unnamed namespace
-
-
 
 namespace RAYX {
 
@@ -69,23 +39,12 @@ template <typename TAcc>
 class SimpleTracer : public DeviceTracer {
   private:
     using Acc = TAcc;
-    using AccDev = alpaka::Dev<Acc>;
     using Cpu = alpaka::DevCpu;
-
-    using CpuPlatform = alpaka::Platform<Cpu>;
-    using AccPlatform = alpaka::Platform<Acc>;
 
     using Dim = alpaka::Dim<Acc>;
     using Idx = alpaka::Idx<Acc>;
     static_assert(std::is_same_v<Idx, int>); // TODO(Sven): ensure TraceResult has the same Idx type as SimpleTracer
     using Vec = alpaka::Vec<Dim, Idx>;
-
-    using Seq = alpaka::AccCpuSerial<Dim, Idx>;
-
-    // template <typename T>
-    // using AccBuf = alpaka::Buf<Acc, T, Dim, Idx>;
-    // template <typename T>
-    // using CpuBuf = alpaka::Buf<Cpu, T, Dim, Idx>;
 
     using QueueProperty = alpaka::NonBlocking;
     using Queue = alpaka::Queue<Acc, QueueProperty>;
@@ -104,20 +63,6 @@ class SimpleTracer : public DeviceTracer {
 
   private:
     TraceResult traceBatch(const TraceRawConfig& cfg);
-
-    template <typename T>
-    Idx scan_sum(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, const Idx n);
-
-    template <typename T>
-    void gather(
-        Queue queue,
-        Buf<Acc, T> dst,
-        Buf<Acc, T> src,
-        Buf<Acc, Idx> srcOffsets,
-        Buf<Acc, Idx> srcSizes,
-        const Idx srcMaxSize,
-        const Idx n
-    );
 
     const int m_deviceIndex;
 };
@@ -217,73 +162,6 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     return result;
 }
 
-// TODO(Sven): implement parallel scan
-template <typename Acc>
-template <typename T>
-alpaka::Idx<Acc> SimpleTracer<Acc>::scan_sum(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, const Idx n) {
-    RAYX_PROFILE_SCOPE_STDOUT("scan");
-
-    auto seq = getDevice<Seq>();
-
-    auto h_src = std::vector<T>(n);
-    auto h_dst = std::vector<T>(n);
-
-    auto h_srcView = alpaka::createView(seq, h_src);
-    auto h_dstView = alpaka::createView(seq, h_dst);
-
-    alpaka::memcpy(queue, h_srcView, src, Vec{n});
-
-    Idx sum;
-    alpaka::exec<Seq>(
-        queue,
-        alpaka::WorkDivMembers<Dim, Idx> { Vec{1}, Vec{1}, Vec{1}, },
-        [] ALPAKA_FN_HOST (const auto&, Idx* sum, T* dst, const T* src, const Idx n) {
-            *sum = 0;
-            for (Idx i = 0; i < n; ++i) {
-                dst[i] = *sum;
-                *sum += src[i];
-            }
-        },
-        &sum,
-        alpaka::getPtrNative(h_dst),
-        alpaka::getPtrNative(h_src),
-        n
-    );
-
-    // wait because the above kernel is not guaranteed to finish before the next task
-    alpaka::wait(queue);
-
-    alpaka::memcpy(queue, dst, h_dst, Vec{n});
-
-    // wait for all operations to finish, before destructing buffers
-    alpaka::wait(queue);
-    return sum;
-}
-
-template <typename Acc>
-template <typename T>
-void SimpleTracer<Acc>::gather(
-    Queue queue,
-    Buf<Acc, T> dst,
-    Buf<Acc, T> src,
-    Buf<Acc, Idx> srcOffsets,
-    Buf<Acc, Idx> srcSizes,
-    const Idx srcMaxSize,
-    const Idx n
-) {
-    alpaka::exec<Acc>(
-        queue,
-        getWorkDivForAcc<Acc>(n),
-        GatherKernel{},
-        alpaka::getPtrNative(dst),
-        alpaka::getPtrNative(src),
-        alpaka::getPtrNative(srcOffsets),
-        alpaka::getPtrNative(srcSizes),
-        srcMaxSize,
-        n
-    );
-}
-
 template <typename Acc>
 TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
     auto host = getDevice<Cpu>();
@@ -338,10 +216,10 @@ TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
     // make output events compact
 
     auto compactRayOffsets = createBuffer<Idx, Idx>(queue, Vec{numInputRays});
-    auto globalEventsCount = scan_sum<Idx>(queue, compactRayOffsets, outputRayCounts, numInputRays);
+    auto globalEventsCount = scan_sum<Acc, Idx>(queue, compactRayOffsets, outputRayCounts, numInputRays);
 
     auto compactGlobalEvents = createBuffer<Idx, Ray>(queue, Vec{globalEventsCount});
-    gather<Ray>(
+    gather_n<Acc, Ray>(
         queue,
         compactGlobalEvents,
         outputRays,
