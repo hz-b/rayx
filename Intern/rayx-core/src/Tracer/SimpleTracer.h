@@ -27,39 +27,32 @@ struct DynamicElementsKernel {
     }
 };
 
-struct PredicateKernel {
-    template <typename Acc>
-    RAYX_FUNC
-    void operator() (
-        const Acc& acc,
-        alpaka::Idx<Acc>* predicates,
-        const alpaka::Idx<Acc>* src,
-        const alpaka::Idx<Acc> numPredicatesPerElement
-    ) const {
-        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-
-        for (int i = 0; i < numPredicatesPerElement; ++i) {
-            int idx = gid * numPredicatesPerElement + i;
-            auto pass = i < src[gid];
-            predicates[idx] = pass ? 1 : 0;
-        }
-    }
-};
-
-struct ScatterKernel {
+struct GatherKernel {
     template <typename Acc, typename T>
     RAYX_FUNC
     void operator() (
         const Acc& acc,
         T* dst,
         const T* src,
-        const alpaka::Idx<Acc>* predicates,
-        const alpaka::Idx<Acc>* indices
+        const alpaka::Idx<Acc>* srcOffsets,
+        const alpaka::Idx<Acc>* srcSizes,
+        const alpaka::Idx<Acc> srcMaxSize,
+        const alpaka::Idx<Acc> n
     ) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
-        if (predicates[gid])
-            dst[indices[gid]] = src[gid];
+        if (gid < n) {
+            using Idx = alpaka::Idx<Acc>;
+
+            auto offset = srcOffsets[gid];
+            auto size = srcSizes[gid];
+
+            for (int i = 0; i < size; ++i) {
+                const auto idst = offset + i;
+                const auto isrc = gid * srcMaxSize + i;
+                dst[idst] = src[isrc];
+            }
+        }
     }
 };
 
@@ -116,9 +109,15 @@ class SimpleTracer : public DeviceTracer {
     Idx scan_sum(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, const Idx n);
 
     template <typename T>
-    void scatter(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, Buf<Acc, Idx> predicates, Buf<Acc, Idx> indices, const Idx n);
-
-    void createFilterPredicates(Queue queue, Buf<Acc, Idx> predicates, Buf<Acc, Idx> src, const Idx numPredicatesPerElement, const Idx n);
+    void gather(
+        Queue queue,
+        Buf<Acc, T> dst,
+        Buf<Acc, T> src,
+        Buf<Acc, Idx> srcOffsets,
+        Buf<Acc, Idx> srcSizes,
+        const Idx srcMaxSize,
+        const Idx n
+    );
 
     const int m_deviceIndex;
 };
@@ -218,18 +217,6 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     return result;
 }
 
-template <typename Acc>
-void SimpleTracer<Acc>::createFilterPredicates(Queue queue, Buf<Acc, Idx> predicates, Buf<Acc, Idx> src, const Idx numPredicatesPerElement, const Idx n) {
-    alpaka::exec<Acc>(
-        queue,
-        getWorkDivForAcc<Acc>(n),
-        PredicateKernel{},
-        alpaka::getPtrNative(predicates),
-        alpaka::getPtrNative(src),
-        numPredicatesPerElement
-    );
-}
-
 // TODO(Sven): implement parallel scan
 template <typename Acc>
 template <typename T>
@@ -275,15 +262,25 @@ alpaka::Idx<Acc> SimpleTracer<Acc>::scan_sum(Queue queue, Buf<Acc, T> dst, Buf<A
 
 template <typename Acc>
 template <typename T>
-void SimpleTracer<Acc>::scatter(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, Buf<Acc, Idx> predicates, Buf<Acc, Idx> indices, const Idx n) {
+void SimpleTracer<Acc>::gather(
+    Queue queue,
+    Buf<Acc, T> dst,
+    Buf<Acc, T> src,
+    Buf<Acc, Idx> srcOffsets,
+    Buf<Acc, Idx> srcSizes,
+    const Idx srcMaxSize,
+    const Idx n
+) {
     alpaka::exec<Acc>(
         queue,
         getWorkDivForAcc<Acc>(n),
-        ScatterKernel{},
+        GatherKernel{},
         alpaka::getPtrNative(dst),
         alpaka::getPtrNative(src),
-        alpaka::getPtrNative(predicates),
-        alpaka::getPtrNative(indices)
+        alpaka::getPtrNative(srcOffsets),
+        alpaka::getPtrNative(srcSizes),
+        srcMaxSize,
+        n
     );
 }
 
@@ -340,18 +337,19 @@ TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
 
     // make output events compact
 
-    auto globalEventFilterPredicates = createBuffer<Idx, Idx>(queue, Vec{numOutputRays});
-    createFilterPredicates(queue, globalEventFilterPredicates, outputRayCounts, cfg.m_maxEvents, numInputRays);
-
-    auto globalEventIndices = createBuffer<Idx, Idx>(queue, Vec{numOutputRays});
-    auto globalEventsCount = scan_sum<Idx>(queue, globalEventIndices, globalEventFilterPredicates, numOutputRays);
+    auto compactRayOffsets = createBuffer<Idx, Idx>(queue, Vec{numInputRays});
+    auto globalEventsCount = scan_sum<Idx>(queue, compactRayOffsets, outputRayCounts, numInputRays);
 
     auto compactGlobalEvents = createBuffer<Idx, Ray>(queue, Vec{globalEventsCount});
-    scatter<Ray>(queue, compactGlobalEvents, outputRays, globalEventFilterPredicates, globalEventIndices, numOutputRays);
-
-    auto compactRayOffsets = createBuffer<Idx, Idx>(queue, Vec{numInputRays});
-    auto globalEventsCount2 = scan_sum<Idx>(queue, compactRayOffsets, outputRayCounts, numInputRays);
-    assert(globalEventsCount == globalEventsCount2);
+    gather<Ray>(
+        queue,
+        compactGlobalEvents,
+        outputRays,
+        compactRayOffsets,
+        outputRayCounts,
+        cfg.m_maxEvents,
+        numInputRays
+    );
 
     // transfer
     // TODO(Sven): make transfer a noop for cpu accelerators
@@ -360,13 +358,13 @@ TraceResult SimpleTracer<Acc>::traceBatch(const TraceRawConfig& cfg) {
     auto h_compactRayOffsetsView = alpaka::createView(host, h_compactRayOffsets);
     alpaka::memcpy(queue, h_compactRayOffsets, compactRayOffsets, Vec{numInputRays});
 
-    auto h_compactGlobalEvents = std::vector<Ray>(globalEventsCount);
-    auto h_compactGlobalEventsView = alpaka::createView(host, h_compactGlobalEvents);
-    alpaka::memcpy(queue, h_compactGlobalEventsView, compactGlobalEvents, Vec{globalEventsCount});
-
     auto h_outputRayCounts = std::vector<Idx>(numInputRays);
     auto h_outputRayCountsView = alpaka::createView(host, h_outputRayCounts);
     alpaka::memcpy(queue, h_outputRayCountsView, outputRayCounts, Vec{numInputRays});
+
+    auto h_compactGlobalEvents = std::vector<Ray>(globalEventsCount);
+    auto h_compactGlobalEventsView = alpaka::createView(host, h_compactGlobalEvents);
+    alpaka::memcpy(queue, h_compactGlobalEventsView, compactGlobalEvents, Vec{globalEventsCount});
 
     alpaka::wait(queue);
 
