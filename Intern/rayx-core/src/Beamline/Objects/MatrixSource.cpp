@@ -64,7 +64,7 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
         }
     }
     // afterwards start from the beginning again
-    for (uint32_t i = 0; i < m_numberOfRays - rmat * rmat; i++) {
+    /*for (uint32_t i = 0; i < m_numberOfRays - rmat * rmat; i++) {
         /*Ray r = rayVector.at(i);
         glm::dvec3 position =
             glm::dvec3(r.m_position.x, r.m_position.y, r.m_position.z);
@@ -80,11 +80,11 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
 
         Ray r_copy(position.x, position.y, position.z, direction.x, direction.y,
                    direction.z, stokes.x, stokes.y, stokes.z, stokes.w, en,
-                   1.0);*/
+                   1.0);
         Ray r_copy((const Ray&)returnList.at(i));
         r_copy.m_energy = en = selectEnergy();
         returnList.push_back(r_copy);
-    }
+    }*/
     return returnList;
 }
 

@@ -34,12 +34,18 @@ enum class ValueType {
 class Undefined {};
 
 class Value;
+
 /**
- * This Map is the foundation for the DEsignELement ad DesignSource
- * All Parameter 
+ * This Map is the foundation for the DesignELement ad DesignSource
+ * All Parameter are defined by a string set in DesignElement.cpp and a Value. 
+ * The Value describes the possible Types. It is defined as a shared pointer because of the recursive call.
+ * 
 */
 using Map = std::unordered_map<std::string, std::shared_ptr<Value>>;
 
+/**
+ * To ensure a typesafe Map all possible options are defined in the Value class bellow
+*/
 class Value {
   public:
     Value() : m_variant(Undefined()) {}

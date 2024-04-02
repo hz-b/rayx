@@ -66,15 +66,15 @@ TEST_F(TestSuite, testEnergyDistribution) {
         },
         {
             .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy = 104.042, //TODO Fanny check if true (106.42)
+            .energy = 104.042,
         },
         {
             .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy = 51.29,  //TODO Fanny check if true (47.92)
+            .energy = 51.29,
         },
         {
             .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy = 123.19, //TODO Fanny check if true (127.96)
+            .energy = 123.19,
         },
     };
 
