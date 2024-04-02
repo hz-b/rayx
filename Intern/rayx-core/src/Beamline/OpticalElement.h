@@ -14,7 +14,7 @@ namespace RAYX {
 
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
-struct DesignElement; //TODO Fanny see where the forward declaration has to go
+struct DesignElement; 
 
 // This is the current "high-level" representation of an OpticalElement.
 // As you can see, it is precisely the same as the shader-internal representation `Element` in addition with a name.

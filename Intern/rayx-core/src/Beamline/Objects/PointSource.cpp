@@ -7,18 +7,18 @@
 
 namespace RAYX {
 
-PointSource::PointSource(const DesignSource& deso) : LightSource(deso),
-    m_widthDist(deso.getWidthDist()),
-    m_heightDist(deso.getHeightDist()),
-    m_horDist(deso.getHorDist()),
-    m_verDist(deso.getVerDist()),
-    m_pol(deso.getStokes()),
-    m_verDivergence(deso.getVerDivergence()),
-    m_sourceDepth(deso.getSourceDepth()),
-    m_sourceHeight(deso.getSourceHeight()),
-    m_sourceWidth(deso.getSourceWidth())
+PointSource::PointSource(const DesignSource& dSource) : LightSource(dSource),
+    m_widthDist(dSource.getWidthDist()),
+    m_heightDist(dSource.getHeightDist()),
+    m_horDist(dSource.getHorDist()),
+    m_verDist(dSource.getVerDist()),
+    m_pol(dSource.getStokes()),
+    m_verDivergence(dSource.getVerDivergence()),
+    m_sourceDepth(dSource.getSourceDepth()),
+    m_sourceHeight(dSource.getSourceHeight()),
+    m_sourceWidth(dSource.getSourceWidth())
      {
-    m_horDivergence = deso.getHorDivergence();
+    m_horDivergence = dSource.getHorDivergence();
 }
 
 /**
@@ -89,7 +89,6 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        //glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)

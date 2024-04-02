@@ -50,6 +50,7 @@ void DesignSource::setWorldPosition(glm::dvec4 p) {
     v["worldPosition"]["x"] = p.x;
     v["worldPosition"]["y"] = p.y;
     v["worldPosition"]["z"] = p.z;
+    v["worldPosition"]["w"] = p.w;
 }
 
 glm::dvec4 DesignSource::getWorldPosition() const {
@@ -57,6 +58,7 @@ glm::dvec4 DesignSource::getWorldPosition() const {
     d[0] = v["worldPosition"]["x"].as_double();
     d[1] = v["worldPosition"]["y"].as_double();
     d[2] = v["worldPosition"]["z"].as_double();
+    d[3] = 0;
     return d;
 }
 
@@ -65,16 +67,19 @@ void DesignSource::setWorldOrientation(glm::dmat4x4 o) {
     v["worldXDirection"]["x"] = o[0][0];
     v["worldXDirection"]["y"] = o[0][1];
     v["worldXDirection"]["z"] = o[0][2];
+    v["worldXDirection"]["w"] = o[0][3];
 
     v["worldYDirection"] = Map();
     v["worldYDirection"]["x"] = o[1][0];
     v["worldYDirection"]["y"] = o[1][1];
     v["worldYDirection"]["z"] = o[1][2];
+    v["worldYDirection"]["w"] = o[1][3];
 
     v["worldZDirection"] = Map();
     v["worldZDirection"]["x"] = o[2][0];
     v["worldZDirection"]["y"] = o[2][1];
     v["worldZDirection"]["z"] = o[2][2];
+    v["worldZDirection"]["w"] = o[2][3];
 }
 
 glm::dmat4x4 DesignSource::getWorldOrientation() const {
@@ -83,14 +88,17 @@ glm::dmat4x4 DesignSource::getWorldOrientation() const {
     o[0][0] = v["worldXDirection"]["x"].as_double();
     o[0][1] = v["worldXDirection"]["y"].as_double();
     o[0][2] = v["worldXDirection"]["z"].as_double();
+    o[0][3] = 0;
 
     o[1][0] = v["worldYDirection"]["x"].as_double();
     o[1][1] = v["worldYDirection"]["y"].as_double();
     o[1][2] = v["worldYDirection"]["z"].as_double();
+    o[1][3] = 0;
 
     o[2][0] = v["worldZDirection"]["x"].as_double();
     o[2][1] = v["worldZDirection"]["y"].as_double();
     o[2][2] = v["worldZDirection"]["z"].as_double();
+    o[2][3] = 0;
 
     return o;
 }

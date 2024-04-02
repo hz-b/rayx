@@ -9,19 +9,19 @@
 
 namespace RAYX {
 
-CircleSource::CircleSource(const DesignSource& deso) : LightSource(deso) {
-    m_pol = deso.getStokes();
+CircleSource::CircleSource(const DesignSource& dSource) : LightSource(dSource) {
+    m_stokes = dSource.getStokes();
 
-    m_sourceDepth = deso.getSourceDepth();
-    m_sourceHeight = deso.getSourceHeight();
-    m_sourceWidth = deso.getSourceWidth();
+    m_sourceDepth = dSource.getSourceDepth();
+    m_sourceHeight = dSource.getSourceHeight();
+    m_sourceWidth = dSource.getSourceWidth();
 
-    m_misalignment = deso.getMisalignment();
+    m_misalignment = dSource.getMisalignment();
 
-    m_numOfCircles = deso.getNumOfCircles();
-    m_maxOpeningAngle = deso.getMaxOpeningAngle();
-    m_minOpeningAngle = deso.getMinOpeningAngle();
-    m_deltaOpeningAngle = deso.getDeltaOpeningAngle();
+    m_numOfCircles = dSource.getNumOfCircles();
+    m_maxOpeningAngle = dSource.getMaxOpeningAngle();
+    m_minOpeningAngle = dSource.getMinOpeningAngle();
+    m_deltaOpeningAngle = dSource.getDeltaOpeningAngle();
 }
 /**
  * Creates random rays from circle source with specified num. of circles and
@@ -56,7 +56,7 @@ std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const 
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirection();
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_stokes, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }

@@ -34,6 +34,10 @@ enum class ValueType {
 class Undefined {};
 
 class Value;
+/**
+ * This Map is the foundation for the DEsignELement ad DesignSource
+ * All Parameter 
+*/
 using Map = std::unordered_map<std::string, std::shared_ptr<Value>>;
 
 class Value {

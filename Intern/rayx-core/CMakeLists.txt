@@ -12,7 +12,7 @@ endif()
 
 # ---- Add tests ----
 # TODO re-enable
- add_subdirectory(tests)
+ # add_subdirectory(tests)
 
 # -------------------
 

@@ -8,17 +8,17 @@
 
 namespace RAYX {
 
-SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& deso) : LightSource(deso),
-    m_sourceDepth(deso.getSourceDepth()),
-    m_sigmaType(deso.getSigmaType()),
-    m_undulatorLength(deso.getUndulatorLength()),
-    m_photonEnergy(deso.getEnergy()),
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : LightSource(dSource),
+    m_sourceDepth(dSource.getSourceDepth()),
+    m_sigmaType(dSource.getSigmaType()),
+    m_undulatorLength(dSource.getUndulatorLength()),
+    m_photonEnergy(dSource.getEnergy()),
     m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
-    m_electronSigmaX(deso.getElectronSigmaX()),
-    m_electronSigmaXs(deso.getElectronSigmaXs()),
-    m_electronSigmaY(deso.getElectronSigmaY()),
-    m_electronSigmaYs(deso.getElectronSigmaYs()),
-    m_pol(deso.getStokes()) 
+    m_electronSigmaX(dSource.getElectronSigmaX()),
+    m_electronSigmaXs(dSource.getElectronSigmaXs()),
+    m_electronSigmaY(dSource.getElectronSigmaY()),
+    m_electronSigmaYs(dSource.getElectronSigmaYs()),
+    m_pol(dSource.getStokes()) 
     
     {
         

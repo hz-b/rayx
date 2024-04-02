@@ -5,15 +5,14 @@
 #include "EnergyDistribution.h"
 
 namespace RAYX {
-LightSource::LightSource(const DesignSource& deso) {
-    m_name = deso.getName();
-    m_EnergyDistribution = deso.getEnergyDistribution();
-    m_misalignmentParams = deso.getMisalignment();
-    m_numberOfRays = (uint32_t) deso.getNumberOfRays();
-    m_orientation = deso.getWorldOrientation();
-    m_position = deso.getWorldPosition();
-    m_verDivergence = 0.0;
-}
+LightSource::LightSource(const DesignSource& dSource) 
+    : m_name(dSource.getName()),
+      m_EnergyDistribution(dSource.getEnergyDistribution()),
+      m_numberOfRays(static_cast<uint32_t> (dSource.getNumberOfRays())),
+      m_verDivergence(0.0),
+      m_orientation(dSource.getWorldOrientation()),
+      m_position(dSource.getWorldPosition()),
+      m_misalignmentParams(dSource.getMisalignment()) {}
 
 Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentParams; }
 

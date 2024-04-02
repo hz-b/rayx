@@ -4,8 +4,8 @@
 #include "Data/xml.h"
 
 namespace RAYX {
-struct DesignSource;  // TODO Fanny see where the forward declaration has to go
-class LightSource;    // TODO Fanny see where the forward declaration has to go
+struct DesignSource;   
+class LightSource;     
 
 class RAYX_API PointSource : public LightSource {
   public:

@@ -21,8 +21,6 @@ const bool enableValidationLayers = true;
 class Window;
 class Device;
 class RenderObject;
-struct DesignElement;
-struct DesignSource;
 
 class Application {
   public:
