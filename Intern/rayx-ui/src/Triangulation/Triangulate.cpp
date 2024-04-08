@@ -373,7 +373,7 @@ void triangulate(const PolygonComplex& poly, std::vector<TextureVertex>& points,
 // Cutout to Outline conversion
 // Holes are represented by polygons in clockwise order
 PolygonSimple calculateOutlineFromCutout(const Cutout& cutout, std::vector<TextureVertex>& vertices, bool clockwise = false) {
-    constexpr double defWidthHeight = 50.0f;
+    constexpr double defWidthHeight = 27.3f;
     Outline outline;
 
     switch (static_cast<int>(cutout.m_type)) {
@@ -421,7 +421,7 @@ void planarTriangulation(const RAYX::OpticalElement& element, std::vector<Textur
         SlitBehaviour slit = deserializeSlit(element.m_element.m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
         poly.push_back(calculateOutlineFromCutout(element.m_element.m_cutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true)); // Hole -> Clockwise order
+        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));  // Hole -> Clockwise order
     } else {
         poly.push_back(calculateOutlineFromCutout(element.m_element.m_cutout, vertices));
     }

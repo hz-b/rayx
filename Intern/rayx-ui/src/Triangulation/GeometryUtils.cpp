@@ -30,7 +30,7 @@ std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
             break;
         }
         default: {  // CTYPE_UNLIMITED and unknown types
-            return {50.0, 50.0};
+            return {27.3, 27.3};
             break;
         }
     }
