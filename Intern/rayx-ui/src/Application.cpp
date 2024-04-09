@@ -37,7 +37,11 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .build();
-    m_TexturePool = DescriptorPool::Builder(m_Device).addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000).setMaxSets(1000).build();
+    m_TexturePool = DescriptorPool::Builder(m_Device)
+                        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
+                        .setMaxSets(1000)
+                        .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
+                        .build();
 
     init();
 }
@@ -109,6 +113,7 @@ void Application::run() {
     std::future<std::vector<Scene::RenderObjectInput>> getRObjInputsFuture;
     // Main loop
     VkExtent2D sceneExtent = {1920, 1080};
+    m_State = State::RunningWithoutScene;
     while (!m_Window.shouldClose()) {
         // Skip rendering when minimized
         if (m_Window.isMinimized()) {
@@ -237,7 +242,6 @@ void Application::run() {
             uboBuffers[frameIndex]->writeToBuffer(&m_Camera);
 
             // Render
-            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
             FrameInfo frameInfo = {
                 .camera = m_Camera,                          //
                 .frameIndex = frameIndex,                    //
@@ -260,6 +264,7 @@ void Application::run() {
             gridRenderSystem.render(frameInfo);
             m_Renderer.endOffscreenRenderPass(frameInfo);
 
+            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
             // UI
             m_UIHandler.beginUIRender();
             m_UIHandler.setupUI(m_UIParams, elements, rSourcePositions);

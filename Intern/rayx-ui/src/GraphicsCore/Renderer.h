@@ -72,6 +72,7 @@ class Renderer {
     void beginOffscreenRenderPass(FrameInfo& frameInfo);
     void endOffscreenRenderPass(FrameInfo& frameInfo);
     std::shared_ptr<Texture> getOffscreenColorTexture() const { return m_offscreenColorTexture; }
+    std::shared_ptr<Texture> getOffscreenDepthTexture() const { return m_offscreenDepthTexture; }
 
     void offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, const DescriptorPool& pool, VkDescriptorSet& descriptorSet);
     void resizeOffscreenResources(const VkExtent2D& extent);

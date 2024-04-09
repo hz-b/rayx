@@ -345,12 +345,12 @@ VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
     for (const auto& availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            std::cout << "Present mode: Mailbox" << std::endl;
+            RAYX_VERB << "Present mode: Mailbox";
             return availablePresentMode;
         }
     }
 
-    std::cout << "Present mode: V-Sync" << std::endl;
+    RAYX_VERB << "Present mode: V-Sync";
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 

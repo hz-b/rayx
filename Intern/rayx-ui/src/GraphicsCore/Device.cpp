@@ -274,19 +274,19 @@ void Device::hasGflwRequiredInstanceExtensions() {
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-    std::cout << "available extensions:" << std::endl;
+    RAYX_VERB << "available extensions:";
     std::unordered_set<std::string> available;
     for (const auto& extension : extensions) {
-        std::cout << "\t" << extension.extensionName << std::endl;
+        RAYX_VERB << "\t" << extension.extensionName;
         available.insert(extension.extensionName);
     }
 
-    std::cout << "required extensions:" << std::endl;
+    RAYX_VERB << "required extensions:";
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions) {
-        std::cout << "\t" << required << std::endl;
+        RAYX_VERB << "\t" << required;
         if (available.find(required) == available.end()) {
-            throw std::runtime_error("Missing required glfw extension");
+            RAYX_ERR << "Required extension " << required << " not available!";
         }
     }
 }
