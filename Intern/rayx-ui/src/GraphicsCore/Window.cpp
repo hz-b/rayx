@@ -35,22 +35,15 @@ Window::~Window() {
  */
 void Window::framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height) {
     auto window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(rawWindow));
-    window->m_framebufferResized = true;
-    window->m_width = width;
-    window->m_height = height;
+    if (window) {
+        window->onFramebufferResize(width, height);
+    } else {
+        RAYX_ERR << "Failed to get window pointer in framebuffer resize callback!";
+    }
 }
 
-/**
- * Updates the size of the window based on framebuffer size.
- * If the framebuffer size is zero, it waits for an event to change it.
- */
-void Window::updateWindowSize() {
-    int width = 0, height = 0;
-    glfwGetFramebufferSize(m_Window, &width, &height);
-    while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(m_Window, &width, &height);
-        glfwWaitEvents();
-    }
+void Window::onFramebufferResize(int width, int height) {
+    m_framebufferResized = true;
     m_width = width;
     m_height = height;
 }

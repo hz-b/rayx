@@ -26,18 +26,19 @@ Renderer::~Renderer() {
 }
 
 void Renderer::recreateSwapChain() {
-    auto extent = m_Window.getExtent();
-    while (extent.width == 0 || extent.height == 0) {
-        extent = m_Window.getExtent();
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(m_Window.window(), &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(m_Window.window(), &width, &height);
         glfwWaitEvents();
     }
     vkDeviceWaitIdle(m_Device.device());
 
     if (m_SwapChain == nullptr) {
-        m_SwapChain = std::make_unique<SwapChain>(m_Device, extent);
+        m_SwapChain = std::make_unique<SwapChain>(m_Device, VkExtent2D(width, height));
     } else {
         std::shared_ptr<SwapChain> oldSwapChain = std::move(m_SwapChain);
-        m_SwapChain = std::make_unique<SwapChain>(m_Device, extent, oldSwapChain);
+        m_SwapChain = std::make_unique<SwapChain>(m_Device, VkExtent2D(width, height), oldSwapChain);
 
         if (!oldSwapChain->compareSwapFormats(*m_SwapChain)) {
             throw std::runtime_error("Swap chain image(or depth) format has changed!");
@@ -161,16 +162,16 @@ void Renderer::beginOffscreenRenderPass(FrameInfo& frameInfo) {
     frameInfo.commandBuffer = m_Device.beginSingleTimeCommands();
 
     // Begin the offscreen render pass
+    VkClearValue clearValues[2];
+    clearValues[0].color = {{0.05f, 0.05f, 0.05f, 1.0f}};
+    clearValues[1].depthStencil = {1.0f, 0};
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_offscreenRenderPass;
     renderPassInfo.framebuffer = m_offscreenFramebuffer;
     renderPassInfo.renderArea.extent.width = m_offscreenExtent.width;
     renderPassInfo.renderArea.extent.height = m_offscreenExtent.height;
-
-    VkClearValue clearValues[2];
-    clearValues[0].color = {{0.25f, 0.25f, 0.25f, 1.0f}};
-    clearValues[1].depthStencil = {1.0f, 0};
     renderPassInfo.clearValueCount = 2;
     renderPassInfo.pClearValues = clearValues;
 
@@ -199,6 +200,12 @@ void Renderer::endOffscreenRenderPass(FrameInfo& frameInfo) {
 }
 
 void Renderer::offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, const DescriptorPool& pool, VkDescriptorSet& descriptorSet) {
+    // Check if the descriptor set needs to be recreated
+    if (descriptorSet != VK_NULL_HANDLE) {
+        vkFreeDescriptorSets(m_Device.device(), pool.getDescriptorPool(), 1, &descriptorSet);
+        descriptorSet = VK_NULL_HANDLE;
+    }
+
     VkDescriptorSetLayout layouts[] = {layout.getDescriptorSetLayout()};
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -243,27 +250,26 @@ void Renderer::resizeOffscreenResources(const VkExtent2D& extent) {
 }
 
 void Renderer::createOffscreenResources() {
-    RAYX_LOG << "Creating offscreen resources";
+    RAYX_VERB << "Creating offscreen resources";
     m_offscreenColorTexture = std::make_shared<Texture>(
         m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_IMAGE_ASPECT_COLOR_BIT, m_offscreenExtent);
-    m_offscreenColorTexture->transitionImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    m_offscreenColorTexture->transitionImageLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     m_offscreenDepthTexture = std::make_shared<Texture>(  //
         m_Device, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT, m_offscreenExtent);
     m_offscreenDepthTexture->transitionImageLayout(VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
 void Renderer::createOffscreenRenderPass() {
-    // Define a simple render pass with a single color attachment for offscreen rendering
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;  // Same format as the offscreen image
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;    // Clear at the start
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;  // Store when done
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;               // Don't care about initial layout of the image
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;  // Image will be read from, so transition to transfer source layout
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     VkAttachmentReference colorAttachmentRef = {};
     colorAttachmentRef.attachment = 0;
@@ -289,7 +295,6 @@ void Renderer::createOffscreenRenderPass() {
     subpass.pColorAttachments = &colorAttachmentRef;
     subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
-    // Define subpass dependencies for layout transitions
     VkSubpassDependency dependency = {};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;

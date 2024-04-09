@@ -9,10 +9,11 @@
 
 Texture::Texture(const Device& device)
     : m_Device{device},
+      m_extent{0, 0},
       m_format{VK_FORMAT_R8G8B8A8_UNORM},
+      m_layout{VK_IMAGE_LAYOUT_UNDEFINED},
       m_usageFlags{VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT},
-      m_aspectFlags{VK_IMAGE_ASPECT_COLOR_BIT},
-      m_layout{VK_IMAGE_LAYOUT_UNDEFINED} {
+      m_aspectFlags{VK_IMAGE_ASPECT_COLOR_BIT} {
     std::vector<uint8_t> data = dataFromPath(getExecutablePath() / "Assets/textures/default.png");
     createImage(VK_IMAGE_TILING_OPTIMAL, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     createImageView();
@@ -22,12 +23,12 @@ Texture::Texture(const Device& device)
 
 Texture::Texture(const Device& device, VkFormat format, VkImageUsageFlags usage, VkImageAspectFlags aspectFlags, VkExtent2D extent)
     : m_Device{device},  //
-      m_format{format},
       m_extent{extent},
+      m_format{format},
+      m_layout{VK_IMAGE_LAYOUT_UNDEFINED},
       m_usageFlags(usage),
-      m_aspectFlags{aspectFlags},
-      m_layout{VK_IMAGE_LAYOUT_UNDEFINED} {
-    RAYX_LOG << "Creating texture with format: " << format << " usage: " << usage << " aspect: " << aspectFlags;
+      m_aspectFlags{aspectFlags} {
+    RAYX_VERB << "Creating texture with format: " << format << " usage: " << usage << " aspect: " << aspectFlags;
     createImage(VK_IMAGE_TILING_OPTIMAL, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     createImageView();
     createSampler();
@@ -106,7 +107,6 @@ std::vector<uint8_t> Texture::dataFromPath(const std::filesystem::path& path) {
     stbi_uc* pixels = stbi_load(path.string().c_str(), reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height), &_, STBI_rgb_alpha);
     if (!pixels) {
         RAYX_ERR << "Failed to load texture image: " << path.string();
-        std::unreachable();
     }
     m_extent.width = static_cast<uint32_t>(width);
     m_extent.height = static_cast<uint32_t>(height);
@@ -119,8 +119,8 @@ std::vector<uint8_t> Texture::dataFromPath(const std::filesystem::path& path) {
 void Texture::resize(uint32_t width, uint32_t height) {
     m_extent.width = width;
     m_extent.height = height;
-    RAYX_LOG << "Resizing texture to " << width << "x" << height;
-    RAYX_LOG << "Usage flags: " << m_usageFlags << " Aspect flags: " << m_aspectFlags << " Format: " << m_format;
+    RAYX_VERB << "Resizing texture to " << width << "x" << height;
+    RAYX_VERB << "Usage flags: " << m_usageFlags << " Aspect flags: " << m_aspectFlags << " Format: " << m_format;
     vkDeviceWaitIdle(m_Device.device());
     cleanup();
     createImage(VK_IMAGE_TILING_OPTIMAL, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -210,6 +210,11 @@ void Texture::setupTransitionDetails(VkImageLayout oldLayout, VkImageLayout newL
         dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    } else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+        srcAccessMask = 0;
+        dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
         srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
