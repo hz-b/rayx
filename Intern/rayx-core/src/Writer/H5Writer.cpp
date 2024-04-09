@@ -75,7 +75,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     bundleHist.reserve(numRays);
     size_t double_index = 0;
     RAYX::RayHistory rayHist;
-    unsigned int startEventID = doubles[1];
+    double startEventID = doubles[1];
     while (double_index < doubles.size()) {
         // Extract and ignore Ray-ID and Snapshot-ID
         [[maybe_unused]] double rayId = doubles[double_index++];
@@ -112,7 +112,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     return bundleHist;
 }
 
-RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) {
+RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, int& startEventID) {
     RAYX::BundleHistory rays;
 
     try {
@@ -125,7 +125,7 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
         auto dims = dataset.getSpace().getDimensions();
         doubles.resize(dims[0] * dims[1]);
         dataset.read(doubles.data());
-        unsigned int startEventID = doubles[1];
+        startEventID = static_cast<int>(doubles[1]);
         rays = fromDoubles(doubles, format);
         RAYX_LOG << "Loaded " << rays.size() << " rays from " << filename;
 
@@ -134,5 +134,8 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
     }
     return rays;
 }
+
+// backwards compatibility
+RAYX_API RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) { return raysFromH5(filename, format, *new int); }
 
 #endif
