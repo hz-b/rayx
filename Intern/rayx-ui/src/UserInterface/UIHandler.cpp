@@ -384,6 +384,11 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], static_cast<int>(deviceItems.size()));
                 ImGui::EndDisabled();
             }
+            // startEventID selection
+            ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
+
+            // maxEvents selection
+            ImGui::InputInt("Max Events", &uiParams.simulationInfo.maxEvents);
 
             if (!uiParams.simulationInfo.fixedSeed) {
                 ImGui::BeginDisabled();

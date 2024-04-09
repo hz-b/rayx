@@ -14,11 +14,12 @@ struct UIRayInfo {
     bool renderAllRays;
     size_t amountOfRays;
     size_t maxAmountOfRays;
+    int startEventID = 0;
 };
 
 struct UISimulationInfo {
-    int startEventID = 0;  // unused right now
-    int maxEvents = 0;     // unused right now
+    int startEventID = 0;
+    int maxEvents = 0;
     int maxBatchSize = 100000;
     int tracer = 1;
     bool sequential = false;

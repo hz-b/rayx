@@ -272,4 +272,7 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
 #endif
 }
 
-void Application::loadBeamline(const std::filesystem::path& rmlPath) { m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath)); }
+void Application::loadBeamline(const std::filesystem::path& rmlPath) {
+    m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath));
+    m_UIParams.simulationInfo.maxEvents = m_Beamline->m_OpticalElements.size() + 2;
+}

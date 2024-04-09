@@ -64,7 +64,7 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
 // Define the type of the filter function
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
-                          uint32_t amountOfRays) {
+                          uint32_t amountOfRays, int startEventID) {
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
@@ -79,9 +79,11 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         auto& rayHist = rayCache[i];
 
         if (beamline.m_LightSources.size() <= rayHist[0].m_sourceID) {
-            RAYX_ERR << "Trying to acces out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
+            RAYX_ERR << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
         }
         glm::vec4 rayLastPos = (glm::vec4)beamline.m_LightSources[(size_t)rayHist[0].m_sourceID]->getPosition();
+
+        bool isFirstEvent = true;  // Add a flag to track the first event.
 
         for (const auto& event : rayHist) {
             if (event.m_lastElement >= beamline.m_OpticalElements.size()) {
@@ -93,11 +95,16 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;
 
-            ColorVertex origin = {rayLastPos, originColor};
-            ColorVertex point = {worldPos, pointColor};
+            if (!(isFirstEvent && startEventID > 0)) {
+                // Only execute if not the first event with startEventID > 0
+                ColorVertex origin = {rayLastPos, originColor};
+                ColorVertex point = {worldPos, pointColor};
 
-            rays.push_back(Line(origin, point));
-            rayLastPos = point.pos;
+                rays.push_back(Line(origin, point));
+            }
+
+            rayLastPos = worldPos;  // Update rayLastPos in every case for the next iteration
+            isFirstEvent = false;   // Update the flag after the first iteration
         }
     }
 
