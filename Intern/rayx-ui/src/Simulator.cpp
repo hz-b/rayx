@@ -28,7 +28,9 @@ void Simulator::runSimulation() {
         return;
     }
     // Run rayx core
-    m_maxEvents = static_cast<unsigned int>(m_Beamline.m_OpticalElements.size() + 2);
+    if (m_maxEvents <= 0) {
+        m_maxEvents = static_cast<unsigned int>(m_Beamline.m_OpticalElements.size() + 2);
+    }
     unsigned int startEventID = 0;
 
     auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, startEventID);
@@ -96,7 +98,8 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
     }
     m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
     m_deviceIndex = simulationInfo.deviceIndex;
-
+    m_startEventID = simulationInfo.startEventID;
+    m_maxEvents = simulationInfo.maxEvents;
     if (simulationInfo.fixedSeed) {
         if (simulationInfo.seed != -1) {
             RAYX::fixSeed(simulationInfo.seed);

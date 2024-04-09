@@ -11,6 +11,7 @@ class Simulator {
     std::vector<std::string> getAvailableDevices();
 
   private:
+    unsigned int m_startEventID = 0;
     unsigned int m_maxEvents = 0;
 
     std::filesystem::path m_RMLPath;  ///< Path to the RML file
