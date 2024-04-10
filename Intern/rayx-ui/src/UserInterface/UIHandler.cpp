@@ -202,17 +202,17 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
 
 #ifndef NO_H5
             std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
-            m_showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
+            uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
 #else
             std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
-            m_showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
+            uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
 #endif
             m_showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
 
             if (m_showRMLNotExistPopup) {
                 uiParams.rmlReady = false;
             } else {
-                if (m_showH5NotExistPopup) {
+                if (uiParams.showH5NotExistPopup) {
                     uiParams.h5Ready = false;
                     m_pathValidState = false;
                 } else {
@@ -231,7 +231,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     if (uiParams.rmlPath != "") {
         ImGui::SameLine();
         if (ImGui::Button("Retrace current file")) {
-            m_showH5NotExistPopup = false;
+            uiParams.showH5NotExistPopup = false;
             m_showRMLNotExistPopup = false;
             uiParams.rmlReady = true;
             uiParams.runSimulation = true;
@@ -301,7 +301,7 @@ void UIHandler::showHotkeysWindow() {
 }
 
 void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
-    if (m_showH5NotExistPopup || m_showRMLNotExistPopup) {
+    if (uiParams.showH5NotExistPopup || m_showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
         ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
@@ -314,7 +314,7 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             if (m_showRMLNotExistPopup) {
                 ImGui::Text("RML file does not exist or is not valid.");
             } else {
-                ImGui::Text("The H5 file does not exist.");
+                ImGui::Text("The H5 file does not exist or is not valid.");
             }
             ImGui::Spacing();
             ImGui::Text("Do you want to run the simulation now?");  // Ask the user if they want to run the simulation now
@@ -329,7 +329,7 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             ImGui::SetCursorPosX(buttonsStartPos);
 
             if (ImGui::Button("Yes", ImVec2(120, 40))) {  // Make the button a bit larger
-                m_showH5NotExistPopup = false;
+                uiParams.showH5NotExistPopup = false;
                 m_showRMLNotExistPopup = false;
                 uiParams.rmlReady = true;
                 uiParams.runSimulation = true;
@@ -341,7 +341,7 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             ImGui::SetCursorPosX(buttonsStartPos + 120 + spaceBetweenButtons);  // Adjust for the next button
 
             if (ImGui::Button("No", ImVec2(120, 40))) {  // Make the button a bit larger
-                m_showH5NotExistPopup = false;
+                uiParams.showH5NotExistPopup = false;
                 m_showRMLNotExistPopup = false;
                 uiParams.runSimulation = false;  // Do not start the simulation
                 ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
@@ -361,7 +361,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(410, 230), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(420, 250), ImGuiCond_Always);
 
         if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
@@ -385,7 +385,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::EndDisabled();
             }
             // startEventID selection
-            ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
+            // ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
 
             // maxEvents selection
             ImGui::InputInt("Max Events", &uiParams.simulationInfo.maxEvents);

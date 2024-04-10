@@ -31,9 +31,8 @@ void Simulator::runSimulation() {
     if (m_maxEvents <= 0) {
         m_maxEvents = static_cast<unsigned int>(m_Beamline.m_OpticalElements.size() + 2);
     }
-    unsigned int startEventID = 0;
 
-    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, startEventID);
+    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, m_startEventID);
 
     // check max EventID
     unsigned int maxEventID = 0;
@@ -41,7 +40,7 @@ void Simulator::runSimulation() {
 
     for (auto& ray : rays) {
         if (ray.size() > (maxEventID)) {
-            maxEventID = static_cast<unsigned int>(ray.size()) + startEventID;
+            maxEventID = static_cast<unsigned int>(ray.size()) + m_startEventID;
         }
 
         for (auto& event : ray) {
@@ -80,9 +79,9 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    writeH5(rays, path, fmt, names, startEventID);
+    writeH5(rays, path, fmt, names, m_startEventID);
 #else
-    writeCSV(rays, path, fmt, startEventID);
+    writeCSV(rays, path, fmt, m_startEventID);
 #endif
 }
 

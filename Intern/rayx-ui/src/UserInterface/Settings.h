@@ -46,6 +46,7 @@ struct UIParameters {
     std::filesystem::path rmlPath;
     bool rmlReady;
     bool h5Ready;
+    bool showH5NotExistPopup = false;
     float frameTime;
     UIRayInfo rayInfo;
     bool runSimulation;

@@ -168,6 +168,21 @@ void Application::run() {
                         raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         // Wait for loadBeamline and loadRays to finish
                         RAYX_VERB << "Loaded RML file: " << m_RMLPath;
+
+                        for (auto ray : m_rays) {
+                            // get last elemtent of vector
+                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
+                            if (id > m_Beamline->m_OpticalElements.size()) {
+                                m_UIParams.showH5NotExistPopup = true;
+                                break;
+                            }
+                        }
+                        if (m_UIParams.showH5NotExistPopup) {
+                            RAYX_LOG << "H5 file not compatible with RML file";
+                            m_State = State::RunningWithoutScene;
+                            break;
+                        }
+
                         RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
 
                         elements = m_Beamline->m_OpticalElements;
