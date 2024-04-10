@@ -41,7 +41,6 @@ class UIHandler {
     ImFont* m_largeFont;
 
     bool m_showRMLNotExistPopup = false;
-    bool m_showH5NotExistPopup = false;
     bool m_pathValidState = false;
 
     VkRenderPass m_RenderPass;

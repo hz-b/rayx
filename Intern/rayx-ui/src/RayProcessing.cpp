@@ -118,6 +118,9 @@ void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<
     // Iterate over all rays in the bundle history
     for (const auto& rayBundle : rays) {
         for (const auto& ray : rayBundle) {
+            if (ray.m_lastElement >= numElements) {
+                continue;
+            }
             sortedRays[ray.m_lastElement].push_back(ray);
         }
     }
