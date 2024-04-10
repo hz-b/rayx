@@ -83,7 +83,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         }
         glm::vec4 rayLastPos = (glm::vec4)beamline.m_LightSources[(size_t)rayHist[0].m_sourceID]->getPosition();
 
-        bool isFirstEvent = true;  // Add a flag to track the first event.
+        bool isFirstEvent = true;
 
         for (const auto& event : rayHist) {
             if (event.m_lastElement >= beamline.m_OpticalElements.size()) {

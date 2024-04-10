@@ -11,7 +11,8 @@ using uint = unsigned int;
 
 namespace RAYX {
 
-BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batch_size, int thread_count, unsigned int maxEvents, int startEventID) {
+BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batch_size, int thread_count, unsigned int maxEvents,
+                            unsigned int startEventID) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "maxEvents: " << maxEvents;
 
@@ -76,7 +77,7 @@ BundleHistory Tracer::trace(const Beamline& b, Sequential seq, uint64_t max_batc
         {
             RAYX_PROFILE_SCOPE_STDOUT("Tracing");
             rawBatch = traceRaw(cfg);
-            RAYX_LOG << "Traced " << rawBatch.size() << " events.";
+            RAYX_VERB << "Traced " << rawBatch.size() << " events.";
             assert(rawBatch.size() == batch_size * (maxEvents - startEventID));
         }
 
