@@ -51,7 +51,7 @@ class RAYX_API Tracer {
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
     BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
-                        int startEventID = 0);
+                        unsigned int startEventID = 0);
 
     void setDevice(int deviceID);
 

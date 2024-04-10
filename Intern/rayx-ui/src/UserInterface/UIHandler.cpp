@@ -365,7 +365,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
         if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
-            ImGui::InputInt("Max Batch Size", &uiParams.simulationInfo.maxBatchSize);
+            ImGui::InputScalar("Max Batch Size", ImGuiDataType_U32, &uiParams.simulationInfo.maxBatchSize);
 
             // Prepare device combo box
             std::vector<const char*> deviceItems;
@@ -374,28 +374,30 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
             }
 
             const char* tracerItems[] = {"CPU Tracer", "VULKAN Tracer"};
-            ImGui::Combo("Tracer", &uiParams.simulationInfo.tracer, tracerItems, IM_ARRAYSIZE(tracerItems));
+            ImGui::Combo("Tracer", reinterpret_cast<int*>(&uiParams.simulationInfo.tracer), tracerItems, IM_ARRAYSIZE(tracerItems));
 
             // Device selection combo box
             if (uiParams.simulationInfo.tracer == 1) {  // If not CPU Tracer, enable device selection
-                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], static_cast<int>(deviceItems.size()));
+                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
+                             static_cast<int>(deviceItems.size()));
             } else {
                 ImGui::BeginDisabled();  // Disable combo box if CPU Tracer is selected
-                ImGui::Combo("Device", &uiParams.simulationInfo.deviceIndex, &deviceItems[0], static_cast<int>(deviceItems.size()));
+                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
+                             static_cast<int>(deviceItems.size()));
                 ImGui::EndDisabled();
             }
             // startEventID selection
             // ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
 
             // maxEvents selection
-            ImGui::InputInt("Max Events", &uiParams.simulationInfo.maxEvents);
+            ImGui::InputScalar("Max Events", ImGuiDataType_U32, &uiParams.simulationInfo.maxEvents);
 
             if (!uiParams.simulationInfo.fixedSeed) {
                 ImGui::BeginDisabled();
-                ImGui::InputInt("Seed", &uiParams.simulationInfo.seed);
+                ImGui::InputScalar("Seed", ImGuiDataType_U32, &uiParams.simulationInfo.seed);
                 ImGui::EndDisabled();
             } else {
-                ImGui::InputInt("Seed", &uiParams.simulationInfo.seed);
+                ImGui::InputScalar("Seed", ImGuiDataType_U32, &uiParams.simulationInfo.seed);
             }
             ImGui::SameLine();
             ImGui::Checkbox("Fixed Seed", &uiParams.simulationInfo.fixedSeed);
@@ -412,7 +414,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
             float buttonsWidth = /* 2* */ 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
             ImGui::SetCursorPosX((windowWidth - buttonsWidth) / 2.0f);
 
-            if (uiParams.simulationInfo.deviceIndex >= static_cast<int>(uiParams.simulationInfo.availableDevices.size())) {
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<unsigned int>(uiParams.simulationInfo.availableDevices.size())) {
                 ImGui::BeginDisabled();
             }
 
@@ -421,7 +423,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::CloseCurrentPopup();
             }
 
-            if (uiParams.simulationInfo.deviceIndex >= static_cast<int>(uiParams.simulationInfo.availableDevices.size())) {
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<unsigned int>(uiParams.simulationInfo.availableDevices.size())) {
                 ImGui::EndDisabled();
             }
 

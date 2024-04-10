@@ -28,7 +28,7 @@ void Simulator::runSimulation() {
         return;
     }
     // Run rayx core
-    if (m_maxEvents <= 0) {
+    if (!m_maxEvents) {
         m_maxEvents = static_cast<unsigned int>(m_Beamline.m_OpticalElements.size() + 2);
     }
 

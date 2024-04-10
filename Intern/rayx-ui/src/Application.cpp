@@ -171,14 +171,14 @@ void Application::run() {
 
                         for (auto ray : m_rays) {
                             // get last elemtent of vector
-                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
+                            size_t id = ray.back().m_lastElement;
                             if (id > m_Beamline->m_OpticalElements.size()) {
                                 m_UIParams.showH5NotExistPopup = true;
                                 break;
                             }
                         }
                         if (m_UIParams.showH5NotExistPopup) {
-                            RAYX_LOG << "H5 file not compatible with RML file";
+                            RAYX_VERB << "H5 file not compatible with RML file";
                             m_State = State::RunningWithoutScene;
                             break;
                         }
@@ -280,7 +280,8 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays = raysFromH5(rayFilePath, FULL_FORMAT, m_UIParams.rayInfo.startEventID);
+    m_rays = raysFromH5(rayFilePath, FULL_FORMAT, &m_UIParams.rayInfo.startEventID);
+
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
     m_rays = loadCSV(rayFilePath);
@@ -289,5 +290,5 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
 
 void Application::loadBeamline(const std::filesystem::path& rmlPath) {
     m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath));
-    m_UIParams.simulationInfo.maxEvents = static_cast<int>(m_Beamline->m_OpticalElements.size()) + 2;
+    m_UIParams.simulationInfo.maxEvents = static_cast<unsigned int>(m_Beamline->m_OpticalElements.size()) + 2;
 }

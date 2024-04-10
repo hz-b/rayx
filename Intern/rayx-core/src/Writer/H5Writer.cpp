@@ -112,7 +112,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     return bundleHist;
 }
 
-RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, int& startEventID) {
+RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, unsigned int* startEventID) {
     RAYX::BundleHistory rays;
 
     try {
@@ -125,17 +125,16 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
         auto dims = dataset.getSpace().getDimensions();
         doubles.resize(dims[0] * dims[1]);
         dataset.read(doubles.data());
-        startEventID = static_cast<int>(doubles[1]);
+        if (startEventID) {
+            *startEventID = static_cast<unsigned int>(doubles[1]);
+        }
         rays = fromDoubles(doubles, format);
-        RAYX_LOG << "Loaded " << rays.size() << " rays from " << filename;
+        RAYX_VERB << "Loaded " << rays.size() << " rays from " << filename;
 
     } catch (HighFive::Exception& err) {
         RAYX_ERR << err.what();
     }
     return rays;
 }
-
-// backwards compatibility
-RAYX_API RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) { return raysFromH5(filename, format, *new int); }
 
 #endif
