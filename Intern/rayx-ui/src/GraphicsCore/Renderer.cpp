@@ -235,10 +235,6 @@ void Renderer::offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, c
 }
 
 void Renderer::resizeOffscreenResources(const VkExtent2D& extent) {
-    if (m_offscreenExtent.width == extent.width && m_offscreenExtent.height == extent.height) {
-        return;
-    }
-
     m_offscreenExtent = extent;
 
     m_offscreenColorTexture->resize(extent.width, extent.height);

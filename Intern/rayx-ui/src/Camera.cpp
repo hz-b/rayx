@@ -18,9 +18,7 @@ CameraController::CameraController()
       m_pitch(0.0f),
       m_mouseLooking(false),
       m_lastMouseX(0.0),
-      m_lastMouseY(0.0) {
-    RAYX_LOG << "CameraController created";
-}
+      m_lastMouseY(0.0) {}
 
 void CameraController::updateDirection(float deltaYaw, float deltaPitch) {
     m_yaw += deltaYaw;
@@ -116,7 +114,6 @@ void CameraController::update(Camera& cam, float aspectRatio) {
 }
 
 void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance) {
-    RAYX_LOG << "Looking at point";
     // Set the camera's x-coordinate to match the target point
     float x = targetPoint.x;
 
