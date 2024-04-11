@@ -42,9 +42,9 @@ class RAYX_API Tracer {
     );
 
     inline Platform platform() { return m_platform; }
-    inline int deviceIndex() { return m_deviceIndex; }
+    inline int64_t deviceIndex() { return m_deviceIndex; }
 
-    static int deviceCount(Platform platform);
+    static int64_t deviceCount(Platform platform);
     static std::string deviceName(Platform platform, int deviceIndex);
 
   private:

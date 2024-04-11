@@ -12,7 +12,7 @@ using Idx = int32_t;
 using GpuAcc = RAYX::DefaultGpuAcc<Dim, Idx>;
 using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
 
-inline int getDeviceCountForPlatform(RAYX::Tracer::Platform platform) {
+inline int64_t getDeviceCountForPlatform(Tracer::Platform platform) {
     switch (platform) {
     case RAYX::Tracer::Platform::Gpu:
 #ifdef GPU_TRACER
@@ -34,7 +34,7 @@ inline std::string getDeviceName(RAYX::Tracer::Platform platform, int deviceInde
             return alpaka::getName(dev);
 #else
             assert(false && "Gpu support was disabled during build. Cannot get device name");
-            break;
+            return "device-not-found";
 #endif
 
         }
@@ -92,7 +92,7 @@ BundleHistory Tracer::trace(
     );
 }
 
-int Tracer::deviceCount(Platform platform) {
+int64_t Tracer::deviceCount(Platform platform) {
     return getDeviceCountForPlatform(platform);
 }
 
