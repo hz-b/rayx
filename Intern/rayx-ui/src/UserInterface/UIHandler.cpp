@@ -11,6 +11,8 @@
 #include "CanonicalizePath.h"
 #include "RayProcessing.h"
 
+extern bool isSceneWindowHovered;
+
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {
         printf("%s\n", message);
@@ -251,7 +253,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
         ImGuiID dockspace_id = ImGui::GetID("Root");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
-        static auto first_time = true;
+        static bool first_time = true;
         if (first_time) {
             first_time = false;
 
@@ -282,6 +284,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement
                          ImVec4(0, 0, 0, 0));
         }
     }
+    isSceneWindowHovered = ImGui::IsWindowHovered();
     ImGui::End();
 
     showSceneEditorWindow(uiParams);

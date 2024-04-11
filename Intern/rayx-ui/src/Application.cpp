@@ -21,6 +21,8 @@
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
 
+bool isSceneWindowHovered = false;  // TODO: remove this global variable (doing this will require a refactor of the way we use glfw)
+
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
     : m_Window(width, height, name),                                   //
@@ -171,7 +173,7 @@ void Application::run() {
 
                         for (auto ray : m_rays) {
                             // get last elemtent of vector
-                            size_t id = ray.back().m_lastElement;
+                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
                             if (id > m_Beamline->m_OpticalElements.size()) {
                                 m_UIParams.showH5NotExistPopup = true;
                                 break;

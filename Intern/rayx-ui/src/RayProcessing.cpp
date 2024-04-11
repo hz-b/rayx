@@ -121,7 +121,7 @@ void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<
             if (ray.m_lastElement >= numElements) {
                 continue;
             }
-            sortedRays[ray.m_lastElement].push_back(ray);
+            sortedRays[static_cast<size_t>(ray.m_lastElement)].push_back(ray);
         }
     }
 }

@@ -9,14 +9,6 @@
 
 class Buffer;
 
-// TODO:
-// - Change this to Texture
-// - Check all functions for creating images, views, and samplers and combine them here
-// - Implement all functions
-// - How does outside code know whether resizing is needed?
-//   - On resize, outside code needs to check image info again and recreate descriptor set
-//   - Would be nice to have a wrapper class that handles this (RenderTarget?)
-//   - How does the extent info  get from UI to Renderer?
 class Texture {
   public:
     Texture(const Device& device);
