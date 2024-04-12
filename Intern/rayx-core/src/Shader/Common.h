@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef RAYX_CORE
+#ifdef RAYX_BUILD_DLL
 #include <alpaka/core/Common.hpp>
 #define RAYX_FUNC ALPAKA_FN_ACC
 #else

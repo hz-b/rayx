@@ -102,7 +102,6 @@ else()
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
-    PRIVATE RAYX_CORE
     PRIVATE RAYX_BUILD_DLL
     PUBLIC ${COMPILE_PLATFORM}
     RAYX_PROJECT_DIR="${CMAKE_SOURCE_DIR}"
