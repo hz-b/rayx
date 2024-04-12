@@ -9,6 +9,26 @@
 
 namespace RAYX {
 
+Cutout mkOpeningCutout(const DesignElement& dele) {
+    auto shape = dele.getOpeningShape();
+
+    // This converts y (height) to z (length), as the RML file uses DesignPlane::XY for slits, whereas our model uses XZ.
+
+    if (shape == CTYPE_RECT) {
+        return serializeRect({
+            .m_width = dele.getOpeningWidth(),
+            .m_length = dele.getOpeningHeight(),
+        });
+    } else if (shape == CTYPE_ELLIPTICAL) { // elliptical
+        return serializeElliptical({
+            .m_diameter_x = dele.getOpeningWidth(),
+            .m_diameter_z = dele.getOpeningHeight(),
+        });
+    } else {
+        RAYX_ERR << "unsupported opening type!";
+        return {};
+    }
+}
 
 Cutout mkBeamstopCutout(const DesignElement& dele) {
     auto centralBeamstop = dele.getCentralBeamstop();
@@ -35,7 +55,7 @@ Cutout mkBeamstopCutout(const DesignElement& dele) {
 }
 
 Element makeSlit(const DesignElement& dele) {
-    Cutout openingCutout = dele.getCutout();
+    Cutout openingCutout = mkOpeningCutout(dele);
     Cutout beamstopCutout = mkBeamstopCutout(dele);
 
     auto surface = serializePlaneXZ();
@@ -43,7 +63,7 @@ Element makeSlit(const DesignElement& dele) {
         .m_openingCutout = openingCutout,
         .m_beamstopCutout = beamstopCutout,
     });
-    Element el = makeElement(dele, behaviour, surface, serializeUnlimited(), DesignPlane::XY);
+    Element el = makeElement(dele, behaviour, surface, {}, DesignPlane::XY);
     Cutout globalCutout = el.m_cutout;
 
     // the opening needs to be a subset of the whole object.
