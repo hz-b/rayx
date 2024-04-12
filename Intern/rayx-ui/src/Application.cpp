@@ -174,7 +174,7 @@ void Application::run() {
                         for (auto ray : m_rays) {
                             // get last elemtent of vector
                             size_t id = static_cast<size_t>(ray.back().m_lastElement);
-                            if (id > m_Beamline->m_OpticalElements.size()) {
+                            if (id > m_Beamline->m_DesignElements.size()) {
                                 m_UIParams.showH5NotExistPopup = true;
                                 break;
                             }
@@ -296,5 +296,5 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
 
 void Application::loadBeamline(const std::filesystem::path& rmlPath) {
     m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath));
-    m_UIParams.simulationInfo.maxEvents = static_cast<unsigned int>(m_Beamline->m_OpticalElements.size()) + 2;
+    m_UIParams.simulationInfo.maxEvents = static_cast<unsigned int>(m_Beamline->m_DesignElements.size()) + 2;
 }
