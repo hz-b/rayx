@@ -20,17 +20,18 @@ inline alpaka::Idx<Acc> scan_sum(
     using Dim = alpaka::Dim<Acc>;
     using Idx = alpaka::Idx<Acc>;
     using Vec = alpaka::Vec<Dim, Idx>;
+
+    using Cpu = alpaka::DevCpu;
     using Seq = alpaka::AccCpuSerial<Dim, Idx>;
 
+    auto cpu = getDevice<Cpu>();
     auto seq = getDevice<Seq>();
+    auto acc_platform = alpaka::Platform<Acc>();
 
-    auto h_src = std::vector<T>(n);
-    auto h_dst = std::vector<T>(n);
+    auto h_src = alpaka::allocMappedBufIfSupported<T, Idx>(cpu, acc_platform, Vec{n});
+    auto h_dst = alpaka::allocMappedBufIfSupported<T, Idx>(cpu, acc_platform, Vec{n});
 
-    auto h_srcView = alpaka::createView(seq, h_src);
-    auto h_dstView = alpaka::createView(seq, h_dst);
-
-    alpaka::memcpy(queue, h_srcView, src, Vec{n});
+    alpaka::memcpy(queue, h_src, src, Vec{n});
 
     Idx sum;
     alpaka::exec<Seq>(
