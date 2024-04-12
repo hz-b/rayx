@@ -26,10 +26,9 @@ inline alpaka::Idx<Acc> scan_sum(
 
     auto cpu = getDevice<Cpu>();
     auto seq = getDevice<Seq>();
-    auto acc_platform = alpaka::Platform<Acc>();
 
-    auto h_src = alpaka::allocMappedBufIfSupported<T, Idx>(cpu, acc_platform, Vec{n});
-    auto h_dst = alpaka::allocMappedBufIfSupported<T, Idx>(cpu, acc_platform, Vec{n});
+    auto h_src = alpaka::allocBuf<T, Idx>(cpu, Vec{n});
+    auto h_dst = alpaka::allocBuf<T, Idx>(cpu, Vec{n});
 
     alpaka::memcpy(queue, h_src, src, Vec{n});
 

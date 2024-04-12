@@ -127,14 +127,13 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
 
     const auto cpu = getDevice<Cpu>();
     const auto acc = getDevice<Acc>(m_deviceIndex);
-    const auto acc_platform = alpaka::Platform<Acc>();
     auto queue = Queue(acc);
 
-    auto alloc = [cpu, acc_platform] <typename T> (Queue queue, Buffer<T>& buffer, Idx size) {
+    auto alloc = [cpu] <typename T> (Queue queue, Buffer<T>& buffer, Idx size) {
         const auto shouldAlloc = !buffer.buf || alpaka::getExtentProduct(*buffer.buf) < size;
         if (shouldAlloc) {
             buffer.buf = alpaka::allocAsyncBufIfSupported<T, Idx>(queue, Vec{size});
-            buffer.staging = alpaka::allocMappedBufIfSupported<T, Idx>(cpu, acc_platform, Vec{size});
+            buffer.staging = alpaka::allocBuf<T, Idx>(cpu, Vec{size});
         }
     };
 
@@ -280,12 +279,11 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue queue, const 
     );
 
     const auto cpu = getDevice<Cpu>();
-    const auto acc_platform = alpaka::Platform<Acc>();
-    auto alloc = [cpu, acc_platform] <typename T> (Queue queue, Buffer<T>& buffer, Idx size) {
+    auto alloc = [cpu] <typename T> (Queue queue, Buffer<T>& buffer, Idx size) {
         const auto shouldAlloc = !buffer.buf || alpaka::getExtentProduct(*buffer.buf) < size;
         if (shouldAlloc) {
             buffer.buf = alpaka::allocAsyncBufIfSupported<T, Idx>(queue, Vec{size});
-            buffer.staging = alpaka::allocMappedBufIfSupported<T, Idx>(cpu, acc_platform, Vec{size});
+            buffer.staging = alpaka::allocBuf<T, Idx>(cpu, Vec{size});
         }
     };
 
