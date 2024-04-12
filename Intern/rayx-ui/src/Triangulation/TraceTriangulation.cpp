@@ -3,7 +3,7 @@
 #include "Beamline/Beamline.h"
 #include "Colors.h"
 #include "Shader/Collision.h"
-#include "Tracer/SimpleTracer.h"
+#include "Tracer/Tracer.h"
 #include "Triangulation/GeometryUtils.h"
 
 /**

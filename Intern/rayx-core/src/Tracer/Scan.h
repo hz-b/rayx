@@ -54,8 +54,9 @@ inline alpaka::Idx<Acc> scan_sum(
 
     alpaka::memcpy(queue, dst, h_dst, Vec{n});
 
-    // wait for all operations to finish, before destructing buffers
+    // wait for all operations to finish, before destroying buffers
     alpaka::wait(queue);
+
     return sum;
 }
 

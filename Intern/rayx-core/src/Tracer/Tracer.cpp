@@ -92,10 +92,6 @@ BundleHistory Tracer::trace(
     );
 }
 
-void Tracer::setPushConstants(const PushConstants* p) {
-    m_deviceTracer->setPushConstants(p);
-}
-
 int Tracer::deviceCount(Platform platform) {
     return getDeviceCountForPlatform(platform);
 }

@@ -20,8 +20,6 @@ struct GatherKernel {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
         if (gid < n) {
-            using Idx = alpaka::Idx<Acc>;
-
             auto offset = srcOffsets[gid];
             auto size = srcSizes[gid];
 

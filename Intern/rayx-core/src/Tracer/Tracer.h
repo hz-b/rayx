@@ -47,10 +47,6 @@ class RAYX_API Tracer {
     static std::string deviceName(Platform platform, int deviceIndex);
 
   private:
-    // TODO Why are the PushConstants not part of the TraceRawConfig?
-    // TODO The TraceRawConfig is supposed to contain all information relevant for tracing.
-    void setPushConstants(const PushConstants*);
-
     const Platform m_platform;
     const int m_deviceIndex;
 
