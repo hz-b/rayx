@@ -2,9 +2,9 @@
 
 TEST_F(TestSuite, allBeamlineObjects) {
     auto b = loadBeamline("allBeamlineObjects");
-    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 6); // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
     CHECK_EQ(b.m_DesignElements.size(),
-             8);  // plane mirror, toroid, slit, sphere grating, plane grating,
+             12);  // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating,
                   // sphere mirror, rzp, image plane
 }
 
