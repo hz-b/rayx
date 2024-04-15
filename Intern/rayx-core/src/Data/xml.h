@@ -23,6 +23,7 @@ namespace RAYX {
 class EnergyDistribution;
 enum class CentralBeamstop;
 enum class CurvatureType;
+enum class BehaviourType;
 enum class CylinderDirection;
 enum class FigureRotation;
 enum class GratingMount;

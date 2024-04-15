@@ -14,47 +14,10 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 
-void whatBehaviour(xml::Parser parser,  DesignElement* de) {
-    std::string type = parser.type();
-    if (type.find("Grating") != std::string::npos) {
-        std::cout << "found grating!" << '\n';
-        getGrating(parser, de);
-    } else if (type.find("Mirror") != std::string::npos) {
-        std::cout << "found mirror!" << '\n';
-    }
-}
 
-void whatSurface(xml::Parser parser,  DesignElement* de) {
-    std::string type = parser.type();
-    if (type.find("ImagePlane") != std::string::npos) {
-        std::cout << "found Imageplane!" << '\n';
-        de->setCurvatureType(CurvatureType::Plane);
-    } else if (type.find("Cone") != std::string::npos) {
-        std::cout << "found Cone!" << '\n';
-        de->setCurvatureType(CurvatureType::Cone);
-    }  else if (type.find("Cyliner") != std::string::npos) {
-        std::cout << "found Cylinder!" << '\n';
-        de->setCurvatureType(CurvatureType::Cylinder);
-    } else if (type.find("Ellipsoid") != std::string::npos) {
-        std::cout << "found Ellipsoid!" << '\n';
-        de->setCurvatureType(CurvatureType::Ellipsoid);
-    } else if (type.find("Cubic") != std::string::npos) {
-        std::cout << "found Cubic!" << '\n';
-        de->setCurvatureType(CurvatureType::Cubic);
-    } else if (type.find("Toroid") != std::string::npos) {
-        std::cout << "found Tororid!" << '\n';
-        de->setCurvatureType(CurvatureType::Toroidal);
-    } else {
-        std::cout << "found none!" << '\n';
-    }
-}
 
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
-    
-    whatBehaviour(parser, de);
-    //whatCutout(parser, &de);
-    whatSurface(parser, de);
 
     if (strcmp(type, "ImagePlane") == 0) {      
         getImageplane(parser, de);
@@ -66,6 +29,12 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         getEllipsoid(parser, de);
     } else if (strcmp(type, "Experts Optics") == 0) {
         getExpertsOptics(parser, de);
+    } else if (strcmp(type, "Cone") == 0) {
+        getCone(parser, de);
+    } else if (strcmp(type, "Cylinder") == 0) {
+        getCylinder(parser, de);
+    } else if (strcmp(type, "Ellipsoid") == 0) {
+        getEllipsoid(parser, de);
     } else if (strcmp(type, "Experts Cubic") == 0) {
         getExpertsCubic(parser, de);
     } else if (strcmp(type, "Paraboloid") == 0) {
@@ -90,6 +59,7 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
     }
 }
+
 
 namespace RAYX {
 

@@ -188,6 +188,9 @@ struct RAYX_API DesignElement {
     void setCurvatureType(CurvatureType value);
     CurvatureType getCurvatureType() const;
 
+    void setBehaviourType(BehaviourType value);
+    BehaviourType getBehaviourType() const;
+
     
 };
 }  // namespace RAYX

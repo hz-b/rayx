@@ -2,50 +2,33 @@
 
 #include "Debug/Debug.h"
 #include "Beamline/Objects/SurfaceType.h"
+#include "Beamline/Objects/BehaviourType.h"
 
 namespace RAYX {
 Element DesignElement::compile() const {
-    Element e;
-    Surface surface = makeSurface(*this);
-    Behaviour behav = 
-    /*if (getType() == "ImagePlane") { 
-        e =makeImagePlane(*this);
-    } else if (getType() == "Slit") {
-        ////e =makeSlit(*this);
-    }else if (getType() == "Cone") {
-        ////e =makeCone(*this);
-    }else if (getType() == "Cylinder") {
-        ////e =makeCylinder(*this);
-    }else if (getType() == "Ellipsoid") {
-        //e =makeEllipsoid(*this);
-    }else if (getType() == "Paraboloid") {
-        //e =makeParaboloid(*this);
-    }else if (getType() == "Plane Grating") {
-        //e =makePlaneGrating(*this);
-    }else if (getType() == "Plane Mirror") {
-        //e =makePlaneMirror(*this);
-    }else if (getType() == "Spherical Grating") {
-        //e =makeSphereGrating(*this);
-    }else if (getType() == "Spherical Mirror" || getType() == "Sphere") {
-        //e =makeSphereMirror(*this);
-    }else if (getType() == "Toroid") {
-        //e =makeToroidMirror(*this);
-    }else if (getType() == "Reflection Zoneplate") {
-        //e =makeReflectionZonePlate(*this);
-    }else if (getType() == "Experts Optics") {
-        //e =makeExperts(*this);
-    }else if (getType() == "Experts Cubic") {
-        //e =makeExpertsCubic(*this);
-    }*/
-    return e;
+    Surface surface;
+    Behaviour behav;
+
+    if (getType() == "Experts Optics") {
+        return makeElement(*this, serializeMirror(), makeQuadric(*this));
+    } else {
+        surface = makeSurface(*this);
+        behav = makeBehaviour(*this);
+        if (getType() == "Slit") {
+            return makeElement(*this, behav, surface, {}, DesignPlane::XY);
+        } else if (getType() == "ImagePlane") {
+            return makeElement(*this, behav, surface, serializeUnlimited(), DesignPlane::XY);
+        } else {
+            return makeElement(*this, behav, surface);
+        }
+    }
+    
+    
 }
 
-void DesignElement::setName(std::string s) { 
-    v["name"] = s; 
-}
-void DesignElement::setType(std::string s) { 
-    v["type"] = s; 
-}
+void DesignElement::setName(std::string s) { v["name"] = s; }
+void DesignElement::setType(std::string s) { v["type"] = s; }
+
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 std::string DesignElement::getType() const { return v["type"].as_string(); }
 
@@ -460,5 +443,9 @@ double DesignElement::getImageType() const {return v["imageType"].as_double();}
 
 void DesignElement::setCurvatureType(CurvatureType value) {v["curvatureType"] = value;}
 CurvatureType DesignElement::getCurvatureType() const {return v["curvatureType"].as_curvatureType();}
+
+void DesignElement::setBehaviourType(BehaviourType value) {v["behaviourType"] = value;}
+BehaviourType DesignElement::getBehaviourType() const {return v["behaviourType"].as_behaviourType();}
+
 
 }  // namespace RAYX

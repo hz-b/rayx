@@ -210,7 +210,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
         CHECK_EQ(horResult, values.horDivergence);
         CHECK_EQ(heightResult, values.sourceHeight);
         CHECK_EQ(widthResult, values.sourceWidth);
-    }*/
+    }
 }
 
 

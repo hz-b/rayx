@@ -12,11 +12,17 @@ Surface makeSurface(const DesignElement& dele) {
     } else if (surface == CurvatureType::Toroidal) {
         return makeToroid(dele);
     } else if (surface == CurvatureType::Spherical) {
-        return makeToroid(dele);
+        return makeDesignSphere(dele);
+    } else if (surface == CurvatureType::RzpSphere) {
+        return makeSphere(dele.getLongRadius());
     } else if (surface == CurvatureType::Cone) {
         return makeCone(dele);
+    } else if (surface == CurvatureType::Cylinder) {
+        return makeCylinder(dele);
     } else if (surface == CurvatureType::Ellipsoid) {
         return makeEllipsoid(dele);
+    } else if (surface == CurvatureType::Paraboloid) {
+        return makeParaboloid(dele);
     } else {
         return serializePlaneXZ();
     }
@@ -24,6 +30,52 @@ Surface makeSurface(const DesignElement& dele) {
 
 Surface makePlane() {
     return serializePlaneXZ();
+}
+
+Surface makeCylinder(const DesignElement& dele) {
+    auto cyl_direction = dele.getRadiusDirection();
+    auto radius = dele.getRadius();
+    auto incidence = dele.getGrazingIncAngle();
+    auto entranceArmLength = dele.getEntranceArmLength();
+    auto exitArmLength = dele.getExitArmLength();
+
+    double a11 = 0, a33 = 0, a24 = 0;
+    if (cyl_direction == CylinderDirection::LongRadiusR) {  // X-DIR
+        a11 = 0;
+        a33 = 1;
+        a24 = -radius;
+    } else {  // Z_DIR/ SHORT_RADIUS_RHO
+        a11 = 1;
+        a33 = 0;
+        a24 = -radius;
+    }
+    int icurv = 1;
+    if (a24 > 0) icurv = -1;  // Translated from RAY.FOR
+    if (radius == 0) {
+        if (cyl_direction == CylinderDirection::LongRadiusR) {
+            radius = 2.0 / incidence.sin() / (1.0 / entranceArmLength + 1.0 / exitArmLength);
+        } else {
+            if (entranceArmLength == 0.0 || exitArmLength == 0.0 || incidence.rad == 0.0) {
+                radius = 0.0;
+            } else {
+                radius = 2.0 * incidence.sin() / (1.0 / entranceArmLength + 1.0 / exitArmLength);
+            }
+        }
+    }
+
+    return serializeQuadric({
+        .m_icurv = icurv,
+        .m_a11 = a11,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = 1,
+        .m_a23 = 0,
+        .m_a24 = a24,
+        .m_a33 = a33,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
 }
 
 Surface makeCone(const DesignElement& dele) {
@@ -155,7 +207,30 @@ Surface makeEllipsoid(const DesignElement& dele) {
     });
 }
 
+
+Surface makeDesignSphere(const DesignElement& dele) {
+    auto entranceArmLength = dele.getEntranceArmLength();
+    auto exitArmLength = dele.getExitArmLength();
+    auto grazingIncidenceAngle = dele.getGrazingIncAngle();
+    auto radius = 2.0 / grazingIncidenceAngle.sin() / (1.0 / entranceArmLength + 1.0 / exitArmLength);
+
+    return serializeQuadric({
+        .m_icurv = 1,
+        .m_a11 = 1,
+        .m_a12 = 0,
+        .m_a13 = 0,
+        .m_a14 = 0,
+        .m_a22 = 1,
+        .m_a23 = 0,
+        .m_a24 = -radius,
+        .m_a33 = 1,
+        .m_a34 = 0,
+        .m_a44 = 0,
+    });
+}
+
 Surface makeSphere(double radius) {
+
     return serializeQuadric({
         .m_icurv = 1,
         .m_a11 = 1,
