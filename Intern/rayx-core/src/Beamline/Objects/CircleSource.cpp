@@ -92,5 +92,4 @@ glm::dvec3 CircleSource::getDirection() const {
     return glm::dvec3(al, am, an);
 }
 
-
 }  // namespace RAYX

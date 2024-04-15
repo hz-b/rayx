@@ -44,23 +44,22 @@ double get_factorTotalPowerDipol() {
     return totalPower;
 }
 
-DipoleSource::DipoleSource(const DesignSource& dSource) : LightSource(dSource), 
-    m_bendingRadius(dSource.getBendingRadius()),
-    m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
-    m_photonFlux(dSource.getPhotonFlux()),
-    m_sourceHeight(dSource.getSourceHeight()),
-    m_sourceWidth(dSource.getSourceWidth()),
-    m_electronEnergy(dSource.getElectronEnergy()),
-    m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
-    m_photonEnergy(dSource.getEnergy()),
-    m_verEbeamDivergence(dSource.getVerEBeamDivergence()),
-    m_bandwidth(1.0e-3),
-    m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
-    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
-    m_energySpread(dSource.getEnergySpread()),
-    m_energySpreadUnit(dSource.getEnergySpreadUnit())
-{   
-    
+DipoleSource::DipoleSource(const DesignSource& dSource)
+    : LightSource(dSource),
+      m_bendingRadius(dSource.getBendingRadius()),
+      m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
+      m_photonFlux(dSource.getPhotonFlux()),
+      m_sourceHeight(dSource.getSourceHeight()),
+      m_sourceWidth(dSource.getSourceWidth()),
+      m_electronEnergy(dSource.getElectronEnergy()),
+      m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
+      m_photonEnergy(dSource.getEnergy()),
+      m_verEbeamDivergence(dSource.getVerEBeamDivergence()),
+      m_bandwidth(1.0e-3),
+      m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
+      m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+      m_energySpread(dSource.getEnergySpread()),
+      m_energySpreadUnit(dSource.getEnergySpreadUnit()) {
     m_horDivergence = dSource.getHorDivergence();
     m_verDivergence = DipoleSource::vDivergence(m_photonEnergy, m_verEbeamDivergence);
     m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);

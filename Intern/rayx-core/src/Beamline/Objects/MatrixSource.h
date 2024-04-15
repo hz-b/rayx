@@ -3,7 +3,7 @@
 #include "Beamline/LightSource.h"
 
 namespace RAYX {
-struct DesignSource;  
+struct DesignSource;
 
 class RAYX_API MatrixSource : public LightSource {
   public:

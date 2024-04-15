@@ -1,8 +1,9 @@
 #include "DesignSource.h"
 
-#include "Debug/Debug.h"
-#include "Beamline/Objects/Objects.h"
 #include <filesystem>
+
+#include "Beamline/Objects/Objects.h"
+#include "Debug/Debug.h"
 namespace RAYX {
 
 std::vector<Ray> DesignSource::compile(int i) const {

@@ -38,15 +38,15 @@ class Value;
 
 /**
  * This Map is the foundation for the DesignELement ad DesignSource
- * All Parameter are defined by a string set in DesignElement.cpp and a Value. 
+ * All Parameter are defined by a string set in DesignElement.cpp and a Value.
  * The Value describes the possible Types. It is defined as a shared pointer because of the recursive call.
- * 
-*/
+ *
+ */
 using Map = std::unordered_map<std::string, std::shared_ptr<Value>>;
 
 /**
  * To ensure a typesafe Map all possible options are defined in the Value class bellow
-*/
+ */
 class Value {
   public:
     Value() : m_variant(Undefined()) {}
@@ -97,16 +97,32 @@ class Value {
     void operator=(SigmaType x) { m_variant = x; }
     void operator=(BehaviourType x) { m_variant = x; }
 
-
-
     inline ValueType type() const {
         const ValueType types[] = {
-            ValueType::Undefined, ValueType::Double,     ValueType::Int,           ValueType::CylinderDirection,
-            ValueType::String,    ValueType::Map,        ValueType::Dvec4,         ValueType::EnergySpreadUnit,
-            ValueType::Rad,       ValueType::Material,   ValueType::Misalignment,  ValueType::CentralBeamStop,
-            ValueType::Cutout,    ValueType::Bool,       ValueType::FigureRotation,ValueType::CurvatureType,
-            ValueType::Surface,   ValueType::SourceDist, ValueType::SpreadType,    ValueType::EnergyDistributionType,
-            ValueType::Dmat4x4,   ValueType::SigmaType,  ValueType::BehaviourType, ValueType::ElectronEnergyOrientation,           
+            ValueType::Undefined,
+            ValueType::Double,
+            ValueType::Int,
+            ValueType::CylinderDirection,
+            ValueType::String,
+            ValueType::Map,
+            ValueType::Dvec4,
+            ValueType::EnergySpreadUnit,
+            ValueType::Rad,
+            ValueType::Material,
+            ValueType::Misalignment,
+            ValueType::CentralBeamStop,
+            ValueType::Cutout,
+            ValueType::Bool,
+            ValueType::FigureRotation,
+            ValueType::CurvatureType,
+            ValueType::Surface,
+            ValueType::SourceDist,
+            ValueType::SpreadType,
+            ValueType::EnergyDistributionType,
+            ValueType::Dmat4x4,
+            ValueType::SigmaType,
+            ValueType::BehaviourType,
+            ValueType::ElectronEnergyOrientation,
         };
         return types[m_variant.index()];
     }
@@ -206,7 +222,7 @@ class Value {
         if (!x) throw std::runtime_error("as_surface() called on non-surface!");
         return *x;
     }
-    
+
     inline SourceDist as_sourceDist() const {
         auto* x = std::get_if<SourceDist>(&m_variant);
         if (!x) throw std::runtime_error("as_sourceDist() called on non-sourceDist!");
@@ -262,20 +278,16 @@ class Value {
             throw std::runtime_error("Indexing into non-map!");
         }
 
-        if (!m->contains(s)){
+        if (!m->contains(s)) {
             (*m)[s] = std::make_shared<Value>();
         }
-        return *((*m)[s].get()); 
+        return *((*m)[s].get());
     }
 
   private:
-    std::variant<
-                 Undefined,        double,          int,       ElectronEnergyOrientation,
-                 glm::dvec4,       glm::dmat4x4,    bool,      EnergyDistributionType, 
-                 Misalignment,     CentralBeamstop, Cutout,    CylinderDirection, 
-                 FigureRotation,   Map,             Surface,   CurvatureType,
-                 SourceDist,       SpreadType,      Rad,       Material,
-                 EnergySpreadUnit, std::string,     SigmaType, BehaviourType
-                > m_variant;
+    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
+                 CentralBeamstop, Cutout, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType>
+        m_variant;
 };
 }  // namespace RAYX

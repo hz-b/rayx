@@ -11,7 +11,6 @@ class RAYX_API CircleSource : public LightSource {
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
 
-
     glm::dvec3 getDirection() const;
 
   private:

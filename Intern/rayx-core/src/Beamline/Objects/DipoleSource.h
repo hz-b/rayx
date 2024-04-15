@@ -18,7 +18,6 @@ class RAYX_API DipoleSource : public LightSource {
 
     std::vector<Ray> getRays(int thread_count = 1) const override;
 
-
     // calculate Ray-Information
     glm::dvec3 getXYZPosition(double) const;
     double getEnergy() const;

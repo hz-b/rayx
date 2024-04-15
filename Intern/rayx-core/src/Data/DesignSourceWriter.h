@@ -69,7 +69,6 @@ void setMatrixSource(xml::Parser parser, DesignSource* ds) {
     setDefaultOrientation(parser, ds);
 }
 
-
 void setDipoleSource(xml::Parser parser, DesignSource* ds) {
     setAllMandatory(parser, ds);
 

@@ -22,9 +22,9 @@ struct RAYX_API DesignElement {
 
     void setWorldOrientation(glm::dmat4x4 o);
     glm::dmat4x4 getWorldOrientation() const;
- 
+
     void setMisalignment(Misalignment m);
-    Misalignment getMisalignment() const;   
+    Misalignment getMisalignment() const;
 
     void setSlopeError(SlopeError s);
     SlopeError getSlopeError() const;
@@ -75,13 +75,11 @@ struct RAYX_API DesignElement {
     void setTotalWidth(double width);
     double getTotalWidth() const;
 
-
     void setProfileKind(int value);
     int getProfileKind() const;
 
     void setProfileFile(double value);
     double getProfileFile() const;
-
 
     void setTotalLength(double value);
     double getTotalLength() const;
@@ -129,7 +127,6 @@ struct RAYX_API DesignElement {
     void setParameterPType(double value);
     double getParameterPType() const;
 
-
     void setLineDensity(double value);
     double getLineDensity() const;
 
@@ -139,7 +136,7 @@ struct RAYX_API DesignElement {
     // Setter and Getter for longRadius
     void setLongRadius(double value);
     double getLongRadius() const;
-    
+
     void setFresnelZOffset(double value);
     double getFresnelZOffset() const;
 
@@ -190,7 +187,5 @@ struct RAYX_API DesignElement {
 
     void setBehaviourType(BehaviourType value);
     BehaviourType getBehaviourType() const;
-
-    
 };
 }  // namespace RAYX

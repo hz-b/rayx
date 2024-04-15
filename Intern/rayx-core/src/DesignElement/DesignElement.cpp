@@ -1,10 +1,11 @@
 #include "DesignElement.h"
 
-#include "Debug/Debug.h"
-#include "Beamline/Objects/SurfaceType.h"
 #include "Beamline/Objects/BehaviourType.h"
+#include "Beamline/Objects/SurfaceType.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
+
 Element DesignElement::compile() const {
     Surface surface;
     Behaviour behav;
@@ -22,8 +23,6 @@ Element DesignElement::compile() const {
             return makeElement(*this, behav, surface);
         }
     }
-    
-    
 }
 
 void DesignElement::setName(std::string s) { v["name"] = s; }
@@ -100,7 +99,6 @@ void DesignElement::setMisalignment(Misalignment m) {
     v["translationZerror"] = m.m_translationZerror;
 }
 
-
 Misalignment DesignElement::getMisalignment() const {
     Misalignment m;
     m.m_rotationXerror.rad = v["rotationXerror"].as_double();
@@ -136,7 +134,6 @@ SlopeError DesignElement::getSlopeError() const {
     return s;
 }
 
-
 void DesignElement::setCutout(Cutout c) {
     v["geometricalShape"] = c.m_type;
     if (c.m_type == CTYPE_RECT) {
@@ -159,17 +156,17 @@ Cutout DesignElement::getCutout() const {
 
     c.m_type = v["geometricalShape"].as_double();
 
-    if (c.m_type == CTYPE_RECT) { // Rectangle
+    if (c.m_type == CTYPE_RECT) {  // Rectangle
         RectCutout rect;
         rect.m_width = v["CutoutWidth"].as_double();
         rect.m_length = v["CutoutLength"].as_double();
         c = serializeRect(rect);
-    } else if (c.m_type == CTYPE_ELLIPTICAL) { //Ellipsoid
+    } else if (c.m_type == CTYPE_ELLIPTICAL) {  // Ellipsoid
         EllipticalCutout elli;
         elli.m_diameter_x = v["CutoutDiameterX"].as_double();
         elli.m_diameter_z = v["CutoutDiameterZ"].as_double();
         c = serializeElliptical(elli);
-    } else if (c.m_type == CTYPE_TRAPEZOID) { //Trapezoid
+    } else if (c.m_type == CTYPE_TRAPEZOID) {  // Trapezoid
         TrapezoidCutout trapi;
         trapi.m_widthA = v["CutoutWidthA"].as_double();
         trapi.m_widthB = v["CutoutWidthB"].as_double();
@@ -180,9 +177,7 @@ Cutout DesignElement::getCutout() const {
     return c;
 }
 
-Cutout DesignElement::getGlobalCutout() const {
-    return serializeUnlimited();
-}
+Cutout DesignElement::getGlobalCutout() const { return serializeUnlimited(); }
 
 void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
     v["vlsParams"] = Map();
@@ -196,17 +191,9 @@ void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
 }
 
 std::array<double, 6> DesignElement::getVLSParameters() const {
-    return {
-        v["vlsParams"]["vlsParameterB2"].as_double(),
-        v["vlsParams"]["vlsParameterB3"].as_double(),
-        v["vlsParams"]["vlsParameterB4"].as_double(),
-        v["vlsParams"]["vlsParameterB5"].as_double(),
-        v["vlsParams"]["vlsParameterB6"].as_double(),
-        v["vlsParams"]["vlsParameterB7"].as_double()
-    };
+    return {v["vlsParams"]["vlsParameterB2"].as_double(), v["vlsParams"]["vlsParameterB3"].as_double(), v["vlsParams"]["vlsParameterB4"].as_double(),
+            v["vlsParams"]["vlsParameterB5"].as_double(), v["vlsParams"]["vlsParameterB6"].as_double(), v["vlsParams"]["vlsParameterB7"].as_double()};
 }
-
-
 
 void DesignElement::setExpertsOptics(Surface value) {
     QuadricSurface qua = deserializeQuadric(value);
@@ -221,7 +208,6 @@ void DesignElement::setExpertsOptics(Surface value) {
     v["expertsParams"]["A33"] = qua.m_a33;
     v["expertsParams"]["A34"] = qua.m_a34;
     v["expertsParams"]["A44"] = qua.m_a44;
-
 }
 
 Surface DesignElement::getExpertsOptics() const {
@@ -284,8 +270,6 @@ Surface DesignElement::getExpertsCubic() const {
 
     return serializeCubic(cub);
 }
-
-
 
 // Azimuthal Angle
 void DesignElement::setAzimuthalAngle(Rad r) { v["AzimuthalAngle"] = r; }
@@ -363,7 +347,6 @@ CylinderDirection DesignElement::getRadiusDirection() const { return v["bendingR
 void DesignElement::setRadius(double value) { v["radius"] = value; }
 double DesignElement::getRadius() const { return v["radius"].as_double(); }
 
-
 void DesignElement::setDesignGrazingIncAngle(Rad value) { v["designGrazingIncAngle"] = value; }
 Rad DesignElement::getDesignGrazingIncAngle() const { return v["designGrazingIncAngle"].as_rad(); }
 
@@ -386,11 +369,11 @@ FigureRotation DesignElement::getFigureRotation() const { return v["figureRotati
 void DesignElement::setArmLength(double value) { v["armLength"] = value; }
 double DesignElement::getArmLength() const { return v["armLength"].as_double(); }
 
-//parameter_P
+// parameter_P
 void DesignElement::setParameterP(double value) { v["parameter_P"] = value; }
 double DesignElement::getParameterP() const { return v["parameter_P"].as_double(); }
 
-//parameter_P_type
+// parameter_P_type
 void DesignElement::setParameterPType(double value) { v["parameter_P_type"] = value; }
 double DesignElement::getParameterPType() const { return v["parameter_P_type"].as_double(); }
 
@@ -398,12 +381,12 @@ double DesignElement::getParameterPType() const { return v["parameter_P_type"].a
 void DesignElement::setLineDensity(double value) { v["lineDensity"] = value; }
 double DesignElement::getLineDensity() const { return v["lineDensity"].as_double(); }
 
-void DesignElement::setShortRadius(double value) { v["shortRadius"] = value;}
-double DesignElement::getShortRadius() const {return v["shortRadius"].as_double();}
+void DesignElement::setShortRadius(double value) { v["shortRadius"] = value; }
+double DesignElement::getShortRadius() const { return v["shortRadius"].as_double(); }
 
 // Setter and Getter for longRadius
-void DesignElement::setLongRadius(double value) {v["longRadius"] = value;}
-double DesignElement::getLongRadius() const {return v["longRadius"].as_double();}
+void DesignElement::setLongRadius(double value) { v["longRadius"] = value; }
+double DesignElement::getLongRadius() const { return v["longRadius"].as_double(); }
 
 void DesignElement::setFresnelZOffset(double value) { v["FresnelZOffset"] = value; }
 double DesignElement::getFresnelZOffset() const { return v["FresnelZOffset"].as_double(); }
@@ -435,17 +418,16 @@ double DesignElement::getDesignMeridionalExitArmLength() const { return v["Desig
 void DesignElement::setOrderOfDiffraction(double value) { v["OrderDiffraction"] = value; }
 double DesignElement::getOrderOfDiffraction() const { return v["OrderDiffraction"].as_double(); }
 
-void DesignElement::setAdditionalOrder(double value) {v["additionalOrder"] = value;}
-double DesignElement::getAdditionalOrder() const { return v["additionalOrder"].as_double();}
+void DesignElement::setAdditionalOrder(double value) { v["additionalOrder"] = value; }
+double DesignElement::getAdditionalOrder() const { return v["additionalOrder"].as_double(); }
 
-void DesignElement::setImageType(double value) {v["imageType"] = value;}
-double DesignElement::getImageType() const {return v["imageType"].as_double();}
+void DesignElement::setImageType(double value) { v["imageType"] = value; }
+double DesignElement::getImageType() const { return v["imageType"].as_double(); }
 
-void DesignElement::setCurvatureType(CurvatureType value) {v["curvatureType"] = value;}
-CurvatureType DesignElement::getCurvatureType() const {return v["curvatureType"].as_curvatureType();}
+void DesignElement::setCurvatureType(CurvatureType value) { v["curvatureType"] = value; }
+CurvatureType DesignElement::getCurvatureType() const { return v["curvatureType"].as_curvatureType(); }
 
-void DesignElement::setBehaviourType(BehaviourType value) {v["behaviourType"] = value;}
-BehaviourType DesignElement::getBehaviourType() const {return v["behaviourType"].as_behaviourType();}
-
+void DesignElement::setBehaviourType(BehaviourType value) { v["behaviourType"] = value; }
+BehaviourType DesignElement::getBehaviourType() const { return v["behaviourType"].as_behaviourType(); }
 
 }  // namespace RAYX

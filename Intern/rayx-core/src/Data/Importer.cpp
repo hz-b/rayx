@@ -14,12 +14,10 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 
-
-
 void parseElement(xml::Parser parser, DesignElement* de) {
     const char* type = parser.type();
 
-    if (strcmp(type, "ImagePlane") == 0) {      
+    if (strcmp(type, "ImagePlane") == 0) {
         getImageplane(parser, de);
     } else if (strcmp(type, "Cone") == 0) {
         getCone(parser, de);
@@ -59,7 +57,6 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
     }
 }
-
 
 namespace RAYX {
 
