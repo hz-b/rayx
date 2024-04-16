@@ -16,7 +16,7 @@ std::vector<Ray> DesignSource::compile(int i) const {
         MatrixSource ms(*this);
         ray = ms.getRays(i);
         std::cout << getName() << std::endl;
-    } else if (getName() == "Dipole Source") {
+    }else if (getName() == "Dipole Source" || getName() == "Dipole") {
         DipoleSource ds(*this);
         ray = ds.getRays(i);
         std::cout << getName() << std::endl;

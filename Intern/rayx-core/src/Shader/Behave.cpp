@@ -127,3 +127,26 @@ Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col) {
     // doesn't need to do anything.
     return r;
 }
+
+Ray behaveFoil(Ray r, int id, ALLOW_UNUSED Collision col) {
+    // this ist just copied from mirror, WIP
+    // calculate intersection point and normal at intersection point
+    double azimuthal_angle = inv_elements[id].m_azimuthalAngle;
+
+    // calculate the new direction after the reflection
+    r.m_direction = reflect(r.m_direction, col.normal);
+
+    double real_S, real_P, delta;
+    double incidence_angle = getIncidenceAngle(r, col.normal);  // getTheta
+    int mat = int(inv_elements[id].m_material);
+    if (mat != -2) {
+        efficiency(r, real_S, real_P, delta, incidence_angle, mat);
+
+        bool absorbed = updateStokes(r, real_S, real_P, delta, azimuthal_angle);
+        if (absorbed) {
+            recordFinalEvent(r, ETYPE_ABSORBED);
+        }
+        r.m_order = 0;
+    }
+    return r;
+}

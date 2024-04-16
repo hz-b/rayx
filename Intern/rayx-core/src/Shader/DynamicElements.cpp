@@ -57,6 +57,9 @@ void dynamicElements() {
             case (BTYPE_IMAGE_PLANE):
                 elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col);
                 break;
+            case (BTYPE_FOIL):
+                elem_ray = behaveFoil(elem_ray, col.elementIndex, col);
+                break;
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!

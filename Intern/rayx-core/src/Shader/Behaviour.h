@@ -13,6 +13,7 @@ const int BTYPE_GRATING = 1;
 const int BTYPE_SLIT = 2;
 const int BTYPE_RZP = 3;
 const int BTYPE_IMAGE_PLANE = 4;
+const int BTYPE_FOIL = 5;
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
@@ -189,6 +190,19 @@ INLINE Behaviour serializeImagePlane() {
     b.m_type = BTYPE_IMAGE_PLANE;
     return b;
 }
+
+
+/////////////////
+// Foil
+////////////////
+
+// Foil Behaviour in progress, not complete
+INLINE Behaviour serializeFoil() {
+    Behaviour b;
+    b.m_type = BTYPE_FOIL;
+    return b;
+}
+
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

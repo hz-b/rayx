@@ -15,7 +15,7 @@ namespace RAYX {
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
 enum class CurvatureType { Plane, Toroidal, Spherical, Cubic, Cone, Cylinder, Ellipsoid, Paraboloid, Quadric, RzpSphere}; // order is crucial for xml prser
-enum class BehaviourType { Mirror, Grating, Slit, Rzp, ImagePlane};
+enum class BehaviourType { Mirror, Grating, Slit, Rzp, ImagePlane, Foil};
 enum class FigureRotation { Yes, Plane, A11 };
 
 struct DesignElement; //TODO Fanny see where the forward declaration has to go

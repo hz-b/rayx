@@ -16,7 +16,7 @@ Behaviour makeBehaviour(const DesignElement& dele){
         return makeRZPBehaviour(dele);
     } else if (behave == BehaviourType::Slit) {
         return makeSlit(dele);
-    } else if (behave == BehaviourType::Mirror){
+    } else if (behave == BehaviourType::Foil){
         return serializeMirror();
     } else {
         return serializeImagePlane();

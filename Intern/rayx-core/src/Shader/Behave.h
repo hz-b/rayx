@@ -19,5 +19,6 @@ Ray behaveRZP(Ray r, int id, Collision col);
 Ray behaveGrating(Ray r, int id, Collision col);
 Ray behaveMirror(Ray r, int id, Collision col);
 Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col);
+Ray behaveFoil(Ray r, int id, ALLOW_UNUSED Collision col);
 
 #endif
