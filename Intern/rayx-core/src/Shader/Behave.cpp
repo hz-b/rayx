@@ -133,8 +133,8 @@ Ray behaveFoil(Ray r, int id, ALLOW_UNUSED Collision col) {
     // calculate intersection point and normal at intersection point
     double azimuthal_angle = inv_elements[id].m_azimuthalAngle;
 
-    // calculate the new direction after the reflection
-    r.m_direction = reflect(r.m_direction, col.normal);
+    // calculate the new direction after the refraction
+    r.m_direction = refract(r.m_direction, col.normal, 1.00002);
 
     double real_S, real_P, delta;
     double incidence_angle = getIncidenceAngle(r, col.normal);  // getTheta
