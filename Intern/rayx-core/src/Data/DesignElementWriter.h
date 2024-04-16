@@ -35,7 +35,13 @@ void getImageplane(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY); 
     de->setCurvatureType(CurvatureType::Plane);
     de->setBehaviourType(BehaviourType::ImagePlane);
-    }
+}
+
+void getFoil(xml::Parser parser, DesignElement* de) { 
+    setAllMandatory(parser, de, DesignPlane::XZ); 
+    de->setCurvatureType(CurvatureType::Plane);
+    de->setBehaviourType(BehaviourType::Foil);
+}
 
 void getSlit(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY);

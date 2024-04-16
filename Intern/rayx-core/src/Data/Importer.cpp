@@ -37,6 +37,8 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         getEllipsoid(parser, de);
     } else if (strcmp(type, "Experts Cubic") == 0) {
         getExpertsCubic(parser, de);
+    } else if (strcmp(type, "Foil") == 0) {
+        getFoil(parser, de);
     } else if (strcmp(type, "Paraboloid") == 0) {
         getParaboloid(parser, de);
     } else if (strcmp(type, "Plane Grating") == 0) {
