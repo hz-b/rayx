@@ -79,10 +79,16 @@ class SimpleTracer : public DeviceTracer {
         Buffer<Element> elements;
         Buffer<int>     materialIndices;
         Buffer<double>  materialData;
+
+        Idx elementsSize;
+        Idx materialIndicesSize;
+        Idx materialDataSize;
     } m_beamlineInput;
 
     struct BatchInput {
         Buffer<Ray> rays;
+
+        Idx raysSize;
     } m_batchInput;
 
     struct BatchOutput {
@@ -156,9 +162,12 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     resizeBufferIfNeeded(q, m_batchOutput.compactEventCounts, firstBatchSize);
     resizeBufferIfNeeded(q, m_batchOutput.compactEventOffsets, firstBatchSize);
     resizeBufferIfNeeded(q, m_batchOutput.events, maxOutputEventsCount);
-    transferToBuffer(q, cpu, m_beamlineInput.elements, elements, static_cast<Idx>(elements.size()));
-    transferToBuffer(q, cpu, m_beamlineInput.materialIndices, materialTables.indexTable, static_cast<Idx>(materialTables.indexTable.size()));
-    transferToBuffer(q, cpu, m_beamlineInput.materialData, materialTables.materialTable, static_cast<Idx>(materialTables.materialTable.size()));
+    m_beamlineInput.elementsSize = static_cast<Idx>(elements.size());
+    m_beamlineInput.materialIndicesSize = static_cast<Idx>(materialTables.indexTable.size());
+    m_beamlineInput.materialDataSize = static_cast<Idx>(materialTables.materialTable.size());
+    transferToBuffer(q, cpu, m_beamlineInput.elements, elements, m_beamlineInput.elementsSize);
+    transferToBuffer(q, cpu, m_beamlineInput.materialIndices, materialTables.indexTable, m_beamlineInput.materialIndicesSize);
+    transferToBuffer(q, cpu, m_beamlineInput.materialData, materialTables.materialTable, m_beamlineInput.materialDataSize);
 
     // This will be the complete BundleHistory.
     // All initialized events will have been put into this by the end of this function.
@@ -187,7 +196,8 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
         };
 
         const auto inputRays = rays.data() + rayIdStart;
-        transferToBuffer(q, cpu, m_batchInput.rays, inputRays, static_cast<Idx>(batchSize));
+        m_batchInput.raysSize = static_cast<Idx>(batchSize);
+        transferToBuffer(q, cpu, m_batchInput.rays, inputRays, m_batchInput.raysSize);
 
         // run the actual tracer (GPU/CPU).
         const auto traceResult = traceBatch(q, numInputRays);
@@ -231,13 +241,13 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
         .nextEventIndex     = {},
 
         // buffers
-        .rayData            = bufToSpan(*m_batchInput.rays.buf),
+        .rayData            = bufToSpan(*m_batchInput.rays.buf, m_batchInput.raysSize),
         .outputData         = bufToSpan(*m_batchOutput.events.buf),
         .outputRayCounts    = bufToSpan(*m_batchOutput.compactEventCounts.buf),
-        .elements           = bufToSpan(*m_beamlineInput.elements.buf),
+        .elements           = bufToSpan(*m_beamlineInput.elements.buf, m_beamlineInput.elementsSize),
         .xyznull            = {},
-        .matIdx             = bufToSpan(*m_beamlineInput.materialIndices.buf),
-        .mat                = bufToSpan(*m_beamlineInput.materialData.buf),
+        .matIdx             = bufToSpan(*m_beamlineInput.materialIndices.buf, m_beamlineInput.materialIndicesSize),
+        .mat                = bufToSpan(*m_beamlineInput.materialData.buf, m_beamlineInput.materialDataSize),
 
 #ifdef RAYX_DEBUG_MODE
         .d_struct           = {},
