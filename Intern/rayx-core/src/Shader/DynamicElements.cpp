@@ -72,7 +72,8 @@ void dynamicElements(int gid, Inv& inv) {
         _ray = rayMatrixMult(elem_ray, nextElement.m_outTrans);
     }
 
+    // store recorded events count
     auto eventsCount = static_cast<int>(inv.nextEventIndex - inv.pushConstants.startEventID);
-    eventsCount = std::max(0, std::min(static_cast<int>(inv.pushConstants.maxEvents) - 1, eventsCount));
+    eventsCount = std::max(0, std::min(static_cast<int>(inv.pushConstants.maxEvents), eventsCount));
     inv.outputRayCounts[gid] = eventsCount;
 }
