@@ -30,18 +30,6 @@ file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 alpaka_add_library(${PROJECT_NAME} SHARED ${SOURCE})
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-if(alpaka_ACC_GPU_CUDA_ENABLE)
-    enable_language(CUDA)
-    foreach(_file ${SOURCE})
-        set_source_files_properties(${_file} PROPERTIES LANGUAGE CUDA)
-    endforeach()
-    if(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL ON)
-        set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
-    elseif(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL OFF)
-        set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_SEPARABLE_COMPILATION OFF)
-    endif()
-endif()
-
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
