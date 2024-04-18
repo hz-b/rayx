@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 
 # ---- Project ----
 project(RAYX VERSION 0.19.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_STANDARD 20)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 # -----------------
 
 # ---- Subdirectories ----
