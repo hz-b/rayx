@@ -54,7 +54,7 @@ endif()
 # ---- Warnings ----
 if(MSVC)
     message(STATUS "MSVC")
-    target_compile_options(${PROJECT_NAME} PRIVATE /W3 /wd4251 /wd4267)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/W3 /wd4251 /wd4267>)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     message(STATUS "GCC")
