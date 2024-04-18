@@ -15,7 +15,7 @@
 
 namespace RAYX {
 void VulkanTracer::listPhysicalDevices() {
-    auto deviceList = m_engine.getPhysicalDevices();
+    auto deviceList = this->getPhysicalDevices();
     unsigned int deviceIndex = 0;
     std::cout << "Listing Vulkan Devices:" << std::endl;
     for (const auto& device : deviceList) {
