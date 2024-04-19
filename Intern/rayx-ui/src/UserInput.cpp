@@ -81,7 +81,6 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
     if (ImGui::GetIO().WantCaptureKeyboard) return;
-    if (!isSceneWindowHovered) return;
 
     auto camController = reinterpret_cast<CameraController*>(glfwGetWindowUserPointer(window));
 
