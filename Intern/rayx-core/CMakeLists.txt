@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# ---- for files compiled with cuda compiler, prepend -Xcompiler flags ----
+function(prepend_xcompiler FLAG_LIST PREPENDED_FLAG_LIST)
+    set(SRC ${${FLAG_LIST}})
+    foreach(FLAG ${SRC})
+        set(DST ${DST} -Xcompiler ${FLAG})
+    endforeach()
+    set(${PREPENDED_FLAG_LIST} ${DST} PARENT_SCOPE)
+endfunction()
+
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
@@ -40,12 +49,13 @@ install(TARGETS ${PROJECT_NAME}
 
 # -----------------
 
-
 # -----OpenMP--------
 find_package(OpenMP)
 
 if(OpenMP_CXX_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+    prepend_xcompiler(OpenMP_CXX_FLAGS OpenMP_CUDA_FLAGS)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${OpenMP_CUDA_FLAGS}>)
 else()
     message(STATUS "OpenMP not found")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP)
