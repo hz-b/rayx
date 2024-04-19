@@ -112,7 +112,7 @@ void Renderer::endFrame() {
     m_currentFrameIndex = (m_currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
-void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer, const VkClearValue& clearValue) {
+void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
     assert(m_isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
     assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
 
@@ -126,7 +126,7 @@ void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer, const VkC
     renderPassInfo.renderArea.extent = extent;
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = clearValue.color;
+    clearValues[0].color = {{0.1f, 0.1f, 0.1f, 1.0f}};
     clearValues[1].depthStencil = {1.0f, 0};
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
@@ -157,13 +157,13 @@ void Renderer::initializeOffscreenRendering() {
     createOffscreenFramebuffer();
 }
 
-void Renderer::beginOffscreenRenderPass(FrameInfo& frameInfo) {
+void Renderer::beginOffscreenRenderPass(FrameInfo& frameInfo, const VkClearValue& clearValue) {
     // Single time command buffer for offscreen rendering
     frameInfo.commandBuffer = m_Device.beginSingleTimeCommands();
 
     // Begin the offscreen render pass
     VkClearValue clearValues[2];
-    clearValues[0].color = {{0.05f, 0.05f, 0.05f, 1.0f}};
+    clearValues[0].color = clearValue.color;
     clearValues[1].depthStencil = {1.0f, 0};
 
     VkRenderPassBeginInfo renderPassInfo{};

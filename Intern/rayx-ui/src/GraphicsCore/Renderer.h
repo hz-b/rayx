@@ -61,7 +61,7 @@ class Renderer {
      * @brief Begins the render pass for the swap chain.
      * @param commandBuffer The Vulkan command buffer for rendering.
      */
-    void beginSwapChainRenderPass(VkCommandBuffer commandBuffer, const VkClearValue& clearValue);
+    void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
     /**
      * @brief Ends the render pass for the swap chain.
@@ -69,7 +69,7 @@ class Renderer {
      */
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
-    void beginOffscreenRenderPass(FrameInfo& frameInfo);
+    void beginOffscreenRenderPass(FrameInfo& frameInfo, const VkClearValue& clearValue);
     void endOffscreenRenderPass(FrameInfo& frameInfo);
     std::shared_ptr<Texture> getOffscreenColorTexture() const { return m_offscreenColorTexture; }
     std::shared_ptr<Texture> getOffscreenDepthTexture() const { return m_offscreenDepthTexture; }

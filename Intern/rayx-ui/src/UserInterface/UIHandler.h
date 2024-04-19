@@ -34,7 +34,7 @@ class UIHandler {
     const Window& m_Window;
     const Device& m_Device;
 
-    float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 0.00f};
+    float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
     float m_scale = 1.0f;
     float m_oldScale = 1.0f;

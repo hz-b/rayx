@@ -257,7 +257,7 @@ void Application::run() {
                     m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
                 }
             }
-            m_Renderer.beginOffscreenRenderPass(frameInfo);
+            m_Renderer.beginOffscreenRenderPass(frameInfo, m_UIHandler.getClearValue());
             if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
                 objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
                 if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
@@ -265,7 +265,7 @@ void Application::run() {
             gridRenderSystem.render(frameInfo);
             m_Renderer.endOffscreenRenderPass(frameInfo);
 
-            m_Renderer.beginSwapChainRenderPass(commandBuffer, m_UIHandler.getClearValue());
+            m_Renderer.beginSwapChainRenderPass(commandBuffer);
             // UI
             m_UIHandler.beginUIRender();
             m_UIHandler.setupUI(m_UIParams, elements, rSourcePositions);
