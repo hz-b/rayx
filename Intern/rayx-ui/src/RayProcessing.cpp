@@ -70,7 +70,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     // Apply the filter function to get the indices of the rays to be rendered
     amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
-    auto maxRayIndex = rayCache.size();
+    size_t maxRayIndex = rayCache.size();
     for (size_t i : rayIndices) {
         if (i >= maxRayIndex) {
             RAYX_VERB << "Ray index out of bounds: " << i;
@@ -81,16 +81,16 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         if (beamline.m_DesignSources.size() <= rayHist[0].m_sourceID) {
             RAYX_ERR << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
         }
-        glm::vec4 rayLastPos = (glm::vec4)beamline.m_DesignSources[(size_t)rayHist[0].m_sourceID].getWorldPosition();
+        glm::vec4 rayLastPos = glm::vec4(beamline.m_DesignSources[static_cast<size_t>(rayHist[0].m_sourceID)].getWorldPosition());
 
         bool isFirstEvent = true;
 
-        for (const auto& event : rayHist) {
+        for (const RAYX::Ray& event : rayHist) {
             if (event.m_lastElement >= beamline.m_DesignElements.size()) {
                 RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
-            glm::vec4 worldPos = beamline.m_DesignElements[(size_t)event.m_lastElement].compile().m_outTrans * glm::vec4(event.m_position, 1.0f);
-            const glm::vec4 WHITE = {1.0f, 1.0f, 1.0f, 0.7f};
+            glm::vec4 worldPos =
+                beamline.m_DesignElements[static_cast<size_t>(event.m_lastElement)].compile().m_outTrans * glm::vec4(event.m_position, 1.0f);
 
             glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;

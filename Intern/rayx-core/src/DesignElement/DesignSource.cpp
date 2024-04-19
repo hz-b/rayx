@@ -5,7 +5,6 @@
 #include <filesystem>
 namespace RAYX {
 
-
 std::vector<Ray> DesignSource::compile(int i) const {
     std::vector<Ray> ray;
 
@@ -17,19 +16,19 @@ std::vector<Ray> DesignSource::compile(int i) const {
         MatrixSource ms(*this);
         ray = ms.getRays(i);
         std::cout << getName() << std::endl;
-    }else if (getName() == "Dipole Source") {
+    } else if (getName() == "Dipole Source") {
         DipoleSource ds(*this);
         ray = ds.getRays(i);
         std::cout << getName() << std::endl;
-    }else if (getName() == "Pixel Source") {
+    } else if (getName() == "Pixel Source") {
         PixelSource ps(*this);
         ray = ps.getRays(i);
         std::cout << getName() << std::endl;
-    }else if (getName() == "Circle Source") {
+    } else if (getName() == "Circle Source") {
         CircleSource cs(*this);
         ray = cs.getRays(i);
         std::cout << getName() << std::endl;
-    }else if (getName() == "Simple Undulator") {
+    } else if (getName() == "Simple Undulator") {
         SimpleUndulatorSource su(*this);
         ray = su.getRays(i);
         std::cout << getName() << std::endl;
@@ -38,12 +37,10 @@ std::vector<Ray> DesignSource::compile(int i) const {
     return ray;
 }
 
-
 void DesignSource::setName(std::string s) { v["name"] = s; }
 void DesignSource::setType(std::string s) { v["type"] = s; }
 
 std::string DesignSource::getName() const { return v["name"].as_string(); }
-
 
 void DesignSource::setWorldPosition(glm::dvec4 p) {
     v["worldPosition"] = Map();
@@ -58,53 +55,57 @@ glm::dvec4 DesignSource::getWorldPosition() const {
     d[0] = v["worldPosition"]["x"].as_double();
     d[1] = v["worldPosition"]["y"].as_double();
     d[2] = v["worldPosition"]["z"].as_double();
-    d[3] = 0;
+    d[3] = 1;
     return d;
 }
 
-void DesignSource::setWorldOrientation(glm::dmat4x4 o) {
+void DesignSource::setWorldOrientation(glm::dmat4x4 orientation) {
     v["worldXDirection"] = Map();
-    v["worldXDirection"]["x"] = o[0][0];
-    v["worldXDirection"]["y"] = o[0][1];
-    v["worldXDirection"]["z"] = o[0][2];
-    v["worldXDirection"]["w"] = o[0][3];
+    v["worldXDirection"]["x"] = orientation[0][0];
+    v["worldXDirection"]["y"] = orientation[0][1];
+    v["worldXDirection"]["z"] = orientation[0][2];
+    v["worldXDirection"]["w"] = orientation[0][3];
 
     v["worldYDirection"] = Map();
-    v["worldYDirection"]["x"] = o[1][0];
-    v["worldYDirection"]["y"] = o[1][1];
-    v["worldYDirection"]["z"] = o[1][2];
-    v["worldYDirection"]["w"] = o[1][3];
+    v["worldYDirection"]["x"] = orientation[1][0];
+    v["worldYDirection"]["y"] = orientation[1][1];
+    v["worldYDirection"]["z"] = orientation[1][2];
+    v["worldYDirection"]["w"] = orientation[1][3];
 
     v["worldZDirection"] = Map();
-    v["worldZDirection"]["x"] = o[2][0];
-    v["worldZDirection"]["y"] = o[2][1];
-    v["worldZDirection"]["z"] = o[2][2];
-    v["worldZDirection"]["w"] = o[2][3];
+    v["worldZDirection"]["x"] = orientation[2][0];
+    v["worldZDirection"]["y"] = orientation[2][1];
+    v["worldZDirection"]["z"] = orientation[2][2];
+    v["worldZDirection"]["w"] = orientation[2][3];
 }
 
 glm::dmat4x4 DesignSource::getWorldOrientation() const {
-    glm::dmat4x4 o;
+    glm::dmat4x4 orientation;
 
-    o[0][0] = v["worldXDirection"]["x"].as_double();
-    o[0][1] = v["worldXDirection"]["y"].as_double();
-    o[0][2] = v["worldXDirection"]["z"].as_double();
-    o[0][3] = 0;
+    orientation[0][0] = v["worldXDirection"]["x"].as_double();
+    orientation[0][1] = v["worldXDirection"]["y"].as_double();
+    orientation[0][2] = v["worldXDirection"]["z"].as_double();
+    orientation[0][3] = 0;
 
-    o[1][0] = v["worldYDirection"]["x"].as_double();
-    o[1][1] = v["worldYDirection"]["y"].as_double();
-    o[1][2] = v["worldYDirection"]["z"].as_double();
-    o[1][3] = 0;
+    orientation[1][0] = v["worldYDirection"]["x"].as_double();
+    orientation[1][1] = v["worldYDirection"]["y"].as_double();
+    orientation[1][2] = v["worldYDirection"]["z"].as_double();
+    orientation[1][3] = 0;
 
-    o[2][0] = v["worldZDirection"]["x"].as_double();
-    o[2][1] = v["worldZDirection"]["y"].as_double();
-    o[2][2] = v["worldZDirection"]["z"].as_double();
-    o[2][3] = 0;
+    orientation[2][0] = v["worldZDirection"]["x"].as_double();
+    orientation[2][1] = v["worldZDirection"]["y"].as_double();
+    orientation[2][2] = v["worldZDirection"]["z"].as_double();
+    orientation[2][3] = 0;
 
-    return o;
+    orientation[3][0] = 0;
+    orientation[3][1] = 0;
+    orientation[3][2] = 0;
+    orientation[3][3] = 1;
+
+    return orientation;
 }
 
 void DesignSource::setMisalignment(Misalignment m) {
-
     v["rotationXerror"] = m.m_rotationXerror.rad;
     v["rotationYerror"] = m.m_rotationYerror.rad;
     v["rotationZerror"] = m.m_rotationZerror.rad;
@@ -128,18 +129,14 @@ Misalignment DesignSource::getMisalignment() const {
     return m;
 }
 
-void DesignSource::setStokeslin0(double value){
+void DesignSource::setStokeslin0(double value) {
     v["stokes"] = Map();
     v["stokes"]["linPol0"] = value;
 }
 
-void DesignSource::setStokeslin45(double value){
-    v["stokes"]["linPol45"] = value;
-}
+void DesignSource::setStokeslin45(double value) { v["stokes"]["linPol45"] = value; }
 
-void DesignSource::setStokescirc(double value){
-    v["stokes"]["circPol"] = value;
-}
+void DesignSource::setStokescirc(double value) { v["stokes"]["circPol"] = value; }
 
 glm::dvec4 DesignSource::getStokes() const {
     glm::dvec4 pol;
@@ -149,7 +146,6 @@ glm::dvec4 DesignSource::getStokes() const {
     pol[3] = v["stokes"]["circPol"].as_double();
     return pol;
 }
-
 
 void DesignSource::setWidthDist(SourceDist value) { v["widthDist"] = value; }
 SourceDist DesignSource::getWidthDist() const { return v["widthDist"].as_sourceDist(); }
@@ -205,27 +201,26 @@ void DesignSource::setEnergyDistributionFile(std::string value) { v["photonEnerg
 void DesignSource::setEnergySpreadType(SpreadType value) { v["energyDistribution"] = value; }
 SpreadType DesignSource::getEnergySpreadType() const { return v["energyDistribution"].as_energySpreadType(); }
 
-void DesignSource::setSeperateEnergies(int value){ v["SeperateEnergies"] = value; }
+void DesignSource::setSeperateEnergies(int value) { v["SeperateEnergies"] = value; }
 
-void DesignSource::setPhotonFlux(double value){ v["photonFlux"] = value; }
+void DesignSource::setPhotonFlux(double value) { v["photonFlux"] = value; }
 double DesignSource::getPhotonFlux() const { return v["photonFlux"].as_double(); }
 
-EnergyDistribution DesignSource::getEnergyDistribution() const { 
+EnergyDistribution DesignSource::getEnergyDistribution() const {
     EnergyDistribution en;
     SpreadType spreadType = v["energyDistribution"].as_energySpreadType();
     EnergyDistributionType energyDistributionType = v["energyDistributionType"].as_energyDistType();
-    
-    
+
     if (energyDistributionType == EnergyDistributionType::File) {
         std::string filename = v["photonEnergyDistributionFile"].as_string();
-        
+
         std::cout << std::filesystem::current_path() << std::endl;
         DatFile df;
         DatFile::load(filename, &df);
 
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
         en = EnergyDistribution(df);
-    
+
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy = v["energy"].as_double();
         double energySpread = v["energySpread"].as_double();
@@ -238,10 +233,9 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
 
         } else if (spreadType == SpreadType::SeperateEnergies) {
             int numOfEnergies;
-            if(!v["SeperateEnergies"].as_int()){
+            if (!v["SeperateEnergies"].as_int()) {
                 numOfEnergies = 3;
-            } else
-            {
+            } else {
                 numOfEnergies = v["SeperateEnergies"].as_int();
             }
             numOfEnergies = abs(numOfEnergies);
@@ -261,87 +255,44 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
 void DesignSource::setNumberOfRays(double value) { v["numberOfRays"] = value; }
 double DesignSource::getNumberOfRays() const { return v["numberOfRays"].as_double(); }
 
-void DesignSource::setNumOfCircles(int value) {
-    v["numOfCircles"] = value;
-}
+void DesignSource::setNumOfCircles(int value) { v["numOfCircles"] = value; }
 
-int DesignSource::getNumOfCircles() const {
-    return v["numOfCircles"].as_int();
-}
+int DesignSource::getNumOfCircles() const { return v["numOfCircles"].as_int(); }
 
-void DesignSource::setMaxOpeningAngle(Rad value) {
-    v["maxOpeningAngle"] = value;
-}
+void DesignSource::setMaxOpeningAngle(Rad value) { v["maxOpeningAngle"] = value; }
 
-Rad DesignSource::getMaxOpeningAngle() const {
-    return v["maxOpeningAngle"].as_rad();
-}
+Rad DesignSource::getMaxOpeningAngle() const { return v["maxOpeningAngle"].as_rad(); }
 
-void DesignSource::setMinOpeningAngle(Rad value) {
-    v["minOpeningAngle"] = value;
-}
+void DesignSource::setMinOpeningAngle(Rad value) { v["minOpeningAngle"] = value; }
 
-Rad DesignSource::getMinOpeningAngle() const {
-    return v["minOpeningAngle"].as_rad();
-}
+Rad DesignSource::getMinOpeningAngle() const { return v["minOpeningAngle"].as_rad(); }
 
-void DesignSource::setDeltaOpeningAngle(Rad value) {
-    v["deltaOpeningAngle"] = value;
-}
+void DesignSource::setDeltaOpeningAngle(Rad value) { v["deltaOpeningAngle"] = value; }
 
-Rad DesignSource::getDeltaOpeningAngle() const {
-    return v["deltaOpeningAngle"].as_rad();
-}
+Rad DesignSource::getDeltaOpeningAngle() const { return v["deltaOpeningAngle"].as_rad(); }
 
+void DesignSource::setSigmaType(SigmaType value) { v["sigmaType"] = value; }
 
-void DesignSource::setSigmaType(SigmaType value) {
-    v["sigmaType"] = value;
-}
+SigmaType DesignSource::getSigmaType() const { return v["sigmaType"].as_sigmaType(); }
 
-SigmaType DesignSource::getSigmaType() const {
-    return v["sigmaType"].as_sigmaType();
-}
+void DesignSource::setUndulatorLength(double value) { v["undulatorLength"] = value; }
 
-void DesignSource::setUndulatorLength(double value) {
-    v["undulatorLength"] = value;
-}
+double DesignSource::getUndulatorLength() const { return v["undulatorLength"].as_double(); }
 
-double DesignSource::getUndulatorLength() const {
-    return v["undulatorLength"].as_double();
-}
+void DesignSource::setElectronSigmaX(double value) { v["electronSigmaX"] = value; }
 
-void DesignSource::setElectronSigmaX(double value) {
-    v["electronSigmaX"] = value;
-}
+double DesignSource::getElectronSigmaX() const { return v["electronSigmaX"].as_double(); }
 
-double DesignSource::getElectronSigmaX() const {
-    return v["electronSigmaX"].as_double();
-}
+void DesignSource::setElectronSigmaXs(double value) { v["electronSigmaXs"] = value; }
 
-void DesignSource::setElectronSigmaXs(double value) {
-    v["electronSigmaXs"] = value;
-}
+double DesignSource::getElectronSigmaXs() const { return v["electronSigmaXs"].as_double(); }
 
-double DesignSource::getElectronSigmaXs() const {
-    return v["electronSigmaXs"].as_double();
-}
+void DesignSource::setElectronSigmaY(double value) { v["electronSigmaY"] = value; }
 
-void DesignSource::setElectronSigmaY(double value) {
-    v["electronSigmaY"] = value;
-}
+double DesignSource::getElectronSigmaY() const { return v["electronSigmaY"].as_double(); }
 
-double DesignSource::getElectronSigmaY() const {
-    return v["electronSigmaY"].as_double();
-}
+void DesignSource::setElectronSigmaYs(double value) { v["electronSigmaYs"] = value; }
 
-void DesignSource::setElectronSigmaYs(double value) {
-    v["electronSigmaYs"] = value;
-}
+double DesignSource::getElectronSigmaYs() const { return v["electronSigmaYs"].as_double(); }
 
-double DesignSource::getElectronSigmaYs() const {
-    return v["electronSigmaYs"].as_double();
-}
-
-
-
-}
+}  // namespace RAYX

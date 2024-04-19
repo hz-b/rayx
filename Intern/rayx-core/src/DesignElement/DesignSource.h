@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Value.h"
 
 namespace RAYX {
@@ -56,7 +55,7 @@ struct RAYX_API DesignSource {
 
     void setEnergySpreadType(SpreadType value);
     SpreadType getEnergySpreadType() const;
-    
+
     void setEnergyDistributionType(EnergyDistributionType value);
     void setEnergyDistributionFile(std::string value);
 
@@ -80,7 +79,7 @@ struct RAYX_API DesignSource {
     EnergyDistribution getEnergyDistribution() const;
 
     void setMisalignment(Misalignment m);
-    Misalignment getMisalignment() const;   
+    Misalignment getMisalignment() const;
 
     void setNumberOfRays(double value);
     double getNumberOfRays() const;
@@ -120,7 +119,5 @@ struct RAYX_API DesignSource {
 
     void setElectronSigmaYs(double value);
     double getElectronSigmaYs() const;
-    
-
 };
-}
+}  // namespace RAYX

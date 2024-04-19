@@ -43,8 +43,6 @@ class UIHandler {
     bool m_showRMLNotExistPopup = false;
     bool m_pathValidState = false;
 
-    VkDescriptorSet m_sceneDescriptorSet;
-
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
     ImGuiIO m_IO;
