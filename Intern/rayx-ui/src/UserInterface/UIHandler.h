@@ -36,9 +36,9 @@ class UIHandler {
 
     float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 0.00f};
 
-    bool m_useLargeFont = false;
-    ImFont* m_smallFont;
-    ImFont* m_largeFont;
+    float m_scale = 1.0f;
+    float m_oldScale = 1.0f;
+    std::vector<ImFont*> m_fonts;
 
     bool m_showRMLNotExistPopup = false;
     bool m_pathValidState = false;
@@ -51,7 +51,6 @@ class UIHandler {
 
     BeamlineOutliner m_BeamlineOutliner;
 
-    void initializeDockingLayout();
     void showSceneEditorWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showHotkeysWindow();

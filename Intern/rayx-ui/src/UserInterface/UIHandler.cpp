@@ -131,8 +131,12 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     {
         // Setup style
         const std::filesystem::path fontPath = getExecutablePath() / "Assets/fonts/Roboto-Regular.ttf";
-        m_smallFont = m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f);
-        m_largeFont = m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 24.0f);
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 8.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 32.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 48.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 64.0f));
+        m_IO.Fonts->Build();
 
         ImGui_ImplVulkan_CreateFontsTexture();
     }
@@ -220,11 +224,35 @@ void UIHandler::beginUIRender() {
  * @param rObjects
  */
 void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
-    if (m_useLargeFont) {
-        ImGui::PushFont(m_largeFont);
-    } else {
-        ImGui::PushFont(m_smallFont);
+    ImFont* currentFont;
+    float adjustedScale;
+    if (m_oldScale != m_scale) {
+        ImGuiStyle style = ImGui::GetStyle();
+        style.ScaleAllSizes(m_scale / m_oldScale);
+        style.ScrollbarSize = 15.0f;
+        m_oldScale = m_scale;
     }
+    if (m_scale <= 0.5f) {
+        currentFont = m_fonts[0];
+        adjustedScale = m_scale / 0.5f;
+    } else if (m_scale <= 1.0f) {
+        currentFont = m_fonts[1];
+        adjustedScale = m_scale / 1.0f;
+    } else if (m_scale <= 2.0f) {
+        currentFont = m_fonts[2];
+        adjustedScale = m_scale / 2.0f;
+    } else if (m_scale <= 3.0f) {
+        currentFont = m_fonts[3];
+        adjustedScale = m_scale / 3.0f;
+    } else if (m_scale <= 4.0f) {
+        currentFont = m_fonts[4];
+        adjustedScale = m_scale / 4.0f;
+    } else {
+        currentFont = m_fonts[4];
+        adjustedScale = 1.0f;
+    }
+    ImGui::GetIO().FontGlobalScale = adjustedScale;
+    ImGui::PushFont(currentFont);
 
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
@@ -394,7 +422,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
 void UIHandler::showSettingsWindow() {
     ImGui::Begin("Settings");
 
-    ImGui::Checkbox("Large Font", &m_useLargeFont);
+    ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::End();
 }
@@ -421,13 +449,9 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
     if (uiParams.showH5NotExistPopup || m_showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
 
         ImGui::OpenPopup("File Not Found");
         if (ImGui::BeginPopupModal("File Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            // Scale up font size
-            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-
             if (m_showRMLNotExistPopup) {
                 ImGui::Text("RML file does not exist or is not valid.");
             } else {
@@ -438,14 +462,8 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
             ImGui::Spacing();
 
             // Calculate center position for buttons. Assuming 120 pixels width for each button and 10 pixels space between them
-            constexpr float windowWidth = 400;         // Popup window width
-            constexpr float buttonsWidth = 240;        // Total buttons width (120 * 2)
-            constexpr float spaceBetweenButtons = 10;  // Space between buttons
-            constexpr float buttonsStartPos = (windowWidth - buttonsWidth - spaceBetweenButtons) * 0.5f;
 
-            ImGui::SetCursorPosX(buttonsStartPos);
-
-            if (ImGui::Button("Yes", ImVec2(120, 40))) {  // Make the button a bit larger
+            if (ImGui::Button("Yes", ImVec2(120 * m_scale, 0))) {  // Make the button a bit larger
                 uiParams.showH5NotExistPopup = false;
                 m_showRMLNotExistPopup = false;
                 uiParams.rmlReady = true;
@@ -455,17 +473,12 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
 
             ImGui::SameLine();  // Keep on the same line to ensure proper spacing
 
-            ImGui::SetCursorPosX(buttonsStartPos + 120 + spaceBetweenButtons);  // Adjust for the next button
-
-            if (ImGui::Button("No", ImVec2(120, 40))) {  // Make the button a bit larger
+            if (ImGui::Button("No", ImVec2(120 * m_scale, 0))) {  // Make the button a bit larger
                 uiParams.showH5NotExistPopup = false;
                 m_showRMLNotExistPopup = false;
                 uiParams.runSimulation = false;  // Do not start the simulation
                 ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
             }
-
-            // Revert to original font size
-            ImGui::PopFont();
 
             ImGui::EndPopup();
         }
@@ -478,7 +491,6 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
 
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(430, 290), ImGuiCond_Always);
 
         if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
@@ -535,7 +547,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::BeginDisabled();
             }
 
-            if (ImGui::Button("Start Simulation", ImVec2(120, buttonHeight))) {
+            if (ImGui::Button("Start Simulation")) {
                 uiParams.simulationSettingsReady = true;
                 ImGui::CloseCurrentPopup();
             }

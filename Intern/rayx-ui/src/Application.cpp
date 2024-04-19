@@ -253,8 +253,7 @@ void Application::run() {
             };
             if (m_UIParams.sceneExtent.height != 0 && m_UIParams.sceneExtent.width != 0) {
                 if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
-                    sceneExtent = m_UIParams.sceneExtent;
-                    m_Renderer.resizeOffscreenResources(sceneExtent);
+                    m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
                     m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
                 }
             }
