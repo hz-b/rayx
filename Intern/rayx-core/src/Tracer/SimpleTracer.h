@@ -100,9 +100,6 @@ class SimpleTracer : public DeviceTracer {
     } m_batchResult;
 
     template <typename T>
-    void resizeVectorIfNeeded(std::vector<T>& vec, const Idx size);
-
-    template <typename T>
     void resizeBufferIfNeeded(Queue q, Buffer<T>& buffer, const Idx size);
 
     template <typename T>
@@ -290,13 +287,6 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
 
 template <typename Acc>
 template <typename T>
-void SimpleTracer<Acc>::resizeVectorIfNeeded(std::vector<T>& vec, const Idx size) {
-    const auto nextPowerOfTwo = glm::pow(2, glm::ceil(glm::log(size) / glm::log(2)));
-    vec.resize(nextPowerOfTwo);
-}
-
-template <typename Acc>
-template <typename T>
 void SimpleTracer<Acc>::resizeBufferIfNeeded(Queue q, Buffer<T>& buffer, const Idx size) {
     const auto shouldAlloc = !buffer.buf || alpaka::getExtentProduct(*buffer.buf) < size;
     if (shouldAlloc) {
@@ -330,7 +320,7 @@ void SimpleTracer<Acc>::transferFromBuffer(Queue q, alpaka::DevCpu cpu, T* dst, 
 template <typename Acc>
 template <typename T>
 void SimpleTracer<Acc>::transferFromBuffer(Queue q, alpaka::DevCpu cpu, std::vector<T>& dst, Buffer<T>& src, const Idx size) {
-    resizeVectorIfNeeded(dst, size);
+    dst.resize(size);
     auto dstView = alpaka::createView(cpu, dst, Vec{size});
     alpaka::memcpy(q, dstView, *src.buf, Vec{size});
 }
