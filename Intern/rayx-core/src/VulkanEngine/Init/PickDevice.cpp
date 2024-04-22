@@ -21,6 +21,9 @@ void VulkanEngine::pickDevice() {
 
 // scan for devices
 std::vector<VkPhysicalDevice> VulkanEngine::getPhysicalDevices() {
+    if (!m_Instance) {
+        createInstance();
+    }
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
     if (deviceCount == 0) throw std::runtime_error("failed to find GPUs with Vulkan Support!");
@@ -163,7 +166,6 @@ void VulkanEngine::createLogicalDevice() {
     deviceFeatures.shaderFloat64 = VK_TRUE;
     deviceFeatures.shaderInt64 = VK_TRUE;
     deviceFeatures.robustBufferAccess = VK_TRUE;
-
 
     VkPhysicalDeviceVulkan13Features vk13features{};
     vk13features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
