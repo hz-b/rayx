@@ -1,8 +1,8 @@
 #include "UIHandler.h"
 
-#include <imgui_internal.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#include <imgui_internal.h>
 #include <nfd.h>
 
 #include <fstream>
@@ -363,14 +363,8 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
             if (m_showRMLNotExistPopup) {
                 uiParams.rmlReady = false;
             } else {
-                if (uiParams.showH5NotExistPopup) {
-                    uiParams.h5Ready = false;
-                    m_pathValidState = false;
-                } else {
-                    uiParams.h5Ready = true;
-                    m_pathValidState = true;
-                    uiParams.rmlReady = true;
-                }
+                uiParams.h5Ready = !uiParams.showH5NotExistPopup;
+                uiParams.rmlReady = true;
                 uiParams.rmlPath = outPath;
             }
         } else if (result == NFD_CANCEL) {
@@ -381,7 +375,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     }
     if (uiParams.rmlPath != "") {
         ImGui::SameLine();
-        if (ImGui::Button("Retrace current file")) {
+        if (ImGui::Button("Trace current file")) {
             uiParams.showH5NotExistPopup = false;
             m_showRMLNotExistPopup = false;
             uiParams.rmlReady = true;
@@ -390,7 +384,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     } else {
         ImGui::SameLine();
         ImGui::BeginDisabled();
-        ImGui::Button("Retrace current file");
+        ImGui::Button("Trace current file");
         ImGui::EndDisabled();
     }
 
@@ -400,7 +394,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     uiParams.camController.displaySettings();
     ImGui::Separator();
-    if (!uiParams.rmlPath.empty() && m_pathValidState) {
+    if (!uiParams.rmlPath.empty() && uiParams.rayInfo.raysLoaded) {
         size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
 
@@ -446,7 +440,7 @@ void UIHandler::showHotkeysWindow() {
 }
 
 void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
-    if (uiParams.showH5NotExistPopup || m_showRMLNotExistPopup) {
+    if (m_showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
 
@@ -454,30 +448,14 @@ void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
         if (ImGui::BeginPopupModal("File Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             if (m_showRMLNotExistPopup) {
                 ImGui::Text("RML file does not exist or is not valid.");
-            } else {
-                ImGui::Text("The H5 file does not exist or is not valid.");
             }
-            ImGui::Spacing();
-            ImGui::Text("Do you want to run the simulation now?");  // Ask the user if they want to run the simulation now
-            ImGui::Spacing();
 
-            // Calculate center position for buttons. Assuming 120 pixels width for each button and 10 pixels space between them
-
-            if (ImGui::Button("Yes", ImVec2(120 * m_scale, 0))) {  // Make the button a bit larger
+            if (ImGui::Button("Okay", ImVec2(120 * m_scale, 0))) {  // Make the button a bit larger
                 uiParams.showH5NotExistPopup = false;
                 m_showRMLNotExistPopup = false;
-                uiParams.rmlReady = true;
-                uiParams.runSimulation = true;
+                uiParams.runSimulation = false;
+                uiParams.rmlReady = false;   // Do not start the simulation
                 ImGui::CloseCurrentPopup();  // Close the popup when an option is selected
-            }
-
-            ImGui::SameLine();  // Keep on the same line to ensure proper spacing
-
-            if (ImGui::Button("No", ImVec2(120 * m_scale, 0))) {  // Make the button a bit larger
-                uiParams.showH5NotExistPopup = false;
-                m_showRMLNotExistPopup = false;
-                uiParams.runSimulation = false;  // Do not start the simulation
-                ImGui::CloseCurrentPopup();      // Close the popup when an option is selected
             }
 
             ImGui::EndPopup();

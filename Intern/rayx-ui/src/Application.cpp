@@ -135,20 +135,33 @@ void Application::run() {
                 m_State = State::LoadingBeamline;
                 m_UIParams.rmlReady = false;
             }
+            if (m_UIParams.runSimulation) {
+                if (m_UIParams.simulationSettingsReady) {
+                    // open simulation dialog
+                    m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo);
+                    m_UIParams.simulationSettingsReady = false;
+                    m_State = State::InitializeSimulation;
+                }
+            }
 
             switch (m_State) {
                 case State::LoadingBeamline:
                     if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        if (m_UIParams.runSimulation) {
-                            if (m_UIParams.simulationSettingsReady) {
-                                // open simulation dialog
-                                m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo);
-                                m_UIParams.simulationSettingsReady = false;
-                                m_State = State::InitializeSimulation;
-                            }
-                        } else {
+                        // reset rays
+                        m_rays.clear();
+                        m_UIParams.rayInfo.raysLoaded = false;
+                        m_Scene = std::make_unique<Scene>(m_Device);
+                        elements = m_Beamline->m_DesignElements;
+                        sources = m_Beamline->m_DesignSources;
+                        rSourcePositions.clear();
+                        for (auto& source : sources) {
+                            rSourcePositions.push_back(source.getWorldPosition());
+                        }
+                        if (m_UIParams.h5Ready) {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
                             m_State = State::LoadingRays;
+                        } else {
+                            m_State = State::PrepareElements;
                         }
                     }
                     break;
@@ -172,7 +185,6 @@ void Application::run() {
                         RAYX_VERB << "Loaded RML file: " << m_RMLPath;
 
                         for (auto ray : m_rays) {
-                            // get last elemtent of vector
                             size_t id = static_cast<size_t>(ray.back().m_lastElement);
                             if (id > m_Beamline->m_DesignElements.size()) {
                                 m_UIParams.showH5NotExistPopup = true;
@@ -187,32 +199,22 @@ void Application::run() {
 
                         RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
 
-                        elements = m_Beamline->m_DesignElements;
-                        sources = m_Beamline->m_DesignSources;
-                        rSourcePositions.clear();
-                        for (auto& source : sources) {
-                            rSourcePositions.push_back(source.getWorldPosition());
-                        }
-
-                        m_Scene = std::make_unique<Scene>(m_Device);
-
                         buildRayCacheFuture =
                             std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
-                        getRObjInputsFuture =
-                            std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(elements), std::ref(m_rays));
-
                         m_State = State::BuildingRays;
                     }
                     break;
                 case State::BuildingRays:
                     if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
-                        if (m_Scene->getState() == Scene::State::Complete) {
-                            m_State = State::Running;
-                        } else {
-                            m_State = State::BuildingElements;
-                        }
+                        m_UIParams.rayInfo.raysLoaded = true;
+                        m_State = State::PrepareElements;
                     }
+                    break;
+                case State::PrepareElements:
+                    getRObjInputsFuture =
+                        std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(elements), std::ref(m_rays));
+                    m_State = State::BuildingElements;
                     break;
                 case State::BuildingElements:
                     if (getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {

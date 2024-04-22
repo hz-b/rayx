@@ -41,7 +41,6 @@ class UIHandler {
     std::vector<ImFont*> m_fonts;
 
     bool m_showRMLNotExistPopup = false;
-    bool m_pathValidState = false;
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;
