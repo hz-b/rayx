@@ -11,8 +11,8 @@ Simulator::Simulator() {
     m_seq = RAYX::Sequential::No;
     std::vector<VkPhysicalDevice> deviceList;
     {
-        RAYX::VulkanTracer VkTracer;
-        deviceList = VkTracer.getPhysicalDevices();
+        auto engine = std::make_unique<RAYX::VulkanEngine>();
+        deviceList = engine->getPhysicalDevices();
     }
     for (const auto& device : deviceList) {
         VkPhysicalDeviceProperties deviceProperties;
