@@ -46,6 +46,7 @@ class Application {
         LoadingBeamline,
         LoadingRays,
         BuildingRays,
+        PrepareElements,
         BuildingElements,
         Running,
         RunningWithoutScene

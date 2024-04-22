@@ -1,7 +1,8 @@
 #pragma once
 
-#include <filesystem>
 #include <vulkan/vulkan.h>
+
+#include <filesystem>
 
 #include "Camera.h"
 
@@ -11,6 +12,7 @@
  * UI Parameters such as toggles, paths, etc.
  */
 struct UIRayInfo {
+    bool raysLoaded;
     bool displayRays;
     bool raysChanged;
     bool cacheChanged;
@@ -66,7 +68,7 @@ struct UIParameters {
           rmlReady(false),
           h5Ready(false),
           frameTime(0.0f),
-          rayInfo({false, false, false, false, 0, 0}),
+          rayInfo({false, false, false, false, false, 0, 0}),
           runSimulation(false),
           simulationSettingsReady(false),
           simulationInfo({
