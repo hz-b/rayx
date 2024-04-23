@@ -35,3 +35,10 @@
 #endif
 #pragma warning Unknown dynamic link import / export semantics.
 #endif
+
+// make string comparison available for msvc compiler
+// not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
