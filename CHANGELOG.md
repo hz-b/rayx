@@ -1,5 +1,7 @@
 # Changes
 
-- Improve robustness of rayx-ui optical element rendering
-- Fixing asset distribution for rayx-ui
-- Fixing script distribution for rayx
+- UI restyling
+- Added dockspace for more flexibility
+- UI Scale slider
+- Improvements for tracing with RAYX-UI
+- Loading witout h5
