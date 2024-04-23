@@ -6,7 +6,9 @@
 #include "CutoutFns.h"
 #include "ApplySlopeError.h"
 #include "Cubic.h"
+#include "Throw.h"
 
+namespace RAYX {
 
 /**************************************************************
  *                    Quadric collision
@@ -498,3 +500,5 @@ Collision findCollision(const Ray& _ray, Inv& inv) {
 
     return best_col;
 }
+
+} // namespace RAYX

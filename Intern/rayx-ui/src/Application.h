@@ -64,6 +64,6 @@ class Application {
     void loadRays(const std::filesystem::path& rmlPath);
     void loadBeamline(const std::filesystem::path& rmlPath);
 
-    void createRayCache(BundleHistory& rayCache, UIRayInfo& rayInfo);
-    void updateRays(BundleHistory& rayCache, std::optional<RenderObject>& rayObj, UIRayInfo& rayInfo);
+    void createRayCache(RAYX::BundleHistory& rayCache, UIRayInfo& rayInfo);
+    void updateRays(RAYX::BundleHistory& rayCache, std::optional<RenderObject>& rayObj, UIRayInfo& rayInfo);
 };

@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "InvocationState.h"
 
+namespace RAYX {
+
 /** creates a Müller matrix (see p. 32 of Schäfers, 2007)
  * @param R_s
  * @param R_p
@@ -22,3 +24,5 @@ RAYX_FUNC dmat4 mullerMatrix(double R_s, double R_p, double delta);
  * @returns `true`, if ray should be absorbed
  */
 RAYX_FUNC bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv);
+
+} // namespace RAYX

@@ -5,6 +5,8 @@
 #include "Cutout.h"
 #include "Surface.h"
 
+namespace RAYX {
+
 struct SlopeError {
     double m_sag;  // aka `slopeErrorX`
     double m_mer;  // aka `slopeErrorZ`
@@ -57,3 +59,5 @@ struct Element {
 
 // make sure Element does not introduce cost on copy or default construction
 static_assert(std::is_trivially_copyable_v<Element>);
+
+} // namespace RAYX

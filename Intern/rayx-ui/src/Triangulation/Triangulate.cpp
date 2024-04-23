@@ -8,31 +8,32 @@
 #include "Debug/Debug.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
+#include "Shader/Element.h"
 #include "Triangulation/TraceTriangulation.h"
 
 // ------ Helper functions ------
 
-void calculateSolidMeshOfType(const Cutout& cutout, std::vector<TextureVertex>& vertices, std::vector<uint32_t>* indices = nullptr) {
+void calculateSolidMeshOfType(const RAYX::Cutout& cutout, std::vector<TextureVertex>& vertices, std::vector<uint32_t>* indices = nullptr) {
     constexpr double defWidthHeight = 50.0f;  // TODO(Jannis): define this in one place (@see getRectangularDimensions)
     Polygon poly;
 
     switch (static_cast<int>(cutout.m_type)) {
-        case CTYPE_TRAPEZOID: {
-            TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
+        case RAYX::CTYPE_TRAPEZOID: {
+            RAYX::TrapezoidCutout trapezoid = RAYX::deserializeTrapezoid(cutout);
             poly.calculateForQuadrilateral(trapezoid.m_widthA, trapezoid.m_widthB, trapezoid.m_length, trapezoid.m_length);
             break;
         }
-        case CTYPE_RECT: {
-            RectCutout rect = deserializeRect(cutout);
+        case RAYX::CTYPE_RECT: {
+            RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
             poly.calculateForQuadrilateral(rect.m_width, rect.m_width, rect.m_length, rect.m_length);
             break;
         }
-        case CTYPE_ELLIPTICAL: {
-            EllipticalCutout ellipse = deserializeElliptical(cutout);
+        case RAYX::CTYPE_ELLIPTICAL: {
+            RAYX::EllipticalCutout ellipse = RAYX::deserializeElliptical(cutout);
             poly.calculateForElliptical(ellipse.m_diameter_x, ellipse.m_diameter_z);
             break;
         }
-        case CTYPE_UNLIMITED:
+        case RAYX::CTYPE_UNLIMITED:
         default: {
             poly.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
             break;
@@ -49,9 +50,9 @@ void calculateSolidMeshOfType(const Cutout& cutout, std::vector<TextureVertex>& 
     vertices.insert(vertices.end(), poly.vertices.begin(), poly.vertices.end());
 }
 
-void calculateMeshForSlit(const Element& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void calculateMeshForSlit(const RAYX::Element& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // Deserialize to get SlitBehaviour
-    SlitBehaviour slit = deserializeSlit(element.m_behaviour);
+    RAYX::SlitBehaviour slit = deserializeSlit(element.m_behaviour);
 
     // Calculate vertices for the beamstop
     calculateSolidMeshOfType(slit.m_beamstopCutout, vertices, &indices);
@@ -119,14 +120,14 @@ void calculateMeshForSlit(const Element& element, std::vector<TextureVertex>& ve
 
 void planarTriangulation(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
-    if (element.m_element.m_behaviour.m_type == BTYPE_SLIT) {
+    if (element.m_element.m_behaviour.m_type == RAYX::BTYPE_SLIT) {
         calculateMeshForSlit(element.m_element, vertices, indices);
     } else {
         calculateSolidMeshOfType(element.m_element.m_cutout, vertices, &indices);
     }
 }
 
-bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }
+bool isPlanar(const RAYX::QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }
 
 // ------ Interface functions ------
 
@@ -135,12 +136,12 @@ bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 &&
  */
 void triangulateObject(const RAYX::OpticalElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     switch (static_cast<int>(element.m_element.m_surface.m_type)) {
-        case STYPE_PLANE_XZ: {
+        case RAYX::STYPE_PLANE_XZ: {
             planarTriangulation(element, vertices, indices);
             break;
         }
-        case STYPE_QUADRIC: {
-            QuadricSurface q = deserializeQuadric(element.m_element.m_surface);
+        case RAYX::STYPE_QUADRIC: {
+            RAYX::QuadricSurface q = RAYX::deserializeQuadric(element.m_element.m_surface);
             if (isPlanar(q)) {
                 planarTriangulation(element, vertices, indices);
             } else {
@@ -148,7 +149,7 @@ void triangulateObject(const RAYX::OpticalElement& element, std::vector<TextureV
             }
             break;
         }
-        case STYPE_TOROID: {
+        case RAYX::STYPE_TOROID: {
             traceTriangulation(element, vertices, indices);
             break;
         }

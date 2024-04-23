@@ -1,5 +1,8 @@
 #include "RefractiveIndex.h"
 #include "InvocationState.h"
+#include "Throw.h"
+
+namespace RAYX {
 
 // The inv.mat table consists of all the entries from the Palik & Nff tables for all materials that were loaded into the shader.
 // Thus, when you want to get some concrete palik entry for a particular element, you need the inv.matIdx table to "know where to look" in inv.mat:
@@ -157,4 +160,4 @@ dvec2 RAYX_API getAtomicMassAndRho(int material) {
     return dvec2(0.0, 0.0);
 }
 
-
+} // namespace RAYX

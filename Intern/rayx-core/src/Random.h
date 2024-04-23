@@ -1,5 +1,7 @@
 #pragma once
+
 #include "Core.h"
+#include <stdint.h>
 
 // All C++ randomness should be using this module.
 // Otherwise set-seeding tests will not work.

@@ -1,6 +1,8 @@
 #include "SphericalCoords.h"
 #include "Approx.h"
 
+namespace RAYX {
+
 RAYX_FUNC
 void RAYX_API sphericalCoordsToDirection(double phi, double psi, dvec3& out_direction) {
     double cos_psi = r8_cos(psi);
@@ -16,3 +18,5 @@ void RAYX_API directionToSphericalCoords(dvec3 direction, double& out_phi, doubl
     out_psi = -r8_asin(direction.z);
     out_phi = r8_atan2(direction.x, direction.y);
 }
+
+} // namespace RAYX

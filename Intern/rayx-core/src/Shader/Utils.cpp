@@ -1,10 +1,13 @@
 #include "Utils.h"
+#include "Constants.h"
 #include "InvocationState.h"
 #include "Complex.h"
 #include "Approx.h"
 #include "Rand.h"
 #include "Helper.h"
 #include "RefractiveIndex.h"
+
+namespace RAYX {
 
 // converts energy in eV to wavelength in nm
 RAYX_FUNC
@@ -48,3 +51,4 @@ double RAYX_API getIncidenceAngle(Ray r, dvec3 normal) {
     return theta;
 }
 
+} // namespace RAYX

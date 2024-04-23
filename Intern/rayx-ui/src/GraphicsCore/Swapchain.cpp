@@ -1,6 +1,9 @@
 #include "Swapchain.h"
 
 #include <utility>
+#include <limits>
+#include <array>
+#include <iostream>
 
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
 

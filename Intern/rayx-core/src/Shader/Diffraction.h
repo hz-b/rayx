@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "InvocationState.h"
 
+namespace RAYX {
+
 // Calculates the factorial of n: n!
 RAYX_FUNC double RAYX_API fact(int n);
 
@@ -28,3 +30,5 @@ RAYX_FUNC void bessel_diff(double radius, double wl, double& dphi, double& dpsi,
  * @return result stored in dAngle
  */
 RAYX_FUNC void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
+
+} // namespace RAYX

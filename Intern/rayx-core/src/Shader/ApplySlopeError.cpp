@@ -1,6 +1,9 @@
 #include "ApplySlopeError.h"
+#include "Constants.h"
 #include "Approx.h"
 #include "Rand.h"
+
+namespace RAYX {
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -91,3 +94,4 @@ dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv) {
     return normal;
 }
 
+} // namespace RAYX

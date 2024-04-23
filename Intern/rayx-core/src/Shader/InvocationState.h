@@ -15,6 +15,9 @@
 
 #include "Common.h"
 #include "Ray.h"
+#include "Element.h"
+
+namespace RAYX {
 
 // Useful for GPU Tracing
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
@@ -58,3 +61,5 @@ struct RAYX_API InvocationState {
 };
 
 using Inv = InvocationState;
+
+} // namespace RAYX

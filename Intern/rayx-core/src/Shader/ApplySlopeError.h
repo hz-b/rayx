@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "InvocationState.h"
 
+namespace RAYX {
+
 /**
 turn the normal vector through x_rad and z_rad
 @params:  	normal: the normal vector
@@ -31,3 +33,5 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FUNC dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv);
+
+} // namespace RAYX

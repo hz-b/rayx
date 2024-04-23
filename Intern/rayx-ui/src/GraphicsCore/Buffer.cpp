@@ -1,6 +1,7 @@
 #include "Buffer.h"
 
 #include <cstring>
+#include <cassert>
 
 /**
  * Allocates buffer memory using given parameters and associates it with a Device.

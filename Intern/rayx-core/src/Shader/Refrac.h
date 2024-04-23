@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "InvocationState.h"
 
+namespace RAYX {
+
 /**
 calculates refracted ray
 @params: 	r: ray
@@ -30,3 +32,5 @@ RAYX_FUNC Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv);
  */
 RAYX_FUNC Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
                           double a, Inv& inv);  // TODO fix unused var
+
+} // namespace RAYX

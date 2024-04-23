@@ -1,5 +1,10 @@
 #include "LineDensity.h"
 #include "Approx.h"
+#include "Behaviour.h"
+#include "ImageType.h"
+#include "Throw.h"
+
+namespace RAYX {
 
 /** variable line spacing for gratings
 @params
@@ -183,3 +188,5 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
 
     return;
 }
+
+} // namespace RAYX

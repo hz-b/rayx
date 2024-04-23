@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <string>
+
 #include "Device.h"
 
 struct PipelineConfigInfo {

@@ -8,6 +8,8 @@
 
 #include "Core.h"
 
+namespace RAYX {
+
 struct Rad;
 
 // an angle in degrees.
@@ -32,3 +34,5 @@ struct Rad {
 
     double rad;
 };
+
+} // namespace RAYX

@@ -2,6 +2,8 @@
 
 #include "Common.h"
 
+namespace RAYX {
+
 #undef m_private_serialization_params
 
 // Cutout types:
@@ -12,7 +14,7 @@ const int CTYPE_ELLIPTICAL = 1;
 const int CTYPE_TRAPEZOID = 2;
 const int CTYPE_UNLIMITED = 3;
 
-struct Cutout {
+struct RAYX_API Cutout {
     // This types is one of the `CTYPE` constants.
     // It expresses what kind of Cutout this represents.
     double m_type;
@@ -28,7 +30,7 @@ struct Cutout {
 ///////////////////////////////////
 
 // A rectangle specified by width/length centered at (x=0, z=0).
-struct RectCutout {
+struct RAYX_API RectCutout {
     double m_width; // in X direction
     double m_length; // in Z direction
 };
@@ -59,7 +61,7 @@ inline RectCutout deserializeRect(Cutout ser) {
 // An elliptical shape given by two diameters.
 // It can be understood as a circle with individual stretch-factors for both dimensions.
 // The point (x=0, z=0) lies at the center of the ellipse.
-struct EllipticalCutout {
+struct RAYX_API EllipticalCutout {
     double m_diameter_x;
     double m_diameter_z;
 };
@@ -90,7 +92,7 @@ inline EllipticalCutout deserializeElliptical(Cutout ser) {
 // A trapezoid consists of two lines with lengths `m_widthA` and `m_widthB`, both parallel to the X-axis.
 // These lines have a distance of `m_length`.
 // The point (x=0, z=0) lies at the center of the trapezoid.
-struct TrapezoidCutout {
+struct RAYX_API TrapezoidCutout {
     double m_widthA; // in X direction
     double m_widthB; // in X direction
     double m_length; // in Z direction
@@ -131,3 +133,5 @@ inline Cutout serializeUnlimited() {
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
+
+} // namespace RAYX

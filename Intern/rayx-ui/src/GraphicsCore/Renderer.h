@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <cassert>
 
 #include "Device.h"
 #include "Swapchain.h"

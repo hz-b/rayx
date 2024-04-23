@@ -5,6 +5,8 @@
 
 #define COLLISION_EPSILON 1e-6
 
+namespace RAYX {
+
 // A "ray-element" collision.
 struct RAYX_API Collision {
     // The point where `_ray` hits the element, in element-coordinates.
@@ -25,3 +27,5 @@ RAYX_FUNC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTrian
 RAYX_FUNC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
 RAYX_FUNC Collision findCollisionWith(Ray r, uint id, Inv& inv);
 RAYX_FUNC Collision findCollision(const Ray& _ray, Inv& inv);
+
+} // namespace RAYX

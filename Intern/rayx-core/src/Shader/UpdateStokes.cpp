@@ -2,6 +2,8 @@
 #include "Approx.h"
 #include "Rand.h"
 
+namespace RAYX {
+
 /** creates a Müller matrix (see p. 32 of Schäfers, 2007)
  * @param R_s
  * @param R_p
@@ -42,3 +44,4 @@ bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azi
     return (r.m_stokes.x / stokes_old.x) - rn <= 0;
 }
 
+} // namespace RAYX

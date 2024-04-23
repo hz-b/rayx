@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include <array>
+
 Renderer::Renderer(Window& window, Device& device) : m_Window{window}, m_Device{device} {
     recreateSwapChain();
     createCommandBuffers();

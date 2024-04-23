@@ -59,7 +59,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
 
         // calculate max batch size
-        uint64_t max_batch_size = DEFAULT_BATCH_SIZE;
+        uint64_t max_batch_size = RAYX::DEFAULT_BATCH_SIZE;
         if (m_CommandParser->m_args.m_BatchSize != 0) {
             max_batch_size = m_CommandParser->m_args.m_BatchSize;
         }

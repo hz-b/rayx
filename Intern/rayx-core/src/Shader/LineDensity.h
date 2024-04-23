@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Common.h"
+#include "Behaviour.h"
+#include "Ray.h"
+
+namespace RAYX {
 
 /** variable line spacing for gratings
 @params
@@ -18,3 +22,5 @@ given direction on the grating
 @returns: (inplace) DX, DZ
 */
 RAYX_FUNC void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ);
+
+} // namespace RAYX

@@ -1,5 +1,8 @@
 #include "Rand.h"
+#include "Constants.h"
 #include "Approx.h"
+
+namespace RAYX {
 
 const uint64_t RNG_KEY = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
 
@@ -47,3 +50,5 @@ double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma) {
 
     return Z;
 }
+
+} // namespace RAYX

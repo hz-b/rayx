@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "Ray.h"
 
+namespace RAYX {
+
 // converts energy in eV to wavelength in nm
 RAYX_FUNC double RAYX_API hvlam(double x);
 
@@ -14,3 +16,5 @@ RAYX_FUNC Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m);
 
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FUNC double RAYX_API getIncidenceAngle(Ray r, dvec3 normal);
+
+} // namespace RAYX

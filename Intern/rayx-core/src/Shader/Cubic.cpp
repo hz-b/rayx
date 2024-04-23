@@ -1,6 +1,8 @@
 #include "Cubic.h"
 #include "Approx.h"
 
+namespace RAYX {
+
 // rotates for the cubic collision by angle alpha (taken from RAY-UI)
 RAYX_FUNC
 dvec3 RAYX_API cubicPosition(Ray r, double alpha) {
@@ -22,3 +24,5 @@ dvec3 RAYX_API cubicDirection(Ray r, double alpha) {
 
     return dvec3(0, dy, dz);
 }
+
+} // namespace RAYX

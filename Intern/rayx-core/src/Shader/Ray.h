@@ -69,4 +69,4 @@ static_assert(std::is_trivially_copyable_v<Ray>);
 // TODO(Sven): should this rather check divisibility by sizeof(dvec4) ?
 static_assert(sizeof(Ray) % alignof(dvec3) == 0);
 
-}  // namespace RAYX
+} // namespace RAYX

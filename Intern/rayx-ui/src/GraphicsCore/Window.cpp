@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <stdexcept>
 
 /**
  * This constructor performs several key tasks:

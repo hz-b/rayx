@@ -1,6 +1,9 @@
 #include "Refrac.h"
 #include "Helper.h"
 #include "Approx.h"
+#include "EventType.h"
+
+namespace RAYX {
 
 /**
 calculates refracted ray
@@ -98,3 +101,5 @@ Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
     }
     return r;
 }
+
+} // namespace RAYX

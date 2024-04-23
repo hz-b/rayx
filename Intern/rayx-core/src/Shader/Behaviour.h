@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "Cutout.h"
 
+namespace RAYX {
+
 #undef m_private_serialization_params
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
@@ -78,7 +80,7 @@ inline GratingBehaviour deserializeGrating(Behaviour b) {
 // Slit
 ///////////////////
 
-struct SlitBehaviour {
+struct RAYX_API SlitBehaviour {
     // The Slit consists of a ray-blocking wall with a small opening inside it.
     // This is the shape (aka cutout) of this small opening.
     // The set of points in the m_openingCutout need to be a subset of the cutout of the whole object.
@@ -199,3 +201,5 @@ inline Behaviour serializeImagePlane() {
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
+
+} // namespace RAYX

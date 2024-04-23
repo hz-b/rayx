@@ -9,6 +9,10 @@
 #include "Refrac.h"
 #include "UpdateStokes.h"
 #include "LineDensity.h"
+#include "EventType.h"
+#include "Throw.h"
+
+namespace RAYX {
 
 RAYX_FUNC
 Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
@@ -131,3 +135,5 @@ Ray behaveImagePlane(Ray r, [[maybe_unused]] int id, [[maybe_unused]] Collision 
     // doesn't need to do anything.
     return r;
 }
+
+} // namespace RAYX

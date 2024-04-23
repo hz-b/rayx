@@ -1,5 +1,9 @@
 #include "GeometryUtils.h"
 
+#include <vector>
+
+#include <Shader/Constants.h>
+
 #include "Colors.h"
 
 void Polygon::calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
@@ -20,7 +24,7 @@ void Polygon::calculateForElliptical(double diameterA, double diameterB) {
 
     // Calculate vertices
     for (uint32_t i = 0; i < numVertices; i++) {
-        double angle = 2.0f * PI * i / numVertices;
+        double angle = 2.0f * RAYX::PI * i / numVertices;
         glm::vec4 pos = {diameterA * cos(angle) / 2.0f, 0, diameterB * sin(angle) / 2.0f, 1.0f};
         glm::vec2 uv = glm::vec2(OPT_ELEMENT_COLOR);
         vertices.push_back({pos, uv});
@@ -88,30 +92,30 @@ std::vector<std::vector<double>> calculateDistanceMatrix(const std::vector<Textu
  * Given a Cutout object, this function calculates and returns the width and
  * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
  */
-std::pair<double, double> getRectangularDimensions(const Cutout& cutout) {
+std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
     double width = 0.0;
     double length = 0.0;
 
     switch (static_cast<int>(cutout.m_type)) {
-        case CTYPE_RECT: {
-            RectCutout rect = deserializeRect(cutout);
+        case RAYX::CTYPE_RECT: {
+            RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
             width = rect.m_width;
             length = rect.m_length;
             break;
         }
-        case CTYPE_ELLIPTICAL: {
-            EllipticalCutout ell = deserializeElliptical(cutout);
+        case RAYX::CTYPE_ELLIPTICAL: {
+            RAYX::EllipticalCutout ell = RAYX::deserializeElliptical(cutout);
             width = ell.m_diameter_x;   // Diameter is essentially the max width
             length = ell.m_diameter_z;  // Diameter is the max length
             break;
         }
-        case CTYPE_TRAPEZOID: {
-            TrapezoidCutout trap = deserializeTrapezoid(cutout);
+        case RAYX::CTYPE_TRAPEZOID: {
+            RAYX::TrapezoidCutout trap = RAYX::deserializeTrapezoid(cutout);
             width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
             length = trap.m_length;
             break;
         }
-        default: {  // CTYPE_UNLIMITED and unknown types
+        default: {  // RAYX::CTYPE_UNLIMITED and unknown types
             return {50.0, 50.0};
             break;
         }

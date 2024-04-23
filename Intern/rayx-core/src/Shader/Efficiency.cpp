@@ -4,6 +4,8 @@
 #include "Utils.h"
 #include "RefractiveIndex.h"
 
+namespace RAYX {
+
 /** calculates cosinus of transmittance angle with snell's law
  * cosinus is needed in fresnel formula
  * sin(incidence_angle)² = 1 - cos(incidence_angle)²
@@ -150,3 +152,4 @@ void efficiency(Ray r, double& real_S, double& real_P, double& delta, double inc
     real_P = euler_P.x;
 }
 
+} // namespace RAYX

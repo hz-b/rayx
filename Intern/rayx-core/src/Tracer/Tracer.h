@@ -4,15 +4,16 @@
 #include <string>
 #include <vector>
 
-#include "DeviceTracer.h"
-#include "Core.h"
-#include "Shader/Ray.h"
+#include <Core.h>
+#include <Shader/Ray.h>
 
-// if no `--batch` option is given, this it the batch size.
-const uint64_t DEFAULT_BATCH_SIZE = 100000;
+#include "DeviceTracer.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
+
+// if no `--batch` option is given, this it the batch size.
+const uint64_t DEFAULT_BATCH_SIZE = 100000;
 
 class RAYX_API Tracer {
   public:

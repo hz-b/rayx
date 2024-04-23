@@ -3,6 +3,9 @@
 #include "Behave.h"
 #include "Utils.h"
 #include "Helper.h"
+#include "EventType.h"
+
+namespace RAYX {
 
 RAYX_FUNC
 void dynamicElements(int gid, Inv& inv) {
@@ -77,3 +80,5 @@ void dynamicElements(int gid, Inv& inv) {
     eventsCount = std::max(0, std::min(static_cast<int>(inv.pushConstants.maxEvents), eventsCount));
     inv.outputRayCounts[gid] = eventsCount;
 }
+
+} // namespace RAYX

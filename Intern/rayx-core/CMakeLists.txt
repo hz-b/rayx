@@ -93,13 +93,6 @@ else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
 endif()
 
-# -------------------------
-
-# ---- PCH ----
-target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
-set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-target_compile_options(${PROJECT_NAME} PUBLIC -include ${CMAKE_SOURCE_DIR}/Intern/rayx-core/raycorePCH.h)
-
 # -------------
 
 # ---- Defines ----

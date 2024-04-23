@@ -9,28 +9,28 @@ namespace {
 
 using Dim = alpaka::DimInt<1>;
 using Idx = int32_t;
-using GpuAcc = DefaultGpuAcc<Dim, Idx>;
-using CpuAcc = DefaultCpuAcc<Dim, Idx>;
+using GpuAcc = RAYX::DefaultGpuAcc<Dim, Idx>;
+using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
 
-inline int getDeviceCountForPlatform(Tracer::Platform platform) {
+inline int getDeviceCountForPlatform(RAYX::Tracer::Platform platform) {
     switch (platform) {
-    case Tracer::Platform::Gpu:
+    case RAYX::Tracer::Platform::Gpu:
 #ifdef GPU_TRACER
         return alpaka::getDevCount(alpaka::Platform<GpuAcc>());
 #else
         return 0;
 #endif
 
-    default: // case Tracer::Platform::Cpu
+    default: // case RAYX::Tracer::Platform::Cpu
         return alpaka::getDevCount(alpaka::Platform<CpuAcc>());
     }
 }
 
-inline std::string getDeviceName(Tracer::Platform platform, int deviceIndex) {
+inline std::string getDeviceName(RAYX::Tracer::Platform platform, int deviceIndex) {
     switch (platform) {
-        case Tracer::Platform::Gpu: {
+        case RAYX::Tracer::Platform::Gpu: {
 #ifdef GPU_TRACER
-            auto dev = getDevice<GpuAcc>(deviceIndex);
+            auto dev = RAYX::getDevice<GpuAcc>(deviceIndex);
             return alpaka::getName(dev);
 #else
             assert(false && "Gpu support was disabled during build. Cannot get device name");
@@ -39,17 +39,17 @@ inline std::string getDeviceName(Tracer::Platform platform, int deviceIndex) {
 
         }
         default: { // case Tracer::Platform::Cpu
-            auto dev = getDevice<CpuAcc>(deviceIndex);
+            auto dev = RAYX::getDevice<CpuAcc>(deviceIndex);
             return alpaka::getName(dev);
         }
     }
 }
 
-inline std::shared_ptr<DeviceTracer> createDeviceTracer(Tracer::Platform platform, int deviceIndex) {
+inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(RAYX::Tracer::Platform platform, int deviceIndex) {
     switch (platform) {
-    case Tracer::Platform::Gpu:
+    case RAYX::Tracer::Platform::Gpu:
 #ifdef GPU_TRACER
-            return std::make_shared<SimpleTracer<GpuAcc>>(deviceIndex);
+            return std::make_shared<RAYX::SimpleTracer<GpuAcc>>(deviceIndex);
 #else
             RAYX_WARN
                 << "Gpu Tracer was disabled during build."
@@ -58,8 +58,8 @@ inline std::shared_ptr<DeviceTracer> createDeviceTracer(Tracer::Platform platfor
             ;
             [[fallthrough]];
 #endif
-    default: // case Tracer::Platform::Cpu
-        return std::make_shared<SimpleTracer<CpuAcc>>(deviceIndex);
+    default: // case RAYX::Tracer::Platform::Cpu
+        return std::make_shared<RAYX::SimpleTracer<CpuAcc>>(deviceIndex);
     }
 }
 

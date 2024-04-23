@@ -5,6 +5,9 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <variant>
+#include <vector>
+
+#include <Debug/Debug.h>
 
 /**
  * @struct Vertex

@@ -40,5 +40,5 @@ class Scene {
 
     std::vector<RenderObject> m_ElementRObjects = {};
     std::optional<RenderObject> m_RaysRObject = {};
-    BundleHistory m_rayCache = {};
+    RAYX::BundleHistory m_rayCache = {};
 };

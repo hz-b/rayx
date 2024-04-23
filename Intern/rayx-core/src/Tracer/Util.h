@@ -1,6 +1,7 @@
 #pragma once
 
 #include <alpaka/alpaka.hpp>
+#include <span>
 
 namespace RAYX {
 

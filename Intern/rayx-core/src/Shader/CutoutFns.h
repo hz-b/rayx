@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Common.h"
+#include "Cutout.h"
+
+namespace RAYX {
 
 // checks whether the point (x, z) is within the cutout.
 RAYX_FUNC bool RAYX_API inCutout(Cutout cutout, double x, double z);
@@ -16,3 +19,5 @@ RAYX_FUNC dvec2 RAYX_API cutoutBoundingBox(Cutout cutout);
 // might not find all subset-violations, but should find most of them.
 // (might not find all Ellipsoid vs Trapezoid violations)
 RAYX_FUNC void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2);
+
+} // namespace RAYX

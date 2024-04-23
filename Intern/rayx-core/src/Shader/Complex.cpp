@@ -1,5 +1,8 @@
 #include "Complex.h"
+#include "Constants.h"
 #include "Approx.h"
+
+namespace RAYX {
 
 RAYX_FUNC
 dvec2 cx_sqrt(dvec2 a) {
@@ -52,3 +55,5 @@ dvec2 cx_pow(dvec2 a, int n) {
     double im    = dpow(r, n) * r8_sin(n * angle);
     return dvec2(real, im);
 }
+
+} // namespace RAYX

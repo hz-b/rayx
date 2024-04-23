@@ -2,6 +2,8 @@
 
 #include "Common.h"
 
+namespace RAYX {
+
 /* COMPLEX NUMBERS */
 // make a struct for complex numbers or just use vec2?
 
@@ -33,3 +35,5 @@ RAYX_FUNC dvec2 cx_to_polar(dvec2 a);
 
 // Complex power
 RAYX_FUNC dvec2 cx_pow(dvec2 a, int n);
+
+} // namespace RAYX

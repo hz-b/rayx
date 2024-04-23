@@ -54,13 +54,13 @@ void traceTriangulation(const RAYX::OpticalElement& element, std::vector<Texture
     auto [width, length] = getRectangularDimensions(element.m_element.m_cutout);
     RAYX::BundleHistory rayGrid = createRayGrid(gridSize, width, length);
 
-    Collision coll;
+    RAYX::Collision coll;
     coll.found = false;
-    std::vector<std::vector<Collision>> collisionGrid(gridSize, std::vector<Collision>(gridSize, coll));
+    std::vector<std::vector<RAYX::Collision>> collisionGrid(gridSize, std::vector<RAYX::Collision>(gridSize, coll));
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
-            Collision collision = findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout, true);
+            RAYX::Collision collision = RAYX::findCollisionInElementCoords(rayGrid[i][j], element.m_element.m_surface, element.m_element.m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }

@@ -14,9 +14,6 @@
 
 /// For quick debugging prints, this file further exposes RAYX_DBG(x).
 
-// This include is necessary, as Debug implements a special formatting for Ray.
-#include <Shader/Ray.h>
-
 #include <array>
 #include <glm.hpp>
 #include <iomanip>
@@ -24,7 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "Core.h"
+// This include is necessary, as Debug implements a special formatting for Ray.
+#include <Shader/Ray.h>
 
 // Debug only code; use it as: DEBUG(<statement>);
 #ifdef RAYX_DEBUG_MODE
@@ -201,4 +199,4 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
 
 #define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
 
-}  // namespace RAYX
+} // namespace RAYX

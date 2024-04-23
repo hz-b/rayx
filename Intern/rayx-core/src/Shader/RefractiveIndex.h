@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "InvocationState.h"
 
+namespace RAYX {
+
 /// Both of these structs are used to effectively calculate the Refractive Index of some material when hit by a photon with a particular m_energy.
 /// The PalikEntry represents the the complex-valued refractive index directly as n + ik.
 /// The NffEntry instead holds atomic scattering factors which can be used to derive the refractive index.
@@ -36,3 +38,5 @@ RAYX_FUNC dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& in
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 RAYX_FUNC dvec2 RAYX_API getAtomicMassAndRho(int material);
+
+} // namespace RAYX

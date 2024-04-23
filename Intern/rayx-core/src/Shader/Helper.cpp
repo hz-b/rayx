@@ -1,4 +1,8 @@
 #include "Helper.h"
+#include "EventType.h"
+#include "Throw.h"
+
+namespace RAYX {
 
 RAYX_FUNC
 void init(Inv& inv) {
@@ -78,3 +82,5 @@ void recordFinalEvent(Ray r, double w, Inv& inv) {
     recordEvent(r, w, inv);
     inv.finalized = true;
 }
+
+} // namespace RAYX

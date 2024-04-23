@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include <Debug/Debug.h>
+
 #include "Camera.h"
 
 /**

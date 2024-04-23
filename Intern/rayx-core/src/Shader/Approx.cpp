@@ -1,3 +1,8 @@
+#include "Approx.h"
+#include "Constants.h"
+
+namespace RAYX {
+
 /**
  * DOUBLE PRECISION APPROXIMATION FOR ARCTAN AND COSINUS
  * source: https://people.sc.fsu.edu/~jburkardt/c_src/fn/fn.html
@@ -183,7 +188,7 @@ void RAYX_API r8_upak(double x, double& y, int& n)
 }
 
 RAYX_FUNC
-int i4_mach(int i)
+int RAYX_API i4_mach(int i)
 
 /******************************************************************************/
 /*
@@ -1012,3 +1017,5 @@ double RAYX_API dpow(double a, int b) {
     }
     return res;
 }
+
+} // namespace RAYX
