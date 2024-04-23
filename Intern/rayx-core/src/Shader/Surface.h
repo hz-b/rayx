@@ -79,8 +79,8 @@ inline QuadricSurface deserializeQuadric(Surface ser) {
 /////////////
 
 #define ToroidType double
-const ToroidType TOROID_TYPE_CONVEX = 0;
-const ToroidType TOROID_TYPE_CONCAVE = 1;
+constexpr ToroidType TOROID_TYPE_CONVEX = 0;
+constexpr ToroidType TOROID_TYPE_CONCAVE = 1;
 
 struct ToroidSurface {
     double m_longRadius;
