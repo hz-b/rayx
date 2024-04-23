@@ -15,8 +15,8 @@
 namespace RAYX {
 
 std::filesystem::path getExecutablePath() {
-    char buffer[1024];
-    std::size_t length = sizeof(buffer);
+    constexpr std::size_t length = 1024;
+    char buffer[length];
     memset(buffer, 0, length);
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)

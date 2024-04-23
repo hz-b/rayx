@@ -49,7 +49,7 @@ class UIHandler {
     BeamlineOutliner m_BeamlineOutliner;
 
     void showSceneEditorWindow(UIParameters& uiParams);
-    void showSettingsWindow();
+    void showSettingsWindow(UIParameters& uiParams);
     void showHotkeysWindow();
     void showMissingFilePopupWindow(UIParameters& uiParams);
     void showSimulationSettingsPopupWindow(UIParameters& uiParams);

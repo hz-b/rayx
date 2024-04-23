@@ -53,12 +53,13 @@ struct UIParameters {
     std::filesystem::path rmlPath;
     bool rmlReady;
     bool h5Ready;
-    bool showH5NotExistPopup = false;
+    bool showH5NotExistPopup;
     float frameTime;
     UIRayInfo rayInfo;
     bool runSimulation;
     bool simulationSettingsReady;
     UISimulationInfo simulationInfo;
+    bool useDefaultUI;
 
     UIParameters(CameraController& camController, const std::vector<std::string>& availableDevices)
         : sceneExtent({0, 0}),
@@ -67,6 +68,7 @@ struct UIParameters {
           rmlPath(""),
           rmlReady(false),
           h5Ready(false),
+          showH5NotExistPopup(false),
           frameTime(0.0f),
           rayInfo({false, false, false, false, false, 0, 0}),
           runSimulation(false),
@@ -79,7 +81,9 @@ struct UIParameters {
               false,
               availableDevices,
               0,
-          }) {}
+          }),
+          // Check if imgui.ini exists in the current directory
+          useDefaultUI(!std::filesystem::exists("imgui.ini")) {}
 
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;

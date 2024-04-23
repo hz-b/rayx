@@ -281,10 +281,8 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
         ImGuiID dockspace_id = ImGui::GetID("Root");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
-        static bool first_time = true;
-        if (first_time) {
-            first_time = false;
-
+        if (uiParams.useDefaultUI) {
+            uiParams.useDefaultUI = false;
             ImGui::DockBuilderRemoveNode(dockspace_id);
             ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags | ImGuiDockNodeFlags_DockSpace);
             ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
@@ -318,7 +316,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     showSceneEditorWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
-    showSettingsWindow();
+    showSettingsWindow(uiParams);
     m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elemets, rSourcePositions);
     showHotkeysWindow();
     ImGui::End();
@@ -413,10 +411,13 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::End();
 }
 
-void UIHandler::showSettingsWindow() {
+void UIHandler::showSettingsWindow(UIParameters& uiParams) {
     ImGui::Begin("Settings");
 
-    ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+    if (ImGui::Button("Reset Layout")) {
+        uiParams.useDefaultUI = true;
+    }
+    ImGui::SliderFloat("UI Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::End();
 }
