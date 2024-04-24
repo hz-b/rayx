@@ -4,7 +4,7 @@
 
 namespace RAYX {
 
-const uint64_t RNG_KEY = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
+constexpr uint64_t RNG_KEY = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
 
 RAYX_FUNC
 uint64_t RAYX_API squares64(uint64_t& ctr) {

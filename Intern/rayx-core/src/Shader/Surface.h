@@ -9,10 +9,10 @@ namespace RAYX {
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTYPE
 // constants)
-const int STYPE_QUADRIC = 0;
-const int STYPE_TOROID = 1;
-const int STYPE_PLANE_XZ = 2;
-const int STYPE_CUBIC = 3;
+constexpr int STYPE_QUADRIC = 0;
+constexpr int STYPE_TOROID = 1;
+constexpr int STYPE_PLANE_XZ = 2;
+constexpr int STYPE_CUBIC = 3;
 
 struct Surface {
     double m_type;

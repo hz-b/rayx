@@ -28,7 +28,7 @@ constexpr double ELEMENTARY_CHARGE = 1.602176634e-19;  // Checked 2019-7-25, PB,
 constexpr double PLANCK = 6.62607015e-34;  // Checked 2019-7-25, PB, NIST (exact): Planck constant [Js]
 
 /// \f$\hbar\f$ [Js]. Planck's bar constant.
-const double PLANCK_BAR = PLANCK / (2 * PI);
+constexpr double PLANCK_BAR = PLANCK / (2 * PI);
 
 /// m_e [kg]. electron mass.
 constexpr double ELECTRON_MASS = 9.1093837015e-31;  // Checked 2019-7-25, PB, NIST: mass of electron [kg];

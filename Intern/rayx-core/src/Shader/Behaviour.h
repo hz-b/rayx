@@ -9,11 +9,11 @@ namespace RAYX {
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `Behave.h`.
-const int BTYPE_MIRROR = 0;
-const int BTYPE_GRATING = 1;
-const int BTYPE_SLIT = 2;
-const int BTYPE_RZP = 3;
-const int BTYPE_IMAGE_PLANE = 4;
+constexpr int BTYPE_MIRROR = 0;
+constexpr int BTYPE_GRATING = 1;
+constexpr int BTYPE_SLIT = 2;
+constexpr int BTYPE_RZP = 3;
+constexpr int BTYPE_IMAGE_PLANE = 4;
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.

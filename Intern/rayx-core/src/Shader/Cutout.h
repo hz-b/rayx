@@ -9,10 +9,10 @@ namespace RAYX {
 // Cutout types:
 // a subset of points of the XZ-plane. used to limit the potentially infinite surfaces.
 // note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with `geometricalShape` from Ray-UI.
-const int CTYPE_RECT = 0;
-const int CTYPE_ELLIPTICAL = 1;
-const int CTYPE_TRAPEZOID = 2;
-const int CTYPE_UNLIMITED = 3;
+constexpr int CTYPE_RECT = 0;
+constexpr int CTYPE_ELLIPTICAL = 1;
+constexpr int CTYPE_TRAPEZOID = 2;
+constexpr int CTYPE_UNLIMITED = 3;
 
 struct RAYX_API Cutout {
     // This types is one of the `CTYPE` constants.
