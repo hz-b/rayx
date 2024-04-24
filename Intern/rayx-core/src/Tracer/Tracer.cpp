@@ -12,7 +12,7 @@ using Idx = int32_t;
 using GpuAcc = RAYX::DefaultGpuAcc<Dim, Idx>;
 using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
 
-inline int64_t getDeviceCountForPlatform(Tracer::Platform platform) {
+inline int64_t getDeviceCountForPlatform(RAYX::Tracer::Platform platform) {
     switch (platform) {
     case RAYX::Tracer::Platform::Gpu:
 #ifdef GPU_TRACER
