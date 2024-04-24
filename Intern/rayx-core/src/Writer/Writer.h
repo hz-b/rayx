@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Shader/Ray.h"
 
 using uint = unsigned int;

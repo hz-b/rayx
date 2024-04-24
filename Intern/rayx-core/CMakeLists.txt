@@ -9,6 +9,32 @@ function(prepend_xcompiler FLAG_LIST PREPENDED_FLAG_LIST)
     set(${PREPENDED_FLAG_LIST} ${DST} PARENT_SCOPE)
 endfunction()
 
+function(alpaka_target In_Name)
+    if(alpaka_ACC_GPU_CUDA_ENABLE)
+        enable_language(CUDA)
+        # We have to set this here since CUDA_SEPARABLE_COMPILATION is not propagated by the alpaka::alpaka target.
+        if(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL ON)
+            set_property(TARGET ${In_Name} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+        elseif(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL OFF)
+            set_property(TARGET ${In_Name} PROPERTY CUDA_SEPARABLE_COMPILATION OFF)
+        endif()
+    endif()
+endfunction()
+
+function(alpaka_source)
+    if(alpaka_ACC_GPU_CUDA_ENABLE)
+        enable_language(CUDA)
+        foreach(_file ${ARGN})
+            if((${_file} MATCHES "\\.cpp$") OR
+               (${_file} MATCHES "\\.cxx$") OR
+               (${_file} MATCHES "\\.cu$")
+            )
+                set_source_files_properties(${_file} PROPERTIES LANGUAGE CUDA)
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
@@ -27,7 +53,13 @@ add_subdirectory(tests)
 # ---- Project ----
 project(rayx-core VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
-alpaka_add_library(${PROJECT_NAME} SHARED ${SOURCE})
+file(GLOB_RECURSE ALPAKA_SOURCE
+    ${PROJECT_SOURCE_DIR}/src/Shader/*.cpp
+    ${PROJECT_SOURCE_DIR}/src/Tracer/*.cpp
+)
+add_library(${PROJECT_NAME} SHARED ${SOURCE})
+alpaka_target(${PROJECT_NAME})
+alpaka_source(${ALPAKA_SOURCE})
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
