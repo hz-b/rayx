@@ -19,7 +19,6 @@
 #include "Shader/Efficiency.h"
 #include "Shader/Diffraction.h"
 
-#include "Tracer/SimpleTracer.h"
 #include "Writer/CSVWriter.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
