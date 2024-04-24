@@ -177,19 +177,15 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     return true;
 }
 
-std::filesystem::path Parser::parseEnergyDistributionFile() const { 
-    
+std::filesystem::path Parser::parseEnergyDistributionFile() const {
     std::filesystem::path datpath = Parser::parseStr("photonEnergyDistributionFile");
     std::filesystem::path combinedPath = rmlFile.parent_path() / datpath;
-    try
-    {
-        combinedPath = std::filesystem::canonical(combinedPath);   
-    }
-    catch(const std::exception& e)
-    {
+    try {
+        combinedPath = std::filesystem::canonical(combinedPath);
+    } catch (const std::exception& e) {
         RAYX_ERR << "Failed to canonicalize datfile path: " << e.what();
     }
-    
+
     RAYX_VERB << "Combined datfile path: " << combinedPath;
     return combinedPath;
 }
@@ -217,7 +213,7 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out
     glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection, worldZdirection};
     double determinant = glm::determinant(worldDirections);
 
-    if (determinant == 0) {
+    if (-1e-8 < determinant && determinant < 1e-8) {
         RAYX_WARN << "Vectors are not a basis.";
     }
 

@@ -421,7 +421,7 @@ void planarTriangulation(const RAYX::DesignElement& element, std::vector<Texture
         SlitBehaviour slit = deserializeSlit(element.compile().m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
         poly.push_back(calculateOutlineFromCutout(element.compile().m_cutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true)); // Hole -> Clockwise order
+        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));  // Hole -> Clockwise order
     } else {
         poly.push_back(calculateOutlineFromCutout(element.compile().m_cutout, vertices));
     }
@@ -450,6 +450,8 @@ void triangulateObject(const RAYX::DesignElement& element, std::vector<TextureVe
             }
             break;
         }
+        case STYPE_CUBIC:
+            RAYX_WARN << "Cubic surfaces are not supported yet.";
         case STYPE_TOROID: {
             traceTriangulation(element, vertices, indices);
             break;
