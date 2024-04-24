@@ -28,7 +28,6 @@ add_subdirectory(tests)
 project(rayx-core VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 alpaka_add_library(${PROJECT_NAME} SHARED ${SOURCE})
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
