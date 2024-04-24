@@ -135,7 +135,7 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 # Only build gpu tracer when CUDA is enabled
-if(NOT ${alpaka_ACC_GPU_CUDA_ENABLE})
+if(NOT alpaka_ACC_GPU_CUDA_ENABLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_GPU_TRACER)
 endif()
 

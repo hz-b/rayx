@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+include(CheckLanguage)
 
 set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 
@@ -20,4 +21,22 @@ set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
-# add_subdirectory(alpaka)
+# -------------------
+
+# ---- Check for CUDA and configure Alpaka ----
+set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE OFF CACHE BOOL "")
+set(alpaka_ACC_CPU_B_SEQ_T_OMP2_ENABLE OFF CACHE BOOL "")
+set(alpaka_ACC_CPU_B_TBB_T_SEQ_ENABLE OFF CACHE BOOL "")
+set(alpaka_ACC_CPU_B_SEQ_T_THREADS_ENABLE OFF CACHE BOOL "")
+set(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE ON CACHE BOOL "")
+
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+    set(alpaka_ACC_GPU_CUDA_ENABLE ON CACHE BOOL "")
+    set(alpaka_RELOCATABLE_DEVICE_CODE ON CACHE BOOL "")
+else()
+    message(WARNING "Cuda compiler was not found by CMake. GPU tracer will be disabled.")
+    set(NO_CUDA ON)
+endif()
+
+add_subdirectory(alpaka)

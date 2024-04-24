@@ -9,9 +9,8 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 # -----------------
 
 # ---- Subdirectories ----
-add_subdirectory(Extern/alpaka)
-add_subdirectory(Intern)
 add_subdirectory(Extern)
+add_subdirectory(Intern)
 
 # ------------------------
 
