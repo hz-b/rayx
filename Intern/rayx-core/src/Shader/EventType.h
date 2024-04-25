@@ -2,6 +2,8 @@
 
 #include "Common.h"
 
+namespace RAYX {
+
 // The meaning of the `m_eventType` field of a `Ray`:
 ////////////////////////////////////////////////////
 
@@ -34,3 +36,5 @@ constexpr double ETYPE_FATAL_ERROR = 6;
 // These rays have just been emitted and not had any other events
 // If there are no other elements the ray has this eventtype
 constexpr double ETYPE_EMITTED = 7;
+
+} // namespace RAYX
