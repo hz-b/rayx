@@ -2,7 +2,7 @@
 #include "Beamline/OpticalElement.h"
 
 namespace RAYX {
-
-Element makeToroidMirror(const DesignObject& dobj);
+struct DesignElement;  
+Element makeToroidMirror(const DesignElement& dele);
 
 }  // namespace RAYX

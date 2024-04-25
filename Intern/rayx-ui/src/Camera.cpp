@@ -10,20 +10,15 @@
 CameraController::CameraController()
     : m_position(0.0f, 5.0f, -10.0f),
       m_direction(0.0f, 0.0f, 1.0f),
+      m_cameraMode(CameraMode::Perspective),
+      m_perspectiveCfg({60.0f, 0.1f, 10000.0f}),
+      m_orthogonalCfg({100.0f, -1000.0f, 1000.0f}),
       m_up(0.0f, 1.0f, 0.0f),
       m_yaw(90.0f),
       m_pitch(0.0f),
       m_mouseLooking(false),
       m_lastMouseX(0.0),
-      m_lastMouseY(0.0) {
-    m_perspectiveCfg.m_FOV = 60.0f;
-    m_perspectiveCfg.m_near = 0.1f;
-    m_perspectiveCfg.m_far = 10000.0f;
-
-    m_orthogonalCfg.m_near = -1000.0f;
-    m_orthogonalCfg.m_far = 1000.0f;
-    m_orthogonalCfg.m_frustumScale = 100.0f;
-}
+      m_lastMouseY(0.0) {}
 
 void CameraController::updateDirection(float deltaYaw, float deltaPitch) {
     m_yaw += deltaYaw;

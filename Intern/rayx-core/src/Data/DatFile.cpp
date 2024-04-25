@@ -10,7 +10,7 @@
 namespace RAYX {
 bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     std::ifstream s(filename);
-
+    RAYX_VERB << filename;
     std::string line;
 
     // line 1

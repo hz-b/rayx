@@ -3,23 +3,19 @@
 #include "Beamline/LightSource.h"
 
 namespace RAYX {
+struct DesignSource;  
 
 class RAYX_API MatrixSource : public LightSource {
   public:
-    MatrixSource(const DesignObject&);
+    MatrixSource(const DesignSource&);
     virtual ~MatrixSource() = default;
 
     virtual std::vector<Ray> getRays(int thread_count = 1) const override;
-    double getHorDivergence() const override;
-    double getSourceHeight() const override;
-    double getSourceWidth() const override;
 
   private:
     SourcePulseType m_sourceDistributionType;  // TODO: wo muss der name angepasst werden?
 
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
+    glm::dvec4 m_pol;
 
     double m_verDivergence;
     double m_sourceDepth;

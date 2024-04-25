@@ -1,29 +1,28 @@
 
 #include "CircleSource.h"
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
-#include "Random.h"
-#include "Shader/Constants.h"
+#include <DesignElement/DesignSource.h>
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Debug/Instrumentor.h>
+#include <Random.h>
+#include <Shader/Constants.h>
 
 namespace RAYX {
 
-CircleSource::CircleSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_sourceDepth = dobj.parseSourceDepth();
-    m_sourceWidth = dobj.parseSourceWidth();
-    m_sourceHeight = dobj.parseSourceHeight();
+CircleSource::CircleSource(const DesignSource& dSource) : LightSource(dSource) {
+    m_stokes = dSource.getStokes();
 
-    m_misalignment = getMisalignmentParams();
+    m_sourceDepth = dSource.getSourceDepth();
+    m_sourceHeight = dSource.getSourceHeight();
+    m_sourceWidth = dSource.getSourceWidth();
 
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
+    m_misalignment = dSource.getMisalignment();
 
-    m_numOfCircles = dobj.parseNumOfEquidistantCircles();
-    m_maxOpeningAngle = dobj.parseMaxOpeningAngle();
-    m_minOpeningAngle = dobj.parseMinOpeningAngle();
-    m_deltaOpeningAngle = dobj.parseDeltaOpeningAngle();
+    m_numOfCircles = dSource.getNumOfCircles();
+    m_maxOpeningAngle = dSource.getMaxOpeningAngle();
+    m_minOpeningAngle = dSource.getMinOpeningAngle();
+    m_deltaOpeningAngle = dSource.getDeltaOpeningAngle();
 }
 /**
  * Creates random rays from circle source with specified num. of circles and
@@ -57,9 +56,8 @@ std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const 
         // get corresponding direction to create circles
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirection();
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_stokes, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }
@@ -95,10 +93,5 @@ glm::dvec3 CircleSource::getDirection() const {
     return glm::dvec3(al, am, an);
 }
 
-double CircleSource::getHorDivergence() const { return m_horDivergence; }
-
-double CircleSource::getSourceHeight() const { return m_sourceHeight; }
-
-double CircleSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

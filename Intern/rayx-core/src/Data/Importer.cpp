@@ -4,95 +4,102 @@
 #include <memory>
 #include <rapidxml.hpp>
 #include <sstream>
+#include <string>
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/Objects.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElementWriter.h"
+#include "DesignSourceWriter.h"
+#include <DesignElement/DesignElement.h>
+
+void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
+    const char* type = parser.type();
+    // TODO add functions for each Element
+
+    if (strcmp(type, "ImagePlane") == 0) {
+        getImageplane(parser, de);
+    } else if (strcmp(type, "Cone") == 0) {
+        getCone(parser, de);
+    } else if (strcmp(type, "Cylinder") == 0) {
+        getCylinder(parser, de);
+    } else if (strcmp(type, "Ellipsoid") == 0) {
+        getEllipsoid(parser, de);
+    } else if (strcmp(type, "Experts Optics") == 0) {
+        getExpertsOptics(parser, de);
+    } else if (strcmp(type, "Experts Cubic") == 0) {
+        getExpertsCubic(parser, de);
+    } else if (strcmp(type, "Paraboloid") == 0) {
+        getParaboloid(parser, de);
+    } else if (strcmp(type, "Plane Grating") == 0) {
+        getPlaneGrating(parser, de);
+    } else if (strcmp(type, "Plane Mirror") == 0) {
+        getPlaneMirror(parser, de);
+    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+        getRZP(parser, de);
+    } else if (strcmp(type, "Slit") == 0) {
+        getSlit(parser, de);
+    } else if (strcmp(type, "Spherical Grating") == 0) {
+        getSphereGrating(parser, de);
+    } else if (strcmp(type, "Sphere") == 0) {
+        getSphereMirror(parser, de);
+    } else if (strcmp(type, "Spherical Mirror") == 0) {
+        getSphereMirror(parser, de);
+    } else if (strcmp(type, "Toroid") == 0) {
+        getToroidMirror(parser, de);
+    } else {
+        RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
+    }
+}
 
 namespace RAYX {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
                               std::filesystem::path filename) {
-    const char* type = node->first_attribute("type")->value();
-
     // the following three blocks of code are lambda expressions (see
     // https://en.cppreference.com/w/cpp/language/lambda) They define functions
     // to be used in the if-else-chain below to keep it structured and readable.
 
-    // addLightSource(s, node) is a function adding a light source to the
+    // //addLightSource(s, node) is a function adding a light source to the
     // beamline (if it's not nullptr)
-    const auto addLightSource = [&](const std::shared_ptr<LightSource>& s, rapidxml::xml_node<>* node) {
-        if (s) {
-            beamline->m_LightSources.push_back(s);
-        } else {
-            RAYX_ERR << "could not construct LightSource with Name: " << node->first_attribute("name")->value()
-                     << "; Type: " << node->first_attribute("type")->value();
-        }
-    };
-
-    const auto addOpticalElement = [&](Element e, rapidxml::xml_node<>* node) {
-        OpticalElement e2 = {
-            .m_element = e,
-            .m_name = node->first_attribute("name")->value(),
-        };
-
-        beamline->m_OpticalElements.push_back(e2);
-    };
 
     RAYX::xml::Parser parser(node, group_context, filename);
+    const char* type = parser.type();
+    DesignSource ds;
+    ds.v = Map();
+
+    DesignElement de;
+    de.v = Map();
 
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
     if (strcmp(type, "Point Source") == 0) {
-        addLightSource(std::make_shared<PointSource>(parser), node);
+        setPointSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Matrix Source") == 0) {
-        addLightSource(std::make_shared<MatrixSource>(parser), node);
+        setMatrixSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Dipole") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
+        setDipoleSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Dipole Source") == 0) {
-        addLightSource(std::make_shared<DipoleSource>(parser), node);
+        setDipoleSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Pixel Source") == 0) {
-        addLightSource(std::make_shared<PixelSource>(parser), node);
+        setPixelSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Circle Source") == 0) {
-        addLightSource(std::make_shared<CircleSource>(parser), node);
+        setCircleSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
     } else if (strcmp(type, "Simple Undulator") == 0) {
-        addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
-
-    // shader-compatible Elements can be constructed using their corresponding "make" functions.
-    // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
-    } else if (strcmp(type, "ImagePlane") == 0) {
-        addOpticalElement(makeImagePlane(parser), node);
-    } else if (strcmp(type, "Plane Mirror") == 0) {
-        addOpticalElement(makePlaneMirror(parser), node);
-    } else if (strcmp(type, "Toroid") == 0) {
-        addOpticalElement(makeToroidMirror(parser), node);
-    } else if (strcmp(type, "Slit") == 0) {
-        addOpticalElement(makeSlit(parser), node);
-    } else if (strcmp(type, "Spherical Grating") == 0) {
-        addOpticalElement(makeSphereGrating(parser), node);
-    } else if (strcmp(type, "Plane Grating") == 0) {
-        addOpticalElement(makePlaneGrating(parser), node);
-    } else if (strcmp(type, "Sphere") == 0) {
-        addOpticalElement(makeSphereMirror(parser), node);
-    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
-        addOpticalElement(makeReflectionZonePlate(parser), node);
-    } else if (strcmp(type, "Ellipsoid") == 0) {
-        addOpticalElement(makeEllipsoid(parser), node);
-    } else if (strcmp(type, "Cylinder") == 0) {
-        addOpticalElement(makeCylinder(parser), node);
-    } else if (strcmp(type, "Cone") == 0) {
-        addOpticalElement(makeCone(parser), node);
-    } else if (strcmp(type, "Paraboloid") == 0) {
-        addOpticalElement(makeParaboloid(parser), node);
-    } else if (strcmp(type, "Experts Optics") == 0) {
-        addOpticalElement(makeExperts(parser), node);
-    } else if (strcmp(type, "Experts Cubic") == 0) {
-        addOpticalElement(makeExpertsCubic(parser), node);
+        setSimpleUndulatorSource(parser, &ds);
+        beamline->m_DesignSources.push_back(ds);
+        // addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
-        RAYX_WARN << "could not classify beamline object with Name: " << node->first_attribute("name")->value()
-                  << "; Type: " << node->first_attribute("type")->value();
+        parseElement(parser, &de);
+        beamline->m_DesignElements.push_back(de);
     }
 }
 

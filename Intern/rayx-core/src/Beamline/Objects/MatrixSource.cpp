@@ -1,23 +1,22 @@
 #include "MatrixSource.h"
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
-#include "Random.h"
-#include "Shader/Constants.h"
+#include <DesignElement/DesignSource.h>
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Debug/Instrumentor.h>
+#include <Random.h>
+#include <Shader/Constants.h>
 
 namespace RAYX {
 
-MatrixSource::MatrixSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
-    m_horDivergence = dobj.parseHorDiv();
-    m_verDivergence = dobj.parseVerDiv();
-    m_sourceDepth = dobj.parseSourceDepth();
-    m_sourceHeight = dobj.parseSourceHeight();
-    m_sourceWidth = dobj.parseSourceWidth();
-}
+MatrixSource::MatrixSource(const DesignSource& dSource) : LightSource(dSource),
+    m_pol(dSource.getStokes()),
+    m_verDivergence(dSource.getVerDivergence()),
+    m_sourceDepth(dSource.getSourceDepth()),
+    m_sourceHeight(dSource.getSourceHeight()),
+    m_sourceWidth(dSource.getSourceWidth()) 
+{ 
+    m_horDivergence = dSource.getHorDivergence(); }
 
 /**
  * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as
@@ -58,9 +57,8 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
             glm::dvec3 direction = getDirectionFromAngles(phi, psi);
             glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
             direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-            glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-            Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+            Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
             // Ray(1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
             returnList.push_back(r);
@@ -90,11 +88,5 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
     }
     return returnList;
 }
-
-double MatrixSource::getHorDivergence() const { return m_horDivergence; }
-
-double MatrixSource::getSourceHeight() const { return m_sourceHeight; }
-
-double MatrixSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

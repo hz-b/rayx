@@ -1,37 +1,36 @@
 #include "SimpleUndulatorSource.h"
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
-#include "Random.h"
-#include "Shader/Constants.h"
+#include <DesignElement/DesignSource.h>
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Debug/Instrumentor.h>
+#include <Random.h>
+#include <Shader/Constants.h>
 
 namespace RAYX {
 
-SimpleUndulatorSource::SimpleUndulatorSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_sigmaType = dobj.parseSigmaType();
-    m_photonEnergy = dobj.parsePhotonEnergy();
-    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
-    m_undulatorLength = dobj.parseUndulatorLength();
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : LightSource(dSource),
+    m_sourceDepth(dSource.getSourceDepth()),
+    m_sigmaType(dSource.getSigmaType()),
+    m_undulatorLength(dSource.getUndulatorLength()),
+    m_photonEnergy(dSource.getEnergy()),
+    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+    m_electronSigmaX(dSource.getElectronSigmaX()),
+    m_electronSigmaXs(dSource.getElectronSigmaXs()),
+    m_electronSigmaY(dSource.getElectronSigmaY()),
+    m_electronSigmaYs(dSource.getElectronSigmaYs()),
+    m_pol(dSource.getStokes()) 
+    
+    {
+        
     m_undulatorSigma = calcUndulatorSigma();
     m_undulatorSigmaS = calcUndulatorSigmaS();
-    m_electronSigmaX = dobj.parseElectronSigmaX();
-    m_electronSigmaXs = dobj.parseElectronSigmaXs();
-    m_electronSigmaY = dobj.parseElectronSigmaY();
-    m_electronSigmaYs = dobj.parseElectronSigmaYs();
-
     m_horDivergence = getHorDivergence();
     m_verDivergence = getVerDivergence();
 
-    m_sourceDepth = dobj.parseSourceDepth();
     m_sourceHeight = getSourceHeight();
     m_sourceWidth = getSourceWidth();
-
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
-
-    
+  
 }
 
 /**
@@ -75,9 +74,8 @@ std::vector<Ray> SimpleUndulatorSource::getRays([[maybe_unused]] int thread_coun
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }

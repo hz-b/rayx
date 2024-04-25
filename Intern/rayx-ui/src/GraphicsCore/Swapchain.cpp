@@ -5,6 +5,8 @@
 #include <array>
 #include <iostream>
 
+#include <Debug/Debug.h>
+
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
 
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
@@ -153,8 +155,9 @@ void SwapChain::createSwapChain() {
 
     createInfo.oldSwapchain = m_oldSwapChain == nullptr ? VK_NULL_HANDLE : m_oldSwapChain->m_SwapChain;
 
-    if (vkCreateSwapchainKHR(m_Device.device(), &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create swap chain!");
+    VkResult result = vkCreateSwapchainKHR(m_Device.device(), &createInfo, nullptr, &m_SwapChain);
+    if (result != VK_SUCCESS) {
+        throw std::runtime_error("failed to create swap chain! Error code: " + std::to_string(result));
     }
 
     // we only specified a minimum number of images in the swap chain, so the implementation is
@@ -347,12 +350,12 @@ VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
     for (const auto& availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            std::cout << "Present mode: Mailbox" << std::endl;
+            RAYX_VERB << "Present mode: Mailbox";
             return availablePresentMode;
         }
     }
 
-    std::cout << "Present mode: V-Sync" << std::endl;
+    RAYX_VERB << "Present mode: V-Sync";
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 

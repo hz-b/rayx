@@ -2,20 +2,21 @@
 
 #include <ext/scalar_constants.hpp>
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Material/Material.h"
-#include "Shader/Constants.h"
-#include "angle.h"
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Material/Material.h>
+#include <Shader/Constants.h>
+#include <angle.h>
+#include <DesignElement/DesignElement.h>
 
 namespace RAYX {
 
-Element makeCylinder(const DesignObject& dobj) {
-    auto cyl_direction = dobj.parseBendingRadius();
-    auto radius = dobj.parseRadius();
-    auto incidence = dobj.parseGrazingIncAngle();
-    auto entranceArmLength = dobj.parseEntranceArmLength();
-    auto exitArmLength = dobj.parseExitArmLength();
+Element makeCylinder(const DesignElement& dele) {
+    auto cyl_direction = dele.getRadiusDirection();
+    auto radius = dele.getRadius();
+    auto incidence = dele.getGrazingIncAngle();
+    auto entranceArmLength = dele.getEntranceArmLength();
+    auto exitArmLength = dele.getExitArmLength();
 
     double a11 = 0, a33 = 0, a24 = 0;
     if (cyl_direction == CylinderDirection::LongRadiusR) {  // X-DIR
@@ -55,7 +56,7 @@ Element makeCylinder(const DesignObject& dobj) {
         .m_a44 = 0,
     });
     auto behaviour = serializeMirror();
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

@@ -17,9 +17,9 @@ using RayFilterFunction = std::function<std::vector<size_t>(const RAYX::BundleHi
  */
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
-                          uint32_t amountOfRays);
+                          uint32_t amountOfRays, int startEventID = 0);
 
-std::vector<RAYX::Ray> getRaysOfElement(const RAYX::BundleHistory& rays, size_t elementIndex);
+void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements);
 
 std::vector<size_t> findMostCentralRays(const std::vector<std::vector<double>>& features, const std::vector<size_t>& clusterAssignments,
                                         const std::vector<std::vector<double>>& centroids, size_t k);

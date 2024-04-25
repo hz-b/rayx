@@ -1,18 +1,20 @@
 #include "Ellipsoid.h"
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Material/Material.h"
-#include "Shader/Constants.h"
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Material/Material.h>
+#include <Shader/Constants.h>
+#include <DesignElement/DesignElement.h>
 
 namespace RAYX {
 
-Element makeEllipsoid(const DesignObject& dobj) {
-    auto entranceArmLength = dobj.parseEntranceArmLength();
-    auto exitArmLength = dobj.parseExitArmLength();
-    auto shortHalfAxisB = dobj.parseShortHalfAxisB();
-    auto longHalfAxisA = dobj.parseLongHalfAxisA();
-    auto designGrazingAngle = dobj.parseDesignGrazingIncAngle();
+Element makeEllipsoid(const DesignElement& dele) {
+    auto entranceArmLength = dele.getEntranceArmLength();
+    auto exitArmLength = dele.getExitArmLength();
+
+    auto shortHalfAxisB = dele.getShortHalfAxisB();
+    auto longHalfAxisA = dele.getLongHalfAxisA();
+    auto designGrazingAngle = dele.getDesignGrazingIncAngle();
 
     // if design angle not given, take incidenceAngle
     // calc y0
@@ -43,10 +45,10 @@ Element makeEllipsoid(const DesignObject& dobj) {
         mt = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 / y0;
     }
 
-    auto figureRotation = dobj.parseFigureRotation();
+    auto figureRotation = dele.getFigureRotation();
 
     // calculate a11
-    auto a11 = dobj.parseParameterA11();
+    auto a11 = dele.getParameterA11();
     if (figureRotation == FigureRotation::Yes) {
         a11 = 1;
     } else if (figureRotation == FigureRotation::Plane) {
@@ -79,7 +81,7 @@ Element makeEllipsoid(const DesignObject& dobj) {
         .m_a44 = a44,
     });
     auto behaviour = serializeMirror();
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

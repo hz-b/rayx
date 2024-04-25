@@ -5,8 +5,12 @@
 #include <cassert>
 
 #include "Device.h"
+#include "FrameInfo.h"
+#include "GraphicsCore/Descriptors.h"
 #include "Swapchain.h"
 #include "Window.h"
+
+class Texture;
 
 /**
  * @brief The Renderer class manages the rendering process, including the swapchain, command buffers, and ImGui integration.
@@ -29,6 +33,7 @@ class Renderer {
     VkFormat getSwapChainDepthFormat() const { return m_SwapChain->getDepthFormat(); }
     uint32_t getSwapChainImageCount() const { return m_SwapChain->getImageCount(); }
     float getAspectRatio() const { return m_SwapChain->extentAspectRatio(); }
+    VkRenderPass getOffscreenRenderPass() const { return m_offscreenRenderPass; }
 
     bool isFrameInProgress() const { return m_isFrameStarted; }
 
@@ -57,7 +62,7 @@ class Renderer {
      * @brief Begins the render pass for the swap chain.
      * @param commandBuffer The Vulkan command buffer for rendering.
      */
-    void beginSwapChainRenderPass(VkCommandBuffer commandBuffer, const VkClearValue& clearValue);
+    void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
     /**
      * @brief Ends the render pass for the swap chain.
@@ -65,16 +70,36 @@ class Renderer {
      */
     void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
+    void beginOffscreenRenderPass(FrameInfo& frameInfo, const VkClearValue& clearValue);
+    void endOffscreenRenderPass(FrameInfo& frameInfo);
+    std::shared_ptr<Texture> getOffscreenColorTexture() const { return m_offscreenColorTexture; }
+    std::shared_ptr<Texture> getOffscreenDepthTexture() const { return m_offscreenDepthTexture; }
+
+    void offscreenDescriptorSetUpdate(const DescriptorSetLayout& layout, const DescriptorPool& pool, VkDescriptorSet& descriptorSet);
+    void resizeOffscreenResources(const VkExtent2D& extent);
+
   private:
     void createCommandBuffers();
     void freeCommandBuffers();
     void recreateSwapChain();
+    void initializeOffscreenRendering();
 
     Window& m_Window;
     Device& m_Device;
 
     std::unique_ptr<SwapChain> m_SwapChain;
     std::vector<VkCommandBuffer> m_commandBuffers;
+
+    // Off screen rendering
+    VkExtent2D m_offscreenExtent = {1920, 1080};
+    std::shared_ptr<Texture> m_offscreenColorTexture;
+    std::shared_ptr<Texture> m_offscreenDepthTexture;
+    VkFramebuffer m_offscreenFramebuffer;
+    VkRenderPass m_offscreenRenderPass;
+
+    void createOffscreenResources();
+    void createOffscreenRenderPass();
+    void createOffscreenFramebuffer();
 
     uint32_t m_currentImageIndex;     // Index of the current swap chain image.
     uint32_t m_currentFrameIndex{0};  // Index of the current frame.

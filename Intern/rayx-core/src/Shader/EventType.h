@@ -30,3 +30,7 @@ constexpr double ETYPE_BEYOND_HORIZON = 5;
 // This is a general error code that means some assertion failed in the shader.
 // This error code is typically generated using `_throw`.
 constexpr double ETYPE_FATAL_ERROR = 6;
+
+// These rays have just been emitted and not had any other events
+// If there are no other elements the ray has this eventtype
+constexpr double ETYPE_EMITTED = 7;

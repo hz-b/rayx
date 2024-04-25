@@ -46,7 +46,7 @@ endif()
 # -----------------------
 
 # ---- Add tests ----
-add_subdirectory(tests)
+  add_subdirectory(tests)
 
 # -------------------
 
@@ -123,7 +123,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(COMPILE_PLATFORM RAYX_PLATFORM_MSVC)
 else()
-    set(COMPILE_PLATFORM UNKNOWN)
+    set(COMPILE_PLATFORM RAYX_PLATFORM_UNKNOWN)
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
@@ -155,14 +155,50 @@ target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka)
 
 # ------------------------
 
+# ---- Data ----
+# Define the source and destination paths
+set(DATA_SRC_DIR "${CMAKE_SOURCE_DIR}/Data")
+# Set the destination directory for the Data directory based on the build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DATA_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Data")
+else()
+    set(DATA_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Data")
+endif()
+
+# Copy the Data directory to the binary output directory after building
+message(STATUS "Copying Data directory from ${DATA_SRC_DIR} to ${DATA_DST_DIR}")
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${DATA_SRC_DIR} ${DATA_DST_DIR}
+    COMMENT "Copying Data directory to build output directory..."
+)
+# -----------------
+
+# ---- Scripts ----
+# Define the source and destination paths
+set(SCRIPT_SRC_DIR "${CMAKE_SOURCE_DIR}/Scripts/plot.py")
+# Set the destination directory for the Scripts directory based on the build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(SCRIPT_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Scripts/plot.py")
+else()
+    set(SCRIPT_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Scripts/plot.py")
+endif()
+
+# Copy the Scripts directory to the binary output directory after building
+message(STATUS "Copying Scripts directory from ${SCRIPT_SRC_DIR} to ${SCRIPT_DST_DIR}")
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${SCRIPT_SRC_DIR} ${SCRIPT_DST_DIR}
+    COMMENT "Copying Scripts directory to build output directory..."
+)
+# -----------------
+
 # ---- CPack ----
-
-include(InstallRequiredSystemLibraries)
-
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
+install(FILES ${SCRIPT_SRC_DIR} DESTINATION bin/Scripts)
 
 include(CPack)
 

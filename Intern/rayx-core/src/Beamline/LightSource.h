@@ -1,4 +1,5 @@
 #pragma once
+
 #include <array>
 #include <glm.hpp>
 #include <string>
@@ -10,6 +11,7 @@
 #include "Shader/Ray.h"
 
 namespace RAYX {
+
 enum class SpreadType { HardEdge, SoftEdge, SeperateEnergies };    // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist::Thirds represents PixelSource Footprint
@@ -17,20 +19,15 @@ enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
 
+struct DesignSource;
+
 class RAYX_API LightSource {
   public:
-    LightSource(const DesignObject&);
+    LightSource(const DesignSource&);
     virtual ~LightSource() = default;
-
-    // Setter (Only used in frontend)
-    // void setSourceHeight(double height) { m_sourceHeight = height; }
-    // void setSourceWidth(double width) { m_sourceWidth = width; }
 
     // Getter
     Misalignment getMisalignmentParams() const;
-    virtual double getHorDivergence() const { return m_horDivergence; }
-    virtual double getSourceHeight() const { return m_sourceHeight; }
-    virtual double getSourceWidth() const { return m_sourceWidth; }
     glm::dvec4 getPosition() const { return m_position; }
 
     /** yields the average energy of the energy distribution

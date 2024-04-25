@@ -61,9 +61,9 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
     if (!rayInfo.renderAllRays) {
-        rays = getRays(m_rayCache, beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
+        rays = getRays(m_rayCache, beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays, rayInfo.startEventID);
     } else {
-        rays = getRays(m_rayCache, beamline, noFilter, (uint32_t)rayInfo.maxAmountOfRays);
+        rays = getRays(m_rayCache, beamline, noFilter, (uint32_t)rayInfo.maxAmountOfRays, rayInfo.startEventID);
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject
@@ -89,9 +89,13 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
     }
 }
 
-std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::OpticalElement> elements,
+std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
                                                               const RAYX::BundleHistory& rays) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
+
+    std::vector<std::vector<RAYX::Ray>> sortedRays;
+    sortRaysByElement(rays, sortedRays, elements.size());
+
     std::vector<RenderObjectInput> rObjectsInput;
     for (uint32_t i = 0; i < elements.size(); i++) {
         std::vector<TextureVertex> vertices;
@@ -99,13 +103,13 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
 
         triangulateObject(elements[i], vertices, indices);
 
-        glm::mat4 modelMatrix = elements[i].m_element.m_outTrans;
+        glm::mat4 modelMatrix = elements[i].compile().m_outTrans;
 
         if (vertices.size() == 4) {
-            auto [width, height] = getRectangularDimensions(elements[i].m_element.m_cutout);
+            auto [width, height] = getRectangularDimensions(elements[i].compile().m_cutout);
 
-            std::vector<std::vector<uint32_t>> footprint = makeFootprint(getRaysOfElement(rays, i), -width / 2, width / 2, -height / 2, height / 2,
-                                                                         (uint32_t)(width * 10), (uint32_t)(height * 10));
+            std::vector<std::vector<uint32_t>> footprint =
+                makeFootprint(sortedRays[i], -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));
 
             uint32_t footprintWidth, footprintHeight;
             std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
@@ -130,7 +134,9 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     for (const auto& input : inputs) {
         std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
         if (input.textureInput.has_value()) {
-            Texture texture(m_Device, input.textureInput->data.get(), input.textureInput->footprintWidth, input.textureInput->footprintHeight);
+            Texture texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+                            VK_IMAGE_ASPECT_COLOR_BIT, {input.textureInput->width, input.textureInput->height});
+            texture.updateFromData(input.textureInput->data.get(), input.textureInput->width, input.textureInput->height);
             m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, std::move(texture), setLayout,
                                            descriptorPool);
         } else {

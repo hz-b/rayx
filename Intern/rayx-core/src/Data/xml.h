@@ -27,11 +27,12 @@ enum class CylinderDirection;
 enum class FigureRotation;
 enum class GratingMount;
 enum class SourceDist;
-enum class GeometricalShape;
 enum class ElectronEnergyOrientation;
+enum class EnergyDistributionType;
 enum class SourcePulseType;
 enum class EnergySpreadUnit;
 enum class SigmaType;
+enum class SpreadType;
 
 // An error in position and orientation that an object might have.
 struct Misalignment {
@@ -87,6 +88,8 @@ struct RAYX_API Parser {
 
     const char* name() const;
 
+    const char* type() const;
+
     // parsers for fundamental types
     double parseDouble(const char* paramname) const;
     int parseInt(const char* paramname) const;
@@ -109,6 +112,7 @@ struct RAYX_API Parser {
     double parseImageType() const;
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
+    std::filesystem::path parseEnergyDistributionFile() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.
@@ -176,8 +180,9 @@ struct RAYX_API Parser {
     inline double parsePhotonFlux() const { return parseDouble("photonFlux"); }
     inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
     inline double parseEnergySpread() const { return parseDouble("energySpread"); }
+    inline SpreadType parseEnergySpreadType() const { return static_cast<SpreadType>(parseInt("energySpreadType")); }
+    inline EnergyDistributionType parseEnergyDistributionType() const { return static_cast<EnergyDistributionType>(parseInt("energyDistributionType")); }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
-
     inline int parseNumOfEquidistantCircles() const { return parseDouble("numberCircles"); }
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
     inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }

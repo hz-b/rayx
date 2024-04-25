@@ -26,6 +26,7 @@ class CommandParser {
         std::string m_providedFile;  // -i (Input)
         std::optional<int> m_deviceID;
         bool m_benchmark = false;
+        bool m_verbose = false;
     } m_args;
 
   private:
@@ -44,5 +45,5 @@ class CommandParser {
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
         {'d', {OptionType::OPTIONAL_INT, "device", "Device ID.", &(m_args.m_deviceID)}},
         {'b', {OptionType::BOOL, "benchmark", "Benchmark mode.", &(m_args.m_benchmark)}},
-    };
+        {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}}};
 };

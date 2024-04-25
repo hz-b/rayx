@@ -130,7 +130,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     RAYX_VERB << "maxEvents: " << maxEvents;
 
     // don't trace if there are no optical elements
-    if (b.m_OpticalElements.size() == 0) {
+    if (b.m_DesignElements.size() == 0) {
         // an empty history suffices, nothing is happening to the rays!
         BundleHistory result;
         return result;
@@ -139,9 +139,9 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     // prepare input data
     auto extractElements = [&b] {
         std::vector<Element> elements;
-        elements.reserve(b.m_OpticalElements.size());
-        for (const auto& e : b.m_OpticalElements)
-            elements.push_back(e.m_element);
+        elements.reserve(b.m_DesignElements.size());
+        for (const auto& e : b.m_DesignElements)
+            elements.push_back(e.compile());
         return elements;
     };
     const auto elements = extractElements();

@@ -5,6 +5,7 @@
 
 namespace RAYX {
 
-Element makeSphereMirror(const DesignObject&);
+struct DesignElement;  
+Element makeSphereMirror(const DesignElement& dele);
 
 }  // namespace RAYX

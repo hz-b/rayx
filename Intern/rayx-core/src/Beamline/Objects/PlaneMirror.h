@@ -2,7 +2,8 @@
 #include "Beamline/OpticalElement.h"
 
 namespace RAYX {
+struct DesignElement;  
 
-Element makePlaneMirror(DesignObject& dobj);
+Element makePlaneMirror(const DesignElement& dele);
 
 }  // namespace RAYX

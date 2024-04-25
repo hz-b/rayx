@@ -2,18 +2,18 @@
 
 #include <cmath>
 
-#include "EnergyDistribution.h"
+#include <DesignElement/DesignSource.h>
+#include <Beamline/EnergyDistribution.h>
 
 namespace RAYX {
-LightSource::LightSource(const DesignObject& dobj) {
-    m_name = dobj.name();
-    m_EnergyDistribution = dobj.parseEnergyDistribution();
-    m_misalignmentParams = dobj.parseMisalignment();
-    m_numberOfRays = dobj.parseNumberRays();
-    m_orientation = dobj.parseOrientation();
-    m_position = dobj.parsePosition();
-    m_verDivergence = 0.0;
-}
+LightSource::LightSource(const DesignSource& dSource) 
+    : m_name(dSource.getName()),
+      m_EnergyDistribution(dSource.getEnergyDistribution()),
+      m_numberOfRays(static_cast<uint32_t> (dSource.getNumberOfRays())),
+      m_verDivergence(0.0),
+      m_orientation(dSource.getWorldOrientation()),
+      m_position(dSource.getWorldPosition()),
+      m_misalignmentParams(dSource.getMisalignment()) {}
 
 Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentParams; }
 
@@ -30,7 +30,7 @@ double LightSource::selectEnergy() const { return m_EnergyDistribution.selectEne
 
 double LightSource::calcPhotonWavelength(double photonEnergy) {
     // Energy Distribution Type : Values only
-    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy; //i nm to eV
+    double photonWaveLength = photonEnergy == 0.0 ? 0 : inm2eV / photonEnergy;  // i nm to eV
     return photonWaveLength;
 }
 

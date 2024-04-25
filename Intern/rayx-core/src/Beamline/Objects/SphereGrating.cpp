@@ -1,16 +1,17 @@
 #include "SphereGrating.h"
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Material/Material.h"
-#include "Shader/Constants.h"
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Material/Material.h>
+#include <Shader/Constants.h>
+#include <DesignElement/DesignElement.h>
 
 namespace RAYX {
 
-Element makeSphereGrating(const DesignObject& dobj) {
-    auto surface = makeSphere(dobj.parseRadius());
-    auto behaviour = makeGrating(dobj);
-    return makeElement(dobj, behaviour, surface);
+Element makeSphereGrating(const DesignElement& dele) {
+    auto surface = makeSphere(dele.getRadius());
+    auto behaviour = makeGrating(dele);
+    return makeElement(dele, behaviour, surface);
 }
 
 }  // namespace RAYX

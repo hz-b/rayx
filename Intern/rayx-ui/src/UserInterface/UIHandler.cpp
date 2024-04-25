@@ -2,6 +2,7 @@
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#include <imgui_internal.h>
 #include <nfd.h>
 
 #include <fstream>
@@ -9,6 +10,8 @@
 
 #include "CanonicalizePath.h"
 #include "RayProcessing.h"
+
+extern bool isSceneWindowHovered;
 
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {
@@ -36,7 +39,7 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     VkDescriptorPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    poolInfo.maxSets = 1000;
+    poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);
     poolInfo.poolSizeCount = (uint32_t)std::size(poolSizes);
     poolInfo.pPoolSizes = poolSizes;
 
@@ -115,35 +118,97 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     initInfo.Queue = m_Device.graphicsQueue();
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = m_DescriptorPool;
+    initInfo.RenderPass = m_RenderPass;
     initInfo.Allocator = nullptr;
     initInfo.MinImageCount = imageCount;
     initInfo.ImageCount = imageCount;
     initInfo.CheckVkResultFn = nullptr;
 
     ImGui_ImplGlfw_InitForVulkan(m_Window.window(), true);
-    ImGui_ImplVulkan_Init(&initInfo, m_RenderPass);
+    ImGui_ImplVulkan_Init(&initInfo);
 
     // Upload fonts
     {
         // Setup style
-        m_smallFont =
-            m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 16.0f);
-        m_largeFont =
-            m_IO.Fonts->AddFontFromFileTTF(RAYX::canonicalizeRepositoryPath("./Intern/rayx-ui/res/fonts/Roboto-Regular.ttf").string().c_str(), 24.0f);
+        const std::filesystem::path fontPath = RAYX::getExecutablePath() / "Assets/fonts/Roboto-Regular.ttf";
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 8.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 32.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 48.0f));
+        m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 64.0f));
+        m_IO.Fonts->Build();
 
-        auto tmpCommandBuffer = m_Device.beginSingleTimeCommands();
-        ImGui_ImplVulkan_CreateFontsTexture(tmpCommandBuffer);
-        m_Device.endSingleTimeCommands(tmpCommandBuffer);
-        ImGui_ImplVulkan_DestroyFontUploadObjects();
+        ImGui_ImplVulkan_CreateFontsTexture();
     }
+    ImGuiStyle* style = &ImGui::GetStyle();
+
+    style->WindowPadding = ImVec2(15, 15);
+    style->WindowRounding = 5.0f;
+    style->FramePadding = ImVec2(5, 5);
+    style->FrameRounding = 4.0f;
+    style->ItemSpacing = ImVec2(12, 8);
+    style->ItemInnerSpacing = ImVec2(8, 6);
+    style->IndentSpacing = 25.0f;
+    style->ScrollbarSize = 15.0f;
+    style->ScrollbarRounding = 9.0f;
+    style->GrabMinSize = 5.0f;
+    style->GrabRounding = 3.0f;
+
+    style->Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);          // White text
+    style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);  // Light grey for disabled text
+
+    style->Colors[ImGuiCol_WindowBg] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.0f);
+    // style->Colors[ImGuiCol_ChildWindowBg] = ImVec4(1.00f, 0.98f, 0.95f, 0.58f);
+    style->Colors[ImGuiCol_PopupBg] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 0.92f);
+    style->Colors[ImGuiCol_Border] = ImVec4(0.28f, 0.28f, 0.28f, 0.65f);
+    style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+    style->Colors[ImGuiCol_FrameBg] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.26f, 0.26f, 0.78f);
+    style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+    style->Colors[ImGuiCol_TitleBg] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 0.75f);
+    style->Colors[ImGuiCol_TitleBgActive] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.20f, 0.22f, 0.27f, 0.47f);
+    style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(1.00f, 0.98f, 0.95f, 0.00f);
+    style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 0.85f);
+    style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 0.85f);
+    style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f);
+    // style->Colors[ImGuiCol_ComboBg] = ImVec4(1.00f, 0.98f, 0.95f, 1.00f);
+    style->Colors[ImGuiCol_CheckMark] = ImVec4(0.25f, 1.00f, 0.00f, 0.80f);
+    style->Colors[ImGuiCol_Button] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.0f);
+    style->Colors[ImGuiCol_ButtonHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    style->Colors[ImGuiCol_ButtonActive] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    style->Colors[ImGuiCol_SliderGrab] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 0.64f);
+    style->Colors[ImGuiCol_SliderGrabActive] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_Header] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.0f);
+    style->Colors[ImGuiCol_HeaderHovered] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 0.86f);
+    style->Colors[ImGuiCol_HeaderActive] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.00f);
+    // style->Colors[ImGuiCol_Column] = ImVec4(0.00f, 0.00f, 0.00f, 0.32f);
+    // style->Colors[ImGuiCol_ColumnHovered] = ImVec4(0.25f, 1.00f, 0.00f, 0.78f);
+    // style->Colors[ImGuiCol_ColumnActive] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+    style->Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.04f);
+    style->Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.25f, 1.00f, 0.00f, 0.78f);
+    style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+    // style->Colors[ImGuiCol_CloseButton] = ImVec4(0.40f, 0.39f, 0.38f, 0.16f);
+    // style->Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.40f, 0.39f, 0.38f, 0.39f);
+    // style->Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.40f, 0.39f, 0.38f, 1.00f);
+    style->Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+    style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+    style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+    style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+    style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+    // style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
+
+    // Enable docking
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
 UIHandler::~UIHandler() {
-    vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
-    vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
+    vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
 }
 
 void UIHandler::beginUIRender() {
@@ -158,18 +223,105 @@ void UIHandler::beginUIRender() {
  * @param uiParams
  * @param rObjects
  */
-void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::OpticalElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
-    if (m_useLargeFont) {
-        ImGui::PushFont(m_largeFont);
-    } else {
-        ImGui::PushFont(m_smallFont);
+void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
+    ImFont* currentFont;
+    float adjustedScale;
+    if (m_oldScale != m_scale) {
+        ImGuiStyle style = ImGui::GetStyle();
+        style.ScaleAllSizes(m_scale / m_oldScale);
+        style.ScrollbarSize = 15.0f;
+        m_oldScale = m_scale;
     }
+    if (m_scale <= 0.5f) {
+        currentFont = m_fonts[0];
+        adjustedScale = m_scale / 0.5f;
+    } else if (m_scale <= 1.0f) {
+        currentFont = m_fonts[1];
+        adjustedScale = m_scale / 1.0f;
+    } else if (m_scale <= 2.0f) {
+        currentFont = m_fonts[2];
+        adjustedScale = m_scale / 2.0f;
+    } else if (m_scale <= 3.0f) {
+        currentFont = m_fonts[3];
+        adjustedScale = m_scale / 3.0f;
+    } else if (m_scale <= 4.0f) {
+        currentFont = m_fonts[4];
+        adjustedScale = m_scale / 4.0f;
+    } else {
+        currentFont = m_fonts[4];
+        adjustedScale = 1.0f;
+    }
+    ImGui::GetIO().FontGlobalScale = adjustedScale;
+    ImGui::PushFont(currentFont);
+
+    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    window_flags |= ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) window_flags |= ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 0.0f));
+    ImGui::Begin("Root", nullptr, window_flags);
+    ImGui::PopStyleVar();
+    ImGui::PopStyleVar(2);
+
+    // Dockspace
+    auto& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+        ImGuiID dockspace_id = ImGui::GetID("Root");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+
+        static bool first_time = true;
+        if (first_time) {
+            first_time = false;
+
+            ImGui::DockBuilderRemoveNode(dockspace_id);
+            ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags | ImGuiDockNodeFlags_DockSpace);
+            ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+            auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+            auto dock_id_right_top = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Up, 0.5f, nullptr, &dock_id_right);
+            auto dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.5f, nullptr, &dock_id_right);
+
+            ImGui::DockBuilderDockWindow("Render View", dockspace_id);
+            ImGui::DockBuilderDockWindow("Properties Manager", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("Settings", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("Beamline Outline", dock_id_right_bottom);
+            ImGui::DockBuilderDockWindow("Hotkeys", dock_id_right_bottom);
+            ImGui::DockBuilderFinish(dockspace_id);
+        }
+    }
+
+    // Render View
+    ImGui::Begin("Render View");
+    ImVec2 size = ImGui::GetContentRegionAvail();
+    if (size.x > 0 && size.y > 0) {
+        uiParams.sceneExtent = {static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y)};
+        if (uiParams.sceneDescriptorSet != VK_NULL_HANDLE) {
+            ImGui::Image((ImTextureID)uiParams.sceneDescriptorSet, ImVec2(size.x, size.y), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1),
+                         ImVec4(0, 0, 0, 0));
+        }
+    }
+    isSceneWindowHovered = ImGui::IsWindowHovered();
+    ImGui::End();
 
     showSceneEditorWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
+    showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
-    showHotkeysWindow();
     m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elemets, rSourcePositions);
+    showHotkeysWindow();
+    ImGui::End();
 
     ImGui::PopFont();
 }
@@ -189,9 +341,6 @@ void UIHandler::endUIRender(VkCommandBuffer commandBuffer) {
 }
 
 void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 450), ImGuiCond_Once);
-
     ImGui::Begin("Properties Manager");
 
     if (ImGui::Button("Open File Dialog")) {
@@ -209,13 +358,13 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
             std::string rayFilePathCSV = rmlPath.substr(0, rmlPath.size() - 4) + ".csv";
             uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathCSV);
 #endif
-            uiParams.showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
+            m_showRMLNotExistPopup = rmlPath.substr(rmlPath.size() - 4, 4) != ".rml" || !std::filesystem::exists(rmlPath);
 
-            if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
-                uiParams.pathChanged = false;
+            if (m_showRMLNotExistPopup) {
+                uiParams.rmlReady = false;
             } else {
-                uiParams.pathChanged = true;
-                uiParams.pathValidState = true;
+                uiParams.h5Ready = !uiParams.showH5NotExistPopup;
+                uiParams.rmlReady = true;
                 uiParams.rmlPath = outPath;
             }
         } else if (result == NFD_CANCEL) {
@@ -224,6 +373,20 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
             printf("Error: %s\n", NFD_GetError());
         }
     }
+    if (uiParams.rmlPath != "") {
+        ImGui::SameLine();
+        if (ImGui::Button("Trace current file")) {
+            uiParams.showH5NotExistPopup = false;
+            m_showRMLNotExistPopup = false;
+            uiParams.rmlReady = true;
+            uiParams.runSimulation = true;
+        }
+    } else {
+        ImGui::SameLine();
+        ImGui::BeginDisabled();
+        ImGui::Button("Trace current file");
+        ImGui::EndDisabled();
+    }
 
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
@@ -231,7 +394,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
     uiParams.camController.displaySettings();
     ImGui::Separator();
-    if (!uiParams.rmlPath.empty() && uiParams.pathValidState) {
+    if (!uiParams.rmlPath.empty() && uiParams.rayInfo.raysLoaded) {
         size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
 
@@ -251,20 +414,14 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
 }
 
 void UIHandler::showSettingsWindow() {
-    ImGui::SetNextWindowPos(ImVec2(0, 450), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 100), ImGuiCond_Once);
-
     ImGui::Begin("Settings");
 
-    ImGui::Checkbox("Large Font", &m_useLargeFont);
+    ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::End();
 }
 
 void UIHandler::showHotkeysWindow() {
-    ImGui::SetNextWindowPos(ImVec2(0, 550), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(450, 210), ImGuiCond_Once);
-
     ImGui::Begin("Hotkeys");
 
     ImGui::Text("Keyboard Hotkeys:");
@@ -283,29 +440,106 @@ void UIHandler::showHotkeysWindow() {
 }
 
 void UIHandler::showMissingFilePopupWindow(UIParameters& uiParams) {
-    if (uiParams.showH5NotExistPopup || uiParams.showRMLNotExistPopup) {
+    if (m_showRMLNotExistPopup) {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
                                 ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);  // Set size
 
         ImGui::OpenPopup("File Not Found");
         if (ImGui::BeginPopupModal("File Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            // Scale up font size
-            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-
-            if (uiParams.showRMLNotExistPopup) {
+            if (m_showRMLNotExistPopup) {
                 ImGui::Text("RML file does not exist or is not valid.");
-            } else {
-                ImGui::Text("The H5 file does not exist.");
-            }
-            ImGui::Spacing();
-            if (ImGui::Button("OK")) {
-                uiParams.showH5NotExistPopup = false;
-                uiParams.showRMLNotExistPopup = false;
             }
 
-            // Revert to original font size
-            ImGui::PopFont();
+            if (ImGui::Button("Okay", ImVec2(120 * m_scale, 0))) {  // Make the button a bit larger
+                uiParams.showH5NotExistPopup = false;
+                m_showRMLNotExistPopup = false;
+                uiParams.runSimulation = false;
+                uiParams.rmlReady = false;   // Do not start the simulation
+                ImGui::CloseCurrentPopup();  // Close the popup when an option is selected
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+}
+
+void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
+    if (uiParams.runSimulation && !uiParams.simulationSettingsReady) {
+        ImGui::OpenPopup("Simulation Settings");
+
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Always,
+                                ImVec2(0.5f, 0.5f));
+
+        if (ImGui::BeginPopupModal("Simulation Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Checkbox("Sequential", &uiParams.simulationInfo.sequential);
+            ImGui::InputScalar("Max Batch Size", ImGuiDataType_U32, &uiParams.simulationInfo.maxBatchSize);
+
+            // Prepare device combo box
+            std::vector<const char*> deviceItems;
+            for (const auto& device : uiParams.simulationInfo.availableDevices) {
+                deviceItems.push_back(device.c_str());
+            }
+
+            const char* tracerItems[] = {"CPU Tracer", "VULKAN Tracer"};
+            ImGui::Combo("Tracer", reinterpret_cast<int*>(&uiParams.simulationInfo.tracer), tracerItems, IM_ARRAYSIZE(tracerItems));
+
+            // Device selection combo box
+            if (uiParams.simulationInfo.tracer == 1) {  // If not CPU Tracer, enable device selection
+                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
+                             static_cast<int>(deviceItems.size()));
+            } else {
+                ImGui::BeginDisabled();  // Disable combo box if CPU Tracer is selected
+                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
+                             static_cast<int>(deviceItems.size()));
+                ImGui::EndDisabled();
+            }
+            // startEventID selection
+            // ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
+
+            // maxEvents selection
+            ImGui::InputScalar("Max Events", ImGuiDataType_U32, &uiParams.simulationInfo.maxEvents);
+
+            if (!uiParams.simulationInfo.fixedSeed) {
+                ImGui::BeginDisabled();
+                ImGui::InputScalar("Seed", ImGuiDataType_U32, &uiParams.simulationInfo.seed);
+                ImGui::EndDisabled();
+            } else {
+                ImGui::InputScalar("Seed", ImGuiDataType_U32, &uiParams.simulationInfo.seed);
+            }
+            ImGui::SameLine();
+            ImGui::Checkbox("Fixed Seed", &uiParams.simulationInfo.fixedSeed);
+
+            ImGui::Separator();
+
+            // Push buttons to the bottom
+            float totalSpace = ImGui::GetContentRegionAvail().y;
+            float buttonHeight = 40.0f;
+            ImGui::Dummy(ImVec2(0.0f, totalSpace - buttonHeight - ImGui::GetStyle().ItemSpacing.y * 2));
+
+            // Centering buttons
+            float windowWidth = ImGui::GetWindowSize().x;
+            float buttonsWidth = /* 2* */ 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
+            ImGui::SetCursorPosX((windowWidth - buttonsWidth) / 2.0f);
+
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<unsigned int>(uiParams.simulationInfo.availableDevices.size())) {
+                ImGui::BeginDisabled();
+            }
+
+            if (ImGui::Button("Start Simulation")) {
+                uiParams.simulationSettingsReady = true;
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<unsigned int>(uiParams.simulationInfo.availableDevices.size())) {
+                ImGui::EndDisabled();
+            }
+
+            // ImGui::SameLine();
+
+            // if (ImGui::Button("Cancel", ImVec2(120, buttonHeight))) {
+            //     uiParams.runSimulation = false;
+            //     ImGui::CloseCurrentPopup();
+            // }
 
             ImGui::EndPopup();
         }

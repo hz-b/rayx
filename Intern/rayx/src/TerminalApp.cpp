@@ -66,7 +66,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_OpticalElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
+        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_DesignElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
 
         if (m_CommandParser->m_args.m_startEventID >= maxEvents) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
@@ -112,7 +112,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_ERR << "Have you selected .csv exporting?";
             }
 
-            auto cmd = std::string("python ") + RAYX::canonicalizeRepositoryPath(std::string("Scripts/plot.py")).string() + " " + file;
+            auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
             auto ret = system(cmd.c_str());
             if (ret != 0) {
                 RAYX_WARN << "received error code while printing";
@@ -203,10 +203,11 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
  */
 std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
     std::vector<std::string> names;
-    names.reserve(m_Beamline->m_OpticalElements.size());
+    names.reserve(m_Beamline->m_DesignElements.size());
 
-    for (const auto& opticalElement : m_Beamline->m_OpticalElements) {
-        names.push_back(opticalElement.m_name);
+    for (const auto& designElement : m_Beamline->m_DesignElements) {
+        names.push_back("name!");
+        // TODO find the actual names!
     }
 
     return names;
@@ -219,10 +220,10 @@ std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
  */
 std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
     std::vector<std::string> names;
-    names.reserve(m_Beamline->m_LightSources.size());
+    names.reserve(m_Beamline->m_DesignSources.size());
 
-    for (const auto& lightSources : m_Beamline->m_LightSources) {
-        names.push_back(lightSources->m_name);
+    for (const auto& lightSources : m_Beamline->m_DesignSources) {
+        names.push_back(lightSources.getName());
     }
 
     return names;

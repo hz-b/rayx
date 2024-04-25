@@ -159,8 +159,8 @@ void GraphicsPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo,
     configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;            // Use source alpha value
     configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;  // Subtract source alpha from 1
     configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;                             // Add source and destination
-    configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;                  // Source alpha factor for the alpha channel
-    configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;                 // Destination alpha factor for the alpha channel
+    configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;            // Source alpha factor for the alpha channel
+    configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;  // Destination alpha factor for the alpha channel
     configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;                             // Operation for blending alpha channel
 
     configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

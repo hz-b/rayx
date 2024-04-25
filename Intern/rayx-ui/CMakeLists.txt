@@ -4,12 +4,11 @@ find_package(Vulkan) # TODO: rayx-ui gets vulkan from rayx-core, this is a hack 
 
 if(Vulkan_FOUND)
     # ---- Add tests ----
-    # add_subdirectory(tests)
+    add_subdirectory(tests)
     # -------------------
 
     # ---- Project ----
     project(rayx-ui VERSION ${RAYX_VERSION})
-    set(CMAKE_CXX_STANDARD 20)
 
     set(IMGUI_DIR ../../Extern/imgui/)
     set(GLFW_DIR ../../Extern/glfw/)
@@ -32,16 +31,42 @@ if(Vulkan_FOUND)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         GLM_FORCE_RADIANS
         GLM_FORCE_DEPTH_ZERO_TO_ONE)
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets)
+    else()
+        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets)
+    endif()
+
+    message(STATUS "Resource directory: ${RESOURCE_DIR}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/res
+        ${RESOURCE_DIR}
+    )
     # -----------------
 
 
     # ---- CPack ----
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/shaders
-            DESTINATION ./
-            FILES_MATCHING PATTERN "*_*.spv")
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*_*.spv")
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*")
+    else()
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*_*.spv")
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets
+                DESTINATION ./bin
+                FILES_MATCHING PATTERN "*")
+    endif()
     include(InstallRequiredSystemLibraries)
-    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/../../LICENSE")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx-ui - RAYX GUI Application")
     include(CPack)
@@ -71,7 +96,11 @@ if(Vulkan_FOUND)
     # ---- Compile Shaders ----
     # Function to compile shaders
     function(compile_shaders target shaders_dir)
-        set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/shaders")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders)
+        else()
+            set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders)
+        endif()
         file(MAKE_DIRECTORY ${OUTPUT_DIR})
         # Get a list of all shader files in the specified directory
         file(GLOB SHADER_FILES "${shaders_dir}/*.frag" "${shaders_dir}/*.vert")
@@ -85,7 +114,7 @@ if(Vulkan_FOUND)
             string(SUBSTRING ${SHADER_EXT} 1 -1 SHADER_STAGE) # Remove the leading '.' from the extension
 
             # Set output file name
-            set(OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME}_${SHADER_STAGE}.spv")
+            set(OUTPUT_FILE ${OUTPUT_DIR}/${SHADER_NAME}_${SHADER_STAGE}.spv)
 
             # Create a custom command for each shader file
             add_custom_command(

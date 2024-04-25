@@ -2,12 +2,13 @@
 
 #include <fstream>
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
-#include "Random.h"
-#include "Shader/Constants.h"
-#include "Shader/EventType.h"
+#include <DesignElement/DesignSource.h>
+#include <Data/xml.h>
+#include <Debug/Debug.h>
+#include <Debug/Instrumentor.h>
+#include <Random.h>
+#include <Shader/Constants.h>
+#include <Shader/EventType.h>
 
 #ifndef NO_OMP
 #include <omp.h>
@@ -44,29 +45,27 @@ double get_factorTotalPowerDipol() {
     return totalPower;
 }
 
-DipoleSource::DipoleSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_energySpreadType = dobj.parseEnergyDistribution();
-    m_photonFlux = dobj.parsePhotonFlux();
-    m_electronEnergyOrientation = dobj.parseElectronEnergyOrientation();
-    m_sourcePulseType = dobj.parseSourcePulseType();
-    m_bendingRadius = dobj.parseBendingRadiusDouble();
-    m_electronEnergy = dobj.parseElectronEnergy();
-    m_photonEnergy = dobj.parsePhotonEnergy();
-    m_verEbeamDivergence = dobj.parseVerEbeamDivergence();
-    m_energySpread = dobj.parseEnergySpread();
-    m_energySpreadUnit = dobj.parseEnergySpreadUnit();
-    m_horDivergence = dobj.parseHorDiv();
-    m_sourceHeight = dobj.parseSourceHeight();
-    m_sourceWidth = dobj.parseSourceWidth();
-
-    m_criticalEnergy = RAYX::get_factorCriticalEnergy();
-    m_bandwidth = 1.0e-3;
+DipoleSource::DipoleSource(const DesignSource& dSource) : LightSource(dSource), 
+    m_bendingRadius(dSource.getBendingRadius()),
+    m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
+    m_photonFlux(dSource.getPhotonFlux()),
+    m_sourceHeight(dSource.getSourceHeight()),
+    m_sourceWidth(dSource.getSourceWidth()),
+    m_electronEnergy(dSource.getElectronEnergy()),
+    m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
+    m_photonEnergy(dSource.getEnergy()),
+    m_verEbeamDivergence(dSource.getVerEBeamDivergence()),
+    m_bandwidth(1.0e-3),
+    m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
+    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+    m_energySpread(dSource.getEnergySpread()),
+    m_energySpreadUnit(dSource.getEnergySpreadUnit())
+{   
+    
+    m_horDivergence = dSource.getHorDivergence();
     m_verDivergence = DipoleSource::vDivergence(m_photonEnergy, m_verEbeamDivergence);
     m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
 
-    m_gamma = std::fabs(m_electronEnergy) * get_factorElectronEnergy();
-
-    m_photonWaveLength = calcPhotonWavelength(m_photonEnergy);
     setLogInterpolation();
     setMaxIntensity();
     setMaxFlux();
@@ -487,10 +486,10 @@ void DipoleSource::setMaxFlux() {
     }
 }
 
-double DipoleSource::getHorDivergence() const { return m_horDivergence; }
+/*double DipoleSource::getHorDivergence() const { return m_horDivergence; }
 
 double DipoleSource::getSourceHeight() const { return m_sourceHeight; }
 
 double DipoleSource::getSourceWidth() const { return m_sourceWidth; }
-
+*/
 }  // namespace RAYX

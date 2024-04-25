@@ -1,19 +1,18 @@
 #pragma once
 
 #include "Beamline/LightSource.h"
+#include "Data/xml.h"
 
 namespace RAYX {
+struct DesignSource;   
+class LightSource;     
 
 class RAYX_API PointSource : public LightSource {
   public:
-    PointSource(const DesignObject&);
+    PointSource(const DesignSource&);
     virtual ~PointSource() = default;
 
-    std::vector<Ray> getRays(int thread_count = 1) const override;
-
-    double getHorDivergence() const override;
-    double getSourceHeight() const override;
-    double getSourceWidth() const override;
+    std::vector<Ray> getRays(int thread_count = 1) const;
 
   private:
     // Geometric Params
@@ -23,9 +22,7 @@ class RAYX_API PointSource : public LightSource {
     SourceDist m_verDist;
     SourcePulseType m_sourceDistributionType;  // TODO unused.
 
-    double m_linearPol_0;
-    double m_linearPol_45;
-    double m_circularPol;
+    glm::dvec4 m_pol;
 
     double m_verDivergence;
     double m_sourceDepth;

@@ -64,13 +64,13 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
 // Define the type of the filter function
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
-                          uint32_t amountOfRays) {
+                          uint32_t amountOfRays, int startEventID) {
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
     amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
-    auto maxRayIndex = rayCache.size();
+    size_t maxRayIndex = rayCache.size();
     for (size_t i : rayIndices) {
         if (i >= maxRayIndex) {
             RAYX_VERB << "Ray index out of bounds: " << i;
@@ -78,43 +78,52 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         }
         auto& rayHist = rayCache[i];
 
-        if (beamline.m_LightSources.size() <= rayHist[0].m_sourceID) {
-            RAYX_ERR << "Trying to acces out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
+        if (beamline.m_DesignSources.size() <= rayHist[0].m_sourceID) {
+            RAYX_ERR << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
         }
-        glm::vec4 rayLastPos = (glm::vec4)beamline.m_LightSources[(size_t)rayHist[0].m_sourceID]->getPosition();
+        glm::vec4 rayLastPos = glm::vec4(beamline.m_DesignSources[static_cast<size_t>(rayHist[0].m_sourceID)].getWorldPosition());
 
-        for (const auto& event : rayHist) {
-            if (event.m_lastElement >= beamline.m_OpticalElements.size()) {
+        bool isFirstEvent = true;
+
+        for (const RAYX::Ray& event : rayHist) {
+            if (event.m_lastElement >= beamline.m_DesignElements.size()) {
                 RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
-            glm::vec4 worldPos = beamline.m_OpticalElements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
-            const glm::vec4 WHITE = {1.0f, 1.0f, 1.0f, 0.7f};
+            glm::vec4 worldPos =
+                beamline.m_DesignElements[static_cast<size_t>(event.m_lastElement)].compile().m_outTrans * glm::vec4(event.m_position, 1.0f);
 
             glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;
 
-            ColorVertex origin = {rayLastPos, originColor};
-            ColorVertex point = {worldPos, pointColor};
+            if (!(isFirstEvent && startEventID > 0)) {
+                // Only execute if not the first event with startEventID > 0
+                ColorVertex origin = {rayLastPos, originColor};
+                ColorVertex point = {worldPos, pointColor};
 
-            rays.push_back(Line(origin, point));
-            rayLastPos = point.pos;
+                rays.push_back(Line(origin, point));
+            }
+
+            rayLastPos = worldPos;  // Update rayLastPos in every case for the next iteration
+            isFirstEvent = false;   // Update the flag after the first iteration
         }
     }
 
     return rays;
 }
-
-std::vector<RAYX::Ray> getRaysOfElement(const RAYX::BundleHistory& rays, size_t elementIndex) {
+void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    std::vector<RAYX::Ray> returnRays;
-    for (const auto& rayHist : rays) {
-        for (const auto& ray : rayHist) {
-            if (ray.m_lastElement == elementIndex) {
-                returnRays.push_back(ray);
+
+    sortedRays.resize(numElements);
+
+    // Iterate over all rays in the bundle history
+    for (const auto& rayBundle : rays) {
+        for (const auto& ray : rayBundle) {
+            if (ray.m_lastElement >= numElements) {
+                continue;
             }
+            sortedRays[static_cast<size_t>(ray.m_lastElement)].push_back(ray);
         }
     }
-    return returnRays;
 }
 
 std::vector<std::vector<float>> extractFeatures(const RAYX::BundleHistory& bundleHist, size_t eventIndex) {

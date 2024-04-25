@@ -74,7 +74,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_OpticalElements.size() + 2);
+    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
 }
 
 std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
@@ -158,6 +158,7 @@ void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHis
 std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len) {
     // The ray should hit every element from the beamline once.
     if (ray_hist.size() != beamline_len) {
+
         return {};
     }
 
@@ -176,17 +177,18 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No) {
     auto beamline = loadBeamline(filename);
-    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, 1, beamline.m_OpticalElements.size() + 2);
+    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
 
     std::vector<RAYX::Ray> out;
 
     for (auto ray_hist : hist) {
-        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_OpticalElements.size());
+        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_DesignElements.size());
+
         if (opt_ray) {
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            double btype = beamline.m_OpticalElements[elem].m_element.m_behaviour.m_type;
+            double btype = beamline.m_DesignElements[elem].compile().m_behaviour.m_type;// m_element.m_behaviour.m_type;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
             if (btype == BTYPE_IMAGE_PLANE || btype == BTYPE_SLIT) {
@@ -195,11 +197,9 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
                 r.m_direction.y = orig_r.m_direction.z;
                 r.m_direction.z = orig_r.m_direction.y;
             }
-
             out.push_back(r);
         }
     }
-
     return out;
 }
 

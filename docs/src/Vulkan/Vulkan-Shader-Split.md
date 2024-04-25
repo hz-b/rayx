@@ -20,12 +20,12 @@ The Vulkan Engine is made out of multiple passes. A (compute) Pass is the main c
 
 Let's suppose, we have Task A, B, and C to be executed on the GPU. If A and B can be ran sequentially, but C needs some CPU intervention before being also executed on GPU, then a possible composition would be to `createComputePipelinePass()` with A and B in the same Pass (containing 2 pipelines/shaders) and another Pass with only C. A Compute Command recorded for the first Pass will execute for both A and B. Another one is needed for C.
 
-![How to create passes](../../res/split1.png)
+![How to create passes](../res/split1.png)
 
 ### Flow management 
 To follow vulkan usage styles, the vulkan engine is initiliazed once. Then, as we use a batching system, we prepare the Passes (descirptor updating, necessary buffer reallocation, etc. ), run the the required compute task, cleanup, and repeat.
 
-![Flow](../../res/split2.png)
+![Flow](../res/split2.png)
 
 ### Memory management
 For buffer-descriptor-Pass binding, a new `BufferHandler` is created. This manages and prepares the buffers needed for the compute tasks.

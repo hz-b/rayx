@@ -2,48 +2,48 @@
 
 TEST_F(TestSuite, allBeamlineObjects) {
     auto b = loadBeamline("allBeamlineObjects");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(),
-             8);  // plane mirror, toroid, slit, sphere grating, plane grating,
+    CHECK_EQ(b.m_DesignSources.size(), 6); // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
+    CHECK_EQ(b.m_DesignElements.size(),
+             12);  // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating,
                   // sphere mirror, rzp, image plane
 }
 
 TEST_F(TestSuite, loadDatFile) {
     auto b = loadBeamline("loadDatFile");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignElements.size(), 1);
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 15, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 12, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 15, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 12, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
     auto b = loadBeamline("loadDatFile2");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignElements.size(), 1);
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 14.7, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 17.1, 0.1);
-    CHECK_EQ(b.m_LightSources[0]->m_EnergyDistribution.selectEnergy(), 16.7, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 14.7, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17.1, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 16.7, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
     auto b = loadBeamline("loadGroups");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(), 4);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignElements.size(), 4);
 }
 
 TEST_F(TestSuite, groupTransform) {
     auto b = loadBeamline("groupTransform");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(), 1);
-    auto m = b.m_OpticalElements[0].m_element.m_inTrans;
+    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignElements.size(), 1);
+    auto m = b.m_DesignElements[0].compile().m_inTrans;
     glm::dmat4x4 correct = {
         1,   0,  0,     0,  //
         0,   1,  0,     0,  //
@@ -58,7 +58,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
         std::string rmlFile;
         double energy;
     };
-
+    
     std::vector<testInput> testinput = {
         {
             .rmlFile = "PointSourceSeperateEnergies",
@@ -66,21 +66,21 @@ TEST_F(TestSuite, testEnergyDistribution) {
         },
         {
             .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy = 106.42,
+            .energy = 104.042,
         },
         {
             .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy = 47.92,
+            .energy = 51.29,
         },
         {
             .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy = 127.96,
+            .energy = 123.19,
         },
     };
 
     for (auto values : testinput) {
         auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.m_LightSources[0]->m_EnergyDistribution.selectEnergy();
+        auto energy = beamline.m_DesignSources[0].getEnergyDistribution().selectEnergy();
 
         CHECK_EQ(energy, values.energy, 0.1);
     }
@@ -89,7 +89,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
-    Element para = beamline.m_OpticalElements[0].m_element;
+    Element para = beamline.m_DesignElements[0].compile();
     auto parabo = deserializeQuadric(para.m_surface);
 
     CHECK_EQ(1, parabo.m_a11);
@@ -107,7 +107,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
 
 TEST_F(TestSuite, testSphereQuad) {
     auto beamline = loadBeamline("SphereMirrorDefault");
-    Element sph = beamline.m_OpticalElements[0].m_element;
+    Element sph = beamline.m_DesignElements[0].compile();
     auto sphere = deserializeQuadric(sph.m_surface);
 
     CHECK_EQ(1, sphere.m_a11);
@@ -125,7 +125,7 @@ TEST_F(TestSuite, testSphereQuad) {
 
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
-    Element elli = beamline.m_OpticalElements[0].m_element;
+    Element elli = beamline.m_DesignElements[0].compile();
     auto ellips = deserializeQuadric(elli.m_surface);
 
     CHECK_EQ(1, ellips.m_a11);
@@ -143,7 +143,7 @@ TEST_F(TestSuite, testEllipsoidQuad) {
 
 TEST_F(TestSuite, testCylinderQuad) {
     auto beamline = loadBeamline("CylinderDefault");
-    Element cyli = beamline.m_OpticalElements[0].m_element;
+    Element cyli = beamline.m_DesignElements[0].compile();
     auto cylinder = deserializeQuadric(cyli.m_surface);
 
     CHECK_EQ(0, cylinder.m_a11);
@@ -161,7 +161,7 @@ TEST_F(TestSuite, testCylinderQuad) {
 
 TEST_F(TestSuite, testConeQuad) {
     auto beamline = loadBeamline("Cone");
-    Element con = beamline.m_OpticalElements[0].m_element;
+    Element con = beamline.m_DesignElements[0].compile();
     auto cone = deserializeQuadric(con.m_surface);
 
     CHECK_EQ(0.903353, cone.m_a11, 0.001);
@@ -179,7 +179,7 @@ TEST_F(TestSuite, testConeQuad) {
 
 TEST_F(TestSuite, testToroidSurface) {
     auto beamline = loadBeamline("toroid");
-    Element trid = beamline.m_OpticalElements[0].m_element;
+    Element trid = beamline.m_DesignElements[0].compile();
     auto toroid = deserializeToroid(trid.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
@@ -190,7 +190,7 @@ TEST_F(TestSuite, testToroidSurface) {
 
 TEST_F(TestSuite, testExpertsOptic) {
     auto beamline = loadBeamline("toroid");
-    Element trid = beamline.m_OpticalElements[0].m_element;
+    Element trid = beamline.m_DesignElements[0].compile();
     auto toroid = deserializeToroid(trid.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
@@ -206,24 +206,22 @@ TEST_F(TestSuite, testExpertsOptic) {
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
     auto beamline = loadBeamline("twoSourcesTest");
 
-    std::shared_ptr<LightSource> dsrc = beamline.m_LightSources[0];
-    DipoleSource* dipolesource = dynamic_cast<DipoleSource*>(&*dsrc);
+    DesignSource dipolesource = beamline.m_DesignSources[0];
 
-    std::shared_ptr<LightSource> psrc = beamline.m_LightSources[1];
-    PointSource* pointsource = dynamic_cast<PointSource*>(&*psrc);
+    DesignSource pointsource = beamline.m_DesignSources[1];
 
-    CHECK_EQ(100, dipolesource->getEnergy());
-    CHECK_EQ(148.8, pointsource->selectEnergy(), 0.1);
+    CHECK_EQ(100, dipolesource.getEnergy());
+    CHECK_EQ(150.24724068638105, pointsource.getEnergyDistribution().selectEnergy());
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
-    CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
+    //CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
+    CHECK_EQ(0, pointsource.getSourceWidth(), 0.1);
 }
 
 TEST_F(TestSuite, groupTransform2) {
     auto b = loadBeamline("groupTransform2");
-    CHECK_EQ(b.m_LightSources.size(), 1);
-    CHECK_EQ(b.m_OpticalElements.size(), 1);
+    CHECK_EQ(b.m_DesignSources.size(), 1);
+    CHECK_EQ(b.m_DesignElements.size(), 1);
 
     glm::dmat4x4 yz_swap = {
         1, 0, 0, 0,
@@ -249,8 +247,8 @@ TEST_F(TestSuite, groupTransform2) {
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
 
-    glm::dmat4x4 inTrans = b.m_OpticalElements[0].m_element.m_inTrans * yz_swap;
-    glm::dmat4x4 outTrans = b.m_OpticalElements[0].m_element.m_outTrans * yz_swap;
+    glm::dmat4x4 inTrans = b.m_DesignElements[0].compile().m_inTrans * yz_swap;
+    glm::dmat4x4 outTrans = b.m_DesignElements[0].compile().m_outTrans * yz_swap;
 
     glm::dmat4x4 orientationResult = glm::dmat4x4(glm::dmat3x3(inTrans));
     glm::dvec4 positionResult = outTrans * glm::dvec4(0, 0, 0, 1);

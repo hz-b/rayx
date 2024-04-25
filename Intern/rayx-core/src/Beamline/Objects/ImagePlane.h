@@ -1,8 +1,9 @@
 #pragma once
 #include "Beamline/OpticalElement.h"
+#include "DesignElement/DesignElement.h"
 
 namespace RAYX {
-
-Element makeImagePlane(const DesignObject& dobj);
+struct DesignElement;  
+Element makeImagePlane(const DesignElement& dele);
 
 }  // namespace RAYX

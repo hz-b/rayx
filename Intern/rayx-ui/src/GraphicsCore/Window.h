@@ -34,11 +34,6 @@ class Window {
     ~Window();
 
     /**
-     * @brief Updates the size of the window based on framebuffer size.
-     */
-    void updateWindowSize();
-
-    /**
      * @brief Creates a Vulkan surface associated with the window.
      * @param instance The Vulkan instance.
      * @param surface The Vulkan surface.
@@ -63,6 +58,7 @@ class Window {
      * @param height The new height of the framebuffer.
      */
     static void framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height);
+    void onFramebufferResize(int width, int height);
 
     uint32_t m_width;
     uint32_t m_height;

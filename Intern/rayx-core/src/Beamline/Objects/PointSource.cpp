@@ -1,27 +1,26 @@
 #include "PointSource.h"
 
-#include "Data/xml.h"
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
-#include "Random.h"
-#include "Shader/Constants.h"
+#include <DesignElement/DesignSource.h>
+#include <DesignElement/DesignElement.h>
+#include <Debug/Debug.h>
+#include <Debug/Instrumentor.h>
+#include <Random.h>
+#include <Shader/Constants.h>
 
 namespace RAYX {
 
-PointSource::PointSource(const DesignObject& dobj) : LightSource(dobj) {
-    m_widthDist = dobj.parseSourceWidthDistribution();
-    m_heightDist = dobj.parseSourceHeightDistribution();
-    m_horDist = dobj.parseHorDivDistribution();
-    m_verDist = dobj.parseVerDivDistribution();
-    m_horDivergence = dobj.parseHorDiv();
-    m_verDivergence = dobj.parseVerDiv();
-    m_sourceDepth = dobj.parseSourceDepth();
-    m_sourceHeight = dobj.parseSourceHeight();
-    m_sourceWidth = dobj.parseSourceWidth();
-
-    m_linearPol_0 = dobj.parseLinearPol0();
-    m_linearPol_45 = dobj.parseLinearPol45();
-    m_circularPol = dobj.parseCircularPol();
+PointSource::PointSource(const DesignSource& dSource) : LightSource(dSource),
+    m_widthDist(dSource.getWidthDist()),
+    m_heightDist(dSource.getHeightDist()),
+    m_horDist(dSource.getHorDist()),
+    m_verDist(dSource.getVerDist()),
+    m_pol(dSource.getStokes()),
+    m_verDivergence(dSource.getVerDivergence()),
+    m_sourceDepth(dSource.getSourceDepth()),
+    m_sourceHeight(dSource.getSourceHeight()),
+    m_sourceWidth(dSource.getSourceWidth())
+     {
+    m_horDivergence = dSource.getHorDivergence();
 }
 
 /**
@@ -92,9 +91,8 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
         glm::dvec3 direction = getDirectionFromAngles(phi, psi);
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
-        glm::dvec4 stokes = glm::dvec4(1, m_linearPol_0, m_linearPol_45, m_circularPol);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, stokes, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)
 #pragma omp critical
         { rayList.push_back(r); }
@@ -105,10 +103,10 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
     return rayList;
 }
 
-double PointSource::getHorDivergence() const { return m_horDivergence; }
+//double PointSource::getHorDivergence() const { return m_horDivergence; }
 
-double PointSource::getSourceHeight() const { return m_sourceHeight; }
+//double PointSource::getSourceHeight() const { return m_sourceHeight; }
 
-double PointSource::getSourceWidth() const { return m_sourceWidth; }
+//double PointSource::getSourceWidth() const { return m_sourceWidth; }
 
 }  // namespace RAYX

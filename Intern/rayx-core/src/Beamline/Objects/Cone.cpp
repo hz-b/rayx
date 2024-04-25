@@ -1,15 +1,16 @@
 #include "Cone.h"
 
-#include "Debug/Debug.h"
-#include "Shader/Constants.h"
+#include <Debug/Debug.h>
+#include <Shader/Constants.h>
+#include <DesignElement/DesignElement.h>
 
 namespace RAYX {
-Element makeCone(const DesignObject& dobj) {
-    auto incidence = dobj.parseGrazingIncAngle();
-    double entranceArmLength = dobj.parseEntranceArmLength();
-    double exitArmLength = dobj.parseExitArmLength();
+Element makeCone(const DesignElement& dele) {
+    auto incidence = dele.getGrazingIncAngle();
+    double entranceArmLength = dele.getEntranceArmLength();
+    double exitArmLength = dele.getExitArmLength();
 
-    double zl = dobj.parseTotalLength();
+    double zl = dele.getTotalLength();
 
     double ra = entranceArmLength;
     double rb = exitArmLength;
@@ -58,6 +59,6 @@ Element makeCone(const DesignObject& dobj) {
         .m_a34 = 0,
         .m_a44 = 0,
     });
-    return makeElement(dobj, behaviour, surface);
+    return makeElement(dele, behaviour, surface);
 }
 }  // namespace RAYX

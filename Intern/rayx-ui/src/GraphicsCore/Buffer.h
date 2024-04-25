@@ -22,7 +22,7 @@ class Buffer {
      * @param memoryPropertyFlags Memory property flags.
      * @param minOffsetAlignment Minimum required alignment offset.
      */
-    Buffer(Device& device, const std::string& name, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
+    Buffer(const Device& device, const std::string& name, VkDeviceSize instanceSize, uint32_t instanceCount, VkBufferUsageFlags usageFlags,
            VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize minOffsetAlignment = 1);
     /// Destroys the Buffer object and frees memory.
     ~Buffer();
@@ -98,7 +98,7 @@ class Buffer {
   private:
     static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
-    Device& m_Device;
+    const Device& m_Device;
     std::string m_Name;
     void* m_mapped = nullptr;
     VkBuffer m_Buffer = VK_NULL_HANDLE;

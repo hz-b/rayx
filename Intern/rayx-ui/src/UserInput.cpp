@@ -6,6 +6,8 @@
 
 #include "Camera.h"
 
+extern bool isSceneWindowHovered;
+
 /**
  * This function handles various keyboard events including window manipulation and camera movement.
  * It integrates ImGui for GUI events and directly manipulates a CameraController object for 3D navigation.
@@ -61,6 +63,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         if (action == GLFW_PRESS) {
+            if (!isSceneWindowHovered) return;
             camController->startMouseLook();
             double mouseX, mouseY;
             glfwGetCursorPos(window, &mouseX, &mouseY);

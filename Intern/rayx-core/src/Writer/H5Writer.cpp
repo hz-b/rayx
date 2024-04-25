@@ -75,12 +75,13 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     bundleHist.reserve(numRays);
     size_t double_index = 0;
     RAYX::RayHistory rayHist;
+    double startEventID = doubles[1];
     while (double_index < doubles.size()) {
         // Extract and ignore Ray-ID and Snapshot-ID
         [[maybe_unused]] double rayId = doubles[double_index++];
         double eventId = doubles[double_index++];
 
-        if (eventId == 0) {
+        if (eventId == startEventID) {
             bundleHist.push_back(rayHist);
             rayHist.clear();
         }
@@ -104,32 +105,35 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
 
         double_index += formatSize - 2;
     }
-
+    bundleHist.push_back(rayHist);
     // Remove first empty snapshot
     bundleHist.erase(bundleHist.begin());
 
     return bundleHist;
 }
 
-RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) {
+RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, unsigned int* startEventID) {
     RAYX::BundleHistory rays;
-    HighFive::File file(filename, HighFive::File::ReadOnly);
-
-    std::vector<double> doubles;
 
     try {
+        HighFive::File file(filename, HighFive::File::ReadOnly);
+
+        std::vector<double> doubles;
+
         // read data
         auto dataset = file.getDataSet("rays");
         auto dims = dataset.getSpace().getDimensions();
         doubles.resize(dims[0] * dims[1]);
         dataset.read(doubles.data());
-
+        if (startEventID) {
+            *startEventID = static_cast<unsigned int>(doubles[1]);
+        }
         rays = fromDoubles(doubles, format);
+        RAYX_VERB << "Loaded " << rays.size() << " rays from " << filename;
 
     } catch (HighFive::Exception& err) {
         RAYX_ERR << err.what();
     }
-
     return rays;
 }
 

@@ -13,6 +13,7 @@ namespace RAYX {
 
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
+struct DesignElement; 
 
 // This is the current "high-level" representation of an OpticalElement.
 // As you can see, it is precisely the same as the shader-internal representation `Element` in addition with a name.
@@ -38,19 +39,19 @@ glm::dmat4 defaultOutMatrix(const DesignObject& dobj, DesignPlane plane);
 double defaultMaterial(const DesignObject& dobj);
 
 // constructs an Element given all of its components. Some information that is not explicitly given, will be parsed from the `dobj`.
-Element makeElement(const DesignObject& dobj, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
+Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {}, DesignPlane plane=DesignPlane::XZ);
 
-Element makeExperts(const DesignObject& dobj);
-Element makeExpertsCubic(const DesignObject& dobj);
+Element makeExperts(const DesignElement& dobj);
+Element makeExpertsCubic(const DesignElement& dobj);
 
 // creates a toroid from the parameters given in `dobj`.
-Surface makeToroid(const DesignObject& dobj);
+Surface makeToroid(const DesignElement& dele);
 
 // creates a quadric from the parameters given in `dobj`.
-Surface makeQuadric(const DesignObject& dobj);
+Surface makeQuadric(const DesignElement& dobj);
 
 // creates a cubic from the parameters given in `dobj`.
-Surface makeCubic(const DesignObject& dobj);
+Surface makeCubic(const DesignElement& dobj);
 
 // creates a sphere quadric from the parameters given in `dobj`.
 Surface makeSphere(double radius);
@@ -59,6 +60,6 @@ Surface makeSphere(double radius);
 Surface makePlane();
 
 // creates a Grating Behaviour from the parameters given in `dobj`.
-Behaviour makeGrating(const DesignObject& dobj);
+Behaviour makeGrating(const DesignElement& dele);
 
 }  // namespace RAYX
