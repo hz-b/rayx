@@ -8,9 +8,11 @@ namespace RAYX {
 struct AccNull {};
 
 template <typename Dim, typename Idx>
-#if defined(ALPAKA_ACC_GPU_CUDA_ENABLED) || defined(ALPAKA_ACC_GPU_HIP_ENABLED)
+#if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
 #define GPU_TRACER
 using DefaultGpuAcc = alpaka::AccGpuCudaRt<Dim, Idx>;
+#elif defined(ALPAKA_ACC_GPU_HIP_ENABLED)
+using DefaultGpuAcc = alpaka::AccGpuHipRt<Dim, Idx>;
 #else
 using DefaultGpuAcc = AccNull;
 #endif
