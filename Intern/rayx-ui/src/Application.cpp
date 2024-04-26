@@ -58,9 +58,6 @@ void Application::init() {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
     }
-    if (m_CommandParser.m_args.m_verbose) {
-        RAYX::setDebugVerbose(true);
-    }
 
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
     UIRayInfo rayInfo{
@@ -259,7 +256,6 @@ void Application::run() {
             if (m_UIParams.sceneExtent.height != 0 && m_UIParams.sceneExtent.width != 0) {
                 if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
                     m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
-                    sceneExtent = m_UIParams.sceneExtent;
                     m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
                 }
             }
