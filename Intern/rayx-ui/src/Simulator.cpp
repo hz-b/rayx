@@ -76,14 +76,14 @@ void Simulator::runSimulation() {
 
 void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, const RAYX::Beamline& beamline,
                                         const UISimulationInfo& simulationInfo) {
+    using DeviceType = RAYX::DeviceConfig::DeviceType;
+    const auto cpu = simulationInfo.tracer == 0;
+    const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
+    m_Tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
+
     m_RMLPath = RMLPath;
     m_Beamline = std::move(beamline);
     m_max_batch_size = simulationInfo.maxBatchSize;
-    if (simulationInfo.tracer == 0) {
-        m_Tracer = std::make_unique<RAYX::Tracer>(RAYX::Tracer::Platform::Cpu);
-    } else {
-        m_Tracer = std::make_unique<RAYX::Tracer>(RAYX::Tracer::Platform::Gpu);
-    }
     m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
     m_deviceIndex = simulationInfo.deviceIndex;
     m_startEventID = simulationInfo.startEventID;

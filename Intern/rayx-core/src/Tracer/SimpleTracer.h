@@ -149,7 +149,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     const auto materialTables = b.calcMinimalMaterialTables();
     const auto randomSeed = randomDouble();
 
-    const auto cpu = getDevice<Cpu>();
+    const auto cpu = getDevice<Cpu>(0);
     const auto acc = getDevice<Acc>(m_deviceIndex);
     auto q = Queue(acc);
 

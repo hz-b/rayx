@@ -7,14 +7,26 @@ namespace RAYX {
 // declare invalid Acc
 struct AccNull {};
 
-template <typename Dim, typename Idx>
 #if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
-#define GPU_TRACER
-using DefaultGpuAcc = alpaka::AccGpuCudaRt<Dim, Idx>;
-#elif defined(ALPAKA_ACC_GPU_HIP_ENABLED)
-using DefaultGpuAcc = alpaka::AccGpuHipRt<Dim, Idx>;
+#define RAYX_CUDA
+#endif
+
+#if defined(ALPAKA_ACC_GPU_HIP_ENABLED)
+#define RAYX_HIP
+#endif
+
+template <typename Dim, typename Idx>
+#if defined(RAYX_CUDA)
+using GpuAccCuda = alpaka::AccGpuCudaRt<Dim, Idx>;
 #else
-using DefaultGpuAcc = AccNull;
+using GpuAccCuda = AccNull;
+#endif
+
+template <typename Dim, typename Idx>
+#if defined(RAYX_HIP)
+using GpuAccHip = alpaka::AccGpuHipRt<Dim, Idx>;
+#else
+using GpuAccHip = AccNull;
 #endif
 
 template <typename Dim, typename Idx>
@@ -32,19 +44,13 @@ using DefaultCpuAcc = alpaka::AccCpuSerial<Dim, Idx>;
 using DefaultCpuAcc = AccNull;
 #endif
 
-template <typename Dim, typename Idx>
-using DefaultAcc = std::conditional_t<
-    alpaka::isAccelerator<DefaultGpuAcc<Dim, Idx>>,
-    DefaultGpuAcc<Dim, Idx>,
-    DefaultCpuAcc<Dim, Idx>
->;
-
 template <typename Acc>
 constexpr bool isAccAvailable() {
     return !std::is_same_v<Acc, AccNull> && alpaka::isAccelerator<Acc>;
 }
 
 // test if we have a minimum required Accelerator
-static_assert(isAccAvailable<DefaultCpuAcc<alpaka::DimInt<1>, int>>()); // test if at least one Cpu Acc is available.
+// we need at least one Cpu Acc is available.
+static_assert(isAccAvailable<DefaultCpuAcc<alpaka::DimInt<1>, int32_t>>());
 
 } // namespace RAYX

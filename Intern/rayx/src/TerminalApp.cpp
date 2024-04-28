@@ -159,11 +159,12 @@ void TerminalApp::run() {
     }
 
     // Choose Hardware
-    auto platform = m_CommandParser->m_args.m_cpuFlag
-        ? RAYX::Tracer::Platform::Cpu
-        : RAYX::Tracer::Platform::Gpu
+    using DeviceType = RAYX::DeviceConfig::DeviceType;
+    const auto deviceType = m_CommandParser->m_args.m_cpuFlag
+        ? DeviceType::Cpu
+        : DeviceType::Gpu
     ;
-    m_Tracer = std::make_unique<RAYX::Tracer>(platform);
+    m_Tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);

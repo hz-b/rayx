@@ -6,15 +6,10 @@
 namespace RAYX {
 
 template <typename Acc>
-inline auto getDevice(int deviceIndex = 0) {
+inline auto getDevice(int deviceIndex) {
     const auto platform = alpaka::Platform<Acc>();
-    const auto dev = alpaka::getDevByIdx(platform, deviceIndex);
-    RAYX_VERB
-        << "found " << alpaka::getDevCount(platform)
-        << " device(s) for platform '" << alpaka::getAccName<Acc>() << "'."
-        << " picking '" << alpaka::getName(dev) << "'"
-    ;
-    return dev;
+    const auto acc = alpaka::getDevByIdx(platform, deviceIndex);
+    return acc;
 };
 
 template <typename Acc>

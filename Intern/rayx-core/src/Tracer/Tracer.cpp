@@ -7,58 +7,32 @@
 
 namespace {
 
-using Dim = alpaka::DimInt<1>;
-using Idx = int32_t;
-using GpuAcc = RAYX::DefaultGpuAcc<Dim, Idx>;
-using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
+using DeviceType = RAYX::DeviceConfig::DeviceType;
+using DeviceIndex = RAYX::DeviceConfig::Device::Index;
 
-inline int64_t getDeviceCountForPlatform(RAYX::Tracer::Platform platform) {
-    switch (platform) {
-    case RAYX::Tracer::Platform::Gpu:
-#ifdef GPU_TRACER
-        return alpaka::getDevCount(alpaka::Platform<GpuAcc>());
+inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceType, DeviceIndex deviceIndex) {
+    using Dim = alpaka::DimInt<1>;
+    using Idx = int32_t;
+
+    switch (deviceType) {
+    case DeviceType::GpuCuda:
+#if defined(RAYX_CUDA)
+        using GpuAccCuda = RAYX::GpuAccCuda<Dim, Idx>;
+        return std::make_shared<RAYX::SimpleTracer<GpuAccCuda>>(deviceIndex);
 #else
-        return 0;
+        RAYX_ERR << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
+        return nullptr;
 #endif
-
-    default: // case RAYX::Tracer::Platform::Cpu
-        return alpaka::getDevCount(alpaka::Platform<CpuAcc>());
-    }
-}
-
-inline std::string getDeviceName(RAYX::Tracer::Platform platform, int deviceIndex) {
-    switch (platform) {
-        case RAYX::Tracer::Platform::Gpu: {
-#ifdef GPU_TRACER
-            auto dev = RAYX::getDevice<GpuAcc>(deviceIndex);
-            return alpaka::getName(dev);
+    case DeviceType::GpuHip:
+#if defined(RAYX_HIP)
+        using GpuAccHip = RAYX::GpuAccHip<Dim, Idx>;
+        return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
 #else
-            assert(false && "Gpu support was disabled during build. Cannot get device name");
-            return "device-not-found";
+        RAYX_ERR << "Failed to create Tracer with Hip device. Hip was disabled during build.";
+        return nullptr;
 #endif
-
-        }
-        default: { // case Tracer::Platform::Cpu
-            auto dev = RAYX::getDevice<CpuAcc>(deviceIndex);
-            return alpaka::getName(dev);
-        }
-    }
-}
-
-inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(RAYX::Tracer::Platform platform, int deviceIndex) {
-    switch (platform) {
-    case RAYX::Tracer::Platform::Gpu:
-#ifdef GPU_TRACER
-            return std::make_shared<RAYX::SimpleTracer<GpuAcc>>(deviceIndex);
-#else
-            RAYX_WARN
-                << "Gpu Tracer was disabled during build."
-                << " Falling back to Cpu Tracer."
-                << " Add '-x' flag on launch to use the Cpu Tracer directly"
-            ;
-            [[fallthrough]];
-#endif
-    default: // case RAYX::Tracer::Platform::Cpu
+    default: // case DeviceType::Cpu
+        using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
         return std::make_shared<RAYX::SimpleTracer<CpuAcc>>(deviceIndex);
     }
 }
@@ -67,11 +41,17 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(RAYX::Tracer::Plat
 
 namespace RAYX {
 
-Tracer::Tracer(Platform platform, int deviceIndex) :
-    m_platform(platform),
-    m_deviceIndex(deviceIndex)
-{
-    m_deviceTracer = createDeviceTracer(platform, deviceIndex);
+Tracer::Tracer(const DeviceConfig& deviceConfig) {
+    if (deviceConfig.enabledDevicesCount() != 1)
+        RAYX_ERR << "The number of selected devices must be exactly 1!";
+
+    for (const auto& device : deviceConfig.devices) {
+        if (device.enable) {
+            RAYX_LOG << "Creating tracer with device: " << device.name;
+            m_deviceTracer = createDeviceTracer(device.type, device.index);
+            break;
+        }
+    }
 }
 
 BundleHistory Tracer::trace(
@@ -90,14 +70,6 @@ BundleHistory Tracer::trace(
         maxEvents,
         startEventID
     );
-}
-
-int64_t Tracer::deviceCount(Platform platform) {
-    return getDeviceCountForPlatform(platform);
-}
-
-std::string Tracer::deviceName(Platform platform, int deviceIndex) {
-    return getDeviceName(platform, deviceIndex);
 }
 
 /// Get the last event for each ray of the bundle.

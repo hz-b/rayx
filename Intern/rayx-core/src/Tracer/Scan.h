@@ -24,8 +24,8 @@ inline alpaka::Idx<Acc> scan_sum(
     using Cpu = alpaka::DevCpu;
     using Seq = alpaka::AccCpuSerial<Dim, Idx>;
 
-    auto cpu = getDevice<Cpu>();
-    auto seq = getDevice<Seq>();
+    auto cpu = getDevice<Cpu>(0);
+    auto seq = getDevice<Seq>(0);
 
     auto h_src = alpaka::allocBuf<T, Idx>(cpu, Vec{n});
     auto h_dst = alpaka::allocBuf<T, Idx>(cpu, Vec{n});

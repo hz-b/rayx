@@ -163,11 +163,9 @@ class TestSuite : public testing::Test {
         }
 
         // Choose Hardware
-        auto platform = cpu
-            ? RAYX::Tracer::Platform::Cpu
-            : RAYX::Tracer::Platform::Gpu
-        ;
-        tracer = std::make_unique<RAYX::Tracer>(platform);
+        using DeviceType = RAYX::DeviceConfig::DeviceType;
+        const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
+        tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
     }
 
     // called before every test invocation.

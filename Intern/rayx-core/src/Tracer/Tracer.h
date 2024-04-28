@@ -7,6 +7,7 @@
 #include <Core.h>
 #include <Shader/Ray.h>
 
+#include "DeviceConfig.h"
 #include "DeviceTracer.h"
 
 // Abstract Tracer base class.
@@ -17,17 +18,12 @@ const uint64_t DEFAULT_BATCH_SIZE = 100000;
 
 class RAYX_API Tracer {
   public:
-    enum class Platform {
-        Cpu,
-        Gpu,
-    };
-
     /**
      * @brief Constructs Tracer for the desired platform
      * @param platform specify the platform
      * @param deviceIndex index of the picked divice on specified platform
      */
-    Tracer(Platform platform, int deviceIndex = 0);
+    Tracer(const DeviceConfig& deviceConfig);
 
     // This will call the trace implementation of a subclass
     // See `BundleHistory` for information about the return value.
@@ -41,16 +37,7 @@ class RAYX_API Tracer {
         int startEventID = 0
     );
 
-    inline Platform platform() { return m_platform; }
-    inline int64_t deviceIndex() { return m_deviceIndex; }
-
-    static int64_t deviceCount(Platform platform);
-    static std::string deviceName(Platform platform, int deviceIndex);
-
   private:
-    const Platform m_platform;
-    const int m_deviceIndex;
-
     std::shared_ptr<DeviceTracer> m_deviceTracer;
 };
 
