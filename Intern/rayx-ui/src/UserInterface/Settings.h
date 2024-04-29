@@ -28,19 +28,17 @@ struct UISimulationInfo {
     unsigned int startEventID = 0;
     unsigned int maxEvents = 0;
     unsigned int maxBatchSize = 100000;
-    unsigned int tracer = 1;
     bool sequential = false;
     std::vector<std::string> availableDevices;
     unsigned int deviceIndex = 0;
     bool fixedSeed = false;
     int seed;
 
-    UISimulationInfo(int startEventID, int maxEvents, int maxBatchSize, int tracer, bool sequential, const std::vector<std::string>& availableDevices,
+    UISimulationInfo(int startEventID, int maxEvents, int maxBatchSize, bool sequential, const std::vector<std::string>& availableDevices,
                      int deviceIndex, bool fixedSeed = false, int seed = 0)
         : startEventID(startEventID),
           maxEvents(maxEvents),
           maxBatchSize(maxBatchSize),
-          tracer(tracer),
           sequential(sequential),
           availableDevices(availableDevices),
           deviceIndex(deviceIndex),
@@ -77,7 +75,6 @@ struct UIParameters {
               0,
               0,
               100000,
-              0,
               false,
               availableDevices,
               0,

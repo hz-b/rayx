@@ -480,19 +480,10 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 deviceItems.push_back(device.c_str());
             }
 
-            const char* tracerItems[] = {"CPU Tracer", "VULKAN Tracer"};
-            ImGui::Combo("Tracer", reinterpret_cast<int*>(&uiParams.simulationInfo.tracer), tracerItems, IM_ARRAYSIZE(tracerItems));
-
             // Device selection combo box
-            if (uiParams.simulationInfo.tracer == 1) {  // If not CPU Tracer, enable device selection
-                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
-                             static_cast<int>(deviceItems.size()));
-            } else {
-                ImGui::BeginDisabled();  // Disable combo box if CPU Tracer is selected
-                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
-                             static_cast<int>(deviceItems.size()));
-                ImGui::EndDisabled();
-            }
+            ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
+                         static_cast<int>(deviceItems.size()));
+
             // startEventID selection
             // ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
 

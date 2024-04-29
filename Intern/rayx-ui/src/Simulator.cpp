@@ -8,7 +8,6 @@
 // constructor
 Simulator::Simulator() {
     m_seq = RAYX::Sequential::No;
-    m_availableDevices.push_back("placeholder-device-1");
 }
 
 void Simulator::runSimulation() {
@@ -76,16 +75,16 @@ void Simulator::runSimulation() {
 
 void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, const RAYX::Beamline& beamline,
                                         const UISimulationInfo& simulationInfo) {
-    using DeviceType = RAYX::DeviceConfig::DeviceType;
-    const auto cpu = simulationInfo.tracer == 0;
-    const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
-    m_Tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
+    const auto deviceAlreadyEnabled = m_deviceConfig.devices[simulationInfo.deviceIndex].enable;
+    if (!deviceAlreadyEnabled) {
+        m_deviceConfig.disableAllDevices().enableDeviceByIndex(simulationInfo.deviceIndex);
+        m_Tracer = std::make_unique<RAYX::Tracer>(m_deviceConfig);
+    }
 
     m_RMLPath = RMLPath;
     m_Beamline = std::move(beamline);
     m_max_batch_size = simulationInfo.maxBatchSize;
     m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-    m_deviceIndex = simulationInfo.deviceIndex;
     m_startEventID = simulationInfo.startEventID;
     m_maxEvents = simulationInfo.maxEvents;
     if (simulationInfo.fixedSeed) {
@@ -100,4 +99,9 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
     m_readyForSimulation = true;
 }
 
-std::vector<std::string> Simulator::getAvailableDevices() { return m_availableDevices; }
+std::vector<std::string> Simulator::getAvailableDevices() {
+    auto deviceNames = std::vector<std::string>();
+    for (const RAYX::DeviceConfig::Device& device : m_deviceConfig.devices)
+        deviceNames.push_back(device.name);
+    return deviceNames;
+}
