@@ -162,10 +162,37 @@ size_t DeviceConfig::enabledDevicesCount() const {
     return count;
 }
 
+DeviceConfig& DeviceConfig::disableAllDevices(DeviceType deviceType) {
+    for (auto& device : devices)
+        device.enable = !(device.type | deviceType);
+
+    return *this;
+}
+
 DeviceConfig& DeviceConfig::enableAllDevices(DeviceType deviceType) {
     for (auto& device : devices)
         device.enable = device.type | deviceType;
 
+    return *this;
+}
+
+DeviceConfig& DeviceConfig::disableDeviceByIndex(const Device::Index deviceIndex) {
+    if (devices.size() <= deviceIndex) {
+        dumpDevices();
+        RAYX_ERR << "Specified device index is out of range: " << deviceIndex;
+    }
+
+    devices[deviceIndex].enable = false;
+    return *this;
+}
+
+DeviceConfig& DeviceConfig::enableDeviceByIndex(const Device::Index deviceIndex) {
+    if (devices.size() <= deviceIndex) {
+        dumpDevices();
+        RAYX_ERR << "Specified device index is out of range: " << deviceIndex;
+    }
+
+    devices[deviceIndex].enable = true;
     return *this;
 }
 
@@ -189,16 +216,6 @@ DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
     }
 
     bestIt->enable = true;
-    return *this;
-}
-
-DeviceConfig& DeviceConfig::enableDeviceByIndex(const Device::Index deviceIndex) {
-    if (devices.size() <= deviceIndex) {
-        dumpDevices();
-        RAYX_ERR << "Specified device index is out of range: " << deviceIndex;
-    }
-
-    devices[deviceIndex].enable = true;
     return *this;
 }
 

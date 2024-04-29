@@ -36,9 +36,13 @@ struct RAYX_API DeviceConfig {
     void dumpDevices() const;
     size_t enabledDevicesCount() const;
 
+    DeviceConfig& disableAllDevices(DeviceType deviceType = DeviceType::All);
     DeviceConfig& enableAllDevices(DeviceType deviceType = DeviceType::All);
-    DeviceConfig& enableBestDevice(DeviceType deviceType = DeviceType::All);
+
+    DeviceConfig& disableDeviceByIndex(const Device::Index deviceIndex);
     DeviceConfig& enableDeviceByIndex(const Device::Index deviceIndex);
+
+    DeviceConfig& enableBestDevice(DeviceType deviceType = DeviceType::All);
 
     std::vector<Device> devices;
 };
