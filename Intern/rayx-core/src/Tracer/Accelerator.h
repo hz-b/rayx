@@ -19,42 +19,21 @@ constexpr inline auto getBlockSize() {
 
     auto impl = [] () -> Idx {
 #if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccGpuCudaRt<Dim, Idx>>) {
+        if constexpr (std::is_same_v<Acc, alpaka::AccGpuCudaRt<Dim, Idx>>)
             return 128;
-        }
 #endif
 
 #if defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Blocks<Dim, Idx>>) {
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Blocks<Dim, Idx>>)
             return 1;
-        }
-#endif
-
-#if defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccCpuOmp2Threads<Dim, Idx>>) {
-            return 20;
-        }
-#endif
-
-#if defined(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccCpuTbbBlocks<Dim, Idx>>) {
-            return 1024;
-        }
-#endif
-
-#if defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccCpuThreads<Dim, Idx>>) {
-            return 20;
-        }
 #endif
 
 #if defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
-        if constexpr (std::is_same_v<Acc, alpaka::AccCpuSerial<Dim, Idx>>) {
+        if constexpr (std::is_same_v<Acc, alpaka::AccCpuSerial<Dim, Idx>>)
             return 1;
-        }
 #endif
 
-        return 0;
+        return 0; // unimplemented
     };
 
     constexpr Idx blockSize = impl();

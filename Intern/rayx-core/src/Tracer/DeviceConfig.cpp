@@ -145,7 +145,6 @@ namespace RAYX {
 DeviceConfig::DeviceConfig(DeviceType fetchedDeviceType) :
     devices(getAvailableDevices(fetchedDeviceType))
 {
-    // RAYX_PROFILE_FUNCTION_STDOUT();
 }
 
 void DeviceConfig::dumpDevices() const {
