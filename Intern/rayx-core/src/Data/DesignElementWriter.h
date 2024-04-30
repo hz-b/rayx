@@ -22,7 +22,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
-    de->setCurvatureType(CurvatureType::Plane);
+    //de->setCurvatureType(CurvatureType::Plane); TODo reenable
 
     if (de->getType() != "ImagePlane") {
         de->setCutout(parser.parseCutout(dp));
@@ -31,10 +31,16 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     }
 }
 
-void getImageplane(xml::Parser parser, DesignElement* de) { setAllMandatory(parser, de, DesignPlane::XY); }
+void getImageplane(xml::Parser parser, DesignElement* de) { 
+    setAllMandatory(parser, de, DesignPlane::XY); 
+    de->setCurvatureType(CurvatureType::Plane);
+    de->setBehaviourType(BehaviourType::ImagePlane);
+    }
 
 void getSlit(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY);
+    de->setCurvatureType(CurvatureType::Plane);
+    de->setBehaviourType(BehaviourType::Slit);
 
     de->setOpeningShape(parser.parseOpeningShape());
     de->setOpeningWidth(parser.parseOpeningWidth());
@@ -49,6 +55,8 @@ void getSlit(xml::Parser parser, DesignElement* de) {
 
 void getCone(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Cone);
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
@@ -58,6 +66,8 @@ void getCone(xml::Parser parser, DesignElement* de) {
 
 void getCylinder(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Cylinder);
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setRadiusDirection(parser.parseBendingRadius());
     de->setRadius(parser.parseRadius());
@@ -68,6 +78,8 @@ void getCylinder(xml::Parser parser, DesignElement* de) {
 
 void getEllipsoid(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Ellipsoid);
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setShortHalfAxisB(parser.parseShortHalfAxisB());
     de->setLongHalfAxisA(parser.parseLongHalfAxisA());
@@ -81,6 +93,8 @@ void getEllipsoid(xml::Parser parser, DesignElement* de) {
 
 void getParaboloid(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Paraboloid);
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setArmLength(parser.parseArmLength());
     de->setParameterP(parser.parseParameterP());
@@ -90,6 +104,7 @@ void getParaboloid(xml::Parser parser, DesignElement* de) {
 }
 
 void getGrating(xml::Parser parser, DesignElement* de) {
+    de->setBehaviourType(BehaviourType::Grating);
     de->setVLSParameters(parser.parseVls());
     de->setLineDensity(parser.parseLineDensity());
     de->setOrderOfDiffraction(parser.parseOrderDiffraction());
@@ -97,28 +112,45 @@ void getGrating(xml::Parser parser, DesignElement* de) {
 
 void getPlaneGrating(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Plane);
+
     getGrating(parser, de);
 }
 
 void getSphereGrating(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Spherical);
 
-    de->setRadius(parser.parseRadius());
+    de->setDeviationAngle(parser.parseDeviationAngle());
+    de->setEntranceArmLength(parser.parseEntranceArmLength());
+    de->setExitArmLength(parser.parseExitArmLength());
+    de->setCalcRadiusDeviationAngle();
+
     getGrating(parser, de);
 }
 
-void getPlaneMirror(xml::Parser parser, DesignElement* de) { setAllMandatory(parser, de, DesignPlane::XZ); }
+void getPlaneMirror(xml::Parser parser, DesignElement* de) { 
+    setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Plane); 
+    de->setBehaviourType(BehaviourType::Mirror);
+}
 
 void getSphereMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
-
+    de->setCurvatureType(CurvatureType::Spherical);
+    de->setBehaviourType(BehaviourType::Mirror);
+    
+    
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
+    de->setCalcRadius();
 }
 
 void getToroidMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Toroidal); 
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setShortRadius(parser.parseShortRadius());
     de->setLongRadius(parser.parseLongRadius());
@@ -126,6 +158,14 @@ void getToroidMirror(xml::Parser parser, DesignElement* de) {
 
 void getRZP(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    CurvatureType curv = parser.parseCurvatureType();
+    if (curv == CurvatureType::Spherical) {
+        curv = CurvatureType::RzpSphere;
+    }
+    de->setCurvatureType(curv);
+    
+
+    de->setBehaviourType(BehaviourType::Rzp);
 
     de->setFresnelZOffset(parser.parseFresnelZOffset());
     de->setDesignMeridionalExitArmLength(parser.parseExitArmLengthMer());
@@ -139,21 +179,23 @@ void getRZP(xml::Parser parser, DesignElement* de) {
     de->setDesignAlphaAngle(parser.parseDesignAlphaAngle());
     de->setDesignBetaAngle(parser.parseDesignBetaAngle());
     de->setImageType(parser.parseImageType());
-    de->setCurvatureType(parser.parseCurvatureType());
     de->setAdditionalOrder(parser.parseAdditionalOrder());
     de->setShortRadius(parser.parseShortRadius());
     de->setLongRadius(parser.parseLongRadius());
-    de->setCurvatureType(parser.parseCurvatureType());
 }
 
 void getExpertsCubic(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Cubic);
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setExpertsCubic(serializeCubic(parser.parseCubicParameters()));
 }
 
 void getExpertsOptics(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Quadric);
+    de->setBehaviourType(BehaviourType::Mirror);
 
     de->setExpertsOptics(serializeQuadric(parser.parseQuadricParameters()));
 }

@@ -214,7 +214,6 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
     CHECK_EQ(150.24724068638105, pointsource.getEnergyDistribution().selectEnergy());
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    //CHECK_EQ(-21.74, dipolesource->getXYZPosition(0.1).x, 0.1);
     CHECK_EQ(0, pointsource.getSourceWidth(), 0.1);
 }
 

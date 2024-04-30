@@ -1,54 +1,35 @@
 #include "DesignElement.h"
 
 #include "Debug/Debug.h"
+#include "Beamline/Objects/SurfaceType.h"
+#include "Beamline/Objects/BehaviourType.h"
 
 namespace RAYX {
+    
 Element DesignElement::compile() const {
+    Surface surface;
+    Behaviour behav;
 
-    Element e;
-    if (getType() == "ImagePlane") {
-        e = makeImagePlane(*this);
-    } else if (getType() == "Slit") {
-        e = makeSlit(*this);
-    }else if (getType() == "Cone") {
-        e = makeCone(*this);
-    }else if (getType() == "Cylinder") {
-        e = makeCylinder(*this);
-    }else if (getType() == "Ellipsoid") {
-        e = makeEllipsoid(*this);
-    }else if (getType() == "Paraboloid") {
-        e = makeParaboloid(*this);
-    }else if (getType() == "Plane Grating") {
-        e = makePlaneGrating(*this);
-    }else if (getType() == "Plane Mirror") {
-        e = makePlaneMirror(*this);
-    }else if (getType() == "Spherical Grating") {
-        e = makeSphereGrating(*this);
-    }else if (getType() == "Spherical Mirror" || getType() == "Sphere") {
-        e = makeSphereMirror(*this);
-    }else if (getType() == "Toroid") {
-        e = makeToroidMirror(*this);
-    }else if (getType() == "Reflection Zoneplate") {
-        e = makeReflectionZonePlate(*this);
-    }else if (getType() == "Experts Optics") {
-        e = makeExperts(*this);
-    }else if (getType() == "Experts Cubic") {
-        e = makeExpertsCubic(*this);
+    if (getType() == "Experts Optics") {
+        return makeElement(*this, serializeMirror(), makeQuadric(*this));
+    } else {
+        surface = makeSurface(*this);
+        behav = makeBehaviour(*this);
+        if (getType() == "Slit") {
+            return makeElement(*this, behav, surface, {}, DesignPlane::XY);
+        } else if (getType() == "ImagePlane") {
+            return makeElement(*this, behav, surface, serializeUnlimited(), DesignPlane::XY);
+        } else {
+            return makeElement(*this, behav, surface);
+        }
     }
-    return e;
 }
 
-void DesignElement::setName(std::string s) { 
-    v["name"] = s; 
-}
-void DesignElement::setType(std::string s) { 
-    v["type"] = s; 
-}
+void DesignElement::setName(std::string s) { v["name"] = s; }
+void DesignElement::setType(std::string s) { v["type"] = s; }
+
 std::string DesignElement::getName() const { return v["name"].as_string(); }
 std::string DesignElement::getType() const { return v["type"].as_string(); }
-
-
-
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
     v["worldPosition"] = Map();
@@ -303,6 +284,22 @@ Surface DesignElement::getExpertsCubic() const {
     return serializeCubic(cub);
 }
 
+// for the spherical Mirror the radius can be calculated from grazing Inc angle, entrace Armlength and exit Armlength
+// copied from RAY-UI
+void DesignElement::setCalcRadius() {
+    double radius = 2.0 / v["grazingIncAngle"].as_rad().sin() / (1.0 / v["entranceArmLength"].as_double() + 1.0 / v["exitArmLength"].as_double());
+    v["radius"] = radius;
+}
+
+// for the Spherical Grating the radius is calculated from the deviation angle instead grazing inc angle
+// copied from RAY-UI
+// TODO: support different types of input Angle : constant inc angle, SMG fix focus
+void DesignElement::setCalcRadiusDeviationAngle() {
+    double theta = v["deviationAngle"].as_rad().rad > 0 ? (180 - v["deviationAngle"].as_rad().rad)/2 * PI / 180.0 : (90 + v["deviationAngle"].as_rad().rad) * PI / 180.0;
+    double radius = 2.0 / sin(theta) / ( 1.0 / v["entranceArmLength"].as_double() + 1.0 / v["exitArmLength"].as_double());
+    v["radius"] = radius;
+}
+
 // Azimuthal Angle
 void DesignElement::setAzimuthalAngle(Rad r) { v["AzimuthalAngle"] = r; }
 Rad DesignElement::getAzimuthalAngle() const { return v["AzimuthalAngle"].as_rad(); }
@@ -362,6 +359,9 @@ double DesignElement::getTotalLength() const { return v["totalLength"].as_double
 // Grazing Inc Angle
 void DesignElement::setGrazingIncAngle(Rad value) { v["grazingIncAngle"] = value; }
 Rad DesignElement::getGrazingIncAngle() const { return v["grazingIncAngle"].as_rad(); }
+
+void DesignElement::setDeviationAngle(Rad value) { v["deviationAngle"] = value; }
+Rad DesignElement::getDeviationAngle() const { return v["deviationAngle"].as_rad(); }
 
 // Entrance Arm Length
 void DesignElement::setEntranceArmLength(double value) { v["entranceArmLength"] = value; }
@@ -459,5 +459,9 @@ double DesignElement::getImageType() const {return v["imageType"].as_double();}
 
 void DesignElement::setCurvatureType(CurvatureType value) {v["curvatureType"] = value;}
 CurvatureType DesignElement::getCurvatureType() const {return v["curvatureType"].as_curvatureType();}
+
+void DesignElement::setBehaviourType(BehaviourType value) {v["behaviourType"] = value;}
+BehaviourType DesignElement::getBehaviourType() const {return v["behaviourType"].as_behaviourType();}
+
 
 }  // namespace RAYX
