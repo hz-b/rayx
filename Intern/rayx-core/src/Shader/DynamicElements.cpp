@@ -48,20 +48,20 @@ void dynamicElements(int gid, Inv& inv) {
         elem_ray.m_position = col.hitpoint;
         elem_ray.m_lastElement = col.elementIndex;
 
-        switch(btype) {
-            case (BTYPE_MIRROR):
+        switch (btype) {
+            case BTYPE_MIRROR:
                 elem_ray = behaveMirror(elem_ray, col.elementIndex, col, inv);
                 break;
-            case (BTYPE_GRATING):
+            case BTYPE_GRATING:
                 elem_ray = behaveGrating(elem_ray, col.elementIndex, col, inv);
                 break;
-            case (BTYPE_SLIT) :
+            case BTYPE_SLIT:
                 elem_ray = behaveSlit(elem_ray, col.elementIndex, col, inv);
                 break;
-            case (BTYPE_RZP):
+            case BTYPE_RZP:
                 elem_ray = behaveRZP(elem_ray, col.elementIndex, col, inv);
                 break;
-            case (BTYPE_IMAGE_PLANE):
+            case BTYPE_IMAGE_PLANE:
                 elem_ray = behaveImagePlane(elem_ray, col.elementIndex, col, inv);
                 break;
         }
