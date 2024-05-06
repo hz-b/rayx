@@ -61,6 +61,7 @@ void Application::init() {
 
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
     UIRayInfo rayInfo{
+        .raysLoaded = false,     //
         .displayRays = true,     //
         .raysChanged = false,    //
         .cacheChanged = false,   //
