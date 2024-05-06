@@ -67,10 +67,10 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     RAYX::xml::Parser parser(node, group_context, filename);
     const char* type = parser.type();
     DesignSource ds;
-    ds.v = Map();
+    ds.m_elementParameters = Map();
 
     DesignElement de;
-    de.v = Map();
+    de.m_elementParameters = Map();
 
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.

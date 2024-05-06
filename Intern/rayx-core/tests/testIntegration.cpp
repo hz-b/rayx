@@ -16,6 +16,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
 }
 TEST_F(TestSuite, PlaneMirrorMis) { compareLastAgainstRayUI("PlaneMirrorMis"); }
 TEST_F(TestSuite, SphereMirrorDefault) { compareLastAgainstRayUI("SphereMirrorDefault"); }
+TEST_F(TestSuite, SphereGrating) { compareLastAgainstRayUI("SphereGrating", 1e-3, Sequential::Yes); } 
 
 // In these tests the ray would hit the ImagePlane before the PlaneGrating, if we trace dynamically.
 // This prevents comparing the results to Ray-UI, and hence we do sequential tracing here to allow for such a comparison.
@@ -66,10 +67,6 @@ TEST_F(TestSuite, toroid_swapped) { compareLastAgainstRayUI("toroid_swapped"); }
 
 TEST_F(TestSuite, Ellipsoid_DGIA) { compareLastAgainstRayUI("Ellipsoid_DGIA"); }
 TEST_F(TestSuite, Ellipsoid_MB) { compareLastAgainstRayUI("Ellipsoid_MB"); }
-
-// TODO: why is this called Ellipsoid_PM if it contains a PlaneMirror and no
-// Ellipsoid?
-TEST_F(TestSuite, Ellipsoid_PM) { compareLastAgainstRayUI("Ellipsoid_PM"); }
 
 TEST_F(TestSuite, ellipsoid_ip_200mirrormis) { compareLastAgainstRayUI("ellipsoid_ip_200mirrormis"); }
 

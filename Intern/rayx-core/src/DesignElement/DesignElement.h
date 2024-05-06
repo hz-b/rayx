@@ -8,7 +8,7 @@
 namespace RAYX {
 
 struct RAYX_API DesignElement {
-    Value v;
+    DesignMap m_elementParameters;
     Element compile() const;
 
     void setName(std::string s);
