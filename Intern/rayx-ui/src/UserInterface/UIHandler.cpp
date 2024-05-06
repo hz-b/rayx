@@ -223,7 +223,7 @@ void UIHandler::beginUIRender() {
  * @param uiParams
  * @param rObjects
  */
-void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elemets, std::vector<glm::dvec3>& rSourcePositions) {
+void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
     ImFont* currentFont;
     float adjustedScale;
     if (m_oldScale != m_scale) {
@@ -319,7 +319,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
-    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elemets, rSourcePositions);
+    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elements, rSourcePositions);
     showHotkeysWindow();
     ImGui::End();
 
