@@ -323,6 +323,13 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     showHotkeysWindow();
     ImGui::End();
 
+    // setting focus to the beamline outline window
+    static bool first_time = true;
+    if (first_time) {
+        first_time = false;
+        ImGui::SetWindowFocus("Beamline Outline");
+    }
+
     ImGui::PopFont();
 }
 
@@ -363,7 +370,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
             if (m_showRMLNotExistPopup) {
                 uiParams.rmlReady = false;
             } else {
-                uiParams.h5Ready = !uiParams.showH5NotExistPopup;
+                uiParams.h5Ready = !uiParams.showH5NotExistPopup && m_loadh5withRML;
                 uiParams.rmlReady = true;
                 uiParams.rmlPath = outPath;
             }
@@ -417,6 +424,9 @@ void UIHandler::showSettingsWindow() {
     ImGui::Begin("Settings");
 
     ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+
+    // checkbox
+    ImGui::Checkbox("Load h5 with RML", &m_loadh5withRML);
 
     ImGui::End();
 }
