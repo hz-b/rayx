@@ -5,7 +5,7 @@
 namespace RAYX {
 
 struct RAYX_API DesignSource {
-    Value v;
+    DesignMap m_elementParameters;
     std::vector<Ray> compile(int thread_count) const;
 
     void setStokeslin0(double value);
