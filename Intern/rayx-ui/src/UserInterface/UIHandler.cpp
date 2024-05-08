@@ -385,7 +385,7 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
         if (ImGui::Button("Trace current file")) {
             uiParams.showH5NotExistPopup = false;
             m_showRMLNotExistPopup = false;
-            uiParams.rmlReady = true;
+            // uiParams.rmlReady = true;
             uiParams.runSimulation = true;
         }
     } else {
