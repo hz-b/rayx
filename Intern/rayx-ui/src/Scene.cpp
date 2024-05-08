@@ -130,7 +130,7 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
     RAYX_PROFILE_FUNCTION_STDOUT();
-
+    m_ElementRObjects.clear();
     for (const auto& input : inputs) {
         std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
         if (input.textureInput.has_value()) {
