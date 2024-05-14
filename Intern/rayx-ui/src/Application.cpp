@@ -209,7 +209,12 @@ void Application::run() {
                     if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
                         m_UIParams.rayInfo.raysLoaded = true;
-                        m_State = State::PrepareElements;
+                        if (m_buildElementsNeeded) {
+                            m_State = State::PrepareElements;
+                        } else {
+                            m_State = State::Running;
+                            m_buildElementsNeeded = true;
+                        }
                     }
                     break;
                 case State::PrepareElements:
@@ -239,6 +244,7 @@ void Application::run() {
             if (m_UIParams.rayInfo.raysChanged) {
                 m_State = State::BuildingRays;
                 m_UIParams.rayInfo.raysChanged = false;
+                m_buildElementsNeeded = false;
             }
 
             // Update UBO

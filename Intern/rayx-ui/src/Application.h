@@ -75,6 +75,7 @@ class Application {
     std::filesystem::path m_RMLPath;             ///< Path to the RML file
     std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
     RAYX::BundleHistory m_rays;                  ///< Ray cache
+    bool m_buildElementsNeeded = true;
 
     void init();
 
