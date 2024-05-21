@@ -45,6 +45,8 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         getSphereMirror(parser, de);
     } else if (type == ElementType::ToroidMirror) {
         getToroidMirror(parser, de);
+    } else if (strcmp(type, "Toroidal Grating") == 0) {
+        getToroidalGrating(parser, de);
     } else {
         RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
                  << "; Type: " << int(parser.type());  // TODO: write type as string not enum id

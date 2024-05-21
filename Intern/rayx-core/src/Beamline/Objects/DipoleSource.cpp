@@ -260,8 +260,6 @@ double DipoleSource::getInterpolation(double energy) const {
  * chooses psi and stokes-vector according to the natural distribution spectrum
  */
 PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
-    // RAYX_PROFILE_SCOPE("getPsiStokes");
-
     PsiAndStokes psiandstokes;
     do {
         psiandstokes.psi = (randomDouble() - 0.5) * 6 * m_verDivergence;
@@ -274,7 +272,6 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
 }
 
 PsiAndStokes DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
-    // RAYX_PROFILE_SCOPE("dipolefold");
 
     int ln = (int)sigpsi;
     double trsgyp = 0.0;
@@ -333,12 +330,9 @@ PsiAndStokes DipoleSource::dipoleFold(double psi, double photonEnergy, double si
 }
 
 glm::dvec4 DipoleSource::getStokesSyn(double energy, double psi1, double psi2) const {
-    // RAYX_PROFILE_SCOPE("getStokesSyn");
-
     double fak = 3453345200000000.0;  // getFactorDistribution
 
     double gamma = fabs(m_electronEnergy) * 1957;  // getFactorElectronEnergy
-    // double ec = m_criticalEnergy * 1000 * pow(m_electronEnergy, 3) / m_bendingRadius;
     double y0 = energy / m_criticalEnergy / 1000.0;
     double xnue1 = 1.0 / 3.0;
     double xnue2 = 2.0 / 3.0;
@@ -372,13 +366,10 @@ glm::dvec4 DipoleSource::getStokesSyn(double energy, double psi1, double psi2) c
         stokes[3] = stokes[3] + xints;
         psi = psi + dpsi;
     }
-
     return stokes;
 }
 
 double DipoleSource::bessel(double hnue, double zeta) const {
-    // RAYX_PROFILE_SCOPE("bessel");
-
     double h = 0.1;
     double result = h / 2.0 * exp(-zeta);
     double c1 = 1;
@@ -394,7 +385,6 @@ double DipoleSource::bessel(double hnue, double zeta) const {
         result = result + c1;
         c2 = result / 1e6;
     }
-
     return result;
 }
 
@@ -407,7 +397,7 @@ void DipoleSource::setLogInterpolation() {
 }
 
 double DipoleSource::vDivergence(double energy, double sigv) const {
-    double gamma = fabs(m_electronEnergy) * get_factorElectronEnergy();  // factorElectronEnergy
+    double gamma = fabs(m_electronEnergy) * get_factorElectronEnergy();
     if (gamma == 0.0 || m_criticalEnergy == 0.0) {
         return 0;
     }
@@ -485,10 +475,4 @@ void DipoleSource::setMaxFlux() {
     }
 }
 
-/*double DipoleSource::getHorDivergence() const { return m_horDivergence; }
-
-double DipoleSource::getSourceHeight() const { return m_sourceHeight; }
-
-double DipoleSource::getSourceWidth() const { return m_sourceWidth; }
-*/
 }  // namespace RAYX
