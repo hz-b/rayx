@@ -251,7 +251,8 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
             auto dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.5f, nullptr, &dock_id_right);
 
             ImGui::DockBuilderDockWindow("Render View", dockspace_id);
-            ImGui::DockBuilderDockWindow("Properties Manager", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("Beamline Design", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("UI Settings", dock_id_right_top);
             ImGui::DockBuilderDockWindow("Settings", dock_id_right_top);
             ImGui::DockBuilderDockWindow("Beamline Outline", dock_id_right_bottom);
             ImGui::DockBuilderDockWindow("Hotkeys", dock_id_right_bottom);
@@ -279,6 +280,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     ImGui::PopStyleVar();
 
     showSceneEditorWindow(uiParams);
+    showUISettingsWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
@@ -311,7 +313,7 @@ void UIHandler::endUIRender(VkCommandBuffer commandBuffer) {
 }
 
 void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
-    ImGui::Begin("Properties Manager");
+    ImGui::Begin("Beamline Design");
 
     if (ImGui::Button("Open File Dialog")) {
         const std::vector<std::string> results =
@@ -354,8 +356,16 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
         ImGui::EndDisabled();
     }
 
+    ImGui::End();
+}
+
+void UIHandler::showUISettingsWindow(UIParameters& uiParams) {
+    ImGui::Begin("UI Settings");
+
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
+
+    ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::Separator();
     uiParams.camController.displaySettings();
