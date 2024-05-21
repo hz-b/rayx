@@ -6,7 +6,6 @@
 
 #include "Beamline/Beamline.h"
 #include "RenderObject.h"
-#include "Tracer/Tracer.h"
 #include "UserInterface/Settings.h"
 
 class Scene {
