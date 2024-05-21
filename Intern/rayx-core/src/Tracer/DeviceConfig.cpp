@@ -6,7 +6,6 @@
 #include <ranges>
 #include <algorithm>
 #include <sstream>
-#include <experimental/iterator>
 
 #include <Debug/Debug.h>
 
@@ -120,7 +119,7 @@ std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All)
 }
 
 std::string deviceTypeToString(DeviceType deviceType) {
-    std::vector<std::string> names;
+    std::vector<const char*> names;
 
     if (deviceType & DeviceType::Cpu)
         names.push_back("Cpu");
@@ -130,10 +129,16 @@ std::string deviceTypeToString(DeviceType deviceType) {
         names.push_back("GpuHip");
 
     if (names.empty())
-        return "Unsupported";
+        names.push_back("Unsupported");
 
     std::stringstream ss;
-    std::copy(names.begin(), names.end(), std::experimental::ostream_joiner<std::string>(ss, " | "));
+
+    // join names with separator
+    for (size_t i = 0; i < names.size(); ++i) {
+        if (i != 0)
+            ss << " | ";
+        ss << names[i];
+    }
 
     return ss.str();
 }
@@ -148,7 +153,7 @@ DeviceConfig::DeviceConfig(DeviceType fetchedDeviceType) :
 }
 
 void DeviceConfig::dumpDevices() const {
-    RAYX_LOG << "Available devices: " << devices.size();
+    RAYX_LOG << "Number of available devices: " << devices.size();
     for (size_t i = 0; i < devices.size(); ++i) {
         const auto& device = devices[i];
         RAYX_LOG << "Device - index: " << i << ", type: " << deviceTypeToString(device.type) << ", name: " << device.name;
@@ -211,7 +216,7 @@ DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
 
     if (bestIt == devicesByTypeView.end()) {
         dumpDevices();
-        RAYX_WARN
+        RAYX_ERR
             << "Could not find best device for types: " << deviceTypeToString(deviceType);
     }
 
