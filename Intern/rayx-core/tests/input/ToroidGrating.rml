@@ -6,7 +6,7 @@
    <param id="numberRays" enabled="T">20000</param>
    <param id="sourceWidth" enabled="T">0.065</param>
    <param id="sourceHeight" enabled="T">0.04</param>
-   <param id="sourceDepth" enabled="T">1</param>
+   <param id="sourceDepth" enabled="T">0</param>
    <param id="horDiv" enabled="T">1</param>
    <param id="verDiv" enabled="T">1</param>
    <param id="worldPosition" enabled="F">
@@ -67,7 +67,7 @@
    <param id="distancePreceding" enabled="T">10000</param>
    <param id="azimuthalAngle" enabled="T">0</param>
    <param id="lineProfile" comment="unknown" enabled="T">3</param>
-   <param id="gratingEfficiency" enabled="T">0.5</param>
+   <param id="gratingEfficiency" enabled="T">1</param>
    <param id="blazeAngle" enabled="F">4</param>
    <param id="aspectAngle" enabled="F">90</param>
    <param id="grooveDepth" enabled="F">10</param>

@@ -11,6 +11,12 @@
 
 namespace RAYX {
 
+/**
+ * Set all Parameters for each optical Element a RML file can define.
+ * Set all mandatory parameters is called for every element without exception.
+ * This only works in combi with the xml parser.
+*/
+
 void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setName(parser.name());
     de->setType(parser.type());
@@ -22,9 +28,8 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
-    //de->setCurvatureType(CurvatureType::Plane); TODo reenable
 
-    if (de->getType() != "ImagePlane") {
+    if (de->getType() != "ImagePlane") { 
         de->setCutout(parser.parseCutout(dp));
     } else {
         de->setCutout(serializeUnlimited());
@@ -124,7 +129,7 @@ void getSphereGrating(xml::Parser parser, DesignElement* de) {
     de->setDeviationAngle(parser.parseDeviationAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCalcRadiusDeviationAngle();
+    de->setCalcRadiusDeviationAngle();                      // pre calculated radius so the element can call getRadius
 
     getGrating(parser, de);
 }
@@ -144,7 +149,7 @@ void getSphereMirror(xml::Parser parser, DesignElement* de) {
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCalcRadius();
+    de->setCalcRadius();                                    // pre calculated radius so the element can call getRadius
 }
 
 void getToroidMirror(xml::Parser parser, DesignElement* de) {
@@ -156,15 +161,24 @@ void getToroidMirror(xml::Parser parser, DesignElement* de) {
     de->setLongRadius(parser.parseLongRadius());
 }
 
+void getToroidalGrating(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Toroidal); 
+    de->setBehaviourType(BehaviourType::Mirror);
+
+    de->setShortRadius(parser.parseShortRadius());
+    de->setLongRadius(parser.parseLongRadius());
+
+    getGrating(parser, de);
+}
+
 void getRZP(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
     CurvatureType curv = parser.parseCurvatureType();
-    if (curv == CurvatureType::Spherical) {
+    if (curv == CurvatureType::Spherical) {     // special case of sphere 
         curv = CurvatureType::RzpSphere;
     }
     de->setCurvatureType(curv);
-    
-
     de->setBehaviourType(BehaviourType::Rzp);
 
     de->setFresnelZOffset(parser.parseFresnelZOffset());
