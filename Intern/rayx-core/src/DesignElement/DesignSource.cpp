@@ -1,29 +1,30 @@
 #include "DesignSource.h"
 
-#include "Debug/Debug.h"
-#include "Beamline/Objects/Objects.h"
 #include <filesystem>
+
+#include "Beamline/Objects/Objects.h"
+#include "Debug/Debug.h"
 namespace RAYX {
 
 std::vector<Ray> DesignSource::compile(int i) const {
     std::vector<Ray> ray;
 
-    if (getName() == "Point Source") {
+    if (getType() == "Point Source") {
         PointSource ps(*this);
         ray = ps.getRays(i);
-    } else if (getName() == "Matrix Source") {
+    } else if (getType() == "Matrix Source") {
         MatrixSource ms(*this);
-        ray = ms.getRays(i); 
-    } else if (getName() == "Dipole Source") {
+        ray = ms.getRays(i);
+    } else if (getType() == "Dipole Source") {
         DipoleSource ds(*this);
         ray = ds.getRays(i);
-    } else if (getName() == "Pixel Source") {
+    } else if (getType() == "Pixel Source") {
         PixelSource ps(*this);
         ray = ps.getRays(i);
-    } else if (getName() == "Circle Source") {
+    } else if (getType() == "Circle Source") {
         CircleSource cs(*this);
         ray = cs.getRays(i);
-    } else if (getName() == "Simple Undulator") {
+    } else if (getType() == "Simple Undulator") {
         SimpleUndulatorSource su(*this);
         ray = su.getRays(i);
     }
@@ -35,6 +36,7 @@ void DesignSource::setName(std::string s) { m_elementParameters["name"] = s; }
 void DesignSource::setType(std::string s) { m_elementParameters["type"] = s; }
 
 std::string DesignSource::getName() const { return m_elementParameters["name"].as_string(); }
+std::string DesignSource::getType() const { return m_elementParameters["type"].as_string(); }
 
 void DesignSource::setWorldPosition(glm::dvec4 p) {
     m_elementParameters["worldPosition"] = Map();
@@ -181,7 +183,9 @@ void DesignSource::setElectronEnergy(double value) { m_elementParameters["electr
 double DesignSource::getElectronEnergy() const { return m_elementParameters["electronEnergy"].as_double(); }
 
 void DesignSource::setElectronEnergyOriantation(ElectronEnergyOrientation value) { m_elementParameters["electronEnergyOriantation"] = value; }
-ElectronEnergyOrientation DesignSource::getElectronEnergyOrientation() const { return m_elementParameters["electronEnergyOriantation"].as_electronEnergyOrientation(); }
+ElectronEnergyOrientation DesignSource::getElectronEnergyOrientation() const {
+    return m_elementParameters["electronEnergyOriantation"].as_electronEnergyOrientation();
+}
 
 void DesignSource::setEnergySpread(double value) { m_elementParameters["energySpread"] = value; }
 double DesignSource::getEnergySpread() const { return m_elementParameters["energySpread"].as_double(); }
