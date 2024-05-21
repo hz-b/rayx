@@ -28,3 +28,33 @@
 [submodule "Extern/alpaka"]
 	path = Extern/alpaka
 	url = https://github.com/alpaka-group/alpaka.git
+[submodule "Extern/boost/config"]
+	path = Extern/boost/config
+	url = https://github.com/boostorg/config.git
+[submodule "Extern/boost/assert"]
+	path = Extern/boost/assert
+	url = https://github.com/boostorg/assert.git
+[submodule "Extern/boost/static_assert"]
+	path = Extern/boost/static_assert
+	url = https://github.com/boostorg/static_assert.git
+[submodule "Extern/boost/type_traits"]
+	path = Extern/boost/type_traits
+	url = https://github.com/boostorg/type_traits.git
+[submodule "Extern/boost/throw_exception"]
+	path = Extern/boost/throw_exception
+	url = https://github.com/boostorg/throw_exception.git
+[submodule "Extern/boost/core"]
+	path = Extern/boost/core
+	url = https://github.com/boostorg/core.git
+[submodule "Extern/boost/align"]
+	path = Extern/boost/align
+	url = https://github.com/boostorg/align.git
+[submodule "Extern/boost/predef"]
+	path = Extern/boost/predef
+	url = https://github.com/boostorg/predef.git
+[submodule "Extern/boost/preprocessor"]
+	path = Extern/boost/preprocessor
+	url = https://github.com/boostorg/preprocessor.git
+[submodule "Extern/boost/atomic"]
+	path = Extern/boost/atomic
+	url = https://github.com/boostorg/atomic.git
