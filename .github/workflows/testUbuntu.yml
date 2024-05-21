@@ -21,7 +21,6 @@ jobs:
           git submodule sync
           git submodule update --init --recursive
 
-
       - name: Install dependencies
         run: |
           sudo wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
@@ -29,18 +28,12 @@ jobs:
           sudo apt update --yes
           sudo apt install --yes vulkan-sdk xorg-dev cmake libgtk-3-dev libdbus-1-dev
 
-      - name: Cache Boost
-        uses: actions/cache@v2
-        with:
-          path: '${{ runner.workspace }}/boost_*.tar.gz'
-          key: 'boost-1.85.0'
-
       - name: Build Boost
         id: boost
         uses: egor-tensin/build-boost@v1
         with:
           version: 1.85.0
-          libraries: align assert atomic config core predef preprocessor static_assert throw_exception type_traits
+          libraries:
           platform: x64
           configuration: Release
 
