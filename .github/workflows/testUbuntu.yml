@@ -33,7 +33,6 @@ jobs:
         uses: egor-tensin/build-boost@v1
         with:
           version: 1.85.0
-          libraries: align assert atomic config core predef preprocessor static_assert throw_exception type_traits
           platform: x64
           configuration: Release
 
