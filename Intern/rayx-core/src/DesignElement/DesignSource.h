@@ -16,6 +16,7 @@ struct RAYX_API DesignSource {
     void setName(std::string s);
     void setType(std::string s);
     std::string getName() const;
+    std::string getType() const;
 
     void setWidthDist(SourceDist value);
     SourceDist getWidthDist() const;
