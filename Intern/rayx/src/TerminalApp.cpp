@@ -155,16 +155,27 @@ void TerminalApp::run() {
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
         m_CommandParser->getVersion();
-        exit(1);
+        exit(0);
+    }
+    if (m_CommandParser->m_args.m_listDevices) {
+        RAYX::DeviceConfig().dumpDevices();
+        exit(0);
     }
 
     // Choose Hardware
-    using DeviceType = RAYX::DeviceConfig::DeviceType;
-    const auto deviceType = m_CommandParser->m_args.m_cpuFlag
-        ? DeviceType::Cpu
-        : DeviceType::Gpu
-    ;
-    m_Tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
+    auto getDevice = [&] {
+        if (m_CommandParser->m_args.m_deviceID != -1) {
+            return RAYX::DeviceConfig().enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
+        } else {
+            using DeviceType = RAYX::DeviceConfig::DeviceType;
+            const auto deviceType = m_CommandParser->m_args.m_cpuFlag
+                ? DeviceType::Cpu
+                : DeviceType::Gpu
+            ;
+            return RAYX::DeviceConfig(deviceType).enableBestDevice();
+        }
+    };
+    m_Tracer = std::make_unique<RAYX::Tracer>(getDevice());
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);
