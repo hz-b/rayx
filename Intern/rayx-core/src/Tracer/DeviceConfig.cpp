@@ -148,12 +148,14 @@ std::string deviceTypeToString(DeviceType deviceType) {
 namespace RAYX {
 
 DeviceConfig::DeviceConfig(DeviceType fetchedDeviceType) :
-    devices(getAvailableDevices(fetchedDeviceType))
+    devices(getAvailableDevices(fetchedDeviceType)),
+    m_fetchedDeviceType(fetchedDeviceType)
 {
 }
 
 void DeviceConfig::dumpDevices() const {
     RAYX_LOG << "Number of available devices: " << devices.size();
+    RAYX_LOG << "Fetched device types: " << deviceTypeToString(m_fetchedDeviceType);
     for (size_t i = 0; i < devices.size(); ++i) {
         const auto& device = devices[i];
         RAYX_LOG << "Device - index: " << i << ", type: " << deviceTypeToString(device.type) << ", name: " << device.name;
@@ -217,7 +219,9 @@ DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
     if (bestIt == devicesByTypeView.end()) {
         dumpDevices();
         RAYX_ERR
-            << "Could not find best device for types: " << deviceTypeToString(deviceType);
+            << "Could not find best device for types: " << deviceTypeToString(
+                static_cast<DeviceType>(m_fetchedDeviceType & deviceType)
+            );
     }
 
     bestIt->enable = true;

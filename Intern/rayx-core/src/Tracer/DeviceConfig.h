@@ -45,6 +45,9 @@ struct RAYX_API DeviceConfig {
     DeviceConfig& enableBestDevice(DeviceType deviceType = DeviceType::All);
 
     std::vector<Device> devices;
+
+  private:
+    const DeviceType m_fetchedDeviceType;
 };
 
 } // namespace RAYX
