@@ -1,5 +1,4 @@
 #include "Efficiency.h"
-#include "Approx.h"
 #include "Complex.h"
 #include "Utils.h"
 #include "RefractiveIndex.h"
@@ -70,7 +69,7 @@ void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_trans
  */
 RAYX_FUNC
 void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv& inv) {
-    dvec2 cos_incidence = dvec2(r8_cos(incidence_angle),
+    dvec2 cos_incidence = dvec2(glm::cos(incidence_angle),
                                 0.0);  // complex number, initialization only for first layer, the
                                        // others are then derived from this with snell's law
 
@@ -107,7 +106,7 @@ dvec2 RAYX_API cartesian_to_euler(dvec2 complex) {
         euler = dvec2(infinity(), infinity());
         return euler;
     }
-    euler = dvec2(r, r8_atan2(complex.y, complex.x));  // phi in rad
+    euler = dvec2(r, glm::atan(complex.y, complex.x));  // phi in rad
     return euler;
 }
 

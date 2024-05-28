@@ -1,8 +1,8 @@
 #include "Diffraction.h"
 #include "Constants.h"
-#include "Approx.h"
 #include "InvocationState.h"
 #include "Rand.h"
+#include "Approx.h"
 
 namespace RAYX {
 
@@ -96,10 +96,10 @@ void fraun_diff(double dim, double wl, double& dAngle, Inv& inv) {
             rna[i] = squaresDoubleRNG(inv.ctr);
         }
         dAngle = (rna[0] - 0.5) * div;
-        double u = PI * b * r8_sin(dAngle) / wl;
+        double u = PI * b * glm::sin(dAngle) / wl;
         double wd = 1;
         if (u != 0) {
-            wd = r8_sin(u) / u;
+            wd = glm::sin(u) / u;
             wd = wd * wd;
         }
         c = wd - rna[1];

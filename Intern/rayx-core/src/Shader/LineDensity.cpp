@@ -1,5 +1,4 @@
 #include "LineDensity.h"
-#include "Approx.h"
 #include "Behaviour.h"
 #include "ImageType.h"
 #include "Throw.h"
@@ -57,10 +56,10 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
         X = 0;
 
     // avoid calculating the same sinus/cosinus multiple times (costly)
-    double s_beta = r8_sin(beta);
-    double c_beta = r8_cos(beta);
-    double s_alpha = r8_sin(alpha);
-    double c_alpha = r8_cos(alpha);
+    double s_beta = glm::sin(beta);
+    double c_beta = glm::cos(beta);
+    double s_alpha = glm::sin(alpha);
+    double c_alpha = glm::cos(alpha);
 
     /*
     if (DERIVATION_METHOD == 1) {
@@ -96,8 +95,8 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
     } else if (IMAGE_TYPE == IT_ASTIGMATIC2ASTIGMATIC) {
         double s_rim = sign(rimer);
         double s_rom = sign(romer);
-        double c_2alpha = r8_cos(2 * alpha);
-        double c_2beta = r8_cos(2 * beta);
+        double c_2alpha = glm::cos(2 * alpha);
+        double c_2beta = glm::cos(2 * beta);
         if (FX == 0 && FZ == 0) {  //   !plane
 
             zi = s_rim * (rimer * c_alpha + Z);

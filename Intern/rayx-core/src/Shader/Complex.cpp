@@ -19,9 +19,9 @@ dvec2 cx_tan(dvec2 a) { return cx_div(cx_sin(a), cx_cos(a)); }
 RAYX_FUNC
 dvec2 cx_log(dvec2 a) {
     double rpart = sqrt((a.x * a.x) + (a.y * a.y));
-    double ipart = r8_atan2(a.y, a.x);
+    double ipart = glm::atan(a.y, a.x);
     if (ipart > PI) ipart = ipart - (2.0 * PI);
-    return dvec2(r8_log(rpart), ipart);
+    return dvec2(glm::log(rpart), ipart);
 }
 
 RAYX_FUNC
@@ -42,17 +42,17 @@ dvec2 cx_sin_of_one_over_z(dvec2 z) { return cx_sin(cx_div(dvec2(1.0, 0.0), z));
 
 RAYX_FUNC
 dvec2 cx_to_polar(dvec2 a) {
-    double phi = r8_atan(a.y / a.x);
+    double phi = glm::atan(a.y / a.x);
     double r   = length(a);
     return dvec2(r, phi);
 }
 
 RAYX_FUNC
 dvec2 cx_pow(dvec2 a, int n) {
-    double angle = r8_atan2(a.y, a.x);
+    double angle = glm::atan(a.y, a.x);
     double r     = length(a);
-    double real  = dpow(r, n) * r8_cos(n * angle);
-    double im    = dpow(r, n) * r8_sin(n * angle);
+    double real  = dpow(r, n) * glm::cos(n * angle);
+    double im    = dpow(r, n) * glm::sin(n * angle);
     return dvec2(real, im);
 }
 

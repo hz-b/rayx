@@ -14,9 +14,9 @@ namespace RAYX {
 #define cx_div(a, b)  dvec2(((a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y)), ((a.y * b.x - a.x * b.y) / (b.x * b.x + b.y * b.y)))
 #define cx_modulus(a) length(a)
 #define cx_conj(a)    dvec2(a.x, -a.y)
-#define cx_arg(a)     r8_atan(a.y, a.x)
-#define cx_sin(a)     dvec2(r8_sin(a.x) * r8_cosh(a.y), r8_cos(a.x) * r8_sinh(a.y))
-#define cx_cos(a)     dvec2(r8_cos(a.x) * r8_cosh(a.y), -r8_sin(a.x) * r8_sinh(a.y))
+#define cx_arg(a)     glm::atan(a.y, a.x)
+#define cx_sin(a)     dvec2(glm::sin(a.x) * glm::cosh(a.y), glm::cos(a.x) * glm::sinh(a.y))
+#define cx_cos(a)     dvec2(glm::cos(a.x) * glm::cosh(a.y), -glm::sin(a.x) * glm::sinh(a.y))
 
 RAYX_FUNC dvec2 cx_sqrt(dvec2 a);
 RAYX_FUNC dvec2 cx_tan(dvec2 a);

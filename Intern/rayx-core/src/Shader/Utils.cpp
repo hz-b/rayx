@@ -2,7 +2,6 @@
 #include "Constants.h"
 #include "InvocationState.h"
 #include "Complex.h"
-#include "Approx.h"
 #include "Rand.h"
 #include "Helper.h"
 #include "RefractiveIndex.h"
@@ -44,7 +43,7 @@ double RAYX_API getIncidenceAngle(Ray r, dvec3 normal) {
     else if (ar > 1.0)
         ar = 1.0;
 
-    double theta = PI - r8_acos(ar);
+    double theta = PI - glm::acos(ar);
     int gt = int(theta > PI / 2);
     // theta in [0, pi]
     theta = gt * (PI - theta) + (1 - gt) * theta;

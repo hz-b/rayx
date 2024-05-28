@@ -1,6 +1,5 @@
 #include "ApplySlopeError.h"
 #include "Constants.h"
-#include "Approx.h"
 #include "Rand.h"
 
 namespace RAYX {
@@ -18,10 +17,10 @@ dvec3 RAYX_API normalCartesian(dvec3 normal, double x_rad, double z_rad) {
     double FY = normal[1];
     double FZ = normal[2];
 
-    double cosx = r8_cos(x_rad);
-    double sinx = r8_sin(x_rad);
-    double cosz = r8_cos(z_rad);
-    double sinz = r8_sin(z_rad);
+    double cosx = glm::cos(x_rad);
+    double sinx = glm::sin(x_rad);
+    double cosz = glm::cos(z_rad);
+    double sinz = glm::sin(z_rad);
 
     // put in matrix mult?
     double FY2 = FY * cosz + FZ * sinz;
@@ -42,12 +41,12 @@ returns modified normal vector
 RAYX_FUNC
 dvec3 RAYX_API normalCylindrical(dvec3 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
-    double arcTanFXFY = r8_atan2(normal[1], normal[0]);
-    double sinz = r8_sin(z_rad);
-    double cosz = r8_cos(z_rad);
+    double arcTanFXFY = glm::atan(normal[1], normal[0]);
+    double sinz = glm::sin(z_rad);
+    double cosz = glm::cos(z_rad);
 
-    normal[0] = r8_cos(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
-    normal[1] = r8_sin(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
+    normal[0] = glm::cos(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
+    normal[1] = glm::sin(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
     normal[2] = normal[2] * cosz - normFXFY * sinz;
 
     return normal;

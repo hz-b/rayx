@@ -2,7 +2,6 @@
 
 #include "Collision.h"
 #include "Utils.h"
-#include "Approx.h"
 #include "CutoutFns.h"
 #include "ApplySlopeError.h"
 #include "Cubic.h"
@@ -305,8 +304,8 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
     
-    col.normal = normalize(dvec3(fx, fy * r8_cos(-cu.m_psi) - fz * r8_sin(-cu.m_psi), fz * r8_cos(-cu.m_psi) + fy * r8_sin(-cu.m_psi)));
-    col.hitpoint = dvec3(x, y * r8_cos(-cu.m_psi) - z * r8_sin(-cu.m_psi), z * r8_cos(-cu.m_psi) + y * r8_sin(-cu.m_psi));
+    col.normal = normalize(dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
+    col.hitpoint = dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
     return col;
 }
 

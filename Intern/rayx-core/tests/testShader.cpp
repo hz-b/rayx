@@ -65,7 +65,7 @@ TEST_F(TestSuite, testSin) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(r8_sin(x), sin(x));
+        CHECK_EQ(glm::sin(x), sin(x));
     }
 }
 
@@ -77,7 +77,7 @@ TEST_F(TestSuite, testCos) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(r8_cos(x), cos(x));
+        CHECK_EQ(glm::cos(x), cos(x));
     }
 }
 
@@ -89,15 +89,15 @@ TEST_F(TestSuite, testAtan) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(r8_atan(x), atan(x));
+        CHECK_EQ(glm::atan(x), atan(x));
     }
 }
 
 TEST_F(TestSuite, testExp) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0};
     for (auto x : args) {
-        CHECK_EQ(r8_exp(x), exp(x));
-        CHECK_EQ(r8_exp(-x), exp(-x));
+        CHECK_EQ(glm::exp(x), exp(x));
+        CHECK_EQ(glm::exp(-x), exp(-x));
     }
 }
 
@@ -105,7 +105,7 @@ TEST_F(TestSuite, testExp) {
 TEST_F(TestSuite, testLog) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0000001};
     for (auto x : args) {
-        CHECK_EQ(r8_log(x), log(x));
+        CHECK_EQ(glm::log(x), log(x));
     }
 }
 

@@ -1,5 +1,4 @@
 #include "UpdateStokes.h"
-#include "Approx.h"
 #include "Rand.h"
 
 namespace RAYX {
@@ -12,8 +11,8 @@ namespace RAYX {
  */
 RAYX_FUNC
 dmat4 mullerMatrix(double R_s, double R_p, double delta) {
-    double c = r8_cos(delta);
-    double s = r8_sin(delta);
+    double c = glm::cos(delta);
+    double s = glm::sin(delta);
     return dmat4((R_s + R_p) / 2.0, (R_p - R_s) / 2.0, 0.0, 0.0, (R_p - R_s) / 2.0, (R_s + R_p) / 2.0, 0.0, 0.0, 0.0, 0.0, R_s * R_p * c,
                  R_s * R_p * s, 0.0, 0.0, -R_s * R_p * s, R_s * R_p * c);
 }
@@ -31,8 +30,8 @@ dmat4 mullerMatrix(double R_s, double R_p, double delta) {
 RAYX_FUNC
 bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azimuthal, Inv& inv) {
     dvec4 stokes_old = r.m_stokes;
-    double c_chi = r8_cos(azimuthal);
-    double s_chi = r8_sin(azimuthal);
+    double c_chi = glm::cos(azimuthal);
+    double s_chi = glm::sin(azimuthal);
     dmat4 rot = dmat4(1, 0, 0, 0, 0, c_chi, -s_chi, 0, 0, s_chi, c_chi, 0, 0, 0, 0, 1);
     dmat4 inv_rot = transpose(rot);
 

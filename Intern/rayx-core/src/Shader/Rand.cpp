@@ -1,6 +1,5 @@
 #include "Rand.h"
 #include "Constants.h"
-#include "Approx.h"
 
 namespace RAYX {
 
@@ -39,12 +38,12 @@ double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma) {
     U = squaresDoubleRNG(ctr);
     V = squaresDoubleRNG(ctr);
     R = squaresDoubleRNG(ctr);
-    Z = sqrt(-2.0 * r8_log(U));
+    Z = sqrt(-2.0 * glm::log(U));
 
     if (R < 0.5)
-        Z *= r8_sin(two_pi * V);
+        Z *= glm::sin(two_pi * V);
     else
-        Z *= r8_cos(two_pi * V);
+        Z *= glm::cos(two_pi * V);
 
     Z = Z * sigma + mu;
 

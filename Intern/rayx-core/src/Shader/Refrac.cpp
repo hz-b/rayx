@@ -1,6 +1,5 @@
 #include "Refrac.h"
 #include "Helper.h"
-#include "Approx.h"
 #include "EventType.h"
 
 namespace RAYX {
@@ -16,13 +15,13 @@ calculates refracted ray
 */
 RAYX_FUNC
 Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv) {
-    double eps1 = -r8_atan(normal.x / normal.y);
-    double del1 = r8_asin(normal.z);
+    double eps1 = -glm::atan(normal.x / normal.y);
+    double del1 = glm::asin(normal.z);
 
-    double cos_d = r8_cos(-del1);
-    double sin_d = r8_sin(-del1);
-    double cos_e = r8_cos(-eps1);
-    double sin_e = r8_sin(-eps1);
+    double cos_d = glm::cos(-del1);
+    double sin_d = glm::sin(-del1);
+    double cos_e = glm::cos(-eps1);
+    double sin_e = glm::sin(-eps1);
     dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
     dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
     r.m_direction = rot * r.m_direction;
@@ -54,14 +53,14 @@ Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
     double an_y = -1.0 / sqq;
     double an_z = zy / sqq;
 
-    double eps1 = r8_atan(an_x / an_y);  //-atan(an_x/an_z) around z, chi
-    double del1 = r8_asin(an_z);         // sign(an_z) * r8_atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); //
+    double eps1 = glm::atan(an_x / an_y);  //-atan(an_x/an_z) around z, chi
+    double del1 = glm::asin(an_z);         // sign(an_z) * glm::atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); //
                                          // -asin(an_z); // -asin around x, psi
-    double cos_d = r8_cos(del1);
+    double cos_d = glm::cos(del1);
     double a1 = linedensity * cos_d;
-    double sin_d = r8_sin(-del1);
-    double cos_e = r8_cos(-eps1);
-    double sin_e = r8_sin(-eps1);
+    double sin_d = glm::sin(-del1);
+    double cos_e = glm::cos(-eps1);
+    double sin_e = glm::sin(-eps1);
     dmat4 rot = dmat4(cos_e, cos_d * sin_e, sin_d * sin_e, 0, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, 0, -sin_d, cos_d, 0, 0, 0, 0, 1);
     dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, 0, sin_d * sin_e, sin_d * cos_e, cos_d, 0, 0, 0, 0, 1);
     r.m_direction = dvec3(rot * dvec4(r.m_direction, 0));
