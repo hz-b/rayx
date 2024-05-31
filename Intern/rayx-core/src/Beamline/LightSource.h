@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <glm.hpp>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -17,7 +18,7 @@ enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
-struct DesignSource;  
+struct DesignSource;
 
 class RAYX_API LightSource {
   public:
@@ -62,5 +63,42 @@ class RAYX_API LightSource {
     // User/Design Parameter
     Misalignment m_misalignmentParams;  // x, y, psi, phi
 };
+
+// String conversion functions
+const std::map<SpreadType, std::string> SpreadTypeToString = {
+    {SpreadType::HardEdge, "HardEdge"}, {SpreadType::SoftEdge, "SoftEdge"}, {SpreadType::SeperateEnergies, "SeperateEnergies"}};
+
+const std::map<std::string, SpreadType> StringToSpreadType = {
+    {"HardEdge", SpreadType::HardEdge}, {"SoftEdge", SpreadType::SoftEdge}, {"SeperateEnergies", SpreadType::SeperateEnergies}};
+
+const std::map<EnergyDistributionType, std::string> EnergyDistributionTypeToString = {{EnergyDistributionType::File, "File"},
+                                                                                      {EnergyDistributionType::Values, "Values"},
+                                                                                      {EnergyDistributionType::Total, "Total"},
+                                                                                      {EnergyDistributionType::Param, "Param"}};
+
+const std::map<std::string, EnergyDistributionType> StringToEnergyDistributionType = {{"File", EnergyDistributionType::File},
+                                                                                      {"Values", EnergyDistributionType::Values},
+                                                                                      {"Total", EnergyDistributionType::Total},
+                                                                                      {"Param", EnergyDistributionType::Param}};
+
+const std::map<SourceDist, std::string> SourceDistToString = {
+    {SourceDist::Uniform, "Uniform"}, {SourceDist::Gaussian, "Gaussian"}, {SourceDist::Thirds, "Thirds"}, {SourceDist::Circle, "Circle"}};
+
+const std::map<std::string, SourceDist> StringToSourceDist = {
+    {"Uniform", SourceDist::Uniform}, {"Gaussian", SourceDist::Gaussian}, {"Thirds", SourceDist::Thirds}, {"Circle", SourceDist::Circle}};
+
+const std::map<ElectronEnergyOrientation, std::string> ElectronEnergyOrientationToString = {
+    {ElectronEnergyOrientation::Clockwise, "Clockwise"}, {ElectronEnergyOrientation::Counterclockwise, "Counterclockwise"}};
+
+const std::map<std::string, ElectronEnergyOrientation> StringToElectronEnergyOrientation = {
+    {"Clockwise", ElectronEnergyOrientation::Clockwise}, {"Counterclockwise", ElectronEnergyOrientation::Counterclockwise}};
+
+const std::map<EnergySpreadUnit, std::string> EnergySpreadUnitToString = {{EnergySpreadUnit::EU_PERCENT, "Percent"}, {EnergySpreadUnit::EU_eV, "eV"}};
+
+const std::map<std::string, EnergySpreadUnit> StringToEnergySpreadUnit = {{"Percent", EnergySpreadUnit::EU_PERCENT}, {"eV", EnergySpreadUnit::EU_eV}};
+
+const std::map<SigmaType, std::string> SigmaTypeToString = {{SigmaType::ST_STANDARD, "Standard"}, {SigmaType::ST_ACCURATE, "Accurate"}};
+
+const std::map<std::string, SigmaType> StringToSigmaType = {{"Standard", SigmaType::ST_STANDARD}, {"Accurate", SigmaType::ST_ACCURATE}};
 
 }  // namespace RAYX
