@@ -180,7 +180,7 @@ void UIHandler::beginUIRender() {
  * @param uiParams
  * @param rObjects
  */
-void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
+void UIHandler::setupUI(UIParameters& uiParams) {
     ImFont* currentFont;
     float adjustedScale;
     if (m_oldScale != m_scale) {
@@ -274,7 +274,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
         }
     }
     isSceneWindowHovered = ImGui::IsWindowHovered();
-    ImGui::End();
+    // ImGui::End();
 
     // Pop the style variable to restore default padding
     ImGui::PopStyleVar();
@@ -284,7 +284,7 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
-    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elements, rSourcePositions);
+    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams);
     showHotkeysWindow();
     ImGui::End();
 
@@ -355,6 +355,12 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
         ImGui::Button("Trace current file");
         ImGui::EndDisabled();
     }
+
+    ImGui::Separator();
+
+    m_BeamlineDesignHandler.showBeamlineDesignWindow(uiParams.beamlineInfo);
+
+    ImGui::End();
 
     ImGui::End();
 }

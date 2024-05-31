@@ -5,6 +5,7 @@
 #include <filesystem>
 
 #include "Camera.h"
+#include "DesignElement/DesignElement.h"
 
 // TODO: Divide this into passed and returned parameters
 
@@ -46,6 +47,14 @@ struct UISimulationInfo {
           seed(seed) {}
 };
 
+struct UIBeamlineInfo {
+    std::vector<glm::dvec3> rSourcePositions;
+    std::vector<RAYX::DesignElement> elements;
+    std::vector<RAYX::DesignSource> sources;
+    int selectedType;  // 0 = Light Source, 1 = Optical Element, 2 = Group
+    int selectedIndex;
+    bool elementsChanged = false;
+};
 struct UIParameters {
     VkExtent2D sceneExtent;
     VkDescriptorSet sceneDescriptorSet;
@@ -59,6 +68,7 @@ struct UIParameters {
     bool runSimulation;
     bool simulationSettingsReady;
     UISimulationInfo simulationInfo;
+    UIBeamlineInfo beamlineInfo;
 
     UIParameters(CameraController& camController, const std::vector<std::string>& availableDevices)
         : sceneExtent({720, 480}),

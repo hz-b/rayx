@@ -105,9 +105,6 @@ void Application::run() {
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
 
     auto currentTime = std::chrono::high_resolution_clock::now();
-    std::vector<glm::dvec3> rSourcePositions;
-    std::vector<RAYX::DesignElement> elements;
-    std::vector<RAYX::DesignSource> sources;
 
     std::future<void> beamlineFuture;
     std::future<void> raysFuture;
@@ -152,11 +149,11 @@ void Application::run() {
                         m_rays.clear();
                         m_UIParams.rayInfo.raysLoaded = false;
                         m_Scene = std::make_unique<Scene>(m_Device);
-                        elements = m_Beamline->m_DesignElements;
-                        sources = m_Beamline->m_DesignSources;
-                        rSourcePositions.clear();
-                        for (auto& source : sources) {
-                            rSourcePositions.push_back(source.getWorldPosition());
+                        m_UIParams.beamlineInfo.elements = m_Beamline->m_DesignElements;
+                        m_UIParams.beamlineInfo.sources = m_Beamline->m_DesignSources;
+                        m_UIParams.beamlineInfo.rSourcePositions.clear();
+                        for (auto& source : m_UIParams.beamlineInfo.sources) {
+                            m_UIParams.beamlineInfo.rSourcePositions.push_back(source.getWorldPosition());
                         }
                         if (m_UIParams.h5Ready) {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
@@ -218,8 +215,8 @@ void Application::run() {
                     }
                     break;
                 case State::PrepareElements:
-                    getRObjInputsFuture =
-                        std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(elements), std::ref(m_rays));
+                    getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
+                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_rays));
                     m_State = State::BuildingElements;
                     break;
                 case State::BuildingElements:
@@ -245,6 +242,10 @@ void Application::run() {
                 m_State = State::BuildingRays;
                 m_UIParams.rayInfo.raysChanged = false;
                 m_buildElementsNeeded = false;
+            }
+            if (m_UIParams.beamlineInfo.elementsChanged) {
+                m_State = State::PrepareElements;
+                m_UIParams.beamlineInfo.elementsChanged = false;
             }
 
             // Update UBO
@@ -276,7 +277,7 @@ void Application::run() {
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
             // UI
             m_UIHandler.beginUIRender();
-            m_UIHandler.setupUI(m_UIParams, elements, rSourcePositions);
+            m_UIHandler.setupUI(m_UIParams);
             m_UIHandler.endUIRender(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);
