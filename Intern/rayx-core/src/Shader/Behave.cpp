@@ -109,18 +109,34 @@ Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
 
 RAYX_FUNC
 Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
-    // calculate intersection point and normal at intersection point
-    double azimuthal_angle = inv.elements[id].m_azimuthalAngle;
-
     // calculate the new direction after the reflection
+    const auto incident_vec = r.m_direction;
     r.m_direction = reflect(r.m_direction, col.normal);
 
-    double real_S, real_P, delta;
-    double incidence_angle = getIncidenceAngle(r, col.normal);  // getTheta
     int mat = int(inv.elements[id].m_material);
     if (mat != -2) {
-        efficiency(r, real_S, real_P, delta, incidence_angle, mat, inv);
+        // const auto incident_field = Field {
+        //     .e = {{0, 0}, {0, 0}, {0, 0}},
+        //     .intensity = r.m_stokes.x,
+        // };
+        //
+        // printf("%f, %f, %f, %f\n", r.m_stokes.x,r.m_stokes.y, r.m_stokes.z,r.m_stokes.w);
+        //
+        // const auto reflect_field = intercept_reflect(
+        //     incident_field,
+        //     r.m_energy,
+        //     incident_vec,
+        //     col.normal,
+        //     mat,
+        //     inv
+        // );
+        //
+        // const auto absorbed = (reflect_field.intensity / incident_field.intensity) - squaresDoubleRNG(inv.ctr) <= 0.0;
 
+        const auto incident_angle = get_angle(incident_vec, -col.normal);
+        double real_S, real_P, delta;
+        efficiency(r, real_S, real_P, delta, incident_angle, mat, inv);
+        const double azimuthal_angle = inv.elements[id].m_azimuthalAngle;
         bool absorbed = updateStokes(r, real_S, real_P, delta, azimuthal_angle, inv);
         if (absorbed) {
             recordFinalEvent(r, ETYPE_ABSORBED, inv);

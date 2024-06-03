@@ -2,55 +2,184 @@
 
 #include "Common.h"
 #include "InvocationState.h"
+#include "RefractiveIndex.h"
+#include "Complex.h"
 
 namespace RAYX {
 
-/** calculates cosinus of transmittance angle with snell's law
- * cosinus is needed in fresnel formula
- * sin(incidence_angle)² = 1 - cos(incidence_angle)²
- * ratio² = (cn1 / cn2)²
- * sin(transmittance_angle)² = (cn1 / cn2)² * sin(incidence_angle)²
- * cos(transmittance_angle) = sqrt( 1 - sin(transmittance_angle)²)
- *
- * @param cos_incidence			cosinus of complex incidence angle
- * @param cn1					complex refractive index of material from which
- * the ray is coming
- * @param cn2					complex refractive index of material into which
- * the ray is going
- * @return cos_transmittance 	cosinus of complex transmittance angle
- */
-RAYX_FUNC dvec2 RAYX_API snell(dvec2 cos_incidence, dvec2 cn1, dvec2 cn2);
+struct Field {
+    dvec3c e;
+    double intensity;
+};
 
-/** calculates complex s- and p-polarization with fresnel formulas
- * @param cn1					complex refractive index of material from which
- * the ray is coming
- * @param cn2					complex refractive index of material into which
- * the ray is going
- * @param cos_incidence			cosinus of complex incidence angle
- * @param cos_transmittance 	cosinus of complex transmittance angle
- * @return complex_S			complex s-polarization
- * @return complex_P			complex p-polarization
- *
- */
-RAYX_FUNC void RAYX_API fresnel(dvec2 cn1, dvec2 cn2, dvec2 cos_incidence, dvec2 cos_transmittance, dvec2& complex_S, dvec2& complex_P);
+struct Coeffs {
+    double s;
+    double p;
+};
 
-/** computes complex s and p polarization over all layers with fresnel and
- * snell's law
- * @param energy 				energy of ray
- * @param incidence_angle		normal incidence angle
- * @param material				material the photon collides with
- * @return complex_S			complex s-polarization
- * @return complex_P			complex p-polarization
- */
-RAYX_FUNC void RAYX_API reflectance(double energy, double incidence_angle, dvec2& complex_S, dvec2& complex_P, int material, Inv& inv);
+struct ComplexCoeffs {
+    complex s;
+    complex p;
+};
+
+RAYX_FUNC
+inline
+double get_angle(glm::dvec3 a, glm::dvec3 b) {
+    return glm::acos(glm::dot(a, b));
+}
+
+RAYX_FUNC
+inline
+complex get_refract_angle(const complex incident_angle, const complex ior_i, const complex ior_t) {
+    return alpaka::asin((ior_i / ior_t) * alpaka::sin(incident_angle));
+}
+
+RAYX_FUNC
+inline
+complex get_brewsters_angle(const complex inverse_ior_ratio) {
+    return alpaka::atan(inverse_ior_ratio);
+}
+
+RAYX_FUNC
+inline
+complex get_critical_angle(const complex inverse_ior_ratio) {
+    return alpaka::asin(inverse_ior_ratio);
+}
+
+RAYX_FUNC
+inline
+ComplexCoeffs get_reflect_amplitude(const complex incident_angle, const complex refract_angle, const complex ior_i, const complex ior_t) {
+    const auto cos_i = alpaka::cos(incident_angle);
+    const auto cos_t = alpaka::cos(refract_angle);
+
+    const auto s = (ior_i * cos_i - ior_t * cos_t) / (ior_i * cos_i + ior_t * cos_t);
+    const auto p = (ior_t * cos_i - ior_i * cos_t) / (ior_t * cos_i + ior_i * cos_t);
+
+    return {
+        .s = s,
+        .p = p,
+    };
+}
+
+RAYX_FUNC
+inline
+ComplexCoeffs get_refract_amplitude(const complex incident_angle, const complex refract_angle, const complex ior_i, const complex ior_t) {
+    const auto cos_i = alpaka::cos(incident_angle);
+    const auto cos_t = alpaka::cos(refract_angle);
+
+    const auto s = (2.0 * ior_i * cos_i) / (ior_i * cos_i + ior_t * cos_t);
+    const auto p = (2.0 * ior_i * cos_i) / (ior_t * cos_i + ior_i * cos_t);
+
+    return {
+        .s = s,
+        .p = p,
+    };
+}
+
+RAYX_FUNC
+inline
+Coeffs get_reflect_intensity(const ComplexCoeffs coeffs) {
+    const auto s = (coeffs.s * alpaka::conj(coeffs.s)).real();
+    const auto p = (coeffs.p * alpaka::conj(coeffs.p)).real();
+
+    return {
+        .s = s,
+        .p = p,
+    };
+}
+
+RAYX_FUNC
+inline
+dmat3c get_jones_matrix(const ComplexCoeffs amplitude) {
+    return {
+        amplitude.s, 0, 0,
+        0, amplitude.p, 0,
+        0, 0, 1,
+    };
+}
+
+RAYX_FUNC
+inline
+dmat3c get_polarization_matrix(
+    const glm::dvec3 incident_vec,
+    const glm::dvec3 reflect_or_refract_vec,
+    const glm::dvec3 normal_vec,
+    const ComplexCoeffs amplitude
+) {
+    const auto jones_matrix = get_jones_matrix(amplitude);
+
+    const auto s0 = glm::normalize(glm::cross(incident_vec, -normal_vec));
+    const auto s1 = s0;
+    const auto p0 = glm::cross(incident_vec, s0);
+    const auto p1 = glm::cross(reflect_or_refract_vec, s0);
+
+    const auto o_out = glm::dmat3(
+        s1.x, p1.x, reflect_or_refract_vec.x,
+        s1.y, p1.y, reflect_or_refract_vec.y,
+        s1.z, p1.z, reflect_or_refract_vec.z
+    );
+
+    const auto o_in = glm::dmat3(
+        s0,
+        p0,
+        incident_vec
+    );
+
+    return o_out * jones_matrix * o_in;
+}
+
+RAYX_FUNC
+inline
+Field intercept_reflect(
+    const Field incident_field,
+    const double energy,
+    const dvec3 incident_vec,
+    const dvec3 normal_vec,
+    const int material,
+    Inv& inv
+) {
+    constexpr int vacuum_material = -1;
+    const auto _ior_i = getRefractiveIndex(energy, vacuum_material, inv);
+    const auto _ior_t = getRefractiveIndex(energy, material, inv);
+    const auto ior_i = complex(_ior_i.x, _ior_i.y);
+    const auto ior_t = complex(_ior_t.x, _ior_t.y);
+    // const auto ior_i = complex(1, 0);
+    // const auto ior_t = complex(1, 0);
+
+    const auto incident_angle = complex(get_angle(incident_vec, -normal_vec), 0);
+    const auto refract_angle = get_refract_angle(incident_angle, ior_i, ior_t);
+    const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
+
+    const auto reflect_amplitude = get_reflect_amplitude(incident_angle, refract_angle, ior_i, ior_t);
+    const auto reflect_intensity = get_reflect_intensity(reflect_amplitude);
+    const auto reflect_polarization_matrix = get_polarization_matrix(incident_vec, reflect_vec, normal_vec, reflect_amplitude);
+    const auto reflect_field = reflect_polarization_matrix * incident_field.e;
+
+    return Field {
+        .e = reflect_field,
+        .intensity = (reflect_intensity.s + reflect_intensity.p) / 2.0,
+    };
+}
+
 /**
  * computes complex number a + i*b in euler form:
  * euler = r * e^(i * phi) where r = sqrt(a**2 + b**2) = radius and phi =
  * atan2(a,b) = (absolute) phase
  */
-RAYX_FUNC dvec2 RAYX_API cartesian_to_euler(dvec2 complex);
-
-
+RAYX_FUNC
+inline
+dvec2 RAYX_API cartesian_to_euler(dvec2 complex) {
+    double r = dot(complex,
+                   complex);  // r = sqrt(a**2 + b**2), why not take sqrt in fortran
+                              // code?, maybe better bc square root looses precision
+    dvec2 euler;
+    if (r < 0 || r > 1) {
+        euler = dvec2(1000000.0f, 10000000.0f);
+        return euler;
+    }
+    euler = dvec2(r, glm::atan(complex.y, complex.x));  // phi in rad
+    return euler;
+}
 
 /** computes the difference in the phases of 2 complex number written in euler
  * form: r * e^(i * phi)
@@ -58,7 +187,13 @@ RAYX_FUNC dvec2 RAYX_API cartesian_to_euler(dvec2 complex);
  * @param euler2		second complex number // p
  * @return delta = phi1 - phi2, in [-pi/2, pi/2] degrees
  */
-RAYX_FUNC double phase_difference(dvec2 euler1, dvec2 euler2);
+RAYX_FUNC
+inline
+double phase_difference(dvec2 euler1, dvec2 euler2) {
+    double delta = euler2.y - euler1.y;  // p - s
+    delta = delta - int(delta > 180) * 360.0 + int(delta < -180) * 360.0;
+    return delta;
+}
 
 /** efficiency calculation
  * uses complex numbers for s- and p-polarisation:
@@ -75,6 +210,27 @@ RAYX_FUNC double phase_difference(dvec2 euler1, dvec2 euler2);
  * @param material				material the photon collides with
  * @param others
  */
-RAYX_FUNC void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incidence_angle, int material, Inv& inv);
+RAYX_FUNC
+inline
+void efficiency(Ray r, double& real_S, double& real_P, double& delta, double incident_angle, int material, Inv& inv) {
+    constexpr int vacuum_material = -1;
+    const auto _ior_i = getRefractiveIndex(r.m_energy, vacuum_material, inv);
+    const auto _ior_t = getRefractiveIndex(r.m_energy, material, inv);
+    const auto ior_i = complex(_ior_i.x, _ior_i.y);
+    const auto ior_t = complex(_ior_t.x, _ior_t.y);
+
+    const auto refract_angle = get_refract_angle(incident_angle, ior_i, ior_t);
+
+    const auto reflect_amplitude = get_reflect_amplitude(incident_angle, refract_angle, ior_i, ior_t);
+    const auto reflect_intensity = get_reflect_intensity(reflect_amplitude);
+
+    dvec2 euler_P = cartesian_to_euler(glm::dvec2(reflect_amplitude.s.real(), reflect_amplitude.s.imag()));
+    dvec2 euler_S = cartesian_to_euler(glm::dvec2(reflect_amplitude.p.real(), reflect_amplitude.p.imag()));
+
+    delta = phase_difference(euler_S, euler_P);
+    real_S = euler_S.x;
+    real_P = euler_P.x;
+}
+
 
 } // namespace RAYX

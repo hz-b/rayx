@@ -23,10 +23,11 @@ using glm::dvec3;
 using glm::dvec4;
 using glm::dmat3;
 using glm::dmat4;
-using uint = unsigned int;
 
 using glm::length;
 using glm::mod;
 using glm::sign;
+
+using uint = unsigned int;
 
 } // namespace RAYX

@@ -1,7 +1,6 @@
 #include "Utils.h"
 #include "Constants.h"
 #include "InvocationState.h"
-#include "Complex.h"
 #include "Rand.h"
 #include "Helper.h"
 #include "RefractiveIndex.h"

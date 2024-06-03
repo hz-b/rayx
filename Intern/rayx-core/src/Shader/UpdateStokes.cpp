@@ -40,6 +40,7 @@ bool updateStokes(Ray& r, double real_S, double real_P, double delta, double azi
 
     double rn = squaresDoubleRNG(inv.ctr);
     // throw ray away with certain probability
+    printf("q %d   %f | %f\n", int((r.m_stokes.x / stokes_old.x) - rn <= 0), r.m_stokes.x, stokes_old.x);
     return (r.m_stokes.x / stokes_old.x) - rn <= 0;
 }
 
