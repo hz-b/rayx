@@ -17,8 +17,23 @@ class BeamlineDesignHandler {
     // Define groups
     std::map<std::string, std::vector<std::string>> groups = {
         {"Coordinate Errors", {"translationXerror", "translationYerror", "translationZerror", "rotationXerror", "rotationYerror", "rotationZerror"}},
-        {"Source Parameters", {"sourceDepth", "sourceHeight", "sourceWidth"}}};
+        {"Position",
+         {"worldPosition", "alignmentError", "sourceDepth", "sourceHeight", "sourceWidth", "sourcePulseType", "positionType", "heightDistribution",
+          "widthDistribution"}},
+        {"Direction",
+         {
+             "horDivergence",
+             "verDivergence",
+             "numberOfCircles",
+             "maxOpeningAngle",
+             "minOpeningAngle",
+             "deltaOpeningHandle",
+         }},
+        {"WorldDirection", {"worldXDirection", "worldYDirection", "worldZDirection"}},
+        {"Energy", {"energy", "energySpread", "energyDistributionType", "energyDistribution", "photonEnergyDistributionFile", "separateEnergies"}},
+        {"Stokes", {"linPol"}}};
 
-    std::vector<std::string> customOrder = {"type",           "name",           "translationXerror", "translationYerror", "translationZerror",
-                                            "rotationXerror", "rotationYerror", "rotationZerror"};
+    std::vector<std::string> customOrder = {
+        "type",           "name",           "numberOfRays",  "translationXerror", "translationYerror", "translationZerror",
+        "rotationXerror", "rotationYerror", "rotationZerror"};
 };

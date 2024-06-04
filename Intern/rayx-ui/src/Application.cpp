@@ -181,25 +181,33 @@ void Application::run() {
                         raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         // Wait for loadBeamline and loadRays to finish
                         RAYX_VERB << "Loaded RML file: " << m_RMLPath;
-
-                        for (auto ray : m_rays) {
-                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
-                            if (id > m_Beamline->m_DesignElements.size()) {
-                                m_UIParams.showH5NotExistPopup = true;
+                        if (m_rays.size() == 0) {
+                            if (m_buildElementsNeeded) {
+                                m_State = State::PrepareElements;
+                            } else {
+                                m_State = State::Running;
+                                m_buildElementsNeeded = true;
+                            }
+                        } else {
+                            for (auto ray : m_rays) {
+                                size_t id = static_cast<size_t>(ray.back().m_lastElement);
+                                if (id > m_Beamline->m_DesignElements.size()) {
+                                    m_UIParams.showH5NotExistPopup = true;
+                                    break;
+                                }
+                            }
+                            if (m_UIParams.showH5NotExistPopup) {
+                                RAYX_VERB << "H5 file not compatible with RML file";
+                                m_State = State::RunningWithoutScene;
                                 break;
                             }
-                        }
-                        if (m_UIParams.showH5NotExistPopup) {
-                            RAYX_VERB << "H5 file not compatible with RML file";
-                            m_State = State::RunningWithoutScene;
-                            break;
-                        }
 
-                        RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
+                            RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
 
-                        buildRayCacheFuture =
-                            std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
-                        m_State = State::BuildingRays;
+                            buildRayCacheFuture =
+                                std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                            m_State = State::BuildingRays;
+                        }
                     }
                     break;
                 case State::BuildingRays:
