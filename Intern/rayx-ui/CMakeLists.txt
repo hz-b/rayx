@@ -81,8 +81,8 @@ if(Vulkan_FOUND)
     # ----------------------
 
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 nfd)
-    target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 portable_file_dialogs)
+    target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE 
         ${GLFW_DIR}/include
         ${GLFW_DIR}/deps
         ${IMGUI_DIR}

@@ -1,9 +1,9 @@
 #include "UIHandler.h"
 
+#include <portable-file-dialogs.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 #include <imgui_internal.h>
-#include <nfd.h>
 
 #include <fstream>
 #include <rapidxml.hpp>
@@ -351,13 +351,10 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Begin("Properties Manager");
 
     if (ImGui::Button("Open File Dialog")) {
-        nfdchar_t* outPath;
-        constexpr uint32_t filterCount = 1;
-        nfdfilteritem_t filterItem[filterCount] = {{"RML Files", "rml, xml"}};
-        nfdresult_t result = NFD_OpenDialog(&outPath, filterItem, filterCount, NULL);
-        if (result == NFD_OKAY) {
-            std::string rmlPath = outPath;
-
+        const std::vector<std::string> results =
+            pfd::open_file("Open Beamline File", "", {"RML Beamline Files", "*.rml *.xml"}, pfd::opt::none).result();
+        if (!results.empty()) {
+            const std::string rmlPath = results[0];
 #ifndef NO_H5
             std::string rayFilePathH5 = rmlPath.substr(0, rmlPath.size() - 4) + ".h5";
             uiParams.showH5NotExistPopup = !std::filesystem::exists(rayFilePathH5);
@@ -372,12 +369,12 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
             } else {
                 uiParams.h5Ready = !uiParams.showH5NotExistPopup && m_loadh5withRML;
                 uiParams.rmlReady = true;
-                uiParams.rmlPath = outPath;
+                uiParams.rmlPath = rmlPath;
             }
-        } else if (result == NFD_CANCEL) {
-            puts("User pressed cancel.");
         } else {
-            printf("Error: %s\n", NFD_GetError());
+            // Add specific handling when the file dialog is cancelled or an error occurs
+            RAYX_LOG << ("User did not select a file or an error occurred.");
+            // TODO: Popup
         }
     }
     if (uiParams.rmlPath != "") {

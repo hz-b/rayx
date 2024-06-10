@@ -1,12 +1,8 @@
-#include <nfd.h>
-
 #include <clocale>
 
 #include "Application.h"
 
 int main(int argc, char** argv) {
-    NFD_Init();  // Initialize Native File Dialog
-
     // Set locale to C to avoid issues with scanf
     std::setlocale(LC_NUMERIC, "C");
 
@@ -19,6 +15,5 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    NFD_Quit();
     return EXIT_SUCCESS;
 }
