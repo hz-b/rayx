@@ -1,5 +1,6 @@
 #include "UIHandler.h"
 
+#undef APIENTRY
 #include <portable-file-dialogs.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
