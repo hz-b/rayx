@@ -8,14 +8,12 @@
 
 class SwapChain {
   public:
-    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
-
-    SwapChain(Device& deviceRef, VkExtent2D windowExtent);
-    SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
+    SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous = nullptr);
     ~SwapChain();
-
     SwapChain(const SwapChain&) = delete;
     void operator=(const SwapChain&) = delete;
+
+    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
     VkFramebuffer getFrameBuffer(int index) const { return m_framebuffers[index]; }
     VkRenderPass getRenderPass() const { return m_RenderPass; }
@@ -24,12 +22,10 @@ class SwapChain {
     VkFormat getImageFormat() const { return m_ImageFormat; }
     VkFormat getDepthFormat() const { return m_DepthFormat; }
     VkExtent2D getExtent() const { return m_Extent; }
-    uint32_t width() const { return m_Extent.width; }
-    uint32_t height() const { return m_Extent.height; }
 
-    float extentAspectRatio() { return static_cast<float>(m_Extent.width) / static_cast<float>(m_Extent.height); }
+    float extentAspectRatio() const { return static_cast<float>(m_Extent.width) / static_cast<float>(m_Extent.height); }
 
-    VkResult acquireNextImage(uint32_t* imageIndex);
+    VkResult acquireNextImage(uint32_t* imageIndex) const;
     VkResult submitCommandBuffers(const std::vector<VkCommandBuffer>& cmdBuffers, uint32_t imageIndex);
 
     bool compareSwapFormats(const SwapChain& other) const { return other.m_DepthFormat == m_DepthFormat && other.m_ImageFormat == m_ImageFormat; }
@@ -44,9 +40,9 @@ class SwapChain {
     void createSyncObjects();
 
     // Helper functions
-    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const;
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const;
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
     VkFormat findDepthFormat() const;
 
     VkFormat m_ImageFormat;

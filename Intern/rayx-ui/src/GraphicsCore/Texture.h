@@ -15,10 +15,8 @@ class Texture {
     Texture(const Device& device, VkFormat format, VkImageUsageFlags usage, VkImageAspectFlags aspectFlags, VkExtent2D extent);
     ~Texture();
 
-    // Not copyable
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
-    // Movable
     Texture(Texture&& other) noexcept;
     Texture& operator=(Texture&& other) noexcept;
 
@@ -27,16 +25,16 @@ class Texture {
     VkSampler getSampler() const { return m_sampler; }
     VkDescriptorImageInfo getDescriptorInfo() const { return {m_sampler, m_view, m_layout}; }
 
+    void updateFromData(const unsigned char* data, uint32_t width, uint32_t height);
+    void updateFromPath(const std::filesystem::path& path);
+    void resize(uint32_t width, uint32_t height);
+    void transitionImageLayout(VkImageLayout newLayout);
+
     struct TextureInput {
         std::unique_ptr<unsigned char[]> data;
         uint32_t width;
         uint32_t height;
     };
-
-    void updateFromData(const unsigned char* data, uint32_t width, uint32_t height);
-    void updateFromPath(const std::filesystem::path& path);
-    void resize(uint32_t width, uint32_t height);
-    void transitionImageLayout(VkImageLayout newLayout);
 
   private:
     const Device& m_Device;
