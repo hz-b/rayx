@@ -101,7 +101,13 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
         std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
 
-        triangulateObject(elements[i], vertices, indices);
+        try {
+            triangulateObject(elements[i], vertices, indices);
+        } catch (const std::exception& ex) {
+            RAYX_WARN << ex.what() << ". Object \"" << elements[i].getName()
+                      << "\" can't be rendered due to triangulation issues. Make sure it is defined correctly in the RML file.";
+            continue;  // Input is not generated --> Object won't be built/rendered
+        }
 
         glm::mat4 modelMatrix = elements[i].compile().m_outTrans;
 
