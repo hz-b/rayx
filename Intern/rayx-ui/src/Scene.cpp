@@ -82,11 +82,6 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
             m_RaysRObject.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
         }
     }
-    if (m_State == State::Empty) {
-        m_State = State::BuiltRayRObject;
-    } else {
-        m_State = State::Complete;
-    }
 }
 
 std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
@@ -149,11 +144,5 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
             m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, Texture(m_Device), setLayout,
                                            descriptorPool);
         }
-    }
-
-    if (m_State == State::Empty) {
-        m_State = State::BuiltElementRObjs;
-    } else {
-        m_State = State::Complete;
     }
 }

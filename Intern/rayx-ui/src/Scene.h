@@ -31,12 +31,10 @@ class Scene {
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
                                 std::shared_ptr<DescriptorPool> descriptorPool);
 
-    State getState() const { return m_State; }
     void resetRayRObject() { m_RaysRObject.reset(); }
 
   private:
     Device& m_Device;
-    State m_State = State::Empty;
 
     std::vector<RenderObject> m_ElementRObjects = {};
     std::optional<RenderObject> m_RaysRObject = {};
