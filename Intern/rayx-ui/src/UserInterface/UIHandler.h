@@ -22,6 +22,9 @@ class UIHandler {
     void setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
     void endUIRender(VkCommandBuffer commandBuffer);
 
+    static void applyDarkTheme();
+    static void applyLightTheme();
+
     VkClearValue getClearValue() const {
         VkClearValue v;
         for (int i = 0; i < 4; i++) {
@@ -36,6 +39,7 @@ class UIHandler {
 
     float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
+    bool m_isDarkTheme = true;
     float m_scale = 1.0f;
     float m_oldScale = 1.0f;
     std::vector<ImFont*> m_fonts;
