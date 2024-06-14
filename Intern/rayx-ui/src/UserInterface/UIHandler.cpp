@@ -9,6 +9,7 @@
 #include <fstream>
 #include <rapidxml.hpp>
 
+#include "Colors.h"
 #include "CanonicalizePath.h"
 #include "RayProcessing.h"
 
@@ -158,6 +159,13 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     style->Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);          // White text
     style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);  // Light grey for disabled text
 
+    style->Colors[ImGuiCol_TabHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+
+    style->Colors[ImGuiCol_Tab] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_TabActive] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (180.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_TabUnfocused] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_TabUnfocusedActive] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (180.0f / 256.0f), 1.00f);
+
     style->Colors[ImGuiCol_WindowBg] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.0f);
     // style->Colors[ImGuiCol_ChildWindowBg] = ImVec4(1.00f, 0.98f, 0.95f, 0.58f);
     style->Colors[ImGuiCol_PopupBg] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 0.92f);
@@ -180,7 +188,7 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     style->Colors[ImGuiCol_ButtonHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
     style->Colors[ImGuiCol_ButtonActive] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
     style->Colors[ImGuiCol_SliderGrab] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 0.64f);
-    style->Colors[ImGuiCol_SliderGrabActive] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f);
+    style->Colors[ImGuiCol_SliderGrabActive] = ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (180.0f / 256.0f), 1.00f);
     style->Colors[ImGuiCol_Header] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.0f);
     style->Colors[ImGuiCol_HeaderHovered] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 0.86f);
     style->Colors[ImGuiCol_HeaderActive] = ImVec4((48.0f / 256.0f), (48.0f / 256.0f), (48.0f / 256.0f), 1.00f);
