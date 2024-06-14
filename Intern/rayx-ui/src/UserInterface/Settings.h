@@ -61,7 +61,7 @@ struct UIParameters {
     UISimulationInfo simulationInfo;
 
     UIParameters(CameraController& camController, const std::vector<std::string>& availableDevices)
-        : sceneExtent({0, 0}),
+        : sceneExtent({720, 480}),
           sceneDescriptorSet(VK_NULL_HANDLE),
           camController(camController),
           rmlPath(""),

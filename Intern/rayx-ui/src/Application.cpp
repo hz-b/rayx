@@ -260,11 +260,10 @@ void Application::run() {
                 .commandBuffer = VK_NULL_HANDLE,             //
                 .descriptorSet = descriptorSets[frameIndex]  //
             };
-            if (m_UIParams.sceneExtent.height != 0 && m_UIParams.sceneExtent.width != 0) {
-                if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
-                    m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
-                    m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
-                }
+            if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
+                m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
+                m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
+                sceneExtent = m_UIParams.sceneExtent;
             }
             m_Renderer.beginOffscreenRenderPass(frameInfo, m_UIHandler.getClearValue());
             if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
