@@ -260,7 +260,10 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     }
 
     // Render View
-    ImGui::Begin("Render View");  // TODO: Remove padding
+    // Push zero padding for the window
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
+    ImGui::Begin("Render View");  // Window with no padding
     ImVec2 size = ImGui::GetContentRegionAvail();
     if (size.x > 0 && size.y > 0) {
         uiParams.sceneExtent = {static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y)};
@@ -271,6 +274,9 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
     }
     isSceneWindowHovered = ImGui::IsWindowHovered();
     ImGui::End();
+
+    // Pop the style variable to restore default padding
+    ImGui::PopStyleVar();
 
     showSceneEditorWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
