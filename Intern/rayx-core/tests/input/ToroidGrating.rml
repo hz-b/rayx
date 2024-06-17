@@ -3,7 +3,7 @@
  <version>1.13</version>
  <beamline>
   <object name="Matrix Source" type="Matrix Source">
-   <param id="numberRays" enabled="T">20000</param>
+   <param id="numberRays" enabled="T">4</param>
    <param id="sourceWidth" enabled="T">0.065</param>
    <param id="sourceHeight" enabled="T">0.04</param>
    <param id="sourceDepth" enabled="T">0</param>
