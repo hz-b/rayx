@@ -129,7 +129,7 @@ void getSphereGrating(xml::Parser parser, DesignElement* de) {
     de->setDeviationAngle(parser.parseDeviationAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCalcRadiusDeviationAngle();                      // pre calculated radius so the element can call getRadius
+    de->setRadius(parser.parseRadius());                      // pre calculated radius so the element can call getRadius
 
     getGrating(parser, de);
 }

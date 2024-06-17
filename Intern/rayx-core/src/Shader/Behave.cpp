@@ -92,7 +92,7 @@ Ray behaveGrating(Ray r, int id, Collision col) {
 
     // linedensity = WL * default_linedensity * order * 1e-06
     double linedensity = vlsGrating(lineDensity, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
-    r.m_order            = orderOfDiffraction;
+    r.m_order = orderOfDiffraction;
     // no additional zero order here?
 
     // refraction
