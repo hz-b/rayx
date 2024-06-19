@@ -76,10 +76,10 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
 
-        if (m_RaysRObject.has_value()) {
-            m_RaysRObject->rebuild(rayVertices, rayIndices);
+        if (!m_RayRObjects.empty()) {
+            m_RayRObjects[0].rebuild(rayVertices, rayIndices);
         } else {
-            m_RaysRObject.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
+            m_RayRObjects.emplace_back(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
         }
     }
 }
