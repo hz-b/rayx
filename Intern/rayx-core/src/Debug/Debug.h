@@ -160,39 +160,44 @@ extern void RAYX_API (*error_fn)();
  * RAYX_DBG(position);
  * */
 
-template <int N, int M>
-inline std::vector<double> formatAsVec(glm::mat<N, M, double> arg) {
-    std::vector<double> out(N * M);
-    for (size_t i = 0; i < N * M; i++) {
-        out[i] = arg[i / N][i % N];
-    }
-    return out;
-}
-
-template <int N>
-inline std::vector<double> formatAsVec(glm::vec<N, double> arg) {
-    std::vector<double> out(N);
-    for (size_t i = 0; i < N; i++) {
-        out[i] = arg[i];
-    }
-    return out;
-}
-
-template <size_t N>
-inline std::vector<double> formatAsVec(std::array<double, N> arg) {
-    std::vector<double> out(N);
-    for (size_t i = 0; i < N; i++) {
-        out[i] = arg[i];
-    }
-    return out;
-}
-
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
+
+inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
 
 inline std::vector<double> formatAsVec(Ray arg) {
     return {arg.m_position.x,  arg.m_position.y,  arg.m_position.z, arg.m_eventType, arg.m_direction.x,
             arg.m_direction.y, arg.m_direction.z, arg.m_energy,     arg.m_stokes.x,  arg.m_stokes.y,
             arg.m_stokes.z,    arg.m_stokes.w,    arg.m_pathLength, arg.m_order,     arg.m_lastElement, arg.m_sourceID};
+}
+
+template <int N, int M, typename T>
+inline std::vector<double> formatAsVec(glm::mat<N, M, T> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < N * M; i++) {
+        auto data = formatAsVec(arg[i / N][i % N]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <int N, typename T>
+inline std::vector<double> formatAsVec(glm::vec<N, T> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < N; i++) {
+        auto data = formatAsVec(arg[i]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <size_t N, typename T>
+inline std::vector<double> formatAsVec(std::array<T, N> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < N; i++) {
+        auto data = formatAsVec(arg[i]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
 }
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);
