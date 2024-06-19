@@ -5,12 +5,11 @@
 #include "RefractiveIndex.h"
 #include "Complex.h"
 
+#include <Debug/Debug.h>
+
 namespace RAYX {
 
-struct Field {
-    dvec3c e;
-    double intensity;
-};
+using Field = cvec3;
 
 struct Coeffs {
     double s;
@@ -18,8 +17,8 @@ struct Coeffs {
 };
 
 struct ComplexCoeffs {
-    complex s;
-    complex p;
+    complex::Complex s;
+    complex::Complex p;
 };
 
 RAYX_FUNC
@@ -30,27 +29,27 @@ double get_angle(glm::dvec3 a, glm::dvec3 b) {
 
 RAYX_FUNC
 inline
-complex get_refract_angle(const complex incident_angle, const complex ior_i, const complex ior_t) {
-    return alpaka::asin((ior_i / ior_t) * alpaka::sin(incident_angle));
+complex::Complex get_refract_angle(const complex::Complex incident_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+    return complex::asin((ior_i / ior_t) * complex::sin(incident_angle));
 }
 
 RAYX_FUNC
 inline
-complex get_brewsters_angle(const complex inverse_ior_ratio) {
-    return alpaka::atan(inverse_ior_ratio);
+complex::Complex get_brewsters_angle(const complex::Complex inverse_ior_ratio) {
+    return complex::atan(inverse_ior_ratio);
 }
 
 RAYX_FUNC
 inline
-complex get_critical_angle(const complex inverse_ior_ratio) {
-    return alpaka::asin(inverse_ior_ratio);
+complex::Complex get_critical_angle(const complex::Complex inverse_ior_ratio) {
+    return complex::asin(inverse_ior_ratio);
 }
 
 RAYX_FUNC
 inline
-ComplexCoeffs get_reflect_amplitude(const complex incident_angle, const complex refract_angle, const complex ior_i, const complex ior_t) {
-    const auto cos_i = alpaka::cos(incident_angle);
-    const auto cos_t = alpaka::cos(refract_angle);
+ComplexCoeffs get_reflect_amplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+    const auto cos_i = complex::cos(incident_angle);
+    const auto cos_t = complex::cos(refract_angle);
 
     const auto s = (ior_i * cos_i - ior_t * cos_t) / (ior_i * cos_i + ior_t * cos_t);
     const auto p = (ior_t * cos_i - ior_i * cos_t) / (ior_t * cos_i + ior_i * cos_t);
@@ -63,9 +62,9 @@ ComplexCoeffs get_reflect_amplitude(const complex incident_angle, const complex 
 
 RAYX_FUNC
 inline
-ComplexCoeffs get_refract_amplitude(const complex incident_angle, const complex refract_angle, const complex ior_i, const complex ior_t) {
-    const auto cos_i = alpaka::cos(incident_angle);
-    const auto cos_t = alpaka::cos(refract_angle);
+ComplexCoeffs get_refract_amplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+    const auto cos_i = complex::cos(incident_angle);
+    const auto cos_t = complex::cos(refract_angle);
 
     const auto s = (2.0 * ior_i * cos_i) / (ior_i * cos_i + ior_t * cos_t);
     const auto p = (2.0 * ior_i * cos_i) / (ior_t * cos_i + ior_i * cos_t);
@@ -78,9 +77,9 @@ ComplexCoeffs get_refract_amplitude(const complex incident_angle, const complex 
 
 RAYX_FUNC
 inline
-Coeffs get_reflect_intensity(const ComplexCoeffs coeffs) {
-    const auto s = (coeffs.s * alpaka::conj(coeffs.s)).real();
-    const auto p = (coeffs.p * alpaka::conj(coeffs.p)).real();
+Coeffs get_reflect_intensity(const ComplexCoeffs reflect_amplitude) {
+    const auto s = (reflect_amplitude.s * complex::conj(reflect_amplitude.s)).real();
+    const auto p = (reflect_amplitude.p * complex::conj(reflect_amplitude.p)).real();
 
     return {
         .s = s,
@@ -90,7 +89,7 @@ Coeffs get_reflect_intensity(const ComplexCoeffs coeffs) {
 
 RAYX_FUNC
 inline
-dmat3c get_jones_matrix(const ComplexCoeffs amplitude) {
+cmat3 get_jones_matrix(const ComplexCoeffs amplitude) {
     return {
         amplitude.s, 0, 0,
         0, amplitude.p, 0,

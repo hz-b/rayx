@@ -22,6 +22,7 @@
 
 // This include is necessary, as Debug implements a special formatting for Ray.
 #include <Shader/Ray.h>
+#include <Shader/Complex.h>
 
 // Debug only code; use it as: DEBUG(<statement>);
 #ifdef RAYX_DEBUG_MODE
