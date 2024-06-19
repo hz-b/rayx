@@ -1,10 +1,9 @@
 #pragma once
 
-#include <math.h>
-
 #include <array>
-#include <glm.hpp>
 #include <vector>
+
+#include <glm.h>
 
 #include "Core.h"
 

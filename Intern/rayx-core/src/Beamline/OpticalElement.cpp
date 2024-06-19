@@ -1,6 +1,5 @@
 #include "OpticalElement.h"
 
-#include <glm.hpp>
 #include <optional>
 
 #include <DesignElement/DesignElement.h>

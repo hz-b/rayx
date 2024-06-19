@@ -15,7 +15,6 @@
 /// For quick debugging prints, this file further exposes RAYX_DBG(x).
 
 #include <array>
-#include <glm.hpp>
 #include <iomanip>
 #include <iostream>
 #include <string>

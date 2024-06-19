@@ -2,7 +2,7 @@
 
 #include <array>
 #include <filesystem>
-#include <glm.hpp>
+#include <glm.h>
 #include <rapidxml.hpp>
 #include <vector>
 

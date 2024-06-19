@@ -1,8 +1,9 @@
 #pragma once
 
 #include <array>
-#include <glm.hpp>
 #include <optional>
+
+#include <glm.h>
 
 #include "Core.h"
 #include "Data/xml.h"

@@ -12,9 +12,7 @@
 #define RAYX_FUNC
 #endif
 
-// glm definitions need to be directly accessible in c++.
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm.hpp>
+#include <glm.h>
 
 namespace RAYX {
 
