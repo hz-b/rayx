@@ -58,7 +58,8 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 
     bool success = true;
     for (size_t i = 0; i < vl.size(); i++) {
-        if (abs(vl[i] - vr[i]) > tolerance) {
+        const bool xor_nan = std::isnan(vl[i]) != std::isnan(vr[i]);
+        if (abs(vl[i] - vr[i]) > tolerance || xor_nan) {
             success = false;
             break;
         }
