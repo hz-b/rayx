@@ -111,33 +111,29 @@ RAYX_FUNC
 Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     // calculate the new direction after the reflection
     const auto incident_vec = r.m_direction;
-    r.m_direction = reflect(r.m_direction, col.normal);
+    const auto reflect_vec = glm::reflect(incident_vec, col.normal);
+    r.m_direction = reflect_vec;
 
     int mat = int(inv.elements[id].m_material);
     if (mat != -2) {
-        // const auto incident_field = Field {
-        //     .e = {{0, 0}, {0, 0}, {0, 0}},
-        //     .intensity = r.m_stokes.x,
-        // };
-        //
-        // printf("%f, %f, %f, %f\n", r.m_stokes.x,r.m_stokes.y, r.m_stokes.z,r.m_stokes.w);
-        //
-        // const auto reflect_field = intercept_reflect(
-        //     incident_field,
-        //     r.m_energy,
-        //     incident_vec,
-        //     col.normal,
-        //     mat,
-        //     inv
-        // );
-        //
-        // const auto absorbed = (reflect_field.intensity / incident_field.intensity) - squaresDoubleRNG(inv.ctr) <= 0.0;
+        constexpr int vacuum_material = -1;
+        const auto _ior_i = getRefractiveIndex(r.m_energy, vacuum_material, inv);
+        const auto _ior_t = getRefractiveIndex(r.m_energy, mat, inv);
+        const auto ior_i = complex::Complex(_ior_i.x, _ior_i.y);
+        const auto ior_t = complex::Complex(_ior_t.x, _ior_t.y);
 
-        const auto incident_angle = get_angle(incident_vec, -col.normal);
-        double real_S, real_P, delta;
-        efficiency(r, real_S, real_P, delta, incident_angle, mat, inv);
-        const double azimuthal_angle = inv.elements[id].m_azimuthalAngle;
-        bool absorbed = updateStokes(r, real_S, real_P, delta, azimuthal_angle, inv);
+        const auto incident_field = Field {{0, 0}, {0, 0}, {0, 0}};
+
+        const auto reflect_field = intercept_reflect(
+            incident_field,
+            incident_vec,
+            reflect_vec,
+            col.normal,
+            ior_i,
+            ior_t
+        );
+
+        const bool absorbed = false;
         if (absorbed) {
             recordFinalEvent(r, ETYPE_ABSORBED, inv);
         }

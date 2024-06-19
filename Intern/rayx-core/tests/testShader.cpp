@@ -849,6 +849,253 @@ TEST_F(TestSuite, testRefracPlane) {
     }
 }
 
+TEST_F(TestSuite, testSnell) {
+    using namespace complex;
+
+    struct InOutPair {
+        Complex in_ior_i;
+        Complex in_ior_t;
+        Complex in_incident_angle;
+
+        Complex out_refract_angle;
+    };
+
+    const auto inouts = std::vector<InOutPair> {
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(1.0, 0),
+            .in_incident_angle = Complex(0.5, 0.5),
+            .out_refract_angle = Complex(0.5, 0.5),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(1.2, 0),
+            .in_incident_angle = Complex(PI * 0.5, 0),
+            .out_refract_angle = Complex(0.98511078333774571, 0),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(1.2, 0),
+            .in_incident_angle = Complex(PI * 0.25, 0),
+            .out_refract_angle = Complex(0.63013724606456445, 0),
+        },
+        {
+            .in_ior_i = Complex(1.2, 0),
+            .in_ior_t = Complex(1.0, 0),
+            .in_incident_angle = Complex(0.63013724606456445, 0),
+            .out_refract_angle = Complex(PI * 0.25, 0),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(0.05, 5.0),
+            .in_incident_angle = Complex(PI * 0.25, 0),
+            .out_refract_angle = Complex(0.0014001432455587293, -0.14094028035483516),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(2.0, 0),
+            .in_incident_angle = Complex(PI * 0.45, 0),
+            .out_refract_angle = Complex(0.51650510236395286, 0),
+        },
+    };
+
+    for (const auto p : inouts) {
+        const auto refract_angle = get_refract_angle(p.in_incident_angle, p.in_ior_i, p.in_ior_t);
+        CHECK_EQ(refract_angle, p.out_refract_angle);
+    }
+}
+
+TEST_F(TestSuite, testFresnel) {
+    using namespace complex;
+
+    struct InOutPair {
+        Complex in_ior_i;
+        Complex in_ior_t;
+        Complex in_incident_angle;
+        Complex in_refract_angle;
+
+        ComplexCoeffs out_reflect_amplitude;
+    };
+
+    std::vector<InOutPair> inouts = {
+        {
+            .in_ior_i = Complex(0.91453807092958361, 0.035170965000031584),
+            .in_ior_t = Complex(1, 0),
+            .in_incident_angle = acos(Complex(0.10897754475504851, 0.40807275584607544)),
+            .in_refract_angle = acos(Complex(0.17315572500228882, 0)),
+            .out_reflect_amplitude = {
+                .s = Complex(0.57163467986230054, 0.62486367906829521),
+                .p = Complex(0.63080662811278632, 0.52640331936127849),
+            },
+        },
+        {
+            .in_ior_i = Complex(0.91452118089946777, 0.035187568837614078),
+            .in_ior_t = Complex(1, 0),
+            .in_incident_angle = acos(Complex(0.10906363669865969, 0.40789272144618016)),
+            .in_refract_angle = acos(Complex(0.1736481785774231, 0)),
+            .out_reflect_amplitude = {
+                .s = Complex(0.56981824812215454, 0.62585833416785819),
+                .p = Complex(0.62929764490597007, 0.52731592442193231),
+            },
+        },
+    };
+
+    for (auto p : inouts) {
+        const auto reflect_amplitude = get_reflect_amplitude(p.in_incident_angle, p.in_refract_angle, p.in_ior_i, p.in_ior_t);
+        CHECK_EQ(reflect_amplitude.p, p.out_reflect_amplitude.p);
+        CHECK_EQ(reflect_amplitude.s, p.out_reflect_amplitude.s);
+    }
+}
+
+TEST_F(TestSuite, testPolarizingReflectionScenario) {
+    using namespace complex;
+
+    const auto incident_vec = glm::normalize(dvec3(-0.195, -0.195, 0.961));
+    const auto normal_vec_0 = glm::normalize(dvec3(0, -1, -1));
+
+    const auto reflect_vec_0 = glm::reflect(incident_vec, -normal_vec_0);
+    CHECK_EQ(reflect_vec_0, glm::normalize(dvec3(-0.195, -0.961, 0.195)));
+
+    const auto incident_angle_0 = get_angle(incident_vec, -normal_vec_0);
+    CHECK_EQ(Rad(incident_angle_0).toDeg().deg, 57.19646879265609);
+
+    const auto reflect_amplitude_0 = ComplexCoeffs {
+        .s = polar(0.992, 2.918),
+        .p = polar(0.975, -0.751),
+    };
+
+    const auto reflect_polarization_matrix_0 = get_polarization_matrix(incident_vec, reflect_vec_0, normal_vec_0, reflect_amplitude_0);
+
+    CHECK_EQ(
+        reflect_polarization_matrix_0,
+        glm::transpose(
+            cmat3 {
+                {-0.889, 0.219}, {0.106, 0.046}, {-0.361, 0.054},
+                {0.361, -0.054}, {0.314, -0.137}, {-0.863, -0.039},
+                {-0.106, -0.046}, {0.655, -0.628}, {0.314, -0.137},
+            }
+        ),
+        1e-3
+    );
+
+    const auto normal_vec_1 = glm::normalize(dvec3(1, 1, 0));
+    const auto reflect_vec_1 = glm::reflect(reflect_vec_0, -normal_vec_1);
+    CHECK_EQ(reflect_vec_1, glm::normalize(dvec3(0.961, 0.195, 0.195)));
+
+    const auto incident_angle_1 = get_angle(reflect_vec_0, -normal_vec_1);
+    CHECK_EQ(Rad(incident_angle_1).toDeg().deg, 35.155651179977404);
+
+    const auto reflect_amplitude_1 = ComplexCoeffs {
+        .s = polar(0.988, 2.80),
+        .p = polar(0.982, -0.507),
+    };
+
+    const auto reflect_polarization_matrix_1 = get_polarization_matrix(reflect_vec_0, reflect_vec_1, normal_vec_1, reflect_amplitude_1);
+
+    CHECK_EQ(
+        reflect_polarization_matrix_1,
+        glm::transpose(
+            cmat3 {
+                {-0.352, 0.081}, {-0.855, -0.028}, {0.365, -0.056},
+                {0.792, -0.450}, {-0.352, 0.081}, {0.052, -0.052},
+                {-0.054, 0.052}, {-0.365, 0.056}, {-0.853, 0.327},
+            }
+        ),
+        1e-2 // TODO: should be 1e-3
+    );
+}
+
+TEST_F(TestSuite, testInterceptReflect) {
+    using namespace complex;
+
+    struct InOutPair {
+        Field in_incident_field;
+        Complex in_ior_i;
+        Complex in_ior_t;
+        dvec3 in_incident_vec;
+        dvec3 in_normal_vec;
+
+        Field out_reflect_field;
+    };
+
+    std::vector<InOutPair> inouts = {
+        // partially polarizing reflection
+        // {
+        //     .in_incident_field = Field({0, 0}, {0, 0}, {0, 0}),
+        //     .in_ior_i = Complex(1.0, 0),
+        //     .in_ior_t = Complex(1.5, 0),
+        //     .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
+        //     .in_normal_vec = glm::normalize(dvec3(-1, 1, 0)),
+        //     .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+        // },
+
+        // partially polarizing reflection
+        // {
+        //     .in_incident_field = Field({0, 0}, {0, 0}, {0, 0}),
+        //     .in_ior_i = Complex(1.5, 0),
+        //     .in_ior_t = Complex(1.0, 0),
+        //     .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
+        //     .in_normal_vec = glm::normalize(dvec3(-1, 1, 0)),
+        //     .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+        // },
+
+        // fully polarizing reflection (reflection at brewsters angle)
+        // {
+        //     .in_incident_field = Field({0, 0}, {0, 0}, {0, 0}),
+        //     .in_ior_i = Complex(1.0, 0),
+        //     .in_ior_t = Complex(1.5, 0),
+        //     .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
+        //     .in_normal_vec = glm::normalize(dvec3(-1, 1, 0)),
+        //     .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+        // },
+
+        // non-polarizing reflection (reflection at normal incidence)
+        // {
+        //     .in_incident_field = Field({0, 0}, {1, 0}, {0, 0}),
+        //     .in_ior_i = Complex(1.0, 0),
+        //     .in_ior_t = Complex(1.5, 0),
+        //     .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
+        //     .in_normal_vec = glm::normalize(dvec3(-1, 1, 0)),
+        //     .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+        // },
+
+        // zero energy field should result in zero energy field after reflection
+        // {
+        //     .in_incident_field = Field({0, 0}, {0, 0}, {0, 0}),
+        //     .in_ior_i = Complex(1.0, 0),
+        //     .in_ior_t = Complex(1.5, 0),
+        //     .in_incident_vec = glm::normalize(dvec3(1, -1, 0)),
+        //     .in_normal_vec = glm::normalize(dvec3(0, 1, 0)),
+        //     .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+        // },
+
+        // total internal reflection
+        // {
+        //     .in_incident_field = Field({0, 0}, {0, 0}, {0, 0}),
+        //     .in_ior_i = Complex(1.0, 0),
+        //     .in_ior_t = Complex(1.5, 0),
+        //     .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
+        //     .in_normal_vec = glm::normalize(dvec3(-1, 1, 0)),
+        //     .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+        // },
+    };
+
+    for (auto p : inouts) {
+        auto reflect_vec = glm::reflect(p.in_incident_vec, p.in_normal_vec);
+
+        auto reflect_field = intercept_reflect(
+            p.in_incident_field,
+            p.in_incident_vec,
+            reflect_vec,
+            p.in_normal_vec,
+            p.in_ior_i,
+            p.in_ior_t
+        );
+
+        CHECK_EQ(reflect_field, p.out_reflect_field);
+    }
+}
+
 // both the Cpp code as well as the shader define hvlam.
 TEST_F(TestSuite, testHvlam) {
     double hv = 100;
