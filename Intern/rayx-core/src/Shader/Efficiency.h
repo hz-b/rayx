@@ -5,8 +5,6 @@
 #include "RefractiveIndex.h"
 #include "Complex.h"
 
-#include <Debug/Debug.h>
-
 namespace RAYX {
 
 using Field = cvec3;
@@ -35,14 +33,14 @@ complex::Complex get_refract_angle(const complex::Complex incident_angle, const 
 
 RAYX_FUNC
 inline
-complex::Complex get_brewsters_angle(const complex::Complex inverse_ior_ratio) {
-    return complex::atan(inverse_ior_ratio);
+complex::Complex get_brewsters_angle(const complex::Complex ior_i, const complex::Complex ior_t) {
+    return complex::atan(ior_t / ior_i);
 }
 
 RAYX_FUNC
 inline
-complex::Complex get_critical_angle(const complex::Complex inverse_ior_ratio) {
-    return complex::asin(inverse_ior_ratio);
+complex::Complex get_critical_angle(const complex::Complex ior_i, const complex::Complex ior_t) {
+    return complex::asin(ior_t / ior_i);
 }
 
 RAYX_FUNC
@@ -80,6 +78,20 @@ inline
 Coeffs get_reflect_intensity(const ComplexCoeffs reflect_amplitude) {
     const auto s = (reflect_amplitude.s * complex::conj(reflect_amplitude.s)).real();
     const auto p = (reflect_amplitude.p * complex::conj(reflect_amplitude.p)).real();
+
+    return {
+        .s = s,
+        .p = p,
+    };
+}
+
+RAYX_FUNC
+inline
+Coeffs get_refract_intensity(ComplexCoeffs refract_amplitude, const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+    const auto r = ((ior_t * complex::cos(refract_angle)) / (ior_i * complex::cos(incident_angle))).real();
+
+    const auto s = r * (refract_amplitude.s * complex::conj(refract_amplitude.s)).real();
+    const auto p = r * (refract_amplitude.p * complex::conj(refract_amplitude.p)).real();
 
     return {
         .s = s,
@@ -129,6 +141,16 @@ cmat3 get_polarization_matrix(
 
 RAYX_FUNC
 inline
+cmat3 get_reflect_polarization_matrix_at_normal_incidence(const ComplexCoeffs amplitude) {
+    return {
+        amplitude.s, 0, 0,
+        0, -amplitude.p, 0,
+        0, 0, -1,
+    };
+}
+
+RAYX_FUNC
+inline
 Field intercept_reflect(
     const Field incident_field,
     const dvec3 incident_vec,
@@ -144,9 +166,13 @@ Field intercept_reflect(
 
     const auto reflect_amplitude = get_reflect_amplitude(incident_angle, refract_angle, ior_i, ior_t);
 
-    const auto reflect_polarization_matrix = get_polarization_matrix(incident_vec, reflect_vec, normal_vec, reflect_amplitude);
-    const auto reflect_field = reflect_polarization_matrix * incident_field;
+    const auto is_normal_incidence = glm::dot(incident_vec, -normal_vec) == 1.0;
+    const auto reflect_polarization_matrix =
+        is_normal_incidence
+        ? get_reflect_polarization_matrix_at_normal_incidence(reflect_amplitude)
+        : get_polarization_matrix(incident_vec, reflect_vec, normal_vec, reflect_amplitude);
 
+    const auto reflect_field = reflect_polarization_matrix * incident_field;
     return reflect_field;
 }
 
