@@ -452,9 +452,9 @@ void UIHandler::applyLightTheme() {
     style->Colors[ImGuiCol_Border] = ImVec4(0.88f, 0.88f, 0.88f, 0.30f);        // Light grey border
     style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);  // No border shadow
 
-    style->Colors[ImGuiCol_FrameBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);         // Frame background slightly lighter than window
-    style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.96f, 0.96f, 0.96f, 0.78f);  // Light grey on hover
-    style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);   // Active frame background
+    style->Colors[ImGuiCol_FrameBg] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);         // Frame background slightly lighter than window
+    style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.90f, 0.90f, 0.78f);  // Light grey on hover
+    style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);   // Active frame background
 
     style->Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
     style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.96f, 0.96f, 0.96f, 0.75f);

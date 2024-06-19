@@ -15,7 +15,7 @@ class Scene {
     enum class State { Empty, BuiltRayRObject, BuiltElementRObjs, Complete };
 
     const std::vector<RenderObject>& getRObjects() const { return m_ElementRObjects; }
-    const std::optional<RenderObject>& getRaysRObject() const { return m_RaysRObject; }
+    const std::vector<RenderObject>& getRaysRObject() const { return m_RayRObjects; }
 
     struct RenderObjectInput {
         glm::mat4 modelMatrix;
@@ -31,12 +31,12 @@ class Scene {
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
                                 std::shared_ptr<DescriptorPool> descriptorPool);
 
-    void resetRayRObject() { m_RaysRObject.reset(); }
+    void resetRayRObject() { m_RayRObjects.clear(); }
 
   private:
     Device& m_Device;
 
     std::vector<RenderObject> m_ElementRObjects = {};
-    std::optional<RenderObject> m_RaysRObject = {};
+    std::vector<RenderObject> m_RayRObjects = {};
     BundleHistory m_rayCache = {};
 };

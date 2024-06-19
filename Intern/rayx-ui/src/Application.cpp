@@ -99,10 +99,10 @@ void Application::run() {
     auto textureSetLayout =
         DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
     // Init render systems
-    std::vector<VkDescriptorSetLayout> layouts = {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()};
-    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
-    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), layouts);
-    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
+    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(),
+                                          {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()});
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<glm::dvec3> rSourcePositions;
@@ -270,7 +270,7 @@ void Application::run() {
                 objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
                 if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
             }
-            gridRenderSystem.render(frameInfo);
+            gridRenderSystem.render(frameInfo, {});
             m_Renderer.endOffscreenRenderPass(frameInfo);
 
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
