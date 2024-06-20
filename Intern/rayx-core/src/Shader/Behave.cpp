@@ -7,6 +7,7 @@
 #include "SphericalCoords.h"
 #include "CutoutFns.h"
 #include "Refrac.h"
+#include "RefractiveIndex.h"
 #include "UpdateStokes.h"
 #include "LineDensity.h"
 #include "EventType.h"

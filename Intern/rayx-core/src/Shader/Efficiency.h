@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Common.h"
-#include "InvocationState.h"
-#include "RefractiveIndex.h"
 #include "Complex.h"
+#include "Constants.h"
 
 namespace RAYX {
 
