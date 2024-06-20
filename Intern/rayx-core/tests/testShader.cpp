@@ -1029,7 +1029,6 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
 TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
     using namespace complex;
 
-    // partially polarizing reflection
     struct IorPair {
         Complex ior_i;
         Complex ior_t;
@@ -1051,7 +1050,6 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
     };
 
     for (const auto ior_pair : ior_pairs) {
-        // inputs
         const auto ior_i = ior_pair.ior_i;
         const auto ior_t = ior_pair.ior_t;
         const auto incident_vec = dvec3(1, 0, 0);
@@ -1090,10 +1088,10 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
     }
 }
 
+// fully polarizing reflection (reflection at brewsters angle)
 TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     using namespace complex;
 
-    // inputs
     const auto ior_i = Complex(1.0, 0);
     const auto ior_t = Complex(2.0, 0);
     const auto incident_vec = dvec3(1, 0, 0);
@@ -1130,6 +1128,53 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     CHECK_EQ(reflect_field, expected_reflect_field);
 }
 
+// non-polarizing reflection (reflection at normal incidence)
+TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
+    using namespace complex;
+
+    const auto ior_i = Complex(1.0, 0);
+    const auto ior_t = Complex(1.5, 0);
+    const auto incident_vec = glm::normalize(dvec3(1, 1, 0));
+    const auto normal_vec = -incident_vec;
+    const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
+    const auto incident_field = Field({0, 0}, {0, 0}, {1, 0});
+
+    const auto reflect_field = intercept_reflect(
+        incident_field,
+        incident_vec,
+        reflect_vec,
+        normal_vec,
+        ior_i,
+        ior_t
+    );
+
+    const auto expected_reflect_field = Field(
+        {0, 0},
+        {0, 0},
+        {-0.2, 0}
+    );
+
+    CHECK_EQ(reflect_field, expected_reflect_field);
+
+    // check if normal-incidence and near-normal-incidence are similar to each other
+    {
+        const auto eps = 1e-3;
+        const auto normal_vec = glm::normalize(-incident_vec + eps);
+        const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
+
+        const auto reflect_field = intercept_reflect(
+            incident_field,
+            incident_vec,
+            reflect_vec,
+            normal_vec,
+            ior_i,
+            ior_t
+        );
+
+        CHECK_EQ(reflect_field, expected_reflect_field, eps);
+    }
+}
+
 TEST_F(TestSuite, testInterceptReflectEdgeCases) {
     using namespace complex;
 
@@ -1144,15 +1189,6 @@ TEST_F(TestSuite, testInterceptReflectEdgeCases) {
     };
 
     std::vector<InOutPair> inouts {
-        // non-polarizing reflection (reflection at normal incidence)
-        {
-            .in_incident_field = Field({0, 0}, {1, 0}, {0, 0}),
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.5, 0),
-            .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
-            .in_normal_vec = glm::normalize(dvec3(-1, 0, 0)),
-            .out_reflect_field = Field({0, 0}, {-0.2, 0}, {0, 0}),
-        },
 
         // zero energy field should result in zero energy field after reflection
         {

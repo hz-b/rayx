@@ -142,10 +142,13 @@ cmat3 get_polarization_matrix(
 RAYX_FUNC
 inline
 cmat3 get_reflect_polarization_matrix_at_normal_incidence(const ComplexCoeffs amplitude) {
+    // since no plane of incidence is defined at normal incidence,
+    // s and p components are equal and only contain the base reflectivity and a phase shift of 180 degrees
+    // here we apply the base reflectivity and phase shift independent of the ray direction to all components
     return {
         amplitude.s, 0, 0,
-        0, -amplitude.p, 0,
-        0, 0, -1,
+        0, amplitude.s, 0,
+        0, 0, amplitude.s,
     };
 }
 
@@ -159,14 +162,13 @@ Field intercept_reflect(
     const complex::Complex ior_i,
     const complex::Complex ior_t
 ) {
-    // TODO: handle special case: dot(incident_vec, reflect_vec) == 1
-
     const auto incident_angle = complex::Complex(get_angle(incident_vec, -normal_vec), 0);
     const auto refract_angle = get_refract_angle(incident_angle, ior_i, ior_t);
 
     const auto reflect_amplitude = get_reflect_amplitude(incident_angle, refract_angle, ior_i, ior_t);
 
-    const auto is_normal_incidence = glm::dot(incident_vec, -normal_vec) == 1.0;
+    // TODO: make this more robust
+    const auto is_normal_incidence = incident_vec == -normal_vec;
     const auto reflect_polarization_matrix =
         is_normal_incidence
         ? get_reflect_polarization_matrix_at_normal_incidence(reflect_amplitude)
