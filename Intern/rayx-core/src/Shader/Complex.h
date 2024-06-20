@@ -85,6 +85,76 @@ namespace complex {
 namespace glm {
 
 template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, RAYX::complex::tcomplex<T>, Q> const& v, T scalar)
+{
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(
+        v.x * scalar,
+        v.y * scalar,
+        v.z * scalar);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, T, Q> const& v, RAYX::complex::tcomplex<T> scalar)
+{
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(
+        v.x * scalar,
+        v.y * scalar,
+        v.z * scalar);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, RAYX::complex::tcomplex<T>, Q> const& v, RAYX::complex::tcomplex<T> scalar)
+{
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(
+        v.x * scalar,
+        v.y * scalar,
+        v.z * scalar);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(T scalar, vec<3, RAYX::complex::tcomplex<T>, Q> const& v)
+{
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(
+        scalar * v.x,
+        scalar * v.y,
+        scalar * v.z);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(RAYX::complex::tcomplex<T> scalar, vec<3, T, Q> const& v)
+{
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(
+        scalar * v.x,
+        scalar * v.y,
+        scalar * v.z);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(RAYX::complex::tcomplex<T> scalar, vec<3, RAYX::complex::tcomplex<T>, Q> const& v)
+{
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(
+        scalar * v.x,
+        scalar * v.y,
+        scalar * v.z);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type operator*(mat<3, 3, T, Q> const& m, typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type const& v) {
+    return typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type(
+        m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z,
+        m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z,
+        m[0][2] * v.x + m[1][2] * v.y + m[2][2] * v.z);
+}
+
+template<typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type operator*(typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type const& v, mat<3, 3, T, Q> const& m) {
+    return typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type(
+        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+        m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
+}
+
+template<typename T, qualifier Q>
 GLM_FUNC_QUALIFIER GLM_CONSTEXPR
 mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
     mat<3, 3, T, Q> const& m1,
