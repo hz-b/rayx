@@ -177,4 +177,57 @@ Field intercept_reflect(
     return reflect_field;
 }
 
+RAYX_FUNC
+inline
+Field fieldToStokes(const Field field) {
+    constexpr double scale = ELECTRIC_PERMITTIVITY * SPEED_OF_LIGHT / 2.0;
+
+    const auto mag = dvec2(
+        complex::abs(field.x),
+        complex::abs(field.y)
+    );
+
+    const auto theta = dvec2(
+        complex::arg(field.x),
+        complex::arg(field.y)
+    );
+
+    return scale * dvec4(
+        mag.x*mag.x + mag.y*mag.y,
+        mag.x*mag.x - mag.y*mag.y,
+        2.0 * mag.x * mag.y * glm::cos(theta.x - theta.y),
+        2.0 * mag.x * mag.y * glm::sin(theta.x - theta.y)
+    );
+}
+
+RAYX_FUNC
+inline
+Field stokesToField(const dvec4 stokes) {
+    const double scale = glm::sqrt(ELECTRIC_PERMITTIVITY * SPEED_OF_LIGHT / 2.0);
+
+    return scale * Field(
+        {glm::sqrt((stokes.x + stokes.y) / 2.0), 0},
+        glm::sqrt((stokes.x + stokes.y) / 2.0) * complex::polar(1.0, -2.0 * glm::atan(stokes.z, stokes.w)),
+        {0, 0}
+    );
+}
+
+RAYX_FUNC
+inline
+dmat3 rotationMatrix(dvec3 d) {
+    auto u = dvec3(0, 1, 0);
+    dvec3 r;
+
+    if (glm::abs(glm::dot(d, u)) < .5) {
+        r = glm::normalize(glm::cross(d, u));
+        u = glm::normalize(glm::cross(r, d));
+    } else {
+        r = dvec3(1, 0, 0);
+        u = glm::normalize(glm::cross(d, r));
+        r = glm::normalize(glm::cross(d, u));
+    }
+
+    return dmat3(r, u, d);
+}
+
 } // namespace RAYX
