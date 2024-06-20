@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "Efficiency.h"
 
 namespace RAYX {
 
@@ -29,9 +30,7 @@ struct RAYX_API Ray {
     /// The energy of this photon (in eV).
     double m_energy;
 
-    /// The stokes vector, see https://en.wikipedia.org/wiki/Stokes_parameters
-    /// They express the polarization of the Ray.
-    dvec4 m_stokes;
+    Field m_field;
 
     /// The distance that this ray has already traveled (in mm).
     double m_pathLength;

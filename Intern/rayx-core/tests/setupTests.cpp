@@ -48,7 +48,11 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_direction = {vec[6], vec[7], vec[8]};
     ray.m_energy = vec[9];
     ray.m_pathLength = vec[10];
-    ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
+
+    const auto stokes = dvec4(vec[11], vec[12], vec[13], vec[14]);
+    const auto rotation = RAYX::rotationMatrix(ray.m_direction);
+    const auto field = rotation * RAYX::stokesToField(stokes);
+    ray.m_field = field;
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;

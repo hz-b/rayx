@@ -71,19 +71,19 @@ static Format FULL_FORMAT = {
     },
     FormatComponent{
         .name = "Stokes0",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[0]; },
+        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
     },
     FormatComponent{
         .name = "Stokes1",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[1]; },
+        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
     },
     FormatComponent{
         .name = "Stokes2",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[2]; },
+        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
     },
     FormatComponent{
         .name = "Stokes3",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[3]; },
+        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
     },
     FormatComponent{
         .name = "pathLength",

@@ -165,9 +165,17 @@ inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
 
 inline std::vector<double> formatAsVec(Ray arg) {
-    return {arg.m_position.x,  arg.m_position.y,  arg.m_position.z, arg.m_eventType, arg.m_direction.x,
-            arg.m_direction.y, arg.m_direction.z, arg.m_energy,     arg.m_stokes.x,  arg.m_stokes.y,
-            arg.m_stokes.z,    arg.m_stokes.w,    arg.m_pathLength, arg.m_order,     arg.m_lastElement, arg.m_sourceID};
+    return {
+        arg.m_position.x, arg.m_position.y, arg.m_position.z,
+        arg.m_eventType,
+        arg.m_direction.x, arg.m_direction.y, arg.m_direction.z,
+        arg.m_energy,
+        arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(), arg.m_field.z.real(), arg.m_field.z.imag(),
+        arg.m_pathLength,
+        arg.m_order,
+        arg.m_lastElement,
+        arg.m_sourceID,
+    };
 }
 
 template <int N, int M, typename T>

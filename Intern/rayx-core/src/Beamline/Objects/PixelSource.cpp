@@ -73,7 +73,10 @@ std::vector<Ray> PixelSource::getRays([[maybe_unused]] int thread_count) const {
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
+        const auto rotation = glm::dmat3(m_orientation);
+        const auto field = rotation * stokesToField(m_pol);
+
+        Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }
