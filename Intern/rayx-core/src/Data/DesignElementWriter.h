@@ -32,7 +32,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     if (de->getType() != ElementType::ImagePlane) {
         de->setCutout(parser.parseCutout(dp));
     } else {
-        de->setCutout(serializeUnlimited());
+        de->setCutout(parser.parseCutout(dp, parser.type()));
     }
 }
 

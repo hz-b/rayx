@@ -569,9 +569,12 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Cutout Parser::parseCutout(DesignPlane plane) const {
+Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
+        if (type == "ImagePlane") {
+            return serializeUnlimited();
+        }
         RAYX_ERR << "geometricalShape missing, but required!";
     }
 
@@ -606,7 +609,7 @@ Cutout Parser::parseCutout(DesignPlane plane) const {
 
         return serializeTrapezoid(trapezoid);
     } else {
-        RAYX_ERR << "invalid geom_shape!";
+        RAYX_ERR << "invalid geometrical shape!";
         return {0, {0.0, 0.0, 0.0}};
     }
 }
