@@ -30,6 +30,7 @@ struct RAYX_API Ray {
     /// The energy of this photon (in eV).
     double m_energy;
 
+    /// The complex electric field
     Field m_field;
 
     /// The distance that this ray has already traveled (in mm).
