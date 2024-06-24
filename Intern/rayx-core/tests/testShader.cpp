@@ -1175,45 +1175,136 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     }
 }
 
-TEST_F(TestSuite, testInterceptReflectEdgeCases) {
+TEST_F(TestSuite, testStokesToFieldAndFieldToStokes) {
     using namespace complex;
 
     struct InOutPair {
-        Field in_incident_field;
-        Complex in_ior_i;
-        Complex in_ior_t;
-        dvec3 in_incident_vec;
-        dvec3 in_normal_vec;
-
-        Field out_reflect_field;
+        Stokes stokes;
+        LocalField field;
     };
 
-    std::vector<InOutPair> inouts {
+    const auto diag = 1.0 / glm::sqrt(2.0);
 
-        // zero energy field should result in zero energy field after reflection
-        {
-            .in_incident_field = Field({0, 0}, {0, 0}, {0, 0}),
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.5, 0),
-            .in_incident_vec = glm::normalize(dvec3(1, 0, 0)),
-            .in_normal_vec = glm::normalize(dvec3(-1, 1, 0)),
-            .out_reflect_field = Field({0, 0}, {0, 0}, {0, 0}),
+    std::vector<InOutPair> inouts {
+        { // linearly polarized (horizontal)
+            .stokes = Stokes(1, 1, 0, 0),
+            .field = LocalField({1, 0}, {0, 0}),
+        },
+        { // linearly polarized (vertical)
+            .stokes = Stokes(1, -1, 0, 0),
+            .field = LocalField({0, 0}, {1, 0}),
+        },
+        { // linearly polarized (diagonal +45 degrees)
+            .stokes = Stokes(1, 0, 1, 0),
+            .field = LocalField({diag, 0}, {diag, 0}),
+        },
+        { // linearly polarized (diagonal -45 degrees)
+            .stokes = Stokes(1, 0, -1, 0),
+            .field = LocalField({diag, 0}, {-diag, 0}),
+        },
+        { // circular polarized (right) (clockwise)
+            .stokes = Stokes(1, 0, 0, 1),
+            .field = LocalField({diag, 0}, {0, -diag}),
+        },
+        { // circular polarized (left) (counter-clockwise)
+            .stokes = Stokes(1, 0, 0, -1),
+            .field = LocalField({diag, 0}, {0, diag}),
         },
     };
 
     for (auto p : inouts) {
-        const auto reflect_vec = glm::reflect(p.in_incident_vec, p.in_normal_vec);
+        // stokes must be polarized in order to convert to an electric field
+        CHECK_EQ(degreeOfPolarization(p.stokes), 1.0);
 
-        const auto reflect_field = intercept_reflect(
-            p.in_incident_field,
-            p.in_incident_vec,
-            reflect_vec,
-            p.in_normal_vec,
-            p.in_ior_i,
-            p.in_ior_t
-        );
+        // convert stokes to field and back and check if stokes are equal to initial stokes
+        {
+            const auto field = stokesToLocalField(p.stokes);
+            CHECK_EQ(intensity(field), intensity(p.stokes));
 
-        CHECK_EQ(reflect_field, p.out_reflect_field);
+            const auto stokes = fieldToStokes(field);
+            CHECK_EQ(intensity(stokes), intensity(p.stokes));
+            CHECK_EQ(stokes, p.stokes);
+
+            // lets shift the phase of our field and check if the stokes are still preserved,
+            // since stokes should not carry phase information
+            const auto mag = abs(field);
+            const auto theta = arg(field);
+            for (double shift = 0.0; shift < PI*2.0; shift += PI/5.0) {
+                const auto field = polar(mag, theta + shift);
+                const auto stokes = fieldToStokes(field);
+                CHECK_EQ(stokes, p.stokes);
+            }
+        }
+
+        // convert field to stokes and back and check if magnitude and polarization is preserved
+        // the phase is not being checked, because stokes parameters do not preserve phase
+        {
+            const auto stokes = fieldToStokes(p.field);
+            CHECK_EQ(intensity(stokes), intensity(p.field));
+            CHECK_EQ(stokes, p.stokes);
+
+            const auto field = stokesToLocalField(stokes);
+
+            // check if the magnitude is preserved
+            const auto mag = abs(field);
+            const auto expected_mag = abs(p.field);
+            CHECK_EQ(mag, expected_mag);
+
+            // check if polarization is preserved
+            // by checking if the difference in phase between x and y component is preserved
+            const auto theta = arg(field);
+            const auto delta = theta.x - theta.y;
+
+            const auto expected_theta = arg(p.field);
+            const auto expected_delta = expected_theta.x - expected_theta.y;
+
+            CHECK_EQ(delta, expected_delta);
+        }
+    }
+}
+
+TEST_F(TestSuite, testRotateField) {
+    using namespace complex;
+
+    // convention for incident field
+    // forward = (0, 0, -1)
+    // up      = (0, 1, 0)
+    // right   = (1, 0, 0)
+    const auto incident_field = Field({1, 0}, {0, 0}, {0, 0});
+
+    struct InOutPair {
+        Field in_field;
+        dvec3 in_forward;
+        dvec3 in_up;
+        Field out_field;
+        Field out_field_rotationWithoutUp;
+    };
+
+    const auto inouts = std::vector<InOutPair> {
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {0, 0, -1},
+            .in_up = {0, 1, 0},
+            .out_field = {{1, 0}, {0, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{1, 0}, {0, 0}, {0, 0}},
+        },
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {1, 0, 0},
+            .in_up = {0, 0, 1},
+            .out_field = {{0, 0}, {-1, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {1, 0}},
+        },
+    };
+
+    for (const auto& p : inouts) {
+        const auto rotation = rotationMatrix(p.in_forward, p.in_up);
+        const auto field = rotation * incident_field;
+        CHECK_EQ(field, p.out_field);
+
+        const auto rotationWithoutUp = rotationMatrix(p.in_forward);
+        const auto field_rotationWithoutUp = rotationWithoutUp * incident_field;
+        CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
     }
 }
 

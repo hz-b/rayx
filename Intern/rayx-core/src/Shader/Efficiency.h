@@ -6,7 +6,9 @@
 
 namespace RAYX {
 
+using Stokes = dvec4;
 using Field = cvec3;
+using LocalField = cvec2;
 
 struct Coeffs {
     double s;
@@ -19,32 +21,27 @@ struct ComplexCoeffs {
 };
 
 RAYX_FUNC
-inline
-double get_angle(glm::dvec3 a, glm::dvec3 b) {
+inline double get_angle(glm::dvec3 a, glm::dvec3 b) {
     return glm::acos(glm::dot(a, b));
 }
 
 RAYX_FUNC
-inline
-complex::Complex get_refract_angle(const complex::Complex incident_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+inline complex::Complex get_refract_angle(const complex::Complex incident_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
     return complex::asin((ior_i / ior_t) * complex::sin(incident_angle));
 }
 
 RAYX_FUNC
-inline
-complex::Complex get_brewsters_angle(const complex::Complex ior_i, const complex::Complex ior_t) {
+inline complex::Complex get_brewsters_angle(const complex::Complex ior_i, const complex::Complex ior_t) {
     return complex::atan(ior_t / ior_i);
 }
 
 RAYX_FUNC
-inline
-complex::Complex get_critical_angle(const complex::Complex ior_i, const complex::Complex ior_t) {
+inline complex::Complex get_critical_angle(const complex::Complex ior_i, const complex::Complex ior_t) {
     return complex::asin(ior_t / ior_i);
 }
 
 RAYX_FUNC
-inline
-ComplexCoeffs get_reflect_amplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+inline ComplexCoeffs get_reflect_amplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
     const auto cos_i = complex::cos(incident_angle);
     const auto cos_t = complex::cos(refract_angle);
 
@@ -58,8 +55,7 @@ ComplexCoeffs get_reflect_amplitude(const complex::Complex incident_angle, const
 }
 
 RAYX_FUNC
-inline
-ComplexCoeffs get_refract_amplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+inline ComplexCoeffs get_refract_amplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
     const auto cos_i = complex::cos(incident_angle);
     const auto cos_t = complex::cos(refract_angle);
 
@@ -73,8 +69,7 @@ ComplexCoeffs get_refract_amplitude(const complex::Complex incident_angle, const
 }
 
 RAYX_FUNC
-inline
-Coeffs get_reflect_intensity(const ComplexCoeffs reflect_amplitude) {
+inline Coeffs get_reflect_intensity(const ComplexCoeffs reflect_amplitude) {
     const auto s = (reflect_amplitude.s * complex::conj(reflect_amplitude.s)).real();
     const auto p = (reflect_amplitude.p * complex::conj(reflect_amplitude.p)).real();
 
@@ -85,8 +80,7 @@ Coeffs get_reflect_intensity(const ComplexCoeffs reflect_amplitude) {
 }
 
 RAYX_FUNC
-inline
-Coeffs get_refract_intensity(ComplexCoeffs refract_amplitude, const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
+inline Coeffs get_refract_intensity(ComplexCoeffs refract_amplitude, const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
     const auto r = ((ior_t * complex::cos(refract_angle)) / (ior_i * complex::cos(incident_angle))).real();
 
     const auto s = r * (refract_amplitude.s * complex::conj(refract_amplitude.s)).real();
@@ -99,8 +93,7 @@ Coeffs get_refract_intensity(ComplexCoeffs refract_amplitude, const complex::Com
 }
 
 RAYX_FUNC
-inline
-cmat3 get_jones_matrix(const ComplexCoeffs amplitude) {
+inline cmat3 get_jones_matrix(const ComplexCoeffs amplitude) {
     return {
         amplitude.s, 0, 0,
         0, amplitude.p, 0,
@@ -109,8 +102,7 @@ cmat3 get_jones_matrix(const ComplexCoeffs amplitude) {
 }
 
 RAYX_FUNC
-inline
-cmat3 get_polarization_matrix(
+inline cmat3 get_polarization_matrix(
     const glm::dvec3 incident_vec,
     const glm::dvec3 reflect_or_refract_vec,
     const glm::dvec3 normal_vec,
@@ -139,8 +131,7 @@ cmat3 get_polarization_matrix(
 }
 
 RAYX_FUNC
-inline
-cmat3 get_reflect_polarization_matrix_at_normal_incidence(const ComplexCoeffs amplitude) {
+inline cmat3 get_reflect_polarization_matrix_at_normal_incidence(const ComplexCoeffs amplitude) {
     // since no plane of incidence is defined at normal incidence,
     // s and p components are equal and only contain the base reflectivity and a phase shift of 180 degrees
     // here we apply the base reflectivity and phase shift independent of the ray direction to all components
@@ -152,8 +143,7 @@ cmat3 get_reflect_polarization_matrix_at_normal_incidence(const ComplexCoeffs am
 }
 
 RAYX_FUNC
-inline
-Field intercept_reflect(
+inline Field intercept_reflect(
     const Field incident_field,
     const dvec3 incident_vec,
     const dvec3 reflect_vec,
@@ -178,21 +168,33 @@ Field intercept_reflect(
 }
 
 RAYX_FUNC
-inline
-Field fieldToStokes(const Field field) {
-    constexpr double scale = ELECTRIC_PERMITTIVITY * SPEED_OF_LIGHT / 2.0;
+inline double intensity(LocalField field) {
+    const auto mag = complex::abs(field);
+    return glm::dot(mag, mag);
+}
 
-    const auto mag = dvec2(
-        complex::abs(field.x),
-        complex::abs(field.y)
-    );
+RAYX_FUNC
+inline double intensity(Field field) {
+    const auto mag = complex::abs(field);
+    return glm::dot(mag, mag);
+}
 
-    const auto theta = dvec2(
-        complex::arg(field.x),
-        complex::arg(field.y)
-    );
+RAYX_FUNC
+inline double intensity(Stokes stokes) {
+    return stokes.x;
+}
 
-    return scale * dvec4(
+RAYX_FUNC
+inline double degreeOfPolarization(const Stokes stokes) {
+    return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x;
+}
+
+RAYX_FUNC
+inline Stokes fieldToStokes(const LocalField field) {
+    const auto mag = complex::abs(field);
+    const auto theta = complex::arg(field);
+
+    return Stokes(
         mag.x*mag.x + mag.y*mag.y,
         mag.x*mag.x - mag.y*mag.y,
         2.0 * mag.x * mag.y * glm::cos(theta.x - theta.y),
@@ -201,33 +203,50 @@ Field fieldToStokes(const Field field) {
 }
 
 RAYX_FUNC
-inline
-Field stokesToField(const dvec4 stokes) {
-    const double scale = glm::sqrt(ELECTRIC_PERMITTIVITY * SPEED_OF_LIGHT / 2.0);
+inline Stokes fieldToStokes(const Field field) {
+    return fieldToStokes(LocalField(field));
+}
 
-    return scale * Field(
-        {glm::sqrt((stokes.x + stokes.y) / 2.0), 0},
-        glm::sqrt((stokes.x + stokes.y) / 2.0) * complex::polar(1.0, -2.0 * glm::atan(stokes.z, stokes.w)),
-        {0, 0}
+RAYX_FUNC
+inline LocalField stokesToLocalField(const Stokes stokes) {
+    const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
+
+    const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
+    const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
+    const auto y = complex::polar(y_mag, y_theta);
+
+    return LocalField(
+        {x_real, 0},
+        y
     );
 }
 
 RAYX_FUNC
-inline
-dmat3 rotationMatrix(dvec3 d) {
-    auto u = dvec3(0, 1, 0);
-    dvec3 r;
+inline Field stokesToField(const Stokes stokes) {
+    return Field(stokesToLocalField(stokes), complex::Complex(0, 0));
+}
 
-    if (glm::abs(glm::dot(d, u)) < .5) {
-        r = glm::normalize(glm::cross(d, u));
-        u = glm::normalize(glm::cross(r, d));
+RAYX_FUNC
+inline dmat3 rotationMatrix(dvec3 forward) {
+    auto up = dvec3(0, 1, 0);
+    dvec3 right;
+
+    if (glm::abs(glm::dot(forward, up)) < .5) {
+        right = glm::normalize(glm::cross(forward, up));
+        up = glm::normalize(glm::cross(right, forward));
     } else {
-        r = dvec3(1, 0, 0);
-        u = glm::normalize(glm::cross(d, r));
-        r = glm::normalize(glm::cross(d, u));
+        right = dvec3(1, 0, 0);
+        up = glm::normalize(glm::cross(forward, right));
+        right = glm::normalize(glm::cross(forward, up));
     }
 
-    return dmat3(r, u, d);
+    return dmat3(right, up, forward);
+}
+
+RAYX_FUNC
+inline dmat3 rotationMatrix(dvec3 forward, dvec3 up) {
+    const auto right = glm::cross(forward, up);
+    return dmat3(right, up, forward);
 }
 
 } // namespace RAYX
