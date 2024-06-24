@@ -70,20 +70,28 @@ static Format FULL_FORMAT = {
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_energy; },
     },
     FormatComponent{
-        .name = "Stokes0",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
+        .name = "Field-x-real",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.x.real(); },
     },
     FormatComponent{
-        .name = "Stokes1",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
+        .name = "Field-x-imag",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.x.imag(); },
     },
     FormatComponent{
-        .name = "Stokes2",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
+        .name = "Field-y-real",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.y.real(); },
     },
     FormatComponent{
-        .name = "Stokes3",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return 0.0; },
+        .name = "Field-y-imag",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.y.imag(); },
+    },
+    FormatComponent{
+        .name = "Field-z-real",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.z.real(); },
+    },
+    FormatComponent{
+        .name = "Field-z-imag",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.z.imag(); },
     },
     FormatComponent{
         .name = "pathLength",
