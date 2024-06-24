@@ -164,7 +164,7 @@ inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 
 inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
 
-inline std::vector<double> formatAsVec(Ray arg) {
+inline std::vector<double> formatAsVec(const Ray arg) {
     return {
         arg.m_position.x, arg.m_position.y, arg.m_position.z,
         arg.m_eventType,
@@ -179,7 +179,7 @@ inline std::vector<double> formatAsVec(Ray arg) {
 }
 
 template <int N, int M, typename T>
-inline std::vector<double> formatAsVec(glm::mat<N, M, T> arg) {
+inline std::vector<double> formatAsVec(const glm::mat<N, M, T> arg) {
     std::vector<double> out;
     for (size_t i = 0; i < N * M; i++) {
         auto data = formatAsVec(arg[i / N][i % N]);
@@ -189,7 +189,7 @@ inline std::vector<double> formatAsVec(glm::mat<N, M, T> arg) {
 }
 
 template <int N, typename T>
-inline std::vector<double> formatAsVec(glm::vec<N, T> arg) {
+inline std::vector<double> formatAsVec(const glm::vec<N, T> arg) {
     std::vector<double> out;
     for (size_t i = 0; i < N; i++) {
         auto data = formatAsVec(arg[i]);
@@ -199,13 +199,28 @@ inline std::vector<double> formatAsVec(glm::vec<N, T> arg) {
 }
 
 template <size_t N, typename T>
-inline std::vector<double> formatAsVec(std::array<T, N> arg) {
+inline std::vector<double> formatAsVec(const std::array<T, N> arg) {
     std::vector<double> out;
     for (size_t i = 0; i < N; i++) {
         auto data = formatAsVec(arg[i]);
         out.insert(out.end(), data.begin(), data.end());
     }
     return out;
+}
+
+template <typename T>
+inline std::vector<double> formatAsVec(const std::vector<T> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < arg.size(); i++) {
+        auto data = formatAsVec(arg[i]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <>
+inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
+    return arg;
 }
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);
