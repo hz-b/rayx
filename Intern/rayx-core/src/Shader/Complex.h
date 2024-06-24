@@ -21,6 +21,7 @@ namespace complex {
     using Complex = tcomplex<double>;
 } // namespace complex
 
+using cvec2 = glm::tvec2<complex::Complex>;
 using cvec3 = glm::tvec3<complex::Complex>;
 using cmat3 = glm::tmat3x3<complex::Complex>;
 
@@ -78,6 +79,60 @@ namespace complex {
     using std::acosh;
     using std::atanh;
 #endif
+} // namespace complex
+
+// add some helper function for glm::tvec of complex
+namespace complex {
+    RAYX_FUNC
+    inline dvec2 abs(cvec2 v) {
+        return dvec2(
+            abs(v.x),
+            abs(v.y)
+        );
+    }
+
+    RAYX_FUNC
+    inline dvec3 abs(cvec3 v) {
+        return dvec3(
+            abs(v.x),
+            abs(v.y),
+            abs(v.z)
+        );
+    }
+
+    RAYX_FUNC
+    inline dvec2 arg(cvec2 v) {
+        return dvec2(
+            arg(v.x),
+            arg(v.y)
+        );
+    }
+
+    RAYX_FUNC
+    inline dvec3 arg(cvec3 v) {
+        return dvec3(
+            arg(v.x),
+            arg(v.y),
+            arg(v.z)
+        );
+    }
+
+    RAYX_FUNC
+    inline cvec2 polar(dvec2 mag, dvec2 theta) {
+        return cvec2(
+            polar(mag.x, theta.x),
+            polar(mag.y, theta.y)
+        );
+    }
+
+    RAYX_FUNC
+    inline cvec3 polar(dvec3 mag, dvec3 theta) {
+        return cvec3(
+            polar(mag.x, theta.x),
+            polar(mag.y, theta.y),
+            polar(mag.z, theta.z)
+        );
+    }
 } // namespace complex
 
 } // namespace RAYX
