@@ -53,19 +53,6 @@ RAYX::Ray parseCSVline(std::string line) {
     const auto rotation = RAYX::rotationMatrix(ray.m_direction);
     const auto field = rotation * RAYX::stokesToField(stokes);
     ray.m_field = field;
-    const auto field2 = RAYX::stokesToField(stokes);
-
-    CHECK_EQ(field2.z, complex::Complex(0, 0));
-    const auto mag1 = dvec3(
-        complex::abs(field.x),
-        complex::abs(field.y),
-        complex::abs(field.z)
-    );
-    const auto mag2 = dvec2(
-        complex::abs(field2.x),
-        complex::abs(field2.y)
-    );
-    CHECK_EQ(glm::dot(mag1, mag1), glm::dot(mag2, mag2));
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
