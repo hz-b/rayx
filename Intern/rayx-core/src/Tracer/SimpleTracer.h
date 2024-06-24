@@ -23,7 +23,7 @@ struct DynamicElementsKernel {
         using Idx = alpaka::Idx<Acc>;
         const Idx gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
-        if (gid < static_cast<Idx>(inv.rayData.size()))
+        if (gid < static_cast<Idx>(inv.inputRays.size()))
             dynamicElements(gid, inv);
     }
 };
@@ -235,8 +235,8 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
         .nextEventIndex     = {},
 
         // buffers
-        .rayData            = bufferToSpan(m_batchInput.rays),
-        .outputData         = bufferToSpan(m_batchOutput.events),
+        .inputRays          = bufferToSpan(m_batchInput.rays),
+        .outputRays         = bufferToSpan(m_batchOutput.events),
         .outputRayCounts    = bufferToSpan(m_batchOutput.compactEventCounts),
         .elements           = bufferToSpan(m_beamlineInput.elements),
         .matIdx             = bufferToSpan(m_beamlineInput.materialIndices),

@@ -44,8 +44,8 @@ struct RAYX_API InvocationState {
     uint64_t ctr;
     uint64_t nextEventIndex;
 
-    std::span<const Ray> rayData;
-    std::span<Ray> outputData;
+    std::span<const Ray> inputRays;
+    std::span<Ray> outputRays;
     std::span<int> outputRayCounts;
     std::span<const Element> elements;
     std::span<const int> matIdx;

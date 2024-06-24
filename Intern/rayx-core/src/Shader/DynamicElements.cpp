@@ -21,7 +21,7 @@ void dynamicElements(int gid, Inv& inv) {
     // #endif
     #endif
 
-    Ray _ray = inv.rayData[gid];
+    Ray _ray = inv.inputRays[gid];
 
     Element nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.

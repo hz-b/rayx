@@ -11,7 +11,7 @@ void init(Inv& inv) {
     // TODO(Sven): dont waste time with initializing
     // sets all output rays controlled by this shader call to ETYPE_UNINIT.
     for (uint i = uint(inv.pushConstants.startEventID); i < inv.pushConstants.maxEvents; i++) {
-        inv.outputData[output_index(i, inv)].m_eventType = ETYPE_UNINIT;
+        inv.outputRays[output_index(i, inv)].m_eventType = ETYPE_UNINIT;
     }
     inv.nextEventIndex = 0;
 
@@ -27,15 +27,15 @@ RAYX_FUNC
 uint64_t rayId(Inv& inv) { return uint64_t(inv.pushConstants.rayIdStart) + uint64_t(inv.globalInvocationId); }
 
 // `i in [0, maxEvents-1]`.
-// Will return the index in outputData to access the `i'th` output ray belonging to this shader call.
-// Typically used as `outputData[output_index(i)]`.
+// Will return the index in outputRays to access the `i'th` output ray belonging to this shader call.
+// Typically used as `outputRays[output_index(i)]`.
 RAYX_FUNC
 uint output_index(uint i, Inv& inv) {
     return uint(inv.globalInvocationId) * uint(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
            uint(inv.pushConstants.startEventID);
 }
 
-// record an event and store it in the next free spot in outputData.
+// record an event and store it in the next free spot in outputRays.
 // `r` will typically be _ray, or some related ray.
 RAYX_FUNC
 void recordEvent(Ray r, double w, Inv& inv) {
@@ -54,13 +54,13 @@ void recordEvent(Ray r, double w, Inv& inv) {
         return;
     }
 
-    // the outputData array might be full!
+    // the outputRays array might be full!
     if (inv.nextEventIndex >= inv.pushConstants.maxEvents) {
         inv.finalized = true;
 
         // change the last event to "ETYPE_TOO_MANY_EVENTS".
         uint idx = output_index(uint(inv.pushConstants.maxEvents - 1), inv);
-        inv.outputData[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
+        inv.outputRays[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
 
         _throw("recordEvent failed: too many events!");
 
@@ -70,7 +70,7 @@ void recordEvent(Ray r, double w, Inv& inv) {
     r.m_eventType = w;
 
     uint idx = output_index(uint(inv.nextEventIndex), inv);
-    inv.outputData[idx] = r;
+    inv.outputRays[idx] = r;
 
     inv.nextEventIndex += 1;
 }
