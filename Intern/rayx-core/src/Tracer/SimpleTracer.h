@@ -239,7 +239,6 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
         .outputData         = bufferToSpan(m_batchOutput.events),
         .outputRayCounts    = bufferToSpan(m_batchOutput.compactEventCounts),
         .elements           = bufferToSpan(m_beamlineInput.elements),
-        .xyznull            = {},
         .matIdx             = bufferToSpan(m_beamlineInput.materialIndices),
         .mat                = bufferToSpan(m_beamlineInput.materialData),
 

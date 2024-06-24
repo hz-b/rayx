@@ -48,7 +48,6 @@ struct RAYX_API InvocationState {
     std::span<Ray> outputData;
     std::span<int> outputRayCounts;
     std::span<const Element> elements;
-    std::span<const dvec4> xyznull;
     std::span<const int> matIdx;
     std::span<const double> mat;
 
