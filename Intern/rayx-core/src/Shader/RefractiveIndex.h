@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "Complex.h"
 #include "InvocationState.h"
 
 namespace RAYX {
@@ -34,7 +35,7 @@ RAYX_FUNC PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv);
 RAYX_FUNC NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv);
 
 // returns dvec2 to represent a complex number
-RAYX_FUNC dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& inv);
+RAYX_FUNC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, Inv& inv);
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 RAYX_FUNC dvec2 RAYX_API getAtomicMassAndRho(int material);

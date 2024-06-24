@@ -1,5 +1,4 @@
 #include "RefractiveIndex.h"
-#include "InvocationState.h"
 #include "Throw.h"
 
 namespace RAYX {
@@ -74,15 +73,15 @@ NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv) {
 
 // returns dvec2 to represent a complex number
 RAYX_FUNC
-dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
+complex::Complex RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
     if (material == -1) {  // vacuum
-        return dvec2(1., 0.);
+        return complex::Complex(1., 0.);
     }
 
     // out of range check
     if (material < 1 || material > 92) {
         _throw("getRefractiveIndex material out of range!");
-        return dvec2(-1.0, -1.0);
+        return complex::Complex(-1.0, -1.0);
     }
 
     // try to get refractive index using Palik table
@@ -106,7 +105,7 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
             }
 
             PalikEntry entry = getPalikEntry(low, material, inv);
-            return dvec2(entry.m_n, entry.m_k);
+            return complex::Complex(entry.m_n, entry.m_k);
         }
     }
 
@@ -136,11 +135,11 @@ dvec2 RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
         double n = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
         double k = (415.252 * rho * entry.m_f2) / (e * e * mass);
 
-        return dvec2(n, k);
+        return complex::Complex(n, k);
     }
 
     _throw("getRefractiveIndex: no matching entry found!");
-    return dvec2(-1.0, -1.0);
+    return complex::Complex(-1.0, -1.0);
 }
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro

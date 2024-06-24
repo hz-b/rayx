@@ -118,15 +118,11 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     int mat = int(inv.elements[id].m_material);
     if (mat != -2) {
         constexpr int vacuum_material = -1;
-        const auto _ior_i = getRefractiveIndex(r.m_energy, vacuum_material, inv);
-        const auto _ior_t = getRefractiveIndex(r.m_energy, mat, inv);
-        const auto ior_i = complex::Complex(_ior_i.x, _ior_i.y);
-        const auto ior_t = complex::Complex(_ior_t.x, _ior_t.y);
-
-        const auto incident_field = Field {{0, 0}, {0, 0}, {0, 0}};
+        const auto ior_i = getRefractiveIndex(r.m_energy, vacuum_material, inv);
+        const auto ior_t = getRefractiveIndex(r.m_energy, mat, inv);
 
         const auto reflect_field = intercept_reflect(
-            incident_field,
+            r.m_field,
             incident_vec,
             reflect_vec,
             col.normal,
@@ -134,10 +130,7 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
             ior_t
         );
 
-        const bool absorbed = false;
-        if (absorbed) {
-            recordFinalEvent(r, ETYPE_ABSORBED, inv);
-        }
+        r.m_field = reflect_field;
         r.m_order = 0;
     }
     return r;
