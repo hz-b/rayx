@@ -11,8 +11,8 @@ class BeamlineDesignHandler {
     void showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo);
 
   private:
-    void showParameters(DesignMap& parameters, bool& changed);
-    void createInputField(const std::string& key, DesignMap& element, bool& changed);
+    void showParameters(DesignMap& parameters, bool& changed, uint32_t type);
+    void createInputField(const std::string& key, DesignMap& element, bool& changed, uint32_t type);
 
     // Define groups
     std::map<std::string, std::vector<std::string>> groups = {
