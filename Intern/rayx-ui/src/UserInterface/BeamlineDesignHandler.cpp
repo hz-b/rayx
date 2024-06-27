@@ -426,25 +426,26 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::Map: {
                 auto currentValue = element.as_map();
-                if (ImGui::CollapsingHeader("##", ImGuiTreeNodeFlags_NoTreePushOnOpen)) {
+                if (ImGui::CollapsingHeader("##", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::Indent(20);  // Increased indentation
                     for (const auto& [subKey, valuePtr] : currentValue) {
-                        ImGui::PushID(subKey.c_str());      // Use PushID to avoid ID conflicts
-                        ImGui::Text("%s", subKey.c_str());  // Display the sub-key as a label
-                        ImGui::SameLine();
+                        ImGui::PushID(subKey.c_str());
 
-                        // Dereference the shared pointer to access the actual element
-                        auto& value = *valuePtr;
+                        bool subChanged = false;
+                        createInputField(subKey, *valuePtr, subChanged, type);
 
-                        if (value.type() == RAYX::ValueType::Double) {
-                            double input = value.as_double();  // Access the double value
-                            if (ImGui::InputDouble(("##" + subKey).c_str(), &input, 0.0, 0.0, "%.6f", flags)) {
-                                value = input;  // Update the value inside the shared pointer
-                                changed = true;
-                            }
+                        if (subChanged) {
+                            changed = true;
+                            currentValue[subKey] = valuePtr;
                         }
-                        ImGui::PopID();  // Pop the ID to maintain the stack integrity
+
+                        ImGui::PopID();
                     }
-                    element = currentValue;  // Update the element with the modified map
+                    ImGui::Unindent(20);  // Match the indentation
+
+                    if (changed) {
+                        element = currentValue;
+                    }
                 }
                 break;
             }
@@ -485,7 +486,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             default:
                 // Ignoring unknown types
-                // RAYX_LOG << "Ignoring unknown type index: " << element.type();
+                RAYX_LOG << "Ignoring unknown type index: ";
                 break;
         }
     }
