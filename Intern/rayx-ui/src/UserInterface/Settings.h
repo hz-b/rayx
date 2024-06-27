@@ -89,7 +89,8 @@ struct UIParameters {
               false,
               availableDevices,
               0,
-          }) {}
+          }),
+          beamlineInfo({std::vector<glm::dvec3>(), std::vector<RAYX::DesignElement>(), std::vector<RAYX::DesignSource>(), -1, -1, false}) {}
 
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;

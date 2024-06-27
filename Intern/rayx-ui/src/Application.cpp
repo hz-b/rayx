@@ -155,6 +155,7 @@ void Application::run() {
                         for (auto& source : m_UIParams.beamlineInfo.sources) {
                             m_UIParams.beamlineInfo.rSourcePositions.push_back(source.getWorldPosition());
                         }
+                        m_UIParams.beamlineInfo.selectedType = -1;
                         if (m_UIParams.h5Ready) {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
                             m_State = State::LoadingRays;
