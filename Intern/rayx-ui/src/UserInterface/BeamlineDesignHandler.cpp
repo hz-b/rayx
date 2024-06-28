@@ -10,8 +10,10 @@
 #include <unordered_set>
 
 #include "Beamline/StringConversion.h"
+#include "Debug/Instrumentor.h"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     if (uiBeamlineInfo.selectedType == 0) {  // source
         auto sourceParameters = uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex].m_elementParameters;
         showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
@@ -112,10 +114,9 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 
     // Calculate widths for consistent layout
-    float fullWidth = ImGui::GetContentRegionAvail().x;
-    float labelWidth = 100;                                           // Fixed width for labels, adjust as needed
-    float baseInputWidth = fullWidth * 0.6f;                          // 60% of the full width
-    float inputWidth = baseInputWidth * std::pow(0.9, nestingLevel);  // Reduce by 10% for each nesting level
+    float fullWidth = ImGui::GetContentRegionAvail().x;                      // Fixed width for labels, adjust as needed
+    float baseInputWidth = fullWidth * 0.6f;                                 // 60% of the full width
+    float inputWidth = baseInputWidth * float(std::pow(0.9, nestingLevel));  // Reduce by 10% for each nesting level
     float rightAlignPosition = fullWidth - inputWidth;
 
     // Align label to the left
@@ -129,24 +130,15 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     ImGui::PushID(key.c_str());
 
     if (key == "type") {
-        const char* sourceItems[] = {"Matrix Source", "Point Source", "Dipole Source", "Pixel Source", "Circle Source", "Simple Undulator"};
-        const char* opticalElementItems[] = {"ImagePlane",   "Cone",
-                                             "Cylinder",     "Ellipsoid",
-                                             "Paraboloid",   "Plane Grating",
-                                             "Plane Mirror", "Reflection Zoneplate",
-                                             "Slit",         "Spherical Grating",
-                                             "Sphere",       "Spherical Mirror",
-                                             "Toroid"};  //"Experts Optics" currently not supported
-
         const char** items;
         int itemsCount;
 
         if (type == 0) {
             items = sourceItems;
-            itemsCount = IM_ARRAYSIZE(sourceItems);
+            itemsCount = IM_ARRAYSIZE(this->sourceItems);
         } else {
             items = opticalElementItems;
-            itemsCount = IM_ARRAYSIZE(opticalElementItems);
+            itemsCount = IM_ARRAYSIZE(this->opticalElementItems);
         }
 
         std::string currentStr = element.as_string();
