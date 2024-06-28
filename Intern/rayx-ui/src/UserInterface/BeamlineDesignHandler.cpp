@@ -5,6 +5,9 @@
 #include <imgui_internal.h>
 
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <unordered_set>
 
 #include "Beamline/StringConversion.h"
 
@@ -75,16 +78,15 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     orderedKeys.insert(orderedKeys.end(), remainingGroups.begin(), remainingGroups.end());
     orderedKeys.insert(orderedKeys.end(), nonGroupedKeys.begin(), nonGroupedKeys.end());
 
-    // Show parameters according to the sorted order
+    std::unordered_set<std::string> unusedKeys = {"entranceArmLength", "exitArmLength", "grazingIncAngle", "AzimuthalAngle"};
+
     for (const auto& key : orderedKeys) {
+        if (unusedKeys.find(key) != unusedKeys.end()) {
+            continue;
+        }
         if (existingGroups.find(key) != existingGroups.end()) {
-            // It's a group
             if (ImGui::CollapsingHeader(key.c_str())) {
-                // Calculate the height based on the number of elements
-                float elementHeight = ImGui::GetTextLineHeightWithSpacing();
-                float childHeight = elementHeight * existingGroups[key].size() * 1.6f + 10.0f;
-                // Begin a child window with a border and specified height
-                ImGui::BeginChild((key + "_child").c_str(), ImVec2(0, childHeight), true, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                ImGui::Indent();
 
                 std::vector<std::string> sortedGroupKeys = existingGroups[key];
                 std::sort(sortedGroupKeys.begin(), sortedGroupKeys.end(), [&](const std::string& a, const std::string& b) {
@@ -93,31 +95,39 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
 
                 for (const auto& groupKey : sortedGroupKeys) {
                     RAYX::DesignMap& element = parameters[groupKey];
-                    createInputField(groupKey, element, changed, type);
+                    createInputField(groupKey, element, changed, type, 1);  // Start with nesting level 1 for grouped items
                 }
 
-                ImGui::EndChild();  // End the child window
+                ImGui::Unindent();
             }
         } else {
             // It's a non-grouped parameter
             RAYX::DesignMap& element = parameters[key];
-            createInputField(key, element, changed, type);
+            createInputField(key, element, changed, type, 0);  // Non-grouped items have nesting level 0
         }
     }
 }
 
-void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::DesignMap& element, bool& changed, uint32_t type) {
+void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::DesignMap& element, bool& changed, uint32_t type, int nestingLevel = 0) {
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 
-    // Calculate the available width for the input box
+    // Calculate widths for consistent layout
     float fullWidth = ImGui::GetContentRegionAvail().x;
-    float keyWidth = ImGui::CalcTextSize(key.c_str()).x;
-    float availableWidth = fullWidth - keyWidth - 10;  // Adjust the margin as needed
+    float labelWidth = 100;                                           // Fixed width for labels, adjust as needed
+    float baseInputWidth = fullWidth * 0.6f;                          // 60% of the full width
+    float inputWidth = baseInputWidth * std::pow(0.9, nestingLevel);  // Reduce by 10% for each nesting level
+    float rightAlignPosition = fullWidth - inputWidth;
 
-    // Display the key name
-    ImGui::TextUnformatted(key.c_str());
-    ImGui::SameLine();
-    ImGui::PushItemWidth(availableWidth);
+    // Align label to the left
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("%s", key.c_str());
+
+    ImGui::SameLine(rightAlignPosition);
+    ImGui::PushItemWidth(inputWidth);
+
+    // Generate a unique ID for each input field
+    ImGui::PushID(key.c_str());
+
     if (key == "type") {
         const char* sourceItems[] = {"Matrix Source", "Point Source", "Dipole Source", "Pixel Source", "Circle Source", "Simple Undulator"};
         const char* opticalElementItems[] = {"ImagePlane",   "Cone",
@@ -132,18 +142,15 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
         int itemsCount;
 
         if (type == 0) {
-            // source
             items = sourceItems;
             itemsCount = IM_ARRAYSIZE(sourceItems);
         } else {
-            // optical element
             items = opticalElementItems;
             itemsCount = IM_ARRAYSIZE(opticalElementItems);
         }
 
-        std::string currentStr = element.as_string();  // Assuming the element stores a string for type
+        std::string currentStr = element.as_string();
 
-        // Find the current index
         int currentItem = -1;
         for (int i = 0; i < itemsCount; i++) {
             if (currentStr == items[i]) {
@@ -152,11 +159,11 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
         }
 
-        if (ImGui::BeginCombo(("##" + key).c_str(), currentItem >= 0 ? items[currentItem] : "")) {
+        if (ImGui::BeginCombo("##combo", currentItem >= 0 ? items[currentItem] : "")) {
             for (int n = 0; n < itemsCount; n++) {
                 bool isSelected = (currentItem == n);
                 if (ImGui::Selectable(items[n], isSelected)) {
-                    element = std::string(items[n]);  // Update the element with the new selected value
+                    element = std::string(items[n]);
                     changed = true;
                 }
                 if (isSelected) {
@@ -165,21 +172,57 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             ImGui::EndCombo();
         }
-    }
 
-    else {
+    } else if (key == "geometricalShape") {
+        const char* shapes[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
+        int input = element.as_double();
+
+        if (ImGui::BeginCombo("##combo", shapes[input])) {
+            for (int i = 0; i < IM_ARRAYSIZE(shapes); i++) {
+                bool isSelected = (input == i);
+                if (ImGui::Selectable(shapes[i], isSelected)) {
+                    element = double(i);
+                    changed = true;
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+    } else {
         switch (element.type()) {
             case RAYX::ValueType::Double: {
                 double input = element.as_double();
-                if (ImGui::InputDouble(("##" + key).c_str(), &input, 0.0, 0.0, "%.6f", flags)) {
-                    element = input;
-                    changed = true;
+
+                // Ensure the input value is not NaN or inf
+                if (std::isnan(input) || std::isinf(input)) {
+                    input = 0.0;  // Default value if input is NaN or inf
+                }
+
+                // Define range limits for the dragging operation
+                double min_range = -1000000.0;  // Set an appropriate minimum range
+                double max_range = 1000000.0;   // Set an appropriate maximum range
+
+                // Set a fixed speed for dragging
+                float speed = 0.1f;  // Adjust this value to control the dragging speed
+
+                if (ImGui::DragScalar("##double", ImGuiDataType_Double, &input, speed, &min_range, &max_range, "%.3f", flags)) {
+                    // Validate the input value before assigning back to element
+                    if (!std::isnan(input) && !std::isinf(input)) {
+                        element = input;
+                        changed = true;
+                    } else {
+                        std::cout << "Invalid input detected, not updating element." << std::endl;
+                    }
                 }
                 break;
             }
+
             case RAYX::ValueType::Int: {
                 int input = element.as_int();
-                if (ImGui::InputInt(("##" + key).c_str(), &input, 0, 0, flags)) {
+                if (ImGui::InputInt("##int", &input, 0, 0, flags)) {
                     element = input;
                     changed = true;
                 }
@@ -187,7 +230,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::Bool: {
                 bool input = element.as_bool();
-                if (ImGui::Checkbox(("##" + key).c_str(), &input)) {
+                if (ImGui::Checkbox("##bool", &input)) {
                     element = input;
                     changed = true;
                 }
@@ -197,26 +240,63 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 std::string input = element.as_string();
                 char buffer[256];
                 strncpy(buffer, input.c_str(), sizeof(buffer));
-                buffer[sizeof(buffer) - 1] = 0;  // Ensure null-termination
-                if (ImGui::InputText(("##" + key).c_str(), buffer, sizeof(buffer), flags)) {
+                buffer[sizeof(buffer) - 1] = 0;
+                if (ImGui::InputText("##string", buffer, sizeof(buffer), flags)) {
                     element = std::string(buffer);
+                    changed = true;
+                }
+                break;
+            }
+            case RAYX::ValueType::Dvec4: {
+                auto currentValue = element.as_dvec4();
+                double vals[4] = {currentValue.x, currentValue.y, currentValue.z, currentValue.w};
+                bool changedLocal = false;
+                for (int i = 0; i < 4; ++i) {
+                    ImGui::PushID(i);
+                    if (ImGui::InputDouble("##dvec4", &vals[i], 0.0, 0.0, "%.3f", flags)) {
+                        changedLocal = true;
+                    }
+                    ImGui::PopID();
+                    if (i < 3) ImGui::SameLine();
+                }
+                if (changedLocal) {
+                    element = dvec4(vals[0], vals[1], vals[2], vals[3]);
+                    changed = true;
+                }
+                break;
+            }
+            case RAYX::ValueType::Dmat4x4: {
+                auto currentValue = element.as_dmat4x4();
+                bool changedLocal = false;
+                for (int row = 0; row < 4; ++row) {
+                    for (int col = 0; col < 4; ++col) {
+                        ImGui::PushID(row * 4 + col);
+                        double val = currentValue[row][col];
+                        if (ImGui::InputDouble("##dmat4x4", &val, 0.0, 0.0, "%.3f", flags)) {
+                            currentValue[row][col] = val;
+                            changedLocal = true;
+                        }
+                        ImGui::PopID();
+                        if (col < 3) ImGui::SameLine();
+                    }
+                    if (row < 3) ImGui::NewLine();
+                }
+                if (changedLocal) {
+                    element = currentValue;
                     changed = true;
                 }
                 break;
             }
             case RAYX::ValueType::SpreadType: {
                 auto currentValue = element.as_energySpreadType();
-                std::string currentStr = SpreadTypeToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##spreadtype", SpreadTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : SpreadTypeToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -224,17 +304,14 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::EnergyDistributionType: {
                 auto currentValue = element.as_energyDistType();
-                std::string currentStr = EnergyDistributionTypeToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##energydisttype", EnergyDistributionTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : EnergyDistributionTypeToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -242,17 +319,14 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::SourceDist: {
                 auto currentValue = element.as_sourceDist();
-                std::string currentStr = SourceDistToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##sourcedist", SourceDistToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : SourceDistToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -260,17 +334,14 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::ElectronEnergyOrientation: {
                 auto currentValue = element.as_electronEnergyOrientation();
-                std::string currentStr = ElectronEnergyOrientationToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##electronenergyorientation", ElectronEnergyOrientationToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : ElectronEnergyOrientationToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -278,17 +349,14 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::EnergySpreadUnit: {
                 auto currentValue = element.as_energySpreadUnit();
-                std::string currentStr = EnergySpreadUnitToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##energyspreadunit", EnergySpreadUnitToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : EnergySpreadUnitToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -296,17 +364,14 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::SigmaType: {
                 auto currentValue = element.as_sigmaType();
-                std::string currentStr = SigmaTypeToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##sigmatype", SigmaTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : SigmaTypeToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -315,7 +380,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             case RAYX::ValueType::Rad: {
                 Rad currentValue = element.as_rad();
                 double input = currentValue.rad;
-                if (ImGui::InputDouble(("##" + key).c_str(), &input, 0.0, 0.0, "%.6f", flags)) {
+                if (ImGui::InputDouble("##rad", &input, 0.0, 0.0, "%.6f", flags)) {
                     element = Rad(input);
                     changed = true;
                 }
@@ -323,63 +388,44 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::Material: {
                 Material currentValue = element.as_material();
-                std::string currentStr = MaterialToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##material", MaterialToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : MaterialToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
                 break;
             }
-
-            case RAYX::ValueType::Misalignment:
-                // Ignoring Misalignment as per instructions
-                break;
             case RAYX::ValueType::CentralBeamstop: {
                 auto currentValue = element.as_centralBeamStop();
-                std::string currentStr = CentralBeamstopToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##centralbeamstop", CentralBeamstopToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : CentralBeamstopToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
                 break;
             }
-            case RAYX::ValueType::Cutout:
-                // TODO
-                break;
-            case RAYX::ValueType::CylinderDirection:
-                // TODO
-                break;
             case RAYX::ValueType::FigureRotation: {
                 auto currentValue = element.as_figureRotation();
-                std::string currentStr = FigureRotationToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##figurerotation", FigureRotationToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : FigureRotationToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -387,38 +433,29 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::CurvatureType: {
                 auto currentValue = element.as_curvatureType();
-                std::string currentStr = CurvatureTypeToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##curvaturetype", CurvatureTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : CurvatureTypeToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
                 break;
             }
-            case RAYX::ValueType::Surface:
-                // Ignoring Surface as per instructions
-                break;
             case RAYX::ValueType::BehaviourType: {
                 auto currentValue = element.as_behaviourType();
-                std::string currentStr = BehaviourTypeToString.at(currentValue);
-                if (ImGui::BeginCombo(("##" + key).c_str(), currentStr.c_str())) {
+                if (ImGui::BeginCombo("##behaviourtype", BehaviourTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : BehaviourTypeToString) {
                         bool isSelected = (currentValue == value);
                         if (ImGui::Selectable(name.c_str(), isSelected)) {
                             element = value;
                             changed = true;
                         }
-                        if (isSelected) {
-                            ImGui::SetItemDefaultFocus();
-                        }
+                        if (isSelected) ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
                 }
@@ -427,69 +464,33 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             case RAYX::ValueType::Map: {
                 auto currentValue = element.as_map();
                 if (ImGui::CollapsingHeader("##", ImGuiTreeNodeFlags_DefaultOpen)) {
-                    ImGui::Indent(20);  // Increased indentation
+                    ImGui::Indent();
                     for (const auto& [subKey, valuePtr] : currentValue) {
                         ImGui::PushID(subKey.c_str());
-
                         bool subChanged = false;
-                        createInputField(subKey, *valuePtr, subChanged, type);
-
+                        createInputField(subKey, *valuePtr, subChanged, type, nestingLevel + 1);
                         if (subChanged) {
                             changed = true;
                             currentValue[subKey] = valuePtr;
                         }
-
                         ImGui::PopID();
                     }
-                    ImGui::Unindent(20);  // Match the indentation
-
-                    if (changed) {
-                        element = currentValue;
-                    }
+                    ImGui::Unindent();
+                    if (changed) element = currentValue;
                 }
                 break;
             }
-
-            case RAYX::ValueType::Dvec4: {
-                auto currentValue = element.as_dvec4();
-                double vals[4] = {currentValue.x, currentValue.y, currentValue.z, currentValue.w};
-                if (ImGui::InputDouble(("##" + key + "_x").c_str(), &vals[0], 0.0, 0.0, "%.6f", flags) ||
-                    ImGui::InputDouble(("##" + key + "_y").c_str(), &vals[1], 0.0, 0.0, "%.6f", flags) ||
-                    ImGui::InputDouble(("##" + key + "_z").c_str(), &vals[2], 0.0, 0.0, "%.6f", flags) ||
-                    ImGui::InputDouble(("##" + key + "_w").c_str(), &vals[3], 0.0, 0.0, "%.6f", flags)) {
-                    element = dvec4(vals[0], vals[1], vals[2], vals[3]);
-                    changed = true;
-                }
+            case RAYX::ValueType::Misalignment:
+            case RAYX::ValueType::Surface:
+            case RAYX::ValueType::Cutout:
+            case RAYX::ValueType::CylinderDirection:
                 break;
-            }
-            case RAYX::ValueType::Dmat4x4: {
-                auto currentValue = element.as_dmat4x4();
-                double vals[16] = {currentValue[0][0], currentValue[0][1], currentValue[0][2], currentValue[0][3],
-                                   currentValue[1][0], currentValue[1][1], currentValue[1][2], currentValue[1][3],
-                                   currentValue[2][0], currentValue[2][1], currentValue[2][2], currentValue[2][3],
-                                   currentValue[3][0], currentValue[3][1], currentValue[3][2], currentValue[3][3]};
-                bool changedLocal = false;
-                for (int i = 0; i < 4; ++i) {
-                    if (ImGui::InputDouble(("##" + key + "_row" + std::to_string(i) + "_col0").c_str(), &vals[i * 4 + 0], 0.0, 0.0, "%.6f", flags) ||
-                        ImGui::InputDouble(("##" + key + "_row" + std::to_string(i) + "_col1").c_str(), &vals[i * 4 + 1], 0.0, 0.0, "%.6f", flags) ||
-                        ImGui::InputDouble(("##" + key + "_row" + std::to_string(i) + "_col2").c_str(), &vals[i * 4 + 2], 0.0, 0.0, "%.6f", flags) ||
-                        ImGui::InputDouble(("##" + key + "_row" + std::to_string(i) + "_col3").c_str(), &vals[i * 4 + 3], 0.0, 0.0, "%.6f", flags)) {
-                        changedLocal = true;
-                    }
-                }
-                if (changedLocal) {
-                    element = glm::dmat4x4(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10],
-                                           vals[11], vals[12], vals[13], vals[14], vals[15]);
-                    changed = true;
-                }
-                break;
-            }
             default:
-                // Ignoring unknown types
-                RAYX_LOG << "Ignoring unknown type index: ";
+                // ImGui::SameLine(rightAlignPosition);
+                ImGui::Text("Unsupported type");
                 break;
         }
     }
-
-    ImGui::PopItemWidth();  // Restore the previous item width
+    ImGui::PopID();
+    ImGui::PopItemWidth();
 }

@@ -12,14 +12,14 @@ class BeamlineDesignHandler {
 
   private:
     void showParameters(DesignMap& parameters, bool& changed, uint32_t type);
-    void createInputField(const std::string& key, DesignMap& element, bool& changed, uint32_t type);
+    void createInputField(const std::string& key, DesignMap& element, bool& changed, uint32_t type, int nestingLevel);
 
     // Define groups
     std::map<std::string, std::vector<std::string>> groups = {
-        {"Coordinate Errors", {"translationXerror", "translationYerror", "translationZerror", "rotationXerror", "rotationYerror", "rotationZerror"}},
         {"Position",
          {"worldPosition", "alignmentError", "sourceDepth", "sourceHeight", "sourceWidth", "sourcePulseType", "positionType", "heightDistribution",
           "widthDistribution"}},
+        {"Coordinate Errors", {"translationXerror", "translationYerror", "translationZerror", "rotationXerror", "rotationYerror", "rotationZerror"}},
         {"Direction",
          {
              "horDivergence",
@@ -31,7 +31,8 @@ class BeamlineDesignHandler {
          }},
         {"WorldDirection", {"worldXDirection", "worldYDirection", "worldZDirection"}},
         {"Energy", {"energy", "energySpread", "energyDistributionType", "energyDistribution", "photonEnergyDistributionFile", "separateEnergies"}},
-        {"Stokes", {"linPol"}}};
+        {"Stokes", {"linPol"}},
+        {"Behaviour", {"geometricalShape", "behaviourType", "curvatureType", "CuoutLength", "CutoutWidth", "Material", "totalLength"}}};
 
     std::vector<std::string> customOrder = {
         "type",           "name",           "numberOfRays",  "translationXerror", "translationYerror", "translationZerror",
