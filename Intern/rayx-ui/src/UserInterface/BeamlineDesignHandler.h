@@ -37,4 +37,9 @@ class BeamlineDesignHandler {
     std::vector<std::string> customOrder = {
         "type",           "name",           "numberOfRays",  "translationXerror", "translationYerror", "translationZerror",
         "rotationXerror", "rotationYerror", "rotationZerror"};
+
+    const char* sourceItems[6] = {"Matrix Source", "Point Source", "Dipole Source", "Pixel Source", "Circle Source", "Simple Undulator"};
+    const char* opticalElementItems[13] = {
+        "ImagePlane",           "Cone", "Cylinder",          "Ellipsoid", "Paraboloid",       "Plane Grating", "Plane Mirror",
+        "Reflection Zoneplate", "Slit", "Spherical Grating", "Sphere",    "Spherical Mirror", "Toroid"};  //"Experts Optics" currently not supported
 };

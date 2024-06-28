@@ -17,52 +17,48 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
             nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         }
 
-        bool isSelected = (beamlineInfo.selectedIndex == child.index) &&
-                          ((beamlineInfo.selectedType == 0 && child.category == "Light Source") ||
-                           (beamlineInfo.selectedType == 1 && child.category == "Optical Element") ||
-                           (beamlineInfo.selectedType == 2 && !child.children.empty()));  // Assuming group category is implied by having children
+        bool isSelected = (beamlineInfo.selectedIndex == child.index) && ((beamlineInfo.selectedType == 0 && child.category == "Light Source") ||
+                                                                          (beamlineInfo.selectedType == 1 && child.category == "Optical Element") ||
+                                                                          (beamlineInfo.selectedType == 2 && !child.children.empty()));
 
         if (isSelected) {
             nodeFlags |= ImGuiTreeNodeFlags_Selected;
-            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));  // Highlight color
-            ImGui::PushStyleColor(ImGuiCol_HeaderHovered,
-                                  ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));  // Highlight color when hovered
-            ImGui::PushStyleColor(ImGuiCol_HeaderActive,
-                                  ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));  // Highlight color when active
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
         }
 
         // Create a unique ID for the button
-        std::string buttonId = "<--##Button" + std::to_string(child.index);
+        std::string buttonId = "<--##" + child.name + std::to_string(child.index);
 
         if (ImGui::Button(buttonId.c_str())) {
-            if (child.category == "Optical Element") {
+            if (child.category == "Optical Element" && child.index >= 0 && child.index < elements.size()) {
                 glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
                                             elements[child.index].compile().m_outTrans[3][2]};
                 camController.lookAtPoint(translationVec);
-            } else if (child.category == "Light Source") {
+            } else if (child.category == "Light Source" && child.index >= 0 && child.index < rSourcePositions.size()) {
                 camController.lookAtPoint(rSourcePositions[child.index]);
             }
         }
 
-        ImGui::SameLine();  // Place the next widget on the same line
+        ImGui::SameLine();
 
-        bool nodeOpen = ImGui::TreeNodeEx(child.name.c_str(), nodeFlags);
+        std::string nodeLabel = child.name + "##" + std::to_string(child.index);
+        bool nodeOpen = ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags);
 
         if (isSelected) {
-            ImGui::PopStyleColor(3);  // Pop the header, header hovered, and header active colors
+            ImGui::PopStyleColor(3);
         }
 
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
-            // Handle selection logic here
             RAYX_VERB << "Selected object: " << child.name << " with index " << child.index;
 
-            // Update beamlineInfo with the selected type and index
             if (child.category == "Light Source") {
                 beamlineInfo.selectedType = 0;
             } else if (child.category == "Optical Element") {
                 beamlineInfo.selectedType = 1;
             } else {
-                beamlineInfo.selectedType = 2;  // Assuming groups fall under a different category
+                beamlineInfo.selectedType = 2;
             }
             beamlineInfo.selectedIndex = child.index;
         }

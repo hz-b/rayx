@@ -11,6 +11,7 @@
 
 #include "Colors.h"
 #include "CanonicalizePath.h"
+#include "Debug/Instrumentor.h"
 #include "RayProcessing.h"
 
 extern bool isSceneWindowHovered;
@@ -313,6 +314,7 @@ void UIHandler::endUIRender(VkCommandBuffer commandBuffer) {
 }
 
 void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     ImGui::Begin("Beamline Design");
 
     if (ImGui::Button("Open File Dialog")) {
