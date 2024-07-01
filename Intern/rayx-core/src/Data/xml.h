@@ -34,6 +34,8 @@ enum class SourcePulseType;
 enum class EnergySpreadUnit;
 enum class SigmaType;
 enum class SpreadType;
+enum class ElementType;
+
 
 // An error in position and orientation that an object might have.
 struct Misalignment {
@@ -89,7 +91,7 @@ struct RAYX_API Parser {
 
     const char* name() const;
 
-    const char* type() const;
+    ElementType type() const;
 
     // parsers for fundamental types
     double parseDouble(const char* paramname) const;

@@ -9,22 +9,22 @@ namespace RAYX {
 std::vector<Ray> DesignSource::compile(int i) const {
     std::vector<Ray> ray;
 
-    if (getType() == "Point Source") {
+    if (getType() == ElementType::PointSource) {
         PointSource ps(*this);
         ray = ps.getRays(i);
-    } else if (getType() == "Matrix Source") {
+    } else if (getType() == ElementType::MatrixSource) {
         MatrixSource ms(*this);
         ray = ms.getRays(i);
-    } else if (getType() == "Dipole Source") {
+    } else if (getType() == ElementType::DipoleSource) {
         DipoleSource ds(*this);
         ray = ds.getRays(i);
-    } else if (getType() == "Pixel Source") {
+    } else if (getType() == ElementType::PixelSource) {
         PixelSource ps(*this);
         ray = ps.getRays(i);
-    } else if (getType() == "Circle Source") {
+    } else if (getType() == ElementType::CircleSource) {
         CircleSource cs(*this);
         ray = cs.getRays(i);
-    } else if (getType() == "Simple Undulator") {
+    } else if (getType() == ElementType::SimpleUndulatorSource) {
         SimpleUndulatorSource su(*this);
         ray = su.getRays(i);
     }
@@ -33,10 +33,10 @@ std::vector<Ray> DesignSource::compile(int i) const {
 }
 
 void DesignSource::setName(std::string s) { m_elementParameters["name"] = s; }
-void DesignSource::setType(std::string s) { m_elementParameters["type"] = s; }
+void DesignSource::setType(ElementType s) { m_elementParameters["type"] = s; }
 
 std::string DesignSource::getName() const { return m_elementParameters["name"].as_string(); }
-std::string DesignSource::getType() const { return m_elementParameters["type"].as_string(); }
+ElementType DesignSource::getType() const { return m_elementParameters["type"].as_elementType(); }
 
 void DesignSource::setWorldPosition(glm::dvec4 p) {
     m_elementParameters["worldPosition"] = Map();
