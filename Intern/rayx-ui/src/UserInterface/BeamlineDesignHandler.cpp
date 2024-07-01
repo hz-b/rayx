@@ -121,9 +121,11 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
 
     // Align label to the left
     ImGui::AlignTextToFramePadding();
-    ImGui::Text("%s", key.c_str());
+    if (element.type() != RAYX::ValueType::Map) {
+        ImGui::Text("%s:", key.c_str());
+        ImGui::SameLine(rightAlignPosition);
+    }
 
-    ImGui::SameLine(rightAlignPosition);
     ImGui::PushItemWidth(inputWidth);
 
     // Generate a unique ID for each input field
@@ -455,7 +457,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::Map: {
                 auto currentValue = element.as_map();
-                if (ImGui::CollapsingHeader("##", ImGuiTreeNodeFlags_DefaultOpen)) {
+                if (ImGui::CollapsingHeader(key.c_str())) {
                     ImGui::Indent();
                     for (const auto& [subKey, valuePtr] : currentValue) {
                         ImGui::PushID(subKey.c_str());

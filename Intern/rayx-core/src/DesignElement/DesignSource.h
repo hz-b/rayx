@@ -69,7 +69,7 @@ struct RAYX_API DesignSource {
     void setElectronEnergyOriantation(ElectronEnergyOrientation value);
     ElectronEnergyOrientation getElectronEnergyOrientation() const;
 
-    void setSeperateEnergies(int value);
+    void setSeparateEnergies(int value);
 
     void setEnergy(double value);
     double getEnergy() const;

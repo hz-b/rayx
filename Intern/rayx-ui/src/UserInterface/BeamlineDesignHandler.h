@@ -30,13 +30,36 @@ class BeamlineDesignHandler {
              "deltaOpeningHandle",
          }},
         {"WorldDirection", {"worldXDirection", "worldYDirection", "worldZDirection"}},
-        {"Energy", {"energy", "energySpread", "energyDistributionType", "energyDistribution", "photonEnergyDistributionFile", "separateEnergies"}},
+        {"Energy",
+         {"energy", "energySpread", "energyDistributionType", "SeparateEnergies", "energyDistribution", "photonEnergyDistributionFile",
+          "separateEnergies"}},
         {"Stokes", {"linPol"}},
-        {"Behaviour", {"geometricalShape", "behaviourType", "curvatureType", "CuoutLength", "CutoutWidth", "Material", "totalLength"}}};
+        {"Behaviour", {"geometricalShape", "behaviourType", "curvatureType", "CutoutLength", "CutoutWidth", "Material", "totalLength"}}};
 
     std::vector<std::string> customOrder = {
-        "type",           "name",           "numberOfRays",  "translationXerror", "translationYerror", "translationZerror",
-        "rotationXerror", "rotationYerror", "rotationZerror"};
+        "type",
+        "name",
+        "numberOfRays",
+        "translationXerror",
+        "translationYerror",
+        "translationZerror",
+        "rotationXerror",
+        "rotationYerror",
+        "rotationZerror",
+        "energy",
+        "energySpread",
+        "energyDistribution",
+        "photonEnergyDistributionFile",
+        "energyDistributionType",
+        "SeparateEnergies",
+        "geometricalShape",
+        "totalLength",
+        "curvatureType",
+        "behaviourType",
+        "Material",
+        "CutoutWidth",
+        "CutoutLength",
+    };
 
     const char* sourceItems[6] = {"Matrix Source", "Point Source", "Dipole Source", "Pixel Source", "Circle Source", "Simple Undulator"};
     const char* opticalElementItems[13] = {
