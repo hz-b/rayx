@@ -9,27 +9,63 @@ BeamlineOutliner::BeamlineOutliner(/* args */) {}
 BeamlineOutliner::~BeamlineOutliner() {}
 
 void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraController& camController, std::vector<RAYX::DesignElement>& elements,
-                                       std::vector<glm::dvec3>& rSourcePositions) const {
+                                       std::vector<glm::dvec3>& rSourcePositions, UIBeamlineInfo& beamlineInfo) const {
     for (auto& child : treeNode.children) {
-        if (child.children.empty()) {
-            std::string label = child.name;
+        ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-            if (ImGui::Selectable(label.c_str())) {
-                // Handle selection logic here
-                RAYX_VERB << "Selected object: " << child.name << " with index " << child.index;
-                if (child.category == "Optical Element") {
-                    glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
-                                                elements[child.index].compile().m_outTrans[3][2]};
-                    camController.lookAtPoint(translationVec);
-                } else if (child.category == "Light Source") {
-                    camController.lookAtPoint(rSourcePositions[child.index]);
-                }
+        if (child.children.empty()) {
+            nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        }
+
+        bool isSelected = (beamlineInfo.selectedIndex == child.index) && ((beamlineInfo.selectedType == 0 && child.category == "Light Source") ||
+                                                                          (beamlineInfo.selectedType == 1 && child.category == "Optical Element") ||
+                                                                          (beamlineInfo.selectedType == 2 && !child.children.empty()));
+
+        if (isSelected) {
+            nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
+        }
+
+        // Create a unique ID for the button
+        std::string buttonId = "<--##" + child.name + std::to_string(child.index);
+
+        if (ImGui::Button(buttonId.c_str())) {
+            if (child.category == "Optical Element" && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
+                glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
+                                            elements[child.index].compile().m_outTrans[3][2]};
+                camController.lookAtPoint(translationVec);
+            } else if (child.category == "Light Source" && child.index >= 0 && static_cast<size_t>(child.index) < rSourcePositions.size()) {
+                camController.lookAtPoint(rSourcePositions[child.index]);
             }
-        } else {
-            if (ImGui::TreeNode(child.name.c_str())) {
-                this->renderImGuiTree(child, camController, elements, rSourcePositions);
-                ImGui::TreePop();
+        }
+
+        ImGui::SameLine();
+
+        std::string nodeLabel = child.name + "##" + std::to_string(child.index);
+        bool nodeOpen = ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags);
+
+        if (isSelected) {
+            ImGui::PopStyleColor(3);
+        }
+
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
+            RAYX_VERB << "Selected object: " << child.name << " with index " << child.index;
+
+            if (child.category == "Light Source") {
+                beamlineInfo.selectedType = 0;
+            } else if (child.category == "Optical Element") {
+                beamlineInfo.selectedType = 1;
+            } else {
+                beamlineInfo.selectedType = 2;
             }
+            beamlineInfo.selectedIndex = child.index;
+        }
+
+        if (nodeOpen && !child.children.empty()) {
+            this->renderImGuiTree(child, camController, elements, rSourcePositions, beamlineInfo);
+            ImGui::TreePop();
         }
     }
 }
@@ -42,14 +78,14 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
 
         if (strcmp(xmlChild->name(), "object") == 0) {
             if (type == "Point Source" || type == "Matrix Source" || type == "Dipole" || type == "Dipole Source" || type == "Pixel Source" ||
-                type == "Circle Source") {
+                type == "Circle Source" || type == "Simple Undulator") {
                 category = "Light Source";
                 TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
                 objectNode.index = m_lightSourceIndex++;
                 treeNode.children.emplace_back(objectNode);
             } else if (type == "ImagePlane" || type == "Plane Mirror" || type == "Toroid" || type == "Slit" || type == "Spherical Grating" ||
                        type == "Plane Grating" || type == "Sphere" || type == "Reflection Zoneplate" || type == "Ellipsoid" || type == "Cylinder" ||
-                       type == "Cone") {
+                       type == "Cone" || type == "Paraboloid" || type == "Spherical Mirror" || type == "Experts Optics") {
                 category = "Optical Element";
                 TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
                 objectNode.index = m_opticalElementIndex++;
@@ -68,7 +104,8 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
 }
 
 void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController,
-                                              std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
+                                              std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions,
+                                              UIBeamlineInfo& beamlineInfo) {
     // Check if file exists
     if (!std::filesystem::exists(filename)) {
         ImGui::Text("Choose a file to display the beamline outline.");
@@ -112,11 +149,10 @@ void BeamlineOutliner::renderImGuiTreeFromRML(const std::filesystem::path& filen
     // Call recursive function to handle the object collection and render the ImGui tree
     m_pTreeRoot = std::make_unique<TreeNode>("Root");
     buildTreeFromXMLNode(xml_beamline, *m_pTreeRoot);
-    renderImGuiTree(*m_pTreeRoot, camController, elements, rSourcePositions);
+    renderImGuiTree(*m_pTreeRoot, camController, elements, rSourcePositions, beamlineInfo);
 }
 
-void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements,
-                                                 std::vector<glm::dvec3>& rSourcePositions) {
+void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams) {
     ImGui::Begin("Beamline Outline");
 
     if (uiParams.rmlPath.empty()) {
@@ -125,13 +161,15 @@ void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::ve
         // Create and render new Tree
         m_lightSourceIndex = 0;
         m_opticalElementIndex = 0;
-        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, elements, rSourcePositions);
+        renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, uiParams.beamlineInfo.elements, uiParams.beamlineInfo.rSourcePositions,
+                               uiParams.beamlineInfo);
         m_currentRML = uiParams.rmlPath;
     } else if (m_pTreeRoot == nullptr) {
         RAYX_ERR << "Error: Tree root is null.";
     } else {
         // Render same Tree
-        renderImGuiTree(*m_pTreeRoot, uiParams.camController, elements, rSourcePositions);
+        renderImGuiTree(*m_pTreeRoot, uiParams.camController, uiParams.beamlineInfo.elements, uiParams.beamlineInfo.rSourcePositions,
+                        uiParams.beamlineInfo);
     }
 
     ImGui::End();

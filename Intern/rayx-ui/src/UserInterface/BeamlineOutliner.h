@@ -24,7 +24,7 @@ class BeamlineOutliner {
     BeamlineOutliner();
     ~BeamlineOutliner();
 
-    void showBeamlineOutlineWindow(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
+    void showBeamlineOutlineWindow(UIParameters& uiParams);
 
   private:
     std::unique_ptr<TreeNode> m_pTreeRoot = nullptr;
@@ -34,8 +34,8 @@ class BeamlineOutliner {
     std::filesystem::path m_currentRML;
 
     void renderImGuiTree(const TreeNode& treeNode, CameraController& camController, std::vector<RAYX::DesignElement>& rObjects,
-                         std::vector<glm::dvec3>& rSourcePositions) const;
+                         std::vector<glm::dvec3>& rSourcePositions, UIBeamlineInfo& beamlineInfo) const;
     void buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode& treeNode);
     void renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController, std::vector<RAYX::DesignElement>& rObjects,
-                                std::vector<glm::dvec3>& rSourcePositions);
+                                std::vector<glm::dvec3>& rSourcePositions, UIBeamlineInfo& beamlineInfo);
 };
