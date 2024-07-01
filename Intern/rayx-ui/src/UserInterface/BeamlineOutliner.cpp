@@ -78,14 +78,14 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
 
         if (strcmp(xmlChild->name(), "object") == 0) {
             if (type == "Point Source" || type == "Matrix Source" || type == "Dipole" || type == "Dipole Source" || type == "Pixel Source" ||
-                type == "Circle Source") {
+                type == "Circle Source" || type == "Simple Undulator") {
                 category = "Light Source";
                 TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
                 objectNode.index = m_lightSourceIndex++;
                 treeNode.children.emplace_back(objectNode);
             } else if (type == "ImagePlane" || type == "Plane Mirror" || type == "Toroid" || type == "Slit" || type == "Spherical Grating" ||
                        type == "Plane Grating" || type == "Sphere" || type == "Reflection Zoneplate" || type == "Ellipsoid" || type == "Cylinder" ||
-                       type == "Cone") {
+                       type == "Cone" || type == "Paraboloid" || type == "Spherical Mirror" || type == "Experts Optics") {
                 category = "Optical Element";
                 TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
                 objectNode.index = m_opticalElementIndex++;

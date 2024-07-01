@@ -74,7 +74,7 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     orderedKeys.insert(orderedKeys.end(), remainingGroups.begin(), remainingGroups.end());
     orderedKeys.insert(orderedKeys.end(), nonGroupedKeys.begin(), nonGroupedKeys.end());
 
-    std::unordered_set<std::string> unusedKeys = {"entranceArmLength", "exitArmLength", "grazingIncAngle", "AzimuthalAngle"};
+    std::unordered_set<std::string> unusedKeys = {"photonFlux", "distancePreceding"};
 
     for (const auto& key : orderedKeys) {
         if (unusedKeys.find(key) != unusedKeys.end()) {
@@ -161,7 +161,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             ImGui::EndCombo();
         }
 
-    } else if (key == "geometricalShape") {
+    } else if (key == "geometricalShape" || key == "openingShape") {
         const char* shapes[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
         int input = int(element.as_double());
 

@@ -74,7 +74,7 @@ void setDipoleSource(xml::Parser parser, DesignSource* ds) {
 
     ds->setEnergySpreadType(parser.parseEnergySpreadType());
     ds->setPhotonFlux(parser.parsePhotonFlux());
-    ds->setElectronEnergyOriantation(parser.parseElectronEnergyOrientation());
+    ds->setElectronEnergyOrientation(parser.parseElectronEnergyOrientation());
     ds->setElectronEnergy(parser.parseElectronEnergy());
     ds->setEnergySpread(parser.parseEnergySpread());
     ds->setBendingRadius(parser.parseBendingRadiusDouble());
