@@ -14,6 +14,8 @@ class BeamlineDesignHandler {
     void showParameters(DesignMap& parameters, bool& changed, uint32_t type);
     void createInputField(const std::string& key, DesignMap& element, bool& changed, uint32_t type, int nestingLevel);
 
+    bool caseInsensitiveCompare(const std::string& a, const std::string& b);
+
     // Define groups
     std::map<std::string, std::vector<std::string>> groups = {
         {"Position",
