@@ -29,7 +29,6 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     // Collect existing members of each group
     std::map<std::string, std::vector<std::string>> existingGroups;
     std::vector<std::string> nonGroupedKeys;
-
     for (const auto& elementPair : parameters) {
         const std::string& key = elementPair.first;
 
@@ -58,6 +57,7 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
         }
     }
 
+    // Sort remaining groups and non-grouped keys alphabetically (case-insensitive)
     std::vector<std::string> remainingGroups;
     for (const auto& group : existingGroups) {
         if (std::find(orderedKeys.begin(), orderedKeys.end(), group.first) == orderedKeys.end()) {
@@ -74,6 +74,7 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     orderedKeys.insert(orderedKeys.end(), remainingGroups.begin(), remainingGroups.end());
     orderedKeys.insert(orderedKeys.end(), nonGroupedKeys.begin(), nonGroupedKeys.end());
 
+    // these are not used in RAYX
     std::unordered_set<std::string> unusedKeys = {"photonFlux", "distancePreceding"};
 
     for (const auto& key : orderedKeys) {
@@ -117,6 +118,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     ImGui::AlignTextToFramePadding();
     if (element.type() != RAYX::ValueType::Map) {
         ImGui::Text("%s:", key.c_str());
+        // Align input field to the right
         ImGui::SameLine(rightAlignPosition);
     }
 
@@ -125,6 +127,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     // Generate a unique ID for each input field
     ImGui::PushID(key.c_str());
 
+    // type,geometricalShape and openingShape need to be a drowdown instead of a string/int input
     if (key == "type") {
         const char** items;
         int itemsCount;
@@ -162,11 +165,24 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
         }
 
     } else if (key == "geometricalShape" || key == "openingShape") {
-        const char* shapes[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
+        const char* shapesGeometrical[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
+        const char* shapesOpening[] = {"Rectangle", "Elliptical", "Unlimited"};
+
+        const char** shapes;
+        int numShapes;
+
+        if (key == "geometricalShape") {
+            shapes = shapesGeometrical;
+            numShapes = IM_ARRAYSIZE(shapesGeometrical);
+        } else {  // key == "openingShape"
+            shapes = shapesOpening;
+            numShapes = IM_ARRAYSIZE(shapesOpening);
+        }
+
         int input = int(element.as_double());
 
         if (ImGui::BeginCombo("##combo", shapes[input])) {
-            for (int i = 0; i < IM_ARRAYSIZE(shapes); i++) {
+            for (int i = 0; i < numShapes; i++) {
                 bool isSelected = (input == i);
                 if (ImGui::Selectable(shapes[i], isSelected)) {
                     element = double(i);
@@ -178,8 +194,10 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             ImGui::EndCombo();
         }
+    }
 
-    } else {
+    else {
+        // dynamic handling of different types
         switch (element.type()) {
             case RAYX::ValueType::Double: {
                 double input = element.as_double();
@@ -450,6 +468,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 }
                 break;
             }
+            // manual sorting is not yet implemented for the map type
             case RAYX::ValueType::Map: {
                 auto currentValue = element.as_map();
                 if (ImGui::CollapsingHeader(key.c_str())) {
@@ -480,14 +499,17 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 }
                 break;
             }
-
+            // probably not needed
             case RAYX::ValueType::Misalignment:
+
+            // this needs a lot of parameters and handling
             case RAYX::ValueType::Surface:
+
+            // not sure if needed
             case RAYX::ValueType::Cutout:
             case RAYX::ValueType::CylinderDirection:
                 break;
             default:
-                // ImGui::SameLine(rightAlignPosition);
                 ImGui::Text("Unsupported type");
                 break;
         }
@@ -496,7 +518,6 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     ImGui::PopItemWidth();
 }
 
-// Sort remaining groups and non-grouped keys alphabetically (case-insensitive)
 bool BeamlineDesignHandler::caseInsensitiveCompare(const std::string& a, const std::string& b) {
     std::string lowerA = a;
     std::string lowerB = b;
