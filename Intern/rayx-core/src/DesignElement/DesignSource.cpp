@@ -182,9 +182,9 @@ double DesignSource::getEnergy() const { return m_elementParameters["energy"].as
 void DesignSource::setElectronEnergy(double value) { m_elementParameters["electronEnergy"] = value; }
 double DesignSource::getElectronEnergy() const { return m_elementParameters["electronEnergy"].as_double(); }
 
-void DesignSource::setElectronEnergyOriantation(ElectronEnergyOrientation value) { m_elementParameters["electronEnergyOriantation"] = value; }
+void DesignSource::setElectronEnergyOrientation(ElectronEnergyOrientation value) { m_elementParameters["electronEnergyOrientation"] = value; }
 ElectronEnergyOrientation DesignSource::getElectronEnergyOrientation() const {
-    return m_elementParameters["electronEnergyOriantation"].as_electronEnergyOrientation();
+    return m_elementParameters["electronEnergyOrientation"].as_electronEnergyOrientation();
 }
 
 void DesignSource::setEnergySpread(double value) { m_elementParameters["energySpread"] = value; }
