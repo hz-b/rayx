@@ -32,11 +32,11 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
         std::string buttonId = "<--##" + child.name + std::to_string(child.index);
 
         if (ImGui::Button(buttonId.c_str())) {
-            if (child.category == "Optical Element" && child.index >= 0 && child.index < elements.size()) {
+            if (child.category == "Optical Element" && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
                 glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
                                             elements[child.index].compile().m_outTrans[3][2]};
                 camController.lookAtPoint(translationVec);
-            } else if (child.category == "Light Source" && child.index >= 0 && child.index < rSourcePositions.size()) {
+            } else if (child.category == "Light Source" && child.index >= 0 && static_cast<size_t>(child.index) < rSourcePositions.size()) {
                 camController.lookAtPoint(rSourcePositions[child.index]);
             }
         }
