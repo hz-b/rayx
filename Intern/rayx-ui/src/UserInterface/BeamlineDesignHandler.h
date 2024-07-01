@@ -5,9 +5,6 @@
 
 class BeamlineDesignHandler {
   public:
-    // BeamlineDesignHandler();
-    // ~BeamlineDesignHandler();
-
     void showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo);
 
   private:
