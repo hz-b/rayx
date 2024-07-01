@@ -12,7 +12,7 @@
 #include "Shader/Ray.h"
 
 namespace RAYX {
-enum class SpreadType { HardEdge, SoftEdge, SeperateEnergies };    // default WhiteBand
+enum class SpreadType { HardEdge, SoftEdge, SeparateEnergies };    // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist::Thirds represents PixelSource Footprint
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };

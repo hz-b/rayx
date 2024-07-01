@@ -6,10 +6,10 @@
 
 // String conversion functions
 const std::map<SpreadType, std::string> SpreadTypeToString = {
-    {SpreadType::HardEdge, "HardEdge"}, {SpreadType::SoftEdge, "SoftEdge"}, {SpreadType::SeperateEnergies, "SeperateEnergies"}};
+    {SpreadType::HardEdge, "HardEdge"}, {SpreadType::SoftEdge, "SoftEdge"}, {SpreadType::SeparateEnergies, "SeparateEnergies"}};
 
 const std::map<std::string, SpreadType> StringToSpreadType = {
-    {"HardEdge", SpreadType::HardEdge}, {"SoftEdge", SpreadType::SoftEdge}, {"SeperateEnergies", SpreadType::SeperateEnergies}};
+    {"HardEdge", SpreadType::HardEdge}, {"SoftEdge", SpreadType::SoftEdge}, {"SeparateEnergies", SpreadType::SeparateEnergies}};
 
 const std::map<EnergyDistributionType, std::string> EnergyDistributionTypeToString = {{EnergyDistributionType::File, "File"},
                                                                                       {EnergyDistributionType::Values, "Values"},
