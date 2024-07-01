@@ -56,9 +56,9 @@ Ray refrac(Ray r, dvec3 normal, double linedensity) {
     double sin_d = r8_sin(-del1);
     double cos_e = r8_cos(-eps1);
     double sin_e = r8_sin(-eps1);
-    dmat4 rot = dmat4(cos_e, cos_d * sin_e, sin_d * sin_e, 0, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, 0, -sin_d, cos_d, 0, 0, 0, 0, 1);
-    dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, 0, sin_d * sin_e, sin_d * cos_e, cos_d, 0, 0, 0, 0, 1);
-    r.m_direction = dvec3(rot * dvec4(r.m_direction, 0));  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
+    dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
+    dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
+    r.m_direction = dvec3(rot * r.m_direction);  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
 
     // Refraction
     double a1 = linedensity * cos_d;
@@ -67,7 +67,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
         r.m_direction[2] -= a1;
-        r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
+        r.m_direction = dvec3(inv_rot * r.m_direction);
     } else {
            recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
