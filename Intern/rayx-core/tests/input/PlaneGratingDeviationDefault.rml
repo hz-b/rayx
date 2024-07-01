@@ -110,49 +110,48 @@
     <param id="cylindricalBowingAmp" enabled="F">0</param>
     <param id="cylindricalBowingRadius" enabled="F">0</param>
     <param id="worldPosition" enabled="F">
-      <x>0</x>
-      <y>0</y>
-      <z>10000</z>
-    </param>
-    <param id="worldXdirection" enabled="F">
-      <x>1</x>
-      <y>0</y>
-      <z>0</z>
-    </param>
-    <param id="worldYdirection" enabled="F">
-      <x>0</x>
-      <y>0.093353315178935053</y>
-      <z>-0.9956330441207254</z>
-    </param>
-    <param id="worldZdirection" enabled="F">
-      <x>0</x>
-      <y>0.9956330441207254</y>
-      <z>0.093353315178935053</z>
-    </param>
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>10000.0000000000000000</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.09335326512785988</y>
+    <z>-0.9956330488136518</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.9956330488136518</y>
+    <z>0.09335326512785988</z>
+   </param>
   </object>
 
   <object name="ImagePlane" type="ImagePlane">
-    <param id="distanceImagePlane" enabled="T">1000</param>
     <param id="worldPosition" enabled="F">
-      <x>0</x>
-      <y>173.64817766693048</y>
-      <z>9015.1922469877918</z>
-    </param>
-    <param id="worldXdirection" enabled="F">
-      <x>1</x>
-      <y>0</y>
-      <z>0</z>
-    </param>
-    <param id="worldYdirection" enabled="F">
-      <x>0</x>
-      <y>-0.98480775301220802</y>
-      <z>-0.17364817766693047</z>
-    </param>
-    <param id="worldZdirection" enabled="F">
-      <x>0</x>
-      <y>0.17364817766693047</y>
-      <z>-0.98480775301220802</z>
-    </param>
+    <x>0.0000000000000000</x>
+    <y>173.6481776669305077</y>
+    <z>9015.1922469877918047</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>-0.9848077530122080</y>
+    <z>-0.1736481776669305</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.1736481776669305</y>
+    <z>-0.9848077530122080</z>
+   </param>
   </object>
 
 </beamline>

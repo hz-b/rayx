@@ -404,8 +404,7 @@ class DesignMap {
   private:
     std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
                  CentralBeamstop, Cutout, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
-                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType>, 
-                 GratingMount
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount>
         m_variant;
 };
 }  // namespace RAYX

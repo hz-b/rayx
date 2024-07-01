@@ -19,6 +19,7 @@ std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSourc
                                                        {ElementType::SphereGrating, "Spherical Grating"},
                                                        {ElementType::SphereMirror, "Sphere Mirror"},
                                                        {ElementType::ToroidMirror, "Toroid"},
+                                                       {ElementType::ToroidGrating, "Toroidal Grating"},
                                                        {ElementType::DipoleSource, "Dipole Source"},
                                                        {ElementType::DipoleSrc, "Dipole"},
                                                        {ElementType::PixelSource, "Pixel Source"},

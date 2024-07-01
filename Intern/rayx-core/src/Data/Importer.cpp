@@ -45,7 +45,7 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         getSphereMirror(parser, de);
     } else if (type == ElementType::ToroidMirror) {
         getToroidMirror(parser, de);
-    } else if (strcmp(type, "Toroidal Grating") == 0) {
+    } else if (type == ElementType::ToroidGrating) {
         getToroidalGrating(parser, de);
     } else {
         RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
