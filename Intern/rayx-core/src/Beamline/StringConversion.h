@@ -8,24 +8,13 @@
 const std::map<SpreadType, std::string> SpreadTypeToString = {
     {SpreadType::HardEdge, "HardEdge"}, {SpreadType::SoftEdge, "SoftEdge"}, {SpreadType::SeparateEnergies, "SeparateEnergies"}};
 
-const std::map<std::string, SpreadType> StringToSpreadType = {
-    {"HardEdge", SpreadType::HardEdge}, {"SoftEdge", SpreadType::SoftEdge}, {"SeparateEnergies", SpreadType::SeparateEnergies}};
-
 const std::map<EnergyDistributionType, std::string> EnergyDistributionTypeToString = {{EnergyDistributionType::File, "File"},
                                                                                       {EnergyDistributionType::Values, "Values"},
                                                                                       {EnergyDistributionType::Total, "Total"},
                                                                                       {EnergyDistributionType::Param, "Param"}};
 
-const std::map<std::string, EnergyDistributionType> StringToEnergyDistributionType = {{"File", EnergyDistributionType::File},
-                                                                                      {"Values", EnergyDistributionType::Values},
-                                                                                      {"Total", EnergyDistributionType::Total},
-                                                                                      {"Param", EnergyDistributionType::Param}};
-
 const std::map<SourceDist, std::string> SourceDistToString = {
     {SourceDist::Uniform, "Uniform"}, {SourceDist::Gaussian, "Gaussian"}, {SourceDist::Thirds, "Thirds"}, {SourceDist::Circle, "Circle"}};
-
-const std::map<std::string, SourceDist> StringToSourceDist = {
-    {"Uniform", SourceDist::Uniform}, {"Gaussian", SourceDist::Gaussian}, {"Thirds", SourceDist::Thirds}, {"Circle", SourceDist::Circle}};
 
 const std::map<ElectronEnergyOrientation, std::string> ElectronEnergyOrientationToString = {
     {ElectronEnergyOrientation::Clockwise, "Clockwise"}, {ElectronEnergyOrientation::Counterclockwise, "Counterclockwise"}};
@@ -58,6 +47,7 @@ const std::map<BehaviourType, std::string> BehaviourTypeToString = {{BehaviourTy
 
 const std::map<FigureRotation, std::string> FigureRotationToString = {
     {FigureRotation::Yes, "Yes"}, {FigureRotation::Plane, "Plane"}, {FigureRotation::A11, "A11"}};
+const std::map<SigmaType, std::string> SigmaTypeToString = {{SigmaType::ST_STANDARD, "Standard"}, {SigmaType::ST_ACCURATE, "Accurate"}};
 
 const std::map<Material, std::string> MaterialToString = {
     {Material::REFLECTIVE, "REFLECTIVE"},
@@ -72,7 +62,8 @@ const std::map<Material, std::string> MaterialToString = {
 // Reverse maps for string to enum conversion
 const std::map<std::string, EnergySpreadUnit> StringToEnergySpreadUnit = {{"Percent", EnergySpreadUnit::EU_PERCENT}, {"eV", EnergySpreadUnit::EU_eV}};
 
-const std::map<SigmaType, std::string> SigmaTypeToString = {{SigmaType::ST_STANDARD, "Standard"}, {SigmaType::ST_ACCURATE, "Accurate"}};
+const std::map<std::string, SourceDist> StringToSourceDist = {
+    {"Uniform", SourceDist::Uniform}, {"Gaussian", SourceDist::Gaussian}, {"Thirds", SourceDist::Thirds}, {"Circle", SourceDist::Circle}};
 
 const std::map<std::string, SigmaType> StringToSigmaType = {{"Standard", SigmaType::ST_STANDARD}, {"Accurate", SigmaType::ST_ACCURATE}};
 const std::map<std::string, RZPType> StringToRZPType = {{"Elliptical", RZPType::Elliptical}, {"Meriodional", RZPType::Meriodional}};
@@ -84,7 +75,8 @@ const std::map<std::string, GratingMount> StringToGratingMount = {{"Deviation", 
 
 const std::map<std::string, ParaboloidType> StringToParaboloidType = {{"Focussing", ParaboloidType::Focussing},
                                                                       {"Collimate", ParaboloidType::Collimate}};
-
+const std::map<std::string, SpreadType> StringToSpreadType = {
+    {"HardEdge", SpreadType::HardEdge}, {"SoftEdge", SpreadType::SoftEdge}, {"SeparateEnergies", SpreadType::SeparateEnergies}};
 const std::map<std::string, CurvatureType> StringToCurvatureType = {
     {"Plane", CurvatureType::Plane},         {"Toroidal", CurvatureType::Toroidal},
     {"Spherical", CurvatureType::Spherical}, {"Cubic", CurvatureType::Cubic},
@@ -97,7 +89,10 @@ const std::map<std::string, BehaviourType> StringToBehaviourType = {{"Mirror", B
                                                                     {"Slit", BehaviourType::Slit},
                                                                     {"Rzp", BehaviourType::Rzp},
                                                                     {"ImagePlane", BehaviourType::ImagePlane}};
-
+const std::map<std::string, EnergyDistributionType> StringToEnergyDistributionType = {{"File", EnergyDistributionType::File},
+                                                                                      {"Values", EnergyDistributionType::Values},
+                                                                                      {"Total", EnergyDistributionType::Total},
+                                                                                      {"Param", EnergyDistributionType::Param}};
 const std::map<std::string, FigureRotation> StringToFigureRotation = {
     {"Yes", FigureRotation::Yes}, {"Plane", FigureRotation::Plane}, {"A11", FigureRotation::A11}};
 
