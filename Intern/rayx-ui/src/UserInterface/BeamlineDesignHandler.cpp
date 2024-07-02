@@ -11,6 +11,7 @@
 
 #include "Beamline/StringConversion.h"
 #include "Debug/Instrumentor.h"
+#include "Shader/Strings.cpp"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
     RAYX_PROFILE_FUNCTION_STDOUT();
@@ -129,41 +130,24 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
 
     // type,geometricalShape and openingShape need to be a drowdown instead of a string/int input
     if (key == "type") {
-        const char** items;
-        int itemsCount;
+        auto currentEl = element.as_elementType();
+        int currentItem = int(std::distance(ElementStringMap.begin(), ElementStringMap.find(currentEl)));
 
-        if (type == 0) {
-            items = sourceItems;
-            itemsCount = IM_ARRAYSIZE(this->sourceItems);
-        } else {
-            items = opticalElementItems;
-            itemsCount = IM_ARRAYSIZE(this->opticalElementItems);
-        }
-
-        std::string currentStr = element.as_string();
-
-        int currentItem = -1;
-        for (int i = 0; i < itemsCount; i++) {
-            if (currentStr == items[i]) {
-                currentItem = i;
-                break;
-            }
-        }
-
-        if (ImGui::BeginCombo("##combo", currentItem >= 0 ? items[currentItem] : "")) {
-            for (int n = 0; n < itemsCount; n++) {
-                bool isSelected = (currentItem == n);
-                if (ImGui::Selectable(items[n], isSelected)) {
-                    element = std::string(items[n]);
+        if (ImGui::BeginCombo("##combo", currentItem >= 0 ? ElementStringMap[currentEl].c_str() : "")) {
+            int n = 0;
+            for (const auto& pair : ElementStringMap) {
+                bool isSelected = (currentEl == pair.first);
+                if (ImGui::Selectable(pair.second.c_str(), isSelected)) {
+                    element = pair.first;
                     changed = true;
                 }
                 if (isSelected) {
                     ImGui::SetItemDefaultFocus();
                 }
+                n++;
             }
             ImGui::EndCombo();
         }
-
     } else if (key == "geometricalShape" || key == "openingShape") {
         const char* shapesGeometrical[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
         const char* shapesOpening[] = {"Rectangle", "Elliptical", "Unlimited"};
