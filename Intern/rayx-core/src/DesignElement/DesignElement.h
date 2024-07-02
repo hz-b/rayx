@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Beamline/Objects/Objects.h"
 #include "Beamline/OpticalElement.h"
 #include "Shader/Element.h"
 #include "Value.h"
@@ -12,10 +11,10 @@ struct RAYX_API DesignElement {
     Element compile() const;
 
     void setName(std::string s);
-    void setType(std::string s);
+    void setType(ElementType s);
 
     std::string getName() const;
-    std::string getType() const;
+    ElementType getType() const;
 
     void setWorldPosition(glm::dvec4 p);
     glm::dvec4 getWorldPosition() const;

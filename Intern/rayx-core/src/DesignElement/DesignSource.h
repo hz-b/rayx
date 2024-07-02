@@ -5,6 +5,7 @@
 namespace RAYX {
 
 struct RAYX_API DesignSource {
+    
     DesignMap m_elementParameters;
     std::vector<Ray> compile(int thread_count) const;
 
@@ -14,9 +15,9 @@ struct RAYX_API DesignSource {
     glm::dvec4 getStokes() const;
 
     void setName(std::string s);
-    void setType(std::string s);
+    void setType(ElementType s);
     std::string getName() const;
-    std::string getType() const;
+    ElementType getType() const;
 
     void setWidthDist(SourceDist value);
     SourceDist getWidthDist() const;

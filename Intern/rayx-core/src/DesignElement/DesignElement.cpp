@@ -1,6 +1,7 @@
 #include "DesignElement.h"
 
 #include "Debug/Debug.h"
+#include "Beamline/Objects/Objects.h"
 #include "Beamline/Objects/SurfaceType.h"
 #include "Beamline/Objects/BehaviourType.h"
 
@@ -10,14 +11,14 @@ Element DesignElement::compile() const {
     Surface surface;
     Behaviour behav;
 
-    if (getType() == "Experts Optics") {
+    if (getType() == ElementType::ExpertsMirror) {
         return makeElement(*this, serializeMirror(), makeQuadric(*this));
     } else {
         surface = makeSurface(*this);
         behav = makeBehaviour(*this);
-        if (getType() == "Slit") {
+        if (getType() == ElementType::Slit) {
             return makeElement(*this, behav, surface, {}, DesignPlane::XY);
-        } else if (getType() == "ImagePlane") {
+        } else if (getType() == ElementType::ImagePlane) {
             return makeElement(*this, behav, surface, serializeUnlimited(), DesignPlane::XY);
         } else {
             return makeElement(*this, behav, surface);
@@ -26,10 +27,10 @@ Element DesignElement::compile() const {
 }
 
 void DesignElement::setName(std::string s) { m_elementParameters["name"] = s; }
-void DesignElement::setType(std::string s) { m_elementParameters["type"] = s; }
+void DesignElement::setType(ElementType s) { m_elementParameters["type"] = s; }
 
 std::string DesignElement::getName() const { return m_elementParameters["name"].as_string(); }
-std::string DesignElement::getType() const { return m_elementParameters["type"].as_string(); }
+ElementType DesignElement::getType() const { return m_elementParameters["type"].as_elementType(); }
 
 void DesignElement::setWorldPosition(glm::dvec4 p) {
     m_elementParameters["worldPosition"] = Map();

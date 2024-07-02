@@ -29,7 +29,8 @@ enum class ValueType {
     EnergySpreadUnit,
     ElectronEnergyOrientation,
     SigmaType,
-    BehaviourType
+    BehaviourType,
+    ElementType
 };
 
 class Undefined {};
@@ -72,6 +73,7 @@ class DesignMap {
     DesignMap(EnergySpreadUnit x) : m_variant(x) {}
     DesignMap(SigmaType x) : m_variant(x) {}
     DesignMap(BehaviourType x) : m_variant(x) {}
+    DesignMap(ElementType x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -96,32 +98,36 @@ class DesignMap {
     void operator=(ElectronEnergyOrientation x) { m_variant = x; }
     void operator=(SigmaType x) { m_variant = x; }
     void operator=(BehaviourType x) { m_variant = x; }
+    void operator=(ElementType x) { m_variant = x; }
 
     inline ValueType type() const {
-        const ValueType types[] = {ValueType::Undefined,
-                                   ValueType::Double,
-                                   ValueType::Int,
-                                   ValueType::String,
-                                   ValueType::Map,
-                                   ValueType::Dvec4,
-                                   ValueType::Dmat4x4,
-                                   ValueType::Bool,
-                                   ValueType::Rad,
-                                   ValueType::Material,
-                                   ValueType::Misalignment,
-                                   ValueType::CentralBeamstop,
-                                   ValueType::Cutout,
-                                   ValueType::CylinderDirection,
-                                   ValueType::FigureRotation,
-                                   ValueType::CurvatureType,
-                                   ValueType::Surface,
-                                   ValueType::SourceDist,
-                                   ValueType::SpreadType,
-                                   ValueType::EnergyDistributionType,
-                                   ValueType::EnergySpreadUnit,
-                                   ValueType::ElectronEnergyOrientation,
-                                   ValueType::SigmaType,
-                                   ValueType::BehaviourType};
+        const ValueType types[] = {
+            ValueType::Undefined,
+            ValueType::Double,
+            ValueType::Int,
+            ValueType::ElectronEnergyOrientation,
+            ValueType::Dvec4,
+            ValueType::Dmat4x4,
+            ValueType::Bool,
+            ValueType::EnergyDistributionType,
+            ValueType::Misalignment,
+            ValueType::CentralBeamstop,
+            ValueType::Cutout,
+            ValueType::CylinderDirection,
+            ValueType::FigureRotation,
+            ValueType::Map,
+            ValueType::Surface,
+            ValueType::CurvatureType,
+            ValueType::SourceDist,
+            ValueType::SpreadType,
+            ValueType::Rad,
+            ValueType::Material,
+            ValueType::EnergySpreadUnit,
+            ValueType::String,
+            ValueType::SigmaType,
+            ValueType::BehaviourType,
+            ValueType::ElementType,
+        };
         return types[m_variant.index()];
     }
 
@@ -263,6 +269,12 @@ class DesignMap {
         return *x;
     }
 
+    inline ElementType as_elementType() const {
+        auto* x = std::get_if<ElementType>(&m_variant);
+        if (!x) throw std::runtime_error("as_elementType() called on non-elementType!");
+        return *x;
+    }
+
     const DesignMap& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map at: " + s);
@@ -380,9 +392,9 @@ class DesignMap {
     }
 
   private:
-    std::variant<Undefined, double, int, std::string, Map, glm::dvec4, glm::dmat4x4, bool, Rad, Material, Misalignment, CentralBeamstop, Cutout,
-                 CylinderDirection, FigureRotation, CurvatureType, Surface, SourceDist, SpreadType, EnergyDistributionType, EnergySpreadUnit,
-                 ElectronEnergyOrientation, SigmaType, BehaviourType>
+    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
+                 CentralBeamstop, Cutout, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType>
         m_variant;
 };
 }  // namespace RAYX

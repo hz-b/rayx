@@ -4,6 +4,7 @@
 namespace RAYX{
     class LightSource;
     struct DesignSource;
+    enum class ElementType;
 }
 
 // Light Sources
