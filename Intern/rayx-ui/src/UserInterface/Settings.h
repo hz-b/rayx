@@ -6,6 +6,7 @@
 
 #include "Camera.h"
 #include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 
 // TODO: Divide this into passed and returned parameters
 

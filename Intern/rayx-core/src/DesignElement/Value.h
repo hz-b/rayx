@@ -102,13 +102,31 @@ class DesignMap {
 
     inline ValueType type() const {
         const ValueType types[] = {
-            ValueType::Undefined, ValueType::Double,     ValueType::Int,           ValueType::CylinderDirection,
-            ValueType::String,    ValueType::Map,        ValueType::Dvec4,         ValueType::EnergySpreadUnit,
-            ValueType::Rad,       ValueType::Material,   ValueType::Misalignment,  ValueType::CentralBeamStop,
-            ValueType::Cutout,    ValueType::Bool,       ValueType::FigureRotation,ValueType::CurvatureType,
-            ValueType::Surface,   ValueType::SourceDist, ValueType::SpreadType,    ValueType::EnergyDistributionType,
-            ValueType::Dmat4x4,   ValueType::SigmaType,  ValueType::BehaviourType, ValueType::ElectronEnergyOrientation,   
-            ValueType::ElementType,        
+            ValueType::Undefined,
+            ValueType::Double,
+            ValueType::Int,
+            ValueType::ElectronEnergyOrientation,
+            ValueType::Dvec4,
+            ValueType::Dmat4x4,
+            ValueType::Bool,
+            ValueType::EnergyDistributionType,
+            ValueType::Misalignment,
+            ValueType::CentralBeamstop,
+            ValueType::Cutout,
+            ValueType::CylinderDirection,
+            ValueType::FigureRotation,
+            ValueType::Map,
+            ValueType::Surface,
+            ValueType::CurvatureType,
+            ValueType::SourceDist,
+            ValueType::SpreadType,
+            ValueType::Rad,
+            ValueType::Material,
+            ValueType::EnergySpreadUnit,
+            ValueType::String,
+            ValueType::SigmaType,
+            ValueType::BehaviourType,
+            ValueType::ElementType,
         };
         return types[m_variant.index()];
     }
@@ -374,14 +392,9 @@ class DesignMap {
     }
 
   private:
-    std::variant<
-                 Undefined,        double,          int,       ElectronEnergyOrientation,
-                 glm::dvec4,       glm::dmat4x4,    bool,      EnergyDistributionType, 
-                 Misalignment,     CentralBeamstop, Cutout,    CylinderDirection, 
-                 FigureRotation,   Map,             Surface,   CurvatureType,
-                 SourceDist,       SpreadType,      Rad,       Material,
-                 EnergySpreadUnit, std::string,     SigmaType, BehaviourType,
-                 ElementType
-                > m_variant;
+    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
+                 CentralBeamstop, Cutout, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType>
+        m_variant;
 };
 }  // namespace RAYX
