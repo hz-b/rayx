@@ -9,6 +9,9 @@
 
 #include <Debug/Debug.h>
 
+#include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
+
 /**
  * @struct Vertex
  * @brief A structure representing a Vertex in 3D space with additional color information.

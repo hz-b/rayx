@@ -7,12 +7,9 @@
 
 #include <Debug/Debug.h>
 
-SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : m_Device{deviceRef}, m_WindowExtent{extent} { init(); }
-
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
-    : m_Device{deviceRef}, m_WindowExtent{extent}, m_oldSwapChain{std::move(previous)} {
+    : m_Device{deviceRef}, m_WindowExtent{extent}, m_oldSwapChain(std::move(previous)) {
     init();
-    m_oldSwapChain = nullptr;
 }
 
 void SwapChain::init() {
@@ -55,7 +52,7 @@ SwapChain::~SwapChain() {
     }
 }
 
-VkResult SwapChain::acquireNextImage(uint32_t* imageIndex) {
+VkResult SwapChain::acquireNextImage(uint32_t* imageIndex) const {
     vkWaitForFences(m_Device.device(), 1, &m_inFlightFences[m_currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
     VkResult result = vkAcquireNextImageKHR(m_Device.device(), m_SwapChain, std::numeric_limits<uint64_t>::max(),
@@ -337,7 +334,7 @@ void SwapChain::createSyncObjects() {
     }
 }
 
-VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const {
     for (const auto& availableFormat : availableFormats) {
         if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return availableFormat;
@@ -347,7 +344,7 @@ VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
     return availableFormats[0];
 }
 
-VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const {
     for (const auto& availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             RAYX_VERB << "Present mode: Mailbox";
@@ -359,7 +356,7 @@ VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentMod
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const {
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return capabilities.currentExtent;
     } else {

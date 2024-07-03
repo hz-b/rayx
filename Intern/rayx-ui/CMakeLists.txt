@@ -22,9 +22,17 @@ if(Vulkan_FOUND)
     add_executable(${PROJECT_NAME} ${SOURCE} ${IMGUI_SOURCES})
 
     if(MSVC)
-        target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "$<$<CONFIG:RELEASE>:/O2>")
+        target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+        if(WERROR STREQUAL "YES")
+            target_compile_options(${PROJECT_NAME} PRIVATE -WX)
+            message(STATUS "Werror mode")
+        endif()
     else()
-        target_compile_options(${PROJECT_NAME} PRIVATE "-Wall" "-Wextra" "$<$<CONFIG:RELEASE>:-O3>") # "-pedantic"
+        target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+        if(WERROR STREQUAL "YES")
+            target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
+            message(STATUS "Werror mode")
+        endif()
     endif()
 
     target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
@@ -81,8 +89,8 @@ if(Vulkan_FOUND)
     # ----------------------
 
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 nfd Vulkan::Vulkan)
-    target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 Vulkan::Vulkan portable_file_dialogs)
+    target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE 
         ${GLFW_DIR}/include
         ${GLFW_DIR}/deps
         ${IMGUI_DIR}

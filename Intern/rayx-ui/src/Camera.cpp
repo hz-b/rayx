@@ -162,11 +162,13 @@ std::string SerializeCameraController(const CameraController& cam) {
 // Deserialize the CameraController from a string
 void DeserializeCameraController(CameraController& cam, const std::string& data) {
     std::istringstream ss(data);
-    glm::vec3 pos = cam.getPosition();
-    glm::vec3 dir = cam.getDirection();
+    glm::vec3 pos;
+    glm::vec3 dir;
 
     ss >> pos.x >> pos.y >> pos.z;
     ss >> dir.x >> dir.y >> dir.z;
+    cam.setPosition(pos);
+    cam.setDirection(dir);
 }
 
 // Save to file

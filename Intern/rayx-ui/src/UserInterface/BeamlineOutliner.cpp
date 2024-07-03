@@ -121,14 +121,16 @@ void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams, std::ve
                                                  std::vector<glm::dvec3>& rSourcePositions) {
     ImGui::Begin("Beamline Outline");
 
-    if (uiParams.rmlReady) {
+    if (uiParams.rmlPath.empty()) {
+        ImGui::Text("Choose a file to display the beamline outline.");
+    } else if (uiParams.rmlPath != m_currentRML) {
         // Create and render new Tree
         m_lightSourceIndex = 0;
         m_opticalElementIndex = 0;
         renderImGuiTreeFromRML(uiParams.rmlPath, uiParams.camController, elements, rSourcePositions);
+        m_currentRML = uiParams.rmlPath;
     } else if (m_pTreeRoot == nullptr) {
-        // Do nothing
-        ImGui::Text("Choose a file to display the beamline outline.");
+        RAYX_ERR << "Error: Tree root is null.";
     } else {
         // Render same Tree
         renderImGuiTree(*m_pTreeRoot, uiParams.camController, elements, rSourcePositions);

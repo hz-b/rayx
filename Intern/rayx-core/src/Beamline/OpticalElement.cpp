@@ -53,43 +53,6 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
 
 double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
 
-Surface makePlane() {
-    return serializePlaneXZ();
-}
-
-Surface makeSphere(double radius) {
-    return serializeQuadric({
-        .m_icurv = 1,
-        .m_a11 = 1,
-        .m_a12 = 0,
-        .m_a13 = 0,
-        .m_a14 = 0,
-        .m_a22 = 1,
-        .m_a23 = 0,
-        .m_a24 = -radius,
-        .m_a33 = 1,
-        .m_a34 = 0,
-        .m_a44 = 0,
-    });
-}
-
-Surface makeToroid(const DesignElement& dele) {
-    return serializeToroid({
-        .m_longRadius = dele.getLongRadius(),
-        .m_shortRadius = dele.getShortRadius(),
-        .m_toroidType = TOROID_TYPE_CONCAVE,
-    });
-}
-
-Behaviour makeGrating(const DesignElement& dele) {
-    auto vls = dele.getVLSParameters();
-    return serializeGrating({
-        .m_vls = {vls[0], vls[1], vls[2], vls[3], vls[4], vls[5]},
-        .m_lineDensity = dele.getLineDensity(),
-        .m_orderOfDiffraction = dele.getOrderOfDiffraction(),
-    });
-}
-
 
 Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
@@ -112,20 +75,14 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
     };
 }
 
-Element makeExperts(const DesignElement& dele) {
+/*Element makeExperts(const DesignElement& dele) {
     return makeElement(dele, serializeMirror(), makeQuadric(dele));
 }
 
 Element makeExpertsCubic(const DesignElement& dobj) {
     return makeElement(dobj, serializeMirror(), makeCubic(dobj));
-}
+}*/
 
-Surface makeQuadric(const DesignElement& dobj) {
-    return dobj.getExpertsOptics();
-}
 
-Surface makeCubic(const DesignElement& dobj) {
-    return dobj.getExpertsCubic();
-}
 
 }  // namespace RAYX

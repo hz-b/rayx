@@ -76,16 +76,11 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
             rayIndices[i * 2 + 1] = i * 2 + 1;
         }
 
-        if (m_RaysRObject.has_value()) {
-            m_RaysRObject->rebuild(rayVertices, rayIndices);
+        if (!m_RayRObjects.empty()) {
+            m_RayRObjects[0].rebuild(rayVertices, rayIndices);
         } else {
-            m_RaysRObject.emplace(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
+            m_RayRObjects.emplace_back(m_Device, glm::mat4(1.0f), rayVertices, rayIndices, Texture(m_Device), setLayout, descriptorPool);
         }
-    }
-    if (m_State == State::Empty) {
-        m_State = State::BuiltRayRObject;
-    } else {
-        m_State = State::Complete;
     }
 }
 
@@ -101,7 +96,13 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
         std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
 
-        triangulateObject(elements[i], vertices, indices);
+        try {
+            triangulateObject(elements[i], vertices, indices);
+        } catch (const std::exception& ex) {
+            RAYX_WARN << ex.what() << ". Object \"" << elements[i].getName()
+                      << "\" can't be rendered due to triangulation issues. Make sure it is defined correctly in the RML file.";
+            continue;  // Input is not generated --> Object won't be built/rendered
+        }
 
         glm::mat4 modelMatrix = elements[i].compile().m_outTrans;
 
@@ -130,7 +131,7 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
     RAYX_PROFILE_FUNCTION_STDOUT();
-
+    m_ElementRObjects.clear();
     for (const auto& input : inputs) {
         std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
         if (input.textureInput.has_value()) {
@@ -143,11 +144,5 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
             m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, Texture(m_Device), setLayout,
                                            descriptorPool);
         }
-    }
-
-    if (m_State == State::Empty) {
-        m_State = State::BuiltElementRObjs;
-    } else {
-        m_State = State::Complete;
     }
 }

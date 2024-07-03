@@ -125,6 +125,9 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
         auto dims = dataset.getSpace().getDimensions();
         doubles.resize(dims[0] * dims[1]);
         dataset.read(doubles.data());
+        if (doubles.size() == 0) {
+            RAYX_ERR << "No rays found in " << filename;
+        }
         if (startEventID) {
             *startEventID = static_cast<unsigned int>(doubles[1]);
         }

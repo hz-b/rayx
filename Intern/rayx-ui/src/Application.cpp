@@ -58,12 +58,10 @@ void Application::init() {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
     }
-    if (m_CommandParser.m_args.m_verbose) {
-        RAYX::setDebugVerbose(true);
-    }
 
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
     UIRayInfo rayInfo{
+        .raysLoaded = false,     //
         .displayRays = true,     //
         .raysChanged = false,    //
         .cacheChanged = false,   //
@@ -101,10 +99,10 @@ void Application::run() {
     auto textureSetLayout =
         DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
     // Init render systems
-    std::vector<VkDescriptorSetLayout> layouts = {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()};
-    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
-    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), layouts);
-    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), globalSetLayout->getDescriptorSetLayout());
+    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
+    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(),
+                                          {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()});
+    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     std::vector<glm::dvec3> rSourcePositions;
@@ -211,7 +209,12 @@ void Application::run() {
                     if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
                         m_UIParams.rayInfo.raysLoaded = true;
-                        m_State = State::PrepareElements;
+                        if (m_buildElementsNeeded) {
+                            m_State = State::PrepareElements;
+                        } else {
+                            m_State = State::Running;
+                            m_buildElementsNeeded = true;
+                        }
                     }
                     break;
                 case State::PrepareElements:
@@ -241,6 +244,7 @@ void Application::run() {
             if (m_UIParams.rayInfo.raysChanged) {
                 m_State = State::BuildingRays;
                 m_UIParams.rayInfo.raysChanged = false;
+                m_buildElementsNeeded = false;
             }
 
             // Update UBO
@@ -256,19 +260,17 @@ void Application::run() {
                 .commandBuffer = VK_NULL_HANDLE,             //
                 .descriptorSet = descriptorSets[frameIndex]  //
             };
-            if (m_UIParams.sceneExtent.height != 0 && m_UIParams.sceneExtent.width != 0) {
-                if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
-                    m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
-                    sceneExtent = m_UIParams.sceneExtent;
-                    m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
-                }
+            if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
+                m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
+                m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
+                sceneExtent = m_UIParams.sceneExtent;
             }
             m_Renderer.beginOffscreenRenderPass(frameInfo, m_UIHandler.getClearValue());
             if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
                 objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
                 if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
             }
-            gridRenderSystem.render(frameInfo);
+            gridRenderSystem.render(frameInfo, {});
             m_Renderer.endOffscreenRenderPass(frameInfo);
 
             m_Renderer.beginSwapChainRenderPass(commandBuffer);

@@ -17,9 +17,8 @@
 
 void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
     const char* type = parser.type();
-    // TODO add functions for each Element
 
-    if (strcmp(type, "ImagePlane") == 0) {
+    if (strcmp(type, "ImagePlane") == 0) {      
         getImageplane(parser, de);
     } else if (strcmp(type, "Cone") == 0) {
         getCone(parser, de);
@@ -29,8 +28,6 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
         getEllipsoid(parser, de);
     } else if (strcmp(type, "Experts Optics") == 0) {
         getExpertsOptics(parser, de);
-    } else if (strcmp(type, "Experts Cubic") == 0) {
-        getExpertsCubic(parser, de);
     } else if (strcmp(type, "Paraboloid") == 0) {
         getParaboloid(parser, de);
     } else if (strcmp(type, "Plane Grating") == 0) {
@@ -54,6 +51,7 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
     }
 }
 
+
 namespace RAYX {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
@@ -68,10 +66,10 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     RAYX::xml::Parser parser(node, group_context, filename);
     const char* type = parser.type();
     DesignSource ds;
-    ds.v = Map();
+    ds.m_elementParameters = Map();
 
     DesignElement de;
-    de.v = Map();
+    de.m_elementParameters = Map();
 
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
@@ -96,7 +94,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     } else if (strcmp(type, "Simple Undulator") == 0) {
         setSimpleUndulatorSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-        // addLightSource(std::make_shared<SimpleUndulatorSource>(parser), node);
     } else {
         parseElement(parser, &de);
         beamline->m_DesignElements.push_back(de);

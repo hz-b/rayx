@@ -8,7 +8,7 @@
 namespace RAYX {
 
 struct RAYX_API DesignElement {
-    Value v;
+    DesignMap m_elementParameters;
     Element compile() const;
 
     void setName(std::string s);
@@ -75,19 +75,20 @@ struct RAYX_API DesignElement {
     void setTotalWidth(double width);
     double getTotalWidth() const;
 
-
     void setProfileKind(int value);
     int getProfileKind() const;
 
     void setProfileFile(double value);
     double getProfileFile() const;
 
-
     void setTotalLength(double value);
     double getTotalLength() const;
 
     void setGrazingIncAngle(Rad value);
     Rad getGrazingIncAngle() const;
+
+    void setDeviationAngle(Rad value);
+    Rad getDeviationAngle() const;
 
     void setEntranceArmLength(double value);
     double getEntranceArmLength() const;
@@ -101,6 +102,10 @@ struct RAYX_API DesignElement {
     // Setter and Getter for radius
     void setRadius(double value);
     double getRadius() const;
+
+    void setCalcRadius();
+    void setCalcRadiusDeviationAngle();
+
 
     void setDesignGrazingIncAngle(Rad value);
     Rad getDesignGrazingIncAngle() const;
@@ -187,6 +192,10 @@ struct RAYX_API DesignElement {
 
     void setCurvatureType(CurvatureType value);
     CurvatureType getCurvatureType() const;
+
+    void setBehaviourType(BehaviourType value);
+    BehaviourType getBehaviourType() const;
+
     
 };
 }  // namespace RAYX

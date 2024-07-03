@@ -4,9 +4,7 @@ include(CheckLanguage)
 set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 
 add_subdirectory(googletest)
-add_subdirectory(NFD-Extended)
-
-# add_subdirectory(glfw)
+add_subdirectory(portable-file-dialogs)
 
 # CLI11
 set(CLI11_SANITIZERS OFF)

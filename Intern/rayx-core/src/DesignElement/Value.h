@@ -7,11 +7,11 @@
 
 #include <Beamline/LightSource.h>
 #include <Beamline/EnergyDistribution.h>
-#include <Beamline/Objects/Cylinder.h>
 #include <Shader/Common.h>
 #include <Shader/Cutout.h>
 #include <Shader/Surface.h>
 #include <Material/Material.h>
+#include <Debug/Debug.h>
 #include <angle.h>
 
 namespace RAYX {
@@ -39,12 +39,13 @@ enum class ValueType {
     EnergyDistributionType,
     EnergySpreadUnit,
     ElectronEnergyOrientation,
-    SigmaType
+    SigmaType,
+    BehaviourType
 };
 
 class Undefined {};
 
-class Value;
+class DesignMap;
 
 /**
  * This Map is the foundation for the DesignELement ad DesignSource
@@ -52,35 +53,36 @@ class Value;
  * The Value describes the possible Types. It is defined as a shared pointer because of the recursive call.
  * 
 */
-using Map = std::unordered_map<std::string, std::shared_ptr<Value>>;
+using Map = std::unordered_map<std::string, std::shared_ptr<DesignMap>>;
 
 /**
  * To ensure a typesafe Map all possible options are defined in the Value class bellow
 */
-class Value {
+class DesignMap {
   public:
-    Value() : m_variant(Undefined()) {}
-    Value(double x) : m_variant(x) {}
-    Value(int x) : m_variant(x) {}
-    Value(bool x) : m_variant(x) {}
-    Value(std::string x) : m_variant(x) {}
-    Value(Map x) : m_variant(x) {}
-    Value(dvec4 x) : m_variant(x) {}
-    Value(dmat4 x) : m_variant(x) {}
-    Value(Rad x) : m_variant(x) {}
-    Value(Material x) : m_variant(x) {}
-    Value(Misalignment x) : m_variant(x) {}
-    Value(CentralBeamstop x) : m_variant(x) {}
-    Value(Cutout x) : m_variant(x) {}
-    Value(CylinderDirection x) : m_variant(x) {}
-    Value(FigureRotation x) : m_variant(x) {}
-    Value(CurvatureType x) : m_variant(x) {}
-    Value(Surface x) : m_variant(x) {}
-    Value(SourceDist x) : m_variant(x) {}
-    Value(SpreadType x) : m_variant(x) {}
-    Value(EnergyDistributionType x) : m_variant(x) {}
-    Value(EnergySpreadUnit x) : m_variant(x) {}
-    Value(SigmaType x) : m_variant(x) {}
+    DesignMap() : m_variant(Undefined()) {}
+    DesignMap(double x) : m_variant(x) {}
+    DesignMap(int x) : m_variant(x) {}
+    DesignMap(bool x) : m_variant(x) {}
+    DesignMap(std::string x) : m_variant(x) {}
+    DesignMap(Map x) : m_variant(x) {}
+    DesignMap(dvec4 x) : m_variant(x) {}
+    DesignMap(glm::dmat4x4 x) : m_variant(x) {}
+    DesignMap(Rad x) : m_variant(x) {}
+    DesignMap(Material x) : m_variant(x) {}
+    DesignMap(Misalignment x) : m_variant(x) {}
+    DesignMap(CentralBeamstop x) : m_variant(x) {}
+    DesignMap(Cutout x) : m_variant(x) {}
+    DesignMap(CylinderDirection x) : m_variant(x) {}
+    DesignMap(FigureRotation x) : m_variant(x) {}
+    DesignMap(CurvatureType x) : m_variant(x) {}
+    DesignMap(Surface x) : m_variant(x) {}
+    DesignMap(SourceDist x) : m_variant(x) {}
+    DesignMap(SpreadType x) : m_variant(x) {}
+    DesignMap(EnergyDistributionType x) : m_variant(x) {}
+    DesignMap(EnergySpreadUnit x) : m_variant(x) {}
+    DesignMap(SigmaType x) : m_variant(x) {}
+    DesignMap(BehaviourType x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -104,6 +106,7 @@ class Value {
     void operator=(EnergySpreadUnit x) { m_variant = x; }
     void operator=(ElectronEnergyOrientation x) { m_variant = x; }
     void operator=(SigmaType x) { m_variant = x; }
+    void operator=(BehaviourType x) { m_variant = x; }
 
 
 
@@ -114,7 +117,7 @@ class Value {
             ValueType::Rad,       ValueType::Material,   ValueType::Misalignment,  ValueType::CentralBeamStop,
             ValueType::Cutout,    ValueType::Bool,       ValueType::FigureRotation,ValueType::CurvatureType,
             ValueType::Surface,   ValueType::SourceDist, ValueType::SpreadType,    ValueType::EnergyDistributionType,
-            ValueType::Dmat4x4,   ValueType::SigmaType,  ValueType::ElectronEnergyOrientation           
+            ValueType::Dmat4x4,   ValueType::SigmaType,  ValueType::BehaviourType, ValueType::ElectronEnergyOrientation,           
         };
         return types[m_variant.index()];
     }
@@ -251,33 +254,48 @@ class Value {
         return *x;
     }
 
-    const Value& operator[](std::string s) const {
-        const Map* m = std::get_if<Map>(&m_variant);
-        if (!m) throw std::runtime_error("Indexing into non-map!");
-
-        return *m->at(s).get();  // TODO return undefined on missing
+    inline BehaviourType as_behaviourType() const {
+        auto* x = std::get_if<BehaviourType>(&m_variant);
+        if (!x) throw std::runtime_error("as_behaviourType() called on non-behaviourType!");
+        return *x;
     }
 
-    Value& operator[](std::string s) {
+    const DesignMap& operator[](std::string s) const {
+        const Map* m = std::get_if<Map>(&m_variant);
+        if (!m) throw std::runtime_error("Indexing into non-map at: " + s);
+        try
+        {
+            auto x = *m->at(s).get();
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            RAYX_LOG << "Indexing into non-map at: " << s ;
+        }
+    
+        return *m->at(s).get();
+    }
+
+    DesignMap& operator[](std::string s) {
         Map* m = std::get_if<Map>(&m_variant);
         if (!m) {
             throw std::runtime_error("Indexing into non-map!");
         }
 
         if (!m->contains(s)){
-            (*m)[s] = std::make_shared<Value>();
+            (*m)[s] = std::make_shared<DesignMap>();
         }
-        return *((*m)[s].get());
+        return *((*m)[s].get()); 
     }
 
   private:
     std::variant<
-                 Undefined,        double,          int,     ElectronEnergyOrientation,
-                 glm::dvec4,       dmat4,           bool,    EnergyDistributionType, 
-                 Misalignment,     CentralBeamstop, Cutout,  CylinderDirection, 
-                 FigureRotation,   Map,             Surface, CurvatureType,
-                 SourceDist,       SpreadType,      Rad,     Material,
-                 EnergySpreadUnit, std::string,     SigmaType
+                 Undefined,        double,          int,       ElectronEnergyOrientation,
+                 glm::dvec4,       glm::dmat4x4,    bool,      EnergyDistributionType, 
+                 Misalignment,     CentralBeamstop, Cutout,    CylinderDirection, 
+                 FigureRotation,   Map,             Surface,   CurvatureType,
+                 SourceDist,       SpreadType,      Rad,       Material,
+                 EnergySpreadUnit, std::string,     SigmaType, BehaviourType
                 > m_variant;
 };
 }  // namespace RAYX

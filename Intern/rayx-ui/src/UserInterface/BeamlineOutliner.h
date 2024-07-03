@@ -31,6 +31,7 @@ class BeamlineOutliner {
 
     int m_lightSourceIndex = 0;
     int m_opticalElementIndex = 0;
+    std::filesystem::path m_currentRML;
 
     void renderImGuiTree(const TreeNode& treeNode, CameraController& camController, std::vector<RAYX::DesignElement>& rObjects,
                          std::vector<glm::dvec3>& rSourcePositions) const;

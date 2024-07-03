@@ -19,12 +19,12 @@
 [submodule "Extern/glfw"]
 	path = Extern/glfw
 	url = https://github.com/glfw/glfw
-[submodule "Extern/NFD-Extended"]
-	path = Extern/NFD-Extended
-	url = https://github.com/btzy/nativefiledialog-extended
 [submodule "Extern/stb"]
 	path = Extern/stb
 	url = https://github.com/nothings/stb
 [submodule "Extern/alpaka"]
 	path = Extern/alpaka
 	url = https://github.com/alpaka-group/alpaka.git
+[submodule "Extern/portable-file-dialogs"]
+	path = Extern/portable-file-dialogs
+	url = https://github.com/samhocevar/portable-file-dialogs.git

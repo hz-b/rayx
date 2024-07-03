@@ -21,6 +21,8 @@ const bool enableValidationLayers = true;
 class Window;
 class Device;
 class RenderObject;
+struct DesignElement;
+struct DesignSource;
 
 class Application {
   public:
@@ -73,6 +75,7 @@ class Application {
     std::filesystem::path m_RMLPath;             ///< Path to the RML file
     std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
     RAYX::BundleHistory m_rays;                  ///< Ray cache
+    bool m_buildElementsNeeded = true;
 
     void init();
 

@@ -106,10 +106,4 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
     return rayList;
 }
 
-//double PointSource::getHorDivergence() const { return m_horDivergence; }
-
-//double PointSource::getSourceHeight() const { return m_sourceHeight; }
-
-//double PointSource::getSourceWidth() const { return m_sourceWidth; }
-
 }  // namespace RAYX

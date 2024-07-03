@@ -23,6 +23,7 @@ namespace RAYX {
 class EnergyDistribution;
 enum class CentralBeamstop;
 enum class CurvatureType;
+enum class BehaviourType;
 enum class CylinderDirection;
 enum class FigureRotation;
 enum class GratingMount;
@@ -133,6 +134,7 @@ struct RAYX_API Parser {
     inline double parseTotalLength() const { return parseDouble("totalLength"); }
     inline double parseTotalHeight() const { return parseDouble("totalHeight"); }
     inline Rad parseGrazingIncAngle() const { return Deg(parseDouble("grazingIncAngle")).toRad(); }
+    inline Rad parseDeviationAngle() const { return Deg(parseDouble("deviationAngle")).toRad(); }
     inline double parseArmLength() const { return parseDouble("armLength"); }
     inline double parseEntranceArmLength() const { return parseDouble("entranceArmLength"); }
     inline double parseExitArmLength() const { return parseDouble("exitArmLength"); }

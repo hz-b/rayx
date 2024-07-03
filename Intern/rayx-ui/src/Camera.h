@@ -36,6 +36,8 @@ class CameraController {
     void setCameraMode(CameraMode mode);
     glm::vec3 getPosition() const { return m_position; }
     glm::vec3 getDirection() const { return m_direction; }
+    void setPosition(const glm::vec3& pos) { m_position = pos; }
+    void setDirection(const glm::vec3& dir) { m_direction = dir; }
 
   private:
     glm::vec3 m_position;

@@ -11,8 +11,8 @@ struct PipelineConfigInfo {
     PipelineConfigInfo(const PipelineConfigInfo&) = delete;
     PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
-    std::vector<VkVertexInputBindingDescription> bindingDescriptions{};
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
+    std::vector<VkVertexInputBindingDescription> bindingDescriptions{};      // Not set in default config
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};  // Not set in default config
     VkPipelineViewportStateCreateInfo viewportInfo;
     VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
     VkPipelineRasterizationStateCreateInfo rasterizationInfo;
@@ -23,11 +23,11 @@ struct PipelineConfigInfo {
     std::vector<VkDynamicState> dynamicStateEnables;
     VkPipelineDynamicStateCreateInfo dynamicStateInfo;
 
-    VkPipelineLayout pipelineLayout = nullptr;
-    VkRenderPass renderPass = nullptr;
-    VkPrimitiveTopology topology;
-    VkPolygonMode polygonMode;
-    uint32_t subpass = 0;
+    VkPipelineLayout pipelineLayout = nullptr;                      // Not set in default config
+    VkRenderPass renderPass = nullptr;                              // Not set in default config
+    VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;  // Not set in default config
+    VkPolygonMode polygonMode = VK_POLYGON_MODE_MAX_ENUM;           // Not set in default config
+    uint32_t subpass = 0;                                           // Not set in default config
 };
 
 /**
@@ -37,7 +37,6 @@ struct PipelineConfigInfo {
  */
 class GraphicsPipeline {
   public:
-    enum class VertexMode { COLORED, TEXTURED };
     GraphicsPipeline(Device& device, const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& createInfo);
     ~GraphicsPipeline();
 
@@ -51,7 +50,7 @@ class GraphicsPipeline {
      *
      * @param configInfo The configuration information to be filled with default values.
      */
-    static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, VertexMode vertexMode = VertexMode::TEXTURED);
+    static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
     VkPipeline getHandle() const { return m_Pipeline; }
 
   private:
