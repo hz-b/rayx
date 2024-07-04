@@ -72,13 +72,14 @@ class Application {
     UIParameters m_UIParams;           ///< UI parameters
     UIHandler m_UIHandler;             ///< UI render system
 
-    std::filesystem::path m_RMLPath;             ///< Path to the RML file
-    std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
-    RAYX::BundleHistory m_rays;                  ///< Ray cache
+    std::filesystem::path m_RMLPath;                   ///< Path to the RML file
+    std::unique_ptr<RAYX::Beamline> m_Beamline;        ///< Beamline
+    RAYX::BundleHistory m_rays;                        ///< All rays
+    std::vector<std::vector<RAYX::Ray>> m_sortedRays;  // rays sorted by element
     bool m_buildElementsNeeded = true;
 
     void init();
 
-    void loadRays(const std::filesystem::path& rmlPath);
+    void loadRays(const std::filesystem::path& rmlPath, const int numElements);
     void loadBeamline(const std::filesystem::path& rmlPath);
 };

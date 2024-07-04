@@ -165,7 +165,7 @@ void Application::run() {
                             m_UIParams.beamlineInfo.selectedType = SelectedType::None;
                         }
                         if (m_UIParams.h5Ready) {
-                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
+                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->m_DesignElements.size());
                             m_State = State::LoadingRays;
                         } else {
                             m_State = State::PrepareElements;
@@ -181,7 +181,7 @@ void Application::run() {
 
                 case State::Simulating:
                     if (simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
+                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->m_DesignElements.size());
                         m_State = State::LoadingRays;
                     }
                     break;
@@ -233,7 +233,7 @@ void Application::run() {
                     break;
                 case State::PrepareElements:
                     getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
-                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_rays));
+                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays));
                     m_State = State::BuildingElements;
                     break;
                 case State::BuildingElements:
@@ -307,7 +307,7 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::loadRays(const std::filesystem::path& rmlPath) {
+void Application::loadRays(const std::filesystem::path& rmlPath, const int numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
@@ -317,6 +317,7 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
     m_rays = loadCSV(rayFilePath);
 #endif
+    sortRaysByElement(m_rays, m_sortedRays, numElements);
 }
 
 void Application::loadBeamline(const std::filesystem::path& rmlPath) {
