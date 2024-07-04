@@ -14,7 +14,7 @@ enum class ElementType {
     ParaboloidMirror,
     PlaneGrating,
     PlaneMirror,
-    ReflectionZoneplante,
+    ReflectionZoneplate,
     Slit,
     SphereGrating,
     Sphere,

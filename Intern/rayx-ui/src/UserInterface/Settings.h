@@ -48,12 +48,13 @@ struct UISimulationInfo {
           seed(seed) {}
 };
 
+enum class SelectedType { None = -1, LightSource = 0, OpticalElement = 1, Group = 2 };
 struct UIBeamlineInfo {
     std::vector<glm::dvec3> rSourcePositions;
     std::vector<RAYX::DesignElement> elements;
     std::vector<RAYX::DesignSource> sources;
-    int selectedType;  // 0 = Light Source, 1 = Optical Element, 2 = Group
-    int selectedIndex;
+    SelectedType selectedType = SelectedType::None;
+    int selectedIndex = -1;
     bool elementsChanged = false;
 };
 struct UIParameters {
@@ -91,7 +92,7 @@ struct UIParameters {
               availableDevices,
               0,
           }),
-          beamlineInfo({std::vector<glm::dvec3>(), std::vector<RAYX::DesignElement>(), std::vector<RAYX::DesignSource>(), -1, -1, false}) {}
+          beamlineInfo() {}
 
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;

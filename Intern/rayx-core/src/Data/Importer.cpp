@@ -14,12 +14,10 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 
-
-
 void parseElement(xml::Parser parser, DesignElement* de) {
     ElementType type = parser.type();
 
-    if (type == ElementType::ImagePlane) {      
+    if (type == ElementType::ImagePlane) {
         getImageplane(parser, de);
     } else if (type == ElementType::ConeMirror) {
         getCone(parser, de);
@@ -35,7 +33,7 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         getPlaneGrating(parser, de);
     } else if (type == ElementType::PlaneMirror) {
         getPlaneMirror(parser, de);
-    } else if (type == ElementType::ReflectionZoneplante) {
+    } else if (type == ElementType::ReflectionZoneplate) {
         getRZP(parser, de);
     } else if (type == ElementType::Slit) {
         getSlit(parser, de);
@@ -48,10 +46,10 @@ void parseElement(xml::Parser parser, DesignElement* de) {
     } else if (type == ElementType::ToroidMirror) {
         getToroidMirror(parser, de);
     } else {
-        RAYX_LOG << "could not classify beamline object with Name: " << parser.name() << "; Type: " << int(parser.type()); //TODO: write type as string not enum id
+        RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
+                 << "; Type: " << int(parser.type());  // TODO: write type as string not enum id
     }
 }
-
 
 namespace RAYX {
 

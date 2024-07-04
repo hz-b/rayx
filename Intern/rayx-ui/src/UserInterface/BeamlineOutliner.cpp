@@ -4,6 +4,8 @@
 
 #include <fstream>
 
+#include "Shader/Strings.h"
+
 BeamlineOutliner::BeamlineOutliner(/* args */) {}
 
 BeamlineOutliner::~BeamlineOutliner() {}
@@ -17,9 +19,10 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
             nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         }
 
-        bool isSelected = (beamlineInfo.selectedIndex == child.index) && ((beamlineInfo.selectedType == 0 && child.category == "Light Source") ||
-                                                                          (beamlineInfo.selectedType == 1 && child.category == "Optical Element") ||
-                                                                          (beamlineInfo.selectedType == 2 && !child.children.empty()));
+        bool isSelected = (beamlineInfo.selectedIndex == child.index) &&
+                          ((beamlineInfo.selectedType == SelectedType::LightSource && child.category == SelectedType::LightSource) ||
+                           (beamlineInfo.selectedType == SelectedType::OpticalElement && child.category == SelectedType::OpticalElement) ||
+                           (beamlineInfo.selectedType == SelectedType::Group && !child.children.empty()));
 
         if (isSelected) {
             nodeFlags |= ImGuiTreeNodeFlags_Selected;
@@ -32,11 +35,12 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
         std::string buttonId = "<--##" + child.name + std::to_string(child.index);
 
         if (ImGui::Button(buttonId.c_str())) {
-            if (child.category == "Optical Element" && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
+            if (child.category == SelectedType::OpticalElement && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
                 glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
                                             elements[child.index].compile().m_outTrans[3][2]};
                 camController.lookAtPoint(translationVec);
-            } else if (child.category == "Light Source" && child.index >= 0 && static_cast<size_t>(child.index) < rSourcePositions.size()) {
+            } else if (child.category == SelectedType::LightSource && child.index >= 0 &&
+                       static_cast<size_t>(child.index) < rSourcePositions.size()) {
                 camController.lookAtPoint(rSourcePositions[child.index]);
             }
         }
@@ -53,12 +57,12 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
             RAYX_VERB << "Selected object: " << child.name << " with index " << child.index;
 
-            if (child.category == "Light Source") {
-                beamlineInfo.selectedType = 0;
-            } else if (child.category == "Optical Element") {
-                beamlineInfo.selectedType = 1;
+            if (child.category == SelectedType::LightSource) {
+                beamlineInfo.selectedType = SelectedType::LightSource;
+            } else if (child.category == SelectedType::OpticalElement) {
+                beamlineInfo.selectedType = SelectedType::OpticalElement;
             } else {
-                beamlineInfo.selectedType = 2;
+                beamlineInfo.selectedType = SelectedType::Group;
             }
             beamlineInfo.selectedIndex = child.index;
         }
@@ -74,28 +78,52 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
     for (rapidxml::xml_node<>* xmlChild = node->first_node(); xmlChild; xmlChild = xmlChild->next_sibling()) {
         rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
         std::string type = typeAttr ? typeAttr->value() : "";
-        std::string category;
+        SelectedType category = SelectedType::None;
+        ElementType elementType = findElementString(type);
 
         if (strcmp(xmlChild->name(), "object") == 0) {
-            if (type == "Point Source" || type == "Matrix Source" || type == "Dipole" || type == "Dipole Source" || type == "Pixel Source" ||
-                type == "Circle Source" || type == "Simple Undulator") {
-                category = "Light Source";
-                TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
-                objectNode.index = m_lightSourceIndex++;
-                treeNode.children.emplace_back(objectNode);
-            } else if (type == "ImagePlane" || type == "Plane Mirror" || type == "Toroid" || type == "Slit" || type == "Spherical Grating" ||
-                       type == "Plane Grating" || type == "Sphere" || type == "Reflection Zoneplate" || type == "Ellipsoid" || type == "Cylinder" ||
-                       type == "Cone" || type == "Paraboloid" || type == "Spherical Mirror" || type == "Experts Optics") {
-                category = "Optical Element";
-                TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
-                objectNode.index = m_opticalElementIndex++;
-                treeNode.children.emplace_back(objectNode);
-            } else {
-                TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
-                treeNode.children.emplace_back(objectNode);
+            switch (elementType) {
+                case ElementType::PointSource:
+                case ElementType::MatrixSource:
+                case ElementType::DipoleSrc:
+                case ElementType::DipoleSource:
+                case ElementType::PixelSource:
+                case ElementType::CircleSource:
+                case ElementType::SimpleUndulatorSource:
+                    category = SelectedType::LightSource;
+                    break;
+                case ElementType::ImagePlane:
+                case ElementType::PlaneMirror:
+                case ElementType::ToroidMirror:
+                case ElementType::Slit:
+                case ElementType::SphereGrating:
+                case ElementType::PlaneGrating:
+                case ElementType::Sphere:
+                case ElementType::ReflectionZoneplate:
+                case ElementType::EllipsoidMirror:
+                case ElementType::CylinderMirror:
+                case ElementType::ConeMirror:
+                case ElementType::ParaboloidMirror:
+                case ElementType::SphereMirror:
+                case ElementType::ExpertsMirror:
+                    category = SelectedType::OpticalElement;
+                    break;
+                default:
+                    category = SelectedType::None;
+                    break;
             }
+
+            TreeNode objectNode(xmlChild->first_attribute("name")->value(), type, category);
+
+            if (category == SelectedType::LightSource) {
+                objectNode.index = m_lightSourceIndex++;
+            } else if (category == SelectedType::OpticalElement) {
+                objectNode.index = m_opticalElementIndex++;
+            }
+
+            treeNode.children.emplace_back(objectNode);
         } else if (strcmp(xmlChild->name(), "group") == 0) {
-            category = "Group";
+            category = SelectedType::Group;
             TreeNode groupNode(xmlChild->first_attribute("name")->value(), "", category);
             buildTreeFromXMLNode(xmlChild, groupNode);
             treeNode.children.push_back(groupNode);

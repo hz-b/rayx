@@ -9,7 +9,7 @@ std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSourc
                                                        {ElementType::ParaboloidMirror, "Paraboloid"},
                                                        {ElementType::PlaneGrating, "Plane Grating"},
                                                        {ElementType::PointSource, "Point Source"},
-                                                       {ElementType::ReflectionZoneplante, "Reflection Zoneplate"},
+                                                       {ElementType::ReflectionZoneplate, "Reflection Zoneplate"},
                                                        {ElementType::SimpleUndulatorSource, "Simple Undulator"},
                                                        {ElementType::Slit, "Slit"},
                                                        {ElementType::Sphere, "Sphere"},

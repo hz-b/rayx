@@ -8,13 +8,13 @@ class BeamlineDesignHandler {
     void showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo);
 
   private:
-    void showParameters(DesignMap& parameters, bool& changed, uint32_t type);
-    void createInputField(const std::string& key, DesignMap& element, bool& changed, uint32_t type, int nestingLevel);
+    void showParameters(RAYX::DesignMap& parameters, bool& changed, SelectedType type);
+    void createInputField(const std::string& key, RAYX::DesignMap& element, bool& changed, SelectedType type, int nestingLevel);
 
     bool caseInsensitiveCompare(const std::string& a, const std::string& b);
 
     // Define groups
-    std::map<std::string, std::vector<std::string>> groups = {
+    const std::map<std::string, const std::vector<std::string>> groups = {
         {"Position",
          {"worldPosition", "alignmentError", "sourceDepth", "sourceHeight", "sourceWidth", "sourcePulseType", "positionType", "heightDist",
           "widthDist", "sigmaType", "electronSigmaX", "electronSigmaY", "undulatorLength", "electronEnergy", "bendingRadius",
@@ -42,40 +42,40 @@ class BeamlineDesignHandler {
                      "parameter_P",      "parameter_P_type", "entranceArmLength", "exitArmLength",  "designGrazingIncAngle",
                      "figureRotation",   "longHalfAxisA",    "shortHalfAxisB",    "longRadius"}}};
 
-    std::vector<std::string> customOrder = {"type",
-                                            "name",
-                                            "numberOfRays",
-                                            "translationXerror",
-                                            "translationYerror",
-                                            "translationZerror",
-                                            "rotationXerror",
-                                            "rotationYerror",
-                                            "rotationZerror",
-                                            "energy",
-                                            "energySpread",
-                                            "energyDistribution",
-                                            "photonEnergyDistributionFile",
-                                            "energyDistributionType",
-                                            "SeparateEnergies",
-                                            "worldPosition",
-                                            "geometricalShape",
-                                            "totalLength",
-                                            "curvatureType",
-                                            "radius",
-                                            "behaviourType",
-                                            "Material",
-                                            "CutoutWidth",
-                                            "CutoutLength",
-                                            "undulatorLength",
-                                            "sigmaType",
-                                            "electronSigmaX",
-                                            "electronSigmaY",
-                                            "centralBeamstop",
-                                            "stopHeight",
-                                            "stopWidth",
-                                            "totalHeight",
-                                            "totalWidth",
-                                            "openingShape",
-                                            "openingHeight",
-                                            "openingWidth"};
+    const std::vector<std::string> customOrder = {"type",
+                                                  "name",
+                                                  "numberOfRays",
+                                                  "translationXerror",
+                                                  "translationYerror",
+                                                  "translationZerror",
+                                                  "rotationXerror",
+                                                  "rotationYerror",
+                                                  "rotationZerror",
+                                                  "energy",
+                                                  "energySpread",
+                                                  "energyDistribution",
+                                                  "photonEnergyDistributionFile",
+                                                  "energyDistributionType",
+                                                  "SeparateEnergies",
+                                                  "worldPosition",
+                                                  "geometricalShape",
+                                                  "totalLength",
+                                                  "curvatureType",
+                                                  "radius",
+                                                  "behaviourType",
+                                                  "Material",
+                                                  "CutoutWidth",
+                                                  "CutoutLength",
+                                                  "undulatorLength",
+                                                  "sigmaType",
+                                                  "electronSigmaX",
+                                                  "electronSigmaY",
+                                                  "centralBeamstop",
+                                                  "stopHeight",
+                                                  "stopWidth",
+                                                  "totalHeight",
+                                                  "totalWidth",
+                                                  "openingShape",
+                                                  "openingHeight",
+                                                  "openingWidth"};
 };
