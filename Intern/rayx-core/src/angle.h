@@ -12,7 +12,7 @@ namespace RAYX {
 struct Rad;
 
 // an angle in degrees.
-struct Deg {
+struct RAYX_API Deg {
     Deg() = default;
     Deg(double d) : deg(d) {}
 
@@ -22,7 +22,7 @@ struct Deg {
 };
 
 // an angle in radians
-struct Rad {
+struct RAYX_API Rad {
     Rad() = default;
     Rad(double r) : rad(r) {}
 
