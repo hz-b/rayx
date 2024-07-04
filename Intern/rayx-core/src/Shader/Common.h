@@ -25,6 +25,7 @@ using glm::dmat4;
 using glm::length;
 using glm::mod;
 using glm::sign;
+using glm::abs;
 
 using uint = unsigned int;
 
