@@ -40,6 +40,7 @@ jobs:
         with:
             boost_version: 1.84.0
             boost_install_dir: ${{github.workspace}}/boost
+            platform_version: 2019
             toolset: msvc
 
       - name: Add Boost to PATH
