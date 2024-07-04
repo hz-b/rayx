@@ -1,16 +1,16 @@
 #include "UIHandler.h"
 
 #undef APIENTRY
-#include <portable-file-dialogs.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 #include <imgui_internal.h>
+#include <portable-file-dialogs.h>
 
 #include <fstream>
 #include <rapidxml.hpp>
 
-#include "Colors.h"
 #include "CanonicalizePath.h"
+#include "Colors.h"
 #include "Debug/Instrumentor.h"
 #include "RayProcessing.h"
 
@@ -288,6 +288,7 @@ void UIHandler::setupUI(UIParameters& uiParams) {
     m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams);
     showHotkeysWindow();
     ImGui::End();
+    ImGui::End();
 
     // setting focus to the beamline outline window
     static bool first_time = true;
@@ -361,9 +362,6 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     ImGui::Separator();
 
     m_BeamlineDesignHandler.showBeamlineDesignWindow(uiParams.beamlineInfo);
-
-    ImGui::End();
-
     ImGui::End();
 }
 

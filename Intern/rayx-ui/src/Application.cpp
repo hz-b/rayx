@@ -156,13 +156,13 @@ void Application::run() {
                             m_UIParams.beamlineInfo.rSourcePositions.push_back(source.getWorldPosition());
                         }
                         if (m_UIParams.beamlineInfo.sources.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = 0;
+                            m_UIParams.beamlineInfo.selectedType = SelectedType::LightSource;
                             m_UIParams.beamlineInfo.selectedIndex = 0;
                         } else if (m_UIParams.beamlineInfo.elements.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = 1;
+                            m_UIParams.beamlineInfo.selectedType = SelectedType::OpticalElement;
                             m_UIParams.beamlineInfo.selectedIndex = 0;
                         } else {
-                            m_UIParams.beamlineInfo.selectedType = -1;
+                            m_UIParams.beamlineInfo.selectedType = SelectedType::None;
                         }
                         if (m_UIParams.h5Ready) {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
