@@ -12,11 +12,12 @@
 struct TreeNode {
     std::string name;
     std::string type;
-    std::string category;  // Add this field for category
+    SelectedType category = SelectedType::None;
     int index = -1;
     std::vector<TreeNode> children;
 
-    TreeNode(const std::string& name, const std::string& type = "", const std::string& category = "") : name(name), type(type), category(category) {}
+    TreeNode(const std::string& name, const std::string& type = "", SelectedType category = SelectedType::None)
+        : name(name), type(type), category(category) {}
 };
 
 class BeamlineOutliner {

@@ -15,18 +15,29 @@
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    if (uiBeamlineInfo.selectedType == 0) {  // source
-        auto sourceParameters = uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex].m_elementParameters;
-        showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
-    } else if (uiBeamlineInfo.selectedType == 1) {  // element
-        auto elementParameters = uiBeamlineInfo.elements[uiBeamlineInfo.selectedIndex].m_elementParameters;
-        showParameters(elementParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
-    } else if (uiBeamlineInfo.selectedType == 2) {  // group
+
+    if (uiBeamlineInfo.selectedType == SelectedType::LightSource) {  // source
+        if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.sources.size())) {
+            auto sourceParameters = uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex].m_elementParameters;
+            showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
+        } else {
+            // Handle out-of-bounds access for sources
+            RAYX_ERR << "Error: selectedIndex is out of bounds for sources.";
+        }
+    } else if (uiBeamlineInfo.selectedType == SelectedType::OpticalElement) {  // element
+        if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.elements.size())) {
+            auto elementParameters = uiBeamlineInfo.elements[uiBeamlineInfo.selectedIndex].m_elementParameters;
+            showParameters(elementParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
+        } else {
+            // Handle out-of-bounds access for elements
+            RAYX_ERR << "Error: selectedIndex is out of bounds for elements.";
+        }
+    } else if (uiBeamlineInfo.selectedType == SelectedType::Group) {  // group
         // Handle group if needed
     }
 }
 
-void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& changed, uint32_t type) {
+void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& changed, SelectedType type) {
     // Collect existing members of each group
     std::map<std::string, std::vector<std::string>> existingGroups;
     std::vector<std::string> nonGroupedKeys;
@@ -106,7 +117,8 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     }
 }
 
-void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::DesignMap& element, bool& changed, uint32_t type, int nestingLevel = 0) {
+void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::DesignMap& element, bool& changed, SelectedType type,
+                                             int nestingLevel = 0) {
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 
     // Calculate widths for consistent layout
