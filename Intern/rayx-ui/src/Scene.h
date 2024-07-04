@@ -27,7 +27,10 @@ class Scene {
     void buildRayCache(UIRayInfo& rayInfo, const RAYX::BundleHistory& rays);
     void buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo, std::shared_ptr<DescriptorSetLayout> setLayout,
                           std::shared_ptr<DescriptorPool> descriptorPool);
-    std::vector<RenderObjectInput> getRObjectInputs(const std::vector<RAYX::DesignElement> elements, const RAYX::BundleHistory& rays) const;
+
+    std::vector<Scene::RenderObjectInput> getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
+                                                           const std::vector<std::vector<RAYX::Ray>> sortedRays) const;
+
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
                                 std::shared_ptr<DescriptorPool> descriptorPool);
 

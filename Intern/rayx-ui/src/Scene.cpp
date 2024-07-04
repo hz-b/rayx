@@ -88,11 +88,8 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
 }
 
 std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
-                                                              const RAYX::BundleHistory& rays) const {
+                                                              const std::vector<std::vector<RAYX::Ray>> sortedRays) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
-
-    std::vector<std::vector<RAYX::Ray>> sortedRays;
-    sortRaysByElement(rays, sortedRays, elements.size());
 
     std::vector<RenderObjectInput> rObjectsInput;
     for (uint32_t i = 0; i < elements.size(); i++) {
