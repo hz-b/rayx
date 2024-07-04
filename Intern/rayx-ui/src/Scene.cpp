@@ -96,21 +96,22 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
 
     std::vector<RenderObjectInput> rObjectsInput;
     for (uint32_t i = 0; i < elements.size(); i++) {
+        auto compiled = elements[i].compile();
         std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
 
         try {
-            triangulateObject(elements[i], vertices, indices);
+            triangulateObject(compiled, vertices, indices);
         } catch (const std::exception& ex) {
             RAYX_WARN << ex.what() << ". Object \"" << elements[i].getName()
                       << "\" can't be rendered due to triangulation issues. Make sure it is defined correctly in the RML file.";
             continue;  // Input is not generated --> Object won't be built/rendered
         }
 
-        glm::mat4 modelMatrix = elements[i].compile().m_outTrans;
+        glm::mat4 modelMatrix = compiled.m_outTrans;
 
         if (vertices.size() == 4) {
-            auto [width, height] = getRectangularDimensions(elements[i].compile().m_cutout);
+            auto [width, height] = getRectangularDimensions(compiled.m_cutout);
 
             std::vector<std::vector<uint32_t>> footprint =
                 makeFootprint(sortedRays[i], -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));

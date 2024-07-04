@@ -65,12 +65,22 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
                           uint32_t amountOfRays, int startEventID) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
     amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
     size_t maxRayIndex = rayCache.size();
+    int counter = 0;
+
+    // compile all elements
+    std::vector<Element> compiledElements;
+    for (const auto& element : beamline.m_DesignElements) {
+        compiledElements.push_back(element.compile());
+        counter++;
+    }
+
     for (size_t i : rayIndices) {
         if (i >= maxRayIndex) {
             RAYX_VERB << "Ray index out of bounds: " << i;
@@ -89,9 +99,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             if (event.m_lastElement >= beamline.m_DesignElements.size()) {
                 RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
-            glm::vec4 worldPos =
-                beamline.m_DesignElements[static_cast<size_t>(event.m_lastElement)].compile().m_outTrans * glm::vec4(event.m_position, 1.0f);
-
+            glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);
             glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;
 
@@ -107,7 +115,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             isFirstEvent = false;   // Update the flag after the first iteration
         }
     }
-
+    RAYX_LOG << "Number of compile() calls: " << counter;
     return rays;
 }
 void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {
