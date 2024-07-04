@@ -30,6 +30,7 @@ ElementType findElementString(const std::string& name) {
     if (it != ElementStringMap.end()) {
         return it->first;
     } else {
+        RAYX_LOG << "Could not find element with name: " << name;
         RAYX_ERR << "Error in findElementString(const std::string&): Element not found";
         return ElementType::ImagePlane;  // or some other default/fallback value
     }
