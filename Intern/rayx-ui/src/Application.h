@@ -77,6 +77,7 @@ class Application {
     RAYX::BundleHistory m_rays;                        ///< All rays
     std::vector<std::vector<RAYX::Ray>> m_sortedRays;  // rays sorted by element
     bool m_buildElementsNeeded = true;
+    bool m_buildTextureNeeded = true;
 
     void init();
 

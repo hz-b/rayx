@@ -121,6 +121,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
 void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
+    sortedRays.clear();
+    sortedRays.resize(numElements);
     // Iterate over all rays in the bundle history
     for (const auto& rayBundle : rays) {
         for (const auto& ray : rayBundle) {

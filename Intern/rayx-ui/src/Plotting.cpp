@@ -106,7 +106,7 @@ std::unique_ptr<unsigned char[]> footprintAsImage(const std::vector<std::vector<
 
         for (uint32_t y = 0; y < height; ++y) {
             for (uint32_t x = 0; x < width; ++x) {
-                int index = std::min(static_cast<int>(footprint[x][height - 1 - y]), LUT_SIZE - 1);
+                int index = std::min(static_cast<int>(footprint[x][y]), LUT_SIZE - 1);  // Correct indexing for flipping
                 memcpy(&data[(y * width + x) * channels], &colorLUT[index], 4);
             }
         }
