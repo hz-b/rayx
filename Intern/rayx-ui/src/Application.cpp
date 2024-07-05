@@ -147,6 +147,7 @@ void Application::run() {
                     if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         // reset rays
                         m_rays.clear();
+                        m_sortedRays.clear();
                         m_UIParams.rayInfo.raysLoaded = false;
                         m_Scene = std::make_unique<Scene>(m_Device);
                         m_UIParams.beamlineInfo.elements = m_Beamline->m_DesignElements;
@@ -164,8 +165,10 @@ void Application::run() {
                         } else {
                             m_UIParams.beamlineInfo.selectedType = SelectedType::None;
                         }
+                        size_t numElements = m_Beamline->m_DesignElements.size();
+                        m_sortedRays.resize(numElements);
                         if (m_UIParams.h5Ready) {
-                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->m_DesignElements.size());
+                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, numElements);
                             m_State = State::LoadingRays;
                         } else {
                             m_State = State::PrepareElements;
@@ -307,7 +310,7 @@ void Application::run() {
     vkDeviceWaitIdle(m_Device.device());
 }
 
-void Application::loadRays(const std::filesystem::path& rmlPath, const int numElements) {
+void Application::loadRays(const std::filesystem::path& rmlPath, const size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";

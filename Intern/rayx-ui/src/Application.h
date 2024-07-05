@@ -80,6 +80,6 @@ class Application {
 
     void init();
 
-    void loadRays(const std::filesystem::path& rmlPath, const int numElements);
+    void loadRays(const std::filesystem::path& rmlPath, const size_t numElements);
     void loadBeamline(const std::filesystem::path& rmlPath);
 };

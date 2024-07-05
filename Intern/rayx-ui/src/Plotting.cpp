@@ -68,38 +68,47 @@ void writeFootprintAsPNG(std::vector<std::vector<uint32_t>> footprint, const cha
     stbi_write_png(filename, width, height, channels, data.get(), width * channels);
 }
 
-std::unique_ptr<unsigned char[]> footprintAsImage(std::vector<std::vector<uint32_t>> footprint, uint32_t& width, uint32_t& height) {
+std::unique_ptr<unsigned char[]> footprintAsImage(const std::vector<std::vector<uint32_t>>& footprint, uint32_t& width, uint32_t& height) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     width = static_cast<uint32_t>(footprint.size());
     height = static_cast<uint32_t>(footprint[0].size());
     constexpr uint32_t channels = 4;  // RGBA is forced for now
     std::unique_ptr<unsigned char[]> data(new unsigned char[width * height * channels]);
 
     // Colors for visualizing ray density.
-    glm::vec4 low = glm::vec4(0.0, 0.1, 1.0, 1.0);
-    glm::vec4 high = glm::vec4(1.0, 0.7, 0.3, 1.0);
+    const glm::vec4 low(0.0f, 0.1f, 1.0f, 1.0f);
+    const glm::vec4 high(1.0f, 0.7f, 0.3f, 1.0f);
+    const glm::vec4 colorDiff = high - low;
 
+    // Find max value in a single pass
     uint32_t max = 0;
-    for (uint32_t x = 0; x < width; x++) {
-        for (uint32_t z = 0; z < height; z++) {
-            uint32_t value = footprint[x][z];
-            if (value > max) max = value;
+    for (const auto& row : footprint) {
+        for (uint32_t value : row) {
+            max = std::max(max, value);
         }
     }
 
     if (max == 0) max = 1;
+    const float logMax = std::log10(static_cast<float>(max) + 1.0f);
+    const float invLogMax = 1.0f / logMax;
 
-    for (uint32_t x = 0; x < width; x++) {
-        for (uint32_t z = 0; z < height; z++) {
-            uint32_t value = footprint[x][z];
-            float logValue = std::log10(static_cast<float>(value) + 1.0f);
-            float logMax = std::log10(static_cast<float>(max) + 1.0f);
-            float normalizedValue = logValue / logMax;
-            glm::vec4 color = glm::mix(low, high, normalizedValue);
-            uint32_t index = (x + z * width) * channels;
-            data[index + 0] = static_cast<unsigned char>(color.r * 255.0);
-            data[index + 1] = static_cast<unsigned char>(color.g * 255.0);
-            data[index + 2] = static_cast<unsigned char>(color.b * 255.0);
-            data[index + 3] = static_cast<unsigned char>(color.a * 255.0);
+    {
+        RAYX_PROFILE_SCOPE_STDOUT("Footprint to Image");
+        constexpr int LUT_SIZE = 1024;
+        std::array<glm::u8vec4, LUT_SIZE> colorLUT;
+
+        // Initialize LUT (do this once)
+        for (int i = 0; i < LUT_SIZE; ++i) {
+            float normalizedValue = std::log10(static_cast<float>(i) + 1.0f) * invLogMax;
+            glm::vec4 color = low + colorDiff * normalizedValue;
+            colorLUT[i] = glm::u8vec4(color * 255.0f);
+        }
+
+        for (uint32_t y = 0; y < height; ++y) {
+            for (uint32_t x = 0; x < width; ++x) {
+                int index = std::min(static_cast<int>(footprint[x][height - 1 - y]), LUT_SIZE - 1);
+                memcpy(&data[(y * width + x) * channels], &colorLUT[index], 4);
+            }
         }
     }
 
