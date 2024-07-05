@@ -147,7 +147,6 @@ void Application::run() {
                     if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         // reset rays
                         m_rays.clear();
-                        m_sortedRays.clear();
                         m_UIParams.rayInfo.raysLoaded = false;
                         m_Scene = std::make_unique<Scene>(m_Device);
                         m_UIParams.beamlineInfo.elements = m_Beamline->m_DesignElements;
@@ -195,6 +194,7 @@ void Application::run() {
                         RAYX_VERB << "Loaded RML file: " << m_RMLPath;
                         if (m_rays.size() == 0) {
                             if (m_buildElementsNeeded) {
+                                m_buildTextureNeeded = true;
                                 m_State = State::PrepareElements;
                             } else {
                                 m_State = State::Running;
@@ -227,6 +227,7 @@ void Application::run() {
                         m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
                         m_UIParams.rayInfo.raysLoaded = true;
                         if (m_buildElementsNeeded) {
+                            m_buildTextureNeeded = true;
                             m_State = State::PrepareElements;
                         } else {
                             m_State = State::Running;
@@ -236,7 +237,8 @@ void Application::run() {
                     break;
                 case State::PrepareElements:
                     getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
-                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays));
+                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays), m_buildTextureNeeded);
+                    m_buildTextureNeeded = false;
                     m_State = State::BuildingElements;
                     break;
                 case State::BuildingElements:
@@ -262,6 +264,7 @@ void Application::run() {
                 m_State = State::BuildingRays;
                 m_UIParams.rayInfo.raysChanged = false;
                 m_buildElementsNeeded = false;
+                m_buildTextureNeeded = true;
             }
             if (m_UIParams.beamlineInfo.elementsChanged) {
                 m_State = State::PrepareElements;

@@ -88,10 +88,11 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
 }
 
 std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
-                                                              const std::vector<std::vector<RAYX::Ray>> sortedRays) const {
+                                                              const std::vector<std::vector<RAYX::Ray>> sortedRays, bool buildTexture) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<RenderObjectInput> rObjectsInput;
+    if (buildTexture) m_textureInputCache.clear();
     for (uint32_t i = 0; i < elements.size(); i++) {
         auto compiled = elements[i].compile();
         std::vector<TextureVertex> vertices;
@@ -107,7 +108,7 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
 
         glm::mat4 modelMatrix = compiled.m_outTrans;
 
-        if (vertices.size() == 4) {
+        if (buildTexture) {
             auto [width, height] = getRectangularDimensions(compiled.m_cutout);
 
             std::vector<std::vector<uint32_t>> footprint =
@@ -116,11 +117,13 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
             uint32_t footprintWidth, footprintHeight;
             std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, footprintWidth, footprintHeight);
 
-            RenderObjectInput inputObject(modelMatrix, vertices, indices, Texture::TextureInput{std::move(data), footprintWidth, footprintHeight});
-            rObjectsInput.emplace_back(std::move(inputObject));
+            Texture::TextureInput textureInput(std::move(data), footprintWidth, footprintHeight);
+            m_textureInputCache.push_back(std::move(textureInput));
 
+            RenderObjectInput inputObject{modelMatrix, vertices, indices};
+            rObjectsInput.emplace_back(std::move(inputObject));
         } else {
-            RenderObjectInput inputObject(modelMatrix, vertices, indices, std::nullopt);
+            RenderObjectInput inputObject{modelMatrix, vertices, indices};
             rObjectsInput.emplace_back(std::move(inputObject));
         }
     }
@@ -133,14 +136,19 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     assert(descriptorPool != nullptr && "Descriptor pool is null");
     RAYX_PROFILE_FUNCTION_STDOUT();
     m_ElementRObjects.clear();
+
+    size_t textureIndex = 0;
     for (const auto& input : inputs) {
         std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
-        if (input.textureInput.has_value()) {
+
+        if (textureIndex < m_textureInputCache.size()) {
+            const auto& textureInput = m_textureInputCache[textureIndex];
             Texture texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-                            VK_IMAGE_ASPECT_COLOR_BIT, {input.textureInput->width, input.textureInput->height});
-            texture.updateFromData(input.textureInput->data.get(), input.textureInput->width, input.textureInput->height);
+                            VK_IMAGE_ASPECT_COLOR_BIT, {textureInput.width, textureInput.height});
+            texture.updateFromData(textureInput.data.get(), textureInput.width, textureInput.height);
             m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, std::move(texture), setLayout,
                                            descriptorPool);
+            ++textureIndex;
         } else {
             m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, Texture(m_Device), setLayout,
                                            descriptorPool);
