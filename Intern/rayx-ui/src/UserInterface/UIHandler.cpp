@@ -1,16 +1,17 @@
 #include "UIHandler.h"
 
 #undef APIENTRY
-#include <portable-file-dialogs.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 #include <imgui_internal.h>
+#include <portable-file-dialogs.h>
 
 #include <fstream>
 #include <rapidxml.hpp>
 
-#include "Colors.h"
 #include "CanonicalizePath.h"
+#include "Colors.h"
+#include "Debug/Instrumentor.h"
 #include "RayProcessing.h"
 
 extern bool isSceneWindowHovered;
@@ -180,7 +181,7 @@ void UIHandler::beginUIRender() {
  * @param uiParams
  * @param rObjects
  */
-void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions) {
+void UIHandler::setupUI(UIParameters& uiParams) {
     ImFont* currentFont;
     float adjustedScale;
     if (m_oldScale != m_scale) {
@@ -246,12 +247,13 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
             ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags | ImGuiDockNodeFlags_DockSpace);
             ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
-            auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+            auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.25f, nullptr, &dockspace_id);
             auto dock_id_right_top = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Up, 0.5f, nullptr, &dock_id_right);
             auto dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.5f, nullptr, &dock_id_right);
 
             ImGui::DockBuilderDockWindow("Render View", dockspace_id);
-            ImGui::DockBuilderDockWindow("Properties Manager", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("Beamline Design", dock_id_right_top);
+            ImGui::DockBuilderDockWindow("UI Settings", dock_id_right_top);
             ImGui::DockBuilderDockWindow("Settings", dock_id_right_top);
             ImGui::DockBuilderDockWindow("Beamline Outline", dock_id_right_bottom);
             ImGui::DockBuilderDockWindow("Hotkeys", dock_id_right_bottom);
@@ -273,17 +275,19 @@ void UIHandler::setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>
         }
     }
     isSceneWindowHovered = ImGui::IsWindowHovered();
-    ImGui::End();
+    // ImGui::End();
 
     // Pop the style variable to restore default padding
     ImGui::PopStyleVar();
 
     showSceneEditorWindow(uiParams);
+    showUISettingsWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
     showSettingsWindow();
-    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams, elements, rSourcePositions);
+    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams);
     showHotkeysWindow();
+    ImGui::End();
     ImGui::End();
 
     // setting focus to the beamline outline window
@@ -311,7 +315,8 @@ void UIHandler::endUIRender(VkCommandBuffer commandBuffer) {
 }
 
 void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
-    ImGui::Begin("Properties Manager");
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    ImGui::Begin("Beamline Design");
 
     if (ImGui::Button("Open File Dialog")) {
         const std::vector<std::string> results =
@@ -354,8 +359,19 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
         ImGui::EndDisabled();
     }
 
+    ImGui::Separator();
+
+    m_BeamlineDesignHandler.showBeamlineDesignWindow(uiParams.beamlineInfo);
+    ImGui::End();
+}
+
+void UIHandler::showUISettingsWindow(UIParameters& uiParams) {
+    ImGui::Begin("UI Settings");
+
     ImGui::Text("Background");
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
+
+    ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
     ImGui::Separator();
     uiParams.camController.displaySettings();

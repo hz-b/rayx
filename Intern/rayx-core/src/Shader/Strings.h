@@ -5,34 +5,32 @@
 #include <optional>
 
 namespace RAYX {
-enum class ElementType{
-        ImagePlane,
-        ConeMirror,
-        CylinderMirror,
-        EllipsoidMirror,
-        ExpertsMirror,
-        ParaboloidMirror,
-        PlaneGrating,
-        PlaneMirror,
-        ReflectionZoneplante,
-        Slit,
-        SphereGrating,
-        Sphere,
-        SphereMirror,
-        ToroidMirror,
-        PointSource,
-        MatrixSource,
-        DipoleSource,
-        DipoleSrc,
-        PixelSource,
-        CircleSource,
-        SimpleUndulatorSource
-    }; 
+enum class ElementType {
+    ImagePlane,
+    ConeMirror,
+    CylinderMirror,
+    EllipsoidMirror,
+    ExpertsMirror,
+    ParaboloidMirror,
+    PlaneGrating,
+    PlaneMirror,
+    ReflectionZoneplate,
+    Slit,
+    SphereGrating,
+    Sphere,
+    SphereMirror,
+    ToroidMirror,
+    PointSource,
+    MatrixSource,
+    DipoleSource,
+    DipoleSrc,
+    PixelSource,
+    CircleSource,
+    SimpleUndulatorSource
+};
 
-static std::map<ElementType, std::string> ElementStringMap;
+extern std::map<ElementType, std::string> ElementStringMap;
 
-
-
-ElementType findElementString(std::string name);
-} //namespace
+ElementType findElementString(const std::string& name);
+}  // namespace RAYX
 #endif

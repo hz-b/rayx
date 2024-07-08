@@ -182,9 +182,9 @@ double DesignSource::getEnergy() const { return m_elementParameters["energy"].as
 void DesignSource::setElectronEnergy(double value) { m_elementParameters["electronEnergy"] = value; }
 double DesignSource::getElectronEnergy() const { return m_elementParameters["electronEnergy"].as_double(); }
 
-void DesignSource::setElectronEnergyOriantation(ElectronEnergyOrientation value) { m_elementParameters["electronEnergyOriantation"] = value; }
+void DesignSource::setElectronEnergyOrientation(ElectronEnergyOrientation value) { m_elementParameters["electronEnergyOrientation"] = value; }
 ElectronEnergyOrientation DesignSource::getElectronEnergyOrientation() const {
-    return m_elementParameters["electronEnergyOriantation"].as_electronEnergyOrientation();
+    return m_elementParameters["electronEnergyOrientation"].as_electronEnergyOrientation();
 }
 
 void DesignSource::setEnergySpread(double value) { m_elementParameters["energySpread"] = value; }
@@ -199,7 +199,7 @@ void DesignSource::setEnergyDistributionFile(std::string value) { m_elementParam
 void DesignSource::setEnergySpreadType(SpreadType value) { m_elementParameters["energyDistribution"] = value; }
 SpreadType DesignSource::getEnergySpreadType() const { return m_elementParameters["energyDistribution"].as_energySpreadType(); }
 
-void DesignSource::setSeperateEnergies(int value) { m_elementParameters["SeperateEnergies"] = value; }
+void DesignSource::setSeparateEnergies(int value) { m_elementParameters["SeparateEnergies"] = value; }
 
 void DesignSource::setPhotonFlux(double value) { m_elementParameters["photonFlux"] = value; }
 double DesignSource::getPhotonFlux() const { return m_elementParameters["photonFlux"].as_double(); }
@@ -229,15 +229,15 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
             }
             en = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
 
-        } else if (spreadType == SpreadType::SeperateEnergies) {
+        } else if (spreadType == SpreadType::SeparateEnergies) {
             int numOfEnergies;
-            if (!m_elementParameters["SeperateEnergies"].as_int()) {
+            if (!m_elementParameters["SeparateEnergies"].as_int()) {
                 numOfEnergies = 3;
             } else {
-                numOfEnergies = m_elementParameters["SeperateEnergies"].as_int();
+                numOfEnergies = m_elementParameters["SeparateEnergies"].as_int();
             }
             numOfEnergies = abs(numOfEnergies);
-            en = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
+            en = EnergyDistribution(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else {
             en = EnergyDistribution(HardEdge(photonEnergy, energySpread));
         }

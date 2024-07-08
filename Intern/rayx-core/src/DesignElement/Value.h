@@ -17,7 +17,7 @@ enum class ValueType {
     Rad,
     Material,
     Misalignment,
-    CentralBeamStop,
+    CentralBeamstop,
     Cutout,
     CylinderDirection,
     FigureRotation,
@@ -39,15 +39,15 @@ class DesignMap;
 
 /**
  * This Map is the foundation for the DesignELement ad DesignSource
- * All Parameter are defined by a string set in DesignElement.cpp and a Value. 
+ * All Parameter are defined by a string set in DesignElement.cpp and a Value.
  * The Value describes the possible Types. It is defined as a shared pointer because of the recursive call.
- * 
-*/
+ *
+ */
 using Map = std::unordered_map<std::string, std::shared_ptr<DesignMap>>;
 
 /**
  * To ensure a typesafe Map all possible options are defined in the Value class bellow
-*/
+ */
 class DesignMap {
   public:
     DesignMap() : m_variant(Undefined()) {}
@@ -100,17 +100,33 @@ class DesignMap {
     void operator=(BehaviourType x) { m_variant = x; }
     void operator=(ElementType x) { m_variant = x; }
 
-
-
     inline ValueType type() const {
         const ValueType types[] = {
-            ValueType::Undefined, ValueType::Double,     ValueType::Int,           ValueType::CylinderDirection,
-            ValueType::String,    ValueType::Map,        ValueType::Dvec4,         ValueType::EnergySpreadUnit,
-            ValueType::Rad,       ValueType::Material,   ValueType::Misalignment,  ValueType::CentralBeamStop,
-            ValueType::Cutout,    ValueType::Bool,       ValueType::FigureRotation,ValueType::CurvatureType,
-            ValueType::Surface,   ValueType::SourceDist, ValueType::SpreadType,    ValueType::EnergyDistributionType,
-            ValueType::Dmat4x4,   ValueType::SigmaType,  ValueType::BehaviourType, ValueType::ElectronEnergyOrientation,   
-            ValueType::ElementType,        
+            ValueType::Undefined,
+            ValueType::Double,
+            ValueType::Int,
+            ValueType::ElectronEnergyOrientation,
+            ValueType::Dvec4,
+            ValueType::Dmat4x4,
+            ValueType::Bool,
+            ValueType::EnergyDistributionType,
+            ValueType::Misalignment,
+            ValueType::CentralBeamstop,
+            ValueType::Cutout,
+            ValueType::CylinderDirection,
+            ValueType::FigureRotation,
+            ValueType::Map,
+            ValueType::Surface,
+            ValueType::CurvatureType,
+            ValueType::SourceDist,
+            ValueType::SpreadType,
+            ValueType::Rad,
+            ValueType::Material,
+            ValueType::EnergySpreadUnit,
+            ValueType::String,
+            ValueType::SigmaType,
+            ValueType::BehaviourType,
+            ValueType::ElementType,
         };
         return types[m_variant.index()];
     }
@@ -210,7 +226,7 @@ class DesignMap {
         if (!x) throw std::runtime_error("as_surface() called on non-surface!");
         return *x;
     }
-    
+
     inline SourceDist as_sourceDist() const {
         auto* x = std::get_if<SourceDist>(&m_variant);
         if (!x) throw std::runtime_error("as_sourceDist() called on non-sourceDist!");
@@ -262,16 +278,13 @@ class DesignMap {
     const DesignMap& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map at: " + s);
-        try
-        {
+        try {
             auto x = *m->at(s).get();
-        }
-        catch(const std::exception& e)
-        {
+        } catch (const std::exception& e) {
             std::cerr << e.what() << '\n';
-            RAYX_LOG << "Indexing into non-map at: " << s ;
+            RAYX_LOG << "Indexing into non-map at: " << s;
         }
-    
+
         return *m->at(s).get();
     }
 
@@ -281,10 +294,101 @@ class DesignMap {
             throw std::runtime_error("Indexing into non-map!");
         }
 
-        if (!m->contains(s)){
+        if (!m->contains(s)) {
             (*m)[s] = std::make_shared<DesignMap>();
         }
-        return *((*m)[s].get()); 
+        return *((*m)[s].get());
+    }
+    // Iterator classes
+    class Iterator {
+      public:
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type = std::ptrdiff_t;
+        using value_type = std::pair<const std::string, std::shared_ptr<DesignMap>>;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+        Iterator(Map::iterator it) : m_it(it) {}
+
+        reference operator*() const { return *m_it; }
+        pointer operator->() { return &(*m_it); }
+
+        // Prefix increment
+        Iterator& operator++() {
+            ++m_it;
+            return *this;
+        }
+
+        // Postfix increment
+        Iterator operator++(int) {
+            Iterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        friend bool operator==(const Iterator& a, const Iterator& b) { return a.m_it == b.m_it; }
+        friend bool operator!=(const Iterator& a, const Iterator& b) { return a.m_it != b.m_it; }
+
+      private:
+        Map::iterator m_it;
+    };
+
+    class ConstIterator {
+      public:
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type = std::ptrdiff_t;
+        using value_type = const std::pair<const std::string, std::shared_ptr<DesignMap>>;
+        using pointer = const value_type*;
+        using reference = const value_type&;
+
+        ConstIterator(Map::const_iterator it) : m_it(it) {}
+
+        reference operator*() const { return *m_it; }
+        pointer operator->() { return &(*m_it); }
+
+        // Prefix increment
+        ConstIterator& operator++() {
+            ++m_it;
+            return *this;
+        }
+
+        // Postfix increment
+        ConstIterator operator++(int) {
+            ConstIterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        friend bool operator==(const ConstIterator& a, const ConstIterator& b) { return a.m_it == b.m_it; }
+        friend bool operator!=(const ConstIterator& a, const ConstIterator& b) { return a.m_it != b.m_it; }
+
+      private:
+        Map::const_iterator m_it;
+    };
+
+    // Begin and end functions for the iterators
+    Iterator begin() {
+        Map* m = std::get_if<Map>(&m_variant);
+        if (!m) throw std::runtime_error("Calling begin() on non-map!");
+        return Iterator(m->begin());
+    }
+
+    Iterator end() {
+        Map* m = std::get_if<Map>(&m_variant);
+        if (!m) throw std::runtime_error("Calling end() on non-map!");
+        return Iterator(m->end());
+    }
+
+    ConstIterator begin() const {
+        const Map* m = std::get_if<Map>(&m_variant);
+        if (!m) throw std::runtime_error("Calling begin() on non-map!");
+        return ConstIterator(m->begin());
+    }
+
+    ConstIterator end() const {
+        const Map* m = std::get_if<Map>(&m_variant);
+        if (!m) throw std::runtime_error("Calling end() on non-map!");
+        return ConstIterator(m->end());
     }
 
   private:

@@ -19,7 +19,7 @@ void setAllMandatory(xml::Parser parser, DesignSource* ds) {
     ds->setWorldOrientation(parser.parseOrientation());
     ds->setWorldPosition(parser.parsePosition());
 
-    ds->setSeperateEnergies(1);
+    ds->setSeparateEnergies(1);
 }
 
 void setDefaultEnergy(xml::Parser parser, DesignSource* ds) {
@@ -69,13 +69,12 @@ void setMatrixSource(xml::Parser parser, DesignSource* ds) {
     setDefaultOrientation(parser, ds);
 }
 
-
 void setDipoleSource(xml::Parser parser, DesignSource* ds) {
     setAllMandatory(parser, ds);
 
     ds->setEnergySpreadType(parser.parseEnergySpreadType());
     ds->setPhotonFlux(parser.parsePhotonFlux());
-    ds->setElectronEnergyOriantation(parser.parseElectronEnergyOrientation());
+    ds->setElectronEnergyOrientation(parser.parseElectronEnergyOrientation());
     ds->setElectronEnergy(parser.parseElectronEnergy());
     ds->setEnergySpread(parser.parseEnergySpread());
     ds->setBendingRadius(parser.parseBendingRadiusDouble());

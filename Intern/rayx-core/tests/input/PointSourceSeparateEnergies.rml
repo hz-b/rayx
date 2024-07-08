@@ -22,8 +22,8 @@
     <param id="energyDistributionType" comment="Values" enabled="T">1</param>
     <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
     <param id="photonEnergy" enabled="T">100</param>
-    <param id="energySpreadType" comment="seperate Energies" enabled="T">2</param>
-    <param id="SeperateEnergies" enabled="T">-5</param>
+    <param id="energySpreadType" comment="separate Energies" enabled="T">2</param>
+    <param id="SeparateEnergies" enabled="T">-5</param>
     <param id="energySpreadUnit" comment="eV" enabled="T">0</param>
     <param id="energySpread" enabled="T">200</param>
     <param id="linearPol_0" enabled="T">1</param>
