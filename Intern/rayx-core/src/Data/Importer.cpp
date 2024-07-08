@@ -36,7 +36,7 @@ void parseElement(xml::Parser parser, DesignElement* de) {
         getPlaneGrating(parser, de);
     } else if (type == ElementType::PlaneMirror) {
         getPlaneMirror(parser, de);
-    } else if (type == ElementType::ReflectionZoneplate) {
+    } else if (type == ElementType::ReflectionZoneplante) {
         getRZP(parser, de);
     } else if (type == ElementType::Slit) {
         getSlit(parser, de);
@@ -49,10 +49,10 @@ void parseElement(xml::Parser parser, DesignElement* de) {
     } else if (type == ElementType::ToroidMirror) {
         getToroidMirror(parser, de);
     } else {
-        RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
-                 << "; Type: " << int(parser.type());  // TODO: write type as string not enum id
+        RAYX_LOG << "could not classify beamline object with Name: " << parser.name() << "; Type: " << int(parser.type()); //TODO: write type as string not enum id
     }
 }
+
 
 namespace RAYX {
 

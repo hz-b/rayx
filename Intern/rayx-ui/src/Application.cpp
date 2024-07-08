@@ -105,6 +105,9 @@ void Application::run() {
     RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
 
     auto currentTime = std::chrono::high_resolution_clock::now();
+    std::vector<glm::dvec3> rSourcePositions;
+    std::vector<RAYX::DesignElement> elements;
+    std::vector<RAYX::DesignSource> sources;
 
     std::future<void> beamlineFuture;
     std::future<void> raysFuture;
@@ -149,20 +152,11 @@ void Application::run() {
                         m_rays.clear();
                         m_UIParams.rayInfo.raysLoaded = false;
                         m_Scene = std::make_unique<Scene>(m_Device);
-                        m_UIParams.beamlineInfo.elements = m_Beamline->m_DesignElements;
-                        m_UIParams.beamlineInfo.sources = m_Beamline->m_DesignSources;
-                        m_UIParams.beamlineInfo.rSourcePositions.clear();
-                        for (auto& source : m_UIParams.beamlineInfo.sources) {
-                            m_UIParams.beamlineInfo.rSourcePositions.push_back(source.getWorldPosition());
-                        }
-                        if (m_UIParams.beamlineInfo.sources.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::LightSource;
-                            m_UIParams.beamlineInfo.selectedIndex = 0;
-                        } else if (m_UIParams.beamlineInfo.elements.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::OpticalElement;
-                            m_UIParams.beamlineInfo.selectedIndex = 0;
-                        } else {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::None;
+                        elements = m_Beamline->m_DesignElements;
+                        sources = m_Beamline->m_DesignSources;
+                        rSourcePositions.clear();
+                        for (auto& source : sources) {
+                            rSourcePositions.push_back(source.getWorldPosition());
                         }
                         if (m_UIParams.h5Ready) {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath);
@@ -190,33 +184,25 @@ void Application::run() {
                         raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                         // Wait for loadBeamline and loadRays to finish
                         RAYX_VERB << "Loaded RML file: " << m_RMLPath;
-                        if (m_rays.size() == 0) {
-                            if (m_buildElementsNeeded) {
-                                m_State = State::PrepareElements;
-                            } else {
-                                m_State = State::Running;
-                                m_buildElementsNeeded = true;
-                            }
-                        } else {
-                            for (auto ray : m_rays) {
-                                size_t id = static_cast<size_t>(ray.back().m_lastElement);
-                                if (id > m_Beamline->m_DesignElements.size()) {
-                                    m_UIParams.showH5NotExistPopup = true;
-                                    break;
-                                }
-                            }
-                            if (m_UIParams.showH5NotExistPopup) {
-                                RAYX_VERB << "H5 file not compatible with RML file";
-                                m_State = State::RunningWithoutScene;
+
+                        for (auto ray : m_rays) {
+                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
+                            if (id > m_Beamline->m_DesignElements.size()) {
+                                m_UIParams.showH5NotExistPopup = true;
                                 break;
                             }
-
-                            RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
-
-                            buildRayCacheFuture =
-                                std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
-                            m_State = State::BuildingRays;
                         }
+                        if (m_UIParams.showH5NotExistPopup) {
+                            RAYX_VERB << "H5 file not compatible with RML file";
+                            m_State = State::RunningWithoutScene;
+                            break;
+                        }
+
+                        RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
+
+                        buildRayCacheFuture =
+                            std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                        m_State = State::BuildingRays;
                     }
                     break;
                 case State::BuildingRays:
@@ -232,8 +218,8 @@ void Application::run() {
                     }
                     break;
                 case State::PrepareElements:
-                    getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
-                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_rays));
+                    getRObjInputsFuture =
+                        std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(elements), std::ref(m_rays));
                     m_State = State::BuildingElements;
                     break;
                 case State::BuildingElements:
@@ -259,10 +245,6 @@ void Application::run() {
                 m_State = State::BuildingRays;
                 m_UIParams.rayInfo.raysChanged = false;
                 m_buildElementsNeeded = false;
-            }
-            if (m_UIParams.beamlineInfo.elementsChanged) {
-                m_State = State::PrepareElements;
-                m_UIParams.beamlineInfo.elementsChanged = false;
             }
 
             // Update UBO
@@ -294,7 +276,7 @@ void Application::run() {
             m_Renderer.beginSwapChainRenderPass(commandBuffer);
             // UI
             m_UIHandler.beginUIRender();
-            m_UIHandler.setupUI(m_UIParams);
+            m_UIHandler.setupUI(m_UIParams, elements, rSourcePositions);
             m_UIHandler.endUIRender(commandBuffer);
 
             m_Renderer.endSwapChainRenderPass(commandBuffer);

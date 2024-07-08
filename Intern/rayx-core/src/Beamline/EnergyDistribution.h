@@ -38,12 +38,12 @@ struct RAYX_API SoftEdge {
 /// The left-most spike is at energy m_centerEnergy - m_energySpread/2, while the right-most spike is at m_centerEnergy + m_energySpread/2.
 
 /// If there is only one spike (i.e. m_numberOfEnergies = 1), then this spike is at `m_centerEnergy`.
-struct RAYX_API SeparateEnergies {
+struct RAYX_API SeperateEnergies {
     double m_centerEnergy;
     double m_energySpread;
     int m_numberOfEnergies;
 
-    SeparateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
+    SeperateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
 
     double selectEnergy() const;
 };
@@ -62,7 +62,7 @@ class RAYX_API EnergyDistribution {
     EnergyDistribution(DatFile);
     EnergyDistribution(HardEdge);
     EnergyDistribution(SoftEdge);
-    EnergyDistribution(SeparateEnergies);
+    EnergyDistribution(SeperateEnergies);
 
     // The selectEnergy() function returns one sample from the underlying distribution.
     // The energy is returned in eV.
@@ -71,6 +71,6 @@ class RAYX_API EnergyDistribution {
   private:
     // Stores either a DatFile, or a HardEdge, or ... etc.
     // The object within m_Variant is the *actual* energy distribution.
-    std::variant<DatFile, HardEdge, SoftEdge, SeparateEnergies> m_Variant;
+    std::variant<DatFile, HardEdge, SoftEdge, SeperateEnergies> m_Variant;
 };
 }  // namespace RAYX

@@ -2,10 +2,10 @@
 
 TEST_F(TestSuite, allBeamlineObjects) {
     auto b = loadBeamline("allBeamlineObjects");
-    CHECK_EQ(b.m_DesignSources.size(), 6);  // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
+    CHECK_EQ(b.m_DesignSources.size(), 6); // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
     CHECK_EQ(b.m_DesignElements.size(),
              12);  // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating,
-                   // sphere mirror, rzp, image plane
+                  // sphere mirror, rzp, image plane
 }
 
 TEST_F(TestSuite, loadDatFile) {
@@ -45,10 +45,10 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(b.m_DesignElements.size(), 1);
     auto m = b.m_DesignElements[0].compile().m_inTrans;
     glm::dmat4x4 correct = {
-        1,   0,     0,  0,  //
-        0,   1,     0,  0,  //
-        0,   0,     -1, 0,  //
-        -42, -1000, 0,  1,  //
+        1,   0,  0,     0,  //
+        0,   1,  0,     0,  //
+        0,   0, -1,     0,  //
+        -42, -1000,  0, 1,  //
     };
     CHECK_EQ(correct, m);
 }
@@ -58,10 +58,10 @@ TEST_F(TestSuite, testEnergyDistribution) {
         std::string rmlFile;
         double energy;
     };
-
+    
     std::vector<testInput> testinput = {
         {
-            .rmlFile = "PointSourceSeparateEnergies",
+            .rmlFile = "PointSourceSeperateEnergies",
             .energy = 100,
         },
         {
@@ -187,6 +187,7 @@ TEST_F(TestSuite, testToroidSurface) {
     CHECK_EQ(1, toroid.m_toroidType);
 }
 
+
 TEST_F(TestSuite, testExpertsOptic) {
     auto beamline = loadBeamline("toroid");
     Element trid = beamline.m_DesignElements[0].compile();
@@ -196,6 +197,7 @@ TEST_F(TestSuite, testExpertsOptic) {
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
     CHECK_EQ(1, toroid.m_toroidType);
 }
+
 
 /***
  * Tests if two sources can be traced in one go.
@@ -221,21 +223,24 @@ TEST_F(TestSuite, groupTransform2) {
     CHECK_EQ(b.m_DesignElements.size(), 1);
 
     glm::dmat4x4 yz_swap = {
-        1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0,
+        0, 0, 1, 0,
+        0, 1, 0, 0,
+        0, 0, 0, 1,
     };
 
-    glm::dmat4x4 groupOr = glm::dmat4x4(  //
-        1, 0, 0, 0,                       //
-        0, 0.985, -0.174, 0,              //
-        0, 0.174, 0.985, 0,               //
-        0, 0, 0, 1);                      //
+    glm::dmat4x4 groupOr = glm::dmat4x4( //
+        1, 0, 0, 0,          //
+        0, 0.985, -0.174, 0, //
+        0, 0.174, 0.985, 0,  //
+        0, 0, 0, 1);         //
     glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);
 
-    glm::dmat4x4 elementOr = glm::dmat4x4(  //
-        1, 0, 0, 0,                         //
-        0, 1, 0, 0,                         //
-        0, 0, 1, 0,                         //
-        0, 0, 0, 1);                        //
+    glm::dmat4x4 elementOr = glm::dmat4x4( //
+        1, 0, 0, 0,  //
+        0, 1, 0, 0,  //
+        0, 0, 1, 0,  //
+        0, 0, 0, 1); //
     glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 1);
 
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;

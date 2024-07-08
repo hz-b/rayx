@@ -5,7 +5,6 @@
 #include <string>
 
 #include "Beamline/OpticalElement.h"
-#include "BeamlineDesignHandler.h"
 #include "BeamlineOutliner.h"
 #include "FrameInfo.h"
 #include "GraphicsCore/Device.h"
@@ -20,7 +19,7 @@ class UIHandler {
     ~UIHandler();
 
     void beginUIRender();
-    void setupUI(UIParameters& uiParams);
+    void setupUI(UIParameters& uiParams, std::vector<RAYX::DesignElement>& elements, std::vector<glm::dvec3>& rSourcePositions);
     void endUIRender(VkCommandBuffer commandBuffer);
 
     static void applyDarkTheme();
@@ -53,10 +52,8 @@ class UIHandler {
     ImGuiIO m_IO;
 
     BeamlineOutliner m_BeamlineOutliner;
-    BeamlineDesignHandler m_BeamlineDesignHandler;
 
     void showSceneEditorWindow(UIParameters& uiParams);
-    void showUISettingsWindow(UIParameters& uiParams);
     void showSettingsWindow();
     void showHotkeysWindow();
     void showMissingFilePopupWindow(UIParameters& uiParams);

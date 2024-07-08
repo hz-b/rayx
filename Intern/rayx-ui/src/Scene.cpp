@@ -60,9 +60,6 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
                              std::shared_ptr<DescriptorPool> descriptorPool) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
-    if (rayInfo.amountOfRays > rayInfo.maxAmountOfRays) {
-        rayInfo.amountOfRays = rayInfo.maxAmountOfRays;
-    }
     if (!rayInfo.renderAllRays) {
         rays = getRays(m_rayCache, beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays, rayInfo.startEventID);
     } else {
