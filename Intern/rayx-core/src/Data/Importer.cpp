@@ -13,6 +13,7 @@
 #include "Debug/Instrumentor.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
+#include "Shader/Strings.h"
 
 
 
