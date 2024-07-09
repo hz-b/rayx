@@ -14,6 +14,9 @@
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 #include <DesignElement/DesignElement.h>
+#include <Shader/Strings.h>
+
+using RAYX::ElementType;
 
 void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
     ElementType type = parser.type();

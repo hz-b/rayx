@@ -13,21 +13,13 @@
 #include "Shader/Strings.h"
 
 namespace RAYX {
-<<<<<<< HEAD
-
-enum class SpreadType { HardEdge, SoftEdge, SeperateEnergies };    // default WhiteBand
-=======
 enum class SpreadType { HardEdge, SoftEdge, SeparateEnergies };    // default WhiteBand
->>>>>>> master
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist::Thirds represents PixelSource Footprint
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
-<<<<<<< HEAD
 
-=======
->>>>>>> master
 struct DesignSource;
 
 class RAYX_API LightSource {
