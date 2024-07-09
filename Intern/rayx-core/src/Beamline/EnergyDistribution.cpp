@@ -10,13 +10,13 @@ EnergyDistribution::EnergyDistribution(HardEdge he) : m_Variant(he) {}
 
 EnergyDistribution::EnergyDistribution(SoftEdge se) : m_Variant(se) {}
 
-EnergyDistribution::EnergyDistribution(SeperateEnergies sep) : m_Variant(sep) {}
+EnergyDistribution::EnergyDistribution(SeparateEnergies sep) : m_Variant(sep) {}
 
 EnergyDistribution::EnergyDistribution() : EnergyDistribution(HardEdge(100.0, 0.0)) {}
 
 double EnergyDistribution::selectEnergy() const {
     // the below code calls either DatFile::selectEnergy,
-    // HardEdge::selectEnergy, SoftEdge::selectEnergy or SeperateEnergies::selectEnergy
+    // HardEdge::selectEnergy, SoftEdge::selectEnergy or SeparateEnergies::selectEnergy
     // depending on what is stored in m_Variant.
 
     // If you want to know more about this "lambda-expression" syntax,
@@ -38,13 +38,13 @@ SoftEdge::SoftEdge(double centerEnergy, double sigma) : m_centerEnergy(centerEne
 
 double SoftEdge::selectEnergy() const { return randomNormal(m_centerEnergy, m_sigma); }
 
-// seperateEnergies impls
+// separateEnergies impls
 
-SeperateEnergies::SeperateEnergies(double centerEnergy, double energySpread, int numOfEnergies)
+SeparateEnergies::SeparateEnergies(double centerEnergy, double energySpread, int numOfEnergies)
     : m_centerEnergy(centerEnergy), m_energySpread(energySpread), m_numberOfEnergies(numOfEnergies) {}
 
-double SeperateEnergies::selectEnergy() const {
-    // choose random spike from range of seperate energies
+double SeparateEnergies::selectEnergy() const {
+    // choose random spike from range of separate energies
     // from energyspread calculate energy for given spike
     if (m_numberOfEnergies == 1) {
         return m_centerEnergy;

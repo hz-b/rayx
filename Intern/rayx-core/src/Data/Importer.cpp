@@ -16,41 +16,41 @@
 #include <DesignElement/DesignElement.h>
 
 void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
-    const char* type = parser.type();
+    ElementType type = parser.type();
 
-    if (strcmp(type, "ImagePlane") == 0) {      
+    if (type == ElementType::ImagePlane) {
         getImageplane(parser, de);
-    } else if (strcmp(type, "Cone") == 0) {
+    } else if (type == ElementType::ConeMirror) {
         getCone(parser, de);
-    } else if (strcmp(type, "Cylinder") == 0) {
+    } else if (type == ElementType::CylinderMirror) {
         getCylinder(parser, de);
-    } else if (strcmp(type, "Ellipsoid") == 0) {
+    } else if (type == ElementType::EllipsoidMirror) {
         getEllipsoid(parser, de);
-    } else if (strcmp(type, "Experts Optics") == 0) {
+    } else if (type == ElementType::ExpertsMirror) {
         getExpertsOptics(parser, de);
-    } else if (strcmp(type, "Paraboloid") == 0) {
+    } else if (type == ElementType::ParaboloidMirror) {
         getParaboloid(parser, de);
-    } else if (strcmp(type, "Plane Grating") == 0) {
+    } else if (type == ElementType::PlaneGrating) {
         getPlaneGrating(parser, de);
-    } else if (strcmp(type, "Plane Mirror") == 0) {
+    } else if (type == ElementType::PlaneMirror) {
         getPlaneMirror(parser, de);
-    } else if (strcmp(type, "Reflection Zoneplate") == 0) {
+    } else if (type == ElementType::ReflectionZoneplate) {
         getRZP(parser, de);
-    } else if (strcmp(type, "Slit") == 0) {
+    } else if (type == ElementType::Slit) {
         getSlit(parser, de);
-    } else if (strcmp(type, "Spherical Grating") == 0) {
+    } else if (type == ElementType::SphereGrating) {
         getSphereGrating(parser, de);
-    } else if (strcmp(type, "Sphere") == 0) {
+    } else if (type == ElementType::Sphere) {
         getSphereMirror(parser, de);
-    } else if (strcmp(type, "Spherical Mirror") == 0) {
+    } else if (type == ElementType::SphereMirror) {
         getSphereMirror(parser, de);
-    } else if (strcmp(type, "Toroid") == 0) {
+    } else if (type == ElementType::ToroidMirror) {
         getToroidMirror(parser, de);
     } else {
-        RAYX_WARN << "could not classify beamline object with Name: " << parser.name() << "; Type: " << parser.type();
+        RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
+                 << "; Type: " << int(parser.type());  // TODO: write type as string not enum id
     }
 }
-
 
 namespace RAYX {
 
@@ -64,7 +64,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     // beamline (if it's not nullptr)
 
     RAYX::xml::Parser parser(node, group_context, filename);
-    const char* type = parser.type();
+    ElementType type = parser.type();
     DesignSource ds;
     ds.m_elementParameters = Map();
 
@@ -73,25 +73,25 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
 
     // Light sources have constructors that accept a const DesignObject& as argument.
     // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
-    if (strcmp(type, "Point Source") == 0) {
+    if (type == ElementType::PointSource) {
         setPointSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-    } else if (strcmp(type, "Matrix Source") == 0) {
+    } else if (type == ElementType::MatrixSource) {
         setMatrixSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-    } else if (strcmp(type, "Dipole") == 0) {
+    } else if (type == ElementType::DipoleSource) {
         setDipoleSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-    } else if (strcmp(type, "Dipole Source") == 0) {
+    } else if (type == ElementType::DipoleSrc) {
         setDipoleSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-    } else if (strcmp(type, "Pixel Source") == 0) {
+    } else if (type == ElementType::PixelSource) {
         setPixelSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-    } else if (strcmp(type, "Circle Source") == 0) {
+    } else if (type == ElementType::CircleSource) {
         setCircleSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
-    } else if (strcmp(type, "Simple Undulator") == 0) {
+    } else if (type == ElementType::SimpleUndulatorSource) {
         setSimpleUndulatorSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
     } else {

@@ -9,6 +9,7 @@
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
 #include "Shader/Constants.h"
+#include "Shader/Strings.h"
 #include "angle.h"
 
 namespace RAYX::xml {
@@ -177,19 +178,15 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
     return true;
 }
 
-std::filesystem::path Parser::parseEnergyDistributionFile() const { 
-    
+std::filesystem::path Parser::parseEnergyDistributionFile() const {
     std::filesystem::path datpath = Parser::parseStr("photonEnergyDistributionFile");
     std::filesystem::path combinedPath = rmlFile.parent_path() / datpath;
-    try
-    {
-        combinedPath = std::filesystem::canonical(combinedPath);   
-    }
-    catch(const std::exception& e)
-    {
+    try {
+        combinedPath = std::filesystem::canonical(combinedPath);
+    } catch (const std::exception& e) {
         RAYX_ERR << "Failed to canonicalize datfile path: " << e.what();
     }
-    
+
     RAYX_VERB << "Combined datfile path: " << combinedPath;
     return combinedPath;
 }
@@ -315,7 +312,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
      *
      * default: 0:HardEdge(WhiteBand)
      *          1:SoftEdge(Energyspread = sigma)
-     *          2:SeperateEnergies(Spikes)
+     *          2:SeparateEnergies(Spikes)
      */
     auto spreadType = static_cast<SpreadType>(spreadType_int);
 
@@ -353,14 +350,14 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             }
             *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
 
-        } else if (spreadType == SpreadType::SeperateEnergies) {
+        } else if (spreadType == SpreadType::SeparateEnergies) {
             int numOfEnergies;
-            if (!xml::paramInt(node, "SeperateEnergies", &numOfEnergies)) {
-                std::cout << "No Number for Seperate Energies in RML File" << std::endl;
+            if (!xml::paramInt(node, "SeparateEnergies", &numOfEnergies)) {
+                std::cout << "No Number for Separate Energies in RML File" << std::endl;
                 numOfEnergies = 3;
             }
             numOfEnergies = abs(numOfEnergies);
-            *out = EnergyDistribution(SeperateEnergies(photonEnergy, energySpread, numOfEnergies));
+            *out = EnergyDistribution(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else {
             *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
         }
@@ -474,7 +471,10 @@ Parser::Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context
 
 const char* Parser::name() const { return node->first_attribute("name")->value(); }
 
-const char* Parser::type() const { return node->first_attribute("type")->value(); }
+ElementType Parser::type() const {
+    const char* val = node->first_attribute("type")->value();
+    return findElementString(std::string(val));
+}
 
 // parsers for fundamental types
 double Parser::parseDouble(const char* paramname) const {

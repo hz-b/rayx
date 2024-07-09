@@ -24,7 +24,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setMaterial(parser.parseMaterial());
     //de->setCurvatureType(CurvatureType::Plane); TODo reenable
 
-    if (de->getType() != "ImagePlane") {
+    if (de->getType() != ElementType::ImagePlane) {
         de->setCutout(parser.parseCutout(dp));
     } else {
         de->setCutout(serializeUnlimited());
@@ -124,7 +124,7 @@ void getSphereGrating(xml::Parser parser, DesignElement* de) {
     de->setDeviationAngle(parser.parseDeviationAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCalcRadiusDeviationAngle();
+    de->setRadius(parser.parseRadius());
 
     getGrating(parser, de);
 }
@@ -144,7 +144,8 @@ void getSphereMirror(xml::Parser parser, DesignElement* de) {
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
-    de->setCalcRadius();
+    de->setRadius(parser.parseRadius());
+
 }
 
 void getToroidMirror(xml::Parser parser, DesignElement* de) {

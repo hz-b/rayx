@@ -6,10 +6,10 @@
 #include <Beamline/EnergyDistribution.h>
 
 namespace RAYX {
-LightSource::LightSource(const DesignSource& dSource) 
+LightSource::LightSource(const DesignSource& dSource)
     : m_name(dSource.getName()),
       m_EnergyDistribution(dSource.getEnergyDistribution()),
-      m_numberOfRays(static_cast<uint32_t> (dSource.getNumberOfRays())),
+      m_numberOfRays(static_cast<uint32_t>(dSource.getNumberOfRays())),
       m_verDivergence(0.0),
       m_orientation(dSource.getWorldOrientation()),
       m_position(dSource.getWorldPosition()),
