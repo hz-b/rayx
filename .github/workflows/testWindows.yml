@@ -48,6 +48,19 @@ jobs:
           echo "${{github.workspace}}/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{github.workspace}}/boost/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+      - name: Install Cuda
+        uses: Jimver/cuda-toolkit@v0.2.16
+        id: cuda-toolkit
+        with:
+          cuda: '12.3.2'
+
+      - name: Add Cuda to PATH
+        run: |
+          echo "Installed cuda version is: ${{steps.cuda-toolkit.outputs.cuda}}"
+          echo "Cuda install location: ${{steps.cuda-toolkit.outputs.CUDA_PATH}}"
+          nvcc -V
+          echo "${{steps.cuda-toolkit.outputs.CUDA_PATH}}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
