@@ -16,6 +16,8 @@ add_subdirectory(Intern)
 
 # ---- Options ----
 option(WERROR "add -Werror option" "NO") # inactive per default
+option(RAYX_ENABLE_CUDA "This option enables the search for CUDA. Project will be compiled without cuda if not found." ON)
+option(RAYX_REQUIRES_CUDA "If option 'RAYX_ENABLE_CUDA' is ON, this option will add the requirement that cuda must be found." OFF)
 
 # ------------------
 
