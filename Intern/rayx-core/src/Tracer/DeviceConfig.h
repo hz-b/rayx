@@ -9,8 +9,8 @@ struct RAYX_API DeviceConfig {
     enum RAYX_API DeviceType {
         Unsupported = 0,
         Cpu         = 1 << 0,
-        GpuCuda     = 1 << 2,
-        GpuHip      = 1 << 3,
+        GpuCuda     = 1 << 1,
+        GpuHip      = 1 << 2,
         Gpu         = GpuCuda | GpuHip,
         All         = Cpu | Gpu,
     };
