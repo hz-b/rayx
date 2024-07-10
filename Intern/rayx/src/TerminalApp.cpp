@@ -66,7 +66,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_DesignElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
+        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? 32 : m_CommandParser->m_args.m_maxEvents;
 
         if (m_CommandParser->m_args.m_startEventID >= maxEvents) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
