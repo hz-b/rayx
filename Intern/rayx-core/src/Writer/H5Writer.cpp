@@ -91,14 +91,18 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
         double eventType = doubles[double_index + 3];
         glm::dvec3 direction(doubles[double_index + 4], doubles[double_index + 5], doubles[double_index + 6]);
         double energy = doubles[double_index + 7];
-        glm::dvec4 stokes(doubles[double_index + 8], doubles[double_index + 9], doubles[double_index + 10], doubles[double_index + 11]);
-        double pathLength = doubles[double_index + 12];
-        double order = doubles[double_index + 13];
-        double lastElement = doubles[double_index + 14];
-        double sourceID = doubles[double_index + 15];
+        RAYX::Field field {
+            {doubles[double_index + 8], doubles[double_index + 9]},
+            {doubles[double_index + 10], doubles[double_index + 11]},
+            {doubles[double_index + 12], doubles[double_index + 13]},
+        };
+        double pathLength = doubles[double_index + 14];
+        double order = doubles[double_index + 15];
+        double lastElement = doubles[double_index + 16];
+        double sourceID = doubles[double_index + 17];
 
         RAYX::Ray ray = {
-            origin, eventType, direction, energy, stokes, pathLength, order, lastElement, sourceID,
+            origin, eventType, direction, energy, field, pathLength, order, lastElement, sourceID,
         };
 
         rayHist.push_back(ray);
