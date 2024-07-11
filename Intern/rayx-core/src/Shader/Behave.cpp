@@ -8,7 +8,6 @@
 #include "CutoutFns.h"
 #include "Refrac.h"
 #include "RefractiveIndex.h"
-#include "UpdateStokes.h"
 #include "LineDensity.h"
 #include "EventType.h"
 #include "Throw.h"
@@ -121,7 +120,7 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
         const auto ior_i = getRefractiveIndex(r.m_energy, vacuum_material, inv);
         const auto ior_t = getRefractiveIndex(r.m_energy, mat, inv);
 
-        const auto reflect_field = intercept_reflect(
+        const auto reflect_field = interceptReflect(
             r.m_field,
             incident_vec,
             reflect_vec,
