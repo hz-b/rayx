@@ -441,7 +441,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 RAYX_FN_ACC
-Collision findCollisionWith(Ray r, uint id, Inv& inv) {
+Collision findCollisionWith(Ray r, uint id, InvState& inv) {
     // misalignment
     r = rayMatrixMult(r, inv.elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
     Collision col = findCollisionInElementCoords(r, inv.elements[id].m_surface, inv.elements[id].m_cutout, false);
@@ -457,7 +457,7 @@ Collision findCollisionWith(Ray r, uint id, Inv& inv) {
 
 // Returns the next collision for the ray `_ray`.
 RAYX_FN_ACC
-Collision findCollision(const Ray& _ray, Inv& inv) {
+Collision findCollision(const Ray& _ray, InvState& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {
         if (_ray.m_lastElement >= inv.elements.size() - 1) {

@@ -41,7 +41,7 @@ const int PREC = 17;
 
 // declare invocation state globally
 // TODO(Sven): do we really need invocation state here, or just material tables individually?
-extern InvocationState inv;
+extern InvState inv;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
 /// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.

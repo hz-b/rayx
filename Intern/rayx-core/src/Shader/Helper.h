@@ -6,10 +6,10 @@
 
 namespace RAYX {
 
-RAYX_FN_ACC void init(Inv& inv);
-RAYX_FN_ACC uint64_t rayId(Inv& inv);
-RAYX_FN_ACC uint output_index(uint i, Inv& inv);
-RAYX_FN_ACC void recordEvent(Ray r, double w, Inv& inv);
-RAYX_FN_ACC void recordFinalEvent(Ray r, double w, Inv& inv);
+RAYX_FN_ACC void init(InvState& inv);
+RAYX_FN_ACC uint64_t rayId(InvState& inv);
+RAYX_FN_ACC uint output_index(uint i, InvState& inv);
+RAYX_FN_ACC void recordEvent(Ray r, double w, InvState& inv);
+RAYX_FN_ACC void recordFinalEvent(Ray r, double w, InvState& inv);
 
 } // namespace RAYX

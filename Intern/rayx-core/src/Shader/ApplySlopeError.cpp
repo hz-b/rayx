@@ -67,7 +67,7 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FN_ACC
-dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv) {
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, InvState& inv) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 

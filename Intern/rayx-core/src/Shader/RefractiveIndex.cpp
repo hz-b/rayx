@@ -23,7 +23,7 @@ namespace RAYX {
 
 /// The number of palik entries we currently store for this material.
 RAYX_FN_ACC
-int RAYX_API getPalikEntryCount(int material, Inv& inv) {
+int RAYX_API getPalikEntryCount(int material, InvState& inv) {
     int m = material - 1;  // in [0, 91]
     // This counts how many doubles are in between the materials index, and the
     // next index in the table. Division by 3, because each entry has 3 members
@@ -33,7 +33,7 @@ int RAYX_API getPalikEntryCount(int material, Inv& inv) {
 
 /// The number of nff entries we currently store for this material.
 RAYX_FN_ACC
-int RAYX_API getNffEntryCount(int material, Inv& inv) {
+int RAYX_API getNffEntryCount(int material, InvState& inv) {
     int m = material - 1;  // in [0, 91]
     // the offset of 92 (== number of materials), skips the palik table and
     // reaches into the nff table. the rest of the logic is as above.
@@ -42,7 +42,7 @@ int RAYX_API getNffEntryCount(int material, Inv& inv) {
 
 // Indexes into the palik table of a particular material at a given index.
 RAYX_FN_ACC
-PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv) {
+PalikEntry RAYX_API getPalikEntry(int index, int material, InvState& inv) {
     int m = material - 1;  // in [0, 91]
     // inv.matIdx[m] is the start of the Palik table of material m.
     // 3*index skips 'index'-many entries, because an entry consists of 3 doubles.
@@ -57,7 +57,7 @@ PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv) {
 }
 
 RAYX_FN_ACC
-NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv) {
+NffEntry RAYX_API getNffEntry(int index, int material, InvState& inv) {
     int m = material - 1;  // in [0, 91]
     // inv.matIdx[92+m] is the start of the Nff table of material m.
     // 3*index skips 'index'-many entries.
@@ -73,7 +73,7 @@ NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv) {
 
 // returns dvec2 to represent a complex number
 RAYX_FN_ACC
-complex::Complex RAYX_API getRefractiveIndex(double energy, int material, Inv& inv) {
+complex::Complex RAYX_API getRefractiveIndex(double energy, int material, InvState& inv) {
     if (material == -1) {  // vacuum
         return complex::Complex(1., 0.);
     }

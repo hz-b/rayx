@@ -19,7 +19,7 @@ namespace {
 struct DynamicElementsKernel {
     template <typename Acc>
     RAYX_FN_ACC
-    void operator() (const Acc& acc, RAYX::Inv inv) const {
+    void operator() (const Acc& acc, RAYX::InvState inv) const {
         using Idx = alpaka::Idx<Acc>;
         const Idx gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
@@ -238,7 +238,7 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
 
     // reference resources
 
-    auto inv = Inv {
+    auto inv = InvState {
         // shader instance local variables
         .globalInvocationId = {},
         .finalized          = {},

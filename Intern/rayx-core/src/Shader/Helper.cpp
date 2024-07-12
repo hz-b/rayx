@@ -5,7 +5,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-void init(Inv& inv) {
+void init(InvState& inv) {
     inv.finalized = false;
 
     // TODO(Sven): dont waste time with initializing
@@ -24,13 +24,13 @@ void init(Inv& inv) {
 }
 
 RAYX_FN_ACC
-uint64_t rayId(Inv& inv) { return uint64_t(inv.pushConstants.rayIdStart) + uint64_t(inv.globalInvocationId); }
+uint64_t rayId(InvState& inv) { return uint64_t(inv.pushConstants.rayIdStart) + uint64_t(inv.globalInvocationId); }
 
 // `i in [0, maxEvents-1]`.
 // Will return the index in outputRays to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputRays[output_index(i)]`.
 RAYX_FN_ACC
-uint output_index(uint i, Inv& inv) {
+uint output_index(uint i, InvState& inv) {
     return uint(inv.globalInvocationId) * uint(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
            uint(inv.pushConstants.startEventID);
 }
@@ -38,7 +38,7 @@ uint output_index(uint i, Inv& inv) {
 // record an event and store it in the next free spot in outputRays.
 // `r` will typically be _ray, or some related ray.
 RAYX_FN_ACC
-void recordEvent(Ray r, double w, Inv& inv) {
+void recordEvent(Ray r, double w, InvState& inv) {
     if (inv.nextEventIndex < inv.pushConstants.startEventID) {
         inv.nextEventIndex += 1;
         return;
@@ -78,7 +78,7 @@ void recordEvent(Ray r, double w, Inv& inv) {
 // Like `recordEvent` above, but it will prevent recording more events after this.
 // Is used for events terminating the path of the ray.
 RAYX_FN_ACC
-void recordFinalEvent(Ray r, double w, Inv& inv) {
+void recordFinalEvent(Ray r, double w, InvState& inv) {
     recordEvent(r, w, inv);
     inv.finalized = true;
 }

@@ -1,7 +1,7 @@
 #include "setupTests.h"
 
 // define globally decralred invocation state
-InvocationState inv;
+InvState inv;
 
 std::unique_ptr<RAYX::Tracer> tracer;
 

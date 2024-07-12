@@ -36,7 +36,7 @@ struct _debug_struct {
 // we don't require forward declarations in GLSL, hence we only do them in C++:
 
 // TODO(Sven): restore RAYX_API attributes for members
-struct RAYX_API InvocationState {
+struct RAYX_API InvState {
 
     // these variables are only used during shader invocation
     int globalInvocationId;
@@ -58,7 +58,5 @@ struct RAYX_API InvocationState {
     // TODO(Sven): make all inputs const
     PushConstants pushConstants;
 };
-
-using Inv = InvocationState;
 
 } // namespace RAYX

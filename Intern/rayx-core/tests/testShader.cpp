@@ -960,12 +960,12 @@ TEST_F(TestSuite, testPolarizationIntensity) {
     const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
 
     const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
-    const auto refract_amplitude = refractAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+    const auto refractAmplitude = calcRefractAmplitude(incidentAngle, refractAngle, iorI, refractIor);
 
-    const auto reflect_intensity = reflectIntensity(reflectAmplitude);
-    const auto refract_intensity = refractIntensity(refract_amplitude, incidentAngle, refractAngle, iorI, refractIor);
-    CHECK_EQ(reflect_intensity.s + refract_intensity.s, 1.0);
-    CHECK_EQ(reflect_intensity.p + refract_intensity.p, 1.0);
+    const auto reflectIntensity = calcReflectIntensity(reflectAmplitude);
+    const auto refractIntensity = calcRefractIntensity(refractAmplitude, incidentAngle, refractAngle, iorI, refractIor);
+    CHECK_EQ(reflectIntensity.s + refractIntensity.s, 1.0);
+    CHECK_EQ(reflectIntensity.p + refractIntensity.p, 1.0);
 }
 
 TEST_F(TestSuite, testPolarizingReflectionScenario) {
@@ -1101,8 +1101,8 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
     const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
 
-    const auto brewsters_angle = brewstersAngle(iorI, refractIor);
-    CHECK_EQ(incidentAngle, brewsters_angle.real());
+    const auto brewstersAngle = calcBrewstersAngle(iorI, refractIor);
+    CHECK_EQ(incidentAngle, brewstersAngle.real());
 
     const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
     const auto reflectElectricField = interceptReflect(
@@ -1115,7 +1115,7 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     );
 
     const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
-    const auto expected_reflect_field = ElectricField(
+    const auto expectedReflectElectricField = ElectricField(
         // p polarized part is lost due to a fully polarizing reflection at brewsters angle
         {0, 0},
 
@@ -1125,7 +1125,7 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
         amplitude.s * incidentElectricField.z
     );
 
-    CHECK_EQ(reflectElectricField, expected_reflect_field);
+    CHECK_EQ(reflectElectricField, expectedReflectElectricField);
 }
 
 // non-polarizing reflection (reflection at normal incidence)

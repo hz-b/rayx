@@ -14,7 +14,7 @@ calculates refracted ray
 "ray beyond horizon"
 */
 RAYX_FN_ACC
-Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv) {
+Ray refrac2D(Ray r, dvec3 normal, double az, double ax, InvState& inv) {
     double eps1 = -glm::atan(normal.x / normal.y);
     double del1 = glm::asin(normal.z);
 
@@ -45,7 +45,7 @@ Ray refrac2D(Ray r, dvec3 normal, double az, double ax, Inv& inv) {
 
 // refraction function used for gratings
 RAYX_FN_ACC
-Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
+Ray refrac(Ray r, dvec3 normal, double linedensity, InvState& inv) {
     double xy = normal[0] / normal[1];
     double zy = normal[2] / normal[1];
     double sqq = sqrt(1 + zy * zy + xy * xy);
@@ -89,7 +89,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity, Inv& inv) {
  */
 RAYX_FN_ACC
 Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
-                          double a, Inv& inv) {  // TODO fix unused var
+                          double a, InvState& inv) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {
         y1 = sqrt(y1);

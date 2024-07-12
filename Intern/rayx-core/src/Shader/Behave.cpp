@@ -15,7 +15,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
+Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
     SlitBehaviour b = deserializeSlit(inv.elements[id].m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -61,7 +61,7 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
 }
 
 RAYX_FN_ACC
-Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
+Ray behaveRZP(Ray r, int id, Collision col, InvState& inv) {
     RZPBehaviour b = deserializeRZP(inv.elements[id].m_behaviour);
 
     double WL            = hvlam(r.m_energy);
@@ -88,7 +88,7 @@ Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
 }
 
 RAYX_FN_ACC
-Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
+Ray behaveGrating(Ray r, int id, Collision col, InvState& inv) {
     GratingBehaviour b = deserializeGrating(inv.elements[id].m_behaviour);
 
     // vls parameters passed in q.elementParams
@@ -108,7 +108,7 @@ Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
 }
 
 RAYX_FN_ACC
-Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
+Ray behaveMirror(Ray r, int id, Collision col, InvState& inv) {
     // calculate the new direction after the reflection
     const auto incident_vec = r.m_direction;
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);
@@ -136,7 +136,7 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
 }
 
 RAYX_FN_ACC
-Ray behaveImagePlane(Ray r, [[maybe_unused]] int id, [[maybe_unused]] Collision col, [[maybe_unused]] Inv& inv) {
+Ray behaveImagePlane(Ray r, [[maybe_unused]] int id, [[maybe_unused]] Collision col, [[maybe_unused]] InvState& inv) {
     // doesn't need to do anything.
     return r;
 }
