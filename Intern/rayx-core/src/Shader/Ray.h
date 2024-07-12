@@ -63,10 +63,4 @@ struct RAYX_API Ray {
 // make sure Ray does not introduce cost on copy or default construction
 static_assert(std::is_trivially_copyable_v<Ray>);
 
-// Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
-// Further, the number of doubles in a Ray need to be divisible by four at all times, as we want to store multiple Rays after each other without
-// padding in `rayData`. This is why we need m_padding.
-// TODO(Sven): should this rather check divisibility by sizeof(dvec4) ?
-static_assert(sizeof(Ray) % alignof(dvec3) == 0);
-
 } // namespace RAYX
