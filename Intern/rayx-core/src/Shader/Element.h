@@ -51,10 +51,6 @@ struct Element {
     // See the `enum class Material` from Material.h to make sense of this value.
     // Materials are either REFLECTIVE, VACUUM or they represent a particular element from the periodic system.
     double m_material;
-
-    // This field is unused, it's only there to guarantee that sizeof(Element) is divisible by sizeof(dmat4).
-    // Should guarantee that std430 in GLSL and c++ have the same memory layout for `Element`.
-    double m_padding[1];
 };
 
 // make sure Element does not introduce cost on copy or default construction

@@ -455,17 +455,17 @@ Collision findCollisionWith(Ray r, uint id, InvState& inv) {
     return col;
 }
 
-// Returns the next collision for the ray `_ray`.
+// Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const Ray& _ray, InvState& inv) {
+Collision findCollision(const Ray& ray, InvState& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {
-        if (_ray.m_lastElement >= inv.elements.size() - 1) {
+        if (ray.m_lastElement >= inv.elements.size() - 1) {
             Collision col;
             col.found = false;
             return col;
         }
-        return findCollisionWith(_ray, uint(_ray.m_lastElement + 1), inv);
+        return findCollisionWith(ray, uint(ray.m_lastElement + 1), inv);
     }
 
     // global coordinates of first intersection point of ray among all elements in beamline
@@ -478,7 +478,7 @@ Collision findCollision(const Ray& _ray, InvState& inv) {
     // move ray slightly forward.
     // -> prevents hitting an element very close to the previous collision.
     // -> prevents self-intersection.
-    Ray r = _ray;
+    Ray r = ray;
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
     // Find intersection points through all elements
@@ -489,7 +489,7 @@ Collision findCollision(const Ray& _ray, InvState& inv) {
         }
 
         dvec3 global_hitpoint = dvec3(inv.elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
-        double current_dist = length(global_hitpoint - _ray.m_position);
+        double current_dist = length(global_hitpoint - ray.m_position);
 
         if (current_dist < best_dist) {
             best_col = current_col;

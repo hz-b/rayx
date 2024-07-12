@@ -36,7 +36,7 @@ uint output_index(uint i, InvState& inv) {
 }
 
 // record an event and store it in the next free spot in outputRays.
-// `r` will typically be _ray, or some related ray.
+// `r` will typically be ray, or some related ray.
 RAYX_FN_ACC
 void recordEvent(Ray r, double w, InvState& inv) {
     if (inv.nextEventIndex < inv.pushConstants.startEventID) {

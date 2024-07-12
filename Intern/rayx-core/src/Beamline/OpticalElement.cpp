@@ -71,7 +71,6 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
         .m_slopeError = dele.getSlopeError(),
         .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
         .m_material = defaultMaterial(dele),
-        .m_padding = {0.0},
     };
 }
 
