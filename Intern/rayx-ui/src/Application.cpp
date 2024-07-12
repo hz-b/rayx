@@ -238,12 +238,13 @@ void Application::run() {
                 case State::PrepareElements:
                     getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
                                                      std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays), m_buildTextureNeeded);
-                    m_buildTextureNeeded = false;
+
                     m_State = State::BuildingElements;
                     break;
                 case State::BuildingElements:
                     if (getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), textureSetLayout, m_TexturePool);
+                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), textureSetLayout, m_TexturePool, m_buildTextureNeeded);
+                        m_buildTextureNeeded = false;
                         m_State = State::Running;
                     }
                     break;

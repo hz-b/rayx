@@ -89,11 +89,12 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
 
 std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
                                                               const std::vector<std::vector<RAYX::Ray>> sortedRays, bool buildTexture) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
+    // RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<RenderObjectInput> rObjectsInput;
     if (buildTexture) m_textureInputCache.clear();
     for (uint32_t i = 0; i < elements.size(); i++) {
+        RAYX_PROFILE_SCOPE_STDOUT("Scene::getRObjectInputs - Triangulation");
         auto compiled = elements[i].compile();
         std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
@@ -106,7 +107,7 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
             continue;  // Input is not generated --> Object won't be built/rendered
         }
 
-        glm::mat4 modelMatrix = compiled.m_outTrans;
+        glm::dmat4& modelMatrix = compiled.m_outTrans;
 
         if (buildTexture) {
             auto [width, height] = getRectangularDimensions(compiled.m_cutout);
@@ -123,6 +124,7 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
             RenderObjectInput inputObject{modelMatrix, vertices, indices};
             rObjectsInput.emplace_back(std::move(inputObject));
         } else {
+            // RAYX_PROFILE_SCOPE_STDOUT("Scene::getRObjectInputs - No Texture");
             RenderObjectInput inputObject{modelMatrix, vertices, indices};
             rObjectsInput.emplace_back(std::move(inputObject));
         }
@@ -131,27 +133,38 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
 }
 
 void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
-                                   std::shared_ptr<DescriptorPool> descriptorPool) {
+                                   std::shared_ptr<DescriptorPool> descriptorPool, bool buildTexture) {
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
     RAYX_PROFILE_FUNCTION_STDOUT();
-    m_ElementRObjects.clear();
+    // m_ElementRObjects.clear();
 
     size_t textureIndex = 0;
-    for (const auto& input : inputs) {
-        std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
+    // RAYX_LOG << "Building " << inputs.size() << " render objects";
+    if (m_ElementRObjects.size() < inputs.size() || buildTexture) {
+        m_ElementRObjects.clear();
+        m_ElementRObjects.reserve(inputs.size());
+        for (const auto& input : inputs) {
+            std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
 
-        if (textureIndex < m_textureInputCache.size()) {
-            const auto& textureInput = m_textureInputCache[textureIndex];
-            Texture texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-                            VK_IMAGE_ASPECT_COLOR_BIT, {textureInput.width, textureInput.height});
-            texture.updateFromData(textureInput.data.get(), textureInput.width, textureInput.height);
-            m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, std::move(texture), setLayout,
-                                           descriptorPool);
-            ++textureIndex;
-        } else {
-            m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, Texture(m_Device), setLayout,
-                                           descriptorPool);
+            if (textureIndex < m_textureInputCache.size()) {
+                // RAYX_PROFILE_SCOPE_STDOUT("Scene::buildRObjectsFromInput - Building RenderObject with Texture");
+                const auto& textureInput = m_textureInputCache[textureIndex];
+                Texture texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+                                VK_IMAGE_ASPECT_COLOR_BIT, {textureInput.width, textureInput.height});
+                texture.updateFromData(textureInput.data.get(), textureInput.width, textureInput.height);
+                m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, std::move(texture), setLayout,
+                                               descriptorPool);
+                ++textureIndex;
+            } else {
+                m_ElementRObjects.emplace_back(m_Device, input.modelMatrix, convertedVertices, input.indices, Texture(m_Device), setLayout,
+                                               descriptorPool);
+            }
+        }
+    } else {
+        for (size_t i = 0; i < inputs.size(); i++) {
+            std::vector<VertexVariant> convertedVertices(inputs[i].vertices.begin(), inputs[i].vertices.end());
+            m_ElementRObjects[i].updateParams(inputs[i].modelMatrix, convertedVertices, inputs[i].indices);
         }
     }
 }
