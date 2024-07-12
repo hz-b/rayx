@@ -93,7 +93,6 @@ std::unique_ptr<unsigned char[]> footprintAsImage(const std::vector<std::vector<
     const float invLogMax = 1.0f / logMax;
 
     {
-        RAYX_PROFILE_SCOPE_STDOUT("Footprint to Image");
         constexpr int LUT_SIZE = 1024;
         std::array<glm::u8vec4, LUT_SIZE> colorLUT;
 

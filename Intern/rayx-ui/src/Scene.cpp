@@ -94,7 +94,6 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
     std::vector<RenderObjectInput> rObjectsInput;
     if (buildTexture) m_textureInputCache.clear();
     for (uint32_t i = 0; i < elements.size(); i++) {
-        RAYX_PROFILE_SCOPE_STDOUT("Scene::getRObjectInputs - Triangulation");
         auto compiled = elements[i].compile();
         std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
@@ -124,7 +123,6 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<
             RenderObjectInput inputObject{modelMatrix, vertices, indices};
             rObjectsInput.emplace_back(std::move(inputObject));
         } else {
-            // RAYX_PROFILE_SCOPE_STDOUT("Scene::getRObjectInputs - No Texture");
             RenderObjectInput inputObject{modelMatrix, vertices, indices};
             rObjectsInput.emplace_back(std::move(inputObject));
         }
@@ -137,10 +135,8 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
     assert(setLayout != nullptr && "Descriptor set layout is null");
     assert(descriptorPool != nullptr && "Descriptor pool is null");
     RAYX_PROFILE_FUNCTION_STDOUT();
-    // m_ElementRObjects.clear();
 
     size_t textureIndex = 0;
-    // RAYX_LOG << "Building " << inputs.size() << " render objects";
     if (m_ElementRObjects.size() < inputs.size() || buildTexture) {
         m_ElementRObjects.clear();
         m_ElementRObjects.reserve(inputs.size());
@@ -148,7 +144,6 @@ void Scene::buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std:
             std::vector<VertexVariant> convertedVertices(input.vertices.begin(), input.vertices.end());
 
             if (textureIndex < m_textureInputCache.size()) {
-                // RAYX_PROFILE_SCOPE_STDOUT("Scene::buildRObjectsFromInput - Building RenderObject with Texture");
                 const auto& textureInput = m_textureInputCache[textureIndex];
                 Texture texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
                                 VK_IMAGE_ASPECT_COLOR_BIT, {textureInput.width, textureInput.height});

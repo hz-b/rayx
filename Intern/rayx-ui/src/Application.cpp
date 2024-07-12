@@ -216,8 +216,13 @@ void Application::run() {
 
                             RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
 
-                            buildRayCacheFuture =
-                                std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                            if (!buildRayCacheFuture.valid() ||
+                                (buildRayCacheFuture.valid() && buildRayCacheFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
+                                buildRayCacheFuture = std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(),
+                                                                 std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                            } else {
+                                RAYX_VERB << "Skipping buildRayCache, async task already running.";
+                            }
                             m_State = State::BuildingRays;
                         }
                     }
@@ -236,8 +241,14 @@ void Application::run() {
                     }
                     break;
                 case State::PrepareElements:
-                    getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
-                                                     std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays), m_buildTextureNeeded);
+                    // only start async task if one is not already running
+                    if (!getRObjInputsFuture.valid() ||
+                        (getRObjInputsFuture.valid() && getRObjInputsFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
+                        getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
+                                                         std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays), m_buildTextureNeeded);
+                    } else {
+                        RAYX_VERB << "Skipping PrepareElements, async task already running.";
+                    }
 
                     m_State = State::BuildingElements;
                     break;
@@ -255,10 +266,16 @@ void Application::run() {
             }
 
             if (m_UIParams.rayInfo.cacheChanged) {
-                buildRayCacheFuture =
-                    std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                // only start async task if one is not already running
+                if (!buildRayCacheFuture.valid() ||
+                    (buildRayCacheFuture.valid() && buildRayCacheFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
+                    buildRayCacheFuture =
+                        std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                    m_UIParams.rayInfo.cacheChanged = false;
+                } else {
+                    RAYX_LOG << "Skipping buildRayCache, async task already running.";
+                }
                 m_State = State::BuildingRays;
-                m_UIParams.rayInfo.cacheChanged = false;
             }
 
             if (m_UIParams.rayInfo.raysChanged) {
