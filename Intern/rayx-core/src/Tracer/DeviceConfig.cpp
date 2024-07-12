@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <Debug/Debug.h>
+#include "Debug/Debug.h"
 
 #include "Platform.h"
 #include "DeviceConfig.h"

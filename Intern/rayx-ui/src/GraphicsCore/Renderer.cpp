@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include <Debug/Debug.h>
+#include "Debug/Debug.h"
 #include "Buffer.h"
 #include "Texture.h"
 

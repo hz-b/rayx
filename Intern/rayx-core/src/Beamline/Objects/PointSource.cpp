@@ -1,11 +1,11 @@
 #include "PointSource.h"
 
-#include <DesignElement/DesignSource.h>
-#include <DesignElement/DesignElement.h>
-#include <Debug/Debug.h>
-#include <Debug/Instrumentor.h>
-#include <Random.h>
-#include <Shader/Constants.h>
+#include "DesignElement/DesignSource.h"
+#include "DesignElement/DesignElement.h"
+#include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
+#include "Random.h"
+#include "Shader/Constants.h"
 
 namespace RAYX {
 

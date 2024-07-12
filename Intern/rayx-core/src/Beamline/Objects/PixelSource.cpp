@@ -1,12 +1,12 @@
 #include "PixelSource.h"
 
-#include <DesignElement/DesignSource.h>
-#include <DesignElement/DesignElement.h>
-#include <Data/xml.h>
-#include <Debug/Debug.h>
-#include <Debug/Instrumentor.h>
-#include <Random.h>
-#include <Shader/Constants.h>
+#include "DesignElement/DesignSource.h"
+#include "DesignElement/DesignElement.h"
+#include "Data/xml.h"
+#include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
+#include "Random.h"
+#include "Shader/Constants.h"
 
 namespace RAYX {
 

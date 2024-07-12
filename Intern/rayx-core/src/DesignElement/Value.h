@@ -5,13 +5,13 @@
 #include <string>
 #include <memory>
 
-#include <Beamline/LightSource.h>
-#include <Beamline/EnergyDistribution.h>
-#include <Shader/Common.h>
-#include <Shader/Cutout.h>
-#include <Shader/Surface.h>
-#include <Material/Material.h>
-#include <Debug/Debug.h>
+#include "Beamline/LightSource.h"
+#include "Beamline/EnergyDistribution.h"
+#include "Shader/Common.h"
+#include "Shader/Cutout.h"
+#include "Shader/Surface.h"
+#include "Material/Material.h"
+#include "Debug/Debug.h"
 #include <angle.h>
 
 namespace RAYX {

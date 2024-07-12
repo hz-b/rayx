@@ -7,13 +7,13 @@
 #include <queue>
 #include <set>
 
-#include <Colors.h>
-#include <Debug/Debug.h>
-#include <Shader/Constants.h>
-#include <Shader/Element.h>
-#include <Shader/Cutout.h>
-#include <DesignElement/DesignElement.h>
-#include <Triangulation/TraceTriangulation.h>
+#include "Colors.h"
+#include "Debug/Debug.h"
+#include "Shader/Constants.h"
+#include "Shader/Element.h"
+#include "Shader/Cutout.h"
+#include "DesignElement/DesignElement.h"
+#include "Triangulation/TraceTriangulation.h"
 
 #include "GeometryUtils.h"
 

@@ -1,6 +1,6 @@
 #include "Window.h"
 #include <stdexcept>
-#include <Debug/Debug.h>
+#include "Debug/Debug.h"
 
 /**
  * This constructor performs several key tasks:

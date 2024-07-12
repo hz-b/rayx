@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Shader/Ray.h>
+#include "Shader/Ray.h"
 #include "Value.h"
 
 namespace RAYX {

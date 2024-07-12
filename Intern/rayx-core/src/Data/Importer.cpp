@@ -13,8 +13,8 @@
 #include "Debug/Instrumentor.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-#include <DesignElement/DesignElement.h>
-#include <Shader/Strings.h>
+#include "DesignElement/DesignElement.h"
+#include "Shader/Strings.h"
 
 using RAYX::ElementType;
 

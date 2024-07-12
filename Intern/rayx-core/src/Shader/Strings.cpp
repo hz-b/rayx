@@ -1,5 +1,5 @@
 #include "Strings.h"
-#include <Debug/Debug.h>
+#include "Debug/Debug.h"
 
 namespace RAYX {
 

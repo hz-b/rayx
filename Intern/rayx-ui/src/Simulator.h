@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Tracer/Tracer.h>
-#include <UserInterface/Settings.h>
-#include <Beamline/Beamline.h>
+#include "Tracer/Tracer.h"
+#include "UserInterface/Settings.h"
+#include "Beamline/Beamline.h"
 
 class Simulator {
   public:
