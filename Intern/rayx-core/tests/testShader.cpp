@@ -900,8 +900,8 @@ TEST_F(TestSuite, testSnell) {
     };
 
     for (const auto p : inouts) {
-        const auto refract_angle = refractAngle(p.in_incident_angle, p.in_ior_i, p.in_ior_t);
-        CHECK_EQ(refract_angle, p.out_refract_angle);
+        const auto refractAngle = calcRefractAngle(p.in_incident_angle, p.in_ior_i, p.in_ior_t);
+        CHECK_EQ(refractAngle, p.out_refract_angle);
     }
 }
 
@@ -941,29 +941,29 @@ TEST_F(TestSuite, testFresnel) {
     };
 
     for (auto p : inouts) {
-        const auto reflect_amplitude = reflectAmplitude(p.in_incident_angle, p.in_refract_angle, p.in_ior_i, p.in_ior_t);
-        CHECK_EQ(reflect_amplitude.p, p.out_reflect_amplitude.p);
-        CHECK_EQ(reflect_amplitude.s, p.out_reflect_amplitude.s);
+        const auto reflectAmplitude = calcReflectAmplitude(p.in_incident_angle, p.in_refract_angle, p.in_ior_i, p.in_ior_t);
+        CHECK_EQ(reflectAmplitude.p, p.out_reflect_amplitude.p);
+        CHECK_EQ(reflectAmplitude.s, p.out_reflect_amplitude.s);
     }
 }
 
 TEST_F(TestSuite, testPolarizationIntensity) {
     using namespace complex;
 
-    const auto ior_i = Complex(1.0, 0);
-    const auto ior_t = Complex(1.5, 0);
-    const auto incident_vec = dvec3(1, 0, 0);
-    const auto normal_vec = glm::normalize(dvec3(-1, 1, 0));
+    const auto iorI = Complex(1.0, 0);
+    const auto refractIor = Complex(1.5, 0);
+    const auto incidentVec = dvec3(1, 0, 0);
+    const auto normalVec = glm::normalize(dvec3(-1, 1, 0));
 
-    const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
-    const auto incident_angle = angleBetweenUnitVectors(incident_vec, -normal_vec);
-    const auto refract_angle = refractAngle(incident_angle, ior_i, ior_t);
+    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
+    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
 
-    const auto reflect_amplitude = reflectAmplitude(incident_angle, refract_angle, ior_i, ior_t);
-    const auto refract_amplitude = refractAmplitude(incident_angle, refract_angle, ior_i, ior_t);
+    const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+    const auto refract_amplitude = refractAmplitude(incidentAngle, refractAngle, iorI, refractIor);
 
-    const auto reflect_intensity = reflectIntensity(reflect_amplitude);
-    const auto refract_intensity = refractIntensity(refract_amplitude, incident_angle, refract_angle, ior_i, ior_t);
+    const auto reflect_intensity = reflectIntensity(reflectAmplitude);
+    const auto refract_intensity = refractIntensity(refract_amplitude, incidentAngle, refractAngle, iorI, refractIor);
     CHECK_EQ(reflect_intensity.s + refract_intensity.s, 1.0);
     CHECK_EQ(reflect_intensity.p + refract_intensity.p, 1.0);
 }
@@ -971,13 +971,13 @@ TEST_F(TestSuite, testPolarizationIntensity) {
 TEST_F(TestSuite, testPolarizingReflectionScenario) {
     using namespace complex;
 
-    const auto incident_vec = glm::normalize(dvec3(-0.195, -0.195, 0.961));
+    const auto incidentVec = glm::normalize(dvec3(-0.195, -0.195, 0.961));
     const auto normal_vec_0 = glm::normalize(dvec3(0, -1, -1));
 
-    const auto reflect_vec_0 = glm::reflect(incident_vec, -normal_vec_0);
+    const auto reflect_vec_0 = glm::reflect(incidentVec, -normal_vec_0);
     CHECK_EQ(reflect_vec_0, glm::normalize(dvec3(-0.195, -0.961, 0.195)));
 
-    const auto incident_angle_0 = angleBetweenUnitVectors(incident_vec, -normal_vec_0);
+    const auto incident_angle_0 = angleBetweenUnitVectors(incidentVec, -normal_vec_0);
     CHECK_EQ(Rad(incident_angle_0).toDeg().deg, 57.19646879265609);
 
     const auto reflect_amplitude_0 = ComplexFresnelCoeffs {
@@ -985,7 +985,7 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
         .p = polar(0.975, -0.751),
     };
 
-    const auto reflect_polarization_matrix_0 = polarizationMatrix(incident_vec, reflect_vec_0, normal_vec_0, reflect_amplitude_0);
+    const auto reflect_polarization_matrix_0 = calcPolaririzationMatrix(incidentVec, reflect_vec_0, normal_vec_0, reflect_amplitude_0);
 
     CHECK_EQ(
         reflect_polarization_matrix_0,
@@ -1011,7 +1011,7 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
         .p = polar(0.982, -0.507),
     };
 
-    const auto reflect_polarization_matrix_1 = polarizationMatrix(reflect_vec_0, reflect_vec_1, normal_vec_1, reflect_amplitude_1);
+    const auto reflect_polarization_matrix_1 = calcPolaririzationMatrix(reflect_vec_0, reflect_vec_1, normal_vec_1, reflect_amplitude_1);
 
     CHECK_EQ(
         reflect_polarization_matrix_1,
@@ -1030,61 +1030,61 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
     using namespace complex;
 
     struct IorPair {
-        Complex ior_i;
-        Complex ior_t;
+        Complex iorI;
+        Complex refractIor;
     };
 
     const auto ior_pairs = std::vector<IorPair> {
         {
-            .ior_i = {1.0, 0},
-            .ior_t = {1.5, 0},
+            .iorI = {1.0, 0},
+            .refractIor = {1.5, 0},
         },
         {
-            .ior_i = {1.5, 0},
-            .ior_t = {1.0, 0},
+            .iorI = {1.5, 0},
+            .refractIor = {1.0, 0},
         },
         {
-            .ior_i = {1.0, 0},
-            .ior_t = {0.05, 5.0},
+            .iorI = {1.0, 0},
+            .refractIor = {0.05, 5.0},
         },
     };
 
     for (const auto ior_pair : ior_pairs) {
-        const auto ior_i = ior_pair.ior_i;
-        const auto ior_t = ior_pair.ior_t;
-        const auto incident_vec = dvec3(1, 0, 0);
-        const auto normal_vec = glm::normalize(dvec3(-1, 1, 0));
+        const auto iorI = ior_pair.iorI;
+        const auto refractIor = ior_pair.refractIor;
+        const auto incidentVec = dvec3(1, 0, 0);
+        const auto normalVec = glm::normalize(dvec3(-1, 1, 0));
 
-        const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
-        const auto incident_angle = angleBetweenUnitVectors(incident_vec, -normal_vec);
-        const auto refract_angle = refractAngle(incident_angle, ior_i, ior_t);
+        const auto reflectVec = glm::reflect(incidentVec, normalVec);
+        const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
+        const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
 
-        const auto incident_field = ElectricField({0, 0}, {1, 0}, {1, 0});
-        const auto reflect_field = interceptReflect(
-            incident_field,
-            incident_vec,
-            reflect_vec,
-            normal_vec,
-            ior_i,
-            ior_t
+        const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
+        const auto reflectElectricField = interceptReflect(
+            incidentElectricField,
+            incidentVec,
+            reflectVec,
+            normalVec,
+            iorI,
+            refractIor
         );
 
-        const auto amplitude = reflectAmplitude(incident_angle, refract_angle, ior_i, ior_t);
+        const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
         const auto expected_reflect_field = ElectricField(
             // p polarized part
             // the value from the y component of the incident field is now carried in the x compnent, due to a 90 degrees reflection
             // the amplitude is negated due to a 180 degrees phase shift
-            -amplitude.p * incident_field.y,
+            -amplitude.p * incidentElectricField.y,
 
             // y component is now 0
             {0, 0},
 
             // s polarized part
             // only gets an amplitude change
-            amplitude.s * incident_field.z
+            amplitude.s * incidentElectricField.z
         );
 
-        CHECK_EQ(reflect_field, expected_reflect_field);
+        CHECK_EQ(reflectElectricField, expected_reflect_field);
     }
 }
 
@@ -1092,29 +1092,29 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
 TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     using namespace complex;
 
-    const auto ior_i = Complex(1.0, 0);
-    const auto ior_t = Complex(2.0, 0);
-    const auto incident_vec = dvec3(1, 0, 0);
-    const auto normal_vec = glm::normalize(dvec3(-1, ior_t.real(), 0));
+    const auto iorI = Complex(1.0, 0);
+    const auto refractIor = Complex(2.0, 0);
+    const auto incidentVec = dvec3(1, 0, 0);
+    const auto normalVec = glm::normalize(dvec3(-1, refractIor.real(), 0));
 
-    const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
-    const auto incident_angle = angleBetweenUnitVectors(incident_vec, -normal_vec);
-    const auto refract_angle = refractAngle(incident_angle, ior_i, ior_t);
+    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
+    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
 
-    const auto brewsters_angle = brewstersAngle(ior_i, ior_t);
-    CHECK_EQ(incident_angle, brewsters_angle.real());
+    const auto brewsters_angle = brewstersAngle(iorI, refractIor);
+    CHECK_EQ(incidentAngle, brewsters_angle.real());
 
-    const auto incident_field = ElectricField({0, 0}, {1, 0}, {1, 0});
-    const auto reflect_field = interceptReflect(
-        incident_field,
-        incident_vec,
-        reflect_vec,
-        normal_vec,
-        ior_i,
-        ior_t
+    const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
+    const auto reflectElectricField = interceptReflect(
+        incidentElectricField,
+        incidentVec,
+        reflectVec,
+        normalVec,
+        iorI,
+        refractIor
     );
 
-    const auto amplitude = reflectAmplitude(incident_angle, refract_angle, ior_i, ior_t);
+    const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
     const auto expected_reflect_field = ElectricField(
         // p polarized part is lost due to a fully polarizing reflection at brewsters angle
         {0, 0},
@@ -1122,30 +1122,30 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
         {0, 0},
 
         // s polarized part
-        amplitude.s * incident_field.z
+        amplitude.s * incidentElectricField.z
     );
 
-    CHECK_EQ(reflect_field, expected_reflect_field);
+    CHECK_EQ(reflectElectricField, expected_reflect_field);
 }
 
 // non-polarizing reflection (reflection at normal incidence)
 TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     using namespace complex;
 
-    const auto ior_i = Complex(1.0, 0);
-    const auto ior_t = Complex(1.5, 0);
-    const auto incident_vec = glm::normalize(dvec3(1, 1, 0));
-    const auto normal_vec = -incident_vec;
-    const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
-    const auto incident_field = ElectricField({0, 0}, {0, 0}, {1, 0});
+    const auto iorI = Complex(1.0, 0);
+    const auto refractIor = Complex(1.5, 0);
+    const auto incidentVec = glm::normalize(dvec3(1, 1, 0));
+    const auto normalVec = -incidentVec;
+    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto incidentElectricField = ElectricField({0, 0}, {0, 0}, {1, 0});
 
-    const auto reflect_field = interceptReflect(
-        incident_field,
-        incident_vec,
-        reflect_vec,
-        normal_vec,
-        ior_i,
-        ior_t
+    const auto reflectElectricField = interceptReflect(
+        incidentElectricField,
+        incidentVec,
+        reflectVec,
+        normalVec,
+        iorI,
+        refractIor
     );
 
     const auto expected_reflect_field = ElectricField(
@@ -1154,24 +1154,24 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
         {-0.2, 0}
     );
 
-    CHECK_EQ(reflect_field, expected_reflect_field);
+    CHECK_EQ(reflectElectricField, expected_reflect_field);
 
     // check if normal-incidence and near-normal-incidence are similar to each other
     {
         const auto eps = 1e-3;
-        const auto normal_vec = glm::normalize(-incident_vec + eps);
-        const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
+        const auto normalVec = glm::normalize(-incidentVec + eps);
+        const auto reflectVec = glm::reflect(incidentVec, normalVec);
 
-        const auto reflect_field = interceptReflect(
-            incident_field,
-            incident_vec,
-            reflect_vec,
-            normal_vec,
-            ior_i,
-            ior_t
+        const auto reflectElectricField = interceptReflect(
+            incidentElectricField,
+            incidentVec,
+            reflectVec,
+            normalVec,
+            iorI,
+            refractIor
         );
 
-        CHECK_EQ(reflect_field, expected_reflect_field, eps);
+        CHECK_EQ(reflectElectricField, expected_reflect_field, eps);
     }
 }
 
@@ -1270,7 +1270,7 @@ TEST_F(TestSuite, testRotateElectricField) {
     // forward = (0, 0, -1)
     // up      = (0, 1, 0)
     // right   = (1, 0, 0)
-    const auto incident_field = ElectricField({1, 0}, {0, 0}, {0, 0});
+    const auto incidentElectricField = ElectricField({1, 0}, {0, 0}, {0, 0});
 
     struct InOutPair {
         ElectricField in_field;
@@ -1299,11 +1299,11 @@ TEST_F(TestSuite, testRotateElectricField) {
 
     for (const auto& p : inouts) {
         const auto rotation = rotationMatrix(p.in_forward, p.in_up);
-        const auto field = rotation * incident_field;
+        const auto field = rotation * incidentElectricField;
         CHECK_EQ(field, p.out_field);
 
         const auto rotationWithoutUp = rotationMatrix(p.in_forward);
-        const auto field_rotationWithoutUp = rotationWithoutUp * incident_field;
+        const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
         CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
     }
 }

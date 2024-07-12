@@ -26,27 +26,27 @@ inline double angleBetweenUnitVectors(glm::dvec3 a, glm::dvec3 b) {
 }
 
 RAYX_FN_ACC
-inline complex::Complex refractAngle(const complex::Complex incident_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
-    return complex::asin((ior_i / ior_t) * complex::sin(incident_angle));
+inline complex::Complex calcRefractAngle(const complex::Complex incidentAngle, const complex::Complex iorI, const complex::Complex iorT) {
+    return complex::asin((iorI / iorT) * complex::sin(incidentAngle));
 }
 
 RAYX_FN_ACC
-inline complex::Complex brewstersAngle(const complex::Complex ior_i, const complex::Complex ior_t) {
-    return complex::atan(ior_t / ior_i);
+inline complex::Complex calcBrewstersAngle(const complex::Complex iorI, const complex::Complex iorT) {
+    return complex::atan(iorT / iorI);
 }
 
 RAYX_FN_ACC
-inline complex::Complex criticalAngle(const complex::Complex ior_i, const complex::Complex ior_t) {
-    return complex::asin(ior_t / ior_i);
+inline complex::Complex calcCriticalAngle(const complex::Complex iorI, const complex::Complex iorT) {
+    return complex::asin(iorT / iorI);
 }
 
 RAYX_FN_ACC
-inline ComplexFresnelCoeffs reflectAmplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
-    const auto cos_i = complex::cos(incident_angle);
-    const auto cos_t = complex::cos(refract_angle);
+inline ComplexFresnelCoeffs calcReflectAmplitude(const complex::Complex incidentAngle, const complex::Complex refractAngle, const complex::Complex iorI, const complex::Complex iorT) {
+    const auto cos_i = complex::cos(incidentAngle);
+    const auto cos_t = complex::cos(refractAngle);
 
-    const auto s = (ior_i * cos_i - ior_t * cos_t) / (ior_i * cos_i + ior_t * cos_t);
-    const auto p = (ior_t * cos_i - ior_i * cos_t) / (ior_t * cos_i + ior_i * cos_t);
+    const auto s = (iorI * cos_i - iorT * cos_t) / (iorI * cos_i + iorT * cos_t);
+    const auto p = (iorT * cos_i - iorI * cos_t) / (iorT * cos_i + iorI * cos_t);
 
     return {
         .s = s,
@@ -55,23 +55,12 @@ inline ComplexFresnelCoeffs reflectAmplitude(const complex::Complex incident_ang
 }
 
 RAYX_FN_ACC
-inline ComplexFresnelCoeffs refractAmplitude(const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
-    const auto cos_i = complex::cos(incident_angle);
-    const auto cos_t = complex::cos(refract_angle);
+inline ComplexFresnelCoeffs calcRefractAmplitude(const complex::Complex incidentAngle, const complex::Complex refractAngle, const complex::Complex iorI, const complex::Complex iorT) {
+    const auto cos_i = complex::cos(incidentAngle);
+    const auto cos_t = complex::cos(refractAngle);
 
-    const auto s = (2.0 * ior_i * cos_i) / (ior_i * cos_i + ior_t * cos_t);
-    const auto p = (2.0 * ior_i * cos_i) / (ior_t * cos_i + ior_i * cos_t);
-
-    return {
-        .s = s,
-        .p = p,
-    };
-}
-
-RAYX_FN_ACC
-inline FresnelCoeffs reflectIntensity(const ComplexFresnelCoeffs reflect_amplitude) {
-    const auto s = (reflect_amplitude.s * complex::conj(reflect_amplitude.s)).real();
-    const auto p = (reflect_amplitude.p * complex::conj(reflect_amplitude.p)).real();
+    const auto s = (2.0 * iorI * cos_i) / (iorI * cos_i + iorT * cos_t);
+    const auto p = (2.0 * iorI * cos_i) / (iorT * cos_i + iorI * cos_t);
 
     return {
         .s = s,
@@ -80,8 +69,19 @@ inline FresnelCoeffs reflectIntensity(const ComplexFresnelCoeffs reflect_amplitu
 }
 
 RAYX_FN_ACC
-inline FresnelCoeffs refractIntensity(const ComplexFresnelCoeffs refract_amplitude, const complex::Complex incident_angle, const complex::Complex refract_angle, const complex::Complex ior_i, const complex::Complex ior_t) {
-    const auto r = ((ior_t * complex::cos(refract_angle)) / (ior_i * complex::cos(incident_angle))).real();
+inline FresnelCoeffs calcReflectIntensity(const ComplexFresnelCoeffs reflectAmplitude) {
+    const auto s = (reflectAmplitude.s * complex::conj(reflectAmplitude.s)).real();
+    const auto p = (reflectAmplitude.p * complex::conj(reflectAmplitude.p)).real();
+
+    return {
+        .s = s,
+        .p = p,
+    };
+}
+
+RAYX_FN_ACC
+inline FresnelCoeffs calcRefractIntensity(const ComplexFresnelCoeffs refract_amplitude, const complex::Complex incidentAngle, const complex::Complex refractAngle, const complex::Complex iorI, const complex::Complex iorT) {
+    const auto r = ((iorT * complex::cos(refractAngle)) / (iorI * complex::cos(incidentAngle))).real();
 
     const auto s = r * (refract_amplitude.s * complex::conj(refract_amplitude.s)).real();
     const auto p = r * (refract_amplitude.p * complex::conj(refract_amplitude.p)).real();
@@ -93,7 +93,7 @@ inline FresnelCoeffs refractIntensity(const ComplexFresnelCoeffs refract_amplitu
 }
 
 RAYX_FN_ACC
-inline cmat3 jonesMatrix(const ComplexFresnelCoeffs amplitude) {
+inline cmat3 calcJonesMatrix(const ComplexFresnelCoeffs amplitude) {
     return {
         amplitude.s, 0, 0,
         0, amplitude.p, 0,
@@ -102,36 +102,36 @@ inline cmat3 jonesMatrix(const ComplexFresnelCoeffs amplitude) {
 }
 
 RAYX_FN_ACC
-inline cmat3 polarizationMatrix(
-    const glm::dvec3 incident_vec,
-    const glm::dvec3 reflect_or_refract_vec,
-    const glm::dvec3 normal_vec,
+inline cmat3 calcPolaririzationMatrix(
+    const glm::dvec3 incidentVec,
+    const glm::dvec3 reflectOrRefractVec,
+    const glm::dvec3 normalVec,
     const ComplexFresnelCoeffs amplitude
 ) {
-    const auto s0 = glm::normalize(glm::cross(incident_vec, -normal_vec));
+    const auto s0 = glm::normalize(glm::cross(incidentVec, -normalVec));
     const auto s1 = s0;
-    const auto p0 = glm::cross(incident_vec, s0);
-    const auto p1 = glm::cross(reflect_or_refract_vec, s0);
+    const auto p0 = glm::cross(incidentVec, s0);
+    const auto p1 = glm::cross(reflectOrRefractVec, s0);
 
-    const auto o_out = glm::dmat3(
+    const auto out = glm::dmat3(
         s1,
         p1,
-        reflect_or_refract_vec
+        reflectOrRefractVec
     );
 
-    const auto o_in = glm::dmat3(
-        s0.x, p0.x, incident_vec.x,
-        s0.y, p0.y, incident_vec.y,
-        s0.z, p0.z, incident_vec.z
+    const auto in = glm::dmat3(
+        s0.x, p0.x, incidentVec.x,
+        s0.y, p0.y, incidentVec.y,
+        s0.z, p0.z, incidentVec.z
     );
 
-    const auto jones_matrix = jonesMatrix(amplitude);
+    const auto jonesMatrix = calcJonesMatrix(amplitude);
 
-    return o_out * jones_matrix * o_in;
+    return out * jonesMatrix * in;
 }
 
 RAYX_FN_ACC
-inline cmat3 reflectPolarizationMatrixAtNormalIncidence(const ComplexFresnelCoeffs amplitude) {
+inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnelCoeffs amplitude) {
     // since no plane of incidence is defined at normal incidence,
     // s and p components are equal and only contain the base reflectivity and a phase shift of 180 degrees
     // here we apply the base reflectivity and phase shift independent of the ray direction to all components
@@ -144,27 +144,27 @@ inline cmat3 reflectPolarizationMatrixAtNormalIncidence(const ComplexFresnelCoef
 
 RAYX_FN_ACC
 inline ElectricField interceptReflect(
-    const ElectricField incident_field,
-    const dvec3 incident_vec,
-    const dvec3 reflect_vec,
-    const dvec3 normal_vec,
-    const complex::Complex ior_i,
-    const complex::Complex ior_t
+    const ElectricField incidentElectricField,
+    const dvec3 incidentVec,
+    const dvec3 reflectVec,
+    const dvec3 normalVec,
+    const complex::Complex iorI,
+    const complex::Complex iorT
 ) {
-    const auto incident_angle = complex::Complex(angleBetweenUnitVectors(incident_vec, -normal_vec), 0);
-    const auto refract_angle = refractAngle(incident_angle, ior_i, ior_t);
+    const auto incidentAngle = complex::Complex(angleBetweenUnitVectors(incidentVec, -normalVec), 0);
+    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, iorT);
 
-    const auto reflect_amplitude = reflectAmplitude(incident_angle, refract_angle, ior_i, ior_t);
+    const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, iorT);
 
     // TODO: make this more robust
-    const auto is_normal_incidence = incident_vec == -normal_vec;
-    const auto reflect_polarization_matrix =
-        is_normal_incidence
-        ? reflectPolarizationMatrixAtNormalIncidence(reflect_amplitude)
-        : polarizationMatrix(incident_vec, reflect_vec, normal_vec, reflect_amplitude);
+    const auto isNormalIncidence = incidentVec == -normalVec;
+    const auto reflectPolarizationMatrix =
+        isNormalIncidence
+        ? calcReflectPolarizationMatrixAtNormalIncidence(reflectAmplitude)
+        : calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
 
-    const auto reflect_field = reflect_polarization_matrix * incident_field;
-    return reflect_field;
+    const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
+    return reflectElectricField;
 }
 
 RAYX_FN_ACC

@@ -11,7 +11,7 @@ template <
     typename T,
     typename Queue
 >
-inline alpaka::Idx<Acc> scan_sum(
+inline alpaka::Idx<Acc> scanSum(
     Queue queue,
     Buf<Acc, T> dst,
     Buf<Acc, T> src,

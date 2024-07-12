@@ -37,7 +37,7 @@ template <
     typename T,
     typename Queue
 >
-inline void gather_n(
+inline void gather(
     Queue queue,
     Buf<Acc, T> dst,
     Buf<Acc, T> src,

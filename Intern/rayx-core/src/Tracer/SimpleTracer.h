@@ -260,7 +260,7 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
 
     // make output events compact
 
-    auto totalEventsCount = scan_sum<Acc, Idx>(
+    auto totalEventsCount = scanSum<Acc, Idx>(
         q,
         *m_batchOutput.compactEventOffsets.buf,
         *m_batchOutput.compactEventCounts.buf,
@@ -269,7 +269,7 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
 
     resizeBufferIfNeeded(q, m_batchOutput.compactEvents, totalEventsCount);
 
-    gather_n<Acc, Ray>(
+    gather<Acc, Ray>(
         q,
         *m_batchOutput.compactEvents.buf,
         *m_batchOutput.events.buf,
