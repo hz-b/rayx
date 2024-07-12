@@ -65,6 +65,7 @@ class SimpleTracer : public DeviceTracer {
         int totalEventsCount;
     };
 
+    /// Buffer references a buffer on a device and stores the size of that buffer.
     template <typename T>
     struct Buffer {
         using Buf = alpaka::Buf<Acc, T, Dim, Idx>;
@@ -76,23 +77,33 @@ class SimpleTracer : public DeviceTracer {
 
     const int m_deviceIndex;
 
+    /// BeamlineInput contains beamline data, that is constant across all batches
     struct BeamlineInput {
         Buffer<Element> elements;
         Buffer<int>     materialIndices;
         Buffer<double>  materialData;
     } m_beamlineInput;
 
+    /// BatchINput contains data corresponding to a single batch
+    /// The data is stored on the accelerator device
     struct BatchInput {
         Buffer<Ray> rays;
     } m_batchInput;
 
+    /// BatchOutput contains data corresponding to a single batch
+    /// The data is stored on the accelerator device
     struct BatchOutput {
+        // compact events are compact output rays, thus no unused slots are in between.
         Buffer<Idx> compactEventCounts;
         Buffer<Idx> compactEventOffsets;
         Buffer<Ray> compactEvents;
+        // events is a buffer with capacity to hold a number of rays: maxEvents * numInputRays
         Buffer<Ray> events;
     } m_batchOutput;
 
+    /// BatchOutput contains data corresponding to a single batch
+    /// The data is stored on the host
+    /// The contents of the BatchResult contain the resulting events from a batch
     struct BatchResult {
         std::vector<Idx> compactEventCounts;
         std::vector<Idx> compactEventOffsets;
