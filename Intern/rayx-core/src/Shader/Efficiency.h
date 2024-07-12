@@ -7,8 +7,8 @@
 namespace RAYX {
 
 using Stokes = dvec4;
-using Field = cvec3;
-using LocalField = cvec2;
+using ElectricField = cvec3;
+using LocalElectricField = cvec2;
 
 struct FresnelCoeffs {
     double s;
@@ -143,8 +143,8 @@ inline cmat3 reflectPolarizationMatrixAtNormalIncidence(const ComplexFresnelCoef
 }
 
 RAYX_FN_ACC
-inline Field interceptReflect(
-    const Field incident_field,
+inline ElectricField interceptReflect(
+    const ElectricField incident_field,
     const dvec3 incident_vec,
     const dvec3 reflect_vec,
     const dvec3 normal_vec,
@@ -168,13 +168,13 @@ inline Field interceptReflect(
 }
 
 RAYX_FN_ACC
-inline double intensity(const LocalField field) {
+inline double intensity(const LocalElectricField field) {
     const auto mag = complex::abs(field);
     return glm::dot(mag, mag);
 }
 
 RAYX_FN_ACC
-inline double intensity(const Field field) {
+inline double intensity(const ElectricField field) {
     const auto mag = complex::abs(field);
     return glm::dot(mag, mag);
 }
@@ -190,7 +190,7 @@ inline double degreeOfPolarization(const Stokes stokes) {
 }
 
 RAYX_FN_ACC
-inline Stokes fieldToStokes(const LocalField field) {
+inline Stokes fieldToStokes(const LocalElectricField field) {
     const auto mag = complex::abs(field);
     const auto theta = complex::arg(field);
 
@@ -203,27 +203,27 @@ inline Stokes fieldToStokes(const LocalField field) {
 }
 
 RAYX_FN_ACC
-inline Stokes fieldToStokes(const Field field) {
-    return fieldToStokes(LocalField(field));
+inline Stokes fieldToStokes(const ElectricField field) {
+    return fieldToStokes(LocalElectricField(field));
 }
 
 RAYX_FN_ACC
-inline LocalField stokesToLocalField(const Stokes stokes) {
+inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
     const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
 
     const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
     const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
     const auto y = complex::polar(y_mag, y_theta);
 
-    return LocalField(
+    return LocalElectricField(
         {x_real, 0},
         y
     );
 }
 
 RAYX_FN_ACC
-inline Field stokesToField(const Stokes stokes) {
-    return Field(stokesToLocalField(stokes), complex::Complex(0, 0));
+inline ElectricField stokesToElectricField(const Stokes stokes) {
+    return ElectricField(stokesToLocalElectricField(stokes), complex::Complex(0, 0));
 }
 
 RAYX_FN_ACC

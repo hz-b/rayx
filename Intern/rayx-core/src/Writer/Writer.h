@@ -70,27 +70,27 @@ static Format FULL_FORMAT = {
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_energy; },
     },
     FormatComponent{
-        .name = "Field-x-real",
+        .name = "ElectricField-x-real",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.x.real(); },
     },
     FormatComponent{
-        .name = "Field-x-imag",
+        .name = "ElectricField-x-imag",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.x.imag(); },
     },
     FormatComponent{
-        .name = "Field-y-real",
+        .name = "ElectricField-y-real",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.y.real(); },
     },
     FormatComponent{
-        .name = "Field-y-imag",
+        .name = "ElectricField-y-imag",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.y.imag(); },
     },
     FormatComponent{
-        .name = "Field-z-real",
+        .name = "ElectricField-z-real",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.z.real(); },
     },
     FormatComponent{
-        .name = "Field-z-imag",
+        .name = "ElectricField-z-imag",
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.z.imag(); },
     },
     FormatComponent{

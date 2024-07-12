@@ -93,7 +93,7 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
         // const auto rotation = rotationMatrix(direction);
-        const auto field = /* rotation *  */stokesToField(m_pol);
+        const auto field = /* rotation *  */stokesToElectricField(m_pol);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)

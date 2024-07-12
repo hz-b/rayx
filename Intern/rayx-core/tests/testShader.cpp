@@ -1059,7 +1059,7 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
         const auto incident_angle = angleBetweenUnitVectors(incident_vec, -normal_vec);
         const auto refract_angle = refractAngle(incident_angle, ior_i, ior_t);
 
-        const auto incident_field = Field({0, 0}, {1, 0}, {1, 0});
+        const auto incident_field = ElectricField({0, 0}, {1, 0}, {1, 0});
         const auto reflect_field = interceptReflect(
             incident_field,
             incident_vec,
@@ -1070,7 +1070,7 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
         );
 
         const auto amplitude = reflectAmplitude(incident_angle, refract_angle, ior_i, ior_t);
-        const auto expected_reflect_field = Field(
+        const auto expected_reflect_field = ElectricField(
             // p polarized part
             // the value from the y component of the incident field is now carried in the x compnent, due to a 90 degrees reflection
             // the amplitude is negated due to a 180 degrees phase shift
@@ -1104,7 +1104,7 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     const auto brewsters_angle = brewstersAngle(ior_i, ior_t);
     CHECK_EQ(incident_angle, brewsters_angle.real());
 
-    const auto incident_field = Field({0, 0}, {1, 0}, {1, 0});
+    const auto incident_field = ElectricField({0, 0}, {1, 0}, {1, 0});
     const auto reflect_field = interceptReflect(
         incident_field,
         incident_vec,
@@ -1115,7 +1115,7 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     );
 
     const auto amplitude = reflectAmplitude(incident_angle, refract_angle, ior_i, ior_t);
-    const auto expected_reflect_field = Field(
+    const auto expected_reflect_field = ElectricField(
         // p polarized part is lost due to a fully polarizing reflection at brewsters angle
         {0, 0},
 
@@ -1137,7 +1137,7 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     const auto incident_vec = glm::normalize(dvec3(1, 1, 0));
     const auto normal_vec = -incident_vec;
     const auto reflect_vec = glm::reflect(incident_vec, normal_vec);
-    const auto incident_field = Field({0, 0}, {0, 0}, {1, 0});
+    const auto incident_field = ElectricField({0, 0}, {0, 0}, {1, 0});
 
     const auto reflect_field = interceptReflect(
         incident_field,
@@ -1148,7 +1148,7 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
         ior_t
     );
 
-    const auto expected_reflect_field = Field(
+    const auto expected_reflect_field = ElectricField(
         {0, 0},
         {0, 0},
         {-0.2, 0}
@@ -1175,12 +1175,12 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     }
 }
 
-TEST_F(TestSuite, testStokesToFieldAndFieldToStokes) {
+TEST_F(TestSuite, testStokesToElectricFieldAndElectricFieldToStokes) {
     using namespace complex;
 
     struct InOutPair {
         Stokes stokes;
-        LocalField field;
+        LocalElectricField field;
     };
 
     const auto diag = 1.0 / glm::sqrt(2.0);
@@ -1188,27 +1188,27 @@ TEST_F(TestSuite, testStokesToFieldAndFieldToStokes) {
     std::vector<InOutPair> inouts {
         { // linearly polarized (horizontal)
             .stokes = Stokes(1, 1, 0, 0),
-            .field = LocalField({1, 0}, {0, 0}),
+            .field = LocalElectricField({1, 0}, {0, 0}),
         },
         { // linearly polarized (vertical)
             .stokes = Stokes(1, -1, 0, 0),
-            .field = LocalField({0, 0}, {1, 0}),
+            .field = LocalElectricField({0, 0}, {1, 0}),
         },
         { // linearly polarized (diagonal +45 degrees)
             .stokes = Stokes(1, 0, 1, 0),
-            .field = LocalField({diag, 0}, {diag, 0}),
+            .field = LocalElectricField({diag, 0}, {diag, 0}),
         },
         { // linearly polarized (diagonal -45 degrees)
             .stokes = Stokes(1, 0, -1, 0),
-            .field = LocalField({diag, 0}, {-diag, 0}),
+            .field = LocalElectricField({diag, 0}, {-diag, 0}),
         },
         { // circular polarized (right) (clockwise)
             .stokes = Stokes(1, 0, 0, 1),
-            .field = LocalField({diag, 0}, {0, -diag}),
+            .field = LocalElectricField({diag, 0}, {0, -diag}),
         },
         { // circular polarized (left) (counter-clockwise)
             .stokes = Stokes(1, 0, 0, -1),
-            .field = LocalField({diag, 0}, {0, diag}),
+            .field = LocalElectricField({diag, 0}, {0, diag}),
         },
     };
 
@@ -1218,7 +1218,7 @@ TEST_F(TestSuite, testStokesToFieldAndFieldToStokes) {
 
         // convert stokes to field and back and check if stokes are equal to initial stokes
         {
-            const auto field = stokesToLocalField(p.stokes);
+            const auto field = stokesToLocalElectricField(p.stokes);
             CHECK_EQ(intensity(field), intensity(p.stokes));
 
             const auto stokes = fieldToStokes(field);
@@ -1243,7 +1243,7 @@ TEST_F(TestSuite, testStokesToFieldAndFieldToStokes) {
             CHECK_EQ(intensity(stokes), intensity(p.field));
             CHECK_EQ(stokes, p.stokes);
 
-            const auto field = stokesToLocalField(stokes);
+            const auto field = stokesToLocalElectricField(stokes);
 
             // check if the magnitude is preserved
             const auto mag = abs(field);
@@ -1263,21 +1263,21 @@ TEST_F(TestSuite, testStokesToFieldAndFieldToStokes) {
     }
 }
 
-TEST_F(TestSuite, testRotateField) {
+TEST_F(TestSuite, testRotateElectricField) {
     using namespace complex;
 
     // convention for incident field
     // forward = (0, 0, -1)
     // up      = (0, 1, 0)
     // right   = (1, 0, 0)
-    const auto incident_field = Field({1, 0}, {0, 0}, {0, 0});
+    const auto incident_field = ElectricField({1, 0}, {0, 0}, {0, 0});
 
     struct InOutPair {
-        Field in_field;
+        ElectricField in_field;
         dvec3 in_forward;
         dvec3 in_up;
-        Field out_field;
-        Field out_field_rotationWithoutUp;
+        ElectricField out_field;
+        ElectricField out_field_rotationWithoutUp;
     };
 
     const auto inouts = std::vector<InOutPair> {

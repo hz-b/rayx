@@ -58,7 +58,7 @@ std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const 
         glm::dvec3 direction = getDirection();
 
         const auto rotation = glm::dmat3(m_orientation);
-        const auto field = rotation * stokesToField(m_stokes);
+        const auto field = rotation * stokesToElectricField(m_stokes);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 

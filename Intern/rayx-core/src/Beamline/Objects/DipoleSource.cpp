@@ -22,8 +22,8 @@ double get_factorCriticalEnergy() {
 }
 
 double get_factorMagneticField() {
-    double magField = ELECTRON_VOLT / (SPEED_OF_LIGHT * ELEMENTARY_CHARGE) * 1.0e9;
-    return magField;
+    double magElectricField = ELECTRON_VOLT / (SPEED_OF_LIGHT * ELEMENTARY_CHARGE) * 1.0e9;
+    return magElectricField;
 }
 
 double get_factorElectronEnergy() {
@@ -133,7 +133,7 @@ std::vector<Ray> DipoleSource::getRays(int thread_count) const {
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
         const auto rotation = glm::dmat3(m_orientation);
-        const auto field = rotation * stokesToField(psiandstokes.stokes);
+        const auto field = rotation * stokesToElectricField(psiandstokes.stokes);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)
