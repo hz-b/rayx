@@ -17,7 +17,7 @@ void Simulator::runSimulation() {
     }
     // Run rayx core
     if (!m_maxEvents) {
-        m_maxEvents = 32;
+        m_maxEvents = m_Beamline.m_DesignElements.size() * 2 + 8;
     }
 
     auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, m_startEventID);

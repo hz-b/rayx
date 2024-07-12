@@ -90,4 +90,10 @@ BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
     return out;
 }
 
+int Tracer::defaultMaxEvents(const Beamline* beamline) {
+    if (beamline)
+        return beamline->m_DesignElements.size() * 2 + 8;
+    return 32;
+}
+
 }  // namespace RAYX

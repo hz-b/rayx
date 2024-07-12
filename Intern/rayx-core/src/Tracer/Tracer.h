@@ -37,6 +37,8 @@ class RAYX_API Tracer {
         int startEventID = 0
     );
 
+    static int defaultMaxEvents(const Beamline* beamline = nullptr);
+
   private:
     std::shared_ptr<DeviceTracer> m_deviceTracer;
 };

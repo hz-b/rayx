@@ -321,5 +321,5 @@ void Application::loadRays(const std::filesystem::path& rmlPath) {
 
 void Application::loadBeamline(const std::filesystem::path& rmlPath) {
     m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath));
-    m_UIParams.simulationInfo.maxEvents = 32;
+    m_UIParams.simulationInfo.maxEvents = RAYX::Tracer::defaultMaxEvents(m_Beamline.get());
 }
