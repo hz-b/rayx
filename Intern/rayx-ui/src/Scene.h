@@ -31,7 +31,7 @@ class Scene {
                                                            const std::vector<std::vector<RAYX::Ray>> sortedRays, bool buildTexture);
 
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
-                                std::shared_ptr<DescriptorPool> descriptorPool);
+                                std::shared_ptr<DescriptorPool> descriptorPool, bool buildTexture);
 
     void resetRayRObject() { m_RayRObjects.clear(); }
 

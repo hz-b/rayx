@@ -49,8 +49,6 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
 void traceTriangulation(const Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
     RAYX::CpuTracer tracer;
 
     constexpr size_t gridSize = 20;
@@ -61,43 +59,38 @@ void traceTriangulation(const Element compiled, std::vector<TextureVertex>& vert
     coll.found = false;
     std::vector<std::vector<Collision>> collisionGrid(gridSize, std::vector<Collision>(gridSize, coll));
 
-    {
-        RAYX_PROFILE_SCOPE_STDOUT("Triangulation: Find collisions");
-        for (size_t i = 0; i < gridSize; ++i) {
-            for (size_t j = 0; j < gridSize; ++j) {
-                Collision collision = findCollisionInElementCoords(rayGrid[i][j], compiled.m_surface, compiled.m_cutout, true);
-                collisionGrid[i][j] = collision;
-            }
+    for (size_t i = 0; i < gridSize; ++i) {
+        for (size_t j = 0; j < gridSize; ++j) {
+            Collision collision = findCollisionInElementCoords(rayGrid[i][j], compiled.m_surface, compiled.m_cutout, true);
+            collisionGrid[i][j] = collision;
         }
     }
 
     uint32_t index = 0;
-    {
-        RAYX_PROFILE_SCOPE_STDOUT("Triangulation: Create vertices and indices");
-        for (size_t i = 0; i < gridSize - 1; ++i) {
-            for (size_t j = 0; j < gridSize - 1; ++j) {
-                if (collisionGrid[i][j].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
-                    vertices.emplace_back(glm::vec4(collisionGrid[i][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                    vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                    vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
 
-                    indices.push_back(index++);
-                    indices.push_back(index++);
-                    indices.push_back(index++);
-                }
-                if (collisionGrid[i + 1][j + 1].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
-                    vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                    vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
-                    vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+    for (size_t i = 0; i < gridSize - 1; ++i) {
+        for (size_t j = 0; j < gridSize - 1; ++j) {
+            if (collisionGrid[i][j].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
+                vertices.emplace_back(glm::vec4(collisionGrid[i][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
 
-                    indices.push_back(index++);
-                    indices.push_back(index++);
-                    indices.push_back(index++);
-                }
+                indices.push_back(index++);
+                indices.push_back(index++);
+                indices.push_back(index++);
+            }
+            if (collisionGrid[i + 1][j + 1].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
+                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+                vertices.emplace_back(glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), OPT_ELEMENT_COLOR);
+
+                indices.push_back(index++);
+                indices.push_back(index++);
+                indices.push_back(index++);
             }
         }
-        if (vertices.empty() || indices.empty()) {
-            throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
-        }
+    }
+    if (vertices.empty() || indices.empty()) {
+        throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
     }
 }

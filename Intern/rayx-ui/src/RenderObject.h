@@ -62,6 +62,8 @@ class RenderObject {
     void updateTexture(const std::filesystem::path& path);
     void updateTexture(const unsigned char* data, uint32_t width, uint32_t height);
 
+    void updateParams(const glm::mat4& modelMatrix, std::vector<VertexVariant>& vertices, std::vector<uint32_t>& indices);
+
     glm::mat4 getModelMatrix() const { return m_modelMatrix; }
     glm::vec3 getTranslationVecor() const { return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]); }
     VkDescriptorSet getDescriptorSet() const { return m_descrSet; }

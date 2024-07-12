@@ -437,6 +437,7 @@ bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 &&
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
 void triangulateObject(const Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+    // RAYX_PROFILE_FUNCTION_STDOUT();
     switch (static_cast<int>(compiled.m_surface.m_type)) {
         case STYPE_PLANE_XZ: {
             planarTriangulation(compiled, vertices, indices);
