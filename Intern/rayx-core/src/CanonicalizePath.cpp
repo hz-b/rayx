@@ -1,13 +1,14 @@
 #include "CanonicalizePath.h"
 
-#include "Debug/Debug.h"
 #include <cstring>
 #include <stdexcept>
+
+#include "Debug/Debug.h"
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #include <windows.h>
 #elif defined(__linux__) || defined(__unix__) || defined(_POSIX_VERSION)
-#include <unistd.h>
 #include <limits.h>
+#include <unistd.h>
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif

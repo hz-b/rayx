@@ -11,15 +11,15 @@
 namespace RAYX {
 
 namespace complex {
-    template <typename T>
+template <typename T>
 #if defined(RAYX_CUDA_ENABLED)
-    using tcomplex = thrust::complex<T>;
+using tcomplex = thrust::complex<T>;
 #else
-    using tcomplex = std::complex<T>;
+using tcomplex = std::complex<T>;
 #endif
 
-    using Complex = tcomplex<double>;
-} // namespace complex
+using Complex = tcomplex<double>;
+}  // namespace complex
 
 using cvec2 = glm::tvec2<complex::Complex>;
 using cvec3 = glm::tvec3<complex::Complex>;
@@ -27,194 +27,134 @@ using cmat3 = glm::tmat3x3<complex::Complex>;
 
 namespace complex {
 #if defined(RAYX_CUDA_ENABLED)
-    using thrust::abs;
-    using thrust::arg;
-    using thrust::norm;
-    using thrust::conj;
-    using thrust::proj;
-    using thrust::polar;
-    using thrust::exp;
-    using thrust::log;
-    using thrust::log10;
-    using thrust::pow;
-    using thrust::sqrt;
+using thrust::abs;
+using thrust::arg;
+using thrust::conj;
+using thrust::exp;
+using thrust::log;
+using thrust::log10;
+using thrust::norm;
+using thrust::polar;
+using thrust::pow;
+using thrust::proj;
+using thrust::sqrt;
 
-    using thrust::sin;
-    using thrust::cos;
-    using thrust::tan;
-    using thrust::asin;
-    using thrust::acos;
-    using thrust::atan;
+using thrust::acos;
+using thrust::asin;
+using thrust::atan;
+using thrust::cos;
+using thrust::sin;
+using thrust::tan;
 
-    using thrust::sinh;
-    using thrust::cosh;
-    using thrust::tanh;
-    using thrust::asinh;
-    using thrust::acosh;
-    using thrust::atanh;
+using thrust::acosh;
+using thrust::asinh;
+using thrust::atanh;
+using thrust::cosh;
+using thrust::sinh;
+using thrust::tanh;
 #else
-    using std::abs;
-    using std::arg;
-    using std::norm;
-    using std::conj;
-    using std::proj;
-    using std::polar;
-    using std::exp;
-    using std::log;
-    using std::log10;
-    using std::pow;
-    using std::sqrt;
+using std::abs;
+using std::arg;
+using std::conj;
+using std::exp;
+using std::log;
+using std::log10;
+using std::norm;
+using std::polar;
+using std::pow;
+using std::proj;
+using std::sqrt;
 
-    using std::sin;
-    using std::cos;
-    using std::tan;
-    using std::asin;
-    using std::acos;
-    using std::atan;
+using std::acos;
+using std::asin;
+using std::atan;
+using std::cos;
+using std::sin;
+using std::tan;
 
-    using std::sinh;
-    using std::cosh;
-    using std::tanh;
-    using std::asinh;
-    using std::acosh;
-    using std::atanh;
+using std::acosh;
+using std::asinh;
+using std::atanh;
+using std::cosh;
+using std::sinh;
+using std::tanh;
 #endif
-} // namespace complex
+}  // namespace complex
 
 // add some helper function for glm::tvec of complex
 namespace complex {
-    RAYX_FN_ACC
-    inline dvec2 abs(cvec2 v) {
-        return dvec2(
-            abs(v.x),
-            abs(v.y)
-        );
-    }
+RAYX_FN_ACC
+inline dvec2 abs(cvec2 v) { return dvec2(abs(v.x), abs(v.y)); }
 
-    RAYX_FN_ACC
-    inline dvec3 abs(cvec3 v) {
-        return dvec3(
-            abs(v.x),
-            abs(v.y),
-            abs(v.z)
-        );
-    }
+RAYX_FN_ACC
+inline dvec3 abs(cvec3 v) { return dvec3(abs(v.x), abs(v.y), abs(v.z)); }
 
-    RAYX_FN_ACC
-    inline dvec2 arg(cvec2 v) {
-        return dvec2(
-            arg(v.x),
-            arg(v.y)
-        );
-    }
+RAYX_FN_ACC
+inline dvec2 arg(cvec2 v) { return dvec2(arg(v.x), arg(v.y)); }
 
-    RAYX_FN_ACC
-    inline dvec3 arg(cvec3 v) {
-        return dvec3(
-            arg(v.x),
-            arg(v.y),
-            arg(v.z)
-        );
-    }
+RAYX_FN_ACC
+inline dvec3 arg(cvec3 v) { return dvec3(arg(v.x), arg(v.y), arg(v.z)); }
 
-    RAYX_FN_ACC
-    inline cvec2 polar(dvec2 mag, dvec2 theta) {
-        return cvec2(
-            polar(mag.x, theta.x),
-            polar(mag.y, theta.y)
-        );
-    }
+RAYX_FN_ACC
+inline cvec2 polar(dvec2 mag, dvec2 theta) { return cvec2(polar(mag.x, theta.x), polar(mag.y, theta.y)); }
 
-    RAYX_FN_ACC
-    inline cvec3 polar(dvec3 mag, dvec3 theta) {
-        return cvec3(
-            polar(mag.x, theta.x),
-            polar(mag.y, theta.y),
-            polar(mag.z, theta.z)
-        );
-    }
-} // namespace complex
+RAYX_FN_ACC
+inline cvec3 polar(dvec3 mag, dvec3 theta) { return cvec3(polar(mag.x, theta.x), polar(mag.y, theta.y), polar(mag.z, theta.z)); }
+}  // namespace complex
 
-} // namespace RAYX
+}  // namespace RAYX
 
 namespace glm {
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, RAYX::complex::tcomplex<T>, Q> const& v, T scalar)
-{
-    return vec<3, RAYX::complex::tcomplex<T>, Q>(
-        v.x * scalar,
-        v.y * scalar,
-        v.z * scalar);
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, RAYX::complex::tcomplex<T>, Q> const& v, T scalar) {
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(v.x * scalar, v.y * scalar, v.z * scalar);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, T, Q> const& v, RAYX::complex::tcomplex<T> scalar)
-{
-    return vec<3, RAYX::complex::tcomplex<T>, Q>(
-        v.x * scalar,
-        v.y * scalar,
-        v.z * scalar);
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, T, Q> const& v, RAYX::complex::tcomplex<T> scalar) {
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(v.x * scalar, v.y * scalar, v.z * scalar);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, RAYX::complex::tcomplex<T>, Q> const& v, RAYX::complex::tcomplex<T> scalar)
-{
-    return vec<3, RAYX::complex::tcomplex<T>, Q>(
-        v.x * scalar,
-        v.y * scalar,
-        v.z * scalar);
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(vec<3, RAYX::complex::tcomplex<T>, Q> const& v,
+                                                                                 RAYX::complex::tcomplex<T> scalar) {
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(v.x * scalar, v.y * scalar, v.z * scalar);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(T scalar, vec<3, RAYX::complex::tcomplex<T>, Q> const& v)
-{
-    return vec<3, RAYX::complex::tcomplex<T>, Q>(
-        scalar * v.x,
-        scalar * v.y,
-        scalar * v.z);
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(T scalar, vec<3, RAYX::complex::tcomplex<T>, Q> const& v) {
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(scalar * v.x, scalar * v.y, scalar * v.z);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(RAYX::complex::tcomplex<T> scalar, vec<3, T, Q> const& v)
-{
-    return vec<3, RAYX::complex::tcomplex<T>, Q>(
-        scalar * v.x,
-        scalar * v.y,
-        scalar * v.z);
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(RAYX::complex::tcomplex<T> scalar, vec<3, T, Q> const& v) {
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(scalar * v.x, scalar * v.y, scalar * v.z);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(RAYX::complex::tcomplex<T> scalar, vec<3, RAYX::complex::tcomplex<T>, Q> const& v)
-{
-    return vec<3, RAYX::complex::tcomplex<T>, Q>(
-        scalar * v.x,
-        scalar * v.y,
-        scalar * v.z);
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<3, RAYX::complex::tcomplex<T>, Q> operator*(RAYX::complex::tcomplex<T> scalar,
+                                                                                 vec<3, RAYX::complex::tcomplex<T>, Q> const& v) {
+    return vec<3, RAYX::complex::tcomplex<T>, Q>(scalar * v.x, scalar * v.y, scalar * v.z);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type operator*(mat<3, 3, T, Q> const& m, typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type const& v) {
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type operator*(
+    mat<3, 3, T, Q> const& m, typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type const& v) {
     return typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type(
-        m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z,
-        m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z,
-        m[0][2] * v.x + m[1][2] * v.y + m[2][2] * v.z);
+        m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z, m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z, m[0][2] * v.x + m[1][2] * v.y + m[2][2] * v.z);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type operator*(typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type const& v, mat<3, 3, T, Q> const& m) {
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type operator*(
+    typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::col_type const& v, mat<3, 3, T, Q> const& m) {
     return typename mat<3, 3, RAYX::complex::tcomplex<T>, Q>::row_type(
-        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
-        m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
-        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
+        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z, m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z, m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR
-mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
-    mat<3, 3, T, Q> const& m1,
-    mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m2
-) {
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(mat<3, 3, T, Q> const& m1,
+                                                                                    mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m2) {
     using namespace RAYX::complex;
 
     T const SrcA00 = m1[0][0];
@@ -237,25 +177,18 @@ mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
     tcomplex<T> const SrcB21 = m2[2][1];
     tcomplex<T> const SrcB22 = m2[2][2];
 
-    return mat<3, 3, tcomplex<T>, Q> {
-        SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02,
-        SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02,
-        SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02,
-        SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12,
-        SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12,
-        SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12,
-        SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22,
-        SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22,
+    return mat<3, 3, tcomplex<T>, Q>{
+        SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02, SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02,
+        SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02, SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12,
+        SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12, SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12,
+        SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22, SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22,
         SrcA02 * SrcB20 + SrcA12 * SrcB21 + SrcA22 * SrcB22,
     };
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR
-mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
-    mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m1,
-    mat<3, 3, T, Q> const& m2
-) {
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m1,
+                                                                                    mat<3, 3, T, Q> const& m2) {
     using namespace RAYX::complex;
 
     tcomplex<T> const SrcA00 = m1[0][0];
@@ -278,25 +211,18 @@ mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
     T const SrcB21 = m2[2][1];
     T const SrcB22 = m2[2][2];
 
-    return mat<3, 3, tcomplex<T>, Q> {
-        SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02,
-        SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02,
-        SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02,
-        SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12,
-        SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12,
-        SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12,
-        SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22,
-        SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22,
+    return mat<3, 3, tcomplex<T>, Q>{
+        SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02, SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02,
+        SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02, SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12,
+        SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12, SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12,
+        SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22, SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22,
         SrcA02 * SrcB20 + SrcA12 * SrcB21 + SrcA22 * SrcB22,
     };
 }
 
-template<typename T, qualifier Q>
-GLM_FUNC_QUALIFIER GLM_CONSTEXPR
-mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
-    mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m1,
-    mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m2
-) {
+template <typename T, qualifier Q>
+GLM_FUNC_QUALIFIER GLM_CONSTEXPR mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m1,
+                                                                                    mat<3, 3, RAYX::complex::tcomplex<T>, Q> const& m2) {
     using namespace RAYX::complex;
 
     tcomplex<T> const SrcA00 = m1[0][0];
@@ -319,17 +245,13 @@ mat<3, 3, RAYX::complex::tcomplex<T>, Q> operator*(
     tcomplex<T> const SrcB21 = m2[2][1];
     tcomplex<T> const SrcB22 = m2[2][2];
 
-    return mat<3, 3, tcomplex<T>, Q> {
-        SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02,
-        SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02,
-        SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02,
-        SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12,
-        SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12,
-        SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12,
-        SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22,
-        SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22,
+    return mat<3, 3, tcomplex<T>, Q>{
+        SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02, SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02,
+        SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02, SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12,
+        SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12, SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12,
+        SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22, SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22,
         SrcA02 * SrcB20 + SrcA12 * SrcB21 + SrcA22 * SrcB22,
     };
 }
 
-} // namespace glm
+}  // namespace glm

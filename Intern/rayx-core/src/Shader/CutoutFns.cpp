@@ -1,4 +1,5 @@
 #include "CutoutFns.h"
+
 #include "Throw.h"
 
 namespace RAYX {
@@ -73,8 +74,8 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         l = inf;
     } else if (cutout.m_type == CTYPE_RECT) {
         RectCutout rect = deserializeRect(cutout);
-        w = rect.m_width/2.0;
-        l = rect.m_length/2.0;
+        w = rect.m_width / 2.0;
+        l = rect.m_length / 2.0;
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
@@ -92,18 +93,18 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         EllipticalCutout ell = deserializeElliptical(cutout);
         double rx = ell.m_diameter_x / 2.0;
         double rz = ell.m_diameter_z / 2.0;
-        ret[0] = dvec4( rx, 0.0, 0.0, 0.0);
-        ret[1] = dvec4(0.0, 0.0,  rz, 0.0);
+        ret[0] = dvec4(rx, 0.0, 0.0, 0.0);
+        ret[1] = dvec4(0.0, 0.0, rz, 0.0);
         ret[2] = dvec4(-rx, 0.0, 0.0, 0.0);
         ret[3] = dvec4(0.0, 0.0, -rz, 0.0);
         return ret;
     } else {
         _throw("invalid cutout type in inCutout!");
     }
-    ret[0] = dvec4( w, 0.0,  l, 0.0);
+    ret[0] = dvec4(w, 0.0, l, 0.0);
     ret[1] = dvec4(-w, 0.0, -l, 0.0);
-    ret[2] = dvec4(-w, 0.0,  l, 0.0);
-    ret[3] = dvec4( w, 0.0, -l, 0.0);
+    ret[2] = dvec4(-w, 0.0, l, 0.0);
+    ret[3] = dvec4(w, 0.0, -l, 0.0);
     return ret;
 }
 
@@ -136,4 +137,4 @@ void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
     }
 }
 
-} // namespace RAYX
+}  // namespace RAYX

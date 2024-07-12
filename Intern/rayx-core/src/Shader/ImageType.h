@@ -12,4 +12,4 @@ constexpr double IT_POINT2HORIZONTAL_LINE = 4.0;
 constexpr double IT_POINT2HORIZONTAL_DIVERGENT_LINE = 5.0;
 constexpr double IT_ASTIGMATIC2ASTIGMATIC = 12.0;
 
-} // namespace RAYX
+}  // namespace RAYX

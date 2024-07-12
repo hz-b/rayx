@@ -1,16 +1,15 @@
 #pragma once
 
-#include "Material/Material.h"
-
 #include <memory>
 #include <vector>
 
 #include "Beamline/LightSource.h"
 #include "Beamline/OpticalElement.h"
 #include "Core.h"
-#include "Shader/Ray.h"
 #include "DesignElement/DesignElement.h"
 #include "DesignElement/DesignSource.h"
+#include "Material/Material.h"
+#include "Shader/Ray.h"
 
 namespace RAYX {
 class LightSource;

@@ -37,4 +37,4 @@ constexpr double ETYPE_FATAL_ERROR = 6;
 // If there are no other elements the ray has this eventtype
 constexpr double ETYPE_EMITTED = 7;
 
-} // namespace RAYX
+}  // namespace RAYX

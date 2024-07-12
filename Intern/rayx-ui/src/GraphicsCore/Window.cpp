@@ -1,5 +1,7 @@
 #include "Window.h"
+
 #include <stdexcept>
+
 #include "Debug/Debug.h"
 
 /**

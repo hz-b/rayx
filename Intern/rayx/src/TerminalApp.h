@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Tracer/Tracer.h"
-
 #include <chrono>
 #include <filesystem>
 
 #include "CommandParser.h"
 #include "RAY-Core.h"
 #include "TerminalAppConfig.h"
+#include "Tracer/Tracer.h"
 
 class TerminalApp {
   public:

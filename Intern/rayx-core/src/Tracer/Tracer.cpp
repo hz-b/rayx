@@ -15,35 +15,34 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
     using Idx = int32_t;
 
     switch (deviceType) {
-    case DeviceType::GpuCuda:
+        case DeviceType::GpuCuda:
 #if defined(RAYX_CUDA)
-        using GpuAccCuda = RAYX::GpuAccCuda<Dim, Idx>;
-        return std::make_shared<RAYX::SimpleTracer<GpuAccCuda>>(deviceIndex);
+            using GpuAccCuda = RAYX::GpuAccCuda<Dim, Idx>;
+            return std::make_shared<RAYX::SimpleTracer<GpuAccCuda>>(deviceIndex);
 #else
-        RAYX_ERR << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
-        return nullptr;
+            RAYX_ERR << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
+            return nullptr;
 #endif
-    case DeviceType::GpuHip:
+        case DeviceType::GpuHip:
 #if defined(RAYX_HIP)
-        using GpuAccHip = RAYX::GpuAccHip<Dim, Idx>;
-        return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
+            using GpuAccHip = RAYX::GpuAccHip<Dim, Idx>;
+            return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
 #else
-        RAYX_ERR << "Failed to create Tracer with Hip device. Hip was disabled during build.";
-        return nullptr;
+            RAYX_ERR << "Failed to create Tracer with Hip device. Hip was disabled during build.";
+            return nullptr;
 #endif
-    default: // case DeviceType::Cpu
-        using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
-        return std::make_shared<RAYX::SimpleTracer<CpuAcc>>(deviceIndex);
+        default:  // case DeviceType::Cpu
+            using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
+            return std::make_shared<RAYX::SimpleTracer<CpuAcc>>(deviceIndex);
     }
 }
 
-} // unnamed namespace
+}  // unnamed namespace
 
 namespace RAYX {
 
 Tracer::Tracer(const DeviceConfig& deviceConfig) {
-    if (deviceConfig.enabledDevicesCount() != 1)
-        RAYX_ERR << "The number of selected devices must be exactly 1!";
+    if (deviceConfig.enabledDevicesCount() != 1) RAYX_ERR << "The number of selected devices must be exactly 1!";
 
     for (const auto& device : deviceConfig.devices) {
         if (device.enable) {
@@ -54,22 +53,9 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-BundleHistory Tracer::trace(
-    const Beamline& beamline,
-    Sequential sequential,
-    uint64_t max_batch_size,
-    int THREAD_COUNT,
-    unsigned int maxEvents,
-    int startEventID
-) {
-    return m_deviceTracer->trace(
-        beamline,
-        sequential,
-        max_batch_size,
-        THREAD_COUNT,
-        maxEvents,
-        startEventID
-    );
+BundleHistory Tracer::trace(const Beamline& beamline, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT, unsigned int maxEvents,
+                            int startEventID) {
+    return m_deviceTracer->trace(beamline, sequential, max_batch_size, THREAD_COUNT, maxEvents, startEventID);
 }
 
 /// Get the last event for each ray of the bundle.
@@ -91,8 +77,7 @@ BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
 }
 
 int Tracer::defaultMaxEvents(const Beamline* beamline) {
-    if (beamline)
-        return beamline->m_DesignElements.size() * 2 + 8;
+    if (beamline) return beamline->m_DesignElements.size() * 2 + 8;
     return 32;
 }
 

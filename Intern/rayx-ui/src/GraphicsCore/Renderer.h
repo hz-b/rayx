@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cassert>
 #include <memory>
 #include <vector>
-#include <cassert>
 
 #include "Device.h"
 #include "FrameInfo.h"

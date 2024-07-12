@@ -1,15 +1,14 @@
 #include <numeric>
 
-#include "setupTests.h"
-
-#include "Shader/Utils.h"
+#include "Beamline/Objects/DipoleSource.h"
+#include "Shader/ApplySlopeError.h"
 #include "Shader/Approx.h"
-#include "Shader/SphericalCoords.h"
+#include "Shader/LineDensity.h"
 #include "Shader/Rand.h"
 #include "Shader/Refrac.h"
-#include "Shader/ApplySlopeError.h"
-#include "Shader/LineDensity.h"
-#include "Beamline/Objects/DipoleSource.h"
+#include "Shader/SphericalCoords.h"
+#include "Shader/Utils.h"
+#include "setupTests.h"
 
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
@@ -860,7 +859,7 @@ TEST_F(TestSuite, testSnell) {
         Complex out_refract_angle;
     };
 
-    const auto inouts = std::vector<InOutPair> {
+    const auto inouts = std::vector<InOutPair>{
         {
             .in_ior_i = Complex(1.0, 0),
             .in_ior_t = Complex(1.0, 0),
@@ -923,20 +922,22 @@ TEST_F(TestSuite, testFresnel) {
             .in_ior_t = Complex(1, 0),
             .in_incident_angle = acos(Complex(0.10897754475504851, 0.40807275584607544)),
             .in_refract_angle = acos(Complex(0.17315572500228882, 0)),
-            .out_reflect_amplitude = {
-                .s = Complex(0.57163467986230054, 0.62486367906829521),
-                .p = Complex(0.63080662811278632, 0.52640331936127849),
-            },
+            .out_reflect_amplitude =
+                {
+                    .s = Complex(0.57163467986230054, 0.62486367906829521),
+                    .p = Complex(0.63080662811278632, 0.52640331936127849),
+                },
         },
         {
             .in_ior_i = Complex(0.91452118089946777, 0.035187568837614078),
             .in_ior_t = Complex(1, 0),
             .in_incident_angle = acos(Complex(0.10906363669865969, 0.40789272144618016)),
             .in_refract_angle = acos(Complex(0.1736481785774231, 0)),
-            .out_reflect_amplitude = {
-                .s = Complex(0.56981824812215454, 0.62585833416785819),
-                .p = Complex(0.62929764490597007, 0.52731592442193231),
-            },
+            .out_reflect_amplitude =
+                {
+                    .s = Complex(0.56981824812215454, 0.62585833416785819),
+                    .p = Complex(0.62929764490597007, 0.52731592442193231),
+                },
         },
     };
 
@@ -980,24 +981,26 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
     const auto incident_angle_0 = angleBetweenUnitVectors(incidentVec, -normal_vec_0);
     CHECK_EQ(Rad(incident_angle_0).toDeg().deg, 57.19646879265609);
 
-    const auto reflect_amplitude_0 = ComplexFresnelCoeffs {
+    const auto reflect_amplitude_0 = ComplexFresnelCoeffs{
         .s = polar(0.992, 2.918),
         .p = polar(0.975, -0.751),
     };
 
     const auto reflect_polarization_matrix_0 = calcPolaririzationMatrix(incidentVec, reflect_vec_0, normal_vec_0, reflect_amplitude_0);
 
-    CHECK_EQ(
-        reflect_polarization_matrix_0,
-        glm::transpose(
-            cmat3 {
-                {-0.889, 0.219}, {0.106, 0.046}, {-0.361, 0.054},
-                {0.361, -0.054}, {0.314, -0.137}, {-0.863, -0.039},
-                {-0.106, -0.046}, {0.655, -0.628}, {0.314, -0.137},
-            }
-        ),
-        1e-3
-    );
+    CHECK_EQ(reflect_polarization_matrix_0,
+             glm::transpose(cmat3{
+                 {-0.889, 0.219},
+                 {0.106, 0.046},
+                 {-0.361, 0.054},
+                 {0.361, -0.054},
+                 {0.314, -0.137},
+                 {-0.863, -0.039},
+                 {-0.106, -0.046},
+                 {0.655, -0.628},
+                 {0.314, -0.137},
+             }),
+             1e-3);
 
     const auto normal_vec_1 = glm::normalize(dvec3(1, 1, 0));
     const auto reflect_vec_1 = glm::reflect(reflect_vec_0, -normal_vec_1);
@@ -1006,23 +1009,26 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
     const auto incident_angle_1 = angleBetweenUnitVectors(reflect_vec_0, -normal_vec_1);
     CHECK_EQ(Rad(incident_angle_1).toDeg().deg, 35.155651179977404);
 
-    const auto reflect_amplitude_1 = ComplexFresnelCoeffs {
+    const auto reflect_amplitude_1 = ComplexFresnelCoeffs{
         .s = polar(0.988, 2.80),
         .p = polar(0.982, -0.507),
     };
 
     const auto reflect_polarization_matrix_1 = calcPolaririzationMatrix(reflect_vec_0, reflect_vec_1, normal_vec_1, reflect_amplitude_1);
 
-    CHECK_EQ(
-        reflect_polarization_matrix_1,
-        glm::transpose(
-            cmat3 {
-                {-0.352, 0.081}, {-0.855, -0.028}, {0.365, -0.056},
-                {0.792, -0.450}, {-0.352, 0.081}, {0.052, -0.052},
-                {-0.054, 0.052}, {-0.365, 0.056}, {-0.853, 0.327},
-            }
-        ),
-        1e-2 // TODO: should be 1e-3
+    CHECK_EQ(reflect_polarization_matrix_1,
+             glm::transpose(cmat3{
+                 {-0.352, 0.081},
+                 {-0.855, -0.028},
+                 {0.365, -0.056},
+                 {0.792, -0.450},
+                 {-0.352, 0.081},
+                 {0.052, -0.052},
+                 {-0.054, 0.052},
+                 {-0.365, 0.056},
+                 {-0.853, 0.327},
+             }),
+             1e-2  // TODO: should be 1e-3
     );
 }
 
@@ -1034,7 +1040,7 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
         Complex refractIor;
     };
 
-    const auto ior_pairs = std::vector<IorPair> {
+    const auto ior_pairs = std::vector<IorPair>{
         {
             .iorI = {1.0, 0},
             .refractIor = {1.5, 0},
@@ -1060,14 +1066,7 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
         const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
 
         const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
-        const auto reflectElectricField = interceptReflect(
-            incidentElectricField,
-            incidentVec,
-            reflectVec,
-            normalVec,
-            iorI,
-            refractIor
-        );
+        const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
 
         const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
         const auto expected_reflect_field = ElectricField(
@@ -1081,8 +1080,7 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
 
             // s polarized part
             // only gets an amplitude change
-            amplitude.s * incidentElectricField.z
-        );
+            amplitude.s * incidentElectricField.z);
 
         CHECK_EQ(reflectElectricField, expected_reflect_field);
     }
@@ -1105,14 +1103,7 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     CHECK_EQ(incidentAngle, brewstersAngle.real());
 
     const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
-    const auto reflectElectricField = interceptReflect(
-        incidentElectricField,
-        incidentVec,
-        reflectVec,
-        normalVec,
-        iorI,
-        refractIor
-    );
+    const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
 
     const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
     const auto expectedReflectElectricField = ElectricField(
@@ -1122,8 +1113,7 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
         {0, 0},
 
         // s polarized part
-        amplitude.s * incidentElectricField.z
-    );
+        amplitude.s * incidentElectricField.z);
 
     CHECK_EQ(reflectElectricField, expectedReflectElectricField);
 }
@@ -1139,20 +1129,9 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     const auto reflectVec = glm::reflect(incidentVec, normalVec);
     const auto incidentElectricField = ElectricField({0, 0}, {0, 0}, {1, 0});
 
-    const auto reflectElectricField = interceptReflect(
-        incidentElectricField,
-        incidentVec,
-        reflectVec,
-        normalVec,
-        iorI,
-        refractIor
-    );
+    const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
 
-    const auto expected_reflect_field = ElectricField(
-        {0, 0},
-        {0, 0},
-        {-0.2, 0}
-    );
+    const auto expected_reflect_field = ElectricField({0, 0}, {0, 0}, {-0.2, 0});
 
     CHECK_EQ(reflectElectricField, expected_reflect_field);
 
@@ -1162,14 +1141,7 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
         const auto normalVec = glm::normalize(-incidentVec + eps);
         const auto reflectVec = glm::reflect(incidentVec, normalVec);
 
-        const auto reflectElectricField = interceptReflect(
-            incidentElectricField,
-            incidentVec,
-            reflectVec,
-            normalVec,
-            iorI,
-            refractIor
-        );
+        const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
 
         CHECK_EQ(reflectElectricField, expected_reflect_field, eps);
     }
@@ -1185,28 +1157,34 @@ TEST_F(TestSuite, testStokesToElectricFieldAndElectricFieldToStokes) {
 
     const auto diag = 1.0 / glm::sqrt(2.0);
 
-    std::vector<InOutPair> inouts {
-        { // linearly polarized (horizontal)
+    std::vector<InOutPair> inouts{
+        {
+            // linearly polarized (horizontal)
             .stokes = Stokes(1, 1, 0, 0),
             .field = LocalElectricField({1, 0}, {0, 0}),
         },
-        { // linearly polarized (vertical)
+        {
+            // linearly polarized (vertical)
             .stokes = Stokes(1, -1, 0, 0),
             .field = LocalElectricField({0, 0}, {1, 0}),
         },
-        { // linearly polarized (diagonal +45 degrees)
+        {
+            // linearly polarized (diagonal +45 degrees)
             .stokes = Stokes(1, 0, 1, 0),
             .field = LocalElectricField({diag, 0}, {diag, 0}),
         },
-        { // linearly polarized (diagonal -45 degrees)
+        {
+            // linearly polarized (diagonal -45 degrees)
             .stokes = Stokes(1, 0, -1, 0),
             .field = LocalElectricField({diag, 0}, {-diag, 0}),
         },
-        { // circular polarized (right) (clockwise)
+        {
+            // circular polarized (right) (clockwise)
             .stokes = Stokes(1, 0, 0, 1),
             .field = LocalElectricField({diag, 0}, {0, -diag}),
         },
-        { // circular polarized (left) (counter-clockwise)
+        {
+            // circular polarized (left) (counter-clockwise)
             .stokes = Stokes(1, 0, 0, -1),
             .field = LocalElectricField({diag, 0}, {0, diag}),
         },
@@ -1229,7 +1207,7 @@ TEST_F(TestSuite, testStokesToElectricFieldAndElectricFieldToStokes) {
             // since stokes should not carry phase information
             const auto mag = abs(field);
             const auto theta = arg(field);
-            for (double shift = 0.0; shift < PI*2.0; shift += PI/5.0) {
+            for (double shift = 0.0; shift < PI * 2.0; shift += PI / 5.0) {
                 const auto field = polar(mag, theta + shift);
                 const auto stokes = fieldToStokes(field);
                 CHECK_EQ(stokes, p.stokes);
@@ -1280,7 +1258,7 @@ TEST_F(TestSuite, testRotateElectricField) {
         ElectricField out_field_rotationWithoutUp;
     };
 
-    const auto inouts = std::vector<InOutPair> {
+    const auto inouts = std::vector<InOutPair>{
         {
             .in_field = {{1, 0}, {0, 0}, {0, 0}},
             .in_forward = {0, 0, -1},
@@ -1453,7 +1431,6 @@ TEST_F(TestSuite, testBesselDipole) {
     DesignSource src = beamline.m_DesignSources[0];
     DipoleSource dipolesource(src);
 
-
     for (auto values : inouts) {
         auto result = dipolesource.bessel(values.proportion, values.zeta);
         CHECK_EQ(result, values.out, 0.1);
@@ -1489,8 +1466,8 @@ TEST_F(TestSuite, testSchwingerDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     DesignSource src = beamline.m_DesignSources[0];
-    
-    DipoleSource dipolesource(src); 
+
+    DipoleSource dipolesource(src);
 
     for (auto values : inouts) {
         auto result = dipolesource.schwinger(values.energy);
@@ -1500,12 +1477,7 @@ TEST_F(TestSuite, testSchwingerDipole) {
 
 TEST_F(TestSuite, testSphericalCoords) {
     std::vector<dvec3> directions = {
-        {1.0, 0.0, 0.0},
-        {0.0, 1.0, 0.0},
-        {0.0, 0.0, 1.0},
-        {-1.0, 0.0, 0.0},
-        {0.0, -1.0, 0.0},
-        {0.0, 0.0, -1.0},
+        {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, {-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0},
     };
 
     for (auto dir : directions) {

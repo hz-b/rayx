@@ -1,4 +1,5 @@
 #include "LineDensity.h"
+
 #include "Behaviour.h"
 #include "ImageType.h"
 #include "Throw.h"
@@ -24,7 +25,6 @@ double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
     double a = lineDensity * (1 + 2 * vls[0] * z + 3 * vls[1] * z2 + 4 * vls[2] * z3 + 5 * vls[3] * z4 + 6 * vls[4] * z5 + 7 * vls[5] * z6);
     return a;
 }
-
 
 /**
 calculates DX and DZ (line spacing in x and z direction) at a given point for a
@@ -188,4 +188,4 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
     return;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

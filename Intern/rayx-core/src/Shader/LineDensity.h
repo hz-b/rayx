@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Common.h"
 #include "Behaviour.h"
+#include "Common.h"
 #include "Ray.h"
 
 namespace RAYX {
@@ -23,4 +23,4 @@ given direction on the grating
 */
 RAYX_FN_ACC void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ);
 
-} // namespace RAYX
+}  // namespace RAYX

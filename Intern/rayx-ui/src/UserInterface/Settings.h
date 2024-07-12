@@ -4,9 +4,8 @@
 
 #include <filesystem>
 
-#include "Debug/Debug.h"
-
 #include "Camera.h"
+#include "Debug/Debug.h"
 #include "DesignElement/DesignElement.h"
 #include "DesignElement/DesignSource.h"
 

@@ -1,9 +1,9 @@
 #include "SurfaceType.h"
 
-#include "DesignElement/DesignElement.h"
 #include "Beamline/Beamline.h"
+#include "DesignElement/DesignElement.h"
 
-namespace RAYX{
+namespace RAYX {
 
 Surface makeSurface(const DesignElement& dele) {
     auto surface = dele.getCurvatureType();
@@ -28,9 +28,7 @@ Surface makeSurface(const DesignElement& dele) {
     }
 }
 
-Surface makePlane() {
-    return serializePlaneXZ();
-}
+Surface makePlane() { return serializePlaneXZ(); }
 
 Surface makeCylinder(const DesignElement& dele) {
     auto cyl_direction = dele.getRadiusDirection();
@@ -208,7 +206,6 @@ Surface makeEllipsoid(const DesignElement& dele) {
 }
 
 Surface makeSphere(double radius) {
-
     return serializeQuadric({
         .m_icurv = 1,
         .m_a11 = 1,
@@ -269,12 +266,8 @@ Surface makeParaboloid(const DesignElement& dele) {
     });
 }
 
-Surface makeQuadric(const DesignElement& dele) {
-    return dele.getExpertsOptics();
-}
+Surface makeQuadric(const DesignElement& dele) { return dele.getExpertsOptics(); }
 
-Surface makeCubic(const DesignElement& dele) {
-    return dele.getExpertsCubic();
-}
+Surface makeCubic(const DesignElement& dele) { return dele.getExpertsCubic(); }
 
-}
+}  // namespace RAYX

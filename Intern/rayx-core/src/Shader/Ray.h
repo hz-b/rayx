@@ -31,7 +31,7 @@ struct RAYX_API Ray {
     double m_energy;
 
     /// The complex electric field
-    ElectricField m_field = ElectricField { {0, 0}, {0, 0}, {0, 0} };
+    ElectricField m_field = ElectricField{{0, 0}, {0, 0}, {0, 0}};
 
     /// The distance that this ray has already traveled (in mm).
     double m_pathLength;
@@ -63,4 +63,4 @@ struct RAYX_API Ray {
 // make sure Ray does not introduce cost on copy or default construction
 static_assert(std::is_trivially_copyable_v<Ray>);
 
-} // namespace RAYX
+}  // namespace RAYX

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Device.h"
 #include <string>
+
+#include "Device.h"
 
 /**
  * @class Buffer

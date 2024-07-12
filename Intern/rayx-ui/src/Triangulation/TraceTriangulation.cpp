@@ -64,7 +64,8 @@ void traceTriangulation(const RAYX::DesignElement& element, std::vector<TextureV
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
-            RAYX::Collision collision = RAYX::findCollisionInElementCoords(rayGrid[i][j], element.compile().m_surface, element.compile().m_cutout, true);
+            RAYX::Collision collision =
+                RAYX::findCollisionInElementCoords(rayGrid[i][j], element.compile().m_surface, element.compile().m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }

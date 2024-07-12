@@ -40,4 +40,4 @@ RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int mate
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 RAYX_FN_ACC dvec2 RAYX_API getAtomicMassAndRho(int material);
 
-} // namespace RAYX
+}  // namespace RAYX

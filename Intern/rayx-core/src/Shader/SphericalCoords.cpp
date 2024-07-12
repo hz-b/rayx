@@ -18,4 +18,4 @@ void RAYX_API directionToSphericalCoords(dvec3 direction, double& out_phi, doubl
     out_phi = glm::atan(direction.x, direction.y);
 }
 
-} // namespace RAYX
+}  // namespace RAYX

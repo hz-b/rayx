@@ -2,9 +2,8 @@
 
 #include <vector>
 
-#include "Shader/Constants.h"
-
 #include "Colors.h"
+#include "Shader/Constants.h"
 
 /**
  * Given a Cutout object, this function calculates and returns the width and

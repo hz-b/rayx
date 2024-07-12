@@ -1,10 +1,10 @@
 
 #include "CircleSource.h"
 
-#include "DesignElement/DesignSource.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 
@@ -95,6 +95,5 @@ glm::dvec3 CircleSource::getDirection() const {
 
     return glm::dvec3(al, am, an);
 }
-
 
 }  // namespace RAYX

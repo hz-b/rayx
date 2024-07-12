@@ -28,10 +28,7 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
                      orientation[2][0], orientation[2][1], orientation[2][2], 0.0, 0.0, 0.0, 0.0, 1.0);  // o
 
     glm::dmat4x4 yz_swap = {
-        1, 0, 0, 0,
-        0, 0, 1, 0,
-        0, 1, 0, 0,
-        0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1,
     };
 
     glm::dmat4x4 inv_rotation = glm::transpose(rotation);
@@ -53,7 +50,6 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
 
 double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
 
-
 Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
         cutout = dele.getCutout();
@@ -62,7 +58,7 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
     auto inMat = defaultInMatrix(dele, plane);
     auto outMat = defaultOutMatrix(dele, plane);
 
-    return Element {
+    return Element{
         .m_inTrans = inMat,
         .m_outTrans = outMat,
         .m_behaviour = behaviour,
@@ -81,7 +77,5 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
 Element makeExpertsCubic(const DesignElement& dobj) {
     return makeElement(dobj, serializeMirror(), makeCubic(dobj));
 }*/
-
-
 
 }  // namespace RAYX

@@ -1,8 +1,9 @@
 #pragma once
 
+#include <glm.h>
+
 #include <array>
 #include <filesystem>
-#include <glm.h>
 #include <rapidxml.hpp>
 #include <vector>
 
@@ -13,7 +14,7 @@
 
 // the direction of a plane, either XY or XZ. This is only used in the parsing.
 // Inside of the shader, every plane-shaped object lies in its XZ plane.
-// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY. 
+// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY.
 // Thus they need a bit of extra handling to convert them to the shaders XZ plane.
 enum class DesignPlane { XY, XZ };
 
@@ -35,7 +36,6 @@ enum class EnergySpreadUnit;
 enum class SigmaType;
 enum class SpreadType;
 enum class ElementType;
-
 
 // An error in position and orientation that an object might have.
 struct Misalignment {
@@ -185,7 +185,9 @@ struct RAYX_API Parser {
     inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
     inline double parseEnergySpread() const { return parseDouble("energySpread"); }
     inline SpreadType parseEnergySpreadType() const { return static_cast<SpreadType>(parseInt("energySpreadType")); }
-    inline EnergyDistributionType parseEnergyDistributionType() const { return static_cast<EnergyDistributionType>(parseInt("energyDistributionType")); }
+    inline EnergyDistributionType parseEnergyDistributionType() const {
+        return static_cast<EnergyDistributionType>(parseInt("energyDistributionType"));
+    }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
     inline int parseNumOfEquidistantCircles() const { return static_cast<int>(parseDouble("numberCircles")); }
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
@@ -195,12 +197,12 @@ struct RAYX_API Parser {
     inline double parseParameterP() const { return parseDouble("parameter_P"); }
     inline double parseParameterPType() const { return parseDouble("parameter_P_type"); }
 
-    inline SigmaType parseSigmaType() const {return static_cast<SigmaType>(parseInt("sigmaType"));}
-    inline double parseUndulatorLength() const {return parseDouble("undulatorLength"); }
-    inline double parseElectronSigmaX() const {return parseDouble("electronSigmaX"); }
-    inline double parseElectronSigmaXs() const {return parseDouble("electronSigmaXs"); }
-    inline double parseElectronSigmaY() const {return parseDouble("electronSigmaY"); }
-    inline double parseElectronSigmaYs() const {return parseDouble("electronSigmaYs"); }
+    inline SigmaType parseSigmaType() const { return static_cast<SigmaType>(parseInt("sigmaType")); }
+    inline double parseUndulatorLength() const { return parseDouble("undulatorLength"); }
+    inline double parseElectronSigmaX() const { return parseDouble("electronSigmaX"); }
+    inline double parseElectronSigmaXs() const { return parseDouble("electronSigmaXs"); }
+    inline double parseElectronSigmaY() const { return parseDouble("electronSigmaY"); }
+    inline double parseElectronSigmaYs() const { return parseDouble("electronSigmaYs"); }
 
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;

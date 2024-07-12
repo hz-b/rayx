@@ -6,8 +6,8 @@
 
 #include "Beamline/Beamline.h"
 #include "RenderObject.h"
-#include "UserInterface/Settings.h"
 #include "Tracer/DeviceTracer.h"
+#include "UserInterface/Settings.h"
 
 class Scene {
   public:

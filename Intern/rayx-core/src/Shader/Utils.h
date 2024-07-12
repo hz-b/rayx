@@ -22,4 +22,4 @@ inline Ray RAYX_API rayMatrixMult(Ray r, const dmat4 m) {
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FN_ACC double RAYX_API getIncidenceAngle(Ray r, dvec3 normal);
 
-} // namespace RAYX
+}  // namespace RAYX

@@ -1,8 +1,9 @@
 #include "Utils.h"
+
 #include "Constants.h"
+#include "Helper.h"
 #include "InvocationState.h"
 #include "Rand.h"
-#include "Helper.h"
 #include "RefractiveIndex.h"
 
 namespace RAYX {
@@ -40,4 +41,4 @@ double RAYX_API getIncidenceAngle(Ray r, dvec3 normal) {
     return theta;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

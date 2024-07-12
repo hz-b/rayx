@@ -2,8 +2,8 @@
 
 #include <array>
 
-#include "Debug/Debug.h"
 #include "Buffer.h"
+#include "Debug/Debug.h"
 #include "Texture.h"
 
 Renderer::Renderer(Window& window, Device& device) : m_Window(window), m_Device(device) {

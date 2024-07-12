@@ -1,28 +1,28 @@
 #include "SimpleUndulatorSource.h"
 
-#include "DesignElement/DesignSource.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 
 namespace RAYX {
 
-SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : LightSource(dSource),
-    m_sourceDepth(dSource.getSourceDepth()),
-    m_sigmaType(dSource.getSigmaType()),
-    m_undulatorLength(dSource.getUndulatorLength()),
-    m_photonEnergy(dSource.getEnergy()),
-    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
-    m_electronSigmaX(dSource.getElectronSigmaX()),
-    m_electronSigmaXs(dSource.getElectronSigmaXs()),
-    m_electronSigmaY(dSource.getElectronSigmaY()),
-    m_electronSigmaYs(dSource.getElectronSigmaYs()),
-    m_pol(dSource.getStokes()) 
-    
-    {
-        
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource)
+    : LightSource(dSource),
+      m_sourceDepth(dSource.getSourceDepth()),
+      m_sigmaType(dSource.getSigmaType()),
+      m_undulatorLength(dSource.getUndulatorLength()),
+      m_photonEnergy(dSource.getEnergy()),
+      m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+      m_electronSigmaX(dSource.getElectronSigmaX()),
+      m_electronSigmaXs(dSource.getElectronSigmaXs()),
+      m_electronSigmaY(dSource.getElectronSigmaY()),
+      m_electronSigmaYs(dSource.getElectronSigmaYs()),
+      m_pol(dSource.getStokes())
+
+{
     m_undulatorSigma = calcUndulatorSigma();
     m_undulatorSigmaS = calcUndulatorSigmaS();
     m_horDivergence = getHorDivergence();
@@ -30,7 +30,6 @@ SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : Ligh
 
     m_sourceHeight = getSourceHeight();
     m_sourceWidth = getSourceWidth();
-  
 }
 
 /**
@@ -38,9 +37,7 @@ SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : Ligh
  * hard edge, gaussian if soft edge)) and extent (eg specified width/height of
  * source)
  */
-double SimpleUndulatorSource::getCoord(const double extent) const {
-    return randomNormal(0, 1) * extent;
-}
+double SimpleUndulatorSource::getCoord(const double extent) const { return randomNormal(0, 1) * extent; }
 
 /**
  * Creates random rays from simple undulator Source
@@ -60,14 +57,14 @@ std::vector<Ray> SimpleUndulatorSource::getRays([[maybe_unused]] int thread_coun
     // create n rays with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     for (int i = 0; i < n; i++) {
-        x = getCoord( m_sourceWidth);
-        y = getCoord( m_sourceHeight);
+        x = getCoord(m_sourceWidth);
+        y = getCoord(m_sourceHeight);
         z = (randomDouble() - 0.5) * m_sourceDepth;
         z += m_position.z;
         en = selectEnergy();  // LightSource.cpp
         glm::dvec3 position = glm::dvec3(x, y, z);
 
-        phi = getCoord( m_horDivergence);
+        phi = getCoord(m_horDivergence);
         psi = getCoord(m_verDivergence);
         // get corresponding angles based on distribution and deviation from
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
@@ -110,23 +107,23 @@ double SimpleUndulatorSource::calcUndulatorSigmaS() const {
 }
 
 double SimpleUndulatorSource::getSourceHeight() const {
-    double height = sqrt(pow(m_electronSigmaY, 2) + pow(m_undulatorSigma, 2));  
-    return height/1000; // in µm
+    double height = sqrt(pow(m_electronSigmaY, 2) + pow(m_undulatorSigma, 2));
+    return height / 1000;  // in µm
 }
 
 double SimpleUndulatorSource::getSourceWidth() const {
-    double width = sqrt(pow(m_electronSigmaX, 2) + pow(m_undulatorSigma, 2));  
-    return width/1000; // in µm
+    double width = sqrt(pow(m_electronSigmaX, 2) + pow(m_undulatorSigma, 2));
+    return width / 1000;  // in µm
 }
 
-double SimpleUndulatorSource::getHorDivergence() const{
-    double hordiv = sqrt(pow(m_electronSigmaXs,2)+pow(m_undulatorSigmaS,2));  
-    return hordiv/1000000; // in µrad
+double SimpleUndulatorSource::getHorDivergence() const {
+    double hordiv = sqrt(pow(m_electronSigmaXs, 2) + pow(m_undulatorSigmaS, 2));
+    return hordiv / 1000000;  // in µrad
 }
 
-double SimpleUndulatorSource::getVerDivergence() const{
-    double verdiv = sqrt(pow(m_electronSigmaYs,2)+pow(m_undulatorSigmaS,2));  
-    return verdiv/1000000; // in µrad
+double SimpleUndulatorSource::getVerDivergence() const {
+    double verdiv = sqrt(pow(m_electronSigmaYs, 2) + pow(m_undulatorSigmaS, 2));
+    return verdiv / 1000000;  // in µrad
 }
 
 }  // namespace RAYX

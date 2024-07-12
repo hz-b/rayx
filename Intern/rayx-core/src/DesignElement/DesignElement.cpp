@@ -1,12 +1,12 @@
 #include "DesignElement.h"
 
-#include "Debug/Debug.h"
+#include "Beamline/Objects/BehaviourType.h"
 #include "Beamline/Objects/Objects.h"
 #include "Beamline/Objects/SurfaceType.h"
-#include "Beamline/Objects/BehaviourType.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
-    
+
 Element DesignElement::compile() const {
     Surface surface;
     Behaviour behav;
@@ -100,7 +100,6 @@ void DesignElement::setMisalignment(Misalignment m) {
     m_elementParameters["translationZerror"] = m.m_translationZerror;
 }
 
-
 Misalignment DesignElement::getMisalignment() const {
     Misalignment m;
     m.m_rotationXerror.rad = m_elementParameters["rotationXerror"].as_double();
@@ -136,7 +135,6 @@ SlopeError DesignElement::getSlopeError() const {
     return s;
 }
 
-
 void DesignElement::setCutout(Cutout c) {
     m_elementParameters["geometricalShape"] = c.m_type;
     if (c.m_type == CTYPE_RECT) {
@@ -159,17 +157,17 @@ Cutout DesignElement::getCutout() const {
 
     c.m_type = m_elementParameters["geometricalShape"].as_double();
 
-    if (c.m_type == CTYPE_RECT) { // Rectangle
+    if (c.m_type == CTYPE_RECT) {  // Rectangle
         RectCutout rect;
         rect.m_width = m_elementParameters["CutoutWidth"].as_double();
         rect.m_length = m_elementParameters["CutoutLength"].as_double();
         c = serializeRect(rect);
-    } else if (c.m_type == CTYPE_ELLIPTICAL) { //Ellipsoid
+    } else if (c.m_type == CTYPE_ELLIPTICAL) {  // Ellipsoid
         EllipticalCutout elli;
         elli.m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double();
         elli.m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double();
         c = serializeElliptical(elli);
-    } else if (c.m_type == CTYPE_TRAPEZOID) { //Trapezoid
+    } else if (c.m_type == CTYPE_TRAPEZOID) {  // Trapezoid
         TrapezoidCutout trapi;
         trapi.m_widthA = m_elementParameters["CutoutWidthA"].as_double();
         trapi.m_widthB = m_elementParameters["CutoutWidthB"].as_double();
@@ -180,9 +178,7 @@ Cutout DesignElement::getCutout() const {
     return c;
 }
 
-Cutout DesignElement::getGlobalCutout() const {
-    return serializeUnlimited();
-}
+Cutout DesignElement::getGlobalCutout() const { return serializeUnlimited(); }
 
 void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
     m_elementParameters["vlsParams"] = Map();
@@ -196,17 +192,10 @@ void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
 }
 
 std::array<double, 6> DesignElement::getVLSParameters() const {
-    return {
-        m_elementParameters["vlsParams"]["vlsParameterB2"].as_double(),
-        m_elementParameters["vlsParams"]["vlsParameterB3"].as_double(),
-        m_elementParameters["vlsParams"]["vlsParameterB4"].as_double(),
-        m_elementParameters["vlsParams"]["vlsParameterB5"].as_double(),
-        m_elementParameters["vlsParams"]["vlsParameterB6"].as_double(),
-        m_elementParameters["vlsParams"]["vlsParameterB7"].as_double()
-    };
+    return {m_elementParameters["vlsParams"]["vlsParameterB2"].as_double(), m_elementParameters["vlsParams"]["vlsParameterB3"].as_double(),
+            m_elementParameters["vlsParams"]["vlsParameterB4"].as_double(), m_elementParameters["vlsParams"]["vlsParameterB5"].as_double(),
+            m_elementParameters["vlsParams"]["vlsParameterB6"].as_double(), m_elementParameters["vlsParams"]["vlsParameterB7"].as_double()};
 }
-
-
 
 void DesignElement::setExpertsOptics(Surface value) {
     QuadricSurface qua = deserializeQuadric(value);
@@ -221,7 +210,6 @@ void DesignElement::setExpertsOptics(Surface value) {
     m_elementParameters["expertsParams"]["A33"] = qua.m_a33;
     m_elementParameters["expertsParams"]["A34"] = qua.m_a34;
     m_elementParameters["expertsParams"]["A44"] = qua.m_a44;
-
 }
 
 Surface DesignElement::getExpertsOptics() const {
@@ -288,7 +276,8 @@ Surface DesignElement::getExpertsCubic() const {
 // for the spherical Mirror the radius can be calculated from grazing Inc angle, entrace Armlength and exit Armlength
 // copied from RAY-UI
 void DesignElement::setCalcRadius() {
-    double radius = 2.0 / m_elementParameters["grazingIncAngle"].as_rad().sin() / (1.0 / m_elementParameters["entranceArmLength"].as_double() + 1.0 / m_elementParameters["exitArmLength"].as_double());
+    double radius = 2.0 / m_elementParameters["grazingIncAngle"].as_rad().sin() /
+                    (1.0 / m_elementParameters["entranceArmLength"].as_double() + 1.0 / m_elementParameters["exitArmLength"].as_double());
     m_elementParameters["radius"] = radius;
 }
 
@@ -296,8 +285,11 @@ void DesignElement::setCalcRadius() {
 // copied from RAY-UI
 // TODO: support different types of input Angle : constant inc angle, SMG fix focus
 void DesignElement::setCalcRadiusDeviationAngle() {
-    double theta = m_elementParameters["deviationAngle"].as_rad().toDeg().deg > 0 ? (180 - m_elementParameters["deviationAngle"].as_rad().toDeg().deg)/2 * PI / 180.0 : (90 + m_elementParameters["deviationAngle"].as_rad().toDeg().deg) * PI / 180.0;
-    double radius = 2.0 / sin(theta) / ( 1.0 / m_elementParameters["entranceArmLength"].as_double() + 1.0 / m_elementParameters["exitArmLength"].as_double());
+    double theta = m_elementParameters["deviationAngle"].as_rad().toDeg().deg > 0
+                       ? (180 - m_elementParameters["deviationAngle"].as_rad().toDeg().deg) / 2 * PI / 180.0
+                       : (90 + m_elementParameters["deviationAngle"].as_rad().toDeg().deg) * PI / 180.0;
+    double radius =
+        2.0 / sin(theta) / (1.0 / m_elementParameters["entranceArmLength"].as_double() + 1.0 / m_elementParameters["exitArmLength"].as_double());
     m_elementParameters["radius"] = radius;
 }
 
@@ -380,7 +372,6 @@ CylinderDirection DesignElement::getRadiusDirection() const { return m_elementPa
 void DesignElement::setRadius(double value) { m_elementParameters["radius"] = value; }
 double DesignElement::getRadius() const { return m_elementParameters["radius"].as_double(); }
 
-
 void DesignElement::setDesignGrazingIncAngle(Rad value) { m_elementParameters["designGrazingIncAngle"] = value; }
 Rad DesignElement::getDesignGrazingIncAngle() const { return m_elementParameters["designGrazingIncAngle"].as_rad(); }
 
@@ -403,11 +394,11 @@ FigureRotation DesignElement::getFigureRotation() const { return m_elementParame
 void DesignElement::setArmLength(double value) { m_elementParameters["armLength"] = value; }
 double DesignElement::getArmLength() const { return m_elementParameters["armLength"].as_double(); }
 
-//parameter_P
+// parameter_P
 void DesignElement::setParameterP(double value) { m_elementParameters["parameter_P"] = value; }
 double DesignElement::getParameterP() const { return m_elementParameters["parameter_P"].as_double(); }
 
-//parameter_P_type
+// parameter_P_type
 void DesignElement::setParameterPType(double value) { m_elementParameters["parameter_P_type"] = value; }
 double DesignElement::getParameterPType() const { return m_elementParameters["parameter_P_type"].as_double(); }
 
@@ -415,12 +406,12 @@ double DesignElement::getParameterPType() const { return m_elementParameters["pa
 void DesignElement::setLineDensity(double value) { m_elementParameters["lineDensity"] = value; }
 double DesignElement::getLineDensity() const { return m_elementParameters["lineDensity"].as_double(); }
 
-void DesignElement::setShortRadius(double value) { m_elementParameters["shortRadius"] = value;}
-double DesignElement::getShortRadius() const {return m_elementParameters["shortRadius"].as_double();}
+void DesignElement::setShortRadius(double value) { m_elementParameters["shortRadius"] = value; }
+double DesignElement::getShortRadius() const { return m_elementParameters["shortRadius"].as_double(); }
 
 // Setter and Getter for longRadius
-void DesignElement::setLongRadius(double value) {m_elementParameters["longRadius"] = value;}
-double DesignElement::getLongRadius() const {return m_elementParameters["longRadius"].as_double();}
+void DesignElement::setLongRadius(double value) { m_elementParameters["longRadius"] = value; }
+double DesignElement::getLongRadius() const { return m_elementParameters["longRadius"].as_double(); }
 
 void DesignElement::setFresnelZOffset(double value) { m_elementParameters["FresnelZOffset"] = value; }
 double DesignElement::getFresnelZOffset() const { return m_elementParameters["FresnelZOffset"].as_double(); }
@@ -452,17 +443,16 @@ double DesignElement::getDesignMeridionalExitArmLength() const { return m_elemen
 void DesignElement::setOrderOfDiffraction(double value) { m_elementParameters["OrderDiffraction"] = value; }
 double DesignElement::getOrderOfDiffraction() const { return m_elementParameters["OrderDiffraction"].as_double(); }
 
-void DesignElement::setAdditionalOrder(double value) {m_elementParameters["additionalOrder"] = value;}
-double DesignElement::getAdditionalOrder() const { return m_elementParameters["additionalOrder"].as_double();}
+void DesignElement::setAdditionalOrder(double value) { m_elementParameters["additionalOrder"] = value; }
+double DesignElement::getAdditionalOrder() const { return m_elementParameters["additionalOrder"].as_double(); }
 
-void DesignElement::setImageType(double value) {m_elementParameters["imageType"] = value;}
-double DesignElement::getImageType() const {return m_elementParameters["imageType"].as_double();}
+void DesignElement::setImageType(double value) { m_elementParameters["imageType"] = value; }
+double DesignElement::getImageType() const { return m_elementParameters["imageType"].as_double(); }
 
-void DesignElement::setCurvatureType(CurvatureType value) {m_elementParameters["curvatureType"] = value;}
-CurvatureType DesignElement::getCurvatureType() const {return m_elementParameters["curvatureType"].as_curvatureType();}
+void DesignElement::setCurvatureType(CurvatureType value) { m_elementParameters["curvatureType"] = value; }
+CurvatureType DesignElement::getCurvatureType() const { return m_elementParameters["curvatureType"].as_curvatureType(); }
 
-void DesignElement::setBehaviourType(BehaviourType value) {m_elementParameters["behaviourType"] = value;}
-BehaviourType DesignElement::getBehaviourType() const {return m_elementParameters["behaviourType"].as_behaviourType();}
-
+void DesignElement::setBehaviourType(BehaviourType value) { m_elementParameters["behaviourType"] = value; }
+BehaviourType DesignElement::getBehaviourType() const { return m_elementParameters["behaviourType"].as_behaviourType(); }
 
 }  // namespace RAYX

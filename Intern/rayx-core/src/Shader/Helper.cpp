@@ -1,4 +1,5 @@
 #include "Helper.h"
+
 #include "EventType.h"
 #include "Throw.h"
 
@@ -83,4 +84,4 @@ void recordFinalEvent(Ray r, double w, InvState& inv) {
     inv.finalized = true;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

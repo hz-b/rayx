@@ -1,9 +1,9 @@
 #pragma once
 
+#include <glm.h>
+
 #include <array>
 #include <vector>
-
-#include <glm.h>
 
 #include "Core.h"
 
@@ -34,4 +34,4 @@ struct RAYX_API Rad {
     double rad;
 };
 
-} // namespace RAYX
+}  // namespace RAYX

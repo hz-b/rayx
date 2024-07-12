@@ -19,7 +19,7 @@ std::vector<Ray> Beamline::getInputRays(int thread_count) const {
     uint32_t raycount = 0;
 
     for (DesignSource dSource : m_DesignSources) {
-        raycount += (uint32_t) dSource.getNumberOfRays();
+        raycount += (uint32_t)dSource.getNumberOfRays();
     }
 
     // We add all remaining rays into the rays of the first light source.

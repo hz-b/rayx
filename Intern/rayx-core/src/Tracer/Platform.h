@@ -53,4 +53,4 @@ constexpr bool isAccAvailable() {
 // we need at least one Cpu Acc is available.
 static_assert(isAccAvailable<DefaultCpuAcc<alpaka::DimInt<1>, int32_t>>());
 
-} // namespace RAYX
+}  // namespace RAYX

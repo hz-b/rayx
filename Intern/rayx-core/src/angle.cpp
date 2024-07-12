@@ -18,4 +18,4 @@ double Rad::sin() const { return std::sin(rad); }
 double Rad::cos() const { return std::cos(rad); }
 double Rad::tan() const { return std::tan(rad); }
 
-} // namespace RAYX
+}  // namespace RAYX

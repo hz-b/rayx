@@ -1,4 +1,5 @@
 #include "Rand.h"
+
 #include "Constants.h"
 
 namespace RAYX {
@@ -50,4 +51,4 @@ double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma) {
     return Z;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

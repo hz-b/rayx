@@ -1,4 +1,5 @@
 #include "Approx.h"
+
 #include "Constants.h"
 
 namespace RAYX {
@@ -13,4 +14,4 @@ double RAYX_API dpow(double a, int b) {
     return res;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

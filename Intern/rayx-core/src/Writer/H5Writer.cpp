@@ -91,7 +91,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
         double eventType = doubles[double_index + 3];
         glm::dvec3 direction(doubles[double_index + 4], doubles[double_index + 5], doubles[double_index + 6]);
         double energy = doubles[double_index + 7];
-        RAYX::ElectricField field {
+        RAYX::ElectricField field{
             {doubles[double_index + 8], doubles[double_index + 9]},
             {doubles[double_index + 10], doubles[double_index + 11]},
             {doubles[double_index + 12], doubles[double_index + 13]},

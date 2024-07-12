@@ -1,12 +1,12 @@
 #include "BehaviourType.h"
 
-#include "DesignElement/DesignElement.h"
 #include "Beamline/Beamline.h"
+#include "DesignElement/DesignElement.h"
 #include "Shader/Utils.h"
 
-namespace RAYX{
+namespace RAYX {
 
-Behaviour makeBehaviour(const DesignElement& dele){
+Behaviour makeBehaviour(const DesignElement& dele) {
     BehaviourType behave = dele.getBehaviourType();
     if (behave == BehaviourType::Grating) {
         return makeGrating(dele);
@@ -16,7 +16,7 @@ Behaviour makeBehaviour(const DesignElement& dele){
         return makeRZPBehaviour(dele);
     } else if (behave == BehaviourType::Slit) {
         return makeSlit(dele);
-    } else if (behave == BehaviourType::Mirror){
+    } else if (behave == BehaviourType::Mirror) {
         return serializeMirror();
     } else {
         return serializeImagePlane();
@@ -42,7 +42,7 @@ Cutout mkOpeningCutout(const DesignElement& dele) {
             .m_width = dele.getOpeningWidth(),
             .m_length = dele.getOpeningHeight(),
         });
-    } else if (shape == CTYPE_ELLIPTICAL) { // elliptical
+    } else if (shape == CTYPE_ELLIPTICAL) {  // elliptical
         return serializeElliptical({
             .m_diameter_x = dele.getOpeningWidth(),
             .m_diameter_z = dele.getOpeningHeight(),
@@ -84,8 +84,7 @@ Behaviour makeSlit(const DesignElement& dele) {
     });
 }
 
-
-Behaviour makeRZPBehaviour(const DesignElement& dele){
+Behaviour makeRZPBehaviour(const DesignElement& dele) {
     auto fresnelZOffset = dele.getFresnelZOffset();
     auto designAlphaAngle = dele.getDesignAlphaAngle();
     auto designBetaAngle = dele.getDesignBetaAngle();
@@ -97,31 +96,27 @@ Behaviour makeRZPBehaviour(const DesignElement& dele){
     auto designMeridionalExitArmLength = dele.getDesignMeridionalExitArmLength();
     auto orderOfDiffraction = dele.getOrderOfDiffraction();  // Assuming this getter is available
 
-
     // designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else designEnergy = designEnergy
     auto designWavelength = designEnergy == 0 ? 0 : hvlam(designEnergy);
     auto additionalOrder = double(dele.getAdditionalOrder());
 
-
     auto imageType = dele.getImageType();
 
-
-    return serializeRZP({.m_imageType = (double) imageType,
-                                   .m_rzpType = (double)RZPType::Elliptical,
-                                   .m_derivationMethod = 0,
-                                   .m_designWavelength = designWavelength,
-                                   .m_designOrderOfDiffraction = designOrderOfDiffraction,
-                                   .m_orderOfDiffraction = orderOfDiffraction,
-                                   .m_fresnelZOffset = fresnelZOffset,
-                                   .m_designSagittalEntranceArmLength = designSagittalEntranceArmLength,
-                                   .m_designSagittalExitArmLength = designSagittalExitArmLength,
-                                   .m_designMeridionalEntranceArmLength = designMeridionalEntranceArmLength,
-                                   .m_designMeridionalExitArmLength = designMeridionalExitArmLength,
-                                   .m_designAlphaAngle = designAlphaAngle.rad,
-                                   .m_designBetaAngle = designBetaAngle.rad,
-                                   .m_additionalOrder = (double)additionalOrder});
-
+    return serializeRZP({.m_imageType = (double)imageType,
+                         .m_rzpType = (double)RZPType::Elliptical,
+                         .m_derivationMethod = 0,
+                         .m_designWavelength = designWavelength,
+                         .m_designOrderOfDiffraction = designOrderOfDiffraction,
+                         .m_orderOfDiffraction = orderOfDiffraction,
+                         .m_fresnelZOffset = fresnelZOffset,
+                         .m_designSagittalEntranceArmLength = designSagittalEntranceArmLength,
+                         .m_designSagittalExitArmLength = designSagittalExitArmLength,
+                         .m_designMeridionalEntranceArmLength = designMeridionalEntranceArmLength,
+                         .m_designMeridionalExitArmLength = designMeridionalExitArmLength,
+                         .m_designAlphaAngle = designAlphaAngle.rad,
+                         .m_designBetaAngle = designBetaAngle.rad,
+                         .m_additionalOrder = (double)additionalOrder});
 }
 
-}
+}  // namespace RAYX

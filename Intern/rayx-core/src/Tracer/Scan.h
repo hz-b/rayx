@@ -1,22 +1,13 @@
 #pragma once
 
-#include "Common.h"
 #include "Accelerator.h"
+#include "Common.h"
 
 namespace RAYX {
 
 // TODO(Sven): implement parallel scan
-template <
-    typename Acc,
-    typename T,
-    typename Queue
->
-inline alpaka::Idx<Acc> scanSum(
-    Queue queue,
-    Buf<Acc, T> dst,
-    Buf<Acc, T> src,
-    const alpaka::Idx<Acc> n
-) {
+template <typename Acc, typename T, typename Queue>
+inline alpaka::Idx<Acc> scanSum(Queue queue, Buf<Acc, T> dst, Buf<Acc, T> src, const alpaka::Idx<Acc> n) {
     using Dim = alpaka::Dim<Acc>;
     using Idx = alpaka::Idx<Acc>;
     using Vec = alpaka::Vec<Dim, Idx>;
@@ -35,19 +26,19 @@ inline alpaka::Idx<Acc> scanSum(
     Idx sum;
     alpaka::exec<Seq>(
         queue,
-        alpaka::WorkDivMembers<Dim, Idx> { Vec{1}, Vec{1}, Vec{1}, },
-        [] ALPAKA_FN_HOST (const auto&, Idx* sum, T* dst, const T* src, const Idx n) {
+        alpaka::WorkDivMembers<Dim, Idx>{
+            Vec{1},
+            Vec{1},
+            Vec{1},
+        },
+        [] ALPAKA_FN_HOST(const auto&, Idx* sum, T* dst, const T* src, const Idx n) {
             *sum = 0;
             for (Idx i = 0; i < n; ++i) {
                 dst[i] = *sum;
                 *sum += src[i];
             }
         },
-        &sum,
-        alpaka::getPtrNative(h_dst),
-        alpaka::getPtrNative(h_src),
-        n
-    );
+        &sum, alpaka::getPtrNative(h_dst), alpaka::getPtrNative(h_src), n);
 
     // wait because the above kernel is not guaranteed to finish before the next task
     alpaka::wait(queue);
@@ -60,4 +51,4 @@ inline alpaka::Idx<Acc> scanSum(
     return sum;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

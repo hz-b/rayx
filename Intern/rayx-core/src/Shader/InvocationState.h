@@ -5,8 +5,8 @@
 #include <span>
 
 #include "Common.h"
-#include "Ray.h"
 #include "Element.h"
+#include "Ray.h"
 
 namespace RAYX {
 
@@ -28,7 +28,6 @@ struct _debug_struct {
 
 // TODO(Sven): restore RAYX_API attributes for members
 struct RAYX_API InvState {
-
     // these variables are only used during shader invocation
     int globalInvocationId;
     bool finalized;
@@ -50,4 +49,4 @@ struct RAYX_API InvState {
     PushConstants pushConstants;
 };
 
-} // namespace RAYX
+}  // namespace RAYX

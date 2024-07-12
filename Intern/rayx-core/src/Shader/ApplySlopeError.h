@@ -34,4 +34,4 @@ slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FN_ACC dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, InvState& inv);
 
-} // namespace RAYX
+}  // namespace RAYX

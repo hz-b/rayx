@@ -1,6 +1,7 @@
 #include "Refrac.h"
-#include "Helper.h"
+
 #include "EventType.h"
+#include "Helper.h"
 
 namespace RAYX {
 
@@ -55,7 +56,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity, InvState& inv) {
 
     double eps1 = glm::atan(an_x / an_y);  //-atan(an_x/an_z) around z, chi
     double del1 = glm::asin(an_z);         // sign(an_z) * glm::atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); //
-                                         // -asin(an_z); // -asin around x, psi
+                                           // -asin(an_z); // -asin around x, psi
     double cos_d = glm::cos(del1);
     double a1 = linedensity * cos_d;
     double sin_d = glm::sin(-del1);
@@ -88,8 +89,7 @@ Ray refrac(Ray r, dvec3 normal, double linedensity, InvState& inv) {
  * WL:wavelength (nm); ORD order of diffraction
  */
 RAYX_FN_ACC
-Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
-                          double a, InvState& inv) {  // TODO fix unused var
+Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal, double a, InvState& inv) {  // TODO fix unused var
     double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
     if (y1 > 0) {
         y1 = sqrt(y1);
@@ -101,4 +101,4 @@ Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
     return r;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

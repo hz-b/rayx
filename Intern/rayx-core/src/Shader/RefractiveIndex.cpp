@@ -1,4 +1,5 @@
 #include "RefractiveIndex.h"
+
 #include "Throw.h"
 
 namespace RAYX {
@@ -15,7 +16,8 @@ namespace RAYX {
 // - 92, because we support 92 elements of the periodic table (from Hydrogen to Uranium)
 // - N is the number of entries in a given Palik/Nff table (this number depends on the periodic element)
 // - 3 because each Palik / Nff entry consists of three doubles.
-// - It is a "sparse" data structure as most of the entries are actually missing, we only load the actually "used" materials into the shader, not all materials.
+// - It is a "sparse" data structure as most of the entries are actually missing, we only load the actually "used" materials into the shader, not all
+// materials.
 // -- Thus, we cannot index into it as inv.mat[i1][i2][i3][i4] directly, but instead have to use inv.matIdx as described above.
 
 // The concrete layout of inv.mat and inv.matIdx has to be compatible with the "loadMaterialTables" function from Material.cpp
@@ -159,4 +161,4 @@ dvec2 RAYX_API getAtomicMassAndRho(int material) {
     return dvec2(0.0, 0.0);
 }
 
-} // namespace RAYX
+}  // namespace RAYX

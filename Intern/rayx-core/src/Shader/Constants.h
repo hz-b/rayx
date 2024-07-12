@@ -9,7 +9,7 @@
 namespace RAYX {
 
 // inverse nanometer-electron volt relationship / reziprocal factor
-constexpr double inm2eV = 1.239852e3; // TODO: Check, find better name maybe
+constexpr double inm2eV = 1.239852e3;  // TODO: Check, find better name maybe
 
 constexpr double PI = 3.14159265358979323846264338327950;
 // 141592653589793238462643383279502884197169399
@@ -41,9 +41,9 @@ constexpr double FINE_STRUCTURE_CONSTANT = 7.2973525693e-3;  // Checked 2020-2-1
 
 /// \f$\epsilon_0\f$ [As/Vm]. vacuum electric permittivity.
 constexpr double ELECTRIC_PERMITTIVITY = 8.8541878128e-12;  // Checked 2019-7-25, PB, NIST: dielectricity of vacuum, or vacuum electric permittivity
-                                                        // [As/Vm] or [F/m]; Standard uncertainty: 0.0000000013e-12
+                                                            // [As/Vm] or [F/m]; Standard uncertainty: 0.0000000013e-12
 
 /// \f$G\f$ [?]. RAY's factor appearing in Schwinger equation context
 constexpr double FACTOR_SCHWINGER_RAY = 1.2556937e15;
 
-} // namespace RAYX
+}  // namespace RAYX

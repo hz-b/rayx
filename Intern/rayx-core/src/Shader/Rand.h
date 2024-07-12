@@ -21,4 +21,4 @@ RAYX_FN_ACC double RAYX_API squaresDoubleRNG(uint64_t& ctr);
 // mu and standard deviation sigma
 RAYX_FN_ACC double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma);
 
-} // namespace RAYX
+}  // namespace RAYX

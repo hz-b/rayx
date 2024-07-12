@@ -5,10 +5,9 @@
 #include <vector>
 
 #include "Core.h"
-#include "Shader/Ray.h"
-
 #include "DeviceConfig.h"
 #include "DeviceTracer.h"
+#include "Shader/Ray.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
@@ -28,14 +27,8 @@ class RAYX_API Tracer {
     // This will call the trace implementation of a subclass
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
-    BundleHistory trace(
-        const Beamline&,
-        Sequential sequential,
-        uint64_t max_batch_size,
-        int THREAD_COUNT = 1,
-        unsigned int maxEvents = 1,
-        int startEventID = 0
-    );
+    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
+                        int startEventID = 0);
 
     static int defaultMaxEvents(const Beamline* beamline = nullptr);
 

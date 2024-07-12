@@ -1,7 +1,7 @@
 #include "setupTests.h"
 
 // Prepare test data
-std::vector<uint8_t> testData = { '1', '2', '3', '4', '5' };  // ASCII values
+std::vector<uint8_t> testData = {'1', '2', '3', '4', '5'};  // ASCII values
 std::string readFilename = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/read_test.txt").string();
 std::string writeFilename = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/write_test.txt").string();
 
@@ -31,8 +31,7 @@ TEST_F(TestSuite, TestWriteFileFromVector) {
 
     // Now read the file and check if the data was written correctly
     std::ifstream readTestFile(writeFilename, std::ios::binary);
-    std::vector<uint8_t> readData((std::istreambuf_iterator<char>(readTestFile)),
-                                   std::istreambuf_iterator<char>());
+    std::vector<uint8_t> readData((std::istreambuf_iterator<char>(readTestFile)), std::istreambuf_iterator<char>());
 
     for (uint32_t i = 0; i < testData.size(); i++) {
         ASSERT_EQ(testData[i], readData[i]);

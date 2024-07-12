@@ -1,18 +1,19 @@
 #pragma once
 
+#include <angle.h>
+
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <variant>
-#include <string>
-#include <memory>
 
-#include "Beamline/LightSource.h"
 #include "Beamline/EnergyDistribution.h"
+#include "Beamline/LightSource.h"
+#include "Debug/Debug.h"
+#include "Material/Material.h"
 #include "Shader/Common.h"
 #include "Shader/Cutout.h"
 #include "Shader/Surface.h"
-#include "Material/Material.h"
-#include "Debug/Debug.h"
-#include <angle.h>
 
 namespace RAYX {
 

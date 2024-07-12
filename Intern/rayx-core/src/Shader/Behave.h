@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Common.h"
 #include "Collision.h"
+#include "Common.h"
 #include "InvocationState.h"
 
 namespace RAYX {
@@ -22,4 +22,4 @@ RAYX_FN_ACC Ray behaveGrating(Ray r, int id, Collision col, InvState& inv);
 RAYX_FN_ACC Ray behaveMirror(Ray r, int id, Collision col, InvState& inv);
 RAYX_FN_ACC Ray behaveImagePlane(Ray r, int id, Collision col, InvState& inv);
 
-} // namespace RAYX
+}  // namespace RAYX

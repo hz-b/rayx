@@ -1,11 +1,11 @@
 #pragma once
 /// Header to include to get all objects defined in RayCore. Don't overuse it or
 /// build times will be unnecessariy long.
-namespace RAYX{
-    class LightSource;
-    struct DesignSource;
-    enum class ElementType;
-}
+namespace RAYX {
+class LightSource;
+struct DesignSource;
+enum class ElementType;
+}  // namespace RAYX
 
 // Light Sources
 #include "Beamline/Objects/CircleSource.h"

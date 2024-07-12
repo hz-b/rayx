@@ -4,8 +4,8 @@
 #include "Data/xml.h"
 
 namespace RAYX {
-struct DesignSource;   
-class LightSource;     
+struct DesignSource;
+class LightSource;
 
 class RAYX_API PointSource : public LightSource {
   public:

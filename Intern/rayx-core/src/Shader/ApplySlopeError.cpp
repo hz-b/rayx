@@ -1,4 +1,5 @@
 #include "ApplySlopeError.h"
+
 #include "Constants.h"
 #include "Rand.h"
 
@@ -53,9 +54,7 @@ dvec3 RAYX_API normalCylindrical(dvec3 normal, double x_rad, double z_rad) {
 }
 
 RAYX_FN_ACC
-double deg2rad(double degree) {
-    return PI * degree / 180;
-}
+double deg2rad(double degree) { return PI * degree / 180; }
 
 /**
 adds slope error to the normal
@@ -93,4 +92,4 @@ dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, InvState& inv)
     return normal;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

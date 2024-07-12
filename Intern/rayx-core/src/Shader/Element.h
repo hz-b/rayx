@@ -1,27 +1,28 @@
 #pragma once
 
-#include "Common.h"
 #include "Behaviour.h"
+#include "Common.h"
 #include "Cutout.h"
 #include "Surface.h"
 
 namespace RAYX {
 
 struct SlopeError {
-    double m_sag;  // aka `slopeErrorX`
-    double m_mer;  // aka `slopeErrorZ`
-    double m_thermalDistortionAmp; // TODO unused
-    double m_thermalDistortionSigmaX; // TODO unused
-    double m_thermalDistortionSigmaZ; // TODO unused
-    double m_cylindricalBowingAmp; // TODO unused
-    double m_cylindricalBowingRadius; // TODO unused
+    double m_sag;                      // aka `slopeErrorX`
+    double m_mer;                      // aka `slopeErrorZ`
+    double m_thermalDistortionAmp;     // TODO unused
+    double m_thermalDistortionSigmaX;  // TODO unused
+    double m_thermalDistortionSigmaZ;  // TODO unused
+    double m_cylindricalBowingAmp;     // TODO unused
+    double m_cylindricalBowingRadius;  // TODO unused
 };
 
 struct Element {
     // for alignment reasons, the dmat4s are at the beginning of the struct.
 
     // the "in-transformation": it converts a point from the world coordinates to the element coordinates of this element.
-    // The name comes from the fact that an "in-going" ray hitting this elemnet, will first-and-foremost be converted to element coordinates by multiplying with m_inTrans.
+    // The name comes from the fact that an "in-going" ray hitting this elemnet, will first-and-foremost be converted to element coordinates by
+    // multiplying with m_inTrans.
     dmat4 m_inTrans;
 
     // the "out-transformation": it converts a point from element coordinates of this element back to the world coordinates.
@@ -56,4 +57,4 @@ struct Element {
 // make sure Element does not introduce cost on copy or default construction
 static_assert(std::is_trivially_copyable_v<Element>);
 
-} // namespace RAYX
+}  // namespace RAYX

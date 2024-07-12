@@ -9,13 +9,12 @@
 
 #include "Colors.h"
 #include "Debug/Debug.h"
-#include "Shader/Constants.h"
-#include "Shader/Element.h"
-#include "Shader/Cutout.h"
 #include "DesignElement/DesignElement.h"
-#include "Triangulation/TraceTriangulation.h"
-
 #include "GeometryUtils.h"
+#include "Shader/Constants.h"
+#include "Shader/Cutout.h"
+#include "Shader/Element.h"
+#include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {
     double x;
@@ -425,14 +424,16 @@ void planarTriangulation(const RAYX::DesignElement& element, std::vector<Texture
         RAYX::SlitBehaviour slit = deserializeSlit(element.compile().m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
         poly.push_back(calculateOutlineFromCutout(element.compile().m_cutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true)); // Hole -> Clockwise order
+        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));  // Hole -> Clockwise order
     } else {
         poly.push_back(calculateOutlineFromCutout(element.compile().m_cutout, vertices));
     }
     triangulate(poly, vertices, indices);
 }
 
-bool isPlanar(const RAYX::QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }
+bool isPlanar(const RAYX::QuadricSurface& q) {
+    return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0);
+}
 
 // ------ Interface functions ------
 

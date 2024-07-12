@@ -1,25 +1,25 @@
 #include "PointSource.h"
 
-#include "DesignElement/DesignSource.h"
-#include "DesignElement/DesignElement.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 
 namespace RAYX {
 
-PointSource::PointSource(const DesignSource& dSource) : LightSource(dSource),
-    m_widthDist(dSource.getWidthDist()),
-    m_heightDist(dSource.getHeightDist()),
-    m_horDist(dSource.getHorDist()),
-    m_verDist(dSource.getVerDist()),
-    m_pol(dSource.getStokes()),
-    m_verDivergence(dSource.getVerDivergence()),
-    m_sourceDepth(dSource.getSourceDepth()),
-    m_sourceHeight(dSource.getSourceHeight()),
-    m_sourceWidth(dSource.getSourceWidth())
-     {
+PointSource::PointSource(const DesignSource& dSource)
+    : LightSource(dSource),
+      m_widthDist(dSource.getWidthDist()),
+      m_heightDist(dSource.getHeightDist()),
+      m_horDist(dSource.getHorDist()),
+      m_verDist(dSource.getVerDist()),
+      m_pol(dSource.getStokes()),
+      m_verDivergence(dSource.getVerDivergence()),
+      m_sourceDepth(dSource.getSourceDepth()),
+      m_sourceHeight(dSource.getSourceHeight()),
+      m_sourceWidth(dSource.getSourceWidth()) {
     m_horDivergence = dSource.getHorDivergence();
 }
 
@@ -93,7 +93,7 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
         // const auto rotation = rotationMatrix(direction);
-        const auto field = /* rotation *  */stokesToElectricField(m_pol);
+        const auto field = /* rotation *  */ stokesToElectricField(m_pol);
 
         Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Beamline/Beamline.h"
 #include "Tracer/Tracer.h"
 #include "UserInterface/Settings.h"
-#include "Beamline/Beamline.h"
 
 class Simulator {
   public:
@@ -20,7 +20,7 @@ class Simulator {
     uint64_t m_max_batch_size = 100000;
     std::unique_ptr<RAYX::Tracer> m_Tracer;
     RAYX::Sequential m_seq = RAYX::Sequential::No;
-    RAYX::DeviceConfig m_deviceConfig;    ///< List of available devices. Selection of device for tracing
+    RAYX::DeviceConfig m_deviceConfig;  ///< List of available devices. Selection of device for tracing
     bool m_readyForSimulation = false;
 
     // after Simulation

@@ -31,4 +31,4 @@ RAYX_FN_ACC void bessel_diff(double radius, double wl, double& dphi, double& dps
  */
 RAYX_FN_ACC void fraun_diff(double dim, double wl, double& dAngle, InvState& inv);
 
-} // namespace RAYX
+}  // namespace RAYX

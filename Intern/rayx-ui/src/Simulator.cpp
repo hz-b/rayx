@@ -6,9 +6,7 @@
 #include "Writer/Writer.h"
 
 // constructor
-Simulator::Simulator() {
-    m_seq = RAYX::Sequential::No;
-}
+Simulator::Simulator() { m_seq = RAYX::Sequential::No; }
 
 void Simulator::runSimulation() {
     if (!m_readyForSimulation) {
@@ -101,7 +99,6 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
 
 std::vector<std::string> Simulator::getAvailableDevices() {
     auto deviceNames = std::vector<std::string>();
-    for (const RAYX::DeviceConfig::Device& device : m_deviceConfig.devices)
-        deviceNames.push_back(device.name);
+    for (const RAYX::DeviceConfig::Device& device : m_deviceConfig.devices) deviceNames.push_back(device.name);
     return deviceNames;
 }

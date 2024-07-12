@@ -1,14 +1,17 @@
 #include "Diffraction.h"
+
+#include "Approx.h"
 #include "Constants.h"
 #include "InvocationState.h"
 #include "Rand.h"
-#include "Approx.h"
 
 namespace RAYX {
 
 RAYX_FN_ACC
 double RAYX_API fact(int a) {
-    if (a < 0) { return a; }
+    if (a < 0) {
+        return a;
+    }
     double f = 1;
     for (int i = 2; i <= a; i++) {
         f *= i;
@@ -106,4 +109,4 @@ void fraun_diff(double dim, double wl, double& dAngle, InvState& inv) {
     }
 }
 
-} // namespace RAYX
+}  // namespace RAYX

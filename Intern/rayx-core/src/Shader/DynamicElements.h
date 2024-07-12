@@ -10,4 +10,4 @@ namespace RAYX {
 // back before the function returns to this function)
 RAYX_FN_ACC void dynamicElements(int gid, InvState& inv);
 
-} // namespace RAYX
+}  // namespace RAYX

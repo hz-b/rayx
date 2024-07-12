@@ -13,17 +13,17 @@
 
 namespace RAYX {
 
+using glm::dmat3;
+using glm::dmat4;
 using glm::dvec2;
 using glm::dvec3;
 using glm::dvec4;
-using glm::dmat3;
-using glm::dmat4;
 
+using glm::abs;
 using glm::length;
 using glm::mod;
 using glm::sign;
-using glm::abs;
 
 using uint = unsigned int;
 
-} // namespace RAYX
+}  // namespace RAYX

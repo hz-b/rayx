@@ -28,4 +28,4 @@ RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surfa
 RAYX_FN_ACC Collision findCollisionWith(Ray r, uint id, InvState& inv);
 RAYX_FN_ACC Collision findCollision(const Ray& ray, InvState& inv);
 
-} // namespace RAYX
+}  // namespace RAYX

@@ -18,4 +18,4 @@ inline auto bufToSpan(TBuf& buf, const alpaka::Idx<TBuf> size) {
 template <typename T>
 using printTypeAsCompileError = typename T::printTypeAsCompileError;
 
-} // namespace RAYX
+}  // namespace RAYX

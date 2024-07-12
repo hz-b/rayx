@@ -31,8 +31,8 @@ struct RAYX_API Cutout {
 
 // A rectangle specified by width/length centered at (x=0, z=0).
 struct RAYX_API RectCutout {
-    double m_width; // in X direction
-    double m_length; // in Z direction
+    double m_width;   // in X direction
+    double m_length;  // in Z direction
 };
 
 RAYX_FN_ACC
@@ -93,9 +93,9 @@ inline EllipticalCutout deserializeElliptical(Cutout ser) {
 // These lines have a distance of `m_length`.
 // The point (x=0, z=0) lies at the center of the trapezoid.
 struct RAYX_API TrapezoidCutout {
-    double m_widthA; // in X direction
-    double m_widthB; // in X direction
-    double m_length; // in Z direction
+    double m_widthA;  // in X direction
+    double m_widthB;  // in X direction
+    double m_length;  // in Z direction
 };
 
 RAYX_FN_ACC
@@ -134,4 +134,4 @@ inline Cutout serializeUnlimited() {
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
 
-} // namespace RAYX
+}  // namespace RAYX

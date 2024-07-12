@@ -30,7 +30,6 @@ RAYX_FN_ACC Ray refrac(Ray r, dvec3 normal, double linedensity, InvState& inv);
  * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
  * WL:wavelength (nm); ORD order of diffraction
  */
-RAYX_FN_ACC Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal,
-                          double a, InvState& inv);  // TODO fix unused var
+RAYX_FN_ACC Ray RAYX_API refracPlane(Ray r, [[maybe_unused]] dvec3 normal, double a, InvState& inv);  // TODO fix unused var
 
-} // namespace RAYX
+}  // namespace RAYX

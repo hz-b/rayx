@@ -1,10 +1,10 @@
 #pragma once
 
+#include <glm.h>
+
 #include <array>
 #include <string>
 #include <vector>
-
-#include <glm.h>
 
 #include "Core.h"
 #include "Data/xml.h"

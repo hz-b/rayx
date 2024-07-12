@@ -1,7 +1,6 @@
-#include "CanonicalizePath.h"
-
 #include <fstream>
 
+#include "CanonicalizePath.h"
 #include "Debug/Debug.h"
 
 namespace RAYX {
@@ -62,7 +61,6 @@ std::optional<std::vector<uint32_t>> readFileAlign32(const std::string& filename
 
     return data;
 }
-
 
 void writeFile(const std::vector<uint8_t>& data, const std::string& filename, const uint32_t count) {
     std::ofstream file;

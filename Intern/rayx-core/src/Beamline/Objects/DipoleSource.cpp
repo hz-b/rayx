@@ -2,10 +2,10 @@
 
 #include <fstream>
 
-#include "DesignElement/DesignSource.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 #include "Shader/EventType.h"
@@ -45,23 +45,22 @@ double get_factorTotalPowerDipol() {
     return totalPower;
 }
 
-DipoleSource::DipoleSource(const DesignSource& dSource) : LightSource(dSource), 
-    m_bendingRadius(dSource.getBendingRadius()),
-    m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
-    m_photonFlux(dSource.getPhotonFlux()),
-    m_sourceHeight(dSource.getSourceHeight()),
-    m_sourceWidth(dSource.getSourceWidth()),
-    m_electronEnergy(dSource.getElectronEnergy()),
-    m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
-    m_photonEnergy(dSource.getEnergy()),
-    m_verEbeamDivergence(dSource.getVerEBeamDivergence()),
-    m_bandwidth(1.0e-3),
-    m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
-    m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
-    m_energySpread(dSource.getEnergySpread()),
-    m_energySpreadUnit(dSource.getEnergySpreadUnit())
-{   
-    
+DipoleSource::DipoleSource(const DesignSource& dSource)
+    : LightSource(dSource),
+      m_bendingRadius(dSource.getBendingRadius()),
+      m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
+      m_photonFlux(dSource.getPhotonFlux()),
+      m_sourceHeight(dSource.getSourceHeight()),
+      m_sourceWidth(dSource.getSourceWidth()),
+      m_electronEnergy(dSource.getElectronEnergy()),
+      m_criticalEnergy(RAYX::get_factorCriticalEnergy()),
+      m_photonEnergy(dSource.getEnergy()),
+      m_verEbeamDivergence(dSource.getVerEBeamDivergence()),
+      m_bandwidth(1.0e-3),
+      m_gamma(std::fabs(m_electronEnergy) * get_factorElectronEnergy()),
+      m_photonWaveLength(calcPhotonWavelength(m_photonEnergy)),
+      m_energySpread(dSource.getEnergySpread()),
+      m_energySpreadUnit(dSource.getEnergySpreadUnit()) {
     m_horDivergence = dSource.getHorDivergence();
     m_verDivergence = DipoleSource::vDivergence(m_photonEnergy, m_verEbeamDivergence);
     m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
@@ -440,7 +439,7 @@ void DipoleSource::calcMagneticField() {
     m_criticalEnergy = get_factorCriticalEnergy() * pow(fabs(m_electronEnergy), 3) / m_bendingRadius;
 
     m_totalPower = get_factorTotalPowerDipol() * 0.1 * pow(fabs(m_electronEnergy), 3) * m_magneticFieldStrength * fabs(m_horDivergence) / 1000.0;
-    m_gamma = m_electronEnergy / (ELECTRON_MASS * pow(SPEED_OF_LIGHT, 2) / (ELECTRON_VOLT)*1.e-9);
+    m_gamma = m_electronEnergy / (ELECTRON_MASS * pow(SPEED_OF_LIGHT, 2) / (ELECTRON_VOLT) * 1.e-9);
 
     if (m_gamma >= 1) {
         m_beta = sqrt(pow(m_gamma, 2) - 1) / m_gamma;

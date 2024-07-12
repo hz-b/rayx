@@ -6,7 +6,8 @@
 
 /// RAYX_LOG, RAYX_VERB prints to std::cout, whereas RAYX_WARN and RAYX_ERR are printed in red and go to std::cerr.
 /// RAYX_VERB is used for "verbose" prints, they can be activated and deactivated using the setDebugVerbose function.
-/// Finally RAYX_ERR is to be used for fatal errors, calling it will automatically terminate the program by calling the configurable `error_fn` defined below.
+/// Finally RAYX_ERR is to be used for fatal errors, calling it will automatically terminate the program by calling the configurable `error_fn`
+/// defined below.
 ///
 /// Each of these variants also has a "debug-only" variant, that gets deactivated in the release mode.
 /// The "debug-only" variant is prefixed by "RAYX_D_" instead of "RAYX_".
@@ -21,8 +22,8 @@
 #include <vector>
 
 // This include is necessary, as Debug implements a special formatting for Ray.
-#include "Shader/Ray.h"
 #include "Shader/Complex.h"
+#include "Shader/Ray.h"
 
 // Debug only code; use it as: DEBUG(<statement>);
 #ifdef RAYX_DEBUG_MODE
@@ -166,15 +167,9 @@ inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.rea
 
 inline std::vector<double> formatAsVec(const Ray arg) {
     return {
-        arg.m_position.x, arg.m_position.y, arg.m_position.z,
-        arg.m_eventType,
-        arg.m_direction.x, arg.m_direction.y, arg.m_direction.z,
-        arg.m_energy,
-        arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(), arg.m_field.z.real(), arg.m_field.z.imag(),
-        arg.m_pathLength,
-        arg.m_order,
-        arg.m_lastElement,
-        arg.m_sourceID,
+        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     arg.m_eventType,      arg.m_direction.x,    arg.m_direction.y,
+        arg.m_direction.z,    arg.m_energy,         arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(),
+        arg.m_field.z.real(), arg.m_field.z.imag(), arg.m_pathLength,     arg.m_order,          arg.m_lastElement,    arg.m_sourceID,
     };
 }
 
@@ -227,4 +222,4 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
 
 #define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
 
-} // namespace RAYX
+}  // namespace RAYX

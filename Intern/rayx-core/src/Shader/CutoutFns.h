@@ -20,4 +20,4 @@ RAYX_FN_ACC dvec2 RAYX_API cutoutBoundingBox(Cutout cutout);
 // (might not find all Ellipsoid vs Trapezoid violations)
 RAYX_FN_ACC void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2);
 
-} // namespace RAYX
+}  // namespace RAYX

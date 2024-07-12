@@ -1,9 +1,10 @@
 #include "DynamicElements.h"
-#include "Collision.h"
+
 #include "Behave.h"
-#include "Utils.h"
-#include "Helper.h"
+#include "Collision.h"
 #include "EventType.h"
+#include "Helper.h"
+#include "Utils.h"
 
 namespace RAYX {
 
@@ -59,7 +60,9 @@ void dynamicElements(int gid, InvState& inv) {
         }
 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (inv.finalized) { break; }
+        if (inv.finalized) {
+            break;
+        }
 
         recordEvent(ray, ETYPE_JUST_HIT_ELEM, inv);
 
@@ -73,4 +76,4 @@ void dynamicElements(int gid, InvState& inv) {
     inv.outputRayCounts[gid] = eventsCount;
 }
 
-} // namespace RAYX
+}  // namespace RAYX

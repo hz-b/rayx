@@ -35,9 +35,7 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     }
 }
 
-TerminalApp::~TerminalApp() {
-    RAYX_VERB << "TerminalApp deleted!";
-}
+TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
 void TerminalApp::tracePath(const std::filesystem::path& path) {
     namespace fs = std::filesystem;
@@ -66,7 +64,8 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
+        int maxEvents =
+            (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
         if (m_CommandParser->m_args.m_startEventID >= maxEvents) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
@@ -168,10 +167,7 @@ void TerminalApp::run() {
             return RAYX::DeviceConfig().enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
         } else {
             using DeviceType = RAYX::DeviceConfig::DeviceType;
-            const auto deviceType = m_CommandParser->m_args.m_cpuFlag
-                ? DeviceType::Cpu
-                : DeviceType::Gpu
-            ;
+            const auto deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
             return RAYX::DeviceConfig(deviceType).enableBestDevice();
         }
     };
