@@ -6,10 +6,10 @@
 namespace RAYX {
 
 // Calculates the factorial of n: n!
-RAYX_FUNC double RAYX_API fact(int n);
+RAYX_FN_ACC double RAYX_API fact(int n);
 
 /**returns first bessel function of parameter v*/
-RAYX_FUNC double RAYX_API bessel1(double v);
+RAYX_FN_ACC double RAYX_API bessel1(double v);
 
 /**
 calculates the Bessel diffraction effects on circular slits and on circular
@@ -20,7 +20,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-RAYX_FUNC void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv);
+RAYX_FN_ACC void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Inv& inv);
 
 /**
  * calculates fraunhofer diffraction effects on rectangular slits
@@ -29,6 +29,6 @@ RAYX_FUNC void bessel_diff(double radius, double wl, double& dphi, double& dpsi,
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-RAYX_FUNC void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
+RAYX_FN_ACC void fraun_diff(double dim, double wl, double& dAngle, Inv& inv);
 
 } // namespace RAYX

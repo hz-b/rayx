@@ -3,7 +3,7 @@
 namespace RAYX {
 
 // rotates for the cubic collision by angle alpha (taken from RAY-UI)
-RAYX_FUNC
+RAYX_FN_ACC
 dvec3 RAYX_API cubicPosition(Ray r, double alpha) {
     
     double yy = r.m_position[1];
@@ -14,7 +14,7 @@ dvec3 RAYX_API cubicPosition(Ray r, double alpha) {
 }
 
 // rotates for the cubic collision by angle alpha (taken from RAY-UI)
-RAYX_FUNC
+RAYX_FN_ACC
 dvec3 RAYX_API cubicDirection(Ray r, double alpha) {
     
     double am = r.m_direction[1];

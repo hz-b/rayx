@@ -16,10 +16,10 @@ namespace RAYX {
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-RAYX_FUNC Ray behaveSlit(Ray r, int id, Collision col, Inv& inv);
-RAYX_FUNC Ray behaveRZP(Ray r, int id, Collision col, Inv& inv);
-RAYX_FUNC Ray behaveGrating(Ray r, int id, Collision col, Inv& inv);
-RAYX_FUNC Ray behaveMirror(Ray r, int id, Collision col, Inv& inv);
-RAYX_FUNC Ray behaveImagePlane(Ray r, int id, Collision col, Inv& inv);
+RAYX_FN_ACC Ray behaveSlit(Ray r, int id, Collision col, Inv& inv);
+RAYX_FN_ACC Ray behaveRZP(Ray r, int id, Collision col, Inv& inv);
+RAYX_FN_ACC Ray behaveGrating(Ray r, int id, Collision col, Inv& inv);
+RAYX_FN_ACC Ray behaveMirror(Ray r, int id, Collision col, Inv& inv);
+RAYX_FN_ACC Ray behaveImagePlane(Ray r, int id, Collision col, Inv& inv);
 
 } // namespace RAYX

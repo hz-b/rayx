@@ -7,7 +7,7 @@
 
 namespace RAYX {
 
-RAYX_FUNC
+RAYX_FN_ACC
 void dynamicElements(int gid, Inv& inv) {
     // initializes the global state.
     inv.globalInvocationId = gid;

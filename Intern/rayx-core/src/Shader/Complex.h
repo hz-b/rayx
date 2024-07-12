@@ -83,7 +83,7 @@ namespace complex {
 
 // add some helper function for glm::tvec of complex
 namespace complex {
-    RAYX_FUNC
+    RAYX_FN_ACC
     inline dvec2 abs(cvec2 v) {
         return dvec2(
             abs(v.x),
@@ -91,7 +91,7 @@ namespace complex {
         );
     }
 
-    RAYX_FUNC
+    RAYX_FN_ACC
     inline dvec3 abs(cvec3 v) {
         return dvec3(
             abs(v.x),
@@ -100,7 +100,7 @@ namespace complex {
         );
     }
 
-    RAYX_FUNC
+    RAYX_FN_ACC
     inline dvec2 arg(cvec2 v) {
         return dvec2(
             arg(v.x),
@@ -108,7 +108,7 @@ namespace complex {
         );
     }
 
-    RAYX_FUNC
+    RAYX_FN_ACC
     inline dvec3 arg(cvec3 v) {
         return dvec3(
             arg(v.x),
@@ -117,7 +117,7 @@ namespace complex {
         );
     }
 
-    RAYX_FUNC
+    RAYX_FN_ACC
     inline cvec2 polar(dvec2 mag, dvec2 theta) {
         return cvec2(
             polar(mag.x, theta.x),
@@ -125,7 +125,7 @@ namespace complex {
         );
     }
 
-    RAYX_FUNC
+    RAYX_FN_ACC
     inline cvec3 polar(dvec3 mag, dvec3 theta) {
         return cvec3(
             polar(mag.x, theta.x),

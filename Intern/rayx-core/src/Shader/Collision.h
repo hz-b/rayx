@@ -22,10 +22,10 @@ struct RAYX_API Collision {
     bool found;
 };
 
-RAYX_FUNC Collision getQuadricCollision(Ray r, QuadricSurface q);
-RAYX_FUNC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
-RAYX_FUNC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
-RAYX_FUNC Collision findCollisionWith(Ray r, uint id, Inv& inv);
-RAYX_FUNC Collision findCollision(const Ray& _ray, Inv& inv);
+RAYX_FN_ACC Collision getQuadricCollision(Ray r, QuadricSurface q);
+RAYX_FN_ACC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
+RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
+RAYX_FN_ACC Collision findCollisionWith(Ray r, uint id, Inv& inv);
+RAYX_FN_ACC Collision findCollision(const Ray& _ray, Inv& inv);
 
 } // namespace RAYX

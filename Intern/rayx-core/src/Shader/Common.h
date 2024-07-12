@@ -7,9 +7,9 @@
 
 #ifdef RAYX_BUILD_DLL
 #include <alpaka/core/Common.hpp>
-#define RAYX_FUNC ALPAKA_FN_ACC
+#define RAYX_FN_ACC ALPAKA_FN_ACC
 #else
-#define RAYX_FUNC
+#define RAYX_FN_ACC
 #endif
 
 #include <glm.h>

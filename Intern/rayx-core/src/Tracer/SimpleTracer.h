@@ -18,7 +18,7 @@ namespace {
 
 struct DynamicElementsKernel {
     template <typename Acc>
-    RAYX_FUNC
+    RAYX_FN_ACC
     void operator() (const Acc& acc, RAYX::Inv inv) const {
         using Idx = alpaka::Idx<Acc>;
         const Idx gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];

@@ -12,7 +12,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-RAYX_FUNC dvec3 RAYX_API normalCartesian(dvec3 normal, double x_rad, double z_rad);
+RAYX_FN_ACC dvec3 RAYX_API normalCartesian(dvec3 normal, double x_rad, double z_rad);
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -21,7 +21,7 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
-RAYX_FUNC dvec3 RAYX_API normalCylindrical(dvec3 normal, double x_rad, double z_rad);
+RAYX_FN_ACC dvec3 RAYX_API normalCylindrical(dvec3 normal, double x_rad, double z_rad);
 
 /**
 adds slope error to the normal
@@ -32,6 +32,6 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-RAYX_FUNC dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv);
+RAYX_FN_ACC dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, Inv& inv);
 
 } // namespace RAYX

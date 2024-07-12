@@ -39,7 +39,7 @@ struct QuadricSurface {
     double m_a44;
 };
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline Surface serializeQuadric(QuadricSurface surface) {
     Surface ser;
     ser.m_type = STYPE_QUADRIC;
@@ -57,7 +57,7 @@ inline Surface serializeQuadric(QuadricSurface surface) {
     return ser;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline QuadricSurface deserializeQuadric(Surface ser) {
     QuadricSurface surface;
     surface.m_icurv = int(ser.m_private_serialization_params[0]);
@@ -88,7 +88,7 @@ struct ToroidSurface {
     ToroidType m_toroidType;
 };
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline Surface serializeToroid(ToroidSurface surface) {
     Surface ser;
     ser.m_type = STYPE_TOROID;
@@ -98,7 +98,7 @@ inline Surface serializeToroid(ToroidSurface surface) {
     return ser;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline ToroidSurface deserializeToroid(Surface ser) {
     ToroidSurface surface;
     surface.m_longRadius = ser.m_private_serialization_params[0];
@@ -113,7 +113,7 @@ inline ToroidSurface deserializeToroid(Surface ser) {
 
 // `PlaneXZ` doesn't have any data so it doesn't need a struct.
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline Surface serializePlaneXZ() {
     Surface ser;
     ser.m_type = STYPE_PLANE_XZ;
@@ -147,7 +147,7 @@ struct CubicSurface {
     double m_psi;
 };
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline Surface serializeCubic(CubicSurface surface) {
     Surface ser;
     ser.m_type = STYPE_CUBIC;
@@ -175,7 +175,7 @@ inline Surface serializeCubic(CubicSurface surface) {
     return ser;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 inline CubicSurface deserializeCubic(Surface ser) {
     CubicSurface surface;
     surface.m_icurv = int(ser.m_private_serialization_params[0]);

@@ -7,7 +7,7 @@ namespace RAYX {
 
 struct GatherKernel {
     template <typename Acc, typename T>
-    RAYX_FUNC
+    RAYX_FN_ACC
     void operator() (
         const Acc& acc,
         T* dst,

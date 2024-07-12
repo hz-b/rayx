@@ -14,7 +14,7 @@
 
 namespace RAYX {
 
-RAYX_FUNC
+RAYX_FN_ACC
 Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
     SlitBehaviour b = deserializeSlit(inv.elements[id].m_behaviour);
 
@@ -60,7 +60,7 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, Inv& inv) {
     return r;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
     RZPBehaviour b = deserializeRZP(inv.elements[id].m_behaviour);
 
@@ -87,7 +87,7 @@ Ray behaveRZP(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
     GratingBehaviour b = deserializeGrating(inv.elements[id].m_behaviour);
 
@@ -107,7 +107,7 @@ Ray behaveGrating(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     // calculate the new direction after the reflection
     const auto incident_vec = r.m_direction;
@@ -135,7 +135,7 @@ Ray behaveMirror(Ray r, int id, Collision col, Inv& inv) {
     return r;
 }
 
-RAYX_FUNC
+RAYX_FN_ACC
 Ray behaveImagePlane(Ray r, [[maybe_unused]] int id, [[maybe_unused]] Collision col, [[maybe_unused]] Inv& inv) {
     // doesn't need to do anything.
     return r;

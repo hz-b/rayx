@@ -26,18 +26,18 @@ struct NffEntry {
     double m_f2;
 };
 
-RAYX_FUNC int RAYX_API getPalikEntryCount(int material, Inv& inv);
+RAYX_FN_ACC int RAYX_API getPalikEntryCount(int material, Inv& inv);
 
-RAYX_FUNC int RAYX_API getNffEntryCount(int material, Inv& inv);
+RAYX_FN_ACC int RAYX_API getNffEntryCount(int material, Inv& inv);
 
-RAYX_FUNC PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv);
+RAYX_FN_ACC PalikEntry RAYX_API getPalikEntry(int index, int material, Inv& inv);
 
-RAYX_FUNC NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv);
+RAYX_FN_ACC NffEntry RAYX_API getNffEntry(int index, int material, Inv& inv);
 
 // returns dvec2 to represent a complex number
-RAYX_FUNC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, Inv& inv);
+RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, Inv& inv);
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
-RAYX_FUNC dvec2 RAYX_API getAtomicMassAndRho(int material);
+RAYX_FN_ACC dvec2 RAYX_API getAtomicMassAndRho(int material);
 
 } // namespace RAYX
