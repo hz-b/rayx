@@ -9,11 +9,11 @@
 
 #include "Colors.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 #include "DesignElement/DesignElement.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
 #include "Shader/Cutout.h"
-#include "Shader/Element.h"
 #include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {
@@ -417,16 +417,16 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
     return indices;
 }
 
-void planarTriangulation(const RAYX::DesignElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void planarTriangulation(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
-    if (element.compile().m_behaviour.m_type == RAYX::BTYPE_SLIT) {
-        RAYX::SlitBehaviour slit = deserializeSlit(element.compile().m_behaviour);
+    if (compiled.m_behaviour.m_type == RAYX::BTYPE_SLIT) {
+        RAYX::SlitBehaviour slit = deserializeSlit(compiled.m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(element.compile().m_cutout, vertices));
+        poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
         poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));  // Hole -> Clockwise order
     } else {
-        poly.push_back(calculateOutlineFromCutout(element.compile().m_cutout, vertices));
+        poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
     }
     triangulate(poly, vertices, indices);
 }
@@ -440,27 +440,28 @@ bool isPlanar(const RAYX::QuadricSurface& q) {
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
-void triangulateObject(const RAYX::DesignElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
-    switch (static_cast<int>(element.compile().m_surface.m_type)) {
+void triangulateObject(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+    // RAYX_PROFILE_FUNCTION_STDOUT();
+    switch (static_cast<int>(compiled.m_surface.m_type)) {
         case RAYX::STYPE_PLANE_XZ: {
-            planarTriangulation(element, vertices, indices);
+            planarTriangulation(compiled, vertices, indices);
             break;
         }
         case RAYX::STYPE_QUADRIC: {
-            RAYX::QuadricSurface q = deserializeQuadric(element.compile().m_surface);
+            RAYX::QuadricSurface q = deserializeQuadric(compiled.m_surface);
             if (isPlanar(q)) {
-                planarTriangulation(element, vertices, indices);
+                planarTriangulation(compiled, vertices, indices);
             } else {
-                traceTriangulation(element, vertices, indices);
+                traceTriangulation(compiled, vertices, indices);
             }
             break;
         }
         case RAYX::STYPE_TOROID: {
-            traceTriangulation(element, vertices, indices);
+            traceTriangulation(compiled, vertices, indices);
             break;
         }
         default:
-            RAYX_ERR << "Unknown element type: " << element.compile().m_surface.m_type;
+            RAYX_ERR << "Unknown element type: " << compiled.m_surface.m_type;
             break;
     }
 }

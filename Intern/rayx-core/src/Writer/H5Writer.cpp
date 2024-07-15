@@ -7,6 +7,8 @@
 #include <string>
 
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
+#include "Shader/Ray.h"
 
 using uint = unsigned int;
 
@@ -64,59 +66,64 @@ void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const
 }
 
 RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format& format) {
-    auto formatSize = format.size();  // Now 16 with the inclusion of Ray-ID and Snapshot-ID
-    auto numRays = doubles.size() / formatSize;
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    const size_t formatSize = format.size();
+    const size_t numRays = doubles.size() / formatSize;
 
     if (doubles.size() % formatSize != 0) {
         throw std::invalid_argument("Size of doubles does not match expected size based on format");
     }
 
     RAYX::BundleHistory bundleHist;
-    bundleHist.reserve(numRays);
-    size_t double_index = 0;
-    RAYX::RayHistory rayHist;
-    double startEventID = doubles[1];
-    while (double_index < doubles.size()) {
-        // Extract and ignore Ray-ID and Snapshot-ID
-        [[maybe_unused]] double rayId = doubles[double_index++];
-        double eventId = doubles[double_index++];
+    bundleHist.reserve(numRays / 2);  // Estimate: assume at least 2 events per ray on average
 
-        if (eventId == startEventID) {
-            bundleHist.push_back(rayHist);
+    RAYX::RayHistory rayHist;
+    rayHist.reserve(8);  // Estimate: assume 8 events per ray on average
+
+    const double startEventID = doubles[1];
+    const double* data = doubles.data();
+
+    for (size_t i = 0; i < numRays; ++i) {
+        const double* rayData = data + i * formatSize;
+
+        double eventId = rayData[1];
+
+        if (eventId == startEventID && !rayHist.empty()) {
+            bundleHist.push_back(std::move(rayHist));
             rayHist.clear();
+            rayHist.reserve(8);
         }
 
-        // Extract data for ray
-        glm::dvec3 origin(doubles[double_index], doubles[double_index + 1], doubles[double_index + 2]);
-        double eventType = doubles[double_index + 3];
-        glm::dvec3 direction(doubles[double_index + 4], doubles[double_index + 5], doubles[double_index + 6]);
-        double energy = doubles[double_index + 7];
-        RAYX::ElectricField field{
-            {doubles[double_index + 8], doubles[double_index + 9]},
-            {doubles[double_index + 10], doubles[double_index + 11]},
-            {doubles[double_index + 12], doubles[double_index + 13]},
-        };
-        double pathLength = doubles[double_index + 14];
-        double order = doubles[double_index + 15];
-        double lastElement = doubles[double_index + 16];
-        double sourceID = doubles[double_index + 17];
-
-        RAYX::Ray ray = {
-            origin, eventType, direction, energy, field, pathLength, order, lastElement, sourceID,
+        const auto ray = RAYX::Ray{
+            .m_position = {rayData[2], rayData[3], rayData[4]},   // origin
+            .m_eventType = rayData[5],                            // eventType
+            .m_direction = {rayData[6], rayData[7], rayData[8]},  // direction
+            .m_energy = rayData[9],                               // energy
+            .m_field =
+                {
+                    // electric field
+                    {rayData[10], rayData[11]},
+                    {rayData[12], rayData[13]},
+                    {rayData[14], rayData[15]},
+                },
+            .m_pathLength = rayData[16],   // pathLength
+            .m_order = rayData[17],        // order
+            .m_lastElement = rayData[18],  // lastElement
+            .m_sourceID = rayData[19]      // sourceID
         };
 
         rayHist.push_back(ray);
-
-        double_index += formatSize - 2;
     }
-    bundleHist.push_back(rayHist);
-    // Remove first empty snapshot
-    bundleHist.erase(bundleHist.begin());
+
+    if (!rayHist.empty()) {
+        bundleHist.push_back(std::move(rayHist));
+    }
 
     return bundleHist;
 }
 
 RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, unsigned int* startEventID) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX::BundleHistory rays;
 
     try {

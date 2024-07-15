@@ -14,7 +14,7 @@
 #include "Shader/Strings.cpp"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
+    // RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (uiBeamlineInfo.selectedType == SelectedType::LightSource) {  // source
         if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.sources.size())) {

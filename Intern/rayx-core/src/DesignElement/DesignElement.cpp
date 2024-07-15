@@ -4,10 +4,12 @@
 #include "Beamline/Objects/Objects.h"
 #include "Beamline/Objects/SurfaceType.h"
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 
 Element DesignElement::compile() const {
+    RAYX_PROFILE_FUNCTION_STDOUT();
     Surface surface;
     Behaviour behav;
 

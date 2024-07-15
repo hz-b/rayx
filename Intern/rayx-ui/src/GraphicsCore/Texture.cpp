@@ -9,6 +9,7 @@
 
 #include "Buffer.h"
 #include "CanonicalizePath.h"
+#include "Debug/Instrumentor.h"
 
 Texture::Texture(const Device& device)
     : m_Device{device},
@@ -82,6 +83,7 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 }
 
 void Texture::updateFromData(const unsigned char* data, uint32_t width, uint32_t height) {
+    // RAYX_PROFILE_FUNCTION_STDOUT();
     m_extent.width = width;
     m_extent.height = height;
 

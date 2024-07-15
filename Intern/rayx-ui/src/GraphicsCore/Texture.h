@@ -34,6 +34,29 @@ class Texture {
         std::unique_ptr<unsigned char[]> data;
         uint32_t width;
         uint32_t height;
+
+        // Default constructor
+        TextureInput() = default;
+
+        // Parameterized constructor
+        TextureInput(std::unique_ptr<unsigned char[]> d, uint32_t w, uint32_t h) : data(std::move(d)), width(w), height(h) {}
+
+        // Move constructor
+        TextureInput(TextureInput&& other) noexcept : data(std::move(other.data)), width(other.width), height(other.height) {}
+
+        // Move assignment operator
+        TextureInput& operator=(TextureInput&& other) noexcept {
+            if (this != &other) {
+                data = std::move(other.data);
+                width = other.width;
+                height = other.height;
+            }
+            return *this;
+        }
+
+        // Delete copy constructor and copy assignment operator
+        TextureInput(const TextureInput&) = delete;
+        TextureInput& operator=(const TextureInput&) = delete;
     };
 
   private:

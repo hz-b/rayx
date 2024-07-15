@@ -35,9 +35,9 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
         std::string buttonId = "<--##" + child.name + std::to_string(child.index);
 
         if (ImGui::Button(buttonId.c_str())) {
+            auto compiled = elements[child.index].compile();
             if (child.category == SelectedType::OpticalElement && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
-                glm::vec3 translationVec = {elements[child.index].compile().m_outTrans[3][0], elements[child.index].compile().m_outTrans[3][1],
-                                            elements[child.index].compile().m_outTrans[3][2]};
+                glm::vec3 translationVec = {compiled.m_outTrans[3][0], compiled.m_outTrans[3][1], compiled.m_outTrans[3][2]};
                 camController.lookAtPoint(translationVec);
             } else if (child.category == SelectedType::LightSource && child.index >= 0 &&
                        static_cast<size_t>(child.index) < rSourcePositions.size()) {

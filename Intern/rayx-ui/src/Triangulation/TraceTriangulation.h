@@ -5,6 +5,7 @@
 #include "Beamline/Objects/MatrixSource.h"
 #include "Beamline/OpticalElement.h"
 #include "RenderObject.h"
+#include "Shader/Element.h"
 
 /**
  * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.
@@ -23,7 +24,7 @@
  *   RenderObject renderObj = traceTriangulation(element, device);
  * @endcode
  */
-void traceTriangulation(const RAYX::DesignElement& element, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices);
+void traceTriangulation(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices);
 
 // ------ Helper functions ------
 

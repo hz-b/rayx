@@ -97,6 +97,12 @@ void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint
     createDescriptorSet();
 }
 
+void RenderObject::updateParams(const glm::mat4& modelMatrix, std::vector<VertexVariant>& vertices, std::vector<uint32_t>& indices) {
+    m_modelMatrix = modelMatrix;
+    rebuild(vertices, indices);
+    createDescriptorSet();
+}
+
 void RenderObject::createVertexBuffers(const std::vector<VertexVariant>& vertices) {
     m_vertexCount = static_cast<uint32_t>(vertices.size());
 

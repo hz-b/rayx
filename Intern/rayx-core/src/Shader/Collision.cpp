@@ -448,6 +448,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
 
 RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
+    // RAYX_PROFILE_FUNCTION_STDOUT();
     double sty = surface.m_type;
 
     Collision col;

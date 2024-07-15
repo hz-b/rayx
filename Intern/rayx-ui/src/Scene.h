@@ -21,15 +21,17 @@ class Scene {
         glm::mat4 modelMatrix;
         std::vector<TextureVertex> vertices;
         std::vector<uint32_t> indices;
-        std::optional<Texture::TextureInput> textureInput;
     };
 
     void buildRayCache(UIRayInfo& rayInfo, const RAYX::BundleHistory& rays);
     void buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo, std::shared_ptr<DescriptorSetLayout> setLayout,
                           std::shared_ptr<DescriptorPool> descriptorPool);
-    std::vector<RenderObjectInput> getRObjectInputs(const std::vector<RAYX::DesignElement> elements, const RAYX::BundleHistory& rays) const;
+
+    std::vector<Scene::RenderObjectInput> getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
+                                                           const std::vector<std::vector<RAYX::Ray>> sortedRays, bool buildTexture);
+
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
-                                std::shared_ptr<DescriptorPool> descriptorPool);
+                                std::shared_ptr<DescriptorPool> descriptorPool, bool buildTexture);
 
     void resetRayRObject() { m_RayRObjects.clear(); }
 
@@ -39,4 +41,5 @@ class Scene {
     std::vector<RenderObject> m_ElementRObjects = {};
     std::vector<RenderObject> m_RayRObjects = {};
     RAYX::BundleHistory m_rayCache = {};
+    mutable std::vector<Texture::TextureInput> m_textureInputCache;  ///< Texture cache
 };
