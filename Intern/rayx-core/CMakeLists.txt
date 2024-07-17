@@ -98,7 +98,13 @@ if(MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     message(STATUS "GCC")
+
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+
+    # set(GCC_CXX_FLAGS -Wpedantic)
+    # prepend_xcompiler(GCC_CXX_FLAGS GCC_CUDA_FLAGS)
+    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${GCC_CXX_FLAGS}>)
+    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${GCC_CUDA_FLAGS}>)
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
