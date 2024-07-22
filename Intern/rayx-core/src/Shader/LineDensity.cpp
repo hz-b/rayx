@@ -12,7 +12,6 @@ double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vl
     // lineDensity = lineDensity * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 +
     // 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
 
-    double eps1 = -r8_atan(normal.x / normal.y);
     double del1 = r8_asin(normal.z);
     double cos_d = r8_cos(-del1); // linedesity is smaller on konvex surfaces
 
