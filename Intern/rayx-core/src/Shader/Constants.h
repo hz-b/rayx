@@ -8,7 +8,7 @@
 #include "ImageType.h"
 
 // inverse nanometer-electron volt relationship / reziprocal factor
-const double INV_NM_2_eV = 1239.841984332002622; // TODO: Check, find better name maybe
+const double INV_NM_TO_EVOLT = 1239.841984332002622; // TODO: Check, find better name maybe
 
 const double PI = 3.14159265358979323846264338327950;
 // 141592653589793238462643383279502884197169399
