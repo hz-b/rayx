@@ -11,7 +11,7 @@ double RAYX_API hvlam(double x) {
     if (x == 0) {
         return 0.0;
     }
-    return INV_NM_2_eV / x;
+    return INV_NM_TO_EVOLT / x;
 }
 
 // originally we calculcated 1/0, which might be UB (https://stackoverflow.com/questions/5802351/what-happens-when-you-divide-by-0-in-a-shader).
