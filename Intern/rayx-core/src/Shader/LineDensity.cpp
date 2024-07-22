@@ -8,16 +8,21 @@
     vls[6]: 6 vls parameters given by user
 @returns line density specifically for this z-coordinate
 */
-double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
+double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vls[6]) {
     // lineDensity = lineDensity * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 +
     // 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
+
+    double eps1 = -r8_atan(normal.x / normal.y);
+    double del1 = r8_asin(normal.z);
+    double cos_d = r8_cos(-del1); // linedesity is smaller on konvex surfaces
+
     double z2 = z * z;
     double z3 = z2 * z;
     double z4 = z3 * z;
     double z5 = z4 * z;
     double z6 = z5 * z;
     double a = lineDensity * (1 + 2 * vls[0] * z + 3 * vls[1] * z2 + 4 * vls[2] * z3 + 5 * vls[3] * z4 + 6 * vls[4] * z5 + 7 * vls[5] * z6);
-    return a;
+    return a * cos_d;
 }
 
 
