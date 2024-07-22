@@ -107,7 +107,7 @@ struct RAYX_API Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
-    Cutout parseCutout(DesignPlane) const;
+    Cutout parseCutout(DesignPlane, std::string) const;
     QuadricSurface parseQuadricParameters() const;
     CubicSurface parseCubicParameters() const;
     ElectronEnergyOrientation parseElectronEnergyOrientation() const;

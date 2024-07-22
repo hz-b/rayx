@@ -42,56 +42,34 @@ Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
 
 // refraction function used for gratings
 Ray refrac(Ray r, dvec3 normal, double linedensity) {
+    // Rotation to fit collision normal to element normal (see Wiki)
     double xy = normal[0] / normal[1];
     double zy = normal[2] / normal[1];
     double sqq = sqrt(1 + zy * zy + xy * xy);
     double an_x = xy / sqq;
     double an_y = -1.0 / sqq;
     double an_z = zy / sqq;
-
     double eps1 = r8_atan(an_x / an_y);  //-atan(an_x/an_z) around z, chi
     double del1 = r8_asin(an_z);         // sign(an_z) * r8_atan(sqrt( (an_z*an_z) / (1-an_z*an_z) )); //
                                          // -asin(an_z); // -asin around x, psi
     double cos_d = r8_cos(del1);
-    double a1 = linedensity * cos_d;
     double sin_d = r8_sin(-del1);
     double cos_e = r8_cos(-eps1);
     double sin_e = r8_sin(-eps1);
-    dmat4 rot = dmat4(cos_e, cos_d * sin_e, sin_d * sin_e, 0, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, 0, -sin_d, cos_d, 0, 0, 0, 0, 1);
-    dmat4 inv_rot = dmat4(cos_e, -sin_e, 0, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, 0, sin_d * sin_e, sin_d * cos_e, cos_d, 0, 0, 0, 0, 1);
-    r.m_direction = dvec3(rot * dvec4(r.m_direction, 0));
+    dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
+    dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
+    r.m_direction = dvec3(rot * r.m_direction);  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
 
+    // Refraction
+    double a1 = linedensity * cos_d;
     double y1 = (r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - ((r.m_direction[2] - a1) * (r.m_direction[2] - a1)));
     if (y1 > 0) {
         y1 = sqrt(y1);
         r.m_direction[1] = y1;
         r.m_direction[2] -= a1;
-        r.m_direction = dvec3(inv_rot * dvec4(r.m_direction, 0));
+        r.m_direction = dvec3(inv_rot * r.m_direction);
     } else {
-        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
-    }
-    return r;
-}
-
-/*
- * simplified refraction function used for plane gratings
- * normal is always the same (0,1,0) -> no rotation and thus no trigonometric
- * functions necessary
- * @param r			ray
- * @param normal		normal at ray-object intersection (for planes always
- * (0,1,0))
- * @param a			a = WL * D0 * ORD * 1.e-6  with D0: line density (l/mm);
- * WL:wavelength (nm); ORD order of diffraction
- */
-Ray RAYX_API refracPlane(Ray r, ALLOW_UNUSED dvec3 normal,
-                          double a) {  // TODO fix unused var
-    double y1 = r.m_direction[1] * r.m_direction[1] + r.m_direction[2] * r.m_direction[2] - (r.m_direction[2] - a) * (r.m_direction[2] - a);
-    if (y1 > 0) {
-        y1 = sqrt(y1);
-        r.m_direction[1] = y1;
-        r.m_direction[2] = r.m_direction[2] - a;
-    } else {
-        recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
+           recordFinalEvent(r, ETYPE_BEYOND_HORIZON);
     }
     return r;
 }

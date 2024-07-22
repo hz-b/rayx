@@ -280,12 +280,13 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
         // all vls-values will be left at 0 if they are missing.
         // Hence we ignore the return values of the upcoming
         // paramDouble-calls.
-        xml::paramDouble(node, "vlsParameterB2", &((*out)[0]));
-        xml::paramDouble(node, "vlsParameterB3", &((*out)[1]));
-        xml::paramDouble(node, "vlsParameterB4", &((*out)[2]));
-        xml::paramDouble(node, "vlsParameterB5", &((*out)[3]));
-        xml::paramDouble(node, "vlsParameterB6", &((*out)[4]));
-        xml::paramDouble(node, "vlsParameterB7", &((*out)[5]));
+        // TODO: Parameter "vlsDefinition" still missing since last rayui update. Not used in rayx
+        xml::paramDouble(node, "vlsParameter1", &((*out)[0]));
+        xml::paramDouble(node, "vlsParameter2", &((*out)[1]));
+        xml::paramDouble(node, "vlsParameter3", &((*out)[2]));
+        xml::paramDouble(node, "vlsParameter4", &((*out)[3]));
+        xml::paramDouble(node, "vlsParameter5", &((*out)[4]));
+        xml::paramDouble(node, "vlsParameter6", &((*out)[5]));
     }
 
     return true;
@@ -569,9 +570,12 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Cutout Parser::parseCutout(DesignPlane plane) const {
+Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
     int geom_shape;
     if (!paramInt(node, "geometricalShape", &geom_shape)) {
+        if (type == "ImagePlane") {
+            return serializeUnlimited();
+        }
         RAYX_ERR << "geometricalShape missing, but required!";
     }
 
@@ -606,7 +610,7 @@ Cutout Parser::parseCutout(DesignPlane plane) const {
 
         return serializeTrapezoid(trapezoid);
     } else {
-        RAYX_ERR << "invalid geom_shape!";
+        RAYX_ERR << "invalid geometrical shape!";
         return {0, {0.0, 0.0, 0.0}};
     }
 }

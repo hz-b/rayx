@@ -26,6 +26,7 @@ cmake-build-release/
 /Tests/.ipynb_checkpoints/*
 CMakeCache.txm
 cmake.check_cache
+imgui.ini
 
 # VSCode Debugger files
 results.json
