@@ -740,7 +740,7 @@ TEST_F(TestSuite, testVlsGrating) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
+        auto out = vlsGrating(p.in_lineDensity, dvec3(0,1,0), p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
 }
