@@ -6,12 +6,12 @@
 calculates refracted ray
 @params: 	r: ray
             normal: normal at intersection point of ray and element
-            az: line spacing in z direction varied spacing for different collision angles is already considered
-            ax: line spacing in x direction
+            az: linedensity in z direction varied spacing for different collision angles is already considered
+            ax: linedensity in x direction
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
+Ray refrac2D(Ray r, dvec3 normal, double density_z, double density_x) {
     // Rotation to fit collision normal to element normal (see Wiki)
     double eps1 = -r8_atan(normal.x / normal.y);
     double del1 = r8_asin(normal.z);
@@ -24,8 +24,8 @@ Ray refrac2D(Ray r, dvec3 normal, double az, double ax) {
     dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
     r.m_direction = rot * r.m_direction; // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
 
-    double x1 = r.m_direction.x - ax;
-    double z1 = r.m_direction.z - az;
+    double x1 = r.m_direction.x - density_x;
+    double z1 = r.m_direction.z - density_z;
     double y1 = 1 - x1 * x1 - z1 * z1;
 
     if (y1 > 0) {
