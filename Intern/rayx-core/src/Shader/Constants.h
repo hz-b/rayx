@@ -7,6 +7,8 @@
 #include "ImageType.h"
 
 namespace RAYX {
+// inverse nanometer-electron volt relationship / reziprocal factor
+constexpr double INV_NM_TO_EVOLT = 1239.841984332002622;
 
 // inverse nanometer-electron volt relationship / reziprocal factor
 constexpr double inm2eV = 1.239852e3;  // TODO: Check, find better name maybe

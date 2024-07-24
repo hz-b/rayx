@@ -97,13 +97,13 @@ Ray behaveGrating(Ray r, int id, Collision col, InvState& inv) {
     double lineDensity = b.m_lineDensity;
     double orderOfDiffraction = b.m_orderOfDiffraction;
 
-    // linedensity = WL * default_linedensity * order * 1e-06
-    double linedensity = vlsGrating(lineDensity, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
+    // adjusted linedensity = WL * default_linedensity * order * 1e-06
+    double adjustedLinedensity = vlsGrating(lineDensity, col.normal, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
     r.m_order = orderOfDiffraction;
     // no additional zero order here?
 
     // refraction
-    r = refrac(r, col.normal, linedensity, inv);
+    r = refrac2D(r, col.normal, adjustedLinedensity, 0, inv);
 
     return r;
 }

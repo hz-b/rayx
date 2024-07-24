@@ -738,113 +738,30 @@ TEST_F(TestSuite, testVlsGrating) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = vlsGrating(p.in_lineDensity, p.in_z, p.in_vls);
+        auto out = vlsGrating(p.in_lineDensity, dvec3(0,1,0), p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
 }
 
-TEST_F(TestSuite, testRefracPlane) {
+TEST_F(TestSuite, testGetIncidenceAngle) {
     struct InOutPair {
         Ray in_ray;
         glm::dvec4 in_normal;
-        double in_a;
 
-        Ray out_ray;
+        double out;
     };
 
-    std::vector<InOutPair>
-        inouts =
-            {
-                {.in_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0, -0.99558611855684065, 0.093851108341926615),
-                     },
-                 .in_normal = glm::dvec4(0, 1, 0, 0),
-                 .in_a = 0.01239852,
-                 .out_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0, 0.99667709206767885, 0.081452588341926618),
-                     }},
-                {.in_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0.01239852, -0.99558611855684065, 0.093851108341926615),
-                     },
-                 .in_normal = glm::dvec4(0, 1, 0, 0),
-                 .in_a = 0.01239852,
-                 .out_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0.01239852, 0.99667709206767885, 0.081452588341926618),
-                     }},
-                {.in_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0.01239852, -0.99567947186812988, 0.0928554753392902),
-                     },
-                 .in_normal = glm::dvec4(0, 1, 0, 0),
-                 .in_a = 0.01239852,
-                 .out_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0.01239852, 0.99675795875308415, 0.080456955339290204),
-                     }},
-                {.in_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0.01239852, -0.99567947186812988, 0.0928554753392902),
-                     },
-                 .in_normal = glm::dvec4(0, 1, 0, 0),
-                 .in_a = 0.01239852,
-                 .out_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(0.01239852, 0.99675795875308415, 0.080456955339290204),
-                     }},
-                {.in_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(-0.00049999991666660004, -0.99558611855684065, 0.093851108341926226),
-                     },
-                 .in_normal = glm::dvec4(0, 1, 0, 0),
-                 .in_a = 0.01239852,
-                 .out_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(-0.00049999991666660004, 0.99667709206767885, 0.08145258834192623),
-                     }},
-                {.in_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(-0.00049999991666660004, -0.995586229182718, 0.093851118714515264),
-                     },
-                 .in_normal = glm::dvec4(0, 1, 0, 0),
-                 .in_a = 0.01239852,
-                 .out_ray =
-                     {
-                         .m_position = glm::dvec3(0, 1, 0),
-                         .m_eventType = 0.01239852,
-                         .m_direction = glm::dvec3(-0.00049999991666660004, 0.9966772027014974, 0.081452598714515267),
-                     }},
-
-            };
+    std::vector<InOutPair> inouts = {{.in_ray =
+                                          {
+                                              .m_position = glm::dvec3(0, 1, 0),
+                                              .m_direction = glm::dvec3(-0.00049999997222222275, -0.17381228817387082, 0.98477867487054738),
+                                          },
+                                      .in_normal = glm::dvec4(0, 1, 0, 0),
+                                      .out = 1.3960967569703167}};
 
     for (auto p : inouts) {
-        auto out_ray = refracPlane(p.in_ray, p.in_normal, p.in_a, inv);
-        CHECK_EQ(out_ray, p.out_ray);
+        auto out = getIncidenceAngle(p.in_ray, p.in_normal);
+        CHECK_EQ(out, p.out);
     }
 }
 
@@ -1292,10 +1209,10 @@ TEST_F(TestSuite, testHvlam) {
     double linedensity = 1000;
     double orderOfDiff = 1;
     double a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
-    CHECK_EQ(a, 0.01239852);
+    CHECK_EQ(a, 0.012398419843320024);
 
     a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
-    CHECK_EQ(a, 0.01239852);
+    CHECK_EQ(a, 0.012398419843320024);
 }
 
 TEST_F(TestSuite, testGetAtomicMassAndRho) {

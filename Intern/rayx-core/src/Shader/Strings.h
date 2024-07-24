@@ -21,6 +21,7 @@ enum class ElementType {
     Sphere,
     SphereMirror,
     ToroidMirror,
+    ToroidGrating,
     PointSource,
     MatrixSource,
     DipoleSource,

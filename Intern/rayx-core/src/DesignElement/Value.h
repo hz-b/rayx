@@ -42,7 +42,8 @@ enum class ValueType {
     ElectronEnergyOrientation,
     SigmaType,
     BehaviourType,
-    ElementType
+    ElementType,
+    GratingMount
 };
 
 class Undefined {};
@@ -86,6 +87,7 @@ class DesignMap {
     DesignMap(SigmaType x) : m_variant(x) {}
     DesignMap(BehaviourType x) : m_variant(x) {}
     DesignMap(ElementType x) : m_variant(x) {}
+    DesignMap(GratingMount x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -110,6 +112,7 @@ class DesignMap {
     void operator=(ElectronEnergyOrientation x) { m_variant = x; }
     void operator=(SigmaType x) { m_variant = x; }
     void operator=(BehaviourType x) { m_variant = x; }
+    void operator=(GratingMount x) { m_variant = x; }
     void operator=(ElementType x) { m_variant = x; }
 
     inline ValueType type() const {
@@ -139,6 +142,7 @@ class DesignMap {
             ValueType::SigmaType,
             ValueType::BehaviourType,
             ValueType::ElementType,
+            ValueType::GratingMount,
         };
         return types[m_variant.index()];
     }
@@ -287,6 +291,12 @@ class DesignMap {
         return *x;
     }
 
+    inline GratingMount as_gratingMount() const {
+        auto* x = std::get_if<GratingMount>(&m_variant);
+        if (!x) throw std::runtime_error("as_gratingMount() called on non-gratingMount!");
+        return *x;
+    }
+
     const DesignMap& operator[](std::string s) const {
         const Map* m = std::get_if<Map>(&m_variant);
         if (!m) throw std::runtime_error("Indexing into non-map at: " + s);
@@ -406,7 +416,7 @@ class DesignMap {
   private:
     std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
                  CentralBeamstop, Cutout, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
-                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType>
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount>
         m_variant;
 };
 }  // namespace RAYX

@@ -6,24 +6,36 @@
 
 namespace RAYX {
 
-/** variable line spacing for gratings
-@params
-    lineDensity: general line density?
-    z: z-coordinate of ray position
-    vls[6]: 6 vls parameters given by user
-@returns line density specifically for this z-coordinate
+/** Computes the adjusted line density at a specific z-coordinate for variable line spacing (VLS) gratings,
+ * considering both the surface orientation and polynomial VLS parameters.
+ * 
+ * @param lineDensity The base line density of the grating.
+ * @param normal A 3-dimensional vector representing the normal to the grating surface at the point of interest.
+ * @param z The z-coordinate at which the line density is to be evaluated.
+ * @param vls An array of six coefficients that modify the line density based on a polynomial of z. These coefficients
+ *            scale the impact of z raised to powers from 1 to 6.
+ * 
+ * @return The modified line density at the given z-coordinate, adjusted for the grating's surface tilt and the polynomial
+ *         specified by the VLS coefficients.
 */
 RAYX_FN_ACC
-double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]) {
-    // lineDensity = lineDensity * (1 + 2*b2*z + 3*b3*z**2 + 4*b4*z**3 +
-    // 5*b5*z**4 + 6*b6*z**5 + 7*b7*z**6)
+double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vls[6]) {
+    // Calculate the inclination angle from the vertical based on the z-component of the surface normal.
+    double del1 = glm::asin(normal.z);
+
+    // Compute the cosine of the negative inclination angle to adjust line density based on the grating's tilt.
+    double cos_d = glm::cos(-del1); // linedesity increases with konvex surface structure
+
+    // Compute powers of z from z^2 to z^6 for polynomial calculation of line density adjustments.
     double z2 = z * z;
     double z3 = z2 * z;
     double z4 = z3 * z;
     double z5 = z4 * z;
     double z6 = z5 * z;
+    // Calculate the modified line density using a polynomial expression, incorporating z and the coefficients from vls.
     double a = lineDensity * (1 + 2 * vls[0] * z + 3 * vls[1] * z2 + 4 * vls[2] * z3 + 5 * vls[3] * z4 + 6 * vls[4] * z5 + 7 * vls[5] * z6);
-    return a;
+    // Return the adjusted line density considering both polynomial modifications and the cosine adjustment for tilt.
+    return a * cos_d;
 }
 
 /**

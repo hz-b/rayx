@@ -13,7 +13,7 @@ namespace RAYX {
     vls[6]: 6 vls parameters given by user
 @returns line density specifically for this z-coordinate
 */
-RAYX_FN_ACC double RAYX_API vlsGrating(double lineDensity, double z, double vls[6]);
+RAYX_FN_ACC double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vls[6]);
 
 /**
 calculates DX and DZ (line spacing in x and z direction) at a given point for a
