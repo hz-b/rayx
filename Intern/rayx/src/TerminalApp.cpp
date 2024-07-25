@@ -8,7 +8,6 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Random.h"
-#include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
@@ -71,52 +70,74 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
             m_CommandParser->m_args.m_startEventID = maxEvents - 1;
         }
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads, maxEvents,
-                                    m_CommandParser->m_args.m_startEventID);
+        auto batchResultFutures = m_Tracer->trace(*m_Beamline);
 
         // check max EventID
         unsigned int maxEventID = 0;
         bool notEnoughEvents = false;
-        {
-            RAYX_PROFILE_SCOPE_STDOUT("maxEventID");
-            for (auto& ray : rays) {
-                if (ray.size() > (maxEventID)) {
-                    maxEventID = ray.size() + m_CommandParser->m_args.m_startEventID;
-                }
-
-                for (auto& event : ray) {
-                    if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
-                        notEnoughEvents = true;
-                    }
-                }
-            }
-        }
-        if (notEnoughEvents) {
-            RAYX_LOG << "Not enough events (" << maxEvents << ")! Consider increasing maxEvents.";
-        }
-        if (maxEventID == 0) {
-            RAYX_LOG << "No events were recorded! If startEventID is set, it might need to be lowered.";
-        } else if (maxEventID < maxEvents) {
-            RAYX_LOG << "maxEvents is set to " << maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting maxEvents to "
-                     << maxEventID << " to increase performance.";
-        }
-
+        // {
+        //     RAYX_PROFILE_SCOPE_STDOUT("maxEventID");
+        //     for (auto& ray : rays) {
+        //         if (ray.size() > (maxEventID)) {
+        //             maxEventID = ray.size() + m_CommandParser->m_args.m_startEventID;
+        //         }
+        //
+        //         for (auto& event : ray) {
+        //             if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
+        //                 notEnoughEvents = true;
+        //             }
+        //         }
+        //     }
+        // }
+        // if (notEnoughEvents) {
+        //     RAYX_LOG << "Not enough events (" << maxEvents << ")! Consider increasing maxEvents.";
+        // }
+        // if (maxEventID == 0) {
+        //     RAYX_LOG << "No events were recorded! If startEventID is set, it might need to be lowered.";
+        // } else if (maxEventID < maxEvents) {
+        //     RAYX_LOG << "maxEvents is set to " << maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting maxEvents to "
+        //              << maxEventID << " to increase performance.";
+        // }
+        //
         // Export Rays to external data.
-        auto file = exportRays(rays, path.string(), m_CommandParser->m_args.m_startEventID);
+        auto rays = RAYX::BundleHistory();
+        for (auto& batchResultFuture : batchResultFutures) {
+            assert(batchResultFuture.valid());
+            batchResultFuture.wait();
+        }
+        for (auto& batchResultFuture : batchResultFutures) {
+            const auto batchResult = batchResultFuture.get();
 
-        // Plot
-        if (m_CommandParser->m_args.m_plotFlag) {
-            if (!file.ends_with(".h5")) {
-                RAYX_WARN << "You can only plot .h5 files!";
-                RAYX_ERR << "Have you selected .csv exporting?";
-            }
+            RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
+            for (uint i = 0; i < batchResult.eventOffsets.size(); i++) {
+                // We now create the Rayhistory for the `i`th ray of the batch:
+                auto begin = batchResult.events.data() + batchResult.eventOffsets[i];
+                auto end = begin + batchResult.eventCounts[i];
+                auto hist = RAYX::RayHistory(begin, end);
 
-            auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
-            auto ret = system(cmd.c_str());
-            if (ret != 0) {
-                RAYX_WARN << "received error code while printing";
+                // We put the `hist` for the `i`th ray of the batch into the global `BundleHistory result`.
+                rays.push_back(hist);
             }
         }
+
+        auto file = exportRays(rays, path.string(), m_CommandParser->m_args.m_startEventID);
+        //
+        // // Plot
+        // if (m_CommandParser->m_args.m_plotFlag) {
+        //     if (!file.ends_with(".h5")) {
+        //         RAYX_WARN << "You can only plot .h5 files!";
+        //         RAYX_ERR << "Have you selected .csv exporting?";
+        //     }
+        //
+        //     auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
+        //     auto ret = system(cmd.c_str());
+        //     if (ret != 0) {
+        //         RAYX_WARN << "received error code while printing";
+        //     }
+        // }
+
+        // for (auto& f : batchResultFutures)
+        //     f.wait();
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
@@ -167,11 +188,15 @@ void TerminalApp::run() {
             return RAYX::DeviceConfig().enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
         } else {
             using DeviceType = RAYX::DeviceConfig::DeviceType;
-            const auto deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
-            return RAYX::DeviceConfig(deviceType).enableBestDevice();
+            DeviceType deviceType;
+            if (m_CommandParser->m_args.m_cpuFlag == m_CommandParser->m_args.m_gpuFlag)
+                deviceType = DeviceType::All;
+            else
+                deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
+            return RAYX::DeviceConfig(deviceType).enableAllDevices();
         }
     };
-    m_Tracer = std::make_unique<RAYX::Tracer>(getDevice());
+    m_Tracer = std::make_unique<RAYX::Scheduler>(getDevice());
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);

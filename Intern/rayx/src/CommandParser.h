@@ -27,7 +27,8 @@ class CommandParser {
     struct Args {
         bool m_plotFlag = false;                       // -p (Plot)
         bool m_csvFlag = false;                        // -c (.csv Output)
-        bool m_cpuFlag = false;                        // -x (CPU Tracer)
+        bool m_cpuFlag = false;                        // -x (Trace on CPU)
+        bool m_gpuFlag = false;                        // -X (Trace on GPU)
         int m_deviceID = -1;                           // -d (Device)
         bool m_listDevices = false;                    // -l (List Devices)
         bool m_benchmark = false;                      // -b (Benchmark)
@@ -75,7 +76,8 @@ class CommandParser {
         {'B', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
         {'b', {OptionType::INT, "batch", "Batch size for Vulkan tracing", &(m_args.m_BatchSize)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
-        {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
+        {'x', {OptionType::BOOL, "cpu", "Tracine on CPU", &(m_args.m_cpuFlag)}},
+        {'X', {OptionType::BOOL, "gpu", "Tracine on GPU", &(m_args.m_gpuFlag)}},
         {'d', {OptionType::INT, "device", "Pick device via Device ID", &(m_args.m_deviceID)}},
         {'l', {OptionType::BOOL, "list", "List available devices", &(m_args.m_listDevices)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},

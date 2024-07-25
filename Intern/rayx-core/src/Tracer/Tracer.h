@@ -13,7 +13,8 @@
 namespace RAYX {
 
 // if no `--batch` option is given, this it the batch size.
-const uint64_t DEFAULT_BATCH_SIZE = 100000;
+// constexpr int DEFAULT_BATCH_SIZE = 1 << 16;
+constexpr int DEFAULT_BATCH_SIZE = 100000;  // 16384 TODO: figure if a power of two is better than just 10000
 
 class RAYX_API Tracer {
   public:

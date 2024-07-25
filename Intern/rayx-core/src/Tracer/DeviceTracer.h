@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstring>
+#include <future>
 
 #include "Core.h"
+#include "Material/Material.h"
 #include "Shader/InvocationState.h"
 
 namespace RAYX {
@@ -30,11 +32,34 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
-                                int startEventID = 0) = 0;
+    // virtual BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
+    // int startEventID = 0) = 0;
+
+    struct BeamlineInput {
+        std::vector<Element> elements;
+        std::vector<Ray> rays;
+        MaterialTables materialTables;
+        double randomSeed;
+    };
+    using BeamlineInputPtr = std::shared_ptr<BeamlineInput>;
+
+    struct BatchInput {
+        int raysOffset;
+        int raysSize;
+    };
+
+    struct RAYX_API BatchOutput {
+        std::vector<int> eventCounts;
+        std::vector<int> eventOffsets;
+        std::vector<Ray> events;
+    };
+
+    virtual BatchOutput traceBatch(const BeamlineInputPtr& beamlineInput, const BatchInput& batchInput) = 0;
 
   protected:
     PushConstants m_pushConstants;
 };
 
 }  // namespace RAYX
+
+// TODO: where RAYX_API ???

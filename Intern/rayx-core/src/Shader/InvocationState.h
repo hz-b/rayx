@@ -24,8 +24,6 @@ struct _debug_struct {
     dmat4 _dMat;  // Can also be used as vectors or scalar
 };
 
-// we don't require forward declarations in GLSL, hence we only do them in C++:
-
 // TODO(Sven): restore RAYX_API attributes for members
 struct RAYX_API InvState {
     // these variables are only used during shader invocation

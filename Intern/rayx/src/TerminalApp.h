@@ -6,7 +6,7 @@
 #include "CommandParser.h"
 #include "RAY-Core.h"
 #include "TerminalAppConfig.h"
-#include "Tracer/Tracer.h"
+#include "Tracer/Scheduler.h"
 
 class TerminalApp {
   public:
@@ -36,6 +36,6 @@ class TerminalApp {
 
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
-    std::unique_ptr<RAYX::Tracer> m_Tracer;
+    std::unique_ptr<RAYX::Scheduler> m_Tracer;
     std::unique_ptr<RAYX::Beamline> m_Beamline;
 };
