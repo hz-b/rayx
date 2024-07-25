@@ -57,8 +57,8 @@ jobs:
       - name: Add Boost to PATH (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          echo "${{github.workspace}}/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{github.workspace}}/boost/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{github.workspace}}/boost" >> $GITHUB_PATH
+          echo "${{github.workspace}}/boost/boost" >> $GITHUB_PATH
 
       - name: Install Cuda (Windows)
         if: matrix.os == 'windows-latest'
@@ -72,10 +72,9 @@ jobs:
         run: |
           echo "Installed cuda version is: ${{steps.cuda-toolkit-windows.outputs.cuda}}"
           echo "Cuda install location: ${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}"
+          echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}" >> $GITHUB_PATH
+          echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}/bin" >> $GITHUB_PATH
           echo "nvcc -V"
-          nvcc -V
-          echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
