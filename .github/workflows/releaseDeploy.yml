@@ -76,6 +76,10 @@ jobs:
           echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}/bin" >> $GITHUB_PATH
           echo "nvcc -V"
 
+      - name: Configure CMake (Windows)
+        if: matrix.os == 'windows-latest'
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRES_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}"
+
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -89,7 +93,8 @@ jobs:
         with:
           cuda: '12.3.2'
 
-      - name: Configure CMake
+      - name: Configure CMake (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRES_CUDA=ON
 
       - name: Build
