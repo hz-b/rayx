@@ -7,23 +7,15 @@ namespace RAYX {
 // declare invalid Acc
 struct AccNull {};
 
-#if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
-#define RAYX_CUDA
-#endif
-
-#if defined(ALPAKA_ACC_GPU_HIP_ENABLED)
-#define RAYX_HIP
-#endif
-
 template <typename Dim, typename Idx>
-#if defined(RAYX_CUDA)
+#if defined(RAYX_CUDA_ENABLED)
 using GpuAccCuda = alpaka::AccGpuCudaRt<Dim, Idx>;
 #else
 using GpuAccCuda = AccNull;
 #endif
 
 template <typename Dim, typename Idx>
-#if defined(RAYX_HIP)
+#if defined(RAYX_HIP_ENABLED)
 using GpuAccHip = alpaka::AccGpuHipRt<Dim, Idx>;
 #else
 using GpuAccHip = AccNull;

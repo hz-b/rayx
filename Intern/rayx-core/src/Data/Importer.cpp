@@ -14,7 +14,7 @@
 #include "DesignElement/DesignElement.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-#include "Shader/Strings.h"
+#include "Strings.h"
 
 using RAYX::ElementType;
 

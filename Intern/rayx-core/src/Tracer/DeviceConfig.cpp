@@ -27,14 +27,14 @@ DeviceType platformToDeviceType<alpaka::PlatformCpu>() {
     return DeviceType::Cpu;
 }
 
-#if defined(RAYX_CUDA)
+#if defined(RAYX_CUDA_ENABLED)
 template <>
 DeviceType platformToDeviceType<alpaka::PlatformCudaRt>() {
     return DeviceType::GpuCuda;
 }
 #endif
 
-#if defined(RAYX_HIP)
+#if defined(RAYX_HIP_ENABLED)
 template <>
 DeviceType platformToDeviceType<alpaka::PlatformHipRt>() {
     return DeviceType::GpuHip;
@@ -49,14 +49,14 @@ struct AccForPlatform<alpaka::PlatformCpu, Dim, Idx> {
     using type = RAYX::DefaultCpuAcc<Dim, Idx>;
 };
 
-#if defined(RAYX_CUDA)
+#if defined(RAYX_CUDA_ENABLED)
 template <typename Dim, typename Idx>
 struct AccForPlatform<alpaka::PlatformCudaRt, Dim, Idx> {
     using type = alpaka::AccGpuCudaRt<Dim, Idx>;
 };
 #endif
 
-#if defined(RAYX_HIP)
+#if defined(RAYX_HIP_ENABLED)
 template <typename Dim, typename Idx>
 struct AccForPlatform<alpaka::PlatformHipRt, Dim, Idx> {
     using type = alpaka::AccGpuHipRt<Dim, Idx>;
@@ -104,11 +104,11 @@ std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All)
 
     if (deviceType & DeviceType::Cpu) append(alpaka::PlatformCpu());
 
-#if defined(RAYX_CUDA)
+#if defined(RAYX_CUDA_ENABLED)
     if (deviceType & DeviceType::GpuCuda) append(alpaka::PlatformCudaRt());
 #endif
 
-#if defined(RAYX_HIP)
+#if defined(RAYX_HIP_ENABLED)
     if (deviceType & DeviceType::GpuHip) append(alpaka::PlatformHipRt());
 #endif
 

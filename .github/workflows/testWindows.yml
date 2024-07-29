@@ -11,11 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Update all submodules
-        run: |
-          git submodule sync
-          git submodule update --init --recursive
+        with:
+          submodules: 'recursive'
 
       - name: Prepare Vulkan SDK
         uses: humbletim/setup-vulkan-sdk@v1.2.0
@@ -48,23 +45,15 @@ jobs:
           echo "${{github.workspace}}/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{github.workspace}}/boost/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Install Cuda
-        uses: Jimver/cuda-toolkit@v0.2.16
+      - name: Setup CUDA Toolkit
         id: cuda-toolkit
-        with:
-          cuda: '12.3.2'
-
-      - name: Add Cuda to PATH
-        run: |
-          echo "Installed cuda version is: ${{steps.cuda-toolkit.outputs.cuda}}"
-          echo "Cuda install location: ${{steps.cuda-toolkit.outputs.CUDA_PATH}}"
-          echo "nvcc -V"
-          nvcc -V
-          echo "${{steps.cuda-toolkit.outputs.CUDA_PATH}}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{steps.cuda-toolkit.outputs.CUDA_PATH}}/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+        run: .\Scripts\setup-cuda.ps1
+        env:
+            INPUT_CUDA_VERSION: 12.5.1
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DRAYX_REQUIRE_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="${{steps.cuda-toolkit.outputs.CUDA_PATH}}"
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DRAYX_REQUIRE_CUDA=ON
 
       - name: Build
         run: |

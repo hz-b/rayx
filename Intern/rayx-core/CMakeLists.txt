@@ -86,12 +86,15 @@ endif()
 if(MSVC)
     message(STATUS "MSVC")
 
-    set(MSVC_CXX_FLAGS /W3 /wd4251 /wd4267)
+    set(MSVC_CXX_FLAGS /W3) # enable warning level 3
+    list(APPEND MSVC_CXX_FLAGS /wd4251) # disable warnings related to missing DLL export annotation on members of exported classes
+    list(APPEND MSVC_CXX_FLAGS /wd4267) # disable warnings related to narrowing conversion
     if(WERROR STREQUAL "YES")
-        list(APPEND MSVC_CXX_FLAGS /WX)
+        list(APPEND MSVC_CXX_FLAGS /WX) # handle warnings as errors
         message(STATUS "Werror mode")
     endif()
     prepend_xcompiler(MSVC_CXX_FLAGS MSVC_CUDA_FLAGS)
+    list(APPEND MSVC_CUDA_FLAGS --diag-suppress 1394) # disable warnings related to missing DLL export annotation on members of exported classes
 
     target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${MSVC_CXX_FLAGS}>)
     target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${MSVC_CUDA_FLAGS}>)
@@ -143,11 +146,17 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
-# Only build gpu tracer when CUDA is enabled
-if(alpaka_ACC_GPU_CUDA_ENABLE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CUDA_ENABLED)
+# Inform about the cuda and hip config of alpaka
+if(alpaka_ACC_GPU_CUDA_ENABLE OR alpaka_ACC_GPU_HIP_ENABLE)
+    if(alpaka_ACC_GPU_CUDA_ENABLE)
+        target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+        target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CUDA_ENABLED)
+    endif()
+    if(alpaka_ACC_GPU_HIP_ENABLE)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_HIP_ENABLED)
+    endif()
 else()
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_GPU_TRACER)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_NO_GPU_TRACER)
 endif()
 
 # -----------------

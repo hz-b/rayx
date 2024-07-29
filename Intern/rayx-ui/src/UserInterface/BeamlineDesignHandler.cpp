@@ -11,7 +11,7 @@
 
 #include "Beamline/StringConversion.h"
 #include "Debug/Instrumentor.h"
-#include "Shader/Strings.cpp"
+#include "Data/Strings.cpp"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
