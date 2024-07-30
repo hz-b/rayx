@@ -11,9 +11,9 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "DesignElement/DesignElement.h"
+#include "Element/Cutout.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
-#include "Beamline/Cutout.h"
 #include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {

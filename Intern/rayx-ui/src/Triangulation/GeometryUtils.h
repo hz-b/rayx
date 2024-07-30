@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Beamline/Cutout.h"
+#include "Element/Cutout.h"
 #include "Vertex.h"
 
 struct Vertex;

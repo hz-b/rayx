@@ -7,13 +7,13 @@
 #include <rapidxml.hpp>
 #include <vector>
 
+#include "Angle.h"
 #include "Beamline/Definitions.h"
-#include "Beamline/Cutout.h"
-#include "Beamline/Surface.h"
+#include "Element/Cutout.h"
+#include "Element/Surface.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
 #include "Shader/SlopeError.h"
-#include "angle.h"
 
 namespace RAYX {
 

@@ -1,6 +1,6 @@
 #include "LineDensity.h"
 
-#include "Beamline/Behaviour.h"
+#include "Element/Behaviour.h"
 #include "ImageType.h"
 #include "Throw.h"
 

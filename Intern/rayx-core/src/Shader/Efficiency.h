@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm.hpp>
+#include <glm.h>
 
 #include "Core.h"
 #include "Complex.h"

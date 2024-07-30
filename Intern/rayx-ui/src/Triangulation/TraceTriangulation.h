@@ -4,7 +4,7 @@
 
 #include "Beamline/Objects/MatrixSource.h"
 #include "RenderObject.h"
-#include "Beamline/Element.h"
+#include "Element/Element.h"
 
 /**
  * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.
