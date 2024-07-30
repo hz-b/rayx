@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Behaviour.h"
-#include "Common.h"
+#include "Core.h"
 #include "Cutout.h"
-#include "SlopeError.h"
+#include "Shader/SlopeError.h"
 #include "Surface.h"
 #include "Data/xml.h"
 
@@ -18,8 +18,8 @@ class DesignElement;
  * @brief Structure to represent an element in the ray tracing simulation.
  */
 struct Element {
-    dmat4 m_inTrans;          ///< In-transformation matrix: Converts a point from world coordinates to element coordinates.
-    dmat4 m_outTrans;         ///< Out-transformation matrix: Converts a point from element coordinates back to world coordinates.
+    glm::dmat4 m_inTrans;     ///< In-transformation matrix: Converts a point from world coordinates to element coordinates.
+    glm::dmat4 m_outTrans;    ///< Out-transformation matrix: Converts a point from element coordinates back to world coordinates.
     Behaviour m_behaviour;    ///< Describes what happens to a ray once it collides with this Element.
     Surface m_surface;        ///< Describes how the Element's surface is curved.
     Cutout m_cutout;          ///< Limits the Surface to the dimensions of the actual Element.

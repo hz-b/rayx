@@ -18,8 +18,8 @@ void dynamicElements(int gid, InvState& inv) {
 
     Element nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
-    nextElement.m_inTrans = dmat4(1);
-    nextElement.m_outTrans = dmat4(1);
+    nextElement.m_inTrans = glm::dmat4(1);
+    nextElement.m_outTrans = glm::dmat4(1);
 
     // Iterate through all bounces
     while (true) {

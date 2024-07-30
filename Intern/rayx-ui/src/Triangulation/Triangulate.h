@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "RenderObject.h"
-#include "Shader/Element.h"
+#include "Beamline/Element.h"
 #include "Tracer/Tracer.h"
 
 /**

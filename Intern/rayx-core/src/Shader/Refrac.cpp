@@ -15,7 +15,7 @@ calculates refracted ray
 "ray beyond horizon"
 */
 RAYX_FN_ACC
-Ray refrac2D(Ray r, dvec3 normal, double density_z, double density_x, InvState& inv) {
+Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x, InvState& inv) {
     // Rotation to fit collision normal to element normal (see Wiki)
     double eps1 = -glm::atan(normal.x / normal.y);
     double del1 = glm::asin(normal.z);
@@ -24,8 +24,8 @@ Ray refrac2D(Ray r, dvec3 normal, double density_z, double density_x, InvState& 
     double sin_d = glm::sin(-del1);
     double cos_e = glm::cos(-eps1);
     double sin_e = glm::sin(-eps1);
-    dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
-    dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
+    auto rot = glm::dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
+    auto inv_rot = glm::dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
     r.m_direction =
         rot * r.m_direction;  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
 

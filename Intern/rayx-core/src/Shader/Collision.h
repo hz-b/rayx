@@ -1,7 +1,11 @@
 #pragma once
 
-#include "Common.h"
+#include <glm.hpp>
+
+#include "Beamline/Cutout.h"
+#include "Core.h"
 #include "InvocationState.h"
+#include "Ray.h"
 
 #define COLLISION_EPSILON 1e-6
 
@@ -10,10 +14,10 @@ namespace RAYX {
 // A "ray-element" collision.
 struct RAYX_API Collision {
     // The point where ray hits the element, in element-coordinates.
-    dvec3 hitpoint;
+    glm::dvec3 hitpoint;
 
     // The normal of the surface at the hitpoint in element-coordinates.
-    dvec3 normal;
+    glm::dvec3 normal;
 
     // The index of the element with which ray collides.
     int elementIndex;

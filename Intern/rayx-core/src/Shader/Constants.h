@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Common.h"
+#include "Core.h"
 #include "EventType.h"
 #include "ImageType.h"
 

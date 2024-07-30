@@ -1,12 +1,14 @@
 #pragma once
 
-#include "Common.h"
+#include <glm.hpp>
+
+#include "Core.h"
 #include "Complex.h"
 #include "Constants.h"
 
 namespace RAYX {
 
-using Stokes = dvec4;
+using Stokes = glm::dvec4;
 using ElectricField = cvec3;
 using LocalElectricField = cvec2;
 
@@ -124,8 +126,8 @@ inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnel
 }
 
 RAYX_FN_ACC
-inline ElectricField interceptReflect(const ElectricField incidentElectricField, const dvec3 incidentVec, const dvec3 reflectVec,
-                                      const dvec3 normalVec, const complex::Complex iorI, const complex::Complex iorT) {
+inline ElectricField interceptReflect(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
+                                      const glm::dvec3 normalVec, const complex::Complex iorI, const complex::Complex iorT) {
     const auto incidentAngle = complex::Complex(angleBetweenUnitVectors(incidentVec, -normalVec), 0);
     const auto refractAngle = calcRefractAngle(incidentAngle, iorI, iorT);
 
@@ -185,26 +187,26 @@ RAYX_FN_ACC
 inline ElectricField stokesToElectricField(const Stokes stokes) { return ElectricField(stokesToLocalElectricField(stokes), complex::Complex(0, 0)); }
 
 RAYX_FN_ACC
-inline dmat3 rotationMatrix(const dvec3 forward) {
-    auto up = dvec3(0, 1, 0);
-    dvec3 right;
+inline glm::dmat3 rotationMatrix(const glm::dvec3 forward) {
+    auto up = glm::dvec3(0, 1, 0);
+    glm::dvec3 right;
 
     if (glm::abs(glm::dot(forward, up)) < .5) {
         right = glm::normalize(glm::cross(forward, up));
         up = glm::normalize(glm::cross(right, forward));
     } else {
-        right = dvec3(1, 0, 0);
+        right = glm::dvec3(1, 0, 0);
         up = glm::normalize(glm::cross(forward, right));
         right = glm::normalize(glm::cross(forward, up));
     }
 
-    return dmat3(right, up, forward);
+    return glm::dmat3(right, up, forward);
 }
 
 RAYX_FN_ACC
-inline dmat3 rotationMatrix(const dvec3 forward, const dvec3 up) {
+inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) {
     const auto right = glm::cross(forward, up);
-    return dmat3(right, up, forward);
+    return glm::dmat3(right, up, forward);
 }
 
 }  // namespace RAYX
