@@ -213,17 +213,17 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
         RAYX_ERR << "Input file is not an *.rml file!";
     }
 
-    Format fmt = formatFromString(m_CommandParser->m_args.m_format);
+    const auto fmt = RAYX::formatFromString(m_CommandParser->m_args.m_format);
 
     if (csv) {
         path += ".csv";
-        writeCSV(hist, path, fmt, startEventID);
+        RAYX::writeCSV(hist, path, fmt, startEventID);
     } else {
 #ifdef NO_H5
-        RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
+        RAYX_ERR << "RAYX::writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
-        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames(), startEventID);
+        RAYX::writeH5(hist, path, fmt, getBeamlineOpticalElementsNames(), startEventID);
 #endif
     }
     return path;

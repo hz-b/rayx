@@ -25,24 +25,24 @@ class CommandParser {
     // Flags initialize to DISABLED
     // Set options in .cpp file
     struct Args {
-        bool m_plotFlag = false;                       // -p (Plot)
-        bool m_csvFlag = false;                        // -c (.csv Output)
-        bool m_cpuFlag = false;                        // -x (Trace on CPU)
-        bool m_gpuFlag = false;                        // -X (Trace on GPU)
-        int m_deviceID = -1;                           // -d (Device)
-        bool m_listDevices = false;                    // -l (List Devices)
-        bool m_benchmark = false;                      // -b (Benchmark)
-        bool m_version = false;                        // -v (Version)
-        std::string m_providedFile = "";               // -i (Input)
-        bool m_isFixSeed = false;                      // -f (Fixed Seed)
-        int m_seed = -1;                               // -s (Provided Seed)
-        int m_BatchSize = 0;                           // -b (Vk batch size )
-        bool m_sequential = false;                     // -S (sequential tracing)
-        bool m_verbose = false;                        // --verbose (Verbose)
-        std::string m_format = defaultFormatString();  // --format
-        int m_setThreads = 1;                          // -T (dipolesource)
-        int m_maxEvents = -1;                          // -m (max events)
-        int m_startEventID = 0;                        // -e (start event id)
+        bool m_plotFlag = false;                             // -p (Plot)
+        bool m_csvFlag = false;                              // -c (.csv Output)
+        bool m_cpuFlag = false;                              // -x (Trace on CPU)
+        bool m_gpuFlag = false;                              // -X (Trace on GPU)
+        int m_deviceID = -1;                                 // -d (Device)
+        bool m_listDevices = false;                          // -l (List Devices)
+        bool m_benchmark = false;                            // -b (Benchmark)
+        bool m_version = false;                              // -v (Version)
+        std::string m_providedFile = "";                     // -i (Input)
+        bool m_isFixSeed = false;                            // -f (Fixed Seed)
+        int m_seed = -1;                                     // -s (Provided Seed)
+        int m_BatchSize = 0;                                 // -b (Vk batch size )
+        bool m_sequential = false;                           // -S (sequential tracing)
+        bool m_verbose = false;                              // --verbose (Verbose)
+        std::string m_format = RAYX::defaultFormatString();  // --format
+        int m_setThreads = 1;                                // -T (dipolesource)
+        int m_maxEvents = -1;                                // -m (max events)
+        int m_startEventID = 0;                              // -e (start event id)
     } m_args;
 
     static inline void getVersion() {

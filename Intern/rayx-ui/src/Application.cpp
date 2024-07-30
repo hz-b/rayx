@@ -335,11 +335,11 @@ void Application::loadRays(const std::filesystem::path& rmlPath, const size_t nu
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays = raysFromH5(rayFilePath, FULL_FORMAT, &m_UIParams.rayInfo.startEventID);
+    m_rays = RAYX::raysFromH5(rayFilePath, RAYX::FULL_FORMAT, &m_UIParams.rayInfo.startEventID);
 
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
-    m_rays = loadCSV(rayFilePath);
+    m_rays = RAYX::loadCSV(rayFilePath);
 #endif
     sortRaysByElement(m_rays, m_sortedRays, numElements);
 }

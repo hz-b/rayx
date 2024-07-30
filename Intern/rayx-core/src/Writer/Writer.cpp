@@ -4,6 +4,8 @@
 
 #include "Debug/Debug.h"
 
+namespace RAYX {
+
 std::string defaultFormatString() {
     std::string output;
     for (auto arg : FULL_FORMAT) {
@@ -37,3 +39,5 @@ Format formatFromString(const std::string& s) {
 
     return output;
 }
+
+}  // namespace RAYX

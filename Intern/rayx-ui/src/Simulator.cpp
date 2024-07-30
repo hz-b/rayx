@@ -54,7 +54,7 @@ void Simulator::runSimulation() {
         RAYX_ERR << "Input file is not an *.rml file!";
     }
 
-    Format fmt = formatFromString(defaultFormatString());
+    const auto fmt = RAYX::formatFromString(RAYX::defaultFormatString());
 
     std::vector<std::string> names;
     names.reserve(m_Beamline.m_DesignElements.size());
@@ -65,9 +65,9 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    writeH5(rays, path, fmt, names, m_startEventID);
+    RAYX::writeH5(rays, path, fmt, names, m_startEventID);
 #else
-    writeCSV(rays, path, fmt, m_startEventID);
+    RAYX::writeCSV(rays, path, fmt, m_startEventID);
 #endif
 }
 

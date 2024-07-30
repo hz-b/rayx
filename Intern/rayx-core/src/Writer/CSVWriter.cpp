@@ -6,7 +6,7 @@
 
 #include "Debug/Debug.h"
 
-// writer:
+namespace {
 
 const int CELL_SIZE = 23;
 const char DELIMITER = ',';
@@ -18,6 +18,10 @@ struct Cell {
 };
 
 using std::min;
+
+}  // unnamed namespace
+
+namespace RAYX {
 
 // Tries to write a string into a cell.
 // Will only write an incomplete string, if it doesn't fit.
@@ -56,7 +60,7 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {
+void writeCSV(const BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {
     std::ofstream file(filename);
 
     // write the header of the CSV file:
@@ -72,9 +76,9 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
 
     // write the body of the CSV file:
     for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
-        const RAYX::RayHistory& ray_hist = hist[ray_id];
+        const RayHistory& ray_hist = hist[ray_id];
         for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
-            const RAYX::Ray& event = ray_hist[event_id];
+            const Ray& event = ray_hist[event_id];
             for (uint i = 0; i < format.size(); i++) {
                 if (i > 0) {
                     file << DELIMITER;
@@ -90,14 +94,14 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
 
 // loader:
 
-RAYX::BundleHistory loadCSV(const std::string& filename) {
+BundleHistory loadCSV(const std::string& filename) {
     std::ifstream file(filename);
 
     // ignore setup line
     std::string s;
     std::getline(file, s);
 
-    RAYX::BundleHistory out;
+    BundleHistory out;
 
     while (std::getline(file, s)) {
         std::vector<double> d;
@@ -121,19 +125,19 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
         const auto direction = glm::dvec3(d[4], d[5], d[6]);
 
         const auto stokes = glm::dvec4(d[8], d[9], d[10], d[11]);
-        // const auto rotation = glm::transpose(RAYX::rotationMatrix(direction));
-        const auto field = /* rotation *  */ RAYX::stokesToElectricField(stokes);
+        // const auto rotation = glm::transpose(rotationMatrix(direction));
+        const auto field = /* rotation *  */ stokesToElectricField(stokes);
 
         // create the Ray from the loaded doubles from this line.
-        RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
-                         .m_eventType = d[3],
-                         .m_direction = direction,
-                         .m_energy = d[7],
-                         .m_field = field,
-                         .m_pathLength = d[12],
-                         .m_order = d[13],
-                         .m_lastElement = d[14],
-                         .m_sourceID = d[15]};
+        Ray ray = {.m_position = {d[0], d[1], d[2]},
+                   .m_eventType = d[3],
+                   .m_direction = direction,
+                   .m_energy = d[7],
+                   .m_field = field,
+                   .m_pathLength = d[12],
+                   .m_order = d[13],
+                   .m_lastElement = d[14],
+                   .m_sourceID = d[15]};
         // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
         // If so, we need to make place for it.
         if (out.size() <= ray_id) {
@@ -157,3 +161,5 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
 
     return out;
 }
+
+}  // namespace RAYX
