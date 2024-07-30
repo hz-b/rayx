@@ -4,8 +4,8 @@ For building and running the project, we recommend using [Visual Studio Code](ht
 
 ## CMake Options:
 
-- `RAYX_ENABLE_Cuda:BOOL` `default = ON` `enable search for Cuda on your system. If found, build with Cuda`
-- `RAYX_REQUIRES_Cuda:BOOL` `default = OFF` `require Cuda to be found on your system. Otherwise throw an error`
+- `RAYX_ENABLE_CUDA:BOOL` `default = ON` `enable search for Cuda on your system. If found, build with Cuda`
+- `RAYX_REQUIRES_CUDA:BOOL` `default = OFF` `require Cuda to be found on your system. Otherwise throw an error`
 
 ## Cloning the Repository
 
