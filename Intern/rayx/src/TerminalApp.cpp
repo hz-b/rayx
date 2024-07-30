@@ -75,7 +75,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                                     m_CommandParser->m_args.m_startEventID);
 
         // check max EventID
-        unsigned int maxEventID = 0;
+        uint32_t maxEventID = 0;
         bool notEnoughEvents = false;
         {
             RAYX_PROFILE_SCOPE_STDOUT("maxEventID");

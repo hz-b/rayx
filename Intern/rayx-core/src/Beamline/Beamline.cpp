@@ -32,10 +32,10 @@ std::vector<Ray> Beamline::getInputRays(int thread_count) const {
     if (m_DesignSources.size() > 1) {
         list.reserve(raycount);
 
-        for (unsigned int i = 1; i < m_DesignSources.size(); i++) {
+        for (size_t i = 1; i < m_DesignSources.size(); i++) {
             std::vector<Ray> sub = m_DesignSources[i].compile(thread_count);
             for (Ray& r : sub) {
-                r.m_sourceID = i;
+                r.m_sourceID = static_cast<double>(i);
             }
             list.insert(list.end(), sub.begin(), sub.end());
         }

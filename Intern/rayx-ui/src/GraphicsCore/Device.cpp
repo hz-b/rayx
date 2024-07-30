@@ -95,7 +95,7 @@ void Device::createInstance() {
     hasGflwRequiredInstanceExtensions();
 }
 
-void Device::pickPhysicalDevice(std::optional<unsigned int> deviceID) {
+void Device::pickPhysicalDevice(std::optional<uint32_t> deviceID) {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
     if (deviceCount == 0) {

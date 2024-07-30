@@ -48,7 +48,7 @@ class SimpleTracer : public DeviceTracer {
   public:
     SimpleTracer(int deviceIndex);
 
-    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, unsigned int maxEvents,
+    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents,
                         int startEventID) override;
 
   private:
@@ -124,7 +124,7 @@ template <typename Acc>
 SimpleTracer<Acc>::SimpleTracer(int deviceIndex) : m_deviceIndex(deviceIndex) {}
 
 template <typename Acc>
-BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, unsigned int maxEvents,
+BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents,
                                        int startEventID) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "maxEvents: " << maxEvents;
@@ -203,7 +203,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
         // put all events from the rawBatch to unified `BundleHistory result`.
         {
             RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
-            for (uint i = 0; i < batchSize; i++) {
+            for (uint32_t i = 0; i < batchSize; i++) {
                 // We now create the Rayhistory for the `i`th ray of the batch:
                 auto begin = m_batchResult.compactEvents.data() + m_batchResult.compactEventOffsets[i];
                 auto end = begin + m_batchResult.compactEventCounts[i];

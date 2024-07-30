@@ -63,7 +63,7 @@ class Device {
     void createInstance();
     void setupDebugMessenger();
     void createSurface();
-    void pickPhysicalDevice(std::optional<unsigned int> deviceID);
+    void pickPhysicalDevice(std::optional<uint32_t> deviceID);
     void createLogicalDevice();
     void createCommandPool();
 
