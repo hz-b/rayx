@@ -75,8 +75,8 @@ void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState&
     }
 
     // 50% neg/pos sign
-    dphi = sign(squaresDoubleRNG(inv.ctr) - 0.5) * dphi;
-    dpsi = sign(squaresDoubleRNG(inv.ctr) - 0.5) * dpsi;
+    dphi = glm::sign(squaresDoubleRNG(inv.ctr) - 0.5) * dphi;
+    dpsi = glm::sign(squaresDoubleRNG(inv.ctr) - 0.5) * dpsi;
 }
 
 /**

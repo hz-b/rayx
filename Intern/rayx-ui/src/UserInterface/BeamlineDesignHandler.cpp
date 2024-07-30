@@ -263,7 +263,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                     if (i < 3) ImGui::SameLine();
                 }
                 if (changedLocal) {
-                    element = RAYX::dvec4(vals[0], vals[1], vals[2], vals[3]);
+                    element = glm::dvec4(vals[0], vals[1], vals[2], vals[3]);
                     changed = true;
                 }
                 break;

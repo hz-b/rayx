@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Common.h"
+#include <glm.hpp>
+
+#include "Core.h"
 
 #if defined(RAYX_CUDA_ENABLED)
 #include <thrust/complex.h>
@@ -84,22 +86,22 @@ using std::tanh;
 // add some helper function for glm::tvec of complex
 namespace complex {
 RAYX_FN_ACC
-inline dvec2 abs(cvec2 v) { return dvec2(abs(v.x), abs(v.y)); }
+inline glm::dvec2 abs(cvec2 v) { return glm::dvec2(abs(v.x), abs(v.y)); }
 
 RAYX_FN_ACC
-inline dvec3 abs(cvec3 v) { return dvec3(abs(v.x), abs(v.y), abs(v.z)); }
+inline glm::dvec3 abs(cvec3 v) { return glm::dvec3(abs(v.x), abs(v.y), abs(v.z)); }
 
 RAYX_FN_ACC
-inline dvec2 arg(cvec2 v) { return dvec2(arg(v.x), arg(v.y)); }
+inline glm::dvec2 arg(cvec2 v) { return glm::dvec2(arg(v.x), arg(v.y)); }
 
 RAYX_FN_ACC
-inline dvec3 arg(cvec3 v) { return dvec3(arg(v.x), arg(v.y), arg(v.z)); }
+inline glm::dvec3 arg(cvec3 v) { return glm::dvec3(arg(v.x), arg(v.y), arg(v.z)); }
 
 RAYX_FN_ACC
-inline cvec2 polar(dvec2 mag, dvec2 theta) { return cvec2(polar(mag.x, theta.x), polar(mag.y, theta.y)); }
+inline cvec2 polar(glm::dvec2 mag, glm::dvec2 theta) { return cvec2(polar(mag.x, theta.x), polar(mag.y, theta.y)); }
 
 RAYX_FN_ACC
-inline cvec3 polar(dvec3 mag, dvec3 theta) { return cvec3(polar(mag.x, theta.x), polar(mag.y, theta.y), polar(mag.z, theta.z)); }
+inline cvec3 polar(glm::dvec3 mag, glm::dvec3 theta) { return cvec3(polar(mag.x, theta.x), polar(mag.y, theta.y), polar(mag.z, theta.z)); }
 }  // namespace complex
 
 }  // namespace RAYX

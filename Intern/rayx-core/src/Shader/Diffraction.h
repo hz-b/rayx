@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Core.h"
 #include "InvocationState.h"
 
 namespace RAYX {

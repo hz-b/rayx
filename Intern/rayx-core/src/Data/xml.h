@@ -8,11 +8,11 @@
 #include <vector>
 
 #include "Beamline/Definitions.h"
+#include "Beamline/Cutout.h"
+#include "Beamline/Surface.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
-#include "Shader/Cutout.h"
 #include "Shader/SlopeError.h"
-#include "Shader/Surface.h"
 #include "angle.h"
 
 namespace RAYX {

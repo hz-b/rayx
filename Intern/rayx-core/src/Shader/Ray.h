@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Common.h"
+#include <glm.hpp>
+
+#include "Core.h"
 #include "Efficiency.h"
 
 namespace RAYX {
@@ -14,7 +16,7 @@ namespace RAYX {
 struct RAYX_API Ray {
     /// The position of the ray.
     /// NOTE: The coordinate system in which the position is to be interpreted, depends on m_eventType!
-    dvec3 m_position;
+    glm::dvec3 m_position;
 
     /// The m_eventType expresses what is currently happening to the ray.
     /// During tracing the eventType will be uninitialized (ETYPE_UNINIT).
@@ -25,7 +27,7 @@ struct RAYX_API Ray {
     /// The direction of the ray.
     /// The direction is normalized, so its L2 norm (aka length) is one.
     /// NOTE: The coordinate system in which direction is to be interpreted, depends on m_eventType!
-    dvec3 m_direction;
+    glm::dvec3 m_direction;
 
     /// The energy of this photon (in eV).
     double m_energy;

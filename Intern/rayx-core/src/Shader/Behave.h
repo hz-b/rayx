@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Collision.h"
-#include "Common.h"
+#include "Core.h"
 #include "InvocationState.h"
+#include "Ray.h"
 
 namespace RAYX {
 

@@ -13,7 +13,7 @@
 #include "DesignElement/DesignElement.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
-#include "Shader/Cutout.h"
+#include "Beamline/Cutout.h"
 #include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {

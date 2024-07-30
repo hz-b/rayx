@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Core.h"
 
 // throws an error, and termiantes the program
 // TODO(Sven): rethink error handling. just instantly terminate with RAYX_ERR or use recordFinalEvent?

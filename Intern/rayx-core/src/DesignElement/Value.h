@@ -8,12 +8,12 @@
 #include <variant>
 
 #include "Beamline/EnergyDistribution.h"
+#include "Beamline/Cutout.h"
 #include "Beamline/LightSource.h"
+#include "Beamline/Surface.h"
+#include "Core.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"
-#include "Shader/Common.h"
-#include "Shader/Cutout.h"
-#include "Shader/Surface.h"
 
 namespace RAYX {
 
@@ -69,7 +69,7 @@ class DesignMap {
     DesignMap(bool x) : m_variant(x) {}
     DesignMap(std::string x) : m_variant(x) {}
     DesignMap(Map x) : m_variant(x) {}
-    DesignMap(dvec4 x) : m_variant(x) {}
+    DesignMap(glm::dvec4 x) : m_variant(x) {}
     DesignMap(glm::dmat4x4 x) : m_variant(x) {}
     DesignMap(Rad x) : m_variant(x) {}
     DesignMap(Material x) : m_variant(x) {}
@@ -94,8 +94,8 @@ class DesignMap {
     void operator=(bool x) { m_variant = x; }
     void operator=(std::string x) { m_variant = x; }
     void operator=(Map x) { m_variant = x; }
-    void operator=(RAYX::dvec4 x) { m_variant = x; }
-    void operator=(dmat4 x) { m_variant = x; }
+    void operator=(glm::dvec4 x) { m_variant = x; }
+    void operator=(glm::dmat4 x) { m_variant = x; }
     void operator=(Rad x) { m_variant = x; }
     void operator=(Material x) { m_variant = x; }
     void operator=(Misalignment x) { m_variant = x; }
@@ -183,8 +183,8 @@ class DesignMap {
         return *x;
     }
 
-    inline dmat4 as_dmat4x4() const {
-        auto* x = std::get_if<dmat4>(&m_variant);
+    inline glm::dmat4 as_dmat4x4() const {
+        auto* x = std::get_if<glm::dmat4>(&m_variant);
         if (!x) throw std::runtime_error("as_dmat4x4() called on non-dmat4x4!");
         return *x;
     }

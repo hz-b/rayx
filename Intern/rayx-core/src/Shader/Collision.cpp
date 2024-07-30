@@ -17,8 +17,8 @@ RAYX_FN_ACC
 Collision getQuadricCollision(Ray r, QuadricSurface q) {
     Collision col;
     col.found = true;
-    col.hitpoint = dvec3(0, 0, 0);
-    col.normal = dvec3(0, 0, 0);
+    col.hitpoint = glm::dvec3(0, 0, 0);
+    col.normal = glm::dvec3(0, 0, 0);
 
     int cs = 1;
     int d_sign = q.m_icurv;
@@ -40,7 +40,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         double anl = r.m_direction[2] / r.m_direction[0];
         y = r.m_position[1] - aml * r.m_position[0];
         z = r.m_position[2] - anl * r.m_position[0];
-        d_sign = int(sign(r.m_direction[0]) * q.m_icurv);
+        d_sign = int(glm::sign(r.m_direction[0]) * q.m_icurv);
 
         a = q.m_a11 + 2 * q.m_a12 * aml + q.m_a22 * aml * aml + 2 * q.m_a13 * anl + 2 * q.m_a23 * aml * anl + q.m_a33 * anl * anl;
         b = q.m_a14 + q.m_a24 * aml + q.m_a34 * anl + (q.m_a12 + q.m_a22 * aml + q.m_a23 * anl) * y + (q.m_a13 + q.m_a23 * aml + q.m_a33 * anl) * z;
@@ -63,7 +63,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         double anm = r.m_direction[2] / r.m_direction[1];
         x = r.m_position[0] - alm * r.m_position[1];
         z = r.m_position[2] - anm * r.m_position[1];
-        d_sign = int(sign(r.m_direction[1]) * q.m_icurv);
+        d_sign = int(glm::sign(r.m_direction[1]) * q.m_icurv);
 
         a = q.m_a22 + 2 * q.m_a12 * alm + q.m_a11 * alm * alm + 2 * q.m_a23 * anm + 2 * q.m_a13 * alm * anm + q.m_a33 * anm * anm;
         b = q.m_a24 + q.m_a14 * alm + q.m_a34 * anm + (q.m_a12 + q.m_a11 * alm + q.m_a13 * anm) * x + (q.m_a23 + q.m_a13 * alm + q.m_a33 * anm) * z;
@@ -89,7 +89,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         // secondParam = amn;
         x = r.m_position[0] - aln * r.m_position[2];
         y = r.m_position[1] - amn * r.m_position[2];
-        d_sign = int(sign(r.m_direction[2]) * q.m_icurv);
+        d_sign = int(glm::sign(r.m_direction[2]) * q.m_icurv);
 
         a = q.m_a33 + 2 * q.m_a13 * aln + q.m_a11 * aln * aln + 2 * q.m_a23 * amn + 2 * q.m_a12 * aln * amn + q.m_a22 * amn * amn;
         b = q.m_a34 + q.m_a14 * aln + q.m_a24 * amn + (q.m_a13 + q.m_a11 * aln + q.m_a12 * amn) * x + (q.m_a23 + q.m_a12 * aln + q.m_a22 * amn) * y;
@@ -107,7 +107,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         }
         x = x + aln * z;
         y = y + amn * z;
-        // r.m_position = dvec3(a, b, c);
+        // r.m_position = glm::dvec3(a, b, c);
     }
 
     // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
@@ -115,12 +115,12 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         col.found = false;
     }
 
-    col.hitpoint = dvec3(x, y, z);
+    col.hitpoint = glm::dvec3(x, y, z);
 
     double fx = 2 * q.m_a14 + 2 * q.m_a11 * x + 2 * q.m_a12 * y + 2 * q.m_a13 * z;
     double fy = 2 * q.m_a24 + 2 * q.m_a12 * x + 2 * q.m_a22 * y + 2 * q.m_a23 * z;
     double fz = 2 * q.m_a34 + 2 * q.m_a13 * x + 2 * q.m_a23 * y + 2 * q.m_a33 * z;
-    col.normal = normalize(dvec3(fx, fy, fz));
+    col.normal = normalize(glm::dvec3(fx, fy, fz));
     return col;
 }
 
@@ -145,8 +145,8 @@ RAYX_FN_ACC
 Collision getCubicCollision(Ray r, CubicSurface cu) {
     Collision col;
     col.found = true;
-    col.hitpoint = dvec3(0, 0, 0);
-    col.normal = dvec3(0, 0, 0);
+    col.hitpoint = glm::dvec3(0, 0, 0);
+    col.normal = glm::dvec3(0, 0, 0);
 
     // Ray r = rotateForCubic(rin, cu.m_psi, 1000);
 
@@ -157,7 +157,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
         cs = 3;
     }
 
-    dvec3 pos = cubicPosition(r, cu.m_psi);
+    glm::dvec3 pos = cubicPosition(r, cu.m_psi);
     double x = pos.x;
     double y = pos.y;
     double z = pos.z;
@@ -170,7 +170,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     double counter = 0;
     double dx = 0;
 
-    dvec3 dir = cubicDirection(r, cu.m_psi);
+    glm::dvec3 dir = cubicDirection(r, cu.m_psi);
     double al = dir.x;
     double am = dir.y;
     double an = dir.z;
@@ -349,7 +349,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
             }
             counter++;
         } while (abs(dx) > 0.001);
-        // r.m_position = dvec3(a, b, c);
+        // r.m_position = glm::dvec3(a, b, c);
     }
 
     // intersection point is in the negative direction (behind the position when the direction is followed forwards), set weight to 0
@@ -361,8 +361,8 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
 
-    col.normal = normalize(dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
-    col.hitpoint = dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
+    col.normal = normalize(glm::dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
+    col.hitpoint = glm::dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
     return col;
 }
 
@@ -381,21 +381,21 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
 
     Collision col;
     col.found = true;
-    col.hitpoint = dvec3(0, 0, 0);
-    col.normal = dvec3(0, 0, 0);
+    col.hitpoint = glm::dvec3(0, 0, 0);
+    col.normal = glm::dvec3(0, 0, 0);
 
     // sign radius: +1 = concave, -1 = convex
-    double isigro = sign(shortRad);
+    double isigro = glm::sign(shortRad);
 
     // double aln = r.m_direction.x / r.m_direction.z;
     // double amn = r.m_direction.y / r.m_direction.z;
 
-    dvec4 normal = dvec4(0, 0, 0, 0);
+    glm::dvec4 normal = glm::dvec4(0, 0, 0, 0);
     double xx = 0.0;
     double zz = 0.0;
     double yy = 0.0;
     double dz = 0.0;
-    dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;
+    glm::dvec3 normalized_dir = glm::dvec3(r.m_direction) / r.m_direction.z;
 
     int n = 0;
     // Newton's method iteration
@@ -416,7 +416,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
         normal.z = -2 * zz;
 
         double func = -rx * rx + (yy - longRad) * (yy - longRad) + zz * zz;
-        double df = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, dvec3(normal));
+        double df = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, glm::dvec3(normal));
         dz = func / df;
         n += 1;
         if (n >= NEW_MAX_ITERATIONS) {
@@ -425,18 +425,18 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
         }
     } while (abs(dz) > NEW_TOLERANCE);
 
-    col.normal = normalize(dvec3(normal));
-    col.hitpoint = dvec3(xx, yy, zz);
+    col.normal = normalize(glm::dvec3(normal));
+    col.hitpoint = glm::dvec3(xx, yy, zz);
 
     if (isTriangul) {  // TODO : Hack, Triangulation sensetive to direction apparently. Actual fix or func rework is needed!
         return col;
     }
 
-    dvec3 rayToHitpoint = col.hitpoint - r.m_position;
+    glm::dvec3 rayToHitpoint = col.hitpoint - r.m_position;
     // edit: if ray points away from the hitpoint, no collision can be found.
     // Note that multiplying the rays direction with -1 SHOULD totally have an effect on the collision detection - in most cases this 180° rotation
     // will make the ray point away from the toroid, and hence preventing a Collision completely. The above code however, is unaffected when
-    // multiplying the ray direction with -1. Due to it having no effect on `dvec3 normalized_dir = dvec3(r.m_direction) / r.m_direction.z;`
+    // multiplying the ray direction with -1. Due to it having no effect on `glm::dvec3 normalized_dir = glm::dvec3(r.m_direction) / r.m_direction.z;`
     col.found = dot(rayToHitpoint, r.m_direction) > 0.0;
 
     return col;
@@ -453,7 +453,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 
     Collision col;
     if (sty == STYPE_PLANE_XZ) {
-        col.normal = dvec3(0, -sign(r.m_direction.y), 0);
+        col.normal = glm::dvec3(0, -glm::sign(r.m_direction.y), 0);
 
         // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
         // velocity = distance/time <-> time = distance/velocity from school physics.
@@ -546,7 +546,7 @@ Collision findCollision(const Ray& ray, InvState& inv) {
             continue;
         }
 
-        dvec3 global_hitpoint = dvec3(inv.elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
+        glm::dvec3 global_hitpoint = glm::dvec3(inv.elements[elementIndex].m_outTrans * glm::dvec4(current_col.hitpoint, 1));
         double current_dist = length(global_hitpoint - ray.m_position);
 
         if (current_dist < best_dist) {

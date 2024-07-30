@@ -13,7 +13,7 @@ turn the normal vector through x_rad and z_rad
 returns modified normal vector
 */
 RAYX_FN_ACC
-dvec3 RAYX_API normalCartesian(dvec3 normal, double x_rad, double z_rad) {
+glm::dvec3 RAYX_API normalCartesian(glm::dvec3 normal, double x_rad, double z_rad) {
     double FX = normal[0];
     double FY = normal[1];
     double FZ = normal[2];
@@ -40,7 +40,7 @@ turn the normal vector through x_rad and z_rad
 returns modified normal vector
 */
 RAYX_FN_ACC
-dvec3 RAYX_API normalCylindrical(dvec3 normal, double x_rad, double z_rad) {
+glm::dvec3 RAYX_API normalCylindrical(glm::dvec3 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
     double arcTanFXFY = glm::atan(normal[1], normal[0]);
     double sinz = glm::sin(z_rad);
@@ -66,7 +66,7 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FN_ACC
-dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, InvState& inv) {
+glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, InvState& inv) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 
