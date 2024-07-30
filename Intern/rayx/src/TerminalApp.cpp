@@ -98,30 +98,23 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         //     RAYX_LOG << "maxEvents is set to " << maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting maxEvents to "
         //              << maxEventID << " to increase performance.";
         // }
-        //
-        // Export Rays to external data.
-        auto rays = RAYX::BundleHistory();
-        for (auto& batchResultFuture : batchResultFutures) {
-            assert(batchResultFuture.valid());
-            batchResultFuture.wait();
-        }
-        for (auto& batchResultFuture : batchResultFutures) {
-            const auto batchResult = batchResultFuture.get();
 
-            RAYX_PROFILE_SCOPE_STDOUT("BundleHistory-calculation");
-            for (uint i = 0; i < batchResult.eventOffsets.size(); i++) {
-                // We now create the Rayhistory for the `i`th ray of the batch:
-                auto begin = batchResult.events.data() + batchResult.eventOffsets[i];
-                auto end = begin + batchResult.eventCounts[i];
-                auto hist = RAYX::RayHistory(begin, end);
-
-                // We put the `hist` for the `i`th ray of the batch into the global `BundleHistory result`.
-                rays.push_back(hist);
+        // export rays
+        {
+            RAYX_PROFILE_SCOPE_STDOUT("write csv");
+            const auto format = RAYX::formatFromString(m_CommandParser->m_args.m_format);
+            const auto startEventIndex = m_CommandParser->m_args.m_startEventID;
+            auto outputFilepath = path;
+            outputFilepath.replace_extension("csv");
+            auto writer = RAYX::CsvWriter(outputFilepath, format, startEventIndex);
+            for (auto& batchResultFuture : batchResultFutures) {
+                assert(batchResultFuture.valid());
+                batchResultFuture.wait();
+                const auto batchResult = batchResultFuture.get();
+                writer.write(batchResult);
             }
         }
 
-        auto file = exportRays(rays, path.string(), m_CommandParser->m_args.m_startEventID);
-        //
         // // Plot
         // if (m_CommandParser->m_args.m_plotFlag) {
         //     if (!file.ends_with(".h5")) {

@@ -17,12 +17,6 @@ struct Cell {
     char buf[CELL_SIZE + 1];  // + 1 for null-termination.
 };
 
-using std::min;
-
-}  // unnamed namespace
-
-namespace RAYX {
-
 // Tries to write a string into a cell.
 // Will only write an incomplete string, if it doesn't fit.
 Cell strToCell(const char* x) {
@@ -33,7 +27,7 @@ Cell strToCell(const char* x) {
         RAYX_WARN << "strToCell: string \"" << x << "\" needs to be shortened!";
     }
 
-    for (int i = 0; i < min(n, CELL_SIZE); i++) {
+    for (int i = 0; i < std::min(n, CELL_SIZE); i++) {
         out.buf[i] = x[i];
     }
     for (int i = n; i < CELL_SIZE; i++) {
@@ -43,6 +37,7 @@ Cell strToCell(const char* x) {
     return out;
 }
 
+// TODO: can we optimize ?
 // Formats a double into a cell.
 Cell doubleToCell(double x) {
     std::stringstream ss;
@@ -60,39 +55,11 @@ Cell doubleToCell(double x) {
     return strToCell(s.c_str());
 }
 
-void writeCSV(const BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {
-    std::ofstream file(filename);
+}  // unnamed namespace
 
-    // write the header of the CSV file:
-    for (uint i = 0; i < format.size(); i++) {
-        if (i > 0) {
-            file << DELIMITER;
-        }
-        file << strToCell(format[i].name).buf;
-    }
-    file << '\n';
+namespace RAYX {
 
-    RAYX_VERB << "Writing " << hist.size() << " rays to file...";
-
-    // write the body of the CSV file:
-    for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
-        const RayHistory& ray_hist = hist[ray_id];
-        for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
-            const Ray& event = ray_hist[event_id];
-            for (uint i = 0; i < format.size(); i++) {
-                if (i > 0) {
-                    file << DELIMITER;
-                }
-                double d = format[i].get_double(ray_id, event_id + startEventID, event);
-                file << doubleToCell(d).buf;
-            }
-            file << '\n';
-        }
-    }
-    RAYX_VERB << "Writing done!";
-}
-
-// loader:
+void RAYX_API writeCSV(const BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {}
 
 BundleHistory loadCSV(const std::string& filename) {
     std::ifstream file(filename);
@@ -160,6 +127,52 @@ BundleHistory loadCSV(const std::string& filename) {
     }
 
     return out;
+}
+
+CsvWriter::CsvWriter(const std::filesystem::path& filepath, const Format& format, int startEventIndex)
+    : m_file(filepath, std::ios::out | std::ios::trunc), m_format(format), m_startEventIndex(startEventIndex) {
+    for (uint32_t i = 0; i < m_format.size(); i++) {
+        if (i > 0) {
+            m_file << DELIMITER;
+        }
+        m_file << strToCell(m_format[i].name).buf;
+    }
+    m_file << '\n';
+
+    validate();
+}
+
+// TODO: can we optimize ?
+void CsvWriter::write(const DeviceTracer::BatchOutput& batch) {
+    RAYX_VERB << "Writing " << batch.eventCounts.size() << " rays to csvm_file...";
+
+    // write single batch to the body of the CSVm_file:
+    for (size_t ray_id = 0; ray_id < batch.eventCounts.size(); ++ray_id) {
+        const auto offset = batch.eventOffsets[ray_id];
+        const auto count = batch.eventCounts[ray_id];
+
+        for (int event_id = 0; event_id < count; ++event_id) {
+            const auto& event = batch.events[offset + event_id];
+
+            for (uint32_t i = 0; i < m_format.size(); i++) {
+                if (i > 0) m_file << DELIMITER;
+                const auto d = m_format[i].get_double(ray_id, event_id + m_startEventIndex, event);
+                m_file << doubleToCell(d).buf;
+            }
+            m_file << '\n';
+        }
+    }
+
+    validate();
+}
+
+void CsvWriter::validate() {
+    if (!m_file) {
+        if (m_file.rdstate() == std::ios_base::failbit)
+            RAYX_ERR << "formatting error";
+        else
+            RAYX_ERR << "unknowne error";
+    }
 }
 
 }  // namespace RAYX
