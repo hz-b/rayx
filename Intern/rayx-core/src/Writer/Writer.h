@@ -14,7 +14,7 @@ struct FormatComponent {
     // The name of the component, example: "X-position".
     const char* name;
     // A function pointer expressing how to access this component given an actual RAYX::Ray.
-    double (*get_double)(unsigned int ray_id, unsigned int event_id, RAYX::Ray ray);
+    double (*get_double)(unsigned int ray_id, unsigned int event_id, const RAYX::Ray& ray);
 };
 
 // Again, a format is simply a list of components!
@@ -31,83 +31,83 @@ Format RAYX_API formatFromString(const std::string&);
 static Format FULL_FORMAT = {
     FormatComponent{
         .name = "Ray-ID",
-        .get_double = [](unsigned int ray_id, unsigned int, RAYX::Ray) { return (double)ray_id; },
+        .get_double = [](unsigned int ray_id, unsigned int, const RAYX::Ray&) { return (double)ray_id; },
     },
     FormatComponent{
         .name = "Event-ID",
-        .get_double = [](unsigned int, unsigned int event_id, RAYX::Ray) { return (double)event_id; },
+        .get_double = [](unsigned int, unsigned int event_id, const RAYX::Ray&) { return (double)event_id; },
     },
     FormatComponent{
         .name = "X-position",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_position.x; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_position.x; },
     },
     FormatComponent{
         .name = "Y-position",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_position.y; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_position.y; },
     },
     FormatComponent{
         .name = "Z-position",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_position.z; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_position.z; },
     },
     FormatComponent{
         .name = "Event-type",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_eventType; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_eventType; },
     },
     FormatComponent{
         .name = "X-direction",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_direction.x; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_direction.x; },
     },
     FormatComponent{
         .name = "Y-direction",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_direction.y; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_direction.y; },
     },
     FormatComponent{
         .name = "Z-direction",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_direction.z; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_direction.z; },
     },
     FormatComponent{
         .name = "Energy",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_energy; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_energy; },
     },
     FormatComponent{
         .name = "ElectricField-x-real",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_field.x.real(); },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_field.x.real(); },
     },
     FormatComponent{
         .name = "ElectricField-x-imag",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_field.x.imag(); },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_field.x.imag(); },
     },
     FormatComponent{
         .name = "ElectricField-y-real",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_field.y.real(); },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_field.y.real(); },
     },
     FormatComponent{
         .name = "ElectricField-y-imag",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_field.y.imag(); },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_field.y.imag(); },
     },
     FormatComponent{
         .name = "ElectricField-z-real",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_field.z.real(); },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_field.z.real(); },
     },
     FormatComponent{
         .name = "ElectricField-z-imag",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_field.z.imag(); },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_field.z.imag(); },
     },
     FormatComponent{
         .name = "pathLength",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_pathLength; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_pathLength; },
     },
     FormatComponent{
         .name = "order",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_order; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_order; },
     },
     FormatComponent{
         .name = "lastElement",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_lastElement; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_lastElement; },
     },
     FormatComponent{
         .name = "lightSourceIndex",
-        .get_double = [](unsigned int, unsigned int, RAYX::Ray ray) { return ray.m_sourceID; },
+        .get_double = [](unsigned int, unsigned int, const RAYX::Ray& ray) { return ray.m_sourceID; },
     },
 };
 

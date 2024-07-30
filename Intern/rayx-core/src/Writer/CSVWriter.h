@@ -19,7 +19,9 @@ BundleHistory RAYX_API loadCSV(const std::string& filename);
 
 class RAYX_API CsvWriter {
   public:
-    CsvWriter(const std::filesystem::path& filepath, const Format& format = FULL_FORMAT, int startEventIndex = 0);
+    static constexpr int DEFAULT_PRECISION = 20;
+
+    CsvWriter(const std::filesystem::path& filepath, const Format& format = FULL_FORMAT, int startEventIndex = 0, int precision = DEFAULT_PRECISION);
 
     void write(const DeviceTracer::BatchOutput& batch);
 
@@ -27,6 +29,7 @@ class RAYX_API CsvWriter {
     std::ofstream m_file;
     Format m_format;
     int m_startEventIndex;
+    int m_precision;
 
     void validate();
 };

@@ -8,52 +8,7 @@
 
 namespace {
 
-const int CELL_SIZE = 23;
-const char DELIMITER = ',';
-
-// The resulting CSV file consists of rows and columns. At each column-row pair, you will find a __Cell__.
-// In order to make it readable, cells have a fixed size; thus the CSV file looks like a grid.
-struct Cell {
-    char buf[CELL_SIZE + 1];  // + 1 for null-termination.
-};
-
-// Tries to write a string into a cell.
-// Will only write an incomplete string, if it doesn't fit.
-Cell strToCell(const char* x) {
-    Cell out{};
-    int n = strlen(x);
-
-    if (n > CELL_SIZE) {
-        RAYX_WARN << "strToCell: string \"" << x << "\" needs to be shortened!";
-    }
-
-    for (int i = 0; i < std::min(n, CELL_SIZE); i++) {
-        out.buf[i] = x[i];
-    }
-    for (int i = n; i < CELL_SIZE; i++) {
-        out.buf[i] = ' ';
-    }
-    out.buf[CELL_SIZE - 1] = '\0';
-    return out;
-}
-
-// TODO: can we optimize ?
-// Formats a double into a cell.
-Cell doubleToCell(double x) {
-    std::stringstream ss;
-    ss.setf(std::ios::fixed);
-
-    ss.precision(CELL_SIZE);
-    std::string s;
-    ss << x;
-    ss >> s;
-
-    // remove digits which do not fit.
-    while (s.size() > CELL_SIZE) {
-        s.pop_back();
-    }
-    return strToCell(s.c_str());
-}
+constexpr char DELIMITER = ',';
 
 }  // unnamed namespace
 
@@ -129,22 +84,26 @@ BundleHistory loadCSV(const std::string& filename) {
     return out;
 }
 
-CsvWriter::CsvWriter(const std::filesystem::path& filepath, const Format& format, int startEventIndex)
-    : m_file(filepath, std::ios::out | std::ios::trunc), m_format(format), m_startEventIndex(startEventIndex) {
+CsvWriter::CsvWriter(const std::filesystem::path& filepath, const Format& format, int startEventIndex, int precision)
+    : m_file(filepath, std::ios::out | std::ios::trunc), m_format(format), m_startEventIndex(startEventIndex), m_precision(precision) {
+    RAYX_VERB << "Opening csv file \"" << filepath << "\".";
+
+    m_file << std::setprecision(m_precision);
+    m_file << std::left;
+
     for (uint32_t i = 0; i < m_format.size(); i++) {
         if (i > 0) {
             m_file << DELIMITER;
         }
-        m_file << strToCell(m_format[i].name).buf;
+        m_file << std::setw(m_precision + 2) << m_format[i].name;
     }
     m_file << '\n';
 
     validate();
 }
 
-// TODO: can we optimize ?
 void CsvWriter::write(const DeviceTracer::BatchOutput& batch) {
-    RAYX_VERB << "Writing " << batch.eventCounts.size() << " rays to csvm_file...";
+    RAYX_VERB << "Writing " << batch.eventCounts.size() << " rays to csv file...";
 
     // write single batch to the body of the CSVm_file:
     for (size_t ray_id = 0; ray_id < batch.eventCounts.size(); ++ray_id) {
@@ -157,7 +116,7 @@ void CsvWriter::write(const DeviceTracer::BatchOutput& batch) {
             for (uint32_t i = 0; i < m_format.size(); i++) {
                 if (i > 0) m_file << DELIMITER;
                 const auto d = m_format[i].get_double(ray_id, event_id + m_startEventIndex, event);
-                m_file << doubleToCell(d).buf;
+                m_file << std::setw(m_precision + 2) << d;
             }
             m_file << '\n';
         }
