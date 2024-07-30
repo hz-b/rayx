@@ -4,7 +4,6 @@
 #include <string>
 
 #include "LightSource.h"
-#include "Objects/BehaviourType.h"
 
 namespace RAYX {
 

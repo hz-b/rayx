@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "Beamline/OpticalElement.h"
 #include "GraphicsCore/Buffer.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Device.h"

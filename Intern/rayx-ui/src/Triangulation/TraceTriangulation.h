@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "Beamline/Objects/MatrixSource.h"
-#include "Beamline/OpticalElement.h"
 #include "RenderObject.h"
 #include "Shader/Element.h"
 

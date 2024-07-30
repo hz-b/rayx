@@ -4,7 +4,6 @@
 
 #include <string>
 
-#include "Beamline/OpticalElement.h"
 #include "BeamlineDesignHandler.h"
 #include "BeamlineOutliner.h"
 #include "FrameInfo.h"

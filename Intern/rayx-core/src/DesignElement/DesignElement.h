@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Beamline/OpticalElement.h"
 #include "Shader/Element.h"
 #include "Value.h"
 

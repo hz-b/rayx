@@ -1,8 +1,6 @@
 #include "DesignElement.h"
 
-#include "Beamline/Objects/BehaviourType.h"
 #include "Beamline/Objects/Objects.h"
-#include "Beamline/Objects/SurfaceType.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
