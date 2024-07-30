@@ -1,5 +1,7 @@
 #include "Texture.h"
 
+#include "Debug/Debug.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -16,7 +18,7 @@ Texture::Texture(const Device& device)
       m_layout{VK_IMAGE_LAYOUT_UNDEFINED},
       m_usageFlags{VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT},
       m_aspectFlags{VK_IMAGE_ASPECT_COLOR_BIT} {
-    std::vector<uint8_t> data = dataFromPath(getExecutablePath() / "Assets/textures/default.png");
+    std::vector<uint8_t> data = dataFromPath(RAYX::getExecutablePath() / "Assets/textures/default.png");
     createImage(VK_IMAGE_TILING_OPTIMAL, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     createImageView();
     createSampler();

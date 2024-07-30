@@ -1,19 +1,14 @@
 // The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
-// All InvocationState variables (except for gl_GlobalInvocationID) are prefixed with `inv_` to separate them from other identifiers.
 
-// TODO If we want to have a multi-threaded CpuTracer, we will require to have multiple InvocationStates at once.
-// Thus we probably want to collect these variables into a `struct InvocationState`, from which each thread has a copy.
-// - The ShaderArrays from these different copies should probably reference the same buffers though!
+#pragma once
 
-// This struct idea might not work well with GLSLs `layout` interpretation of ShaderArrays though.
-// In other words, `inv_elements` probably needs to be a global variable, as `GLSL` has to declare it as a global variable using `layout`.
-// This problem requires further thought...
+#include <span>
 
-#ifndef INVOCATION_STATE_H
-#define INVOCATION_STATE_H
-
-#include "Adapt.h"
+#include "Common.h"
+#include "Element.h"
 #include "Ray.h"
+
+namespace RAYX {
 
 // Useful for GPU Tracing
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
@@ -30,27 +25,28 @@ struct _debug_struct {
 };
 
 // we don't require forward declarations in GLSL, hence we only do them in C++:
-#ifndef GLSL
-extern int gl_GlobalInvocationID;
-extern bool inv_finalized;
-extern uint64_t inv_ctr;
-extern uint64_t inv_nextEventIndex;
-extern ShaderArray<Ray> RAYX_API inv_rayData;
-extern ShaderArray<Ray> RAYX_API inv_outputData;
-extern ShaderArray<Element> RAYX_API inv_elements;
-extern ShaderArray<dvec4> RAYX_API inv_xyznull;
-extern ShaderArray<int> RAYX_API inv_matIdx;
-extern ShaderArray<double> RAYX_API inv_mat;
+
+// TODO(Sven): restore RAYX_API attributes for members
+struct RAYX_API InvState {
+    // these variables are only used during shader invocation
+    int globalInvocationId;
+    bool finalized;
+    uint64_t ctr;
+    uint64_t nextEventIndex;
+
+    std::span<const Ray> inputRays;
+    std::span<Ray> outputRays;
+    std::span<int> outputRayCounts;
+    std::span<const Element> elements;
+    std::span<const int> matIdx;
+    std::span<const double> mat;
 
 #ifdef RAYX_DEBUG_MODE
-extern ShaderArray<_debug_struct> RAYX_API inv_d_struct;
+    std::span<_debug_struct> d_struct;
 #endif
 
-extern PushConstants inv_pushConstants;
-#endif
+    // TODO(Sven): make all inputs const
+    PushConstants pushConstants;
+};
 
-// Every shader execution calculates the route for a single ray.
-// `_ray` is that ray, it's always in world coordinates (!).
-#define _ray (inv_rayData[uint(gl_GlobalInvocationID)])
-
-#endif
+}  // namespace RAYX

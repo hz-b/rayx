@@ -36,11 +36,11 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     }
 }
 
-void getImageplane(xml::Parser parser, DesignElement* de) { 
-    setAllMandatory(parser, de, DesignPlane::XY); 
+void getImageplane(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XY);
     de->setCurvatureType(CurvatureType::Plane);
     de->setBehaviourType(BehaviourType::ImagePlane);
-    }
+}
 
 void getSlit(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY);
@@ -134,9 +134,9 @@ void getSphereGrating(xml::Parser parser, DesignElement* de) {
     getGrating(parser, de);
 }
 
-void getPlaneMirror(xml::Parser parser, DesignElement* de) { 
+void getPlaneMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
-    de->setCurvatureType(CurvatureType::Plane); 
+    de->setCurvatureType(CurvatureType::Plane);
     de->setBehaviourType(BehaviourType::Mirror);
 }
 
@@ -144,18 +144,16 @@ void getSphereMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
     de->setCurvatureType(CurvatureType::Spherical);
     de->setBehaviourType(BehaviourType::Mirror);
-    
-    
+
     de->setGrazingIncAngle(parser.parseGrazingIncAngle());
     de->setEntranceArmLength(parser.parseEntranceArmLength());
     de->setExitArmLength(parser.parseExitArmLength());
     de->setRadius(parser.parseRadius());
-
 }
 
 void getToroidMirror(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
-    de->setCurvatureType(CurvatureType::Toroidal); 
+    de->setCurvatureType(CurvatureType::Toroidal);
     de->setBehaviourType(BehaviourType::Mirror);
 
     de->setShortRadius(parser.parseShortRadius());

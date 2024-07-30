@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include "Device.h"

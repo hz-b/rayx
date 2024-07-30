@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Core.h"
-
 #include "FileIO.h"
 
 namespace RAYX {

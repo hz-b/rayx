@@ -6,7 +6,7 @@
 
 #include "Beamline/Beamline.h"
 #include "RenderObject.h"
-#include "Tracer/Tracer.h"
+#include "Tracer/DeviceTracer.h"
 #include "UserInterface/Settings.h"
 
 class Scene {
@@ -40,6 +40,6 @@ class Scene {
 
     std::vector<RenderObject> m_ElementRObjects = {};
     std::vector<RenderObject> m_RayRObjects = {};
-    BundleHistory m_rayCache = {};
+    RAYX::BundleHistory m_rayCache = {};
     mutable std::vector<Texture::TextureInput> m_textureInputCache;  ///< Texture cache
 };

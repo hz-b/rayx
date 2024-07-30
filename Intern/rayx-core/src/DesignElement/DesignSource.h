@@ -1,11 +1,11 @@
 #pragma once
 
+#include "Shader/Ray.h"
 #include "Value.h"
 
 namespace RAYX {
 
 struct RAYX_API DesignSource {
-    
     DesignMap m_elementParameters;
     std::vector<Ray> compile(int thread_count) const;
 

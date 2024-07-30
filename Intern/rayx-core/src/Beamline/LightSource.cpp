@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-#include "EnergyDistribution.h"
+#include "Beamline/EnergyDistribution.h"
+#include "DesignElement/DesignSource.h"
 
 namespace RAYX {
 LightSource::LightSource(const DesignSource& dSource)

@@ -1,12 +1,14 @@
 #pragma once
 
+#include <glm.h>
+
 #include <array>
-#include <glm.hpp>
 #include <optional>
 
 #include "Core.h"
 #include "Data/xml.h"
 #include "DesignElement/DesignElement.h"
+#include "Shader/Constants.h"
 #include "angle.h"
 
 namespace RAYX {

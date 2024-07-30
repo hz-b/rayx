@@ -1,7 +1,19 @@
 #pragma once
 
+#include <angle.h>
+
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <variant>
+
+#include "Beamline/EnergyDistribution.h"
+#include "Beamline/LightSource.h"
+#include "Debug/Debug.h"
+#include "Material/Material.h"
+#include "Shader/Common.h"
+#include "Shader/Cutout.h"
+#include "Shader/Surface.h"
 
 namespace RAYX {
 
@@ -82,8 +94,8 @@ class DesignMap {
     void operator=(bool x) { m_variant = x; }
     void operator=(std::string x) { m_variant = x; }
     void operator=(Map x) { m_variant = x; }
-    void operator=(dvec4 x) { m_variant = x; }
-    void operator=(glm::dmat4x4 x) { m_variant = x; }
+    void operator=(RAYX::dvec4 x) { m_variant = x; }
+    void operator=(dmat4 x) { m_variant = x; }
     void operator=(Rad x) { m_variant = x; }
     void operator=(Material x) { m_variant = x; }
     void operator=(Misalignment x) { m_variant = x; }
@@ -171,8 +183,8 @@ class DesignMap {
         return *x;
     }
 
-    inline glm::dmat4x4 as_dmat4x4() const {
-        auto* x = std::get_if<glm::dmat4x4>(&m_variant);
+    inline dmat4 as_dmat4x4() const {
+        auto* x = std::get_if<dmat4>(&m_variant);
         if (!x) throw std::runtime_error("as_dmat4x4() called on non-dmat4x4!");
         return *x;
     }

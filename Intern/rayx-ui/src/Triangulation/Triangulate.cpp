@@ -10,8 +10,10 @@
 #include "Colors.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignElement.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
+#include "Shader/Cutout.h"
 #include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {
@@ -59,12 +61,12 @@ double absoluteAngle(const Point2D& p1, const Point2D& p2) { return atan2(p2.x -
 VertexType toVertexType(const Point2D& prev, const Point2D& current, const Point2D& next) {
     double angle = atan2(next.x - current.x, next.y - current.y) - atan2(prev.x - current.x, prev.y - current.y);
     if (angle < 0) {
-        angle += PI * 2;
+        angle += RAYX::PI * 2;
     }
     if (prev < current && next < current) {
-        return angle < PI ? Start : Split;
+        return angle < RAYX::PI ? Start : Split;
     } else if (prev > current && next > current) {
-        return angle < PI ? End : Merge;
+        return angle < RAYX::PI ? End : Merge;
     } else {
         return Regular;
     }
@@ -373,27 +375,27 @@ void triangulate(const PolygonComplex& poly, std::vector<TextureVertex>& points,
 
 // Cutout to Outline conversion
 // Holes are represented by polygons in clockwise order
-PolygonSimple calculateOutlineFromCutout(const Cutout& cutout, std::vector<TextureVertex>& vertices, bool clockwise = false) {
+PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector<TextureVertex>& vertices, bool clockwise = false) {
     constexpr double defWidthHeight = 50.0f;
     Outline outline;
 
     switch (static_cast<int>(cutout.m_type)) {
-        case CTYPE_TRAPEZOID: {
-            TrapezoidCutout trapezoid = deserializeTrapezoid(cutout);
+        case RAYX::CTYPE_TRAPEZOID: {
+            RAYX::TrapezoidCutout trapezoid = RAYX::deserializeTrapezoid(cutout);
             outline.calculateForQuadrilateral(trapezoid.m_widthA, trapezoid.m_widthB, trapezoid.m_length, trapezoid.m_length);
             break;
         }
-        case CTYPE_RECT: {
-            RectCutout rect = deserializeRect(cutout);
+        case RAYX::CTYPE_RECT: {
+            RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
             outline.calculateForQuadrilateral(rect.m_width, rect.m_width, rect.m_length, rect.m_length);
             break;
         }
-        case CTYPE_ELLIPTICAL: {
-            EllipticalCutout ellipse = deserializeElliptical(cutout);
+        case RAYX::CTYPE_ELLIPTICAL: {
+            RAYX::EllipticalCutout ellipse = RAYX::deserializeElliptical(cutout);
             outline.calculateForElliptical(ellipse.m_diameter_x, ellipse.m_diameter_z);
             break;
         }
-        case CTYPE_UNLIMITED:
+        case RAYX::CTYPE_UNLIMITED:
         default: {
             outline.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
             break;
@@ -415,11 +417,11 @@ PolygonSimple calculateOutlineFromCutout(const Cutout& cutout, std::vector<Textu
     return indices;
 }
 
-void planarTriangulation(const Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void planarTriangulation(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
-    if (compiled.m_behaviour.m_type == BTYPE_SLIT) {
-        SlitBehaviour slit = deserializeSlit(compiled.m_behaviour);
+    if (compiled.m_behaviour.m_type == RAYX::BTYPE_SLIT) {
+        RAYX::SlitBehaviour slit = deserializeSlit(compiled.m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
         poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
         poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));  // Hole -> Clockwise order
@@ -429,22 +431,24 @@ void planarTriangulation(const Element compiled, std::vector<TextureVertex>& ver
     triangulate(poly, vertices, indices);
 }
 
-bool isPlanar(const QuadricSurface& q) { return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0); }
+bool isPlanar(const RAYX::QuadricSurface& q) {
+    return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0);
+}
 
 // ------ Interface functions ------
 
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
-void triangulateObject(const Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void triangulateObject(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     switch (static_cast<int>(compiled.m_surface.m_type)) {
-        case STYPE_PLANE_XZ: {
+        case RAYX::STYPE_PLANE_XZ: {
             planarTriangulation(compiled, vertices, indices);
             break;
         }
-        case STYPE_QUADRIC: {
-            QuadricSurface q = deserializeQuadric(compiled.m_surface);
+        case RAYX::STYPE_QUADRIC: {
+            RAYX::QuadricSurface q = deserializeQuadric(compiled.m_surface);
             if (isPlanar(q)) {
                 planarTriangulation(compiled, vertices, indices);
             } else {
@@ -452,7 +456,7 @@ void triangulateObject(const Element compiled, std::vector<TextureVertex>& verti
             }
             break;
         }
-        case STYPE_TOROID: {
+        case RAYX::STYPE_TOROID: {
             traceTriangulation(compiled, vertices, indices);
             break;
         }

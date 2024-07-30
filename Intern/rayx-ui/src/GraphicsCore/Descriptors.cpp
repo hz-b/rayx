@@ -1,5 +1,9 @@
 #include "Descriptors.h"
 
+#include <cassert>
+
+#include "Debug/Debug.h"
+
 // *************** Descriptor Set Layout Builder *********************
 
 DescriptorSetLayout::Builder& DescriptorSetLayout::Builder::addBinding(uint32_t binding, VkDescriptorType descriptorType,

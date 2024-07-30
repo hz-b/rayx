@@ -5,9 +5,8 @@ project(RAY-Core_Tests)
 include(CTest)
 enable_testing()
 set(BINARY rayx-core-tst)
-file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)
-set(SOURCES ${TEST_SOURCES})
-add_executable(${BINARY} ${TEST_SOURCES})
+file(GLOB_RECURSE SOURCE *.h *.cpp)
+add_executable(${BINARY} ${SOURCE})
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 # -----------------
 

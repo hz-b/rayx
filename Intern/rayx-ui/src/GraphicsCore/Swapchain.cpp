@@ -1,6 +1,11 @@
 #include "Swapchain.h"
 
+#include <array>
+#include <iostream>
+#include <limits>
 #include <utility>
+
+#include "Debug/Debug.h"
 
 SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
     : m_Device{deviceRef}, m_WindowExtent{extent}, m_oldSwapChain(std::move(previous)) {

@@ -49,8 +49,8 @@ void CommandParser::analyzeCommands() const {
         RAYX_ERR << "Unsupported seed <= 0";
     }
 
-    if (m_args.m_cpuFlag && m_args.m_BatchSize != 0) {
-        RAYX_WARN << "Batching is not supported in CPU mode";
+    if (m_args.m_cpuFlag && m_args.m_deviceID != -1) {
+        RAYX_ERR << "Picking a device by index is not supported in cpu only mode. Remove flag '-x'";
     }
 }
 

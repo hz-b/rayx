@@ -3,18 +3,20 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignElement.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 
 namespace RAYX {
 
-PixelSource::PixelSource(const DesignSource& deso) : LightSource(deso),
-    m_pol(deso.getStokes()),
-    m_verDivergence(deso.getVerDivergence()),
-    m_sourceDepth(deso.getSourceDepth()),
-    m_sourceHeight(deso.getSourceHeight()),
-    m_sourceWidth(deso.getSourceWidth())
-{ 
+PixelSource::PixelSource(const DesignSource& deso)
+    : LightSource(deso),
+      m_pol(deso.getStokes()),
+      m_verDivergence(deso.getVerDivergence()),
+      m_sourceDepth(deso.getSourceDepth()),
+      m_sourceHeight(deso.getSourceHeight()),
+      m_sourceWidth(deso.getSourceWidth()) {
     m_horDivergence = deso.getHorDivergence();
 }
 
@@ -71,12 +73,14 @@ std::vector<Ray> PixelSource::getRays([[maybe_unused]] int thread_count) const {
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
+        const auto rotation = glm::dmat3(m_orientation);
+        const auto field = rotation * stokesToElectricField(m_pol);
+
+        Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }
     return rayList;
 }
-
 
 }  // namespace RAYX

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 /**
  * @brief Callback for key presses and releases in a GLFW window.

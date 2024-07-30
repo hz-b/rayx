@@ -131,7 +131,7 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     // Upload fonts
     {
         // Setup style
-        const std::filesystem::path fontPath = getExecutablePath() / "Assets/fonts/Roboto-Regular.ttf";
+        const std::filesystem::path fontPath = RAYX::getExecutablePath() / "Assets/fonts/Roboto-Regular.ttf";
         m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 8.0f));
         m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f));
         m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 32.0f));
@@ -585,19 +585,10 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 deviceItems.push_back(device.c_str());
             }
 
-            const char* tracerItems[] = {"CPU Tracer", "VULKAN Tracer"};
-            ImGui::Combo("Tracer", reinterpret_cast<int*>(&uiParams.simulationInfo.tracer), tracerItems, IM_ARRAYSIZE(tracerItems));
-
             // Device selection combo box
-            if (uiParams.simulationInfo.tracer == 1) {  // If not CPU Tracer, enable device selection
-                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
-                             static_cast<int>(deviceItems.size()));
-            } else {
-                ImGui::BeginDisabled();  // Disable combo box if CPU Tracer is selected
-                ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
-                             static_cast<int>(deviceItems.size()));
-                ImGui::EndDisabled();
-            }
+            ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
+                         static_cast<int>(deviceItems.size()));
+
             // startEventID selection
             // ImGui::InputInt("Start Event ID", &uiParams.simulationInfo.startEventID);
 

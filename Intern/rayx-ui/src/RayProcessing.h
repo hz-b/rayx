@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "RenderObject.h"
-#include "Tracer/Tracer.h"
 #define MAX_RAYS 1000
 
 // Definition of the RayFilterFunction type

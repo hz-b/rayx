@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Shader/Ray.h"
 
 using uint = unsigned int;
@@ -68,20 +70,28 @@ static Format FULL_FORMAT = {
         .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_energy; },
     },
     FormatComponent{
-        .name = "Stokes0",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[0]; },
+        .name = "ElectricField-x-real",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.x.real(); },
     },
     FormatComponent{
-        .name = "Stokes1",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[1]; },
+        .name = "ElectricField-x-imag",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.x.imag(); },
     },
     FormatComponent{
-        .name = "Stokes2",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[2]; },
+        .name = "ElectricField-y-real",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.y.real(); },
     },
     FormatComponent{
-        .name = "Stokes3",
-        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_stokes[3]; },
+        .name = "ElectricField-y-imag",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.y.imag(); },
+    },
+    FormatComponent{
+        .name = "ElectricField-z-real",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.z.real(); },
+    },
+    FormatComponent{
+        .name = "ElectricField-z-imag",
+        .get_double = [](uint, uint, RAYX::Ray ray) { return ray.m_field.z.imag(); },
     },
     FormatComponent{
         .name = "pathLength",

@@ -1,6 +1,11 @@
 #include "CutoutFns.h"
 
+#include "Throw.h"
+
+namespace RAYX {
+
 // checks whether the point (x, z) is within the cutout.
+RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     if (cutout.m_type == CTYPE_UNLIMITED) {
         return true;
@@ -58,6 +63,7 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
 
 // returns a matrix M where (M[i].x, M[i].z) are the key points of our cutout.
 // The key points are typically points on the boundary of the cutout.
+RAYX_FN_ACC
 dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
     dmat4 ret;
     double w = 0;
@@ -68,8 +74,8 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         l = inf;
     } else if (cutout.m_type == CTYPE_RECT) {
         RectCutout rect = deserializeRect(cutout);
-        w = rect.m_width/2.0;
-        l = rect.m_length/2.0;
+        w = rect.m_width / 2.0;
+        l = rect.m_length / 2.0;
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
@@ -87,22 +93,23 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         EllipticalCutout ell = deserializeElliptical(cutout);
         double rx = ell.m_diameter_x / 2.0;
         double rz = ell.m_diameter_z / 2.0;
-        ret[0] = dvec4( rx, 0.0, 0.0, 0.0);
-        ret[1] = dvec4(0.0, 0.0,  rz, 0.0);
+        ret[0] = dvec4(rx, 0.0, 0.0, 0.0);
+        ret[1] = dvec4(0.0, 0.0, rz, 0.0);
         ret[2] = dvec4(-rx, 0.0, 0.0, 0.0);
         ret[3] = dvec4(0.0, 0.0, -rz, 0.0);
         return ret;
     } else {
         _throw("invalid cutout type in inCutout!");
     }
-    ret[0] = dvec4( w, 0.0,  l, 0.0);
+    ret[0] = dvec4(w, 0.0, l, 0.0);
     ret[1] = dvec4(-w, 0.0, -l, 0.0);
-    ret[2] = dvec4(-w, 0.0,  l, 0.0);
-    ret[3] = dvec4( w, 0.0, -l, 0.0);
+    ret[2] = dvec4(-w, 0.0, l, 0.0);
+    ret[3] = dvec4(w, 0.0, -l, 0.0);
     return ret;
 }
 
 // returns width and length of the bounding box.
+RAYX_FN_ACC
 dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
     dvec2 ret = dvec2(0.0, 0.0);
     dmat4 keypoints = keyCutoutPoints(cutout);
@@ -118,6 +125,7 @@ dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
 // checks whether c1 is a subset of c2, and prints an error otherwise.
 // might not find all subset-violations, but should find most of them.
 // (might not find all Ellipsoid vs Trapezoid violations)
+RAYX_FN_ACC
 void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
     dmat4 keypoints = keyCutoutPoints(c1);
     for (int i = 0; i < 4; i++) {
@@ -129,3 +137,4 @@ void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
     }
 }
 
+}  // namespace RAYX

@@ -1,10 +1,17 @@
 #include "Diffraction.h"
+
 #include "Approx.h"
+#include "Constants.h"
 #include "InvocationState.h"
 #include "Rand.h"
 
+namespace RAYX {
+
+RAYX_FN_ACC
 double RAYX_API fact(int a) {
-    if (a < 0) { return a; }
+    if (a < 0) {
+        return a;
+    }
     double f = 1;
     for (int i = 2; i <= a; i++) {
         f *= i;
@@ -13,6 +20,7 @@ double RAYX_API fact(int a) {
 }
 
 /**returns first bessel function of parameter v*/
+RAYX_FN_ACC
 double RAYX_API bessel1(double v) {
     if (v < 0.0 || v > 20.0) {
         return 0.0;
@@ -42,7 +50,8 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi) {
+RAYX_FN_ACC
+void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState& inv) {
     double b = abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -50,7 +59,7 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
         for (int i = 0; i < 3; i++) {
-            rn1[i] = squaresDoubleRNG(inv_ctr);
+            rn1[i] = squaresDoubleRNG(inv.ctr);
         }
 
         dphi = rn1[0] * ximax;
@@ -66,8 +75,8 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
     }
 
     // 50% neg/pos sign
-    dphi = sign(squaresDoubleRNG(inv_ctr) - 0.5) * dphi;
-    dpsi = sign(squaresDoubleRNG(inv_ctr) - 0.5) * dpsi;
+    dphi = sign(squaresDoubleRNG(inv.ctr) - 0.5) * dphi;
+    dpsi = sign(squaresDoubleRNG(inv.ctr) - 0.5) * dpsi;
 }
 
 /**
@@ -77,7 +86,8 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
+RAYX_FN_ACC
+void fraun_diff(double dim, double wl, double& dAngle, InvState& inv) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
@@ -86,18 +96,17 @@ void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle) {
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
         for (int i = 0; i < 2; i++) {
-            rna[i] = squaresDoubleRNG(inv_ctr);
+            rna[i] = squaresDoubleRNG(inv.ctr);
         }
         dAngle = (rna[0] - 0.5) * div;
-        double u = PI * b * r8_sin(dAngle) / wl;
+        double u = PI * b * glm::sin(dAngle) / wl;
         double wd = 1;
         if (u != 0) {
-            wd = r8_sin(u) / u;
+            wd = glm::sin(u) / u;
             wd = wd * wd;
         }
         c = wd - rna[1];
     }
 }
 
-
-
+}  // namespace RAYX

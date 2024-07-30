@@ -3,19 +3,21 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 
 namespace RAYX {
 
-MatrixSource::MatrixSource(const DesignSource& dSource) : LightSource(dSource),
-    m_pol(dSource.getStokes()),
-    m_verDivergence(dSource.getVerDivergence()),
-    m_sourceDepth(dSource.getSourceDepth()),
-    m_sourceHeight(dSource.getSourceHeight()),
-    m_sourceWidth(dSource.getSourceWidth()) 
-{ 
-    m_horDivergence = dSource.getHorDivergence(); }
+MatrixSource::MatrixSource(const DesignSource& dSource)
+    : LightSource(dSource),
+      m_pol(dSource.getStokes()),
+      m_verDivergence(dSource.getVerDivergence()),
+      m_sourceDepth(dSource.getSourceDepth()),
+      m_sourceHeight(dSource.getSourceHeight()),
+      m_sourceWidth(dSource.getSourceWidth()) {
+    m_horDivergence = dSource.getHorDivergence();
+}
 
 /**
  * creates floor(sqrt(numberOfRays)) **2 rays (a grid with as many rows as
@@ -57,7 +59,10 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
             glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
             direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-            Ray r = {position, ETYPE_UNINIT, direction, en, m_pol, 0.0, 0.0, -1.0, -1.0};
+            const auto rotation = glm::dmat3(m_orientation);
+            const auto field = rotation * stokesToElectricField(m_pol);
+
+            Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
             returnList.push_back(r);
         }

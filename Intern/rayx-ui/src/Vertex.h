@@ -5,7 +5,9 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <variant>
+#include <vector>
 
+#include "Debug/Debug.h"
 #include "DesignElement/DesignElement.h"
 #include "DesignElement/DesignSource.h"
 

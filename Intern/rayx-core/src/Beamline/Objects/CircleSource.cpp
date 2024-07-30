@@ -4,6 +4,7 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignSource.h"
 #include "Random.h"
 #include "Shader/Constants.h"
 
@@ -56,7 +57,10 @@ std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const 
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirection();
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, m_stokes, 0.0, 0.0, -1.0, -1.0};
+        const auto rotation = glm::dmat3(m_orientation);
+        const auto field = rotation * stokesToElectricField(m_stokes);
+
+        Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
         rayList.push_back(r);
     }
@@ -91,6 +95,5 @@ glm::dvec3 CircleSource::getDirection() const {
 
     return glm::dvec3(al, am, an);
 }
-
 
 }  // namespace RAYX

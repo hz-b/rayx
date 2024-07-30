@@ -14,15 +14,10 @@ const char DELIMITER = ',';
 // The resulting CSV file consists of rows and columns. At each column-row pair, you will find a __Cell__.
 // In order to make it readable, cells have a fixed size; thus the CSV file looks like a grid.
 struct Cell {
-    char buf[CELL_SIZE + 1]; // + 1 for null-termination.
+    char buf[CELL_SIZE + 1];  // + 1 for null-termination.
 };
 
-int min(int a, int b) {
-    if (a > b) {
-        return b;
-    }
-    return a;
-}
+using std::min;
 
 // Tries to write a string into a cell.
 // Will only write an incomplete string, if it doesn't fit.
@@ -123,12 +118,18 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
             RAYX_ERR << "CSV line has incorrect length: " << d.size();
         }
 
+        const auto direction = glm::dvec3(d[4], d[5], d[6]);
+
+        const auto stokes = glm::dvec4(d[8], d[9], d[10], d[11]);
+        // const auto rotation = glm::transpose(RAYX::rotationMatrix(direction));
+        const auto field = /* rotation *  */ RAYX::stokesToElectricField(stokes);
+
         // create the Ray from the loaded doubles from this line.
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
                          .m_eventType = d[3],
-                         .m_direction = {d[4], d[5], d[6]},
+                         .m_direction = direction,
                          .m_energy = d[7],
-                         .m_stokes = {d[8], d[9], d[10], d[11]},
+                         .m_field = field,
                          .m_pathLength = d[12],
                          .m_order = d[13],
                          .m_lastElement = d[14],

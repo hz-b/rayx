@@ -6,7 +6,8 @@
 
 /// RAYX_LOG, RAYX_VERB prints to std::cout, whereas RAYX_WARN and RAYX_ERR are printed in red and go to std::cerr.
 /// RAYX_VERB is used for "verbose" prints, they can be activated and deactivated using the setDebugVerbose function.
-/// Finally RAYX_ERR is to be used for fatal errors, calling it will automatically terminate the program by calling the configurable `error_fn` defined below.
+/// Finally RAYX_ERR is to be used for fatal errors, calling it will automatically terminate the program by calling the configurable `error_fn`
+/// defined below.
 ///
 /// Each of these variants also has a "debug-only" variant, that gets deactivated in the release mode.
 /// The "debug-only" variant is prefixed by "RAYX_D_" instead of "RAYX_".
@@ -14,17 +15,15 @@
 
 /// For quick debugging prints, this file further exposes RAYX_DBG(x).
 
-// This include is necessary, as Debug implements a special formatting for Ray.
-#include <Shader/Ray.h>
-
 #include <array>
-#include <glm.hpp>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "Core.h"
+// This include is necessary, as Debug implements a special formatting for Ray.
+#include "Shader/Complex.h"
+#include "Shader/Ray.h"
 
 // Debug only code; use it as: DEBUG(<statement>);
 #ifdef RAYX_DEBUG_MODE
@@ -162,39 +161,61 @@ extern void RAYX_API (*error_fn)();
  * RAYX_DBG(position);
  * */
 
-template <int N, int M>
-inline std::vector<double> formatAsVec(glm::mat<N, M, double> arg) {
-    std::vector<double> out(N * M);
-    for (size_t i = 0; i < N * M; i++) {
-        out[i] = arg[i / N][i % N];
-    }
-    return out;
-}
-
-template <int N>
-inline std::vector<double> formatAsVec(glm::vec<N, double> arg) {
-    std::vector<double> out(N);
-    for (size_t i = 0; i < N; i++) {
-        out[i] = arg[i];
-    }
-    return out;
-}
-
-template <size_t N>
-inline std::vector<double> formatAsVec(std::array<double, N> arg) {
-    std::vector<double> out(N);
-    for (size_t i = 0; i < N; i++) {
-        out[i] = arg[i];
-    }
-    return out;
-}
-
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 
-inline std::vector<double> formatAsVec(Ray arg) {
-    return {arg.m_position.x,  arg.m_position.y,  arg.m_position.z, arg.m_eventType, arg.m_direction.x,
-            arg.m_direction.y, arg.m_direction.z, arg.m_energy,     arg.m_stokes.x,  arg.m_stokes.y,
-            arg.m_stokes.z,    arg.m_stokes.w,    arg.m_pathLength, arg.m_order,     arg.m_lastElement, arg.m_sourceID};
+inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
+
+inline std::vector<double> formatAsVec(const Ray arg) {
+    return {
+        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     arg.m_eventType,      arg.m_direction.x,    arg.m_direction.y,
+        arg.m_direction.z,    arg.m_energy,         arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(),
+        arg.m_field.z.real(), arg.m_field.z.imag(), arg.m_pathLength,     arg.m_order,          arg.m_lastElement,    arg.m_sourceID,
+    };
+}
+
+template <int N, int M, typename T>
+inline std::vector<double> formatAsVec(const glm::mat<N, M, T> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < N * M; i++) {
+        auto data = formatAsVec(arg[i / N][i % N]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <int N, typename T>
+inline std::vector<double> formatAsVec(const glm::vec<N, T> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < N; i++) {
+        auto data = formatAsVec(arg[i]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <size_t N, typename T>
+inline std::vector<double> formatAsVec(const std::array<T, N> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < N; i++) {
+        auto data = formatAsVec(arg[i]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <typename T>
+inline std::vector<double> formatAsVec(const std::vector<T> arg) {
+    std::vector<double> out;
+    for (size_t i = 0; i < arg.size(); i++) {
+        auto data = formatAsVec(arg[i]);
+        out.insert(out.end(), data.begin(), data.end());
+    }
+    return out;
+}
+
+template <>
+inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
+    return arg;
 }
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);

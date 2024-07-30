@@ -22,6 +22,12 @@ Clone the git repository by running one of the following commands:
 - Install the [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library.
 - Install Python3, python3-dev, and python3-matplotlib.
 - We recommend using the MSVC compiler for Windows, available through [Visual Studio](https://visualstudio.microsoft.com/downloads/) (2019 or newer).
+- Install the [Boost](https://www.boost.org/users/download/) library.
+- Add Boost to your PATH.
+- Optional (required for Tracing on the GPU):
+    - Install [Cuda](https://developer.nvidia.com/cuda-downloads?target_os=Windows).
+    Tested with Cuda version 12.4.1
+    - Add Cuda to your PATH.
 
 ### Known Issues
 - Installing the VulkanSDK at the root directory of your drive may cause issues. If you encounter problems with the VulkanSDK, consider installing it in a different directory.
@@ -48,9 +54,18 @@ To use a custom generator for CMake, such as Ninja for faster builds, you can se
 - Install the Vulkan SDK from [here](https://vulkan.lunarg.com/sdk/home). Select a version under Linux -> Ubuntu Packages.
 - Install Python3, python3-dev, and python3-matplotlib.
 - The project leverages [libhdf5](https://github.com/BlueBrain/HighFive) for data management and incorporates various other libraries for graphical user interfaces, linear algebra computations, and handling different aspects of the X11 window system. Install the necessary libraries with the following command:
+- Install boost
+- Optional (required for Tracing on the GPU):
+    - Install Cuda
 
 `apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev`
 - Ensure the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`.
+
+### Known Issues
+- Depending on the Cuda version, different GCC versions may be supported. Please take a look at the supported versions of GCC for your Cuda installation:
+    - https://stackoverflow.com/questions/6622454/cuda-incompatible-with-my-gcc-version
+    - https://gist.github.com/ax3l/9489132
+    Tested with Cuda version 12.4.1 and GCC version 13.3
 
 ## On Arch Linux
 
@@ -60,4 +75,5 @@ Arch Linux users can obtain all necessary packages through pacman, yay, or other
 
 To install the required packages on Fedora, run the following command:
 
-`sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc blas-devel lapack-devel gtk3-devel pkg-config libXi-devel libXcursor-devel libXinerama-devel libXrandr-devel`
+`sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc blas-devel lapack-devel gtk3-devel pkg-config libXi-devel libXcursor-devel libXinerama-devel libXrandr-devel boost`
+- install cuda

@@ -1,5 +1,10 @@
 #include "LineDensity.h"
-#include "Approx.h"
+
+#include "Behaviour.h"
+#include "ImageType.h"
+#include "Throw.h"
+
+namespace RAYX {
 
 /** Computes the adjusted line density at a specific z-coordinate for variable line spacing (VLS) gratings,
  * considering both the surface orientation and polynomial VLS parameters.
@@ -13,12 +18,13 @@
  * @return The modified line density at the given z-coordinate, adjusted for the grating's surface tilt and the polynomial
  *         specified by the VLS coefficients.
 */
+RAYX_FN_ACC
 double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vls[6]) {
     // Calculate the inclination angle from the vertical based on the z-component of the surface normal.
-    double del1 = r8_asin(normal.z);
+    double del1 = glm::asin(normal.z);
 
     // Compute the cosine of the negative inclination angle to adjust line density based on the grating's tilt.
-    double cos_d = r8_cos(-del1); // linedesity increases with konvex surface structure
+    double cos_d = glm::cos(-del1); // linedesity increases with konvex surface structure
 
     // Compute powers of z from z^2 to z^6 for polynomial calculation of line density adjustments.
     double z2 = z * z;
@@ -32,14 +38,14 @@ double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vl
     return a * cos_d;
 }
 
-
 /**
 calculates DX and DZ (line spacing in x and z direction) at a given point for a
 given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(double) DX, RAYX_INOUT(double) DZ) {
+RAYX_FN_ACC
+void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE = int(b.m_rzpType);
     double risag = b.m_designSagittalEntranceArmLength;
@@ -62,10 +68,10 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(dou
         X = 0;
 
     // avoid calculating the same sinus/cosinus multiple times (costly)
-    double s_beta = r8_sin(beta);
-    double c_beta = r8_cos(beta);
-    double s_alpha = r8_sin(alpha);
-    double c_alpha = r8_cos(alpha);
+    double s_beta = glm::sin(beta);
+    double c_beta = glm::cos(beta);
+    double s_alpha = glm::sin(alpha);
+    double c_alpha = glm::cos(alpha);
 
     /*
     if (DERIVATION_METHOD == 1) {
@@ -101,8 +107,8 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(dou
     } else if (IMAGE_TYPE == IT_ASTIGMATIC2ASTIGMATIC) {
         double s_rim = sign(rimer);
         double s_rom = sign(romer);
-        double c_2alpha = r8_cos(2 * alpha);
-        double c_2beta = r8_cos(2 * beta);
+        double c_2alpha = glm::cos(2 * alpha);
+        double c_2beta = glm::cos(2 * beta);
         if (FX == 0 && FZ == 0) {  //   !plane
 
             zi = s_rim * (rimer * c_alpha + Z);
@@ -193,3 +199,5 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, RAYX_INOUT(dou
 
     return;
 }
+
+}  // namespace RAYX

@@ -10,6 +10,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib/debug)
 
 # -----------------------
 
+# ---- Enable languages that we need ----
+if(alpaka_ACC_GPU_CUDA_ENABLE)
+    enable_language(CUDA)
+endif()
+
+# -----------------------
+
 # ---- Subdirectories ----
 add_subdirectory(rayx-core)
 add_subdirectory(rayx)

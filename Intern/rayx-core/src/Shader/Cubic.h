@@ -1,11 +1,13 @@
-#ifndef CUBIC_H
-#define CUBIC_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
+#include "Ray.h"
 
-//TODO: doku
-dvec3 RAYX_API cubicPosition(Ray r, double alpha);
+namespace RAYX {
 
-dvec3 RAYX_API cubicDirection(Ray r, double alpha);
+// TODO: doku
+RAYX_FN_ACC dvec3 RAYX_API cubicPosition(Ray r, double alpha);
 
-#endif
+RAYX_FN_ACC dvec3 RAYX_API cubicDirection(Ray r, double alpha);
+
+}  // namespace RAYX

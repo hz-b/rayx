@@ -75,11 +75,13 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
 }
 
 void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode& treeNode) {
+    using RAYX::ElementType;
+
     for (rapidxml::xml_node<>* xmlChild = node->first_node(); xmlChild; xmlChild = xmlChild->next_sibling()) {
         rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
         std::string type = typeAttr ? typeAttr->value() : "";
         SelectedType category = SelectedType::None;
-        ElementType elementType = findElementString(type);
+        ElementType elementType = RAYX::findElementString(type);
 
         if (strcmp(xmlChild->name(), "object") == 0) {
             switch (elementType) {

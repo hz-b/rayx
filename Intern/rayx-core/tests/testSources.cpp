@@ -197,7 +197,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
     for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
         DesignSource src = beamline.m_DesignSources[0];
-        
+
         auto test2 = values.horDivergence;
         auto test4 = values.sourceDepth;
         auto test6 = values.sourceWidth;
@@ -210,5 +210,3 @@ TEST_F(TestSuite, testLightsourceGetters) {
         CHECK_EQ(widthResult, values.sourceWidth);
     }
 }
-
-

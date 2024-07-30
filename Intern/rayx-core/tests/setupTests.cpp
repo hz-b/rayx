@@ -1,5 +1,8 @@
 #include "setupTests.h"
 
+// define globally decralred invocation state
+InvState inv;
+
 std::unique_ptr<RAYX::Tracer> tracer;
 
 // helper functions
@@ -45,7 +48,11 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_direction = {vec[6], vec[7], vec[8]};
     ray.m_energy = vec[9];
     ray.m_pathLength = vec[10];
-    ray.m_stokes = {vec[11], vec[12], vec[13], vec[14]};
+
+    const auto stokes = dvec4(vec[11], vec[12], vec[13], vec[14]);
+    const auto rotation = RAYX::rotationMatrix(ray.m_direction);
+    const auto field = rotation * RAYX::stokesToElectricField(stokes);
+    ray.m_field = field;
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
@@ -155,7 +162,6 @@ void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHis
 std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len) {
     // The ray should hit every element from the beamline once.
     if (ray_hist.size() != beamline_len) {
-
         return {};
     }
 
@@ -185,7 +191,7 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            double btype = beamline.m_DesignElements[elem].compile().m_behaviour.m_type;// m_element.m_behaviour.m_type;
+            double btype = beamline.m_DesignElements[elem].compile().m_behaviour.m_type;  // m_element.m_behaviour.m_type;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
             if (btype == BTYPE_IMAGE_PLANE || btype == BTYPE_SLIT) {
@@ -239,13 +245,16 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     compareBundleHistories(a, b, tolerance);
 }
 
+// store materialTables statically, to ensure lifetime while invocation state references it.
+MaterialTables materialTables;
+
 void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
     std::array<bool, 92> mats;
     mats.fill(false);
     for (auto m : mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
-    auto materialTables = loadMaterialTables(mats);
-    inv_mat.data = materialTables.materialTable;
-    inv_matIdx.data = materialTables.indexTable;
+    materialTables = loadMaterialTables(mats);
+    inv.mat = materialTables.materialTable;
+    inv.matIdx = materialTables.indexTable;
 }

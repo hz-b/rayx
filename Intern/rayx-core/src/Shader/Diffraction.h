@@ -1,13 +1,15 @@
-#ifndef DIFFRACTION_H
-#define DIFFRACTION_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
+#include "InvocationState.h"
+
+namespace RAYX {
 
 // Calculates the factorial of n: n!
-double RAYX_API fact(int n);
+RAYX_FN_ACC double RAYX_API fact(int n);
 
 /**returns first bessel function of parameter v*/
-double RAYX_API bessel1(double v);
+RAYX_FN_ACC double RAYX_API bessel1(double v);
 
 /**
 calculates the Bessel diffraction effects on circular slits and on circular
@@ -18,7 +20,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(double) dpsi);
+RAYX_FN_ACC void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState& inv);
 
 /**
  * calculates fraunhofer diffraction effects on rectangular slits
@@ -27,6 +29,6 @@ void bessel_diff(double radius, double wl, RAYX_INOUT(double) dphi, RAYX_INOUT(d
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-void fraun_diff(double dim, double wl, RAYX_INOUT(double) dAngle);
+RAYX_FN_ACC void fraun_diff(double dim, double wl, double& dAngle, InvState& inv);
 
-#endif
+}  // namespace RAYX

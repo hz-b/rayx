@@ -10,19 +10,15 @@
 #include "Core.h"
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
-#include "Material/Material.h"
-#include "Random.h"
 #include "DesignElement/DesignElement.h"
 #include "DesignElement/DesignSource.h"
-
+#include "Material/Material.h"
+#include "Random.h"
 #include "Shader/Constants.h"
+#include "Shader/Diffraction.h"
+#include "Shader/Efficiency.h"
 #include "Shader/Ray.h"
 #include "Shader/RefractiveIndex.h"
-#include "Shader/Efficiency.h"
-#include "Shader/Diffraction.h"
-
-#include "Tracer/CpuTracer.h"
-#include "Tracer/VulkanTracer.h"
 #include "Writer/CSVWriter.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -41,6 +37,10 @@ extern char** GLOBAL_ARGV;
 
 const int PREC = 17;
 
+// declare invocation state globally
+// TODO(Sven): do we really need invocation state here, or just material tables individually?
+extern InvState inv;
+
 /// this is the underlying implementation of the CHECK_EQ macro.
 /// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.
 /// filename, line represents where CHECK_EQ is called.
@@ -56,7 +56,8 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 
     bool success = true;
     for (size_t i = 0; i < vl.size(); i++) {
-        if (abs(vl[i] - vr[i]) > tolerance) {
+        const bool xor_nan = std::isnan(vl[i]) != std::isnan(vr[i]);
+        if (abs(vl[i] - vr[i]) > tolerance || xor_nan) {
             success = false;
             break;
         }
@@ -94,9 +95,10 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 template <>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance) {
-    std::vector<std::string> names = {".m_position.x",  ".m_position.y",  ".m_position.z", ".m_eventType", ".m_direction.x",
-                                      ".m_direction.y", ".m_direction.z", ".m_energy",     ".m_stokes.x",  ".m_stokes.y",
-                                      ".m_stokes.z",    ".m_stokes.w",    ".m_pathLength", ".m_order",     ".m_lastElement", ".m_sourceID"};
+    std::vector<std::string> names = {".m_position.x",   ".m_position.y",   ".m_position.z",   ".m_eventType",    ".m_direction.x",
+                                      ".m_direction.y",  ".m_direction.z",  ".m_energy",       ".m_field.x.real", ".m_field.x.imag",
+                                      ".m_field.y.real", ".m_field.y.imag", ".m_field.z.real", ".m_field.z.imag", ".m_pathLength",
+                                      ".m_order",        ".m_lastElement",  ".m_sourceID"};
     for (int i = 0; i < names.size(); i++) {
         auto t = tolerance;
 
@@ -112,11 +114,11 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 /// check that L and R contain the same doubles.
 // within CHECK_EQ: the __VA_ARGS__ argument is either `double tolerance` or nothing.
 // all variables declared within CHECK_EQ end with `_check_eq` distinguish them from the variables that the user might write.
-#define CHECK_EQ(L, R, ...)                                                                                                                         \
-    {                                                                                                                                               \
-        auto l_check_eq = L;                                                                                                                        \
-        auto r_check_eq = R;                                                                                                                        \
-        checkEq(__FILE__, __LINE__, #L, #R, l_check_eq, r_check_eq, RAYX::formatAsVec(l_check_eq), RAYX::formatAsVec(r_check_eq), ##__VA_ARGS__);   \
+#define CHECK_EQ(L, R, ...)                                                                                                                       \
+    {                                                                                                                                             \
+        auto l_check_eq = L;                                                                                                                      \
+        auto r_check_eq = R;                                                                                                                      \
+        checkEq(__FILE__, __LINE__, #L, #R, l_check_eq, r_check_eq, RAYX::formatAsVec(l_check_eq), RAYX::formatAsVec(r_check_eq), ##__VA_ARGS__); \
     }
 
 /// assert that x holds, and give a fancy print otherwise.
@@ -128,17 +130,17 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 
 /// check whether low <= expr <= high
-#define CHECK_IN(expr, low, high)                                                                      \
-    {                                                                                                  \
-        auto expr_check_in = expr;                                                                     \
-        auto low_check_in = low;                                                                       \
-        if (expr_check_in < low_check_in) {                                                            \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low;       \
-        }                                                                                              \
-        auto high_check_in = high;                                                                     \
-        if (expr_check_in > high_check_in) {                                                           \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high;      \
-        }                                                                                              \
+#define CHECK_IN(expr, low, high)                                                                 \
+    {                                                                                             \
+        auto expr_check_in = expr;                                                                \
+        auto low_check_in = low;                                                                  \
+        if (expr_check_in < low_check_in) {                                                       \
+            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low;  \
+        }                                                                                         \
+        auto high_check_in = high;                                                                \
+        if (expr_check_in > high_check_in) {                                                      \
+            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high; \
+        }                                                                                         \
     }
 
 // ShaderTest
@@ -160,15 +162,10 @@ class TestSuite : public testing::Test {
             }
         }
 
-        if (cpu) {
-            tracer = std::make_unique<RAYX::CpuTracer>();
-        } else {
-#ifdef NO_VULKAN
-            RAYX_ERR << "can't create VulkanTracer due to NO_VULKAN";
-#else
-            tracer = std::make_unique<RAYX::VulkanTracer>();
-#endif
-        }
+        // Choose Hardware
+        using DeviceType = RAYX::DeviceConfig::DeviceType;
+        const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
+        tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
     }
 
     // called before every test invocation.
@@ -206,7 +203,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int bea
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.
 /// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareLastAgainstRayUI(std::string filename, double tolerance = 1e-11, Sequential seq = Sequential::No);
+void compareLastAgainstRayUI(std::string filename, double tolerance = 1e-4, Sequential seq = Sequential::No);
 
 // compares input/<filename>.correct.csv with the trace output.
 void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);

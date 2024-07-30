@@ -1,18 +1,19 @@
-#ifndef BEHAVIOUR_H
-#define BEHAVIOUR_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
 #include "Cutout.h"
+
+namespace RAYX {
 
 #undef m_private_serialization_params
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `Behave.h`.
-const int BTYPE_MIRROR = 0;
-const int BTYPE_GRATING = 1;
-const int BTYPE_SLIT = 2;
-const int BTYPE_RZP = 3;
-const int BTYPE_IMAGE_PLANE = 4;
+constexpr int BTYPE_MIRROR = 0;
+constexpr int BTYPE_GRATING = 1;
+constexpr int BTYPE_SLIT = 2;
+constexpr int BTYPE_RZP = 3;
+constexpr int BTYPE_IMAGE_PLANE = 4;
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
@@ -28,7 +29,8 @@ struct Behaviour {
 ////////////////////
 
 // Mirror holds no data so it doesn't need a struct or a deserialize function.
-INLINE Behaviour serializeMirror() {
+RAYX_FN_ACC
+inline Behaviour serializeMirror() {
     Behaviour b;
     b.m_type = BTYPE_MIRROR;
     return b;
@@ -44,7 +46,8 @@ struct GratingBehaviour {
     double m_orderOfDiffraction;
 };
 
-INLINE Behaviour serializeGrating(GratingBehaviour g) {
+RAYX_FN_ACC
+inline Behaviour serializeGrating(GratingBehaviour g) {
     Behaviour b;
     b.m_type = BTYPE_GRATING;
 
@@ -59,7 +62,8 @@ INLINE Behaviour serializeGrating(GratingBehaviour g) {
     return b;
 }
 
-INLINE GratingBehaviour deserializeGrating(Behaviour b) {
+RAYX_FN_ACC
+inline GratingBehaviour deserializeGrating(Behaviour b) {
     GratingBehaviour g;
     g.m_vls[0] = b.m_private_serialization_params[0];
     g.m_vls[1] = b.m_private_serialization_params[1];
@@ -76,7 +80,7 @@ INLINE GratingBehaviour deserializeGrating(Behaviour b) {
 // Slit
 ///////////////////
 
-struct SlitBehaviour {
+struct RAYX_API SlitBehaviour {
     // The Slit consists of a ray-blocking wall with a small opening inside it.
     // This is the shape (aka cutout) of this small opening.
     // The set of points in the m_openingCutout need to be a subset of the cutout of the whole object.
@@ -87,7 +91,8 @@ struct SlitBehaviour {
     Cutout m_beamstopCutout;
 };
 
-INLINE Behaviour serializeSlit(SlitBehaviour s) {
+RAYX_FN_ACC
+inline Behaviour serializeSlit(SlitBehaviour s) {
     Behaviour b;
     b.m_type = BTYPE_SLIT;
 
@@ -103,7 +108,8 @@ INLINE Behaviour serializeSlit(SlitBehaviour s) {
     return b;
 }
 
-INLINE SlitBehaviour deserializeSlit(Behaviour b) {
+RAYX_FN_ACC
+inline SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
 
     s.m_openingCutout.m_type = b.m_private_serialization_params[0];
@@ -139,7 +145,8 @@ struct RZPBehaviour {
     double m_additionalOrder;
 };
 
-INLINE Behaviour serializeRZP(RZPBehaviour r) {
+RAYX_FN_ACC
+inline Behaviour serializeRZP(RZPBehaviour r) {
     Behaviour b;
     b.m_type = BTYPE_RZP;
 
@@ -160,7 +167,8 @@ INLINE Behaviour serializeRZP(RZPBehaviour r) {
     return b;
 }
 
-INLINE RZPBehaviour deserializeRZP(Behaviour b) {
+RAYX_FN_ACC
+inline RZPBehaviour deserializeRZP(Behaviour b) {
     RZPBehaviour r;
     r.m_imageType = b.m_private_serialization_params[0];
     r.m_rzpType = b.m_private_serialization_params[1];
@@ -184,7 +192,8 @@ INLINE RZPBehaviour deserializeRZP(Behaviour b) {
 ////////////////
 
 // ImagePlane holds no data so it doesn't need a struct or a deserialize function.
-INLINE Behaviour serializeImagePlane() {
+RAYX_FN_ACC
+inline Behaviour serializeImagePlane() {
     Behaviour b;
     b.m_type = BTYPE_IMAGE_PLANE;
     return b;
@@ -193,5 +202,4 @@ INLINE Behaviour serializeImagePlane() {
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
 
-#endif
-
+}  // namespace RAYX

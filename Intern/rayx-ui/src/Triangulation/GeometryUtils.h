@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Shader/Cutout.h"
 #include "Vertex.h"
 
 struct Vertex;
@@ -16,4 +17,4 @@ struct Outline {
  * @param cutout Reference to the Cutout object.
  * @return A pair containing width and length as double values.
  */
-std::pair<double, double> getRectangularDimensions(const Cutout& cutout);
+std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout);

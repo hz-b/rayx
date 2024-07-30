@@ -11,10 +11,14 @@
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "DesignElement/DesignElement.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
+#include "Shader/Strings.h"
 
-void parseElement(xml::Parser parser, DesignElement* de) {
+using RAYX::ElementType;
+
+void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
     ElementType type = parser.type();
 
     if (type == ElementType::ImagePlane) {

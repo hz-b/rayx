@@ -1,5 +1,40 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# ---- for files compiled with cuda compiler, prepend -Xcompiler flags ----
+function(prepend_xcompiler FLAG_LIST PREPENDED_FLAG_LIST)
+    set(SRC ${${FLAG_LIST}})
+    foreach(FLAG ${SRC})
+        set(DST ${DST} -Xcompiler="${FLAG}")
+    endforeach()
+    set(${PREPENDED_FLAG_LIST} ${DST} PARENT_SCOPE)
+endfunction()
+
+function(alpaka_target In_Name)
+    if(alpaka_ACC_GPU_CUDA_ENABLE)
+        enable_language(CUDA)
+        # We have to set this here since CUDA_SEPARABLE_COMPILATION is not propagated by the alpaka::alpaka target.
+        if(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL ON)
+            set_property(TARGET ${In_Name} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+        elseif(alpaka_RELOCATABLE_DEVICE_CODE STREQUAL OFF)
+            set_property(TARGET ${In_Name} PROPERTY CUDA_SEPARABLE_COMPILATION OFF)
+        endif()
+    endif()
+endfunction()
+
+function(alpaka_source)
+    if(alpaka_ACC_GPU_CUDA_ENABLE)
+        enable_language(CUDA)
+        foreach(_file ${ARGN})
+            if((${_file} MATCHES "\\.cpp$") OR
+               (${_file} MATCHES "\\.cxx$") OR
+               (${_file} MATCHES "\\.cu$")
+            )
+                set_source_files_properties(${_file} PROPERTIES LANGUAGE CUDA)
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
@@ -18,7 +53,13 @@ endif()
 # ---- Project ----
 project(rayx-core VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE ALPAKA_SOURCE
+    ${PROJECT_SOURCE_DIR}/src/Shader/*.cpp
+    ${PROJECT_SOURCE_DIR}/src/Tracer/*.cpp
+)
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
+alpaka_target(${PROJECT_NAME})
+alpaka_source(${ALPAKA_SOURCE})
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
@@ -27,12 +68,13 @@ install(TARGETS ${PROJECT_NAME}
 
 # -----------------
 
-
 # -----OpenMP--------
 find_package(OpenMP)
 
 if(OpenMP_CXX_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+    prepend_xcompiler(OpenMP_CXX_FLAGS OpenMP_CUDA_FLAGS)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${OpenMP_CUDA_FLAGS}>)
 else()
     message(STATUS "OpenMP not found")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP)
@@ -42,32 +84,35 @@ endif()
 
 # ---- Warnings ----
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W3 /wd4251 /wd4267)
+    message(STATUS "MSVC")
+
+    set(MSVC_CXX_FLAGS /W3 /wd4251 /wd4267)
     if(WERROR STREQUAL "YES")
-        target_compile_options(${PROJECT_NAME} PRIVATE -WX)
+        list(APPEND MSVC_CXX_FLAGS /WX)
         message(STATUS "Werror mode")
     endif()
+    prepend_xcompiler(MSVC_CXX_FLAGS MSVC_CUDA_FLAGS)
+
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${MSVC_CXX_FLAGS}>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${MSVC_CUDA_FLAGS}>)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) # -Werror)
+    message(STATUS "GCC")
+
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>)
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
-        target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Werror>)
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Werror all-warnings>)
         message(STATUS "Werror mode")
     endif()
 endif()
 
 # ------------------
 
-# ---- Disable Vulkan/H5 ----
-find_package(Vulkan)
-
-if(Vulkan_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
-else()
-    message(STATUS "Vulkan not found")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_VULKAN)
-endif()
+# ---- Disable H5 ----
 
 find_package(HDF5)
 
@@ -78,12 +123,6 @@ else()
     message(STATUS "HDF5 not found")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
 endif()
-
-# -------------------------
-
-# ---- PCH ----
-target_precompile_headers(${PROJECT_NAME} PUBLIC raycorePCH.h)
-set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 
 # -------------
 
@@ -104,6 +143,13 @@ target_compile_definitions(${PROJECT_NAME}
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
 )
 
+# Only build gpu tracer when CUDA is enabled
+if(alpaka_ACC_GPU_CUDA_ENABLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CUDA_ENABLED)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC NO_GPU_TRACER)
+endif()
+
 # -----------------
 
 # ---- Dependencies ----
@@ -114,29 +160,9 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
+    ${PROJECT_SOURCE_DIR}/../../Extern/alpaka/include/
 )
-
-# ----------------------
-
-# ---- Compile Shaders ----
-if(Vulkan_FOUND)
-    add_dependencies(${PROJECT_NAME} RAYX_CORE_COMPILE_SHADER)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders)
-    else()
-        set(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders)
-    endif()
-    set(RAYX_CORE_SHADER ${OUTPUT_DIR}/comp.spv)
-
-    file(MAKE_DIRECTORY ${OUTPUT_DIR})
-    add_custom_command(
-        OUTPUT
-        ${RAYX_CORE_SHADER}
-        COMMAND glslangValidator
-        ARGS -V ${PROJECT_SOURCE_DIR}/src/Shader/main-glsl.comp -o ${RAYX_CORE_SHADER}
-    )
-    add_custom_target(RAYX_CORE_COMPILE_SHADER ALL DEPENDS ${RAYX_CORE_SHADER})
-endif()
+target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka)
 
 # ------------------------
 

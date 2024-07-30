@@ -1,71 +1,39 @@
 #pragma once
 
 #include <memory>
-#include <set>
 #include <string>
 #include <vector>
 
-#include "Beamline/Beamline.h"
 #include "Core.h"
-#include "Shader/Constants.h"
-#include "Shader/InvocationState.h"
+#include "DeviceConfig.h"
+#include "DeviceTracer.h"
 #include "Shader/Ray.h"
-
-// if no `--batch` option is given, this it the batch size.
-const uint64_t DEFAULT_BATCH_SIZE = 100000;
 
 // Abstract Tracer base class.
 namespace RAYX {
 
-/// Expresses whether we force sequential tracing, or we use dynamic tracing.
-/// We prefer this over a boolean, as calling eg. the trace function with an argument of `true` has no obvious meaning.
-/// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
-enum class Sequential { No, Yes };
-
-struct TraceRawConfig {
-    std::vector<Ray> m_rays;
-    double m_rayIdStart;
-    double m_numRays;
-    double m_randomSeed;
-    double m_maxEvents;
-    double m_startEventID;
-    MaterialTables m_materialTables;
-    std::vector<Element> m_elements;
-};
-
-/// Contains all the events of a single Ray in chronological order.
-using RayHistory = std::vector<Ray>;
-
-/// Contains all events for some bundle of rays.
-/// Given a `BundleHistory hist;`
-/// hist[i][j] is the j'th event of the i'th ray of the bundle.
-using BundleHistory = std::vector<RayHistory>;
+// if no `--batch` option is given, this it the batch size.
+const uint64_t DEFAULT_BATCH_SIZE = 100000;
 
 class RAYX_API Tracer {
   public:
-    Tracer() {}
-    virtual ~Tracer() {}
+    /**
+     * @brief Constructs Tracer for the desired platform
+     * @param platform specify the platform
+     * @param deviceIndex index of the picked divice on specified platform
+     */
+    Tracer(const DeviceConfig& deviceConfig);
 
-    // This will call traceRaw.
-    // Everything happening in each traceRaw implementation should be extracted to this function instead.
+    // This will call the trace implementation of a subclass
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
     BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
-                        unsigned int startEventID = 0);
+                        int startEventID = 0);
 
-    void setDevice(int deviceID);
+    static int defaultMaxEvents(const Beamline* beamline = nullptr);
 
-  protected:
-    // where the actual tracing happens.
-    // std::vector<Ray> will contain all events for all Rays (and also the ETYPE_UNINIT events).
-    virtual std::vector<Ray> traceRaw(const TraceRawConfig&) = 0;
-
-    // TODO Why are the PushConstants not part of the TraceRawConfig?
-    // TODO The TraceRawConfig is supposed to contain all information relevant for tracing.
-    virtual void setPushConstants(const PushConstants*) = 0;
-
-    // -1 means no device is selected.
-    int m_deviceID = -1;
+  private:
+    std::shared_ptr<DeviceTracer> m_deviceTracer;
 };
 
 // TODO deprecate these functions and all of their uses.

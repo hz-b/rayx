@@ -90,7 +90,7 @@ Verb::~Verb() {
 void exit1() { exit(1); }
 void (*error_fn)() = exit1;
 
-const int PREC = 17; // precision
+const int PREC = 17;  // precision
 
 // the implementation of RAYX_DBG.
 // the std::vector<double> v contains the data of the object we intend to log.

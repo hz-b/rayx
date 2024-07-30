@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# if(alpaka_ACC_GPU_CUDA_ENABLE)
+#     enable_language(CUDA)
+# endif()
 
 # ---- Project ----
 project(rayx VERSION ${RAYX_VERSION})

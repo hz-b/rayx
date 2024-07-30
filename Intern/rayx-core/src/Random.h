@@ -1,4 +1,7 @@
 #pragma once
+
+#include <stdint.h>
+
 #include "Core.h"
 
 // All C++ randomness should be using this module.

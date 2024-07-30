@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 
 struct Camera {
     alignas(16) glm::mat4 view = glm::mat4(1.0f);

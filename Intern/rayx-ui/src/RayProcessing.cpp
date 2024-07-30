@@ -75,7 +75,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     int counter = 0;
 
     // compile all elements
-    std::vector<Element> compiledElements;
+    std::vector<RAYX::Element> compiledElements;
     for (const auto& element : beamline.m_DesignElements) {
         compiledElements.push_back(element.compile());
         counter++;
@@ -100,8 +100,10 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
                 RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);
-            glm::vec4 originColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
-            glm::vec4 pointColor = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? ORANGE : (event.m_eventType == ETYPE_ABSORBED) ? RED : WHITE;
+            glm::vec4 originColor = (event.m_eventType == RAYX::ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;
+            glm::vec4 pointColor = (event.m_eventType == RAYX::ETYPE_JUST_HIT_ELEM) ? ORANGE
+                                   : (event.m_eventType == RAYX::ETYPE_ABSORBED)    ? RED
+                                                                                    : WHITE;
 
             if (!(isFirstEvent && startEventID > 0)) {
                 // Only execute if not the first event with startEventID > 0

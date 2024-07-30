@@ -1,17 +1,18 @@
-#ifndef SURFACE_H
-#define SURFACE_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
+
+namespace RAYX {
 
 #undef m_private_serialization_params
 
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTYPE
 // constants)
-const int STYPE_QUADRIC = 0;
-const int STYPE_TOROID = 1;
-const int STYPE_PLANE_XZ = 2;
-const int STYPE_CUBIC = 3;
+constexpr int STYPE_QUADRIC = 0;
+constexpr int STYPE_TOROID = 1;
+constexpr int STYPE_PLANE_XZ = 2;
+constexpr int STYPE_CUBIC = 3;
 
 struct Surface {
     double m_type;
@@ -38,7 +39,8 @@ struct QuadricSurface {
     double m_a44;
 };
 
-INLINE Surface serializeQuadric(QuadricSurface surface) {
+RAYX_FN_ACC
+inline Surface serializeQuadric(QuadricSurface surface) {
     Surface ser;
     ser.m_type = STYPE_QUADRIC;
     ser.m_private_serialization_params[0] = double(surface.m_icurv);
@@ -55,7 +57,8 @@ INLINE Surface serializeQuadric(QuadricSurface surface) {
     return ser;
 }
 
-INLINE QuadricSurface deserializeQuadric(Surface ser) {
+RAYX_FN_ACC
+inline QuadricSurface deserializeQuadric(Surface ser) {
     QuadricSurface surface;
     surface.m_icurv = int(ser.m_private_serialization_params[0]);
     surface.m_a11 = ser.m_private_serialization_params[1];
@@ -76,8 +79,8 @@ INLINE QuadricSurface deserializeQuadric(Surface ser) {
 /////////////
 
 #define ToroidType double
-const ToroidType TOROID_TYPE_CONVEX = 0;
-const ToroidType TOROID_TYPE_CONCAVE = 1;
+constexpr ToroidType TOROID_TYPE_CONVEX = 0;
+constexpr ToroidType TOROID_TYPE_CONCAVE = 1;
 
 struct ToroidSurface {
     double m_longRadius;
@@ -85,7 +88,8 @@ struct ToroidSurface {
     ToroidType m_toroidType;
 };
 
-INLINE Surface serializeToroid(ToroidSurface surface) {
+RAYX_FN_ACC
+inline Surface serializeToroid(ToroidSurface surface) {
     Surface ser;
     ser.m_type = STYPE_TOROID;
     ser.m_private_serialization_params[0] = surface.m_longRadius;
@@ -94,7 +98,8 @@ INLINE Surface serializeToroid(ToroidSurface surface) {
     return ser;
 }
 
-INLINE ToroidSurface deserializeToroid(Surface ser) {
+RAYX_FN_ACC
+inline ToroidSurface deserializeToroid(Surface ser) {
     ToroidSurface surface;
     surface.m_longRadius = ser.m_private_serialization_params[0];
     surface.m_shortRadius = ser.m_private_serialization_params[1];
@@ -108,7 +113,8 @@ INLINE ToroidSurface deserializeToroid(Surface ser) {
 
 // `PlaneXZ` doesn't have any data so it doesn't need a struct.
 
-INLINE Surface serializePlaneXZ() {
+RAYX_FN_ACC
+inline Surface serializePlaneXZ() {
     Surface ser;
     ser.m_type = STYPE_PLANE_XZ;
     return ser;
@@ -141,7 +147,8 @@ struct CubicSurface {
     double m_psi;
 };
 
-INLINE Surface serializeCubic(CubicSurface surface) {
+RAYX_FN_ACC
+inline Surface serializeCubic(CubicSurface surface) {
     Surface ser;
     ser.m_type = STYPE_CUBIC;
     ser.m_private_serialization_params[0] = double(surface.m_icurv);
@@ -168,7 +175,8 @@ INLINE Surface serializeCubic(CubicSurface surface) {
     return ser;
 }
 
-INLINE CubicSurface deserializeCubic(Surface ser) {
+RAYX_FN_ACC
+inline CubicSurface deserializeCubic(Surface ser) {
     CubicSurface surface;
     surface.m_icurv = int(ser.m_private_serialization_params[0]);
     surface.m_a11 = ser.m_private_serialization_params[1];
@@ -194,10 +202,7 @@ INLINE CubicSurface deserializeCubic(Surface ser) {
     return surface;
 }
 
-
-
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."
 
-#endif
-
+}  // namespace RAYX

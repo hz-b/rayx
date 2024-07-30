@@ -1,7 +1,9 @@
 #include "ApplySlopeError.h"
-#include "Approx.h"
+
+#include "Constants.h"
 #include "Rand.h"
-#include "InvocationState.h"
+
+namespace RAYX {
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -10,15 +12,16 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
+RAYX_FN_ACC
 dvec3 RAYX_API normalCartesian(dvec3 normal, double x_rad, double z_rad) {
     double FX = normal[0];
     double FY = normal[1];
     double FZ = normal[2];
 
-    double cosx = r8_cos(x_rad);
-    double sinx = r8_sin(x_rad);
-    double cosz = r8_cos(z_rad);
-    double sinz = r8_sin(z_rad);
+    double cosx = glm::cos(x_rad);
+    double sinx = glm::sin(x_rad);
+    double cosz = glm::cos(z_rad);
+    double sinz = glm::sin(z_rad);
 
     // put in matrix mult?
     double FY2 = FY * cosz + FZ * sinz;
@@ -36,22 +39,22 @@ turn the normal vector through x_rad and z_rad
             z_rad: angle in rad for z-axis
 returns modified normal vector
 */
+RAYX_FN_ACC
 dvec3 RAYX_API normalCylindrical(dvec3 normal, double x_rad, double z_rad) {
     double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
-    double arcTanFXFY = r8_atan2(normal[1], normal[0]);
-    double sinz = r8_sin(z_rad);
-    double cosz = r8_cos(z_rad);
+    double arcTanFXFY = glm::atan(normal[1], normal[0]);
+    double sinz = glm::sin(z_rad);
+    double cosz = glm::cos(z_rad);
 
-    normal[0] = r8_cos(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
-    normal[1] = r8_sin(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
+    normal[0] = glm::cos(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
+    normal[1] = glm::sin(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
     normal[2] = normal[2] * cosz - normFXFY * sinz;
 
     return normal;
 }
 
-double deg2rad(double degree) {
-    return PI * degree / 180;
-}
+RAYX_FN_ACC
+double deg2rad(double degree) { return PI * degree / 180; }
 
 /**
 adds slope error to the normal
@@ -62,14 +65,15 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type) {
+RAYX_FN_ACC
+dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type, InvState& inv) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = {squaresNormalRNG(inv_ctr, 0, slopeX), squaresNormalRNG(inv_ctr, 0, slopeZ)};
+        double random_values[2] = {squaresNormalRNG(inv.ctr, 0, slopeX), squaresNormalRNG(inv.ctr, 0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution
         from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0
@@ -88,3 +92,4 @@ dvec3 applySlopeError(dvec3 normal, SlopeError error, int O_type) {
     return normal;
 }
 
+}  // namespace RAYX

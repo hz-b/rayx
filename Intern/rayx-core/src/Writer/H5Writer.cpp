@@ -8,6 +8,7 @@
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Shader/Ray.h"
 
 using uint = unsigned int;
 
@@ -93,17 +94,25 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
             rayHist.reserve(8);
         }
 
-        rayHist.push_back(RAYX::Ray{
-            {rayData[2], rayData[3], rayData[4]},                  // origin
-            rayData[5],                                            // eventType
-            {rayData[6], rayData[7], rayData[8]},                  // direction
-            rayData[9],                                            // energy
-            {rayData[10], rayData[11], rayData[12], rayData[13]},  // stokes
-            rayData[14],                                           // pathLength
-            rayData[15],                                           // order
-            rayData[16],                                           // lastElement
-            rayData[17]                                            // sourceID
-        });
+        const auto ray = RAYX::Ray{
+            .m_position = {rayData[2], rayData[3], rayData[4]},   // origin
+            .m_eventType = rayData[5],                            // eventType
+            .m_direction = {rayData[6], rayData[7], rayData[8]},  // direction
+            .m_energy = rayData[9],                               // energy
+            .m_field =
+                {
+                    // electric field
+                    {rayData[10], rayData[11]},
+                    {rayData[12], rayData[13]},
+                    {rayData[14], rayData[15]},
+                },
+            .m_pathLength = rayData[16],   // pathLength
+            .m_order = rayData[17],        // order
+            .m_lastElement = rayData[18],  // lastElement
+            .m_sourceID = rayData[19]      // sourceID
+        };
+
+        rayHist.push_back(ray);
     }
 
     if (!rayHist.empty()) {

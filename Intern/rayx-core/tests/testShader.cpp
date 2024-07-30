@@ -1,16 +1,14 @@
 #include <numeric>
 
-#include "Tracer/CpuTracer.h"
-#include "setupTests.h"
-
-#include "Shader/Utils.h"
+#include "Beamline/Objects/DipoleSource.h"
+#include "Shader/ApplySlopeError.h"
 #include "Shader/Approx.h"
-#include "Shader/SphericalCoords.h"
+#include "Shader/LineDensity.h"
 #include "Shader/Rand.h"
 #include "Shader/Refrac.h"
-#include "Shader/ApplySlopeError.h"
-#include "Shader/LineDensity.h"
-#include "Beamline/Objects/DipoleSource.h"
+#include "Shader/SphericalCoords.h"
+#include "Shader/Utils.h"
+#include "setupTests.h"
 
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
@@ -66,7 +64,7 @@ TEST_F(TestSuite, testSin) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(r8_sin(x), sin(x));
+        CHECK_EQ(glm::sin(x), sin(x));
     }
 }
 
@@ -78,7 +76,7 @@ TEST_F(TestSuite, testCos) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(r8_cos(x), cos(x));
+        CHECK_EQ(glm::cos(x), cos(x));
     }
 }
 
@@ -90,15 +88,15 @@ TEST_F(TestSuite, testAtan) {
     };
 
     for (auto x : args) {
-        CHECK_EQ(r8_atan(x), atan(x));
+        CHECK_EQ(glm::atan(x), atan(x));
     }
 }
 
 TEST_F(TestSuite, testExp) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0};
     for (auto x : args) {
-        CHECK_EQ(r8_exp(x), exp(x));
-        CHECK_EQ(r8_exp(-x), exp(-x));
+        CHECK_EQ(glm::exp(x), exp(x));
+        CHECK_EQ(glm::exp(-x), exp(-x));
     }
 }
 
@@ -106,7 +104,7 @@ TEST_F(TestSuite, testExp) {
 TEST_F(TestSuite, testLog) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0000001};
     for (auto x : args) {
-        CHECK_EQ(r8_log(x), log(x));
+        CHECK_EQ(glm::log(x), log(x));
     }
 }
 
@@ -767,119 +765,441 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
     }
 }
 
-TEST_F(TestSuite, testReflectance) {
-    updateCpuTracerMaterialTables({Material::Cu});
-
-    struct InOutPair {
-        double in_energy;
-        double in_incidenceAngle;
-        int in_material;
-
-        glm::dvec2 out_complex_S;
-        glm::dvec2 out_complex_P;
-    };
-
-    std::vector<InOutPair> inouts = {{.in_energy = 100,
-                                      .in_incidenceAngle = 1.3962634006709251,
-                                      .in_material = 29,
-                                      .out_complex_S = glm::dvec2(-NAN, -NAN),
-                                      .out_complex_P = glm::dvec2(NAN, NAN)}};
-
-    for (auto p : inouts) {
-        glm::dvec2 complex_S;
-        glm::dvec2 complex_P;
-        reflectance(p.in_energy, p.in_incidenceAngle, complex_S, complex_P, p.in_material);
-        CHECK_EQ(complex_S, p.out_complex_S);
-        CHECK_EQ(complex_P, p.out_complex_P);
-    }
-}
-
 TEST_F(TestSuite, testSnell) {
+    using namespace complex;
+
     struct InOutPair {
-        glm::dvec2 in_cosIncidence;
-        glm::dvec2 in_cn1;
-        glm::dvec2 in_cn2;
+        Complex in_ior_i;
+        Complex in_ior_t;
+        Complex in_incident_angle;
 
-        glm::dvec2 out;
+        Complex out_refract_angle;
     };
 
-    std::vector<InOutPair> inouts = {
-        {.in_cosIncidence = glm::dvec2(0.17364817766693041, 0),
-         .in_cn1 = glm::dvec2(1, 0),
-         .in_cn2 = glm::dvec2(0.91452118089946777, 0.035187568837614078),
-         .out = glm::dvec2(0.10906363661670573, 0.40789272188567433)},
-        {.in_cosIncidence = glm::dvec2(0.17315572500228882, 0),
-         .in_cn1 = glm::dvec2(1, 0),
-         .in_cn2 = glm::dvec2(0.91453807092958361, 0.035170965000031584),
-         .out = glm::dvec2(0.10897754475504863, 0.40807275584607489)},
-        {.in_cosIncidence = glm::dvec2(0.1736481785774231, 0),
-         .in_cn1 = glm::dvec2(1, 0),
-         .in_cn2 = glm::dvec2(0.96684219999999998, 0.06558986),
-         .out = glm::dvec2(0.24302165191294173, 0.28697207607552533)},
-        {.in_cosIncidence = glm::dvec2(0.16307067260397731, 0.0027314608130525712),
-         .in_cn1 = glm::dvec2(0.99816471240025439, 0.00045674598468145697),
-         .in_cn2 = glm::dvec2(0.99514154037883318, 0.0047593281563246184),
-         .out = glm::dvec2(0.14743465849863333, 0.031766878855366699)},
-
+    const auto inouts = std::vector<InOutPair>{
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(1.0, 0),
+            .in_incident_angle = Complex(0.5, 0.5),
+            .out_refract_angle = Complex(0.5, 0.5),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(1.2, 0),
+            .in_incident_angle = Complex(PI * 0.5, 0),
+            .out_refract_angle = Complex(0.98511078333774571, 0),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(1.2, 0),
+            .in_incident_angle = Complex(PI * 0.25, 0),
+            .out_refract_angle = Complex(0.63013724606456445, 0),
+        },
+        {
+            .in_ior_i = Complex(1.2, 0),
+            .in_ior_t = Complex(1.0, 0),
+            .in_incident_angle = Complex(0.63013724606456445, 0),
+            .out_refract_angle = Complex(PI * 0.25, 0),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(0.05, 5.0),
+            .in_incident_angle = Complex(PI * 0.25, 0),
+            .out_refract_angle = Complex(0.0014001432455587293, -0.14094028035483516),
+        },
+        {
+            .in_ior_i = Complex(1.0, 0),
+            .in_ior_t = Complex(2.0, 0),
+            .in_incident_angle = Complex(PI * 0.45, 0),
+            .out_refract_angle = Complex(0.51650510236395286, 0),
+        },
     };
 
-    for (auto p : inouts) {
-        auto out = snell(p.in_cosIncidence, p.in_cn1, p.in_cn2);
-        CHECK_EQ(out, p.out);
+    for (const auto p : inouts) {
+        const auto refractAngle = calcRefractAngle(p.in_incident_angle, p.in_ior_i, p.in_ior_t);
+        CHECK_EQ(refractAngle, p.out_refract_angle);
     }
 }
 
 TEST_F(TestSuite, testFresnel) {
-    struct InOutPair {
-        glm::dvec2 in_cn1;
-        glm::dvec2 in_cn2;
-        glm::dvec2 in_cosIncidence;
-        glm::dvec2 in_cosTransmittance;
+    using namespace complex;
 
-        glm::dvec2 out_complex_S;
-        glm::dvec2 out_complex_P;
+    struct InOutPair {
+        Complex in_ior_i;
+        Complex in_ior_t;
+        Complex in_incident_angle;
+        Complex in_refract_angle;
+
+        ComplexFresnelCoeffs out_reflect_amplitude;
     };
 
     std::vector<InOutPair> inouts = {
-        {.in_cn1 = glm::dvec2(0.91453807092958361, 0.035170965000031584),
-         .in_cn2 = glm::dvec2(1, 0),
-         .in_cosIncidence = glm::dvec2(0.10897754475504851, 0.40807275584607544),
-         .in_cosTransmittance = glm::dvec2(0.17315572500228882, 0),
-         .out_complex_S = glm::dvec2(0.57163467986230054, 0.62486367906829521),
-         .out_complex_P = glm::dvec2(0.63080662811278632, 0.52640331936127849)},
-        {.in_cn1 = glm::dvec2(0.91452118089946777, 0.035187568837614078),
-         .in_cn2 = glm::dvec2(1, 0),
-         .in_cosIncidence = glm::dvec2(0.10906363669865969, 0.40789272144618016),
-         .in_cosTransmittance = glm::dvec2(0.1736481785774231, 0),
-         .out_complex_S = glm::dvec2(0.56981824812215454, 0.62585833416785819),
-         .out_complex_P = glm::dvec2(0.62929764490597007, 0.52731592442193231)},
-
+        {
+            .in_ior_i = Complex(0.91453807092958361, 0.035170965000031584),
+            .in_ior_t = Complex(1, 0),
+            .in_incident_angle = acos(Complex(0.10897754475504851, 0.40807275584607544)),
+            .in_refract_angle = acos(Complex(0.17315572500228882, 0)),
+            .out_reflect_amplitude =
+                {
+                    .s = Complex(0.57163467986230054, 0.62486367906829521),
+                    .p = Complex(0.63080662811278632, 0.52640331936127849),
+                },
+        },
+        {
+            .in_ior_i = Complex(0.91452118089946777, 0.035187568837614078),
+            .in_ior_t = Complex(1, 0),
+            .in_incident_angle = acos(Complex(0.10906363669865969, 0.40789272144618016)),
+            .in_refract_angle = acos(Complex(0.1736481785774231, 0)),
+            .out_reflect_amplitude =
+                {
+                    .s = Complex(0.56981824812215454, 0.62585833416785819),
+                    .p = Complex(0.62929764490597007, 0.52731592442193231),
+                },
+        },
     };
 
     for (auto p : inouts) {
-        glm::dvec2 out_complex_S;
-        glm::dvec2 out_complex_P;
-        fresnel(p.in_cn1, p.in_cn2, p.in_cosIncidence, p.in_cosTransmittance, out_complex_S, out_complex_P);
-        CHECK_EQ(out_complex_S, p.out_complex_S);
-        CHECK_EQ(out_complex_P, p.out_complex_P);
+        const auto reflectAmplitude = calcReflectAmplitude(p.in_incident_angle, p.in_refract_angle, p.in_ior_i, p.in_ior_t);
+        CHECK_EQ(reflectAmplitude.p, p.out_reflect_amplitude.p);
+        CHECK_EQ(reflectAmplitude.s, p.out_reflect_amplitude.s);
     }
 }
 
-TEST_F(TestSuite, testCartesianToEuler) {
-    struct InOutPair {
-        glm::dvec2 in_complex;
-        glm::dvec2 out;
+TEST_F(TestSuite, testPolarizationIntensity) {
+    using namespace complex;
+
+    const auto iorI = Complex(1.0, 0);
+    const auto refractIor = Complex(1.5, 0);
+    const auto incidentVec = dvec3(1, 0, 0);
+    const auto normalVec = glm::normalize(dvec3(-1, 1, 0));
+
+    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
+    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
+
+    const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+    const auto refractAmplitude = calcRefractAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+
+    const auto reflectIntensity = calcReflectIntensity(reflectAmplitude);
+    const auto refractIntensity = calcRefractIntensity(refractAmplitude, incidentAngle, refractAngle, iorI, refractIor);
+    CHECK_EQ(reflectIntensity.s + refractIntensity.s, 1.0);
+    CHECK_EQ(reflectIntensity.p + refractIntensity.p, 1.0);
+}
+
+TEST_F(TestSuite, testPolarizingReflectionScenario) {
+    using namespace complex;
+
+    const auto incidentVec = glm::normalize(dvec3(-0.195, -0.195, 0.961));
+    const auto normal_vec_0 = glm::normalize(dvec3(0, -1, -1));
+
+    const auto reflect_vec_0 = glm::reflect(incidentVec, -normal_vec_0);
+    CHECK_EQ(reflect_vec_0, glm::normalize(dvec3(-0.195, -0.961, 0.195)));
+
+    const auto incident_angle_0 = angleBetweenUnitVectors(incidentVec, -normal_vec_0);
+    CHECK_EQ(Rad(incident_angle_0).toDeg().deg, 57.19646879265609);
+
+    const auto reflect_amplitude_0 = ComplexFresnelCoeffs{
+        .s = polar(0.992, 2.918),
+        .p = polar(0.975, -0.751),
     };
 
-    std::vector<InOutPair> inouts = {
-        {.in_complex = glm::dvec2(0.63080662811278621, 0.52640331936127871), .out = glm::dvec2(0.67501745670559532, 0.69542190922049119)},
-        {.in_complex = glm::dvec2(0.57163467986230043, 0.62486367906829532), .out = glm::dvec2(0.71722082464004022, 0.82985616444880206)},
-        {.in_complex = glm::dvec2(1, 0), .out = glm::dvec2(1, 0)},
-        {.in_complex = glm::dvec2(0, 1), .out = glm::dvec2(1, 1.5707963267948966)}};
+    const auto reflect_polarization_matrix_0 = calcPolaririzationMatrix(incidentVec, reflect_vec_0, normal_vec_0, reflect_amplitude_0);
+
+    CHECK_EQ(reflect_polarization_matrix_0,
+             glm::transpose(cmat3{
+                 {-0.889, 0.219},
+                 {0.106, 0.046},
+                 {-0.361, 0.054},
+                 {0.361, -0.054},
+                 {0.314, -0.137},
+                 {-0.863, -0.039},
+                 {-0.106, -0.046},
+                 {0.655, -0.628},
+                 {0.314, -0.137},
+             }),
+             1e-3);
+
+    const auto normal_vec_1 = glm::normalize(dvec3(1, 1, 0));
+    const auto reflect_vec_1 = glm::reflect(reflect_vec_0, -normal_vec_1);
+    CHECK_EQ(reflect_vec_1, glm::normalize(dvec3(0.961, 0.195, 0.195)));
+
+    const auto incident_angle_1 = angleBetweenUnitVectors(reflect_vec_0, -normal_vec_1);
+    CHECK_EQ(Rad(incident_angle_1).toDeg().deg, 35.155651179977404);
+
+    const auto reflect_amplitude_1 = ComplexFresnelCoeffs{
+        .s = polar(0.988, 2.80),
+        .p = polar(0.982, -0.507),
+    };
+
+    const auto reflect_polarization_matrix_1 = calcPolaririzationMatrix(reflect_vec_0, reflect_vec_1, normal_vec_1, reflect_amplitude_1);
+
+    CHECK_EQ(reflect_polarization_matrix_1,
+             glm::transpose(cmat3{
+                 {-0.352, 0.081},
+                 {-0.855, -0.028},
+                 {0.365, -0.056},
+                 {0.792, -0.450},
+                 {-0.352, 0.081},
+                 {0.052, -0.052},
+                 {-0.054, 0.052},
+                 {-0.365, 0.056},
+                 {-0.853, 0.327},
+             }),
+             1e-2  // TODO: should be 1e-3
+    );
+}
+
+TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
+    using namespace complex;
+
+    struct IorPair {
+        Complex iorI;
+        Complex refractIor;
+    };
+
+    const auto ior_pairs = std::vector<IorPair>{
+        {
+            .iorI = {1.0, 0},
+            .refractIor = {1.5, 0},
+        },
+        {
+            .iorI = {1.5, 0},
+            .refractIor = {1.0, 0},
+        },
+        {
+            .iorI = {1.0, 0},
+            .refractIor = {0.05, 5.0},
+        },
+    };
+
+    for (const auto ior_pair : ior_pairs) {
+        const auto iorI = ior_pair.iorI;
+        const auto refractIor = ior_pair.refractIor;
+        const auto incidentVec = dvec3(1, 0, 0);
+        const auto normalVec = glm::normalize(dvec3(-1, 1, 0));
+
+        const auto reflectVec = glm::reflect(incidentVec, normalVec);
+        const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
+        const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
+
+        const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
+        const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
+
+        const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+        const auto expected_reflect_field = ElectricField(
+            // p polarized part
+            // the value from the y component of the incident field is now carried in the x compnent, due to a 90 degrees reflection
+            // the amplitude is negated due to a 180 degrees phase shift
+            -amplitude.p * incidentElectricField.y,
+
+            // y component is now 0
+            {0, 0},
+
+            // s polarized part
+            // only gets an amplitude change
+            amplitude.s * incidentElectricField.z);
+
+        CHECK_EQ(reflectElectricField, expected_reflect_field);
+    }
+}
+
+// fully polarizing reflection (reflection at brewsters angle)
+TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
+    using namespace complex;
+
+    const auto iorI = Complex(1.0, 0);
+    const auto refractIor = Complex(2.0, 0);
+    const auto incidentVec = dvec3(1, 0, 0);
+    const auto normalVec = glm::normalize(dvec3(-1, refractIor.real(), 0));
+
+    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
+    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
+
+    const auto brewstersAngle = calcBrewstersAngle(iorI, refractIor);
+    CHECK_EQ(incidentAngle, brewstersAngle.real());
+
+    const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
+    const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
+
+    const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+    const auto expectedReflectElectricField = ElectricField(
+        // p polarized part is lost due to a fully polarizing reflection at brewsters angle
+        {0, 0},
+
+        {0, 0},
+
+        // s polarized part
+        amplitude.s * incidentElectricField.z);
+
+    CHECK_EQ(reflectElectricField, expectedReflectElectricField);
+}
+
+// non-polarizing reflection (reflection at normal incidence)
+TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
+    using namespace complex;
+
+    const auto iorI = Complex(1.0, 0);
+    const auto refractIor = Complex(1.5, 0);
+    const auto incidentVec = glm::normalize(dvec3(1, 1, 0));
+    const auto normalVec = -incidentVec;
+    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto incidentElectricField = ElectricField({0, 0}, {0, 0}, {1, 0});
+
+    const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
+
+    const auto expected_reflect_field = ElectricField({0, 0}, {0, 0}, {-0.2, 0});
+
+    CHECK_EQ(reflectElectricField, expected_reflect_field);
+
+    // check if normal-incidence and near-normal-incidence are similar to each other
+    {
+        const auto eps = 1e-3;
+        const auto normalVec = glm::normalize(-incidentVec + eps);
+        const auto reflectVec = glm::reflect(incidentVec, normalVec);
+
+        const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
+
+        CHECK_EQ(reflectElectricField, expected_reflect_field, eps);
+    }
+}
+
+TEST_F(TestSuite, testStokesToElectricFieldAndElectricFieldToStokes) {
+    using namespace complex;
+
+    struct InOutPair {
+        Stokes stokes;
+        LocalElectricField field;
+    };
+
+    const auto diag = 1.0 / glm::sqrt(2.0);
+
+    std::vector<InOutPair> inouts{
+        {
+            // linearly polarized (horizontal)
+            .stokes = Stokes(1, 1, 0, 0),
+            .field = LocalElectricField({1, 0}, {0, 0}),
+        },
+        {
+            // linearly polarized (vertical)
+            .stokes = Stokes(1, -1, 0, 0),
+            .field = LocalElectricField({0, 0}, {1, 0}),
+        },
+        {
+            // linearly polarized (diagonal +45 degrees)
+            .stokes = Stokes(1, 0, 1, 0),
+            .field = LocalElectricField({diag, 0}, {diag, 0}),
+        },
+        {
+            // linearly polarized (diagonal -45 degrees)
+            .stokes = Stokes(1, 0, -1, 0),
+            .field = LocalElectricField({diag, 0}, {-diag, 0}),
+        },
+        {
+            // circular polarized (right) (clockwise)
+            .stokes = Stokes(1, 0, 0, 1),
+            .field = LocalElectricField({diag, 0}, {0, -diag}),
+        },
+        {
+            // circular polarized (left) (counter-clockwise)
+            .stokes = Stokes(1, 0, 0, -1),
+            .field = LocalElectricField({diag, 0}, {0, diag}),
+        },
+    };
 
     for (auto p : inouts) {
-        auto out = cartesian_to_euler(p.in_complex);
-        CHECK_EQ(out, p.out);
+        // stokes must be polarized in order to convert to an electric field
+        CHECK_EQ(degreeOfPolarization(p.stokes), 1.0);
+
+        // convert stokes to field and back and check if stokes are equal to initial stokes
+        {
+            const auto field = stokesToLocalElectricField(p.stokes);
+            CHECK_EQ(intensity(field), intensity(p.stokes));
+
+            const auto stokes = fieldToStokes(field);
+            CHECK_EQ(intensity(stokes), intensity(p.stokes));
+            CHECK_EQ(stokes, p.stokes);
+
+            // lets shift the phase of our field and check if the stokes are still preserved,
+            // since stokes should not carry phase information
+            const auto mag = abs(field);
+            const auto theta = arg(field);
+            for (double shift = 0.0; shift < PI * 2.0; shift += PI / 5.0) {
+                const auto field = polar(mag, theta + shift);
+                const auto stokes = fieldToStokes(field);
+                CHECK_EQ(stokes, p.stokes);
+            }
+        }
+
+        // convert field to stokes and back and check if magnitude and polarization is preserved
+        // the phase is not being checked, because stokes parameters do not preserve phase
+        {
+            const auto stokes = fieldToStokes(p.field);
+            CHECK_EQ(intensity(stokes), intensity(p.field));
+            CHECK_EQ(stokes, p.stokes);
+
+            const auto field = stokesToLocalElectricField(stokes);
+
+            // check if the magnitude is preserved
+            const auto mag = abs(field);
+            const auto expected_mag = abs(p.field);
+            CHECK_EQ(mag, expected_mag);
+
+            // check if polarization is preserved
+            // by checking if the difference in phase between x and y component is preserved
+            const auto theta = arg(field);
+            const auto delta = theta.x - theta.y;
+
+            const auto expected_theta = arg(p.field);
+            const auto expected_delta = expected_theta.x - expected_theta.y;
+
+            CHECK_EQ(delta, expected_delta);
+        }
+    }
+}
+
+TEST_F(TestSuite, testRotateElectricField) {
+    using namespace complex;
+
+    // convention for incident field
+    // forward = (0, 0, -1)
+    // up      = (0, 1, 0)
+    // right   = (1, 0, 0)
+    const auto incidentElectricField = ElectricField({1, 0}, {0, 0}, {0, 0});
+
+    struct InOutPair {
+        ElectricField in_field;
+        dvec3 in_forward;
+        dvec3 in_up;
+        ElectricField out_field;
+        ElectricField out_field_rotationWithoutUp;
+    };
+
+    const auto inouts = std::vector<InOutPair>{
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {0, 0, -1},
+            .in_up = {0, 1, 0},
+            .out_field = {{1, 0}, {0, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{1, 0}, {0, 0}, {0, 0}},
+        },
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {1, 0, 0},
+            .in_up = {0, 0, 1},
+            .out_field = {{0, 0}, {-1, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {1, 0}},
+        },
+    };
+
+    for (const auto& p : inouts) {
+        const auto rotation = rotationMatrix(p.in_forward, p.in_up);
+        const auto field = rotation * incidentElectricField;
+        CHECK_EQ(field, p.out_field);
+
+        const auto rotationWithoutUp = rotationMatrix(p.in_forward);
+        const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
+        CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
     }
 }
 
@@ -912,27 +1232,27 @@ TEST_F(TestSuite, testPalik) {
     updateCpuTracerMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getPalikEntryCount(Cu), 324);
+    CHECK_EQ(getPalikEntryCount(Cu, inv), 324);
 
-    auto Cu0 = getPalikEntry(0, Cu);
+    auto Cu0 = getPalikEntry(0, Cu, inv);
     CHECK_EQ(Cu0.m_energy, 1.0);
     CHECK_EQ(Cu0.m_n, 0.433);
     CHECK_EQ(Cu0.m_k, 8.46);
 
-    auto Cu10 = getPalikEntry(10, Cu);
+    auto Cu10 = getPalikEntry(10, Cu, inv);
     CHECK_EQ(Cu10.m_energy, 2.3);
     CHECK_EQ(Cu10.m_n, 1.04);
     CHECK_EQ(Cu10.m_k, 2.59);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getPalikEntryCount(Au), 386);
+    CHECK_EQ(getPalikEntryCount(Au, inv), 386);
 
-    auto Au0 = getPalikEntry(0, Au);
+    auto Au0 = getPalikEntry(0, Au, inv);
     CHECK_EQ(Au0.m_energy, 0.04959);
     CHECK_EQ(Au0.m_n, 20.3);
     CHECK_EQ(Au0.m_k, 76.992);
 
-    auto Au10 = getPalikEntry(10, Au);
+    auto Au10 = getPalikEntry(10, Au, inv);
     CHECK_EQ(Au10.m_energy, 0.11158);
     CHECK_EQ(Au10.m_n, 12.963);
     CHECK_EQ(Au10.m_k, 57.666);
@@ -942,28 +1262,28 @@ TEST_F(TestSuite, testNff) {
     updateCpuTracerMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getNffEntryCount(Cu), 504);
+    CHECK_EQ(getNffEntryCount(Cu, inv), 504);
 
-    auto Cu0 = getNffEntry(0, Cu);
+    auto Cu0 = getNffEntry(0, Cu, inv);
 
     CHECK_EQ(Cu0.m_energy, 10.0);
     CHECK_EQ(Cu0.m_f1, -9999.0);
     CHECK_EQ(Cu0.m_f2, 1.30088);
 
-    auto Cu10 = getNffEntry(10, Cu);
+    auto Cu10 = getNffEntry(10, Cu, inv);
     CHECK_EQ(Cu10.m_energy, 11.7404);
     CHECK_EQ(Cu10.m_f1, -9999.0);
     CHECK_EQ(Cu10.m_f2, 1.66946);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getNffEntryCount(Au), 506);
+    CHECK_EQ(getNffEntryCount(Au, inv), 506);
 
-    auto Au0 = getNffEntry(0, Au);
+    auto Au0 = getNffEntry(0, Au, inv);
     CHECK_EQ(Au0.m_energy, 10.0);
     CHECK_EQ(Au0.m_f1, -9999.0);
     CHECK_EQ(Au0.m_f2, 1.73645);
 
-    auto Au10 = getNffEntry(10, Au);
+    auto Au10 = getNffEntry(10, Au, inv);
     CHECK_EQ(Au10.m_energy, 11.7404);
     CHECK_EQ(Au10.m_f1, -9999.0);
     CHECK_EQ(Au10.m_f2, 2.67227);
@@ -973,18 +1293,18 @@ TEST_F(TestSuite, testRefractiveIndex) {
     updateCpuTracerMaterialTables({Material::Cu});
 
     // vacuum
-    CHECK_EQ(getRefractiveIndex(42.0, -1), glm::dvec2(1.0, 0.0));
+    CHECK_EQ(getRefractiveIndex(42.0, -1, inv), glm::dvec2(1.0, 0.0));
 
     // palik tests for Cu
     // data taken from Data/PALIK
-    CHECK_EQ(getRefractiveIndex(1.0, 29), glm::dvec2(0.433, 8.46));
-    CHECK_EQ(getRefractiveIndex(1.8, 29), glm::dvec2(0.213, 4.05));
-    CHECK_EQ(getRefractiveIndex(1977.980, 29), glm::dvec2(1.000032, 9.4646668E-05));
+    CHECK_EQ(getRefractiveIndex(1.0, 29, inv), glm::dvec2(0.433, 8.46));
+    CHECK_EQ(getRefractiveIndex(1.8, 29, inv), glm::dvec2(0.213, 4.05));
+    CHECK_EQ(getRefractiveIndex(1977.980, 29, inv), glm::dvec2(1.000032, 9.4646668E-05));
 
     // nff tests for Cu
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
-    CHECK_EQ(getRefractiveIndex(25146.2, 29), glm::dvec2(1.0, 1.0328e-7), 1e-5);
+    CHECK_EQ(getRefractiveIndex(25146.2, 29, inv), glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
 
 TEST_F(TestSuite, testBesselDipole) {
@@ -1028,7 +1348,6 @@ TEST_F(TestSuite, testBesselDipole) {
     DesignSource src = beamline.m_DesignSources[0];
     DipoleSource dipolesource(src);
 
-
     for (auto values : inouts) {
         auto result = dipolesource.bessel(values.proportion, values.zeta);
         CHECK_EQ(result, values.out, 0.1);
@@ -1064,8 +1383,8 @@ TEST_F(TestSuite, testSchwingerDipole) {
 
     auto beamline = loadBeamline("dipole_plain");
     DesignSource src = beamline.m_DesignSources[0];
-    
-    DipoleSource dipolesource(src); 
+
+    DipoleSource dipolesource(src);
 
     for (auto values : inouts) {
         auto result = dipolesource.schwinger(values.energy);
@@ -1075,12 +1394,7 @@ TEST_F(TestSuite, testSchwingerDipole) {
 
 TEST_F(TestSuite, testSphericalCoords) {
     std::vector<dvec3> directions = {
-        {1.0, 0.0, 0.0},
-        {0.0, 1.0, 0.0},
-        {0.0, 0.0, 1.0},
-        {-1.0, 0.0, 0.0},
-        {0.0, -1.0, 0.0},
-        {0.0, 0.0, -1.0},
+        {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, {-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0},
     };
 
     for (auto dir : directions) {

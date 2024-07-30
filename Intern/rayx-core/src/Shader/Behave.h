@@ -1,8 +1,10 @@
-#ifndef BEHAVE_H
-#define BEHAVE_H
+#pragma once
 
-#include "Adapt.h"
 #include "Collision.h"
+#include "Common.h"
+#include "InvocationState.h"
+
+namespace RAYX {
 
 /// Each `behave*` function gets a `Ray r` (in element-coords), the element itself, a randomness counter and the `Collision col`.
 /// `col.hitpoint` expresses where the given ray r will hit the element (in element-coords).
@@ -14,10 +16,10 @@
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-Ray behaveSlit(Ray r, int id, ALLOW_UNUSED Collision col);
-Ray behaveRZP(Ray r, int id, Collision col);
-Ray behaveGrating(Ray r, int id, Collision col);
-Ray behaveMirror(Ray r, int id, Collision col);
-Ray behaveImagePlane(Ray r, ALLOW_UNUSED int id, ALLOW_UNUSED Collision col);
+RAYX_FN_ACC Ray behaveSlit(Ray r, int id, Collision col, InvState& inv);
+RAYX_FN_ACC Ray behaveRZP(Ray r, int id, Collision col, InvState& inv);
+RAYX_FN_ACC Ray behaveGrating(Ray r, int id, Collision col, InvState& inv);
+RAYX_FN_ACC Ray behaveMirror(Ray r, int id, Collision col, InvState& inv);
+RAYX_FN_ACC Ray behaveImagePlane(Ray r, int id, Collision col, InvState& inv);
 
-#endif
+}  // namespace RAYX

@@ -1,5 +1,9 @@
 #include "Window.h"
 
+#include <stdexcept>
+
+#include "Debug/Debug.h"
+
 /**
  * This constructor performs several key tasks:
  * - Initializes GLFW using glfwInit().

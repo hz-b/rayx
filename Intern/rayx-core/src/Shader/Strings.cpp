@@ -1,5 +1,9 @@
 #include "Strings.h"
 
+#include <algorithm>
+
+#include "Debug/Debug.h"
+
 namespace RAYX {
 
 std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSource, "Circle Source"},

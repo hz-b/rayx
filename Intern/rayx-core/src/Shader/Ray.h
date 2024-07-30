@@ -1,11 +1,9 @@
-#ifndef RAY_H
-#define RAY_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
+#include "Efficiency.h"
 
-#ifndef GLSL
 namespace RAYX {
-#endif
 
 /// This type represents a photon ray at a fixed point in time.
 /// Often we consider Rays at particular points in time - when *something happens to them*.
@@ -32,9 +30,8 @@ struct RAYX_API Ray {
     /// The energy of this photon (in eV).
     double m_energy;
 
-    /// The stokes vector, see https://en.wikipedia.org/wiki/Stokes_parameters
-    /// They express the polarization of the Ray.
-    dvec4 m_stokes;
+    /// The complex electric field
+    ElectricField m_field = ElectricField{{0, 0}, {0, 0}, {0, 0}};
 
     /// The distance that this ray has already traveled (in mm).
     double m_pathLength;
@@ -63,15 +60,7 @@ struct RAYX_API Ray {
     // 7. check whether alignment requirements are still satisfied (should be done by the static_assert below).
 };
 
-// Note: A `dvec3` needs an alignment of 4 * sizeof(double), hence two dvec3s can never be directly after each other (without padding).
-// Further, the number of doubles in a Ray need to be divisible by four at all times, as we want to store multiple Rays after each other without
-// padding in `rayData`. This is why we need m_padding.
-#ifndef GLSL
-static_assert(sizeof(Ray) % alignof(dvec3) == 0);
-#endif
+// make sure Ray does not introduce cost on copy or default construction
+static_assert(std::is_trivially_copyable_v<Ray>);
 
-#ifndef GLSL
 }  // namespace RAYX
-#endif
-
-#endif

@@ -1,7 +1,10 @@
-#ifndef REFRACTIVE_INDEX_H
-#define REFRACTIVE_INDEX_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
+#include "Complex.h"
+#include "InvocationState.h"
+
+namespace RAYX {
 
 /// Both of these structs are used to effectively calculate the Refractive Index of some material when hit by a photon with a particular m_energy.
 /// The PalikEntry represents the the complex-valued refractive index directly as n + ik.
@@ -23,18 +26,18 @@ struct NffEntry {
     double m_f2;
 };
 
-int RAYX_API getPalikEntryCount(int material);
+RAYX_FN_ACC int RAYX_API getPalikEntryCount(int material, InvState& inv);
 
-int RAYX_API getNffEntryCount(int material);
+RAYX_FN_ACC int RAYX_API getNffEntryCount(int material, InvState& inv);
 
-PalikEntry RAYX_API getPalikEntry(int index, int material);
+RAYX_FN_ACC PalikEntry RAYX_API getPalikEntry(int index, int material, InvState& inv);
 
-NffEntry RAYX_API getNffEntry(int index, int material);
+RAYX_FN_ACC NffEntry RAYX_API getNffEntry(int index, int material, InvState& inv);
 
 // returns dvec2 to represent a complex number
-dvec2 RAYX_API getRefractiveIndex(double energy, int material);
+RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, InvState& inv);
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
-dvec2 RAYX_API getAtomicMassAndRho(int material);
+RAYX_FN_ACC dvec2 RAYX_API getAtomicMassAndRho(int material);
 
-#endif
+}  // namespace RAYX

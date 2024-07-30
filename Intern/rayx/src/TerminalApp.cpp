@@ -8,8 +8,7 @@
 #include "Data/Importer.h"
 #include "Debug/Debug.h"
 #include "Random.h"
-#include "Tracer/CpuTracer.h"
-#include "Tracer/VulkanTracer.h"
+#include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
@@ -58,14 +57,15 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
 
         // calculate max batch size
-        uint64_t max_batch_size = DEFAULT_BATCH_SIZE;
+        uint64_t max_batch_size = RAYX::DEFAULT_BATCH_SIZE;
         if (m_CommandParser->m_args.m_BatchSize != 0) {
             max_batch_size = m_CommandParser->m_args.m_BatchSize;
         }
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        int maxEvents = (m_CommandParser->m_args.m_maxEvents < 1) ? m_Beamline->m_DesignElements.size() + 2 : m_CommandParser->m_args.m_maxEvents;
+        int maxEvents =
+            (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
         if (m_CommandParser->m_args.m_startEventID >= maxEvents) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
@@ -85,7 +85,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 }
 
                 for (auto& event : ray) {
-                    if (event.m_eventType == ETYPE_TOO_MANY_EVENTS) {
+                    if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
                         notEnoughEvents = true;
                     }
                 }
@@ -111,7 +111,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_ERR << "Have you selected .csv exporting?";
             }
 
-            auto cmd = std::string("python ") + getExecutablePath().string() + "/Scripts/plot.py " + file;
+            auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
             auto ret = system(cmd.c_str());
             if (ret != 0) {
                 RAYX_WARN << "received error code while printing";
@@ -154,30 +154,24 @@ void TerminalApp::run() {
     /////////////////// Argument treatement
     if (m_CommandParser->m_args.m_version) {
         m_CommandParser->getVersion();
-        exit(1);
+        exit(0);
+    }
+    if (m_CommandParser->m_args.m_listDevices) {
+        RAYX::DeviceConfig().dumpDevices();
+        exit(0);
     }
 
     // Choose Hardware
-    if (m_CommandParser->m_args.m_cpuFlag) {
-        m_Tracer = std::make_unique<RAYX::CpuTracer>();
-    } else {
-#ifdef NO_VULKAN
-        RAYX_ERR << "NO_VULKAN: trying to construct VulkanTracer with Vulkan disabled. Use -x to use CPU tracer or enable Vulkan when building.";
-#else
-        m_Tracer = std::make_unique<RAYX::VulkanTracer>();
-
-        /// list physical devices
-        if (m_CommandParser->m_args.m_listDevices) {
-            dynamic_cast<RAYX::VulkanTracer*>(m_Tracer.get())->listPhysicalDevices();
-            exit(0);
+    auto getDevice = [&] {
+        if (m_CommandParser->m_args.m_deviceID != -1) {
+            return RAYX::DeviceConfig().enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
+        } else {
+            using DeviceType = RAYX::DeviceConfig::DeviceType;
+            const auto deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
+            return RAYX::DeviceConfig(deviceType).enableBestDevice();
         }
-        /// select physical device
-        if (m_CommandParser->m_args.m_deviceID >= 0) {
-            m_Tracer->setDevice(m_CommandParser->m_args.m_deviceID);
-        }
-
-#endif
-    }
+    };
+    m_Tracer = std::make_unique<RAYX::Tracer>(getDevice());
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);

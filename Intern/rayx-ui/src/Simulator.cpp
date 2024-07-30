@@ -1,26 +1,12 @@
 #include "Simulator.h"
 
 #include "Random.h"
-#include "Tracer/VulkanTracer.h"
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
 #include "Writer/Writer.h"
 
 // constructor
-Simulator::Simulator() {
-    m_seq = RAYX::Sequential::No;
-    std::vector<VkPhysicalDevice> deviceList;
-    {
-        auto engine = std::make_unique<RAYX::VulkanEngine>();
-        deviceList = engine->getPhysicalDevices();
-    }
-    for (const auto& device : deviceList) {
-        VkPhysicalDeviceProperties deviceProperties;
-        vkGetPhysicalDeviceProperties(device, &deviceProperties);
-
-        m_availableDevices.push_back(deviceProperties.deviceName);
-    }
-}
+Simulator::Simulator() { m_seq = RAYX::Sequential::No; }
 
 void Simulator::runSimulation() {
     if (!m_readyForSimulation) {
@@ -29,7 +15,7 @@ void Simulator::runSimulation() {
     }
     // Run rayx core
     if (!m_maxEvents) {
-        m_maxEvents = static_cast<unsigned int>(m_Beamline.m_DesignElements.size() + 2);
+        m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
     }
 
     auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, m_startEventID);
@@ -44,7 +30,7 @@ void Simulator::runSimulation() {
         }
 
         for (auto& event : ray) {
-            if (event.m_eventType == ETYPE_TOO_MANY_EVENTS) {
+            if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
                 notEnoughEvents = true;
             }
         }
@@ -87,16 +73,16 @@ void Simulator::runSimulation() {
 
 void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, const RAYX::Beamline& beamline,
                                         const UISimulationInfo& simulationInfo) {
+    const auto deviceAlreadyEnabled = m_deviceConfig.devices[simulationInfo.deviceIndex].enable;
+    if (!deviceAlreadyEnabled) {
+        m_deviceConfig.disableAllDevices().enableDeviceByIndex(simulationInfo.deviceIndex);
+        m_Tracer = std::make_unique<RAYX::Tracer>(m_deviceConfig);
+    }
+
     m_RMLPath = RMLPath;
     m_Beamline = std::move(beamline);
     m_max_batch_size = simulationInfo.maxBatchSize;
-    if (simulationInfo.tracer == 0) {
-        m_Tracer = std::make_unique<RAYX::CpuTracer>();
-    } else {
-        m_Tracer = std::make_unique<RAYX::VulkanTracer>();
-    }
     m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-    m_deviceIndex = simulationInfo.deviceIndex;
     m_startEventID = simulationInfo.startEventID;
     m_maxEvents = simulationInfo.maxEvents;
     if (simulationInfo.fixedSeed) {
@@ -111,4 +97,8 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
     m_readyForSimulation = true;
 }
 
-std::vector<std::string> Simulator::getAvailableDevices() { return m_availableDevices; }
+std::vector<std::string> Simulator::getAvailableDevices() {
+    auto deviceNames = std::vector<std::string>();
+    for (const RAYX::DeviceConfig::Device& device : m_deviceConfig.devices) deviceNames.push_back(device.name);
+    return deviceNames;
+}

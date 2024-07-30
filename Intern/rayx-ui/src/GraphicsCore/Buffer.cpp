@@ -1,5 +1,6 @@
 #include "Buffer.h"
 
+#include <cassert>
 #include <cstring>
 
 /**

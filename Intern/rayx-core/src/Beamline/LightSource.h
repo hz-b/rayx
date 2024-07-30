@@ -1,13 +1,13 @@
 #pragma once
+
+#include <glm.h>
+
 #include <array>
-#include <glm.hpp>
-#include <map>
 #include <string>
 #include <vector>
 
 #include "Core.h"
 #include "Data/xml.h"
-#include "DesignElement/DesignSource.h"
 #include "EnergyDistribution.h"
 #include "Shader/Ray.h"
 #include "Shader/Strings.h"
@@ -19,6 +19,7 @@ enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
+
 struct DesignSource;
 
 class RAYX_API LightSource {

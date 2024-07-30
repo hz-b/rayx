@@ -1,7 +1,9 @@
-#ifndef REFRAC_H
-#define REFRAC_H
+#pragma once
 
-#include "Adapt.h"
+#include "Common.h"
+#include "InvocationState.h"
+
+namespace RAYX {
 
 /**
 calculates refracted ray
@@ -12,7 +14,6 @@ calculates refracted ray
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-Ray refrac2D(Ray r, dvec3 normal, double az, double ax);
+RAYX_FN_ACC Ray refrac2D(Ray r, dvec3 normal, double az, double ax, InvState& inv);
 
-
-#endif
+}  // namespace RAYX

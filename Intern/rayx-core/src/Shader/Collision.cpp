@@ -3,15 +3,17 @@
 #include "Collision.h"
 
 #include "ApplySlopeError.h"
-#include "Approx.h"
 #include "Cubic.h"
 #include "CutoutFns.h"
-#include "InvocationState.h"
+#include "Throw.h"
 #include "Utils.h"
+
+namespace RAYX {
 
 /**************************************************************
  *                    Quadric collision
  **************************************************************/
+RAYX_FN_ACC
 Collision getQuadricCollision(Ray r, QuadricSurface q) {
     Collision col;
     col.found = true;
@@ -139,6 +141,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
  *  result is X,Y,Z of intersection
  * Ray in in element koordinates.
  */
+RAYX_FN_ACC
 Collision getCubicCollision(Ray r, CubicSurface cu) {
     Collision col;
     col.found = true;
@@ -358,8 +361,8 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
 
-    col.normal = normalize(dvec3(fx, fy * r8_cos(-cu.m_psi) - fz * r8_sin(-cu.m_psi), fz * r8_cos(-cu.m_psi) + fy * r8_sin(-cu.m_psi)));
-    col.hitpoint = dvec3(x, y * r8_cos(-cu.m_psi) - z * r8_sin(-cu.m_psi), z * r8_cos(-cu.m_psi) + y * r8_sin(-cu.m_psi));
+    col.normal = normalize(dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
+    col.hitpoint = dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
     return col;
 }
 
@@ -367,6 +370,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
  *                    Toroid Collision
  **************************************************************/
 // this uses newton to approximate a solution.
+RAYX_FN_ACC
 Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
     // Constants
     const double NEW_TOLERANCE = 0.0001;
@@ -442,6 +446,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
  *                    Collision Finder
  **************************************************************/
 
+RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     double sty = surface.m_type;
@@ -493,30 +498,32 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
-Collision findCollisionWith(Ray r, uint id) {
+RAYX_FN_ACC
+Collision findCollisionWith(Ray r, uint id, InvState& inv) {
     // misalignment
-    r = rayMatrixMult(r, inv_elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
-    Collision col = findCollisionInElementCoords(r, inv_elements[id].m_surface, inv_elements[id].m_cutout, false);
+    r = rayMatrixMult(r, inv.elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
+    Collision col = findCollisionInElementCoords(r, inv.elements[id].m_surface, inv.elements[id].m_cutout, false);
     if (col.found) {
         col.elementIndex = int(id);
     }
 
-    SlopeError sE = inv_elements[id].m_slopeError;
-    col.normal = applySlopeError(col.normal, sE, 0);
+    SlopeError sE = inv.elements[id].m_slopeError;
+    col.normal = applySlopeError(col.normal, sE, 0, inv);
 
     return col;
 }
 
-// Returns the next collision for the ray `_ray`.
-Collision findCollision() {
+// Returns the next collision for the ray
+RAYX_FN_ACC
+Collision findCollision(const Ray& ray, InvState& inv) {
     // If sequential tracing is enabled, we only check collision with the "next element".
-    if (inv_pushConstants.sequential == 1.0) {
-        if (_ray.m_lastElement >= inv_elements.length() - 1) {
+    if (inv.pushConstants.sequential == 1.0) {
+        if (ray.m_lastElement >= inv.elements.size() - 1) {
             Collision col;
             col.found = false;
             return col;
         }
-        return findCollisionWith(_ray, uint(_ray.m_lastElement + 1));
+        return findCollisionWith(ray, uint(ray.m_lastElement + 1), inv);
     }
 
     // global coordinates of first intersection point of ray among all elements in beamline
@@ -529,18 +536,18 @@ Collision findCollision() {
     // move ray slightly forward.
     // -> prevents hitting an element very close to the previous collision.
     // -> prevents self-intersection.
-    Ray r = _ray;
+    Ray r = ray;
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
     // Find intersection points through all elements
-    for (uint elementIndex = 0; elementIndex < uint(inv_elements.length()); elementIndex++) {
-        Collision current_col = findCollisionWith(r, elementIndex);
+    for (uint elementIndex = 0; elementIndex < uint(inv.elements.size()); elementIndex++) {
+        Collision current_col = findCollisionWith(r, elementIndex, inv);
         if (!current_col.found) {
             continue;
         }
 
-        dvec3 global_hitpoint = dvec3(inv_elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
-        double current_dist = length(global_hitpoint - _ray.m_position);
+        dvec3 global_hitpoint = dvec3(inv.elements[elementIndex].m_outTrans * dvec4(current_col.hitpoint, 1));
+        double current_dist = length(global_hitpoint - ray.m_position);
 
         if (current_dist < best_dist) {
             best_col = current_col;
@@ -550,3 +557,5 @@ Collision findCollision() {
 
     return best_col;
 }
+
+}  // namespace RAYX

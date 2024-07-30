@@ -28,7 +28,7 @@ if(Vulkan_FOUND)
             message(STATUS "Werror mode")
         endif()
     else()
-        target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic) 
+        target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
         if(WERROR STREQUAL "YES")
             target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
             message(STATUS "Werror mode")
@@ -89,7 +89,7 @@ if(Vulkan_FOUND)
     # ----------------------
 
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 portable_file_dialogs)
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 Vulkan::Vulkan portable_file_dialogs)
     target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE 
         ${GLFW_DIR}/include
         ${GLFW_DIR}/deps
