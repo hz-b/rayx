@@ -1,17 +1,10 @@
-#include "OpticalElement.h"
-
-#include <optional>
+#include "Element.h"
 
 #include "DesignElement/DesignElement.h"
 
 namespace RAYX {
 
-glm::dmat4x4 defaultInMatrix(const DesignElement& dele, DesignPlane plane) {
-    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), true, plane);
-}
-glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plane) {
-    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), false, plane);
-}
+// No additional implementation needed for now since the structs do not have member functions
 
 /**
  * calculates element to world coordinates transformation matrix and its
@@ -48,7 +41,15 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
     }
 }
 
-double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
+inline glm::dmat4x4 defaultInMatrix(const DesignElement& dele, DesignPlane plane) {
+    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), true, plane);
+}
+
+inline glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plane) {
+    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), false, plane);
+}
+
+inline double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
 
 Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
@@ -69,13 +70,4 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
         .m_material = defaultMaterial(dele),
     };
 }
-
-/*Element makeExperts(const DesignElement& dele) {
-    return makeElement(dele, serializeMirror(), makeQuadric(dele));
-}
-
-Element makeExpertsCubic(const DesignElement& dobj) {
-    return makeElement(dobj, serializeMirror(), makeCubic(dobj));
-}*/
-
 }  // namespace RAYX

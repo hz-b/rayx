@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Beamline/Beamline.h"
+#include "Beamline/Definitions.h"
 #include "Core.h"
 #include "Shader/Cutout.h"
 

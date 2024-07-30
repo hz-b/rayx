@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Beamline/LightSource.h"
-#include "Beamline/OpticalElement.h"
 #include "Core.h"
 #include "DesignElement/DesignElement.h"
 #include "DesignElement/DesignSource.h"
