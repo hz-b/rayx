@@ -1,6 +1,6 @@
 #include "LineDensity.h"
 
-#include "Behaviour.h"
+#include "Beamline/Behaviour.h"
 #include "ImageType.h"
 #include "Throw.h"
 
@@ -19,7 +19,7 @@ namespace RAYX {
  *         specified by the VLS coefficients.
  */
 RAYX_FN_ACC
-double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vls[6]) {
+double RAYX_API vlsGrating(double lineDensity, glm::dvec3 normal, double z, double vls[6]) {
     // Calculate the inclination angle from the vertical based on the z-component of the surface normal.
     double del1 = glm::asin(normal.z);
 
@@ -45,7 +45,7 @@ given direction on the grating
 @returns: (inplace) DX, DZ
 */
 RAYX_FN_ACC
-void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
+void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE = int(b.m_rzpType);
     double risag = b.m_designSagittalEntranceArmLength;
@@ -105,8 +105,8 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
             ym = -(FX * X) - FY * Y - FZ * Z + FZ * rosag * c_beta + FY * rosag * s_beta;
         }
     } else if (IMAGE_TYPE == IT_ASTIGMATIC2ASTIGMATIC) {
-        double s_rim = sign(rimer);
-        double s_rom = sign(romer);
+        double s_rim = glm::sign(rimer);
+        double s_rom = glm::sign(romer);
         double c_2alpha = glm::cos(2 * alpha);
         double c_2beta = glm::cos(2 * beta);
         if (FX == 0 && FZ == 0) {  //   !plane
@@ -132,8 +132,8 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
             xm = s_rom * (FX * (Y - romer * s_beta) - (FY * nominator) / denominator);
             ym = s_rom * (FZ * (-Z + romer * c_beta) + FY * (-Y + romer * s_beta) - (FX * nominator) / denominator);
         }
-        double ris = sqrt(zi * zi + xi * xi + yi * yi);
-        double rms = sqrt(zm * zm + xm * xm + ym * ym);
+        double ris = glm::sqrt(zi * zi + xi * xi + yi * yi);
+        double rms = glm::sqrt(zm * zm + xm * xm + ym * ym);
 
         double ai = zi / ris;
         double bi = -xi / ris;
@@ -186,8 +186,8 @@ void RAYX_API RZPLineDensity(Ray r, dvec3 normal, RZPBehaviour b, double& DX, do
         _throw("unsupported ImageType!");
     }
 
-    double ris = sqrt(zi * zi + xi * xi + yi * yi);
-    double rms = sqrt(zm * zm + xm * xm + ym * ym);
+    double ris = glm::sqrt(zi * zi + xi * xi + yi * yi);
+    double rms = glm::sqrt(zm * zm + xm * xm + ym * ym);
 
     double ai = xi / ris;
     double am = xm / rms;

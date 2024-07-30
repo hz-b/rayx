@@ -21,25 +21,25 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         // Check point is within the trapezoid
-        dvec2 P = dvec2(x, z);
+        auto P = glm::dvec2(x, z);
 
         // A, B, C, D are the four points on the trapezoid.
         //
         //    A--B    //
         //   /    \   //
         //  C------D  //
-        dvec2 A = dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
-        dvec2 B = dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
-        dvec2 C = dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
-        dvec2 D = dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
+        auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
+        auto B = glm::dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
+        auto C = glm::dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
+        auto D = glm::dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
 
-        dvec2 PmA = P - A;
-        dvec2 BmA = B - A;
-        dvec2 PmD = P - D;
-        dvec2 CmD = C - D;
-        dvec2 DmA = D - A;
-        dvec2 PmB = P - B;
-        dvec2 CmB = C - B;
+        glm::dvec2 PmA = P - A;
+        glm::dvec2 BmA = B - A;
+        glm::dvec2 PmD = P - D;
+        glm::dvec2 CmD = C - D;
+        glm::dvec2 DmA = D - A;
+        glm::dvec2 PmB = P - B;
+        glm::dvec2 CmB = C - B;
 
         double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
         double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
@@ -64,8 +64,8 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
 // returns a matrix M where (M[i].x, M[i].z) are the key points of our cutout.
 // The key points are typically points on the boundary of the cutout.
 RAYX_FN_ACC
-dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
-    dmat4 ret;
+glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
+    glm::dmat4 ret;
     double w = 0;
     double l = 0;
     if (cutout.m_type == CTYPE_UNLIMITED) {
@@ -79,40 +79,40 @@ dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
     } else if (cutout.m_type == CTYPE_TRAPEZOID) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
-        dvec2 A = dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
-        dvec2 B = dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
-        dvec2 C = dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
-        dvec2 D = dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
+        auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
+        auto B = glm::dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
+        auto C = glm::dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
+        auto D = glm::dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
 
-        ret[0] = dvec4(A[0], 0.0, A[1], 0.0);
-        ret[1] = dvec4(B[0], 0.0, B[1], 0.0);
-        ret[2] = dvec4(C[0], 0.0, C[1], 0.0);
-        ret[3] = dvec4(D[0], 0.0, D[1], 0.0);
+        ret[0] = glm::dvec4(A[0], 0.0, A[1], 0.0);
+        ret[1] = glm::dvec4(B[0], 0.0, B[1], 0.0);
+        ret[2] = glm::dvec4(C[0], 0.0, C[1], 0.0);
+        ret[3] = glm::dvec4(D[0], 0.0, D[1], 0.0);
         return ret;
     } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
         EllipticalCutout ell = deserializeElliptical(cutout);
         double rx = ell.m_diameter_x / 2.0;
         double rz = ell.m_diameter_z / 2.0;
-        ret[0] = dvec4(rx, 0.0, 0.0, 0.0);
-        ret[1] = dvec4(0.0, 0.0, rz, 0.0);
-        ret[2] = dvec4(-rx, 0.0, 0.0, 0.0);
-        ret[3] = dvec4(0.0, 0.0, -rz, 0.0);
+        ret[0] = glm::dvec4(rx, 0.0, 0.0, 0.0);
+        ret[1] = glm::dvec4(0.0, 0.0, rz, 0.0);
+        ret[2] = glm::dvec4(-rx, 0.0, 0.0, 0.0);
+        ret[3] = glm::dvec4(0.0, 0.0, -rz, 0.0);
         return ret;
     } else {
         _throw("invalid cutout type in inCutout!");
     }
-    ret[0] = dvec4(w, 0.0, l, 0.0);
-    ret[1] = dvec4(-w, 0.0, -l, 0.0);
-    ret[2] = dvec4(-w, 0.0, l, 0.0);
-    ret[3] = dvec4(w, 0.0, -l, 0.0);
+    ret[0] = glm::dvec4(w, 0.0, l, 0.0);
+    ret[1] = glm::dvec4(-w, 0.0, -l, 0.0);
+    ret[2] = glm::dvec4(-w, 0.0, l, 0.0);
+    ret[3] = glm::dvec4(w, 0.0, -l, 0.0);
     return ret;
 }
 
 // returns width and length of the bounding box.
 RAYX_FN_ACC
-dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
-    dvec2 ret = dvec2(0.0, 0.0);
-    dmat4 keypoints = keyCutoutPoints(cutout);
+glm::dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
+    glm::dvec2 ret = glm::dvec2(0.0, 0.0);
+    glm::dmat4 keypoints = keyCutoutPoints(cutout);
     for (int i = 0; i < 4; i++) {
         double x = abs(keypoints[i][0]) * 2.0;
         double z = abs(keypoints[i][2]) * 2.0;
@@ -127,7 +127,7 @@ dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
 // (might not find all Ellipsoid vs Trapezoid violations)
 RAYX_FN_ACC
 void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
-    dmat4 keypoints = keyCutoutPoints(c1);
+    glm::dmat4 keypoints = keyCutoutPoints(c1);
     for (int i = 0; i < 4; i++) {
         double x = keypoints[i][0];
         double z = keypoints[i][2];

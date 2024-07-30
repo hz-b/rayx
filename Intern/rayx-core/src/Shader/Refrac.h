@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Core.h"
 #include "InvocationState.h"
 
 namespace RAYX {
@@ -13,6 +13,6 @@ anyways. az: linedensity in z direction ax: linedensity in x direction
 @returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
 "ray beyond horizon"
 */
-RAYX_FN_ACC Ray refrac2D(Ray r, dvec3 normal, double az, double ax, InvState& inv);
+RAYX_FN_ACC Ray refrac2D(Ray r, glm::dvec3 normal, double az, double ax, InvState& inv);
 
 }  // namespace RAYX

@@ -42,3 +42,10 @@
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #endif
+
+#ifdef RAYX_BUILD_DLL
+#include <alpaka/core/Common.hpp>
+#define RAYX_FN_ACC ALPAKA_FN_ACC
+#else
+#define RAYX_FN_ACC
+#endif

@@ -738,7 +738,7 @@ TEST_F(TestSuite, testVlsGrating) {
                                      }};
 
     for (auto p : inouts) {
-        auto out = vlsGrating(p.in_lineDensity, dvec3(0, 1, 0), p.in_z, p.in_vls);
+        auto out = vlsGrating(p.in_lineDensity, glm::dvec3(0, 1, 0), p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
 }
@@ -870,8 +870,8 @@ TEST_F(TestSuite, testPolarizationIntensity) {
 
     const auto iorI = Complex(1.0, 0);
     const auto refractIor = Complex(1.5, 0);
-    const auto incidentVec = dvec3(1, 0, 0);
-    const auto normalVec = glm::normalize(dvec3(-1, 1, 0));
+    const auto incidentVec = glm::dvec3(1, 0, 0);
+    const auto normalVec = glm::normalize(glm::dvec3(-1, 1, 0));
 
     const auto reflectVec = glm::reflect(incidentVec, normalVec);
     const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
@@ -889,11 +889,11 @@ TEST_F(TestSuite, testPolarizationIntensity) {
 TEST_F(TestSuite, testPolarizingReflectionScenario) {
     using namespace complex;
 
-    const auto incidentVec = glm::normalize(dvec3(-0.195, -0.195, 0.961));
-    const auto normal_vec_0 = glm::normalize(dvec3(0, -1, -1));
+    const auto incidentVec = glm::normalize(glm::dvec3(-0.195, -0.195, 0.961));
+    const auto normal_vec_0 = glm::normalize(glm::dvec3(0, -1, -1));
 
     const auto reflect_vec_0 = glm::reflect(incidentVec, -normal_vec_0);
-    CHECK_EQ(reflect_vec_0, glm::normalize(dvec3(-0.195, -0.961, 0.195)));
+    CHECK_EQ(reflect_vec_0, glm::normalize(glm::dvec3(-0.195, -0.961, 0.195)));
 
     const auto incident_angle_0 = angleBetweenUnitVectors(incidentVec, -normal_vec_0);
     CHECK_EQ(Rad(incident_angle_0).toDeg().deg, 57.19646879265609);
@@ -919,9 +919,9 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
              }),
              1e-3);
 
-    const auto normal_vec_1 = glm::normalize(dvec3(1, 1, 0));
+    const auto normal_vec_1 = glm::normalize(glm::dvec3(1, 1, 0));
     const auto reflect_vec_1 = glm::reflect(reflect_vec_0, -normal_vec_1);
-    CHECK_EQ(reflect_vec_1, glm::normalize(dvec3(0.961, 0.195, 0.195)));
+    CHECK_EQ(reflect_vec_1, glm::normalize(glm::dvec3(0.961, 0.195, 0.195)));
 
     const auto incident_angle_1 = angleBetweenUnitVectors(reflect_vec_0, -normal_vec_1);
     CHECK_EQ(Rad(incident_angle_1).toDeg().deg, 35.155651179977404);
@@ -975,8 +975,8 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
     for (const auto ior_pair : ior_pairs) {
         const auto iorI = ior_pair.iorI;
         const auto refractIor = ior_pair.refractIor;
-        const auto incidentVec = dvec3(1, 0, 0);
-        const auto normalVec = glm::normalize(dvec3(-1, 1, 0));
+        const auto incidentVec = glm::dvec3(1, 0, 0);
+        const auto normalVec = glm::normalize(glm::dvec3(-1, 1, 0));
 
         const auto reflectVec = glm::reflect(incidentVec, normalVec);
         const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
@@ -1009,8 +1009,8 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
 
     const auto iorI = Complex(1.0, 0);
     const auto refractIor = Complex(2.0, 0);
-    const auto incidentVec = dvec3(1, 0, 0);
-    const auto normalVec = glm::normalize(dvec3(-1, refractIor.real(), 0));
+    const auto incidentVec = glm::dvec3(1, 0, 0);
+    const auto normalVec = glm::normalize(glm::dvec3(-1, refractIor.real(), 0));
 
     const auto reflectVec = glm::reflect(incidentVec, normalVec);
     const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
@@ -1041,7 +1041,7 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
 
     const auto iorI = Complex(1.0, 0);
     const auto refractIor = Complex(1.5, 0);
-    const auto incidentVec = glm::normalize(dvec3(1, 1, 0));
+    const auto incidentVec = glm::normalize(glm::dvec3(1, 1, 0));
     const auto normalVec = -incidentVec;
     const auto reflectVec = glm::reflect(incidentVec, normalVec);
     const auto incidentElectricField = ElectricField({0, 0}, {0, 0}, {1, 0});
@@ -1169,8 +1169,8 @@ TEST_F(TestSuite, testRotateElectricField) {
 
     struct InOutPair {
         ElectricField in_field;
-        dvec3 in_forward;
-        dvec3 in_up;
+        glm::dvec3 in_forward;
+        glm::dvec3 in_up;
         ElectricField out_field;
         ElectricField out_field_rotationWithoutUp;
     };
@@ -1393,7 +1393,7 @@ TEST_F(TestSuite, testSchwingerDipole) {
 }
 
 TEST_F(TestSuite, testSphericalCoords) {
-    std::vector<dvec3> directions = {
+    std::vector<glm::dvec3> directions = {
         {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, {-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0},
     };
 
@@ -1401,7 +1401,7 @@ TEST_F(TestSuite, testSphericalCoords) {
         double phi, psi;
         directionToSphericalCoords(dir, phi, psi);
 
-        dvec3 dir2;
+        glm::dvec3 dir2;
         sphericalCoordsToDirection(phi, psi, dir2);
 
         CHECK_EQ(dir, dir2, 1e-11);

@@ -7,6 +7,7 @@
 #include "Helper.h"
 #include "LineDensity.h"
 #include "Rand.h"
+#include "Ray.h"
 #include "Refrac.h"
 #include "RefractiveIndex.h"
 #include "SphericalCoords.h"

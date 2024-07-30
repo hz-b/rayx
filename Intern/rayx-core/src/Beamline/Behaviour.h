@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Core.h"
 #include "Cutout.h"
 
 namespace RAYX {

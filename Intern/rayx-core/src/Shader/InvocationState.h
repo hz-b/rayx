@@ -4,8 +4,7 @@
 
 #include <span>
 
-#include "Common.h"
-#include "Element.h"
+#include "Beamline/Element.h"
 #include "Ray.h"
 
 namespace RAYX {
@@ -21,7 +20,7 @@ struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name
 };
 
 struct _debug_struct {
-    dmat4 _dMat;  // Can also be used as vectors or scalar
+    glm::dmat4 _dMat;  // Can also be used as vectors or scalar
 };
 
 // we don't require forward declarations in GLSL, hence we only do them in C++:

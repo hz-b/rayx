@@ -25,9 +25,9 @@ double infinity() { return 1e+308; }
 
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FN_ACC
-double RAYX_API getIncidenceAngle(Ray r, dvec3 normal) {
-    normal = normalize(normal);
-    double ar = dot(dvec3(normal), r.m_direction);
+double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal) {
+    normal = glm::normalize(normal);
+    double ar = glm::dot(glm::dvec3(normal), r.m_direction);
     // cut to interval [-1,1]
     if (ar < -1.0)
         ar = -1.0;

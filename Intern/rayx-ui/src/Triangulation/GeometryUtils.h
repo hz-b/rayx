@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Shader/Cutout.h"
+#include "Beamline/Cutout.h"
 #include "Vertex.h"
 
 struct Vertex;
