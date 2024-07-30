@@ -1,6 +1,11 @@
 # How to Build
 
-For building and running the project, we recommend using [Visual Studio Code](https://code.visualstudio.com/) (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the `compile.sh` script can be used for compilation.
+For building and running the project, we recommend using [Visual Studio Code](https://code.visualstudio.com/) (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the `compile.sh` script can be used for compilation (see [using compile.sh](#using-compile.sh)).
+
+## CMake Options:
+
+- `RAYX_ENABLE_Cuda:BOOL` `default = ON` `enable search for Cuda on your system. If found, build with Cuda`
+- `RAYX_REQUIRES_Cuda:BOOL` `default = OFF` `require Cuda to be found on your system. Otherwise throw an error`
 
 ## Cloning the Repository
 
@@ -25,8 +30,8 @@ Clone the git repository by running one of the following commands:
 - Install the [Boost](https://www.boost.org/users/download/) library.
 - Add Boost to your PATH.
 - Optional (required for Tracing on the GPU):
-    - Install [Cuda](https://developer.nvidia.com/cuda-downloads?target_os=Windows).
-    Tested with Cuda version 12.4.1
+    - Install [Cuda](https://developer.nvidia.com/Cuda-downloads?target_os=Windows).
+    Tested with Cuda version 12.5.1
     - Add Cuda to your PATH.
 
 ### Known Issues
@@ -46,8 +51,9 @@ To use a custom generator for CMake, such as Ninja for faster builds, you can se
 
 `cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release`
 
+see: [Cmake Options](#cmake-options)
 
-## On Ubuntu
+## On Linux
 
 ### Prerequisites
 - Ensure cmake, gcc, gdb, and make are installed and up to date.
@@ -57,23 +63,32 @@ To use a custom generator for CMake, such as Ninja for faster builds, you can se
 - Install boost
 - Optional (required for Tracing on the GPU):
     - Install Cuda
+    - see [Determining Cuda and compiler version](#determining-Cuda-and-compiler-version)
 
+### Ubuntu
 `apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev`
 - Ensure the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`.
 
-### Known Issues
-- Depending on the Cuda version, different GCC versions may be supported. Please take a look at the supported versions of GCC for your Cuda installation:
-    - https://stackoverflow.com/questions/6622454/cuda-incompatible-with-my-gcc-version
-    - https://gist.github.com/ax3l/9489132
-    Tested with Cuda version 12.4.1 and GCC version 13.3
-
-## On Arch Linux
-
+### Arch Linux
 Arch Linux users can obtain all necessary packages through pacman, yay, or other package managers. Specific instructions will be provided later.
 
-## On Fedora
-
+### Fedora
 To install the required packages on Fedora, run the following command:
 
 `sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc blas-devel lapack-devel gtk3-devel pkg-config libXi-devel libXcursor-devel libXinerama-devel libXrandr-devel boost`
-- install cuda
+
+### Determining Cuda and compiler version
+- GCC: Depending on the Cuda version, different versions of GCC may be supported.
+This projects is tested with Cuda version 12.4.1 and GCC version 13.3
+Please take a look at the supported versions of GCC for your Cuda installation:
+    - <https://stackoverflow.com/questions/6622454/Cuda-incompatible-with-my-gcc-version>
+    - <https://gist.github.com/ax3l/9489132>
+- Clang: Using clang as Cuda compiler is currently not supported.
+
+### Using compile.sh
+usage: `./compile.sh`
+#### Options:
+- `--release` build in release mode (default: build in debug mode)
+- `--cuda` enable compilation with Cuda (default: build without Cuda)\
+see [Determining Cuda and compiler version](#determining-Cuda-and-compiler-version) \
+example usage: `CXX=g++-13 ./compile.sh --cuda`

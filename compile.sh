@@ -8,11 +8,15 @@ echo "In this case you need to remove the build folder once."
 echo
 
 mode=Debug
+cuda="-DRAYX_ENABLE_CUDA=OFF"
 
 for var in "$@"
 do
     if [[ "$var" == "--release" ]]; then
         mode=Release
+    fi
+    if [[ "$var" == "--cuda" ]]; then
+        cuda="-DRAYX_REQUIRES_CUDA=ON"
     fi
     if [[ "$var" == "--help" ]]; then
         echo "Usage:"
@@ -31,11 +35,11 @@ if [ ! -f ./build/mode ] || [[ ! "$(cat ./build/mode)" == "$mode" ]]; then
     echo > ./build/mode
 
     echo Setting up build directory for mode $mode ...
-    CXX=clang++ cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode -B ./build -G Ninja
+    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode $cuda -B ./build -G Ninja
 
     echo $mode > ./build/mode
 fi
 
 # compiling
 echo Compiling ...
-CXX=clang++ cmake --build ./build --config $mode --target all -j 10 --
+cmake --build ./build --config $mode --target all -j 10 --
