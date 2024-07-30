@@ -2,7 +2,8 @@ name: MDBookDeploy
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push but only for the master branch.
+  # Merged pull requests result in a push, and will trigger this workflow as well
   push:
     branches: [ master ]
 
