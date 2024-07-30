@@ -5,8 +5,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -15,20 +13,20 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         steps:
-        
+
         - uses: actions/checkout@v4
           with:
               fetch-depth: 0
-          
+
         - name: Copy README.md to docs/src
           run: cp README.md docs/src/README.md
-            
+
         - name: Install mdbook
           run: |
               mkdir mdbook
               curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-unknown-linux-gnu.tar.gz | tar -xz --directory=./mdbook
               echo `pwd`/mdbook >> $GITHUB_PATH
-              
+
         - name: Deploy GitHub Pages
           run: |
               cd docs/
