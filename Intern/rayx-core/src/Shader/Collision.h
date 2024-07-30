@@ -29,7 +29,7 @@ struct RAYX_API Collision {
 RAYX_FN_ACC Collision getQuadricCollision(Ray r, QuadricSurface q);
 RAYX_FN_ACC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
 RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
-RAYX_FN_ACC Collision findCollisionWith(Ray r, uint id, InvState& inv);
+RAYX_FN_ACC Collision findCollisionWith(Ray r, uint32_t id, InvState& inv);
 RAYX_FN_ACC Collision findCollision(const Ray& ray, InvState& inv);
 
 }  // namespace RAYX

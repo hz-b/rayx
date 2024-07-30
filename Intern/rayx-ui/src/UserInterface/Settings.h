@@ -22,16 +22,16 @@ struct UIRayInfo {
     bool renderAllRays;
     size_t amountOfRays;
     size_t maxAmountOfRays;
-    unsigned int startEventID = 0;
+    uint32_t startEventID = 0;
 };
 
 struct UISimulationInfo {
-    unsigned int startEventID = 0;
-    unsigned int maxEvents = 0;
-    unsigned int maxBatchSize = 100000;
+    uint32_t startEventID = 0;
+    uint32_t maxEvents = 0;
+    uint32_t maxBatchSize = 100000;
     bool sequential = false;
     std::vector<std::string> availableDevices;
-    unsigned int deviceIndex = 0;
+    uint32_t deviceIndex = 0;
     bool fixedSeed = false;
     int seed;
 

@@ -92,7 +92,7 @@ void Application::run() {
                                .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
                                .build();
     std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (unsigned long i = 0; i < descriptorSets.size(); i++) {
+    for (uint64_t i = 0; i < descriptorSets.size(); i++) {
         auto bufferInfo = uboBuffers[i]->descriptorInfo();
         DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
     }
@@ -335,7 +335,7 @@ void Application::loadRays(const std::filesystem::path& rmlPath, const size_t nu
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays = raysFromH5(rayFilePath, FULL_FORMAT, &m_UIParams.rayInfo.startEventID);
+    m_rays = raysFromH5(rayFilePath, FULL_FORMAT, std::make_unique<uint32_t>(m_UIParams.rayInfo.startEventID));
 
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";

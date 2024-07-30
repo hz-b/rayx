@@ -617,7 +617,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
             float buttonsWidth = /* 2* */ 120.0f + ImGui::GetStyle().ItemSpacing.x;  // Width of two buttons and spacing
             ImGui::SetCursorPosX((windowWidth - buttonsWidth) / 2.0f);
 
-            if (uiParams.simulationInfo.deviceIndex >= static_cast<unsigned int>(uiParams.simulationInfo.availableDevices.size())) {
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<uint32_t>(uiParams.simulationInfo.availableDevices.size())) {
                 ImGui::BeginDisabled();
             }
 
@@ -626,7 +626,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
                 ImGui::CloseCurrentPopup();
             }
 
-            if (uiParams.simulationInfo.deviceIndex >= static_cast<unsigned int>(uiParams.simulationInfo.availableDevices.size())) {
+            if (uiParams.simulationInfo.deviceIndex >= static_cast<uint32_t>(uiParams.simulationInfo.availableDevices.size())) {
                 ImGui::EndDisabled();
             }
 

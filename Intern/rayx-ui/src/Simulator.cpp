@@ -21,12 +21,12 @@ void Simulator::runSimulation() {
     auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, m_startEventID);
 
     // check max EventID
-    unsigned int maxEventID = 0;
+    uint32_t maxEventID = 0;
     bool notEnoughEvents = false;
 
     for (auto& ray : rays) {
         if (ray.size() > (maxEventID)) {
-            maxEventID = static_cast<unsigned int>(ray.size()) + m_startEventID;
+            maxEventID = static_cast<uint32_t>(ray.size()) + m_startEventID;
         }
 
         for (auto& event : ray) {

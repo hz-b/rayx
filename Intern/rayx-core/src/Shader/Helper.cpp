@@ -11,7 +11,7 @@ void init(InvState& inv) {
 
     // TODO(Sven): dont waste time with initializing
     // sets all output rays controlled by this shader call to ETYPE_UNINIT.
-    for (uint i = uint(inv.pushConstants.startEventID); i < inv.pushConstants.maxEvents; i++) {
+    for (uint32_t i = uint32_t(inv.pushConstants.startEventID); i < inv.pushConstants.maxEvents; i++) {
         inv.outputRays[output_index(i, inv)].m_eventType = ETYPE_UNINIT;
     }
     inv.nextEventIndex = 0;
@@ -31,9 +31,9 @@ uint64_t rayId(InvState& inv) { return uint64_t(inv.pushConstants.rayIdStart) + 
 // Will return the index in outputRays to access the `i'th` output ray belonging to this shader call.
 // Typically used as `outputRays[output_index(i)]`.
 RAYX_FN_ACC
-uint output_index(uint i, InvState& inv) {
-    return uint(inv.globalInvocationId) * uint(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
-           uint(inv.pushConstants.startEventID);
+uint32_t output_index(uint32_t i, InvState& inv) {
+    return uint32_t(inv.globalInvocationId) * uint32_t(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
+           uint32_t(inv.pushConstants.startEventID);
 }
 
 // record an event and store it in the next free spot in outputRays.
@@ -60,7 +60,7 @@ void recordEvent(Ray r, double w, InvState& inv) {
         inv.finalized = true;
 
         // change the last event to "ETYPE_TOO_MANY_EVENTS".
-        uint idx = output_index(uint(inv.pushConstants.maxEvents - 1), inv);
+        uint32_t idx = output_index(uint32_t(inv.pushConstants.maxEvents - 1), inv);
         inv.outputRays[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
 
         _throw("recordEvent failed: too many events!");
@@ -70,7 +70,7 @@ void recordEvent(Ray r, double w, InvState& inv) {
 
     r.m_eventType = w;
 
-    uint idx = output_index(uint(inv.nextEventIndex), inv);
+    uint32_t idx = output_index(uint32_t(inv.nextEventIndex), inv);
     inv.outputRays[idx] = r;
 
     inv.nextEventIndex += 1;
