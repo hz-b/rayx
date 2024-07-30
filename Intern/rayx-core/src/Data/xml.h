@@ -7,16 +7,13 @@
 #include <rapidxml.hpp>
 #include <vector>
 
+#include "Beamline/Definitions.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
-#include "Shader/Element.h"
+#include "Shader/Cutout.h"
+#include "Shader/SlopeError.h"
+#include "Shader/Surface.h"
 #include "angle.h"
-
-// the direction of a plane, either XY or XZ. This is only used in the parsing.
-// Inside of the shader, every plane-shaped object lies in its XZ plane.
-// Per default every element has DesignPlane::XZ, but ImagePlane and Slit have DesignPlane::XY.
-// Thus they need a bit of extra handling to convert them to the shaders XZ plane.
-enum class DesignPlane { XY, XZ };
 
 namespace RAYX {
 

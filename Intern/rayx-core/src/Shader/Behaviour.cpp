@@ -1,6 +1,7 @@
-#include "BehaviourType.h"
+#include "Behaviour.h"
 
 #include "Beamline/Beamline.h"
+#include "Beamline/Definitions.h"
 #include "DesignElement/DesignElement.h"
 #include "Shader/Utils.h"
 

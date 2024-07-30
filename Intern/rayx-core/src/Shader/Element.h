@@ -3,58 +3,38 @@
 #include "Behaviour.h"
 #include "Common.h"
 #include "Cutout.h"
+#include "SlopeError.h"
 #include "Surface.h"
+#include "Data/xml.h"
+
+#include <glm.h>
+#include <optional>
 
 namespace RAYX {
 
-struct SlopeError {
-    double m_sag;                      // aka `slopeErrorX`
-    double m_mer;                      // aka `slopeErrorZ`
-    double m_thermalDistortionAmp;     // TODO unused
-    double m_thermalDistortionSigmaX;  // TODO unused
-    double m_thermalDistortionSigmaZ;  // TODO unused
-    double m_cylindricalBowingAmp;     // TODO unused
-    double m_cylindricalBowingRadius;  // TODO unused
-};
+class DesignElement;
 
+/**
+ * @brief Structure to represent an element in the ray tracing simulation.
+ */
 struct Element {
-    // for alignment reasons, the dmat4s are at the beginning of the struct.
-
-    // the "in-transformation": it converts a point from the world coordinates to the element coordinates of this element.
-    // The name comes from the fact that an "in-going" ray hitting this elemnet, will first-and-foremost be converted to element coordinates by
-    // multiplying with m_inTrans.
-    dmat4 m_inTrans;
-
-    // the "out-transformation": it converts a point from element coordinates of this element back to the world coordinates.
-    // This is the matrix inverse to m_inTrans.
-    dmat4 m_outTrans;
-
-    // The Behaviour expresses what happens to a ray once it collides with this Element.
-    Behaviour m_behaviour;
-
-    // The surface expresses how the Elements surface is curved.
-    Surface m_surface;
-
-    // The Cutout limits the Surface to the dimensions of the actual Element.
-    // Surfaces are often infinite, hence we require the Cutout to limit them.
-    Cutout m_cutout;
-
-    // The SlopeError expresses a random noise in the normal vector of a particular surface point on this element.
-    // Such a random noise has the (at least visual) effect, that it feels like a rough - uneven - surface.
-    // As of today, the `applySlopeError` is the only function using this object.
-    SlopeError m_slopeError;
-
-    // The azimuthal angle describes the angle at which this element is rotated around the "main-beam" from the previous element to this element.
-    // TODO This is an artifact from RAY-UI, we actually want to get rid of it. (at least it should not be part of the shader model!)
-    double m_azimuthalAngle;
-
-    // The material that this object is made of.
-    // See the `enum class Material` from Material.h to make sense of this value.
-    // Materials are either REFLECTIVE, VACUUM or they represent a particular element from the periodic system.
-    double m_material;
+    dmat4 m_inTrans;          ///< In-transformation matrix: Converts a point from world coordinates to element coordinates.
+    dmat4 m_outTrans;         ///< Out-transformation matrix: Converts a point from element coordinates back to world coordinates.
+    Behaviour m_behaviour;    ///< Describes what happens to a ray once it collides with this Element.
+    Surface m_surface;        ///< Describes how the Element's surface is curved.
+    Cutout m_cutout;          ///< Limits the Surface to the dimensions of the actual Element.
+    SlopeError m_slopeError;  ///< Describes a random noise in the normal vector of a particular surface point.
+    double m_azimuthalAngle;  ///< Azimuthal angle at which this element is rotated around the "main-beam".
+    double m_material;        ///< The material that this object is made of (see `enum class Material` from Material.h).
 };
 
-// make sure Element does not introduce cost on copy or default construction
+// Ensure Element does not introduce cost on copy or default construction.
 static_assert(std::is_trivially_copyable_v<Element>);
+
+RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
+
+// constructs an Element given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
+Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {},
+                    DesignPlane plane = DesignPlane::XZ);
 
 }  // namespace RAYX

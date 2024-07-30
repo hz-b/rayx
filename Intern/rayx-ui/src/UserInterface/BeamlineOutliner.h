@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "Beamline/OpticalElement.h"
 #include "UserInterface/Settings.h"
 
 // Simple TreeNode

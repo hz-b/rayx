@@ -1,4 +1,4 @@
-#include "SurfaceType.h"
+#include "Surface.h"
 
 #include "Beamline/Beamline.h"
 #include "DesignElement/DesignElement.h"

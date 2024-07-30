@@ -24,6 +24,14 @@ struct Behaviour {
     double m_private_serialization_params[16];
 };
 
+class DesignElement;
+enum class RZPType { Elliptical, Meriodional };
+enum class CentralBeamstop { None, Rectangle, Elliptical };
+Behaviour makeBehaviour(const DesignElement& dele);
+Behaviour makeGrating(const DesignElement& dele);  //< creates a Grating Behaviour from the parameters given in `dele`.
+Behaviour makeSlit(const DesignElement& dele);
+Behaviour makeRZPBehaviour(const DesignElement& dele);
+
 ////////////////////
 // Mirror
 ////////////////////

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "Beamline/OpticalElement.h"
 #include "RenderObject.h"
 #include "Shader/Element.h"
 #include "Tracer/Tracer.h"
