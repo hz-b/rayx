@@ -10,8 +10,6 @@
 #include "Debug/Instrumentor.h"
 #include "Shader/Ray.h"
 
-using uint = unsigned int;
-
 // count the number of events from `hist`.
 int count(const RAYX::BundleHistory& hist) {
     int c = 0;
@@ -26,11 +24,11 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
     std::vector<double> output;
     output.reserve(count(hist) * format.size());
 
-    for (uint ray_id = 0; ray_id < hist.size(); ray_id++) {
+    for (uint32_t ray_id = 0; ray_id < hist.size(); ray_id++) {
         const RAYX::RayHistory& ray_hist = hist[ray_id];
-        for (uint event_id = 0; event_id < ray_hist.size(); event_id++) {
+        for (uint32_t event_id = 0; event_id < ray_hist.size(); event_id++) {
             const RAYX::Ray& event = ray_hist[event_id];
-            for (uint i = 0; i < format.size(); i++) {
+            for (uint32_t i = 0; i < format.size(); i++) {
                 double next = format[i].get_double(ray_id, event_id + startEventID, event);
                 output.push_back(next);
             }
@@ -53,11 +51,11 @@ void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const
         dataset.write_raw(ptr);
 
         // write element names
-        for (unsigned int i = 0; i < elementNames.size(); i++) {
-            auto& e = elementNames[i];
-            dataspace = HighFive::DataSpace({e.size()});
+        for (size_t i = 0; i < elementNames.size(); i++) {
+            std::string& name = elementNames[i];
+            dataspace = HighFive::DataSpace({name.size()});
             dataset = file.createDataSet<char>(std::to_string(i), dataspace);
-            auto ptr = e.c_str();
+            auto ptr = name.c_str();
             dataset.write_raw(ptr);
         }
     } catch (HighFive::Exception& err) {
@@ -122,7 +120,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     return bundleHist;
 }
 
-RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, unsigned int* startEventID) {
+RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, std::unique_ptr<uint32_t> startEventID) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX::BundleHistory rays;
 
@@ -141,7 +139,7 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
             return rays;
         }
         if (startEventID) {
-            *startEventID = static_cast<unsigned int>(doubles[1]);
+            *startEventID = static_cast<uint32_t>(doubles[1]);
         }
         rays = fromDoubles(doubles, format);
         RAYX_VERB << "Loaded " << rays.size() << " rays from " << filename;

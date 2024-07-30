@@ -198,7 +198,7 @@ void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHis
 
 // If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
 // Otherwise, we return `{}`, aka None.
-std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, unsigned int beamline_len);
+std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamline_len);
 
 /// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
 /// Ray UI rays are obtained Export > RawRaysOutgoing.

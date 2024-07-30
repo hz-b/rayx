@@ -60,7 +60,7 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
     std::ofstream file(filename);
 
     // write the header of the CSV file:
-    for (uint i = 0; i < format.size(); i++) {
+    for (uint32_t i = 0; i < format.size(); i++) {
         if (i > 0) {
             file << DELIMITER;
         }
@@ -71,11 +71,11 @@ void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, cons
     RAYX_VERB << "Writing " << hist.size() << " rays to file...";
 
     // write the body of the CSV file:
-    for (unsigned long ray_id = 0; ray_id < hist.size(); ray_id++) {
+    for (uint64_t ray_id = 0; ray_id < hist.size(); ray_id++) {
         const RAYX::RayHistory& ray_hist = hist[ray_id];
-        for (unsigned long event_id = 0; event_id < ray_hist.size(); event_id++) {
+        for (size_t event_id = 0; event_id < ray_hist.size(); event_id++) {
             const RAYX::Ray& event = ray_hist[event_id];
-            for (uint i = 0; i < format.size(); i++) {
+            for (uint32_t i = 0; i < format.size(); i++) {
                 if (i > 0) {
                     file << DELIMITER;
                 }
@@ -105,10 +105,10 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
         std::string num;
 
         std::getline(ss, num, DELIMITER);
-        unsigned long ray_id = std::stoi(num);
+        uint64_t ray_id = std::stoi(num);
 
         std::getline(ss, num, DELIMITER);
-        unsigned long event_id = std::stoi(num);
+        uint64_t event_id = std::stoi(num);
 
         while (std::getline(ss, num, DELIMITER)) {
             d.push_back(std::stod(num));

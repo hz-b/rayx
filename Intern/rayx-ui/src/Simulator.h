@@ -12,8 +12,8 @@ class Simulator {
     std::vector<std::string> getAvailableDevices();
 
   private:
-    unsigned int m_startEventID = 0;
-    unsigned int m_maxEvents = 0;
+    uint32_t m_startEventID = 0;
+    uint32_t m_maxEvents = 0;
 
     std::filesystem::path m_RMLPath;  ///< Path to the RML file
     RAYX::Beamline m_Beamline;        ///< Beamline
