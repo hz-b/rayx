@@ -6,7 +6,7 @@
 #include <stb_image_write.h>
 
 #include <array>
-#include <glm/glm.hpp>
+#include <glm.h>
 
 /**
  * This function takes a vector of rays, along with the minimum and maximum x and z coordinates,

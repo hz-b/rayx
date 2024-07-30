@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glm.hpp>
+#include <glm.h>
 
-#include "Beamline/Cutout.h"
 #include "Core.h"
+#include "Element/Cutout.h"
 #include "InvocationState.h"
 #include "Ray.h"
 
