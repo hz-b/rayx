@@ -15,7 +15,7 @@ namespace RAYX {
  * Set all Parameters for each optical Element a RML file can define.
  * Set all mandatory parameters is called for every element without exception.
  * This only works in combi with the xml parser.
-*/
+ */
 
 void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setName(parser.name());
@@ -32,7 +32,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     if (de->getType() != ElementType::ImagePlane) {
         de->setCutout(parser.parseCutout(dp, ElementStringMap[parser.type()]));
     } else {
-        de->setCutout(parser.parseCutout(dp, ElementStringMap[parser.type()]));        
+        de->setCutout(parser.parseCutout(dp, ElementStringMap[parser.type()]));
     }
 }
 
@@ -162,7 +162,7 @@ void getToroidMirror(xml::Parser parser, DesignElement* de) {
 
 void getToroidalGrating(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
-    de->setCurvatureType(CurvatureType::Toroidal); 
+    de->setCurvatureType(CurvatureType::Toroidal);
     de->setBehaviourType(BehaviourType::Mirror);
 
     de->setShortRadius(parser.parseShortRadius());
@@ -174,7 +174,7 @@ void getToroidalGrating(xml::Parser parser, DesignElement* de) {
 void getRZP(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
     CurvatureType curv = parser.parseCurvatureType();
-    if (curv == CurvatureType::Spherical) {     // special case of sphere 
+    if (curv == CurvatureType::Spherical) {  // special case of sphere
         curv = CurvatureType::RzpSphere;
     }
     de->setCurvatureType(curv);

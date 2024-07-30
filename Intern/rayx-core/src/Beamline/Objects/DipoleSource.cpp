@@ -275,7 +275,6 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en) const {
 }
 
 PsiAndStokes DipoleSource::dipoleFold(double psi, double photonEnergy, double sigpsi) const {
-
     int ln = (int)sigpsi;
     double trsgyp = 0.0;
     double sgyp = 0.0;

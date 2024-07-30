@@ -8,23 +8,23 @@ namespace RAYX {
 
 /** Computes the adjusted line density at a specific z-coordinate for variable line spacing (VLS) gratings,
  * considering both the surface orientation and polynomial VLS parameters.
- * 
+ *
  * @param lineDensity The base line density of the grating.
  * @param normal A 3-dimensional vector representing the normal to the grating surface at the point of interest.
  * @param z The z-coordinate at which the line density is to be evaluated.
  * @param vls An array of six coefficients that modify the line density based on a polynomial of z. These coefficients
  *            scale the impact of z raised to powers from 1 to 6.
- * 
+ *
  * @return The modified line density at the given z-coordinate, adjusted for the grating's surface tilt and the polynomial
  *         specified by the VLS coefficients.
-*/
+ */
 RAYX_FN_ACC
 double RAYX_API vlsGrating(double lineDensity, dvec3 normal, double z, double vls[6]) {
     // Calculate the inclination angle from the vertical based on the z-component of the surface normal.
     double del1 = glm::asin(normal.z);
 
     // Compute the cosine of the negative inclination angle to adjust line density based on the grating's tilt.
-    double cos_d = glm::cos(-del1); // linedesity increases with konvex surface structure
+    double cos_d = glm::cos(-del1);  // linedesity increases with konvex surface structure
 
     // Compute powers of z from z^2 to z^6 for polynomial calculation of line density adjustments.
     double z2 = z * z;

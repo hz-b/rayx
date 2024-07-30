@@ -63,7 +63,7 @@ see: [Cmake Options](#cmake-options)
 - Install boost
 - Optional (required for Tracing on the GPU):
     - Install Cuda
-    - see [Determining Cuda and compiler version](#determining-Cuda-and-compiler-version)
+    - see [Determining Cuda and compiler version](#determining-cuda-and-compiler-version)
 
 ### Ubuntu
 `apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev`
@@ -90,5 +90,5 @@ usage: `./compile.sh`
 #### Options:
 - `--release` build in release mode (default: build in debug mode)
 - `--cuda` enable compilation with Cuda (default: build without Cuda)\
-see [Determining Cuda and compiler version](#determining-Cuda-and-compiler-version) \
+see [Determining Cuda and compiler version](#determining-cuda-and-compiler-version) \
 example usage: `CXX=g++-13 ./compile.sh --cuda`

@@ -26,7 +26,8 @@ Ray refrac2D(Ray r, dvec3 normal, double density_z, double density_x, InvState& 
     double sin_e = glm::sin(-eps1);
     dmat3 rot = dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
     dmat3 inv_rot = dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
-    r.m_direction = rot * r.m_direction; // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
+    r.m_direction =
+        rot * r.m_direction;  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
 
     double x1 = r.m_direction.x - density_x;
     double z1 = r.m_direction.z - density_z;
