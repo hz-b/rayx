@@ -1,16 +1,15 @@
 #pragma once
 
-#include <angle.h>
-
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <variant>
 
+#include "Angle.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Beamline/Cutout.h"
 #include "Beamline/LightSource.h"
-#include "Beamline/Surface.h"
+#include "Element/Cutout.h"
+#include "Element/Surface.h"
 #include "Core.h"
 #include "Debug/Debug.h"
 #include "Material/Material.h"

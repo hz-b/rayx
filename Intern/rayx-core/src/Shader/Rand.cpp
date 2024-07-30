@@ -1,6 +1,6 @@
 #include "Rand.h"
 
-#include <glm.hpp>
+#include <glm.h>
 
 #include "Constants.h"
 

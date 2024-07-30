@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 
 #include <array>
-#include <glm/glm.hpp>
+#include <glm.h>
 #include <variant>
 #include <vector>
 

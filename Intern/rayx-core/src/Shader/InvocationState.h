@@ -4,7 +4,7 @@
 
 #include <span>
 
-#include "Beamline/Element.h"
+#include "Element/Element.h"
 #include "Ray.h"
 
 namespace RAYX {
