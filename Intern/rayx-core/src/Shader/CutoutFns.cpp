@@ -114,8 +114,8 @@ glm::dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
     glm::dvec2 ret = glm::dvec2(0.0, 0.0);
     glm::dmat4 keypoints = keyCutoutPoints(cutout);
     for (int i = 0; i < 4; i++) {
-        double x = abs(keypoints[i][0]) * 2.0;
-        double z = abs(keypoints[i][2]) * 2.0;
+        double x = glm::abs(keypoints[i][0]) * 2.0;
+        double z = glm::abs(keypoints[i][2]) * 2.0;
         if (x > ret[0]) ret[0] = x;
         if (z > ret[1]) ret[1] = z;
     }

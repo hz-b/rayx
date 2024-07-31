@@ -52,7 +52,7 @@ zoneplates
 */
 RAYX_FN_ACC
 void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState& inv) {
-    double b = abs(radius) * 1e06;
+    double b = glm::abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
     double rn1[3];
