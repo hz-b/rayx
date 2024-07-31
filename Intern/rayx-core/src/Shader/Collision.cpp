@@ -22,9 +22,9 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
 
     int cs = 1;
     int d_sign = q.m_icurv;
-    if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
+    if (glm::abs(r.m_direction[1]) >= glm::abs(r.m_direction[0]) && glm::abs(r.m_direction[1]) >= glm::abs(r.m_direction[2])) {
         cs = 2;
-    } else if (abs(r.m_direction[2]) >= abs(r.m_direction[0]) && abs(r.m_direction[2]) >= abs(r.m_direction[1])) {
+    } else if (glm::abs(r.m_direction[2]) >= glm::abs(r.m_direction[0]) && glm::abs(r.m_direction[2]) >= glm::abs(r.m_direction[1])) {
         cs = 3;
     }
 
@@ -50,7 +50,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         if (bbac < 0) {
             col.found = false;
         } else {
-            if (abs(a) > abs(c) * 1e-10) {
+            if (glm::abs(a) > glm::abs(c) * 1e-10) {
                 x = (-b + d_sign * sqrt(bbac)) / a;
             } else {
                 x = (-c / 2) / b;
@@ -73,7 +73,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         if (bbac < 0) {
             col.found = false;
         } else {
-            if (abs(a) > abs(c) * 1e-10) {
+            if (glm::abs(a) > glm::abs(c) * 1e-10) {
                 y = (-b + d_sign * sqrt(bbac)) / a;
             } else {
                 y = (-c / 2) / b;
@@ -99,7 +99,7 @@ Collision getQuadricCollision(Ray r, QuadricSurface q) {
         if (bbac < 0) {
             col.found = false;
         } else {
-            if (abs(a) > abs(c) * 1e-10) {  // pow(10, double(-10))) {
+            if (glm::abs(a) > glm::abs(c) * 1e-10) {  // pow(10, double(-10))) {
                 z = (-b + d_sign * sqrt(bbac)) / a;
             } else {
                 z = (-c / 2) / b;
@@ -151,9 +151,9 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
     // Ray r = rotateForCubic(rin, cu.m_psi, 1000);
 
     int cs = 1;
-    if (abs(r.m_direction[1]) >= abs(r.m_direction[0]) && abs(r.m_direction[1]) >= abs(r.m_direction[2])) {
+    if (glm::abs(r.m_direction[1]) >= glm::abs(r.m_direction[0]) && glm::abs(r.m_direction[1]) >= glm::abs(r.m_direction[2])) {
         cs = 2;
-    } else if (abs(r.m_direction[2]) >= abs(r.m_direction[0]) && abs(r.m_direction[2]) >= abs(r.m_direction[1])) {
+    } else if (glm::abs(r.m_direction[2]) >= glm::abs(r.m_direction[0]) && glm::abs(r.m_direction[2]) >= glm::abs(r.m_direction[1])) {
         cs = 3;
     }
 
@@ -217,7 +217,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                                   an));
             dfunc = dfunc / pow(float(al), 3);
 
-            if (abs(dfunc) < 0.001) {
+            if (glm::abs(dfunc) < 0.001) {
                 dfunc = 0.001;
             }
 
@@ -234,7 +234,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                 z = z1 + anl * x;
             }
             counter++;
-        } while (abs(dx) > 0.001);
+        } while (glm::abs(dx) > 0.001);
 
     } else if (cs == 2) {
         double alm = al / am;
@@ -277,7 +277,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                                 am;
             dfunc = dfunc / pow(float(am), 3);
 
-            if (abs(dfunc) < 0.001) {
+            if (glm::abs(dfunc) < 0.001) {
                 dfunc = 0.001;
             }
 
@@ -294,7 +294,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                 z = z1;
             }
             counter++;
-        } while (abs(dx) > 0.001);
+        } while (glm::abs(dx) > 0.001);
     } else {
         double aln = al / an;
         double amn = am / an;
@@ -331,7 +331,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                              (((z1 - zz) * am - an * y1) * cu.m_b23 - an * cu.m_b32 * zz) * (am * z1 - 2 * am * zz - an * y1) * an);
             dfunc = (-dfunc) / pow(float(an), 3);
 
-            if (abs(dfunc) < 0.001) {
+            if (glm::abs(dfunc) < 0.001) {
                 dfunc = 0.001;
             }
 
@@ -348,7 +348,7 @@ Collision getCubicCollision(Ray r, CubicSurface cu) {
                 z = -2 * y1 / 2 / amn;
             }
             counter++;
-        } while (abs(dx) > 0.001);
+        } while (glm::abs(dx) > 0.001);
         // r.m_position = glm::dvec3(a, b, c);
     }
 
@@ -404,7 +404,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
         zz = zz + dz;
         xx = r.m_position.x + normalized_dir.x * (zz - r.m_position.z);
         if (xx * xx > shortRad * shortRad) {
-            xx = xx / abs(xx) * 0.95 * shortRad;
+            xx = xx / glm::abs(xx) * 0.95 * shortRad;
         }
         yy = r.m_position.y + normalized_dir.y * (zz - r.m_position.z);
         double sq = sqrt(shortRad * shortRad - xx * xx);
@@ -423,7 +423,7 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
             col.found = false;
             return col;
         }
-    } while (abs(dz) > NEW_TOLERANCE);
+    } while (glm::abs(dz) > NEW_TOLERANCE);
 
     col.normal = normalize(glm::dvec3(normal));
     col.hitpoint = glm::dvec3(xx, yy, zz);
@@ -547,7 +547,7 @@ Collision findCollision(const Ray& ray, InvState& inv) {
         }
 
         glm::dvec3 global_hitpoint = glm::dvec3(inv.elements[elementIndex].m_outTrans * glm::dvec4(current_col.hitpoint, 1));
-        double current_dist = length(global_hitpoint - ray.m_position);
+        double current_dist = glm::length(global_hitpoint - ray.m_position);
 
         if (current_dist < best_dist) {
             best_col = current_col;
