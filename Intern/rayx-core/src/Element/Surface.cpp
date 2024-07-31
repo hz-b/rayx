@@ -1,7 +1,7 @@
 #include "Surface.h"
 
 #include "Beamline/Beamline.h"
-#include "DesignElement/DesignElement.h"
+#include "Design/DesignElement.h"
 
 namespace RAYX {
 
