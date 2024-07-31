@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "Debug/Debug.h"
-#include "DesignElement/DesignElement.h"
-#include "DesignElement/DesignSource.h"
+#include "Design/DesignElement.h"
+#include "Design/DesignSource.h"
 
 /**
  * @struct Vertex
