@@ -37,7 +37,7 @@ void dynamicElements(int gid, InvState& inv) {
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         int btype = int(nextElement.m_behaviour.m_type);
 
-        ray.m_pathLength += length(ray.m_position - col.hitpoint);
+        ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
         ray.m_lastElement = col.elementIndex;
 
