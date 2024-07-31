@@ -10,7 +10,7 @@
 #include "Colors.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "DesignElement/DesignElement.h"
+#include "Design/DesignElement.h"
 #include "Element/Cutout.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"

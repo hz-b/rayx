@@ -3,8 +3,8 @@
 #include <optional>
 
 #include "CommandParser.h"
-#include "DesignElement/DesignElement.h"
-#include "DesignElement/DesignSource.h"
+#include "Design/DesignElement.h"
+#include "Design/DesignSource.h"
 #include "GraphicsCore/Descriptors.h"
 #include "GraphicsCore/Renderer.h"
 #include "RayProcessing.h"

@@ -2,7 +2,7 @@
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Definitions.h"
-#include "DesignElement/DesignElement.h"
+#include "Design/DesignElement.h"
 #include "Shader/Utils.h"
 
 namespace RAYX {
