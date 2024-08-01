@@ -44,6 +44,12 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+      - name: Run
+        working-directory: ${{github.workspace}}
+        run: |
+          ./build/bin/release/rayx -x -c -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
+          git checkout -- Intern/rayx-core/tests/input/BoringImagePlane.csv
+
       - name: Test
         working-directory: ${{github.workspace}}/build/bin/release
         run: ./rayx-core-tst -x
