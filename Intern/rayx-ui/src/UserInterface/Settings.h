@@ -96,7 +96,7 @@ struct UIParameters {
         if (path.empty()) return;
         if (path == rmlPath) return;
         if (!std::filesystem::exists(path)) {
-            RAYX_ERR << "RML file does not exist: " << path.string();
+            RAYX_EXIT << "RML file does not exist: " << path.string();
         }
 #ifdef NO_H5
         if (std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".csv")) {

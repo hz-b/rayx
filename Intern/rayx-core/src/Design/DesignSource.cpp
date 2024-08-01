@@ -243,9 +243,9 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
         }
 
     } else {
-        RAYX_ERR << "paramEnergyDistribution is not implemented for "
-                    "energyDistributionType"
-                 << static_cast<int>(energyDistributionType) << "!";
+        RAYX_EXIT << "paramEnergyDistribution is not implemented for "
+                     "energyDistributionType"
+                  << static_cast<int>(energyDistributionType) << "!";
     }
     return en;
 }

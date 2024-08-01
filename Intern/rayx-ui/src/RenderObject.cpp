@@ -89,7 +89,7 @@ void RenderObject::updateTexture(const std::filesystem::path& path) {
 }
 
 void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint32_t height) {
-    if (data == nullptr) RAYX_ERR << "Texture data is null";
+    if (data == nullptr) RAYX_EXIT << "Texture data is null";
 
     m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT, {width, height});
     m_Texture.updateFromData(data, width, height);
@@ -145,6 +145,6 @@ void RenderObject::createDescriptorSet() {
     writer.writeImage(0, &descrInfo);
 
     if (!writer.build(m_descrSet)) {
-        RAYX_ERR << "Failed to build descriptor set for texture";
+        RAYX_EXIT << "Failed to build descriptor set for texture";
     }
 }

@@ -111,7 +111,7 @@ std::vector<uint8_t> Texture::dataFromPath(const std::filesystem::path& path) {
     int width, height, _;
     stbi_uc* pixels = stbi_load(path.string().c_str(), reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height), &_, STBI_rgb_alpha);
     if (!pixels) {
-        RAYX_ERR << "Failed to load texture image: " << path.string();
+        RAYX_EXIT << "Failed to load texture image: " << path.string();
     }
     m_extent.width = static_cast<uint32_t>(width);
     m_extent.height = static_cast<uint32_t>(height);
@@ -151,7 +151,7 @@ void Texture::createImage(VkImageTiling tiling, VkMemoryPropertyFlags properties
     imageInfo.flags = 0;  // Optional, interesting for sparse images
 
     if (vkCreateImage(m_Device.device(), &imageInfo, nullptr, &m_image) != VK_SUCCESS) {
-        RAYX_ERR << "Failed to create image";
+        RAYX_EXIT << "Failed to create image";
     }
 
     // Allocate memory

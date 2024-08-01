@@ -288,7 +288,7 @@ void Device::hasGflwRequiredInstanceExtensions() const {
     for (const auto& required : requiredExtensions) {
         RAYX_VERB << "\t" << required;
         if (available.find(required) == available.end()) {
-            RAYX_ERR << "Required extension " << required << " not available!";
+            RAYX_EXIT << "Required extension " << required << " not available!";
         }
     }
 }

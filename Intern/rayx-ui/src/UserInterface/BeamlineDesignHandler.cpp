@@ -22,7 +22,7 @@ void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineI
             showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
         } else {
             // Handle out-of-bounds access for sources
-            RAYX_ERR << "Error: selectedIndex is out of bounds for sources.";
+            RAYX_EXIT << "Error: selectedIndex is out of bounds for sources.";
         }
     } else if (uiBeamlineInfo.selectedType == SelectedType::OpticalElement) {  // element
         if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.elements.size())) {
@@ -30,7 +30,7 @@ void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineI
             showParameters(elementParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
         } else {
             // Handle out-of-bounds access for elements
-            RAYX_ERR << "Error: selectedIndex is out of bounds for elements.";
+            RAYX_EXIT << "Error: selectedIndex is out of bounds for elements.";
         }
     } else if (uiBeamlineInfo.selectedType == SelectedType::Group) {  // group
         // Handle group if needed

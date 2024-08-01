@@ -49,7 +49,7 @@ Cutout mkOpeningCutout(const DesignElement& dele) {
             .m_diameter_z = dele.getOpeningHeight(),
         });
     } else {
-        RAYX_ERR << "unsupported opening type!";
+        RAYX_EXIT << "unsupported opening type!";
         return {};
     }
 }
@@ -73,7 +73,7 @@ Cutout mkBeamstopCutout(const DesignElement& dele) {
             .m_length = dele.getStopHeight(),
         });
     } else {
-        RAYX_ERR << "unsupported CentralBeamstop type!";
+        RAYX_EXIT << "unsupported CentralBeamstop type!";
         return {};
     }
 }

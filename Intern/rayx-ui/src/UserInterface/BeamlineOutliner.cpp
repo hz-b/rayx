@@ -195,7 +195,7 @@ void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams) {
                                uiParams.beamlineInfo);
         m_currentRML = uiParams.rmlPath;
     } else if (m_pTreeRoot == nullptr) {
-        RAYX_ERR << "Error: Tree root is null.";
+        RAYX_EXIT << "Error: Tree root is null.";
     } else {
         // Render same Tree
         renderImGuiTree(*m_pTreeRoot, uiParams.camController, uiParams.beamlineInfo.elements, uiParams.beamlineInfo.rSourcePositions,

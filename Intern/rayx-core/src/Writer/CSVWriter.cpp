@@ -115,7 +115,7 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
         }
 
         if (d.size() != 16) {
-            RAYX_ERR << "CSV line has incorrect length: " << d.size();
+            RAYX_EXIT << "CSV line has incorrect length: " << d.size();
         }
 
         const auto direction = glm::dvec3(d[4], d[5], d[6]);
@@ -144,11 +144,11 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
         // This happens for example if we load rays with ray-ids 0, 1, 2, 4, 3.
         // Then when the parser reads the 4, it will consider it out-of-order as it expected a 3.
         if (ray_id + 1 != out.size()) {
-            RAYX_ERR << "loadCSV failed: rays out of order";
+            RAYX_EXIT << "loadCSV failed: rays out of order";
         }
         // The event-id of the new event should match the number of previous events found for this ray.
         if (event_id != out[ray_id].size()) {
-            RAYX_ERR << "loadCSV failed: events out of order";
+            RAYX_EXIT << "loadCSV failed: events out of order";
         }
 
         // put the new event into the BundleHistory.

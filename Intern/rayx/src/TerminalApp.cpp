@@ -41,9 +41,9 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
     namespace fs = std::filesystem;
     if (!fs::exists(path)) {
         if (path.empty()) {
-            RAYX_ERR << "No input file provided!";
+            RAYX_EXIT << "No input file provided!";
         } else {
-            RAYX_ERR << "File '" << path << "' not found!";
+            RAYX_EXIT << "File '" << path << "' not found!";
         }
     }
 
@@ -108,7 +108,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         if (m_CommandParser->m_args.m_plotFlag) {
             if (!file.ends_with(".h5")) {
                 RAYX_WARN << "You can only plot .h5 files!";
-                RAYX_ERR << "Have you selected .csv exporting?";
+                RAYX_EXIT << "Have you selected .csv exporting?";
             }
 
             auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
@@ -185,7 +185,7 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
     if (path.ends_with(".rml")) {
         path = path.substr(0, path.length() - 4);
     } else {
-        RAYX_ERR << "Input file is not an *.rml file!";
+        RAYX_EXIT << "Input file is not an *.rml file!";
     }
 
     Format fmt = formatFromString(m_CommandParser->m_args.m_format);
@@ -195,7 +195,7 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
         writeCSV(hist, path, fmt, startEventID);
     } else {
 #ifdef NO_H5
-        RAYX_ERR << "writeH5 called during NO_H5 (HDF5 disabled during build))";
+        RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
         writeH5(hist, path, fmt, getBeamlineOpticalElementsNames(), startEventID);

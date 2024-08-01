@@ -184,7 +184,7 @@ std::filesystem::path Parser::parseEnergyDistributionFile() const {
     try {
         combinedPath = std::filesystem::canonical(combinedPath);
     } catch (const std::exception& e) {
-        RAYX_ERR << "Failed to canonicalize datfile path: " << e.what();
+        RAYX_EXIT << "Failed to canonicalize datfile path: " << e.what();
     }
 
     RAYX_VERB << "Combined datfile path: " << combinedPath;
@@ -365,9 +365,9 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 
         return true;
     } else {
-        RAYX_ERR << "paramEnergyDistribution is not implemented for "
-                    "energyDistributionType"
-                 << static_cast<int>(energyDistributionType) << "!";
+        RAYX_EXIT << "paramEnergyDistribution is not implemented for "
+                     "energyDistributionType"
+                  << static_cast<int>(energyDistributionType) << "!";
         return false;
     }
 }
@@ -481,7 +481,7 @@ ElementType Parser::type() const {
 double Parser::parseDouble(const char* paramname) const {
     double d;
     if (!paramDouble(node, paramname, &d)) {
-        RAYX_ERR << "parseDouble failed for \"" << paramname << "\"";
+        RAYX_EXIT << "parseDouble failed for \"" << paramname << "\"";
     }
     return d;
 }
@@ -489,7 +489,7 @@ double Parser::parseDouble(const char* paramname) const {
 int Parser::parseInt(const char* paramname) const {
     int i;
     if (!paramInt(node, paramname, &i)) {
-        RAYX_ERR << "parseInt failed for \"" << paramname << "\"";
+        RAYX_EXIT << "parseInt failed for \"" << paramname << "\"";
     }
     return i;
 }
@@ -497,7 +497,7 @@ int Parser::parseInt(const char* paramname) const {
 const char* Parser::parseStr(const char* paramname) const {
     const char* s;
     if (!paramStr(node, paramname, &s)) {
-        RAYX_ERR << "parseStr failed for \"" << paramname << "\"";
+        RAYX_EXIT << "parseStr failed for \"" << paramname << "\"";
     }
     return s;
 }
@@ -505,7 +505,7 @@ const char* Parser::parseStr(const char* paramname) const {
 glm::dvec3 Parser::parseDvec3(const char* paramname) const {
     glm::dvec3 v;
     if (!paramDvec3(node, paramname, &v)) {
-        RAYX_ERR << "parseDvec3 failed for \"" << paramname << "\"";
+        RAYX_EXIT << "parseDvec3 failed for \"" << paramname << "\"";
     }
     return v;
 }
@@ -514,7 +514,7 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
 Misalignment Parser::parseMisalignment() const {
     Misalignment x;
     if (!paramMisalignment(node, &x)) {
-        RAYX_ERR << "parseMisalignment failed";
+        RAYX_EXIT << "parseMisalignment failed";
     }
     return x;
 }
@@ -530,7 +530,7 @@ SlopeError Parser::parseSlopeError() const {
 std::array<double, 6> Parser::parseVls() const {
     std::array<double, 6> x{};
     if (!paramVls(node, &x)) {
-        RAYX_ERR << "parseVls failed";
+        RAYX_EXIT << "parseVls failed";
     }
     return x;
 }
@@ -538,7 +538,7 @@ std::array<double, 6> Parser::parseVls() const {
 EnergyDistribution Parser::parseEnergyDistribution() const {
     EnergyDistribution x;
     if (!paramEnergyDistribution(node, rmlFile, &x)) {
-        RAYX_ERR << "parseEnergyDistribution failed";
+        RAYX_EXIT << "parseEnergyDistribution failed";
     }
     return x;
 }
@@ -547,7 +547,7 @@ glm::dvec4 Parser::parsePosition() const {
     glm::dvec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        RAYX_ERR << "parsePosition failed";
+        RAYX_EXIT << "parsePosition failed";
     }
     return x;
 }
@@ -556,7 +556,7 @@ glm::dmat4x4 Parser::parseOrientation() const {
     glm::dvec4 x;
     glm::dmat4x4 y;
     if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
-        RAYX_ERR << "parseOrientation failed";
+        RAYX_EXIT << "parseOrientation failed";
     }
     return y;
 }
@@ -576,7 +576,7 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
         if (type == "ImagePlane") {
             return serializeUnlimited();
         }
-        RAYX_ERR << "geometricalShape missing, but required!";
+        RAYX_EXIT << "geometricalShape missing, but required!";
     }
 
     auto x = [&] { return parseTotalWidth(); };
@@ -587,7 +587,7 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
         } else if (plane == DesignPlane::XZ) {
             return parseTotalLength();
         } else {
-            RAYX_ERR << "parseCutout encountered an invalid design plane!";
+            RAYX_EXIT << "parseCutout encountered an invalid design plane!";
             return 0.0;
         }
     };
@@ -610,7 +610,7 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
 
         return serializeTrapezoid(trapezoid);
     } else {
-        RAYX_ERR << "invalid geometrical shape!";
+        RAYX_EXIT << "invalid geometrical shape!";
         return {0, {0.0, 0.0, 0.0}};
     }
 }
@@ -679,7 +679,7 @@ double Parser::parseImageType() const {
     int imageType_int;
 
     if (!xml::paramInt(node, "imageType", &imageType_int)) {
-        RAYX_ERR << "Cannot determine image type!";
+        RAYX_EXIT << "Cannot determine image type!";
     }
 
     return (double)imageType_int;
