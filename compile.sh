@@ -14,32 +14,38 @@ for var in "$@"
 do
     if [[ "$var" == "--release" ]]; then
         mode=Release
-    fi
-    if [[ "$var" == "--cuda" ]]; then
-        cuda="-DRAYX_REQUIRES_CUDA=ON"
-    fi
-    if [[ "$var" == "--help" ]]; then
+    elif [[ "$var" == "--cuda" ]]; then
+        cuda="-DRAYX_ENABLE_CUDA=ON -DRAYX_REQUIRES_CUDA=ON"
+    elif [[ "$var" == "--help" ]]; then
         echo "Usage:"
-        echo " ./compile.sh"
-        echo " ./compile.sh --release"
+        echo " ./compile.sh [OPTIONS]..."
+        echo "Options:"
+        echo "--release 'Build in Release mode. Otherwise build in Debug mode'"
+        echo "--cuda 'Build with Cuda for tracing on GPU. Otherwise build without Cuda'"
         exit
+    else
+        echo "Error: Unknown option '$var'"
+        exit 1
     fi
 done
+
+build="./build/$mode"
+conf="$cuda"
 
 echo Updating git submodules ...
 git submodule update --recursive --init
 
-[ ! -d build ] && mkdir build
+[ ! -d $build ] && mkdir -p $build
 
-if [ ! -f ./build/mode ] || [[ ! "$(cat ./build/mode)" == "$mode" ]]; then
-    echo > ./build/mode
+if [ ! -f $build/conf ] || [[ ! "$(cat $build/conf)" == "$conf" ]]; then
+    echo > $build/conf
 
-    echo Setting up build directory for mode $mode ...
-    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode $cuda -B ./build -G Ninja
+    echo Setting up build directory for mode $mode and conf $conf ...
+    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode $cuda -B $build -G Ninja
 
-    echo $mode > ./build/mode
+    echo "$conf" > $build/conf
 fi
 
 # compiling
 echo Compiling ...
-cmake --build ./build --config $mode --target all -j 10 --
+cmake --build $build --config $mode --target all -j $(nproc) --
