@@ -10,7 +10,7 @@ Simulator::Simulator() { m_seq = RAYX::Sequential::No; }
 
 void Simulator::runSimulation() {
     if (!m_readyForSimulation) {
-        RAYX_ERR << "Simulator is not ready for simulation!";
+        RAYX_EXIT << "Simulator is not ready for simulation!";
         return;
     }
     // Run rayx core
@@ -51,7 +51,7 @@ void Simulator::runSimulation() {
     if (path.ends_with(".rml")) {
         path = path.substr(0, path.length() - 4);
     } else {
-        RAYX_ERR << "Input file is not an *.rml file!";
+        RAYX_EXIT << "Input file is not an *.rml file!";
     }
 
     Format fmt = formatFromString(defaultFormatString());

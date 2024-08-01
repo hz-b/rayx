@@ -42,15 +42,15 @@ CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_
 
 void CommandParser::analyzeCommands() const {
     if (!m_args.m_isFixSeed && m_args.m_seed != -1) {
-        RAYX_ERR << "Cannot use user-defined seed without -f, try -f-seed <seed>";
+        RAYX_EXIT << "Cannot use user-defined seed without -f, try -f-seed <seed>";
     }
 
     if (m_args.m_isFixSeed && m_args.m_seed < -1) {
-        RAYX_ERR << "Unsupported seed <= 0";
+        RAYX_EXIT << "Unsupported seed <= 0";
     }
 
     if (m_args.m_cpuFlag && m_args.m_deviceID != -1) {
-        RAYX_ERR << "Picking a device by index is not supported in cpu only mode. Remove flag '-x'";
+        RAYX_EXIT << "Picking a device by index is not supported in cpu only mode. Remove flag '-x'";
     }
 }
 

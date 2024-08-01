@@ -461,7 +461,7 @@ void triangulateObject(const RAYX::Element compiled, std::vector<TextureVertex>&
             break;
         }
         default:
-            RAYX_ERR << "Unknown element type: " << compiled.m_surface.m_type;
+            RAYX_EXIT << "Unknown element type: " << compiled.m_surface.m_type;
             break;
     }
 }

@@ -22,7 +22,7 @@ void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineI
             showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
         } else {
             // Handle out-of-bounds access for sources
-            RAYX_ERR << "Error: selectedIndex is out of bounds for sources.";
+            RAYX_EXIT << "Error: selectedIndex is out of bounds for sources.";
         }
     } else if (uiBeamlineInfo.selectedType == SelectedType::OpticalElement) {  // element
         if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.elements.size())) {
@@ -30,7 +30,7 @@ void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineI
             showParameters(elementParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
         } else {
             // Handle out-of-bounds access for elements
-            RAYX_ERR << "Error: selectedIndex is out of bounds for elements.";
+            RAYX_EXIT << "Error: selectedIndex is out of bounds for elements.";
         }
     } else if (uiBeamlineInfo.selectedType == SelectedType::Group) {  // group
         // Handle group if needed
@@ -145,6 +145,11 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
         auto currentEl = element.as_elementType();
         int currentItem = int(std::distance(RAYX::ElementStringMap.begin(), RAYX::ElementStringMap.find(currentEl)));
 
+        static bool isDisabled = true;  // TODO: Enable after SRI release has been built
+        if (true) {
+            ImGui::BeginDisabled();
+        }
+
         if (ImGui::BeginCombo("##combo", currentItem >= 0 ? RAYX::ElementStringMap[currentEl].c_str() : "")) {
             int n = 0;
             for (const auto& pair : RAYX::ElementStringMap) {
@@ -159,6 +164,10 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 n++;
             }
             ImGui::EndCombo();
+        }
+
+        if (isDisabled) {
+            ImGui::EndDisabled();
         }
     } else if (key == "geometricalShape" || key == "openingShape") {
         const char* shapesGeometrical[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
@@ -190,9 +199,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             ImGui::EndCombo();
         }
-    }
-
-    else {
+    } else {
         // dynamic handling of different types
         switch (element.type()) {
             case RAYX::ValueType::Double: {
@@ -236,6 +243,11 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 break;
             }
             case RAYX::ValueType::String: {
+                static bool isDisabled = true;  // TODO: Enable after SRI release has been built
+                if (true) {
+                    ImGui::BeginDisabled();
+                }
+
                 std::string input = element.as_string();
                 char buffer[256];
 #if defined(WIN32)
@@ -247,6 +259,9 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 if (ImGui::InputText("##string", buffer, sizeof(buffer), flags)) {
                     element = std::string(buffer);
                     changed = true;
+                }
+                if (isDisabled) {
+                    ImGui::EndDisabled();
                 }
                 break;
             }

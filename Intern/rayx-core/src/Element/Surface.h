@@ -21,7 +21,7 @@ struct Surface {
     double m_private_serialization_params[32];
 };
 
-class DesignElement;
+struct DesignElement;
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 Surface makeSurface(const DesignElement& dele);
 Surface makeToroid(const DesignElement& dele);      //< creates a toroid from the parameters given in ` dele`.

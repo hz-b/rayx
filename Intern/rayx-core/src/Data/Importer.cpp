@@ -124,7 +124,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline
             if (success) {
                 group_context->push_back(g);
             } else {
-                RAYX_ERR << "parseGroup failed!";
+                RAYX_EXIT << "parseGroup failed!";
             }
             // recursively parse all objects from within the group.
             handleObjectCollection(object, beamline, group_context, filename);
@@ -134,7 +134,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline
                 group_context->pop_back();
             }
         } else if (strcmp(object->name(), "param") != 0) {
-            RAYX_ERR << "received weird object->name(): " << object->name();
+            RAYX_EXIT << "received weird object->name(): " << object->name();
         }
     }
 }
@@ -153,7 +153,7 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     std::string test = buffer.str();
 
     if (test.empty()) {
-        RAYX_ERR << "importBeamline could not open file! (or it was just empty)";
+        RAYX_EXIT << "importBeamline could not open file! (or it was just empty)";
     }
 
     // load the RML string into the rapid XML parser library.

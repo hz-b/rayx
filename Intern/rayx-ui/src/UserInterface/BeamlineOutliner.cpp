@@ -81,9 +81,9 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
         rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
         std::string type = typeAttr ? typeAttr->value() : "";
         SelectedType category = SelectedType::None;
-        ElementType elementType = RAYX::findElementString(type);
 
         if (strcmp(xmlChild->name(), "object") == 0) {
+            ElementType elementType = RAYX::findElementString(type);
             switch (elementType) {
                 case ElementType::PointSource:
                 case ElementType::MatrixSource:
@@ -195,7 +195,7 @@ void BeamlineOutliner::showBeamlineOutlineWindow(UIParameters& uiParams) {
                                uiParams.beamlineInfo);
         m_currentRML = uiParams.rmlPath;
     } else if (m_pTreeRoot == nullptr) {
-        RAYX_ERR << "Error: Tree root is null.";
+        RAYX_EXIT << "Error: Tree root is null.";
     } else {
         // Render same Tree
         renderImGuiTree(*m_pTreeRoot, uiParams.camController, uiParams.beamlineInfo.elements, uiParams.beamlineInfo.rSourcePositions,

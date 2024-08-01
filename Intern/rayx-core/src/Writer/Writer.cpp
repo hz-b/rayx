@@ -22,7 +22,7 @@ FormatComponent componentFromString(const std::string& comp) {
         }
     }
     RAYX_WARN << "Cannot evaluate format component \"" << comp << "\"!";
-    RAYX_ERR << "A valid format would be \"" << defaultFormatString() << "\"";
+    RAYX_EXIT << "A valid format would be \"" << defaultFormatString() << "\"";
     return {};
 }
 

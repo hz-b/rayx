@@ -59,7 +59,7 @@ void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const
             dataset.write_raw(ptr);
         }
     } catch (HighFive::Exception& err) {
-        RAYX_ERR << err.what();
+        RAYX_EXIT << err.what();
     }
 }
 
@@ -145,7 +145,7 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
         RAYX_VERB << "Loaded " << rays.size() << " rays from " << filename;
 
     } catch (HighFive::Exception& err) {
-        RAYX_ERR << err.what();
+        RAYX_EXIT << err.what();
     }
     return rays;
 }
