@@ -30,7 +30,7 @@ class TerminalApp {
     /// children of that directory.
     void tracePath(const std::filesystem::path& path);
     // returns the output filename (either .csv or .h5)
-    std::string exportRays(const RAYX::BundleHistory&, std::string, int startEventID);
+    std::filesystem::path exportRays(RAYX::Scheduler::TraceResult&& hist, std::filesystem::path filepath);
     std::vector<std::string> getBeamlineOpticalElementsNames();
     std::vector<std::string> getBeamlineLightSourcesNames();
 

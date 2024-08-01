@@ -12,20 +12,24 @@
 
 namespace RAYX {
 
+struct RAYX_API Batch {
+    std::vector<Ray> events;
+    std::vector<std::span<Ray>> rays;
+};
+
 class RAYX_API Scheduler {
   public:
     Scheduler(const DeviceConfig& deviceConfig);
     ~Scheduler();
 
-    using BatchResult = DeviceTracer::BatchOutput;
-
-    std::vector<std::future<BatchResult>> trace(const Beamline& beamline);
+    using TraceResult = std::vector<std::future<Batch>>;
+    TraceResult trace(const Beamline& beamline);
 
   private:
     struct BatchJob {
         std::shared_ptr<DeviceTracer::BeamlineInput> beamlineInput;
         DeviceTracer::BatchInput batchInput;
-        std::promise<DeviceTracer::BatchOutput> batchOutputPromise;
+        std::promise<Batch> batchPromise;
     };
 
     BlockingQueue<BatchJob> m_batchJobQueue;

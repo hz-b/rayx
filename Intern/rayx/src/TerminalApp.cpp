@@ -70,7 +70,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
             m_CommandParser->m_args.m_startEventID = maxEvents - 1;
         }
-        auto batchResultFutures = m_Tracer->trace(*m_Beamline);
+        auto traceResult = m_Tracer->trace(*m_Beamline);
 
         // check max EventID
         unsigned int maxEventID = 0;
@@ -99,38 +99,22 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         //              << maxEventID << " to increase performance.";
         // }
 
-        // export rays
-        {
-            RAYX_PROFILE_SCOPE_STDOUT("write csv");
-            const auto format = RAYX::formatFromString(m_CommandParser->m_args.m_format);
-            const auto startEventIndex = m_CommandParser->m_args.m_startEventID;
-            auto outputFilepath = path;
-            outputFilepath.replace_extension("csv");
-            auto writer = RAYX::CsvWriter(outputFilepath, format, startEventIndex);
-            for (auto& batchResultFuture : batchResultFutures) {
-                assert(batchResultFuture.valid());
-                batchResultFuture.wait();
-                const auto batchResult = batchResultFuture.get();
-                writer.write(batchResult);
+        const auto startEventIndex = m_CommandParser->m_args.m_startEventID;
+        const auto file = exportRays(std::move(traceResult), path);
+
+        // Plot
+        if (m_CommandParser->m_args.m_plotFlag) {
+            if (file.extension() != "h5") {
+                RAYX_WARN << "You can only plot .h5 files!";
+                RAYX_ERR << "Have you selected .csv exporting?";
+            }
+
+            auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file.string();
+            auto ret = system(cmd.c_str());
+            if (ret != 0) {
+                RAYX_WARN << "received error code while printing";
             }
         }
-
-        // // Plot
-        // if (m_CommandParser->m_args.m_plotFlag) {
-        //     if (!file.ends_with(".h5")) {
-        //         RAYX_WARN << "You can only plot .h5 files!";
-        //         RAYX_ERR << "Have you selected .csv exporting?";
-        //     }
-        //
-        //     auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
-        //     auto ret = system(cmd.c_str());
-        //     if (ret != 0) {
-        //         RAYX_WARN << "received error code while printing";
-        //     }
-        // }
-
-        // for (auto& f : batchResultFutures)
-        //     f.wait();
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
@@ -195,31 +179,22 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path, int startEventID) {
+std::filesystem::path TerminalApp::exportRays(RAYX::Scheduler::TraceResult&& traceResult, std::filesystem::path filepath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    bool csv = m_CommandParser->m_args.m_csvFlag;
 
-    // strip .rml
-    if (path.ends_with(".rml")) {
-        path = path.substr(0, path.length() - 4);
-    } else {
-        RAYX_ERR << "Input file is not an *.rml file!";
-    }
+    const auto format = RAYX::formatFromString(m_CommandParser->m_args.m_format);
+    const auto startEventIndex = m_CommandParser->m_args.m_startEventID;
+    filepath.replace_extension("csv");
 
-    const auto fmt = RAYX::formatFromString(m_CommandParser->m_args.m_format);
+    auto writer = std::unique_ptr<RAYX::Writer>();
+    if (m_CommandParser->m_args.m_csvFlag)
+        std::make_unique<RAYX::CsvWriter>(filepath, format, startEventIndex)->writeBeamline(std::move(traceResult));
+    else
+        assert(false);
+        // TODO
+        // std::make_unique<RAYX::H5Writer>(filepath, format, startEventIndex)->writeBeamline(std::move(traceResult));
 
-    if (csv) {
-        path += ".csv";
-        RAYX::writeCSV(hist, path, fmt, startEventID);
-    } else {
-#ifdef NO_H5
-        RAYX_ERR << "RAYX::writeH5 called during NO_H5 (HDF5 disabled during build))";
-#else
-        path += ".h5";
-        RAYX::writeH5(hist, path, fmt, getBeamlineOpticalElementsNames(), startEventID);
-#endif
-    }
-    return path;
+    return filepath;
 }
 
 /**

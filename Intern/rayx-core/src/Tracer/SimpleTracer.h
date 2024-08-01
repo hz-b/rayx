@@ -154,7 +154,6 @@ DeviceTracer::BatchOutput SimpleTracer<Acc>::traceBatch(const DeviceTracer::Beam
                          static_cast<Idx>(beamlineInput->materialTables.materialTable.size()));
 
         m_prevBeamlineInput = beamlineInput;
-        RAYX_LOG << "New Beamline";
     }
 
     const auto rayIdStart = batchInput.raysOffset;
@@ -180,12 +179,6 @@ DeviceTracer::BatchOutput SimpleTracer<Acc>::traceBatch(const DeviceTracer::Beam
     transferFromBuffer(q, cpu, m_batchResult.compactEvents, m_batchOutput.compactEvents, static_cast<Idx>(traceResult.totalEventsCount));
 
     alpaka::wait(q);
-
-    // auto rayIndices = zip(m_batchResult.compactEventOffsets, m_batchResult.compactEventCounts);
-    // return DeviceTracer::BatchOutput {
-    //     .rayIndices = std::move(rayIndices),
-    //     .events = std::move(m_batchResult.compactEvents),
-    // };
 
     return DeviceTracer::BatchOutput{
         .eventCounts = std::move(m_batchResult.compactEventCounts),

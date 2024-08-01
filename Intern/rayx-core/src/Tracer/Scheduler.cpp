@@ -35,6 +35,24 @@ std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceType, De
     }
 }
 
+RAYX::Batch batchOutputToBatch(RAYX::DeviceTracer::BatchOutput&& batchOutput) {
+    auto rays = std::vector<std::span<RAYX::Ray>>();
+    rays.reserve(batchOutput.eventOffsets.size());
+
+    for (size_t i = 0; i < batchOutput.eventOffsets.size(); ++i) {
+        const auto data = batchOutput.events.data();
+        const auto offset = batchOutput.eventOffsets[i];
+        const auto size = batchOutput.eventCounts[i];
+        const auto ray = std::span<RAYX::Ray>(data + offset, size);
+        rays.emplace_back(ray);
+    }
+
+    return RAYX::Batch {
+        .events = std::move(batchOutput.events),
+        .rays = std::move(rays),
+    };
+}
+
 }  // unnamed namespace
 
 namespace RAYX {
@@ -58,7 +76,8 @@ Scheduler::Scheduler(const DeviceConfig& deviceConfig) : m_deviceTracerShouldSto
                     using namespace std::chrono_literals;
                     if (auto batchJob = m_batchJobQueue.pop_wait(); batchJob) {
                         auto batchOutput = deviceTracer->traceBatch(batchJob->beamlineInput, batchJob->batchInput);
-                        batchJob->batchOutputPromise.set_value(std::move(batchOutput));
+                        auto batch = batchOutputToBatch(std::move(batchOutput));
+                        batchJob->batchPromise.set_value(std::move(batch));
                     }
                 }
             };
@@ -75,7 +94,7 @@ Scheduler::~Scheduler() {
     for (auto& deviceTracerFuture : m_deviceTracerFutures) deviceTracerFuture.wait();
 }
 
-std::vector<std::future<Scheduler::BatchResult>> Scheduler::trace(const Beamline& beamline) {
+Scheduler::TraceResult Scheduler::trace(const Beamline& beamline) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // don't trace if there are no optical elements
@@ -106,8 +125,8 @@ std::vector<std::future<Scheduler::BatchResult>> Scheduler::trace(const Beamline
         .randomSeed = randomSeed,
     });
 
-    auto batchResultFutures = std::vector<std::future<BatchResult>>();
-    batchResultFutures.reserve(numBatches);
+    auto batchFutures = TraceResult();
+    batchFutures.reserve(numBatches);
 
     for (int i = 0; i < static_cast<int>(rays.size()); i += DEFAULT_BATCH_SIZE) {  // TODO: --batch (batch size)
         const auto batchInput = DeviceTracer::BatchInput{
@@ -115,19 +134,19 @@ std::vector<std::future<Scheduler::BatchResult>> Scheduler::trace(const Beamline
             .raysSize = std::min(DEFAULT_BATCH_SIZE, static_cast<int>(rays.size()) - i),
         };
 
-        auto batchResultPromise = std::promise<BatchResult>();
-        batchResultFutures.push_back(batchResultPromise.get_future());
+        auto batchPromise = std::promise<Batch>();
+        batchFutures.push_back(batchPromise.get_future());
 
         auto batchJob = BatchJob{
             .beamlineInput = beamlineInput,
             .batchInput = batchInput,
-            .batchOutputPromise = std::move(batchResultPromise),
+            .batchPromise = std::move(batchPromise),
         };
 
         m_batchJobQueue.push(std::move(batchJob));
     }
 
-    return batchResultFutures;
+    return batchFutures;
 }
 
 }  // namespace RAYX

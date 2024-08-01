@@ -14,8 +14,6 @@ constexpr char DELIMITER = ',';
 
 namespace RAYX {
 
-void RAYX_API writeCSV(const BundleHistory& hist, const std::string& filename, const Format& format, int startEventID) {}
-
 BundleHistory loadCSV(const std::string& filename) {
     std::ifstream file(filename);
 
@@ -102,16 +100,14 @@ CsvWriter::CsvWriter(const std::filesystem::path& filepath, const Format& format
     validate();
 }
 
-void CsvWriter::write(const DeviceTracer::BatchOutput& batch) {
-    RAYX_VERB << "Writing " << batch.eventCounts.size() << " rays to csv file...";
+void CsvWriter::writeBatch(const Batch& batch) {
+    RAYX_VERB << "Writing " << batch.rays.size() << " rays to csv file...";
 
     // write single batch to the body of the CSVm_file:
-    for (size_t ray_id = 0; ray_id < batch.eventCounts.size(); ++ray_id) {
-        const auto offset = batch.eventOffsets[ray_id];
-        const auto count = batch.eventCounts[ray_id];
-
-        for (int event_id = 0; event_id < count; ++event_id) {
-            const auto& event = batch.events[offset + event_id];
+    for (int ray_id = 0; ray_id < static_cast<int>(batch.rays.size()); ++ray_id) {
+        const auto& ray = batch.rays[ray_id];
+        for (int event_id = 0; event_id < static_cast<int>(ray.size()); ++event_id) {
+            const auto& event = ray[event_id];
 
             for (uint32_t i = 0; i < m_format.size(); i++) {
                 if (i > 0) m_file << DELIMITER;

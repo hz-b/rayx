@@ -9,21 +9,36 @@
 #include "Shader/Ray.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
+#include "Tracer/Scheduler.h"
 
 namespace RAYX {
-
-void RAYX_API writeCSV(const BundleHistory&, const std::string& filename, const Format& format, int startEventID = 0);
 
 // loadCSV only works for csv files created using FULL_FORMAT.
 BundleHistory RAYX_API loadCSV(const std::string& filename);
 
-class RAYX_API CsvWriter {
+class RAYX_API Writer {
+    public:
+    virtual ~Writer() = 0;
+
+    virtual void writeBatch(const Batch& batch) = 0;
+
+    void writeBeamline(Scheduler::TraceResult&& traceResult) {
+        for (auto& batchFuture : traceResult) {
+            assert(batchFuture.valid());
+            batchFuture.wait();
+            const auto batch = batchFuture.get();
+            writeBatch(batch);
+        }
+    }
+};
+
+class RAYX_API CsvWriter : public Writer {
   public:
     static constexpr int DEFAULT_PRECISION = 20;
 
     CsvWriter(const std::filesystem::path& filepath, const Format& format = FULL_FORMAT, int startEventIndex = 0, int precision = DEFAULT_PRECISION);
 
-    void write(const DeviceTracer::BatchOutput& batch);
+    void writeBatch(const Batch& batch) override;
 
   private:
     std::ofstream m_file;
