@@ -42,7 +42,7 @@ void Window::framebufferResizeCallback(GLFWwindow* rawWindow, int width, int hei
     if (window) {
         window->onFramebufferResize(width, height);
     } else {
-        RAYX_ERR << "Failed to get window pointer in framebuffer resize callback!";
+        RAYX_EXIT << "Failed to get window pointer in framebuffer resize callback!";
     }
 }
 

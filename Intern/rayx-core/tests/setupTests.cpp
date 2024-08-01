@@ -15,7 +15,7 @@ double parseDouble(std::string s) {
     if (sscanf(s.c_str(), "%le", &d) != 1) {
 #endif
         RAYX_WARN << "parseDouble failed for string:";
-        RAYX_ERR << s;
+        RAYX_EXIT << s;
         return false;
     }
     return d;

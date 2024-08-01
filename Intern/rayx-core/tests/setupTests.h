@@ -50,7 +50,7 @@ template <typename TL, typename TR>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const TL& tl, const TR& tr, std::vector<double> vl,
                     std::vector<double> vr, double tolerance = 1e-10) {
     if (vl.size() != vr.size()) {
-        RAYX::Err(filename, line) << l << " != " << r << ": different lengths!";
+        RAYX::Exit(filename, line) << l << " != " << r << ": different lengths!";
         return;
     }
 
@@ -122,25 +122,25 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 
 /// assert that x holds, and give a fancy print otherwise.
-#define CHECK(x)                                      \
-    {                                                 \
-        if (!(x)) {                                   \
-            RAYX_ERR << "CHECK(" << #x << ") failed"; \
-        }                                             \
+#define CHECK(x)                                       \
+    {                                                  \
+        if (!(x)) {                                    \
+            RAYX_EXIT << "CHECK(" << #x << ") failed"; \
+        }                                              \
     }
 
 /// check whether low <= expr <= high
-#define CHECK_IN(expr, low, high)                                                                 \
-    {                                                                                             \
-        auto expr_check_in = expr;                                                                \
-        auto low_check_in = low;                                                                  \
-        if (expr_check_in < low_check_in) {                                                       \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low;  \
-        }                                                                                         \
-        auto high_check_in = high;                                                                \
-        if (expr_check_in > high_check_in) {                                                      \
-            RAYX_ERR << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high; \
-        }                                                                                         \
+#define CHECK_IN(expr, low, high)                                                                  \
+    {                                                                                              \
+        auto expr_check_in = expr;                                                                 \
+        auto low_check_in = low;                                                                   \
+        if (expr_check_in < low_check_in) {                                                        \
+            RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low;  \
+        }                                                                                          \
+        auto high_check_in = high;                                                                 \
+        if (expr_check_in > high_check_in) {                                                       \
+            RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high; \
+        }                                                                                          \
     }
 
 // ShaderTest

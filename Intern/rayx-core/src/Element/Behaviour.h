@@ -24,7 +24,7 @@ struct Behaviour {
     double m_private_serialization_params[16];
 };
 
-class DesignElement;
+struct DesignElement;
 enum class RZPType { Elliptical, Meriodional };
 enum class CentralBeamstop { None, Rectangle, Elliptical };
 Behaviour makeBehaviour(const DesignElement& dele);

@@ -39,7 +39,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
 #else
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
 #endif
-            RAYX_ERR << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
+            RAYX_EXIT << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

@@ -12,7 +12,7 @@
 
 namespace RAYX {
 
-class DesignElement;
+struct DesignElement;
 
 /**
  * @brief Structure to represent an element in the ray tracing simulation.

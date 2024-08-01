@@ -20,7 +20,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
             using GpuAccCuda = RAYX::GpuAccCuda<Dim, Idx>;
             return std::make_shared<RAYX::SimpleTracer<GpuAccCuda>>(deviceIndex);
 #else
-            RAYX_ERR << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
+            RAYX_EXIT << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
             return nullptr;
 #endif
         case DeviceType::GpuHip:
@@ -28,7 +28,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
             using GpuAccHip = RAYX::GpuAccHip<Dim, Idx>;
             return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
 #else
-            RAYX_ERR << "Failed to create Tracer with Hip device. Hip was disabled during build.";
+            RAYX_EXIT << "Failed to create Tracer with Hip device. Hip was disabled during build.";
             return nullptr;
 #endif
         default:  // case DeviceType::Cpu
@@ -42,7 +42,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
 namespace RAYX {
 
 Tracer::Tracer(const DeviceConfig& deviceConfig) {
-    if (deviceConfig.enabledDevicesCount() != 1) RAYX_ERR << "The number of selected devices must be exactly 1!";
+    if (deviceConfig.enabledDevicesCount() != 1) RAYX_EXIT << "The number of selected devices must be exactly 1!";
 
     for (const auto& device : deviceConfig.devices) {
         if (device.enable) {

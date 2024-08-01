@@ -51,7 +51,7 @@ std::filesystem::path getExecutablePath() {
 /// this function assumes that `base` is already an absolute path
 std::filesystem::path canonicalize(const std::filesystem::path& relPath, const std::filesystem::path& base) {
     if (!base.is_absolute()) {
-        RAYX_ERR << "canonicalize called with non-absolute base path: \"" << base << "\"";
+        RAYX_EXIT << "canonicalize called with non-absolute base path: \"" << base << "\"";
     }
     // absolute paths will stay unchanged
     if (relPath.is_absolute()) {

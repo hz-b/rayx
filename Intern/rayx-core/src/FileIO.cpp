@@ -68,7 +68,7 @@ void writeFile(const std::vector<uint8_t>& data, const std::string& filename, co
     file.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 
     if (!file.is_open()) {
-        RAYX_ERR << "Failed to open file: " << filename;
+        RAYX_EXIT << "Failed to open file: " << filename;
     }
 
     uint64_t write_count = count;

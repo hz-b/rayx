@@ -29,7 +29,7 @@ const char* getMaterialName(Material m) {
 #include "materials.xmacro"
 #undef X
     }
-    RAYX_ERR << "unknown material in getMaterialName()!";
+    RAYX_EXIT << "unknown material in getMaterialName()!";
     return nullptr;
 }
 
@@ -50,7 +50,7 @@ bool materialFromString(const char* matname, Material* out) {
             return true;
         }
     }
-    RAYX_ERR << "materialFromString(): material \"" << matname << "\" not found";
+    RAYX_EXIT << "materialFromString(): material \"" << matname << "\" not found";
     return false;
 }
 
@@ -59,7 +59,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
 
     auto mats = allNormalMaterials();
     if (mats.size() != 92) {
-        RAYX_ERR << "unexpected number of materials. this is a bug.";
+        RAYX_EXIT << "unexpected number of materials. this is a bug.";
     }
 
     // add palik table content
@@ -69,7 +69,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
             PalikTable t;
 
             if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_ERR << "could not load PalikTable!";
+                RAYX_EXIT << "could not load PalikTable!";
             }
 
             for (auto x : t.m_Lines) {
@@ -87,7 +87,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
             NffTable t;
 
             if (!NffTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_ERR << "could not load NffTable!";
+                RAYX_EXIT << "could not load NffTable!";
             }
 
             for (auto x : t.m_Lines) {

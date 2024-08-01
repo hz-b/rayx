@@ -89,7 +89,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         auto& rayHist = rayCache[i];
 
         if (beamline.m_DesignSources.size() <= rayHist[0].m_sourceID) {
-            RAYX_ERR << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
+            RAYX_EXIT << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
         }
         glm::vec4 rayLastPos = glm::vec4(beamline.m_DesignSources[static_cast<size_t>(rayHist[0].m_sourceID)].getWorldPosition());
 
@@ -97,7 +97,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
 
         for (const RAYX::Ray& event : rayHist) {
             if (event.m_lastElement >= beamline.m_DesignElements.size()) {
-                RAYX_ERR << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
+                RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);
             glm::vec4 originColor = (event.m_eventType == RAYX::ETYPE_JUST_HIT_ELEM) ? YELLOW : WHITE;

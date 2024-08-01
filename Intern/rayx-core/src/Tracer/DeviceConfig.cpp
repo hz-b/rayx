@@ -171,7 +171,7 @@ DeviceConfig& DeviceConfig::enableAllDevices(DeviceType deviceType) {
 DeviceConfig& DeviceConfig::disableDeviceByIndex(const Device::Index deviceIndex) {
     if (devices.size() <= deviceIndex) {
         dumpDevices();
-        RAYX_ERR << "Specified device index is out of range: " << deviceIndex;
+        RAYX_EXIT << "Specified device index is out of range: " << deviceIndex;
     }
 
     devices[deviceIndex].enable = false;
@@ -181,7 +181,7 @@ DeviceConfig& DeviceConfig::disableDeviceByIndex(const Device::Index deviceIndex
 DeviceConfig& DeviceConfig::enableDeviceByIndex(const Device::Index deviceIndex) {
     if (devices.size() <= deviceIndex) {
         dumpDevices();
-        RAYX_ERR << "Specified device index is out of range: " << deviceIndex;
+        RAYX_EXIT << "Specified device index is out of range: " << deviceIndex;
     }
 
     devices[deviceIndex].enable = true;
@@ -196,7 +196,7 @@ DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
 
     if (bestIt == devicesByTypeView.end()) {
         dumpDevices();
-        RAYX_ERR << "Could not find best device for types: " << deviceTypeToString(static_cast<DeviceType>(m_fetchedDeviceType & deviceType));
+        RAYX_EXIT << "Could not find best device for types: " << deviceTypeToString(static_cast<DeviceType>(m_fetchedDeviceType & deviceType));
     }
 
     bestIt->enable = true;
