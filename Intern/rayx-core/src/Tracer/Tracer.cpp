@@ -16,7 +16,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
 
     switch (deviceType) {
         case DeviceType::GpuCuda:
-#if defined(RAYX_CUDA)
+#if defined(RAYX_CUDA_ENABLED)
             using GpuAccCuda = RAYX::GpuAccCuda<Dim, Idx>;
             return std::make_shared<RAYX::SimpleTracer<GpuAccCuda>>(deviceIndex);
 #else
@@ -24,7 +24,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
             return nullptr;
 #endif
         case DeviceType::GpuHip:
-#if defined(RAYX_HIP)
+#if defined(RAYX_HIP_ENABLED)
             using GpuAccHip = RAYX::GpuAccHip<Dim, Idx>;
             return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
 #else

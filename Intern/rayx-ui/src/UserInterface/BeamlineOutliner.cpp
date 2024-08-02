@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-#include "Shader/Strings.h"
+#include "Data/Strings.h"
 
 BeamlineOutliner::BeamlineOutliner(/* args */) {}
 

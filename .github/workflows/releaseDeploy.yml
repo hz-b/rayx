@@ -60,25 +60,16 @@ jobs:
           echo "${{github.workspace}}/boost" >> $GITHUB_PATH
           echo "${{github.workspace}}/boost/boost" >> $GITHUB_PATH
 
-      - name: Install Cuda (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: Jimver/cuda-toolkit@v0.2.16
-        id: cuda-toolkit-windows
-        with:
-          cuda: '12.3.2'
-
-      - name: Add Cuda to PATH (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          echo "Installed cuda version is: ${{steps.cuda-toolkit-windows.outputs.cuda}}"
-          echo "Cuda install location: ${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}"
-          echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}" >> $GITHUB_PATH
-          echo "${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}/bin" >> $GITHUB_PATH
-          echo "nvcc -V"
+      - name: Setup CUDA Toolkit
+        id: cuda-toolkit
+        shell: pwsh
+        run: .\Scripts\setup-cuda.ps1
+        env:
+            INPUT_CUDA_VERSION: 12.5.1
 
       - name: Configure CMake (Windows)
         if: matrix.os == 'windows-latest'
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="${{steps.cuda-toolkit-windows.outputs.CUDA_PATH}}"
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON
 
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'

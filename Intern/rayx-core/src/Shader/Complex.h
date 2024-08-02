@@ -3,7 +3,7 @@
 #include "Common.h"
 
 #if defined(RAYX_CUDA_ENABLED)
-#include <thrust/complex.h>
+#include <cuda/std/complex>
 #else
 #include <complex>
 #endif
@@ -13,7 +13,7 @@ namespace RAYX {
 namespace complex {
 template <typename T>
 #if defined(RAYX_CUDA_ENABLED)
-using tcomplex = thrust::complex<T>;
+using tcomplex = cuda::std::complex<T>;
 #else
 using tcomplex = std::complex<T>;
 #endif
@@ -27,31 +27,31 @@ using cmat3 = glm::tmat3x3<complex::Complex>;
 
 namespace complex {
 #if defined(RAYX_CUDA_ENABLED)
-using thrust::abs;
-using thrust::arg;
-using thrust::conj;
-using thrust::exp;
-using thrust::log;
-using thrust::log10;
-using thrust::norm;
-using thrust::polar;
-using thrust::pow;
-using thrust::proj;
-using thrust::sqrt;
+using cuda::std::abs;
+using cuda::std::arg;
+using cuda::std::conj;
+using cuda::std::exp;
+using cuda::std::log;
+using cuda::std::log10;
+using cuda::std::norm;
+using cuda::std::polar;
+using cuda::std::pow;
+using cuda::std::proj;
+using cuda::std::sqrt;
 
-using thrust::acos;
-using thrust::asin;
-using thrust::atan;
-using thrust::cos;
-using thrust::sin;
-using thrust::tan;
+using cuda::std::acos;
+using cuda::std::asin;
+using cuda::std::atan;
+using cuda::std::cos;
+using cuda::std::sin;
+using cuda::std::tan;
 
-using thrust::acosh;
-using thrust::asinh;
-using thrust::atanh;
-using thrust::cosh;
-using thrust::sinh;
-using thrust::tanh;
+using cuda::std::acosh;
+using cuda::std::asinh;
+using cuda::std::atanh;
+using cuda::std::cosh;
+using cuda::std::sinh;
+using cuda::std::tanh;
 #else
 using std::abs;
 using std::arg;
