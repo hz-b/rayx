@@ -1,44 +1,36 @@
 #pragma once
 
+#include <future>
 #include <memory>
-#include <string>
 #include <vector>
 
+#include "BlockingQueue.h"
 #include "Core.h"
 #include "DeviceConfig.h"
-#include "DeviceTracer.h"
 #include "Shader/Ray.h"
+#include "Tracer.h"
+#include "Beamline/EventList.h"
 
-// Abstract Tracer base class.
 namespace RAYX {
 
-// if no `--batch` option is given, this it the batch size.
-// constexpr int DEFAULT_BATCH_SIZE = 1 << 16;
-constexpr int DEFAULT_BATCH_SIZE = 100000;  // 16384 TODO: figure if a power of two is better than just 10000
-
-class RAYX_API Tracer {
+class RAYX_API Scheduler {
   public:
-    /**
-     * @brief Constructs Tracer for the desired platform
-     * @param platform specify the platform
-     * @param deviceIndex index of the picked divice on specified platform
-     */
-    Tracer(const DeviceConfig& deviceConfig);
+    Scheduler(const DeviceConfig& deviceConfig);
+    ~Scheduler();
 
-    // This will call the trace implementation of a subclass
-    // See `BundleHistory` for information about the return value.
-    // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
-    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, unsigned int maxEvents = 1,
-                        int startEventID = 0);
-
-    static int defaultMaxEvents(const Beamline* beamline = nullptr);
+    using BatchList = std::vector<std::future<EventList>>;
+    BatchList trace(const Beamline& beamline);
 
   private:
-    std::shared_ptr<DeviceTracer> m_deviceTracer;
-};
+    struct BatchJob {
+        std::shared_ptr<DeviceTracer::BeamlineInput> beamlineInput;
+        DeviceTracer::BatchInput batchInput;
+        std::promise<EventList> batchPromise;
+    };
 
-// TODO deprecate these functions and all of their uses.
-RAYX_API std::vector<Ray> extractLastEvents(const BundleHistory& hist);
-RAYX_API BundleHistory convertToBundleHistory(const std::vector<Ray>& rays);
+    BlockingQueue<BatchJob> m_batchJobQueue;
+    std::atomic<bool> m_deviceTracerShouldStop;
+    std::vector<std::future<void>> m_deviceTracerFutures;
+};
 
 }  // namespace RAYX

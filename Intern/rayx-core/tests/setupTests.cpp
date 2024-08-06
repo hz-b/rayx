@@ -71,14 +71,15 @@ RAYX::Beamline loadBeamline(std::string filename) {
 }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
-void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
+void writeToOutputCSV(const RAYX::EventList& events, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    RAYX::writeCSV(hist, f, FULL_FORMAT);
+    RAYX::CsvWriter(f).write(events);
 }
 
-RAYX::BundleHistory traceRML(std::string filename) {
+RAYX::EventList traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
+    // TODO: args
+    return tracer->trace(beamline, /* Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2 */);
 }
 
 std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {

@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "CommandParser.h"
-#include "RAY-Core.h"
+#include "Core.h"
 #include "TerminalAppConfig.h"
 #include "Tracer/Scheduler.h"
 

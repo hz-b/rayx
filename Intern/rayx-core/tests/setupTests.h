@@ -20,6 +20,7 @@
 #include "Shader/Ray.h"
 #include "Shader/RefractiveIndex.h"
 #include "Writer/CSVWriter.h"
+#include "Tracer/Tracer.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

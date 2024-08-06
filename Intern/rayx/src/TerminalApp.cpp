@@ -57,8 +57,8 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // calculate max batch size
         uint64_t max_batch_size = RAYX::DEFAULT_BATCH_SIZE;
-        if (m_CommandParser->m_args.m_BatchSize != 0) {
-            max_batch_size = m_CommandParser->m_args.m_BatchSize;
+        if (m_CommandParser->m_args.m_Size != 0) {
+            max_batch_size = m_CommandParser->m_args.m_Size;
         }
 
         // Run rayx core
@@ -70,7 +70,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             RAYX_LOG << "startEventID must be < maxEvents. Setting to maxEvents-1.";
             m_CommandParser->m_args.m_startEventID = maxEvents - 1;
         }
-        auto traceResult = m_Tracer->trace(*m_Beamline);
+        auto eventList = m_Tracer->trace(*m_Beamline);
 
         // check max EventID
         unsigned int maxEventID = 0;
@@ -100,7 +100,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         // }
 
         const auto startEventIndex = m_CommandParser->m_args.m_startEventID;
-        const auto file = exportRays(std::move(traceResult), path);
+        const auto file = exportRays(std::move(eventList), path);
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
@@ -173,13 +173,13 @@ void TerminalApp::run() {
             return RAYX::DeviceConfig(deviceType).enableAllDevices();
         }
     };
-    m_Tracer = std::make_unique<RAYX::Scheduler>(getDevice());
+    m_Tracer = std::make_unique<RAYX::Tracer>(getDevice());
 
     // Trace, export and plot
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::filesystem::path TerminalApp::exportRays(RAYX::Scheduler::TraceResult&& traceResult, std::filesystem::path filepath) {
+std::filesystem::path TerminalApp::exportRays(RAYX::Tracer::Result&& eventList, std::filesystem::path filepath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     const auto format = RAYX::formatFromString(m_CommandParser->m_args.m_format);
@@ -188,11 +188,11 @@ std::filesystem::path TerminalApp::exportRays(RAYX::Scheduler::TraceResult&& tra
 
     auto writer = std::unique_ptr<RAYX::Writer>();
     if (m_CommandParser->m_args.m_csvFlag)
-        std::make_unique<RAYX::CsvWriter>(filepath, format, startEventIndex)->writeBeamline(std::move(traceResult));
+        std::make_unique<RAYX::CsvWriter>(filepath, format, startEventIndex)->writeBeamline(std::move(eventList));
     else
         assert(false);
         // TODO
-        // std::make_unique<RAYX::H5Writer>(filepath, format, startEventIndex)->writeBeamline(std::move(traceResult));
+        // std::make_unique<RAYX::H5Writer>(filepath, format, startEventIndex)->writeBeamline(std::move(eventList));
 
     return filepath;
 }

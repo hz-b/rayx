@@ -100,7 +100,7 @@ CsvWriter::CsvWriter(const std::filesystem::path& filepath, const Format& format
     validate();
 }
 
-void CsvWriter::writeBatch(const Batch& batch) {
+void CsvWriter::write(const Batch& batch) {
     RAYX_VERB << "Writing " << batch.rays.size() << " rays to csv file...";
 
     // write single batch to the body of the CSVm_file:

@@ -9,7 +9,8 @@
 #include "Shader/Ray.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
-#include "Tracer/Scheduler.h"
+#include "Beamline/EventList.h"
+#include "Tracer/Tracer.h"
 
 namespace RAYX {
 
@@ -20,14 +21,14 @@ class RAYX_API Writer {
     public:
     virtual ~Writer() = 0;
 
-    virtual void writeBatch(const Batch& batch) = 0;
+    virtual void write(const Batch& batch) = 0;
 
-    void writeBeamline(Scheduler::TraceResult&& traceResult) {
-        for (auto& batchFuture : traceResult) {
+    void writeBeamline(Tracer::BatchList&& batches) {
+        for (auto& batchFuture : batches) {
             assert(batchFuture.valid());
             batchFuture.wait();
             const auto batch = batchFuture.get();
-            writeBatch(batch);
+            write(batch);
         }
     }
 };
@@ -38,7 +39,7 @@ class RAYX_API CsvWriter : public Writer {
 
     CsvWriter(const std::filesystem::path& filepath, const Format& format = FULL_FORMAT, int startEventIndex = 0, int precision = DEFAULT_PRECISION);
 
-    void writeBatch(const Batch& batch) override;
+    void write(const Batch& batch) override;
 
   private:
     std::ofstream m_file;
