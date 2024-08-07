@@ -6,10 +6,10 @@
 #include <utility>
 
 #include "Angle.h"
-#include "Beamline/EnergyDistribution.h"
-#include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
 #include "Shader/Constants.h"
+#include "Shader/EnergyDistribution.h"
+#include "Shader/LightSource.h"
 #include "Strings.h"
 
 namespace RAYX::xml {
@@ -326,8 +326,8 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
         path.replace_filename(filename);  // this makes the path `filename` be relative to the
                                           // path of the rml file
 
-        DatFile df;
-        if (!DatFile::load(path, &df)) {
+        SampleEnergyDistribution df;
+        if (!SampleEnergyDistribution::load(path, &df)) {
             return false;
         }
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);

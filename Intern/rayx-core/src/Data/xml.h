@@ -9,6 +9,7 @@
 
 #include "Angle.h"
 #include "Beamline/Definitions.h"
+#include "Beamline/Misalignment.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
@@ -33,16 +34,6 @@ enum class EnergySpreadUnit;
 enum class SigmaType;
 enum class SpreadType;
 enum class ElementType;
-
-// An error in position and orientation that an object might have.
-struct Misalignment {
-    double m_translationXerror;
-    double m_translationYerror;
-    double m_translationZerror;
-    Rad m_rotationXerror;
-    Rad m_rotationYerror;
-    Rad m_rotationZerror;
-};
 
 namespace xml {
 

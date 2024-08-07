@@ -7,7 +7,6 @@
 #include <string>
 
 #include "Beamline/Beamline.h"
-#include "Beamline/Objects/Objects.h"
 #include "Data/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"

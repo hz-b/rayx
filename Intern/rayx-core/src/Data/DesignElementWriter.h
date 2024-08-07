@@ -8,6 +8,7 @@
 #include "Beamline/Beamline.h"
 #include "Beamline/Definitions.h"
 #include "Core.h"
+#include "Data/Strings.h"
 #include "Element/Cutout.h"
 
 namespace RAYX {

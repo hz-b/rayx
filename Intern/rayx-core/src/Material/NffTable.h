@@ -3,10 +3,19 @@
 #include <string>
 #include <vector>
 
-// This file defines the NffEntry.
-#include "../Shader/RefractiveIndex.h"
-
 namespace RAYX {
+
+/// The NffEntry holds atomic scattering factors which can be used to derive the refractive index.
+/// This struct represents one line of a .nff file.
+/// This struct is used to effectively calculate the Refractive Index of some material when hit by a photon with a particular m_energy.
+struct NffEntry {
+    double m_energy;
+
+    // atomic scattering factors:
+    double m_f1;
+    double m_f2;
+};
+
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:

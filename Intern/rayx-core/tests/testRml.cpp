@@ -15,10 +15,11 @@ TEST_F(TestSuite, loadDatFile) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 15, 0.1);
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 15, 0.1);
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17, 0.1);
+    Rand rand;
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 15, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 15, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 17, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 17, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
@@ -28,10 +29,10 @@ TEST_F(TestSuite, loadDatFile2) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 14.4, 0.1);
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17.7, 0.1);
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 17.4, 0.1);
-    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(), 16.0, 0.1);
+    Rand rand;
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 15.3, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 17.9, 0.1);
+    CHECK_EQ(b.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand), 16.9, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -67,22 +68,22 @@ TEST_F(TestSuite, testEnergyDistribution) {
         },
         {
             .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy = 86.5,
+            .energy = 91.81,
         },
         {
             .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy = 46.5,
+            .energy = 41.81,
         },
         {
             .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy = 108.1,
+            .energy = 100.01,
         },
     };
 
     for (auto values : testinput) {
+        Rand rand;
         auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.m_DesignSources[0].getEnergyDistribution().selectEnergy();
-
+        auto energy = beamline.m_DesignSources[0].getEnergyDistribution().selectEnergy(rand);
         CHECK_EQ(energy, values.energy, 0.1);
     }
 }
@@ -204,13 +205,14 @@ TEST_F(TestSuite, testExpertsOptic) {
  */
 // TEST_F(TestSuite, testTwoSourcesInOneRML) {
 //     auto beamline = loadBeamline("twoSourcesTest");
+//     Rand rand;
 //
 //     DesignSource dipolesource = beamline.m_DesignSources[0];
 //
 //     DesignSource pointsource = beamline.m_DesignSources[1];
 //
 //     CHECK_EQ(100, dipolesource.getEnergy());
-//     CHECK_EQ(150.24724068638105, pointsource.getEnergyDistribution().selectEnergy());
+//     CHECK_EQ(150.24724068638105, pointsource.getEnergyDistribution().selectEnergy(rand));
 //
 //     RAYX::fixSeed(RAYX::FIXED_SEED);
 //     CHECK_EQ(0, pointsource.getSourceWidth(), 0.1);

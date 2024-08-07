@@ -67,7 +67,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         int maxEvents =
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads, maxEvents);
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
 
         // check max EventID
         uint32_t maxEventID = 0;

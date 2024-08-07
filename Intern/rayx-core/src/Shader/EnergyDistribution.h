@@ -2,8 +2,8 @@
 
 #include <variant>
 
-#include "Core.h"
-#include "Data/DatFile.h"
+#include "SampleEnergyDistribution.h"
+#include "Shader/Rand.h"
 
 namespace RAYX {
 
@@ -13,9 +13,10 @@ struct RAYX_API HardEdge {
     double m_centerEnergy;
     double m_energySpread;
 
-    HardEdge(double centerEnergy, double energySpread);
+    HardEdge(double centerEnergy, double energySpread) : m_centerEnergy(centerEnergy), m_energySpread(energySpread) {}
 
-    double selectEnergy() const;
+    RAYX_FN_ACC
+    double selectEnergy(Rand& rand) const;
 };
 
 /// Describes a __normal__ distribution with mean `m_centerEnergy` and standard deviation `m_sigma`.
@@ -24,9 +25,10 @@ struct RAYX_API SoftEdge {
     double m_centerEnergy;
     double m_sigma;
 
-    SoftEdge(double centerEnergy, double sigma);
+    SoftEdge(double centerEnergy, double sigma) : m_centerEnergy(centerEnergy), m_sigma(sigma) {}
 
-    double selectEnergy() const;
+    RAYX_FN_ACC
+    double selectEnergy(Rand& rand) const;
 };
 
 /// Describes a uniform distribution of `m_numberOfEnergies` many discrete energies.
@@ -43,34 +45,39 @@ struct RAYX_API SeparateEnergies {
     double m_energySpread;
     int m_numberOfEnergies;
 
-    SeparateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
+    SeparateEnergies(double centerEnergy, double energySpread, int numOfEnergies)
+        : m_centerEnergy(centerEnergy), m_energySpread(energySpread), m_numberOfEnergies(numOfEnergies) {}
 
-    double selectEnergy() const;
+    RAYX_FN_ACC
+    double selectEnergy(Rand& rand) const;
 };
 
 /**
  * The class EnergyDistribution is contained in LightSources to describe the
  * mathematical distribution from which the energy of the rays are sampled. It
  * can either be a `HardEdge` being a uniform distribution in some interval,
- * or a `DatFile` which means that the distribution is loaded from a .DAT file.
+ * or a `SampleEnergyDistribution` which means that the distribution is loaded from a .DAT file.
  */
 class RAYX_API EnergyDistribution {
   public:
-    EnergyDistribution();  // TODO this default-constructor is required because
-                           // LightSource also has one, do we actually want it
-                           // though?
-    EnergyDistribution(DatFile);
-    EnergyDistribution(HardEdge);
-    EnergyDistribution(SoftEdge);
-    EnergyDistribution(SeparateEnergies);
+    EnergyDistribution()
+        : EnergyDistribution(HardEdge(100.0, 0.0)) {}  // TODO this default-constructor is required because
+                                                       // LightSource also has one, do we actually want it
+                                                       // though?
+    EnergyDistribution(SampleEnergyDistribution df) : m_variant(df) {}
+    EnergyDistribution(HardEdge he) : m_variant(he) {}
+    EnergyDistribution(SoftEdge se) : m_variant(se) {}
+    EnergyDistribution(SeparateEnergies sep) : m_variant(sep) {}
 
     // The selectEnergy() function returns one sample from the underlying distribution.
     // The energy is returned in eV.
-    double selectEnergy() const;
+    RAYX_FN_ACC
+    double selectEnergy(Rand& rand) const;
 
   private:
-    // Stores either a DatFile, or a HardEdge, or ... etc.
-    // The object within m_Variant is the *actual* energy distribution.
-    std::variant<DatFile, HardEdge, SoftEdge, SeparateEnergies> m_Variant;
+    // Stores either a SampleEnergyDistribution, or a HardEdge, or ... etc.
+    // The object within m_variant is the *actual* energy distribution.
+    std::variant<SampleEnergyDistribution, HardEdge, SoftEdge, SeparateEnergies> m_variant;
 };
+
 }  // namespace RAYX

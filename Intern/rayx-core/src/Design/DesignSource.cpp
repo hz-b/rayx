@@ -2,35 +2,10 @@
 
 #include <filesystem>
 
-#include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
+#include "Shader/LightSource.h"
+
 namespace RAYX {
-
-std::vector<Ray> DesignSource::compile(int i) const {
-    std::vector<Ray> ray;
-
-    if (getType() == ElementType::PointSource) {
-        PointSource ps(*this);
-        ray = ps.getRays(i);
-    } else if (getType() == ElementType::MatrixSource) {
-        MatrixSource ms(*this);
-        ray = ms.getRays(i);
-    } else if (getType() == ElementType::DipoleSource) {
-        DipoleSource ds(*this);
-        ray = ds.getRays(i);
-    } else if (getType() == ElementType::PixelSource) {
-        PixelSource ps(*this);
-        ray = ps.getRays(i);
-    } else if (getType() == ElementType::CircleSource) {
-        CircleSource cs(*this);
-        ray = cs.getRays(i);
-    } else if (getType() == ElementType::SimpleUndulatorSource) {
-        SimpleUndulatorSource su(*this);
-        ray = su.getRays(i);
-    }
-
-    return ray;
-}
 
 void DesignSource::setName(std::string s) { m_elementParameters["name"] = s; }
 void DesignSource::setType(ElementType s) { m_elementParameters["type"] = s; }
@@ -213,8 +188,8 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
         std::string filename = m_elementParameters["photonEnergyDistributionFile"].as_string();
 
         std::cout << std::filesystem::current_path() << std::endl;
-        DatFile df;
-        DatFile::load(filename, &df);
+        SampleEnergyDistribution df;
+        SampleEnergyDistribution::load(filename, &df);
 
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
         en = EnergyDistribution(df);
@@ -251,7 +226,7 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
 }
 
 void DesignSource::setNumberOfRays(double value) { m_elementParameters["numberOfRays"] = value; }
-double DesignSource::getNumberOfRays() const { return m_elementParameters["numberOfRays"].as_double(); }
+uint64_t DesignSource::getNumberOfRays() const { return static_cast<uint64_t>(m_elementParameters["numberOfRays"].as_double()); }
 
 void DesignSource::setNumOfCircles(int value) { m_elementParameters["numOfCircles"] = value; }
 

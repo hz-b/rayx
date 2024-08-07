@@ -3,10 +3,17 @@
 #include <string>
 #include <vector>
 
-// This file defines the PalikEntry.
-#include "../Shader/RefractiveIndex.h"
-
 namespace RAYX {
+
+/// The PalikEntry represents the the complex-valued refractive index directly as n + ik.
+/// This struct represents one line of a .NKP file.
+/// This struct is used to effectively calculate the Refractive Index of some material when hit by a photon with a particular m_energy.
+struct PalikEntry {
+    double m_energy;
+    double m_n;
+    double m_k;
+};
+
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:

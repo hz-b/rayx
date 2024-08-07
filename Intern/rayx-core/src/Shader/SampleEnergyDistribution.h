@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Core.h"
+#include "Shader/Rand.h"
 
 namespace RAYX {
 /** This struct represents one line of a .DAT file.  */
@@ -15,7 +16,7 @@ struct DatEntry {
 };
 
 /** This struct represents the contents of a .DAT file. */
-struct DatFile {
+struct SampleEnergyDistribution {
     std::string m_title;
     uint32_t m_lineCount;
     double m_start;
@@ -29,12 +30,13 @@ struct DatFile {
     bool m_continuous;
 
     /** loads the .DAT file `filename` and writes it's contents to `out` */
-    static bool load(const std::filesystem::path& filename, DatFile* out);
+    static bool load(const std::filesystem::path& filename, SampleEnergyDistribution* out);
 
     /** creates a valid .DAT file from this struct (may be used for testing) */
     [[maybe_unused]] std::string dump();
 
     /** samples from the distribution given by the .DAT file */
-    double selectEnergy() const;
+    RAYX_FN_ACC
+    double selectEnergy(Rand& rand) const;
 };
 }  // namespace RAYX

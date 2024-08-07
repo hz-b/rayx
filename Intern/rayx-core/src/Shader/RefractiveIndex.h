@@ -2,28 +2,10 @@
 
 #include "Complex.h"
 #include "InvocationState.h"
+#include "Material/NffTable.h"
+#include "Material/PalikTable.h"
 
 namespace RAYX {
-
-/// Both of these structs are used to effectively calculate the Refractive Index of some material when hit by a photon with a particular m_energy.
-/// The PalikEntry represents the the complex-valued refractive index directly as n + ik.
-/// The NffEntry instead holds atomic scattering factors which can be used to derive the refractive index.
-
-/// This struct represents one line of a .NKP file.
-struct PalikEntry {
-    double m_energy;
-    double m_n;
-    double m_k;
-};
-
-/// This struct represents one line of a .nff file.
-struct NffEntry {
-    double m_energy;
-
-    // atomic scattering factors:
-    double m_f1;
-    double m_f2;
-};
 
 RAYX_FN_ACC int RAYX_API getPalikEntryCount(int material, InvState& inv);
 

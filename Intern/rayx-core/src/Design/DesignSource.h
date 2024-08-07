@@ -7,7 +7,6 @@ namespace RAYX {
 
 struct RAYX_API DesignSource {
     DesignMap m_elementParameters;
-    std::vector<Ray> compile(int thread_count) const;
 
     void setStokeslin0(double value);
     void setStokeslin45(double value);
@@ -84,7 +83,7 @@ struct RAYX_API DesignSource {
     Misalignment getMisalignment() const;
 
     void setNumberOfRays(double value);
-    double getNumberOfRays() const;
+    uint64_t getNumberOfRays() const;
 
     void setWorldPosition(glm::dvec4 p);
     glm::dvec4 getWorldPosition() const;
@@ -122,4 +121,5 @@ struct RAYX_API DesignSource {
     void setElectronSigmaYs(double value);
     double getElectronSigmaYs() const;
 };
+
 }  // namespace RAYX

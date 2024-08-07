@@ -1,6 +1,8 @@
 #include "Random.h"
 
 #include "Shader/Rand.h"
+#include <ctime>
+
 #include "Shader/Constants.h"
 
 namespace RAYX {
@@ -9,7 +11,7 @@ static Rand rand;
 
 void fixSeed(uint32_t seed) { rand = Rand(seed); }
 
-void randomSeed() { fixSeed((uint32_t)time(nullptr)); }
+void randomSeed() { fixSeed((uint32_t)std::time(nullptr)); }
 
 uint32_t randomUint() { return rand.randomInt(); }
 

@@ -1,4 +1,4 @@
-#include "DatFile.h"
+#include "SampleEnergyDistribution.h"
 
 #include <fstream>
 #include <iostream>
@@ -8,9 +8,10 @@
 #include "Random.h"
 
 namespace RAYX {
-bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
+bool SampleEnergyDistribution::load(const std::filesystem::path& filename, SampleEnergyDistribution* out) {
+    RAYX_VERB << "Loading SampleEnergyDistribution from DAT file " << filename;
+
     std::ifstream s(filename);
-    RAYX_VERB << filename;
     std::string line;
 
     // line 1
@@ -51,7 +52,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     return true;
 }
 
-[[maybe_unused]] std::string DatFile::dump() {
+[[maybe_unused]] std::string SampleEnergyDistribution::dump() {
     std::stringstream s;
     s << m_title << '\n';
     s << m_lineCount << ' ' << m_start << ' ' << m_end << ' ' << m_step << '\n';
@@ -62,7 +63,8 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     return s.str();
 }
 
-double DatFile::selectEnergy() const {
+RAYX_FN_ACC
+double SampleEnergyDistribution::selectEnergy(Rand& rand) const {
     // runs either continuous Energydistribution from DataFile or just the specific energies
     // provisionally set to true because EnergyDistibution ended support for this choice
     // TODO: Fanny find a way to get a choise for DataFile Distribution back
@@ -74,7 +76,7 @@ double DatFile::selectEnergy() const {
         // we will return an energy between lines[idx].energy and
         // lines[idx+1].energy
         double continuousWeightSum = m_weightSum - m_Lines.front().m_weight / 2 - m_Lines.back().m_weight / 2;
-        double w = randomDoubleInRange(0, continuousWeightSum);
+        double w = rand.randomDoubleInRange(0, continuousWeightSum);
 
         double counter = 0;
         uint32_t idx = 0;
@@ -87,9 +89,9 @@ double DatFile::selectEnergy() const {
         }
 
         // interpolate between lines[idx].energy and lines[idx+1].energy
-        return randomDoubleInRange(m_Lines[idx].m_energy, m_Lines[idx + 1].m_energy);
+        return rand.randomDoubleInRange(m_Lines[idx].m_energy, m_Lines[idx + 1].m_energy);
     } else {
-        double w = randomDoubleInRange(0, m_weightSum);
+        double w = rand.randomDoubleInRange(0, m_weightSum);
 
         double counter = 0;
         for (auto e : m_Lines) {

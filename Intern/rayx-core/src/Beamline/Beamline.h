@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include "Beamline/LightSource.h"
 #include "Core.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
@@ -11,7 +10,6 @@
 #include "Shader/Ray.h"
 
 namespace RAYX {
-class LightSource;
 
 /*
  * The Beamline class is a container for OpticalElements and LightSources.
@@ -21,9 +19,6 @@ class RAYX_API Beamline {
   public:
     Beamline();
     ~Beamline();
-
-    // iterates over the m_LightSources, and collects the rays they emit.
-    std::vector<Ray> getInputRays(int thread_count = 1) const;
 
     /**
      * @brief Quality-of-life function to calculate the smallest possible

@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-#include "LightSource.h"
+#include "Shader/LightSource.h"
 
 namespace RAYX {
 

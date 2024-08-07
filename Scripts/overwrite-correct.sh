@@ -13,8 +13,6 @@
 # If you introduce a bug, and then run this script; the test suite will be filled with __wrong solutions__!
 # It is advisable to check using `git diff` / plotting whether the changes that this script made are the ones you intended.
 
-cd ..
-
 prefix="Intern/rayx-core/tests/input"
 
 for f in "PointSource" "MatrixSource" "PlaneMirror_refl" "MatrixSource_distr" "slit1" "slit2" "slit3" "slit4" "slit5"

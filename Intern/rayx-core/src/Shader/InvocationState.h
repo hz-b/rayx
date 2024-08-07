@@ -5,6 +5,8 @@
 #include <span>
 
 #include "Element/Element.h"
+#include "LightSources.h"
+#include "Rand.h"
 #include "Ray.h"
 
 namespace RAYX {
@@ -13,6 +15,7 @@ namespace RAYX {
 struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
     double rayIdStart;
     double numRays;
+    int32_t numRaysBatch;
     double randomSeed;
     double maxEvents;
     double sequential;
@@ -37,6 +40,8 @@ struct RAYX_API InvState {
     std::span<const Element> elements;
     std::span<const int> matIdx;
     std::span<const double> mat;
+    const LightSourceVariant* lightSource;
+    const int lightSourceId = -1;
 
 #ifdef RAYX_DEBUG_MODE
     std::span<_debug_struct> d_struct;

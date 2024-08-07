@@ -49,3 +49,10 @@
 #else
 #define RAYX_FN_ACC
 #endif
+
+// TODO(Sven): fix this hack
+#ifdef __CUDACC__
+#define RAYX_ACC_CONSTEXPR constexpr __device__ __constant__
+#else
+#define RAYX_ACC_CONSTEXPR constexpr
+#endif

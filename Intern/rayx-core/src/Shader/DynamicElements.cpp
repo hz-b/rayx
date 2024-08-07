@@ -2,8 +2,10 @@
 
 #include "Behave.h"
 #include "Collision.h"
+#include "Debug/Debug.h"
 #include "EventType.h"
 #include "Helper.h"
+#include "LightSources.h"
 #include "Utils.h"
 
 namespace RAYX {
@@ -15,7 +17,7 @@ void dynamicElements(int gid, InvState& inv) {
     init(inv);
 
     auto rand = Rand(rayId(inv), inv.pushConstants.numRays, inv.pushConstants.randomSeed);
-    Ray ray = inv.inputRays[gid];
+    Ray ray = lightSourceGetRay(inv, rand);
 
     Element nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.

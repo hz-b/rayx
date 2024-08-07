@@ -1,8 +1,10 @@
 #include "DesignElement.h"
 
-#include "Beamline/Objects/Objects.h"
+#include "Data/Strings.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
+#include "Element/Behaviour.h"
+#include "Element/Surface.h"
 
 namespace RAYX {
 
