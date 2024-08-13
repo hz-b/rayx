@@ -8,14 +8,14 @@ echo "In this case you need to remove the build folder once."
 echo
 
 mode=Debug
-cuda="-DRAYX_ENABLE_CUDA=OFF"
+enable_cuda=0
 
 for var in "$@"
 do
     if [[ "$var" == "--release" ]]; then
         mode=Release
     elif [[ "$var" == "--cuda" ]]; then
-        cuda="-DRAYX_ENABLE_CUDA=ON -DRAYX_REQUIRES_CUDA=ON"
+        enable_cuda=1
     elif [[ "$var" == "--help" ]]; then
         echo "Usage:"
         echo " ./compile.sh [OPTIONS]..."
@@ -30,7 +30,13 @@ do
 done
 
 build="./build/$mode"
-conf="$cuda"
+conf=""
+
+if [ "$enable_cuda" -eq "1" ]; then
+    conf="$conf -D RAYX_ENABLE_CUDA=ON -DRAYX_REQUIRE_CUDA=ON"
+else
+    conf="$conf -D RAYX_ENABLE_CUDA=OFF"
+fi
 
 echo Updating git submodules ...
 git submodule update --recursive --init
@@ -40,8 +46,14 @@ git submodule update --recursive --init
 if [ ! -f $build/conf ] || [[ ! "$(cat $build/conf)" == "$conf" ]]; then
     echo > $build/conf
 
+    if [ "$enable_cuda" != "1" ]; then
+        printf '\033[0;33m'
+        echo "Building with Cuda backend disabled. Use flag '--cuda' to build with Cuda."
+        printf "\033[0m"
+    fi
+
     echo Setting up build directory for mode $mode and conf $conf ...
-    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode $cuda -B $build -G Ninja
+    cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=$mode $conf -B $build -G Ninja
 
     echo "$conf" > $build/conf
 fi
