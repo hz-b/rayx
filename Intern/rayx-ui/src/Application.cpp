@@ -267,15 +267,12 @@ void Application::run() {
 
             if (m_UIParams.rayInfo.cacheChanged) {
                 // only start async task if one is not already running
-                if (!buildRayCacheFuture.valid() ||
-                    (buildRayCacheFuture.valid() && buildRayCacheFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
+                if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                     buildRayCacheFuture =
                         std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
                     m_UIParams.rayInfo.cacheChanged = false;
-                } else {
-                    RAYX_LOG << "Skipping buildRayCache, async task already running.";
+                    m_State = State::BuildingRays;
                 }
-                m_State = State::BuildingRays;
             }
 
             if (m_UIParams.rayInfo.raysChanged) {

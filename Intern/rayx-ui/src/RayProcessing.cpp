@@ -117,7 +117,6 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             isFirstEvent = false;   // Update the flag after the first iteration
         }
     }
-    RAYX_LOG << "Number of compile() calls: " << counter;
     return rays;
 }
 void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {

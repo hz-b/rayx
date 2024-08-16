@@ -377,16 +377,16 @@ void UIHandler::showUISettingsWindow(UIParameters& uiParams) {
     uiParams.camController.displaySettings();
     ImGui::Separator();
     if (!uiParams.rmlPath.empty() && uiParams.rayInfo.raysLoaded) {
-        size_t tempAmountOfRays = uiParams.rayInfo.amountOfRays;
-        bool tempRenderAllRays = uiParams.rayInfo.renderAllRays;
+        size_t currentAmountOfRays = uiParams.rayInfo.amountOfRays;
+        bool currentRenderAllRays = uiParams.rayInfo.renderAllRays;
 
         displayFilterSlider(uiParams.rayInfo.amountOfRays, uiParams.rayInfo.maxAmountOfRays, uiParams.rayInfo.displayRays,
                             uiParams.rayInfo.renderAllRays);
 
-        if (tempAmountOfRays != uiParams.rayInfo.amountOfRays) {
+        if (currentAmountOfRays != uiParams.rayInfo.amountOfRays) {
             uiParams.rayInfo.raysChanged = true;
         }
-        if (tempRenderAllRays != uiParams.rayInfo.renderAllRays) {
+        if (currentRenderAllRays != uiParams.rayInfo.renderAllRays) {
             uiParams.rayInfo.cacheChanged = true;
         }
     }
