@@ -31,11 +31,12 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
             ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4((84.0f / 256.0f), (84.0f / 256.0f), (84.0f / 256.0f), 1.00f));
         }
 
-        // Create a unique ID for the button
+        // Jump-to-element button
         std::string buttonId = "<--##" + child.name + std::to_string(child.index);
-
+        bool validIndex = (child.index >= 0 && static_cast<size_t>(child.index) < elements.size());
+        if (!validIndex) ImGui::BeginDisabled();  // Groups are not fully supported yet, so child.index of groups is -1
         if (ImGui::Button(buttonId.c_str())) {
-            auto compiled = elements[child.index].compile();
+            RAYX::Element compiled = elements[child.index].compile();
             if (child.category == SelectedType::OpticalElement && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
                 glm::vec3 translationVec = {compiled.m_outTrans[3][0], compiled.m_outTrans[3][1], compiled.m_outTrans[3][2]};
                 camController.lookAtPoint(translationVec);
@@ -44,9 +45,10 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
                 camController.lookAtPoint(rSourcePositions[child.index]);
             }
         }
-
+        if (!validIndex) ImGui::EndDisabled();
         ImGui::SameLine();
 
+        // Label
         std::string nodeLabel = child.name + "##" + std::to_string(child.index);
         bool nodeOpen = ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags);
 
@@ -78,18 +80,17 @@ void BeamlineOutliner::buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode
     using RAYX::ElementType;
 
     for (rapidxml::xml_node<>* xmlChild = node->first_node(); xmlChild; xmlChild = xmlChild->next_sibling()) {
-        rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
-        std::string type = typeAttr ? typeAttr->value() : "";
         SelectedType category = SelectedType::None;
 
         if (strcmp(xmlChild->name(), "object") == 0) {
+            rapidxml::xml_attribute<>* typeAttr = xmlChild->first_attribute("type");
+            std::string type = typeAttr ? typeAttr->value() : "";
             ElementType elementType = RAYX::findElementString(type);
             switch (elementType) {
                 case ElementType::PointSource:
                 case ElementType::MatrixSource:
                 case ElementType::DipoleSrc:
                 case ElementType::DipoleSource:
-                case ElementType::PixelSource:
                 case ElementType::CircleSource:
                 case ElementType::SimpleUndulatorSource:
                     category = SelectedType::LightSource;
