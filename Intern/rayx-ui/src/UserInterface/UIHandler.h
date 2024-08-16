@@ -56,7 +56,6 @@ class UIHandler {
 
     void showSceneEditorWindow(UIParameters& uiParams);
     void showUISettingsWindow(UIParameters& uiParams);
-    void showSettingsWindow();
     void showHotkeysWindow();
     void showMissingFilePopupWindow(UIParameters& uiParams);
     void showSimulationSettingsPopupWindow(UIParameters& uiParams);

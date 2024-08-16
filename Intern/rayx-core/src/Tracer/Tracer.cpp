@@ -46,7 +46,7 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
 
     for (const auto& device : deviceConfig.devices) {
         if (device.enable) {
-            RAYX_LOG << "Creating tracer with device: " << device.name;
+            RAYX_VERB << "Creating tracer with device: " << device.name;
             m_deviceTracer = createDeviceTracer(device.type, device.index);
             break;
         }

@@ -284,7 +284,6 @@ void UIHandler::setupUI(UIParameters& uiParams) {
     showUISettingsWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
-    showSettingsWindow();
     m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams);
     showHotkeysWindow();
     ImGui::End();
@@ -372,10 +371,20 @@ void UIHandler::showUISettingsWindow(UIParameters& uiParams) {
     ImGui::ColorEdit3("Color", (float*)&m_ClearColor);
 
     ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+    if (ImGui::Button("Toggle Theme")) {
+        m_isDarkTheme = !m_isDarkTheme;  // Toggle theme
+        if (m_isDarkTheme) {
+            applyDarkTheme();
+        } else {
+            applyLightTheme();
+        }
+    }
+
+    // checkbox
+    ImGui::Checkbox("Load h5 with RML", &m_loadh5withRML);
 
     ImGui::Separator();
-    uiParams.camController.displaySettings();
-    ImGui::Separator();
+
     if (!uiParams.rmlPath.empty() && uiParams.rayInfo.raysLoaded) {
         size_t currentAmountOfRays = uiParams.rayInfo.amountOfRays;
         bool currentRenderAllRays = uiParams.rayInfo.renderAllRays;
@@ -390,7 +399,12 @@ void UIHandler::showUISettingsWindow(UIParameters& uiParams) {
             uiParams.rayInfo.cacheChanged = true;
         }
     }
-    ImGui::Text("Application average %.6f ms/frame", uiParams.frameTime * 1000.0f);
+
+    ImGui::Separator();
+
+    uiParams.camController.displaySettings();
+
+    ImGui::Text("Application averages %.2f ms/frame", uiParams.frameTime * 1000.0f);
 
     ImGui::End();
 }
@@ -505,25 +519,6 @@ void UIHandler::applyLightTheme() {
     style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.80f, 0.80f, 0.80f, 0.63f);
     style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
     style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 1.00f, 0.35f);  // Light blue for text selection
-}
-
-void UIHandler::showSettingsWindow() {
-    ImGui::Begin("Settings");
-
-    ImGui::SliderFloat("Scale", &m_scale, 0.1f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
-    if (ImGui::Button("Toggle Theme")) {
-        m_isDarkTheme = !m_isDarkTheme;  // Toggle theme
-        if (m_isDarkTheme) {
-            applyDarkTheme();
-        } else {
-            applyLightTheme();
-        }
-    }
-
-    // checkbox
-    ImGui::Checkbox("Load h5 with RML", &m_loadh5withRML);
-
-    ImGui::End();
 }
 
 void UIHandler::showHotkeysWindow() {
