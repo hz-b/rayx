@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "RenderObject.h"
 #include "Element/Element.h"
+#include "RenderObject.h"
 #include "Tracer/Tracer.h"
 
 /**

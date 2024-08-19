@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "Beamline/Beamline.h"
-#include "Element/Cutout.h"
 #include "Core.h"
+#include "Element/Cutout.h"
 
 namespace RAYX {
 

@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "Beamline/Objects/MatrixSource.h"
-#include "RenderObject.h"
 #include "Element/Element.h"
+#include "RenderObject.h"
 
 /**
  * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.

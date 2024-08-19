@@ -1,9 +1,9 @@
 #pragma once
 
+#include <glm.h>
 #include <vulkan/vulkan.h>
 
 #include <array>
-#include <glm.h>
 #include <variant>
 #include <vector>
 

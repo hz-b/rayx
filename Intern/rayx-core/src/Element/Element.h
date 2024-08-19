@@ -1,14 +1,15 @@
 #pragma once
 
+#include <glm.h>
+
+#include <optional>
+
 #include "Behaviour.h"
 #include "Core.h"
 #include "Cutout.h"
+#include "Data/xml.h"
 #include "Shader/SlopeError.h"
 #include "Surface.h"
-#include "Data/xml.h"
-
-#include <glm.h>
-#include <optional>
 
 namespace RAYX {
 

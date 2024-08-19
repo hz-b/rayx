@@ -3,10 +3,10 @@
 #include "Debug/Instrumentor.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <glm.h>
 #include <stb_image_write.h>
 
 #include <array>
-#include <glm.h>
 
 /**
  * This function takes a vector of rays, along with the minimum and maximum x and z coordinates,

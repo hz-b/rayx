@@ -7,10 +7,10 @@
 #include <vector>
 
 #include "Core.h"
+#include "Data/Strings.h"
 #include "Data/xml.h"
 #include "EnergyDistribution.h"
 #include "Shader/Ray.h"
-#include "Data/Strings.h"
 
 namespace RAYX {
 enum class SpreadType { HardEdge, SoftEdge, SeparateEnergies };    // default WhiteBand
