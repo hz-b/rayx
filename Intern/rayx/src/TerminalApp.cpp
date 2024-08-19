@@ -156,18 +156,20 @@ void TerminalApp::run() {
         m_CommandParser->getVersion();
         exit(0);
     }
+
+    using DeviceType = RAYX::DeviceConfig::DeviceType;
+    const auto deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
+
     if (m_CommandParser->m_args.m_listDevices) {
-        RAYX::DeviceConfig().dumpDevices();
+        RAYX::DeviceConfig(deviceType).dumpDevices();
         exit(0);
     }
 
     // Choose Hardware
     auto getDevice = [&] {
         if (m_CommandParser->m_args.m_deviceID != -1) {
-            return RAYX::DeviceConfig().enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
+            return RAYX::DeviceConfig(deviceType).enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
         } else {
-            using DeviceType = RAYX::DeviceConfig::DeviceType;
-            const auto deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
             return RAYX::DeviceConfig(deviceType).enableBestDevice();
         }
     };
