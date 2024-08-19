@@ -9,12 +9,11 @@ RAYX is a simulation tool designed for beamlines at electron storage rings. Curr
 ## RAYX vs RAY-UI
 
 RAYX offers several advanced features, including:
-- Global (not sequential) tracing of beamlines for enhanced efficiency.
-- GPU utilization for accelerated tracing performance.
-- A dedicated mode for sequentially tracing multiple beamlines with ease.
-- Grouping functionality, allowing objects to be grouped together for simplified group transformations.
-
-In contrast, RAY-UI provides a graphical user interface (GUI) for editing beamlines, a feature currently lacking in RAYX. This means that .rml files for beamlines must be edited manually or generated using RAY-UI. Integrating a beamline editor into rayx-ui is among our top priorities for future development.
+- Global (not sequential) tracing of beamlines
+- GPU utilization for accelerated tracing performance
+- A dedicated mode for tracing multiple beamlines with ease
+- Objects in RAYX can be grouped for simplified group transformations
+- A GUI for intuitive beamline design
 
 ## Installing or Building RAYX
 
