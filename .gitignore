@@ -30,3 +30,6 @@ imgui.ini
 
 # VSCode Debugger files
 results.json
+
+# Vim Tags
+/tags
