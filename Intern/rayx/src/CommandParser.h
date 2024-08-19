@@ -25,23 +25,24 @@ class CommandParser {
     // Flags initialize to DISABLED
     // Set options in .cpp file
     struct Args {
-        bool m_plotFlag = false;                       // -p (Plot)
-        bool m_csvFlag = false;                        // -c (.csv Output)
-        bool m_cpuFlag = false;                        // -x (CPU Tracer)
-        int m_deviceID = -1;                           // -d (Device)
-        bool m_listDevices = false;                    // -l (List Devices)
-        bool m_benchmark = false;                      // -b (Benchmark)
-        bool m_version = false;                        // -v (Version)
-        std::string m_providedFile = "";               // -i (Input)
-        bool m_isFixSeed = false;                      // -f (Fixed Seed)
-        int m_seed = -1;                               // -s (Provided Seed)
-        int m_BatchSize = 0;                           // -b (Vk batch size )
-        bool m_sequential = false;                     // -S (sequential tracing)
-        bool m_verbose = false;                        // --verbose (Verbose)
-        std::string m_format = defaultFormatString();  // --format
-        int m_setThreads = 1;                          // -T (dipolesource)
-        int m_maxEvents = -1;                          // -m (max events)
-        int m_startEventID = 0;                        // -e (start event id)
+        bool m_plotFlag = false;                             // -p (Plot)
+        bool m_csvFlag = false;                              // -c (.csv Output)
+        bool m_cpuFlag = false;                              // -x (Trace on CPU)
+        bool m_gpuFlag = false;                              // -X (Trace on GPU)
+        int m_deviceID = -1;                                 // -d (Device)
+        bool m_listDevices = false;                          // -l (List Devices)
+        bool m_benchmark = false;                            // -b (Benchmark)
+        bool m_version = false;                              // -v (Version)
+        std::string m_providedFile = "";                     // -i (Input)
+        bool m_isFixSeed = false;                            // -f (Fixed Seed)
+        int m_seed = -1;                                     // -s (Provided Seed)
+        int m_BatchSize = 0;                                 // -b (Vk batch size )
+        bool m_sequential = false;                           // -S (sequential tracing)
+        bool m_verbose = false;                              // --verbose (Verbose)
+        std::string m_format = defaultFormatString();        // --format
+        int m_setThreads = 1;                                // -T (dipolesource)
+        int m_maxEvents = -1;                                // -m (max events)
+        int m_startEventID = 0;                              // -e (start event id)
     } m_args;
 
     static inline void getVersion() {
@@ -75,7 +76,8 @@ class CommandParser {
         {'B', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
         {'b', {OptionType::INT, "batch", "Batch size for Vulkan tracing", &(m_args.m_BatchSize)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
-        {'x', {OptionType::BOOL, "cpu", "Tracing on CPU", &(m_args.m_cpuFlag)}},
+        {'x', {OptionType::BOOL, "cpu", "Tracine on CPU", &(m_args.m_cpuFlag)}},
+        {'X', {OptionType::BOOL, "gpu", "Tracine on GPU", &(m_args.m_gpuFlag)}},
         {'d', {OptionType::INT, "device", "Pick device via Device ID", &(m_args.m_deviceID)}},
         {'l', {OptionType::BOOL, "list", "List available devices", &(m_args.m_listDevices)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},

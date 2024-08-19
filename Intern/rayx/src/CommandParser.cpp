@@ -48,10 +48,6 @@ void CommandParser::analyzeCommands() const {
     if (m_args.m_isFixSeed && m_args.m_seed < -1) {
         RAYX_EXIT << "Unsupported seed <= 0";
     }
-
-    if (m_args.m_cpuFlag && m_args.m_deviceID != -1) {
-        RAYX_EXIT << "Picking a device by index is not supported in cpu only mode. Remove flag '-x'";
-    }
 }
 
 CommandParser::~CommandParser() = default;

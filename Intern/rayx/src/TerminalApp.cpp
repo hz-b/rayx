@@ -157,8 +157,15 @@ void TerminalApp::run() {
         exit(0);
     }
 
-    using DeviceType = RAYX::DeviceConfig::DeviceType;
-    const auto deviceType = m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
+    auto argToDeviceType = [&] {
+        using DeviceType = RAYX::DeviceConfig::DeviceType;
+        if (m_CommandParser->m_args.m_cpuFlag == m_CommandParser->m_args.m_gpuFlag)
+            return DeviceType::All;
+        return m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
+
+    };
+
+    auto deviceType = argToDeviceType();
 
     if (m_CommandParser->m_args.m_listDevices) {
         RAYX::DeviceConfig(deviceType).dumpDevices();
