@@ -28,7 +28,7 @@ class Scene {
                           std::shared_ptr<DescriptorPool> descriptorPool);
 
     std::vector<Scene::RenderObjectInput> getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
-                                                           const std::vector<std::vector<RAYX::Ray>> sortedRays, bool buildTexture);
+                                                           const std::vector<std::vector<RAYX::Ray>>& sortedRays, bool buildTexture);
 
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
                                 std::shared_ptr<DescriptorPool> descriptorPool, bool buildTexture);

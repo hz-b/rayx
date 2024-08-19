@@ -145,16 +145,22 @@ void Application::run() {
             switch (m_State) {
                 case State::LoadingBeamline:
                     if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        // reset rays
+                        // Clear existing rays and reset scene
                         m_rays.clear();
                         m_UIParams.rayInfo.raysLoaded = false;
                         m_Scene = std::make_unique<Scene>(m_Device);
+
+                        // Update elements and sources for UI
                         m_UIParams.beamlineInfo.elements = m_Beamline->m_DesignElements;
                         m_UIParams.beamlineInfo.sources = m_Beamline->m_DesignSources;
+
+                        // Store source positions in UI parameters
                         m_UIParams.beamlineInfo.rSourcePositions.clear();
                         for (auto& source : m_UIParams.beamlineInfo.sources) {
                             m_UIParams.beamlineInfo.rSourcePositions.push_back(source.getWorldPosition());
                         }
+
+                        // Set default selection in UI based on available sources or elements
                         if (m_UIParams.beamlineInfo.sources.size() > 0) {
                             m_UIParams.beamlineInfo.selectedType = SelectedType::LightSource;
                             m_UIParams.beamlineInfo.selectedIndex = 0;
@@ -164,6 +170,8 @@ void Application::run() {
                         } else {
                             m_UIParams.beamlineInfo.selectedType = SelectedType::None;
                         }
+
+                        // Prepare for ray loading or element preparation
                         size_t numElements = m_Beamline->m_DesignElements.size();
                         m_sortedRays.resize(numElements);
                         if (m_UIParams.h5Ready) {
@@ -215,14 +223,9 @@ void Application::run() {
                             }
 
                             RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
-
-                            if (!buildRayCacheFuture.valid() ||
-                                (buildRayCacheFuture.valid() && buildRayCacheFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
-                                buildRayCacheFuture = std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(),
-                                                                 std::ref(m_UIParams.rayInfo), std::ref(m_rays));
-                            } else {
-                                RAYX_VERB << "Skipping buildRayCache, async task already running.";
-                            }
+                            // We do not need to check the future state here as the loop will not come back here until user interacts with UI again
+                            buildRayCacheFuture =
+                                std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
                             m_State = State::BuildingRays;
                         }
                     }
@@ -245,7 +248,7 @@ void Application::run() {
                     if (!getRObjInputsFuture.valid() ||
                         (getRObjInputsFuture.valid() && getRObjInputsFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
                         getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
-                                                         std::ref(m_UIParams.beamlineInfo.elements), std::ref(m_sortedRays), m_buildTextureNeeded);
+                                                         std::ref(m_UIParams.beamlineInfo.elements), m_sortedRays, m_buildTextureNeeded);
                     } else {
                         RAYX_VERB << "Skipping PrepareElements, async task already running.";
                     }

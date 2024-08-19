@@ -88,7 +88,7 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
 }
 
 std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const std::vector<RAYX::DesignElement> elements,
-                                                              const std::vector<std::vector<RAYX::Ray>> sortedRays, bool buildTexture) {
+                                                              const std::vector<std::vector<RAYX::Ray>>& sortedRays, bool buildTexture) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
 
     std::vector<RenderObjectInput> rObjectsInput;
