@@ -603,9 +603,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
             ImGui::Separator();
 
             // Push buttons to the bottom
-            float totalSpace = ImGui::GetContentRegionAvail().y;
-            float buttonHeight = 40.0f;
-            ImGui::Dummy(ImVec2(0.0f, totalSpace - buttonHeight - ImGui::GetStyle().ItemSpacing.y * 2));
+            ImGui::Dummy(ImVec2(0.0f, ImGui::GetStyle().ItemSpacing.y * 2.0f));
 
             // Centering buttons
             float windowWidth = ImGui::GetWindowSize().x;
