@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 
 # ---- Project ----
-project(RAYX VERSION 0.21.1)
+project(RAYX VERSION 0.21.2)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 20)
