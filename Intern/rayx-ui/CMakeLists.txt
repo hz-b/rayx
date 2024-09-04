@@ -60,23 +60,26 @@ if(Vulkan_FOUND)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
-                DESTINATION ./bin
+                DESTINATION ${INSTALL_DATA_DIR}
                 FILES_MATCHING PATTERN "*_*.spv")
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets
-                DESTINATION ./bin
+                DESTINATION ${INSTALL_DATA_DIR}
+                PATTERN "fonts" EXCLUDE)
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets/fonts
+                DESTINATION ${INSTALL_FONTS_DIR}
                 FILES_MATCHING PATTERN "*")
     else()
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
-                DESTINATION ./bin
+                DESTINATION ${INSTALL_DATA_DIR}
                 FILES_MATCHING PATTERN "*_*.spv")
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets
-                DESTINATION ./bin
-                FILES_MATCHING PATTERN "*")
+                DESTINATION ${INSTALL_DATA_DIR}
+                PATTERN "fonts" EXCLUDE)
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets/fonts
+                DESTINATION ${INSTALL_FONTS_DIR})
     endif()
+
     include(InstallRequiredSystemLibraries)
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx-ui - RAYX GUI Application")
     include(CPack)
     # -----------------
 

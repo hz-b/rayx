@@ -13,7 +13,7 @@ class RAYX_API PixelSource : public LightSource {
 
   private:
     // Geometric Params
-    SourcePulseType m_sourceDistributionType;  // TODO unused.
+    // SourcePulseType m_sourceDistributionType;  // TODO unused.
 
     glm::dvec4 m_pol;
 

@@ -1,12 +1,21 @@
 name: testUbuntu
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'     # Run on all branches
+    tags-ignore:
+      - 'v*'     # Ignore tag pushes matching 'v*'
+  pull_request:
+    branches:
+      - '**'     # Run for all pull requests
 
 env:
   BUILD_TYPE: Release
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: ubuntu-latest
 
     steps:

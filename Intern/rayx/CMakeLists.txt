@@ -8,8 +8,6 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(rayx VERSION ${RAYX_VERSION})
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})
-
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 # ------------------
 
 
@@ -44,22 +42,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 # ----------------------
 
 # ---- CPack ----
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
-          DESTINATION ./bin
-          FILES_MATCHING PATTERN "comp.spv")
-else()
-  install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
-          DESTINATION ./bin
-          FILES_MATCHING PATTERN "comp.spv")
-endif()
-
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data
-        DESTINATION ./bin)
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx - A RAYX Beamline Simulation Tool")
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "rayx")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_EXECUTABLES ${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+include(InstallRequiredSystemLibraries)
 include(CPack)
 # --------------
