@@ -13,10 +13,8 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact-name: rayx-win64.zip
             build-type: Release
           - os: ubuntu-latest
-            artifact-name: rayx-Linux.deb
             build-type: Release
 
     steps:
@@ -70,8 +68,9 @@ jobs:
 
       - name: Configure CMake (Windows)
         if: matrix.os == 'windows-latest'
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
 
+      # Linux-specific build steps
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -87,8 +86,9 @@ jobs:
 
       - name: Configure CMake (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
 
+      # Build the project
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{ matrix.build-type }}
 
@@ -96,30 +96,54 @@ jobs:
         working-directory: ${{github.workspace}}/build/bin/release
         run: ./rayx-core-tst -x
 
-      - name: CPack (Windows)
+      # Generate Windows artifacts (ZIP and NSIS installer)
+      - name: CPack (Windows - ZIP)
         if: matrix.os == 'windows-latest'
         working-directory: ${{github.workspace}}/build
         run: cpack -G ZIP 
 
-      - name: CPack (Ubuntu)
+      - name: CPack (Windows - NSIS Installer)
+        if: matrix.os == 'windows-latest'
+        working-directory: ${{github.workspace}}/build
+        run: cpack -G NSIS
+
+      # Generate Linux artifacts (DEB, RPM, TAR)
+      - name: CPack (Ubuntu - DEB)
         if: matrix.os == 'ubuntu-latest'
         working-directory: ${{github.workspace}}/build
         run: cpack -G DEB
 
-      - name: Upload build artifact (Windows)
+      - name: CPack (Ubuntu - RPM)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ${{github.workspace}}/build
+        run: cpack -G RPM
+
+      - name: CPack (Ubuntu - TAR)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ${{github.workspace}}/build
+        run: cpack -G TGZ
+
+      # Upload artifacts (Windows)
+      - name: Upload build artifacts (Windows)
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact-name }}
-          path: ${{github.workspace}}/build/RAYX-*-win64.zip
+          name: windows-artifacts
+          path: |
+            ${{github.workspace}}/build/RAYX-*.zip
+            ${{github.workspace}}/build/RAYX-*.exe
           if-no-files-found: error
-          
-      - name: Upload build artifact (Ubuntu)
+
+      # Upload artifacts (Ubuntu)
+      - name: Upload build artifacts (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact-name }}
-          path: ${{github.workspace}}/build/RAYX-*-Linux.deb
+          name: ubuntu-artifacts
+          path: |
+            ${{github.workspace}}/build/RAYX-*.deb
+            ${{github.workspace}}/build/RAYX-*.rpm
+            ${{github.workspace}}/build/RAYX-*.tar.gz
           if-no-files-found: error
 
   release:
@@ -127,7 +151,6 @@ jobs:
     needs: build-and-release
     runs-on: ubuntu-latest
     steps:
-      # Checkout CHANGELOG.md
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -148,9 +171,10 @@ jobs:
         with:
           body_path: ${{github.workspace}}/CHANGELOG.md
           files: |
-            ${{github.workspace}}/artifacts/rayx-win64.zip/*.zip
-            ${{github.workspace}}/artifacts/rayx-Linux.deb/*.deb
+            ${{github.workspace}}/artifacts/windows-artifacts/*.zip
+            ${{github.workspace}}/artifacts/windows-artifacts/*.exe
+            ${{github.workspace}}/artifacts/ubuntu-artifacts/*.deb
+            ${{github.workspace}}/artifacts/ubuntu-artifacts/*.rpm
+            ${{github.workspace}}/artifacts/ubuntu-artifacts/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-

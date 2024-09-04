@@ -39,7 +39,6 @@
 #else
 #define RAYX_API
 #endif
-#pragma warning Unknown dynamic link import / export semantics
 #endif
 
 // make string comparison available for msvc compiler

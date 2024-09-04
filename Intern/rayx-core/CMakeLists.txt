@@ -60,12 +60,6 @@ file(GLOB_RECURSE ALPAKA_SOURCE
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 alpaka_target(${PROJECT_NAME})
 alpaka_source(${ALPAKA_SOURCE})
-
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/static)
-
 # -----------------
 
 # -----OpenMP--------
@@ -217,12 +211,17 @@ add_custom_command(
 # -----------------
 
 # ---- CPack ----
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
-install(FILES ${SCRIPT_SRC_DIR} DESTINATION bin/Scripts)
-
+install(TARGETS ${PROJECT_NAME} 
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data
+        DESTINATION ${INSTALL_DATA_DIR}
+        FILES_MATCHING PATTERN "*")
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Scripts
+        DESTINATION ${INSTALL_DATA_DIR}
+        FILES_MATCHING PATTERN "*")
+include(InstallRequiredSystemLibraries)
 include(CPack)
-
 # -----------------
