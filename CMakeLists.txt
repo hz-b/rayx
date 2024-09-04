@@ -1,34 +1,50 @@
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 
 # ---- Project ----
-project(RAYX VERSION 0.21.2)
+project(RAYX VERSION 0.21.27)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
 # ------------------
 
 # ---- Options ----
 option(WERROR "add -Werror option" "NO") # inactive per default
 option(RAYX_ENABLE_CUDA "This option enables the search for CUDA. Project will be compiled without cuda if not found." ON)
 option(RAYX_REQUIRE_CUDA "If option 'RAYX_ENABLE_CUDA' is ON, this option will add the requirement that cuda must be found." OFF)
-
 # ------------------
-
-# ---- Subdirectories ----
-add_subdirectory(Extern)
-add_subdirectory(Intern)
 
 # ---- Code Coverage ----
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)
-
 # ------------------
 
 # ---- CPack ----
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_VENDOR "RAYX")
-set(CPACK_PACKAGE_CONTACT "Max Mustermann <" ${PROJECT_NAME} "@helmholtz-berlin.de>")
-include(CPack)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_DESCRIPTION "${PROJECT_NAME} - For simulating and designing beamlines at synchrotron light sources")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} - For simulating and designing beamlines at synchrotron light sources")
+set(CPACK_PACKAGE_VENDOR "Helmhotz-Zentrum Berlin")
+set(CPACK_PACKAGE_CONTACT "jannis.maier@helmholtz-berlin.de")
+
+# Disable GoogleTest installation
+set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of GoogleTest" FORCE)
+set(INSTALL_GMOCK OFF CACHE BOOL "Disable installation of GoogleMock" FORCE)
+
+# Install directories
+if(APPLE)
+    set(INSTALL_DATA_DIR "Library/Application Support/${PROJECT_NAME}")
+    set(INSTALL_FONTS_DIR "Library/Fonts/${PROJECT_NAME}")
+elseif(UNIX AND NOT APPLE)
+    set(INSTALL_DATA_DIR "share/${PROJECT_NAME}")
+    set(INSTALL_FONTS_DIR "share/fonts/${PROJECT_NAME}")
+elseif(WIN32)
+    set(INSTALL_DATA_DIR "Data")
+    set(INSTALL_FONTS_DIR "Fonts")
+endif()
+# ------------------
+
+
+# ---- Subdirectories ----
+add_subdirectory(Extern)
+add_subdirectory(Intern)
 # ------------------

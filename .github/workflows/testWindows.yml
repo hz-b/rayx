@@ -1,12 +1,21 @@
 name: testWindows
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'     # Run on all branches
+    tags-ignore:
+      - 'v*'     # Ignore tag pushes matching 'v*'
+  pull_request:
+    branches:
+      - '**'     # Run for all pull requests
 
 env:
   BUILD_TYPE: Release
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     runs-on: windows-latest
 
     steps:
@@ -35,10 +44,10 @@ jobs:
         uses: MarkusJx/install-boost@v2.4.5
         id: install-boost
         with:
-            boost_version: 1.84.0
-            boost_install_dir: ${{github.workspace}}/boost
-            platform_version: 2019
-            toolset: msvc
+          boost_version: 1.84.0
+          boost_install_dir: ${{github.workspace}}/boost
+          platform_version: 2019
+          toolset: msvc
 
       - name: Add Boost to PATH
         run: |
@@ -50,7 +59,7 @@ jobs:
         shell: pwsh
         run: .\Scripts\setup-cuda.ps1
         env:
-            INPUT_CUDA_VERSION: 12.5.1
+          INPUT_CUDA_VERSION: 12.5.1
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DRAYX_REQUIRE_CUDA=ON
