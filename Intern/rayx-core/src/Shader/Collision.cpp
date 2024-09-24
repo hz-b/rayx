@@ -499,7 +499,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 RAYX_FN_ACC
-Collision findCollisionWith(Ray r, uint32_t id, InvState& inv) {
+Collision findCollisionWith(Ray r, uint32_t id, InvState& inv, Rand& rand) {
     // misalignment
     r = rayMatrixMult(r, inv.elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
     Collision col = findCollisionInElementCoords(r, inv.elements[id].m_surface, inv.elements[id].m_cutout, false);
@@ -508,14 +508,14 @@ Collision findCollisionWith(Ray r, uint32_t id, InvState& inv) {
     }
 
     SlopeError sE = inv.elements[id].m_slopeError;
-    col.normal = applySlopeError(col.normal, sE, 0, inv);
+    col.normal = applySlopeError(col.normal, sE, 0, rand);
 
     return col;
 }
 
 // Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const Ray& ray, InvState& inv) {
+Collision findCollision(const Ray& ray, InvState& inv, Rand& rand) {
     // If sequential tracing is enabled, we only check collision with the "next element".
     if (inv.pushConstants.sequential == 1.0) {
         if (ray.m_lastElement >= inv.elements.size() - 1) {
@@ -523,7 +523,7 @@ Collision findCollision(const Ray& ray, InvState& inv) {
             col.found = false;
             return col;
         }
-        return findCollisionWith(ray, uint32_t(ray.m_lastElement + 1), inv);
+        return findCollisionWith(ray, uint32_t(ray.m_lastElement + 1), inv, rand);
     }
 
     // global coordinates of first intersection point of ray among all elements in beamline
@@ -541,7 +541,7 @@ Collision findCollision(const Ray& ray, InvState& inv) {
 
     // Find intersection points through all elements
     for (uint32_t elementIndex = 0; elementIndex < uint32_t(inv.elements.size()); elementIndex++) {
-        Collision current_col = findCollisionWith(r, elementIndex, inv);
+        Collision current_col = findCollisionWith(r, elementIndex, inv, rand);
         if (!current_col.found) {
             continue;
         }

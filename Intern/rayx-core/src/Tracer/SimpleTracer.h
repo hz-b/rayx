@@ -225,7 +225,6 @@ SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx 
         // shader instance local variables
         .globalInvocationId = {},
         .finalized = {},
-        .ctr = {},
         .nextEventIndex = {},
 
         // buffers

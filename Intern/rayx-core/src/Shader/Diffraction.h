@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "InvocationState.h"
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -20,7 +20,7 @@ zoneplates
 @returns
     results stored in dphi, dpsi (inout)
 */
-RAYX_FN_ACC void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState& inv);
+RAYX_FN_ACC void bessel_diff(double radius, double wl, double& dphi, double& dpsi, Rand& rand);
 
 /**
  * calculates fraunhofer diffraction effects on rectangular slits
@@ -29,6 +29,6 @@ RAYX_FN_ACC void bessel_diff(double radius, double wl, double& dphi, double& dps
  * @param dAngle 	diffraction angle (inout)
  * @return result stored in dAngle
  */
-RAYX_FN_ACC void fraun_diff(double dim, double wl, double& dAngle, InvState& inv);
+RAYX_FN_ACC void fraun_diff(double dim, double wl, double& dAngle, Rand& rand);
 
 }  // namespace RAYX

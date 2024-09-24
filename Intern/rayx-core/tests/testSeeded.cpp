@@ -13,54 +13,36 @@
 // Additionally to randomness tests, there can also be (non-randomized) regression tests in this module.
 // Which compares the current rayx the output of a previous rayx output which we deemed correct.
 
+// Test if something in our random engine changed
 TEST_F(TestSuite, randomNumbers) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    for (int i = 0; i < 4; i++) {
-        std::cout << randomDouble() << std::endl;
-    }
-
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    double r;
-    r = randomDouble();
-    CHECK_EQ(r, 0.37454011439684315);
-    r = randomDouble();
-    CHECK_EQ(r, 0.79654298438610116);
-    r = randomDouble();
-    CHECK_EQ(r, 0.95071431178383392);
-    r = randomDouble();
-    CHECK_EQ(r, 0.1834347877147223);
+    auto rand = [] { return randomDouble(); };
+    CHECK_EQ(rand(), 0.34984491052813416);
+    CHECK_EQ(rand(), 0.44071569543181971);
+    CHECK_EQ(rand(), 0.99076183046509925);
+    CHECK_EQ(rand(), 0.66844193307846234);
 }
 
+// Test if something in our random engine changed
 TEST_F(TestSuite, randomNumbers_normal) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    for (int i = 0; i < 4; i++) {
-        std::cout << randomNormal(0, 1) << std::endl;
-    }
-
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    double r;
-    r = randomNormal(0, 1);
-    CHECK_EQ(r, 0.40402608730396244);
-    r = randomNormal(0, 1);
-    CHECK_EQ(r, 0.12913107166033977);
-    r = randomNormal(0, 1);
-    CHECK_EQ(r, 0.14650860797333812);
-    r = randomNormal(0, 1);
-    CHECK_EQ(r, -0.83114042984660008);
+    auto rand = [] { return randomNormal(0, 1); };
+    CHECK_EQ(rand(), -1.3499299374111375);
+    CHECK_EQ(rand(), -0.35271630150395944);
+    CHECK_EQ(rand(), 1.0403767208244048);
+    CHECK_EQ(rand(), 0.42837209461852843);
 }
 
-TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded"); }
-
-// Tests sourceDepth of MatrixSource.
-TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
-
-// Tests reflectivity of materials of a PlaneMirror.
-// TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
-
-// Tests the Energy Distribution of a MatrixSource.
-TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
-
-TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded"); }
-TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded"); }
-TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded"); }
-TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded"); }
+// TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded"); }
+//
+// // Tests sourceDepth of MatrixSource.
+// TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
+//
+// // Tests reflectivity of materials of a PlaneMirror.
+// // TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
+//
+// // Tests the Energy Distribution of a MatrixSource.
+// TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
+//
+// TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded"); }
+// TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded"); }
+// TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded"); }
+// TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded"); }

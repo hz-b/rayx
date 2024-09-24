@@ -3,6 +3,7 @@
 #include "Collision.h"
 #include "Core.h"
 #include "InvocationState.h"
+#include "Rand.h"
 #include "Ray.h"
 
 namespace RAYX {
@@ -17,8 +18,8 @@ namespace RAYX {
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
 
-RAYX_FN_ACC Ray behaveSlit(Ray r, int id, Collision col, InvState& inv);
-RAYX_FN_ACC Ray behaveRZP(Ray r, int id, Collision col, InvState& inv);
+RAYX_FN_ACC Ray behaveSlit(Ray r, int id, Collision col, InvState& inv, Rand& rand);
+RAYX_FN_ACC Ray behaveRZP(Ray r, int id, Collision col, InvState& inv, Rand& rand);
 RAYX_FN_ACC Ray behaveGrating(Ray r, int id, Collision col, InvState& inv);
 RAYX_FN_ACC Ray behaveMirror(Ray r, int id, Collision col, InvState& inv);
 RAYX_FN_ACC Ray behaveImagePlane(Ray r, int id, Collision col, InvState& inv);

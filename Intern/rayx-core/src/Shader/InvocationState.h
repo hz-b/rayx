@@ -29,7 +29,6 @@ struct RAYX_API InvState {
     // these variables are only used during shader invocation
     int globalInvocationId;
     bool finalized;
-    uint64_t ctr;
     uint64_t nextEventIndex;
 
     std::span<const Ray> inputRays;

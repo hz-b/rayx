@@ -14,6 +14,7 @@ void dynamicElements(int gid, InvState& inv) {
     inv.globalInvocationId = gid;
     init(inv);
 
+    auto rand = Rand(rayId(inv), inv.pushConstants.numRays, inv.pushConstants.randomSeed);
     Ray ray = inv.inputRays[gid];
 
     Element nextElement;
@@ -23,7 +24,7 @@ void dynamicElements(int gid, InvState& inv) {
 
     // Iterate through all bounces
     while (true) {
-        Collision col = findCollision(ray, inv);
+        Collision col = findCollision(ray, inv, rand);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
@@ -49,10 +50,10 @@ void dynamicElements(int gid, InvState& inv) {
                 ray = behaveGrating(ray, col.elementIndex, col, inv);
                 break;
             case BTYPE_SLIT:
-                ray = behaveSlit(ray, col.elementIndex, col, inv);
+                ray = behaveSlit(ray, col.elementIndex, col, inv, rand);
                 break;
             case BTYPE_RZP:
-                ray = behaveRZP(ray, col.elementIndex, col, inv);
+                ray = behaveRZP(ray, col.elementIndex, col, inv, rand);
                 break;
             case BTYPE_IMAGE_PLANE:
                 ray = behaveImagePlane(ray, col.elementIndex, col, inv);

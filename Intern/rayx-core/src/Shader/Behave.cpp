@@ -17,7 +17,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
+Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv, Rand& rand) {
     SlitBehaviour b = deserializeSlit(inv.elements[id].m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -43,11 +43,11 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
     if (wavelength > 0) {
         if (openingCutout.m_type == CTYPE_RECT) {
             RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi, inv);
-            fraun_diff(r.m_length, wavelength, dPsi, inv);
+            fraun_diff(r.m_width, wavelength, dPhi, rand);
+            fraun_diff(r.m_length, wavelength, dPsi, rand);
         } else if (openingCutout.m_type == CTYPE_ELLIPTICAL) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
-            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, inv);
+            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, rand);
         } else {
             _throw("encountered Slit with unsupported openingCutout");
         }
@@ -63,7 +63,7 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
 }
 
 RAYX_FN_ACC
-Ray behaveRZP(Ray r, int id, Collision col, InvState& inv) {
+Ray behaveRZP(Ray r, int id, Collision col, InvState& inv, Rand& rand) {
     RZPBehaviour b = deserializeRZP(inv.elements[id].m_behaviour);
 
     double WL = hvlam(r.m_energy);
@@ -77,7 +77,7 @@ Ray behaveRZP(Ray r, int id, Collision col, InvState& inv) {
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection)
     // instead of the given order
     if (additional_order == 1) {
-        if (squaresDoubleRNG(inv.ctr) > 0.5) Ord = 0;
+        if (rand.randomDouble() > 0.5) Ord = 0;
     }
 
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY

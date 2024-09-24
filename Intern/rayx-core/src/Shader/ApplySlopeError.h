@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "InvocationState.h"
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -32,6 +33,6 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-RAYX_FN_ACC glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, InvState& inv);
+RAYX_FN_ACC glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand& rand);
 
 }  // namespace RAYX

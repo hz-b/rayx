@@ -2,10 +2,6 @@
 
 #pragma once
 
-#include "Core.h"
-#include "EventType.h"
-#include "ImageType.h"
-
 namespace RAYX {
 // inverse nanometer-electron volt relationship / reziprocal factor
 constexpr double INV_NM_TO_EVOLT = 1239.841984332002622;

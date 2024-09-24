@@ -15,17 +15,10 @@ void init(InvState& inv) {
         inv.outputRays[output_index(i, inv)].m_eventType = ETYPE_UNINIT;
     }
     inv.nextEventIndex = 0;
-
-    // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
-    // TODO Random seeds should probably not be doubles! Casting MAX_UINT64 to double loses precision.
-    const uint64_t MAX_UINT64 = ~(uint64_t(0));
-    const double MAX_UINT64_DOUBLE = 18446744073709551616.0;
-    uint64_t workerCounterNum = MAX_UINT64 / uint64_t(inv.pushConstants.numRays);
-    inv.ctr = rayId(inv) * workerCounterNum + uint64_t(inv.pushConstants.randomSeed * MAX_UINT64_DOUBLE);
 }
 
 RAYX_FN_ACC
-uint64_t rayId(InvState& inv) { return uint64_t(inv.pushConstants.rayIdStart) + uint64_t(inv.globalInvocationId); }
+uint64_t rayId(InvState& inv) { return static_cast<uint64_t>(inv.pushConstants.rayIdStart) + static_cast<uint64_t>(inv.globalInvocationId); }
 
 // `i in [0, maxEvents-1]`.
 // Will return the index in outputRays to access the `i'th` output ray belonging to this shader call.
