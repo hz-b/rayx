@@ -321,7 +321,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 break;
             }
             case RAYX::ValueType::EnergyDistributionType: {
-                auto currentValue = element.as_energyDistType();
+                auto currentValue = element.as_energyDistributionType();
                 if (ImGui::BeginCombo("##energydisttype", RAYX::EnergyDistributionTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : RAYX::EnergyDistributionTypeToString) {
                         bool isSelected = (currentValue == value);

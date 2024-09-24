@@ -254,9 +254,9 @@ class DesignMap {
         return *x;
     }
 
-    inline EnergyDistributionType as_energyDistType() const {
+    inline EnergyDistributionType as_energyDistributionType() const {
         auto* x = std::get_if<EnergyDistributionType>(&m_variant);
-        if (!x) throw std::runtime_error("as_energyDistType() called on non-energyDistType!");
+        if (!x) throw std::runtime_error("as_energyDistributionType() called on non-energyDistributionType!");
         return *x;
     }
 

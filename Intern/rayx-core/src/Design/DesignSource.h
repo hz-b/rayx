@@ -59,6 +59,8 @@ struct RAYX_API DesignSource {
     SpreadType getEnergySpreadType() const;
 
     void setEnergyDistributionType(EnergyDistributionType value);
+    EnergyDistributionType getEnergyDistributionType() const;
+
     void setEnergyDistributionFile(std::string value);
 
     void setEnergySpreadUnit(EnergySpreadUnit value);
