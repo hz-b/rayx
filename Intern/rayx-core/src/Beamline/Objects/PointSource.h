@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Beamline/LightSource.h"
-#include "Data/xml.h"
+#include "Rml/xml.h"
 
 namespace RAYX {
 struct DesignSource;

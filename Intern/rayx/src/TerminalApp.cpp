@@ -5,8 +5,8 @@
 #include <stdexcept>
 
 #include "Debug/Debug.h"
-#include "Data/Importer.h"
-#include "Data/Locate.h"
+#include "Rml/Importer.h"
+#include "Rml/Locate.h"
 #include "Random.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"

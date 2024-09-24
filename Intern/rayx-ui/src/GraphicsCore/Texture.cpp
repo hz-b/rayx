@@ -8,7 +8,7 @@
 #include <utility>
 
 #include "Buffer.h"
-#include "Data/Locate.h"
+#include "Rml/Locate.h"
 #include "Debug/Instrumentor.h"
 
 Texture::Texture(const Device& device)

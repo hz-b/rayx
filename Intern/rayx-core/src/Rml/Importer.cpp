@@ -8,13 +8,13 @@
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/Objects.h"
-#include "Data/xml.h"
+#include "Rml/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-#include "Strings.h"
+#include "Element/Strings.h"
 
 using RAYX::ElementType;
 
