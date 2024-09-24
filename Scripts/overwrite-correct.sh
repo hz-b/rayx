@@ -22,6 +22,6 @@ do
     input="$prefix/${f}_seeded.rml"
     a="$prefix/${f}_seeded.csv"
     b="$prefix/${f}_seeded.correct.csv"
-    ./build/bin/debug/rayx -i "$input" -x -c -f
+    ./build/Debug/bin/debug/rayx -i "$input" -x -c -f
     mv "$a" "$b"
 done

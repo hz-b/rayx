@@ -31,18 +31,18 @@ TEST_F(TestSuite, randomNumbers_normal) {
     CHECK_EQ(rand(), 0.42837209461852843);
 }
 
-// TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded"); }
-//
-// // Tests sourceDepth of MatrixSource.
-// TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
-//
-// // Tests reflectivity of materials of a PlaneMirror.
-// // TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
-//
-// // Tests the Energy Distribution of a MatrixSource.
-// TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
-//
-// TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded"); }
-// TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded"); }
-// TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded"); }
-// TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded"); }
+TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded"); }
+
+// Tests sourceDepth of MatrixSource.
+TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded"); }
+
+// Tests reflectivity of materials of a PlaneMirror.
+// TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
+
+// Tests the Energy Distribution of a MatrixSource.
+TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded"); }
+
+TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded"); }
+TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded"); }
+TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded"); }
+TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded"); }

@@ -114,7 +114,7 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
             d.push_back(std::stod(num));
         }
 
-        if (d.size() != 16) {
+        if (d.size() != 18) {
             RAYX_EXIT << "CSV line has incorrect length: " << d.size();
         }
 
