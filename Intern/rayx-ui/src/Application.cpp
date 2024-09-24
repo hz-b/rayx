@@ -335,7 +335,7 @@ void Application::loadRays(const std::filesystem::path& rmlPath, const size_t nu
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays = raysFromH5(rayFilePath, FULL_FORMAT, std::make_unique<uint32_t>(m_UIParams.rayInfo.startEventID));
+    m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
 
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";

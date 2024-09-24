@@ -20,7 +20,7 @@ int count(const RAYX::BundleHistory& hist) {
 }
 
 // Re-formats `hist` into a bunch of doubles using the format.
-std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format, int startEventID) {
+std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
     std::vector<double> output;
     output.reserve(count(hist) * format.size());
 
@@ -29,7 +29,7 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
         for (uint32_t event_id = 0; event_id < ray_hist.size(); event_id++) {
             const RAYX::Ray& event = ray_hist[event_id];
             for (uint32_t i = 0; i < format.size(); i++) {
-                double next = format[i].get_double(ray_id, event_id + startEventID, event);
+                double next = format[i].get_double(ray_id, event_id, event);
                 output.push_back(next);
             }
         }
@@ -37,11 +37,10 @@ std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& for
     return output;
 }
 
-void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, std::vector<std::string> elementNames,
-             int startEventID) {
+void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, std::vector<std::string> elementNames) {
     HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-    auto doubles = toDoubles(hist, format, startEventID);
+    auto doubles = toDoubles(hist, format);
 
     try {
         // write data
@@ -78,15 +77,12 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     RAYX::RayHistory rayHist;
     rayHist.reserve(8);  // Estimate: assume 8 events per ray on average
 
-    const double startEventID = doubles[1];
     const double* data = doubles.data();
 
     for (size_t i = 0; i < numRays; ++i) {
         const double* rayData = data + i * formatSize;
 
-        double eventId = rayData[1];
-
-        if (eventId == startEventID && !rayHist.empty()) {
+        if (!rayHist.empty()) {
             bundleHist.push_back(std::move(rayHist));
             rayHist.clear();
             rayHist.reserve(8);
@@ -120,7 +116,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
     return bundleHist;
 }
 
-RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format, std::unique_ptr<uint32_t> startEventID) {
+RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX::BundleHistory rays;
 
@@ -137,9 +133,6 @@ RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format
         if (doubles.size() == 0) {
             RAYX_WARN << "No rays found in " << filename;
             return rays;
-        }
-        if (startEventID) {
-            *startEventID = static_cast<uint32_t>(doubles[1]);
         }
         rays = fromDoubles(doubles, format);
         RAYX_VERB << "Loaded " << rays.size() << " rays from " << filename;

@@ -64,7 +64,7 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
 // Define the type of the filter function
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
-                          uint32_t amountOfRays, int startEventID) {
+                          uint32_t amountOfRays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
 
@@ -105,8 +105,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
                                    : (event.m_eventType == RAYX::ETYPE_ABSORBED)    ? RED
                                                                                     : WHITE;
 
-            if (!(isFirstEvent && startEventID > 0)) {
-                // Only execute if not the first event with startEventID > 0
+            if (!isFirstEvent) {
+                // Only execute if not the first event with > 0
                 ColorVertex origin = {rayLastPos, originColor};
                 ColorVertex point = {worldPos, pointColor};
 

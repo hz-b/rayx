@@ -30,8 +30,7 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, uint32_t maxEvents = 1,
-                                int startEventID = 0) = 0;
+    virtual BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, uint32_t maxEvents = 1) = 0;
 
   protected:
     PushConstants m_pushConstants;

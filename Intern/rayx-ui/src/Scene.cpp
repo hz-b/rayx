@@ -64,9 +64,9 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
         rayInfo.amountOfRays = rayInfo.maxAmountOfRays;
     }
     if (!rayInfo.renderAllRays) {
-        rays = getRays(m_rayCache, beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays, rayInfo.startEventID);
+        rays = getRays(m_rayCache, beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
     } else {
-        rays = getRays(m_rayCache, beamline, noFilter, (uint32_t)rayInfo.maxAmountOfRays, rayInfo.startEventID);
+        rays = getRays(m_rayCache, beamline, noFilter, (uint32_t)rayInfo.maxAmountOfRays);
     }
     if (!rays.empty()) {
         // Temporarily aggregate all vertices, then create a single RenderObject

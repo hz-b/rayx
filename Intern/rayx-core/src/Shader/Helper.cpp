@@ -11,7 +11,7 @@ void init(InvState& inv) {
 
     // TODO(Sven): dont waste time with initializing
     // sets all output rays controlled by this shader call to ETYPE_UNINIT.
-    for (uint32_t i = uint32_t(inv.pushConstants.startEventID); i < inv.pushConstants.maxEvents; i++) {
+    for (uint32_t i = uint32_t(0); i < inv.pushConstants.maxEvents; i++) {
         inv.outputRays[output_index(i, inv)].m_eventType = ETYPE_UNINIT;
     }
     inv.nextEventIndex = 0;
@@ -32,18 +32,13 @@ uint64_t rayId(InvState& inv) { return uint64_t(inv.pushConstants.rayIdStart) + 
 // Typically used as `outputRays[output_index(i)]`.
 RAYX_FN_ACC
 uint32_t output_index(uint32_t i, InvState& inv) {
-    return uint32_t(inv.globalInvocationId) * uint32_t(inv.pushConstants.maxEvents - inv.pushConstants.startEventID) + i -
-           uint32_t(inv.pushConstants.startEventID);
+    return uint32_t(inv.globalInvocationId) * uint32_t(inv.pushConstants.maxEvents) + i;
 }
 
 // record an event and store it in the next free spot in outputRays.
 // `r` will typically be ray, or some related ray.
 RAYX_FN_ACC
 void recordEvent(Ray r, double w, InvState& inv) {
-    if (inv.nextEventIndex < inv.pushConstants.startEventID) {
-        inv.nextEventIndex += 1;
-        return;
-    }
     if (inv.finalized) {
         return;
     }

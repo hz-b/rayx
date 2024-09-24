@@ -16,7 +16,6 @@ struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name
     double randomSeed;
     double maxEvents;
     double sequential;
-    double startEventID;
 };
 
 struct _debug_struct {
