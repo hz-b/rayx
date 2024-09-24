@@ -9,46 +9,53 @@
 
 namespace RAYX {
 bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
-    std::ifstream s(filename);
-    RAYX_VERB << filename;
-    std::string line;
+    try
+    {   
+        std::ifstream s(filename);
+        RAYX_VERB << filename;
+        std::string line;
 
-    // line 1
-    std::getline(s, out->m_title);
+        // line 1
+        std::getline(s, out->m_title);
 
-    // line 2
-    std::getline(s, line);
-#if defined(WIN32)
-    if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
-#else
-    if (sscanf(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
-#endif
-        RAYX_EXIT << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"";
-        return false;
-    }
-    out->m_Lines.reserve(out->m_lineCount);
-
-    // line 3..EOF
-    out->m_weightSum = 0;
-    for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
-        if (line.empty()) {
-            continue;
-        }
-
-        DatEntry e{};
-#if defined(WIN32)
-        if (sscanf_s(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
-#else
-        if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
-#endif
-            RAYX_EXIT << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"";
+        // line 2
+        std::getline(s, line);
+    #if defined(WIN32)
+        if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+    #else
+        if (sscanf(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
+    #endif
+            RAYX_D_ERR << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"";
             return false;
         }
-        out->m_Lines.push_back(e);
-        out->m_weightSum += e.m_weight;
-    }
+        out->m_Lines.reserve(out->m_lineCount);
 
-    return true;
+        // line 3..EOF
+        out->m_weightSum = 0;
+        for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
+            if (line.empty()) {
+                continue;
+            }
+
+            DatEntry e{};
+    #if defined(WIN32)
+            if (sscanf_s(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
+    #else
+            if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
+    #endif
+                RAYX_D_ERR << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"";
+                return false;
+            }
+            out->m_Lines.push_back(e);
+            out->m_weightSum += e.m_weight;
+        }
+
+        return true;
+
+    } catch (const std::exception& e) {
+        RAYX_D_ERR << "Exception caught while loading DatFile \"" << filename << "\": " << e.what();
+        return false;
+    }
 }
 
 [[maybe_unused]] std::string DatFile::dump() {
@@ -64,12 +71,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
 double DatFile::selectEnergy() const {
     // runs either continuous Energydistribution from DataFile or just the specific energies
-    // provisionally set to true because EnergyDistibution ended support for this choice
-    // TODO: Fanny find a way to get a choise for DataFile Distribution back
     if (m_continuous) {
-        if (m_Lines.size() == 1) {  // weird edge case, which would crash the code below
-            return m_Lines[0].m_energy;
-        }
         // find the index `idx`, s.t.
         // we will return an energy between lines[idx].energy and
         // lines[idx+1].energy
@@ -79,7 +81,7 @@ double DatFile::selectEnergy() const {
         double counter = 0;
         uint32_t idx = 0;
 
-        for (; idx < m_Lines.size() - 2; idx++) {
+        for (; idx <= m_Lines.size() - 1; idx++) {
             counter += (m_Lines[idx].m_weight + m_Lines[idx + 1].m_weight) / 2;
             if (counter >= w) {
                 break;

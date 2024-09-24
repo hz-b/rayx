@@ -194,6 +194,8 @@ void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { m_elementParame
 EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return m_elementParameters["energySpreadUnit"].as_energySpreadUnit(); }
 
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { m_elementParameters["energyDistributionType"] = value; }
+EnergyDistributionType DesignSource::getEnergyDistributionType() const { return m_elementParameters["energyDistributionType"].as_energyDistributionType(); }
+
 void DesignSource::setEnergyDistributionFile(std::string value) { m_elementParameters["photonEnergyDistributionFile"] = value; }
 
 void DesignSource::setEnergySpreadType(SpreadType value) { m_elementParameters["energyDistribution"] = value; }
@@ -207,12 +209,11 @@ double DesignSource::getPhotonFlux() const { return m_elementParameters["photonF
 EnergyDistribution DesignSource::getEnergyDistribution() const {
     EnergyDistribution en;
     SpreadType spreadType = m_elementParameters["energyDistribution"].as_energySpreadType();
-    EnergyDistributionType energyDistributionType = m_elementParameters["energyDistributionType"].as_energyDistType();
+    EnergyDistributionType energyDistributionType = m_elementParameters["energyDistributionType"].as_energyDistributionType();
 
     if (energyDistributionType == EnergyDistributionType::File) {
         std::string filename = m_elementParameters["photonEnergyDistributionFile"].as_string();
 
-        std::cout << std::filesystem::current_path() << std::endl;
         DatFile df;
         DatFile::load(filename, &df);
 

@@ -23,11 +23,15 @@ void setAllMandatory(xml::Parser parser, DesignSource* ds) {
 }
 
 void setDefaultEnergy(xml::Parser parser, DesignSource* ds) {
-    ds->setEnergy(parser.parsePhotonEnergy());
-    ds->setEnergyDistributionFile(parser.parseEnergyDistributionFile().generic_string());
     ds->setEnergyDistributionType(parser.parseEnergyDistributionType());
-    ds->setEnergySpread(parser.parseEnergySpread());
     ds->setEnergySpreadType(parser.parseEnergySpreadType());
+
+    if (ds->getEnergyDistributionType() == EnergyDistributionType::File) {
+        ds->setEnergyDistributionFile(parser.parseEnergyDistributionFile().generic_string());
+    } else {
+        ds->setEnergy(parser.parsePhotonEnergy());
+        ds->setEnergySpread(parser.parseEnergySpread());
+    }
 }
 
 void setDefaultOrientation(xml::Parser parser, DesignSource* ds) {
