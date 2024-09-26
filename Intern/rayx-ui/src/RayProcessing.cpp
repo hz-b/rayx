@@ -72,13 +72,11 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
     size_t maxRayIndex = rayCache.size();
-    int counter = 0;
 
     // compile all elements
     std::vector<RAYX::Element> compiledElements;
     for (const auto& element : beamline.m_DesignElements) {
         compiledElements.push_back(element.compile());
-        counter++;
     }
 
     for (size_t i : rayIndices) {

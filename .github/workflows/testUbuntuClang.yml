@@ -23,12 +23,18 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod u+x llvm.sh
           sudo ./llvm.sh 17
+          sudo apt-get install --yes libomp-17-dev
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DRAYX_ENABLE_CUDA=OFF -DCMAKE_CXX_COMPILER=clang++
-
+        run: |
+          CC="clang-17" CXX="clang++-17 -Werror" cmake -B ${{github.workspace}}/build \
+          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+          -DRAYX_ENABLE_CUDA=OFF \
+          -DCMAKE_CXX_FLAGS="-fopenmp -Werror" \
+          -DCMAKE_EXE_LINKER_FLAGS="-L/usr/lib/llvm-17/lib -lomp"
+      
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        run: CXX="clang++-17 -Werror" cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Run
         working-directory: ${{github.workspace}}
