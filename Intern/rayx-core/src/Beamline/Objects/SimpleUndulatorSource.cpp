@@ -1,6 +1,6 @@
 #include "SimpleUndulatorSource.h"
 
-#include "Data/xml.h"
+#include "Rml/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignSource.h"

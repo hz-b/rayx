@@ -10,7 +10,7 @@
 #include <unordered_set>
 
 #include "Beamline/StringConversion.h"
-#include "Data/Strings.cpp"
+#include "Element/Strings.cpp"
 #include "Debug/Instrumentor.h"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {

@@ -10,7 +10,7 @@
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
 #include "Shader/Constants.h"
-#include "Strings.h"
+#include "Element/Strings.h"
 
 namespace RAYX::xml {
 

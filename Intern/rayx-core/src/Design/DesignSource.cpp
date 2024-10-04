@@ -214,7 +214,6 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
     if (energyDistributionType == EnergyDistributionType::File) {
         std::string filename = m_elementParameters["photonEnergyDistributionFile"].as_string();
 
-        std::cout << std::filesystem::current_path() << std::endl;
         DatFile df;
         DatFile::load(filename, &df);
 
