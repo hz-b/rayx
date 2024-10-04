@@ -118,11 +118,10 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
             RAYX_EXIT << "CSV line has incorrect length: " << d.size();
         }
 
-        const auto direction = glm::dvec3(d[4], d[5], d[6]);
+        // TODO (Sven): we should definitely use the format here. Both writing and loading require the same format.
 
-        const auto stokes = glm::dvec4(d[8], d[9], d[10], d[11]);
-        // const auto rotation = glm::transpose(RAYX::rotationMatrix(direction));
-        const auto field = /* rotation *  */ RAYX::stokesToElectricField(stokes);
+        const auto direction = glm::dvec3(d[4], d[5], d[6]);
+        const auto field = RAYX::ElectricField {{d[8], d[9]}, {d[10], d[11]}, {d[12], d[13]}};
 
         // create the Ray from the loaded doubles from this line.
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
@@ -130,10 +129,10 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
                          .m_direction = direction,
                          .m_energy = d[7],
                          .m_field = field,
-                         .m_pathLength = d[12],
-                         .m_order = d[13],
-                         .m_lastElement = d[14],
-                         .m_sourceID = d[15]};
+                         .m_pathLength = d[14],
+                         .m_order = d[15],
+                         .m_lastElement = d[16],
+                         .m_sourceID = d[17]};
         // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
         // If so, we need to make place for it.
         if (out.size() <= ray_id) {

@@ -103,7 +103,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         auto t = tolerance;
 
         // integer tolerance for integer values.
-        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/) {
+        if (i == 3 /*eventType*/ || i == 16 /*lastElem*/) {
             t = 0.5;
         }
 
