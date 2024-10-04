@@ -48,8 +48,7 @@ class SimpleTracer : public DeviceTracer {
   public:
     SimpleTracer(int deviceIndex);
 
-    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents,
-                        int startEventID) override;
+    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) override;
 
   private:
     struct TraceResult {
@@ -124,8 +123,7 @@ template <typename Acc>
 SimpleTracer<Acc>::SimpleTracer(int deviceIndex) : m_deviceIndex(deviceIndex) {}
 
 template <typename Acc>
-BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents,
-                                       int startEventID) {
+BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "maxEvents: " << maxEvents;
 
@@ -153,7 +151,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
     auto q = Queue(acc);
 
     const auto firstBatchSize = static_cast<Idx>(glm::min(rays.size(), maxBatchSize));
-    const auto maxOutputEventsCount = static_cast<Idx>(maxBatchSize * (maxEvents - startEventID));
+    const auto maxOutputEventsCount = static_cast<Idx>(maxBatchSize * maxEvents);
     const auto initialCompactEventsSize = static_cast<Idx>(maxBatchSize * glm::min(2u, maxEvents));
     resizeBufferIfNeeded(q, m_batchOutput.compactEvents, initialCompactEventsSize);
     resizeBufferIfNeeded(q, m_batchOutput.compactEventCounts, firstBatchSize);
@@ -184,8 +182,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
                            .numRays = (double)rays.size(),
                            .randomSeed = randomSeed,
                            .maxEvents = (double)maxEvents,
-                           .sequential = sequential,
-                           .startEventID = (double)startEventID};
+                           .sequential = sequential};
 
         const auto inputRays = rays.data() + rayIdStart;
         transferToBuffer(q, cpu, m_batchInput.rays, inputRays, static_cast<Idx>(batchSize));

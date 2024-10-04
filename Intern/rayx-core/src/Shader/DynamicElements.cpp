@@ -71,7 +71,7 @@ void dynamicElements(int gid, InvState& inv) {
     }
 
     // store recorded events count
-    auto eventsCount = static_cast<int>(inv.nextEventIndex - inv.pushConstants.startEventID);
+    auto eventsCount = static_cast<int>(inv.nextEventIndex);
     eventsCount = std::max(0, std::min(static_cast<int>(inv.pushConstants.maxEvents), eventsCount));
     inv.outputRayCounts[gid] = eventsCount;
 }

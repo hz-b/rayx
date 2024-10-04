@@ -16,7 +16,7 @@ using RayFilterFunction = std::function<std::vector<size_t>(const RAYX::BundleHi
  */
 
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
-                          uint32_t amountOfRays, int startEventID = 0);
+                          uint32_t amountOfRays);
 
 void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements);
 

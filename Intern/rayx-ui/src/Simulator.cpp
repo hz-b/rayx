@@ -18,17 +18,11 @@ void Simulator::runSimulation() {
         m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
     }
 
-    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents, m_startEventID);
+    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, 1, m_maxEvents);
 
-    // check max EventID
-    uint32_t maxEventID = 0;
     bool notEnoughEvents = false;
 
     for (auto& ray : rays) {
-        if (ray.size() > (maxEventID)) {
-            maxEventID = static_cast<uint32_t>(ray.size()) + m_startEventID;
-        }
-
         for (auto& event : ray) {
             if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
                 notEnoughEvents = true;
@@ -39,12 +33,7 @@ void Simulator::runSimulation() {
     if (notEnoughEvents) {
         RAYX_LOG << "Not enough events (" << m_maxEvents << ")! Consider increasing m_maxEvents.";
     }
-    if (maxEventID == 0) {
-        RAYX_LOG << "No events were recorded! If startEventID is set, it might need to be lowered.";
-    } else if (maxEventID < m_maxEvents) {
-        RAYX_LOG << "m_maxEvents is set to " << m_maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting m_maxEvents to "
-                 << maxEventID << " to increase performance.";
-    }
+    
 
     // Export Rays to external data.
     std::string path = m_RMLPath.string();
@@ -65,9 +54,9 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    writeH5(rays, path, fmt, names, m_startEventID);
+    writeH5(rays, path, fmt, names);
 #else
-    writeCSV(rays, path, fmt, m_startEventID);
+    writeCSV(rays, path, fmt);
 #endif
 }
 
@@ -83,7 +72,6 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
     m_Beamline = std::move(beamline);
     m_max_batch_size = simulationInfo.maxBatchSize;
     m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-    m_startEventID = simulationInfo.startEventID;
     m_maxEvents = simulationInfo.maxEvents;
     if (simulationInfo.fixedSeed) {
         if (simulationInfo.seed != -1) {
