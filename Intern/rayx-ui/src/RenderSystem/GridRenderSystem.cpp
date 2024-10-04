@@ -1,6 +1,6 @@
 #include "GridRenderSystem.h"
 
-#include "CanonicalizePath.h"
+#include "Data/Locate.h"
 
 GridRenderSystem::GridRenderSystem(Device& device, VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts)
     : RenderSystem(device, fillInput(renderPass), setLayouts) {}
@@ -21,8 +21,8 @@ void GridRenderSystem::render(FrameInfo& frameInfo, [[maybe_unused]] const std::
 
 RenderSystem::Input GridRenderSystem::fillInput(VkRenderPass renderPass) const {
     return RenderSystem::Input{.renderPass = renderPass,
-                               .vertShaderPath = RAYX::getExecutablePath().string() + "/Shaders/grid_shader_vert.spv",
-                               .fragShaderPath = RAYX::getExecutablePath().string() + "/Shaders/grid_shader_frag.spv",
+                               .vertShaderPath = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/grid_shader_vert.spv").string(),
+                               .fragShaderPath = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/grid_shader_frag.spv").string(),
                                .bindingDescriptions = std::vector<VkVertexInputBindingDescription>{},
                                .attributeDescriptions = std::vector<VkVertexInputAttributeDescription>{},
                                .topology = std::nullopt,

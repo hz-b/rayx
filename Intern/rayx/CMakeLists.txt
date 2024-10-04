@@ -42,7 +42,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 # ----------------------
 
 # ---- CPack ----
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+if(APPLE OR UNIX)
+  install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+elseif(WIN32)
+  install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
+endif()
+
 include(InstallRequiredSystemLibraries)
 include(CPack)
 # --------------
