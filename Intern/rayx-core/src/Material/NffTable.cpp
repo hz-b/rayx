@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "CanonicalizePath.h"
+#include "Data/Locate.h"
 #include "Debug/Debug.h"
 
 namespace RAYX {
@@ -14,7 +14,7 @@ bool NffTable::load(const char* element, NffTable* out) {
 
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::tolower(c); });
 
-    std::string f = getExecutablePath().string() + "/Data/nff/" + elementString + ".nff";
+    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath("Data/nff/" + elementString + ".nff");
     RAYX_VERB << "Loading NffTable from " << f;
     std::ifstream s(f);
 
@@ -39,7 +39,7 @@ bool NffTable::load(const char* element, NffTable* out) {
 #else
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_f1, &e.m_f2) != 3) {
 #endif
-            RAYX_EXIT << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
+            RAYX_WARN << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);
