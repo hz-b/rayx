@@ -4,9 +4,9 @@
 #include <memory>
 #include <stdexcept>
 
-#include "CanonicalizePath.h"
-#include "Data/Importer.h"
 #include "Debug/Debug.h"
+#include "Data/Importer.h"
+#include "Data/Locate.h"
 #include "Random.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
@@ -106,7 +106,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_EXIT << "Have you selected .csv exporting?";
             }
 
-            auto cmd = std::string("python ") + RAYX::getExecutablePath().string() + "/Scripts/plot.py " + file;
+            auto cmd = std::string("python ") + RAYX::ResourceHandler::getInstance().getResourcePath("Scripts/plot.py").string() + " " + file;
             auto ret = system(cmd.c_str());
             if (ret != 0) {
                 RAYX_WARN << "received error code while printing";

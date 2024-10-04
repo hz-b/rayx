@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "CanonicalizePath.h"
+#include "Data/Locate.h"
 #include "Debug/Debug.h"
 
 namespace RAYX {
@@ -12,7 +12,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-    std::string f = getExecutablePath().string() + "/Data/PALIK/" + elementString + ".NKP";
+    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath("Data/PALIK/" + elementString + ".NKP");
     RAYX_VERB << "Loading PalikTable from " << f;
     std::ifstream s(f);
 
@@ -39,7 +39,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
 #else
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
 #endif
-            RAYX_EXIT << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
+            RAYX_WARN << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

@@ -9,7 +9,7 @@
 #include <fstream>
 #include <rapidxml.hpp>
 
-#include "CanonicalizePath.h"
+#include "Data/Locate.h"
 #include "Colors.h"
 #include "Debug/Instrumentor.h"
 #include "RayProcessing.h"
@@ -131,7 +131,7 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     // Upload fonts
     {
         // Setup style
-        const std::filesystem::path fontPath = RAYX::getExecutablePath() / "Assets/fonts/Roboto-Regular.ttf";
+        const std::filesystem::path fontPath = RAYX::ResourceHandler::getInstance().getFontPath("Fonts/Roboto-Regular.ttf");
         m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 8.0f));
         m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f));
         m_fonts.push_back(m_IO.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 32.0f));

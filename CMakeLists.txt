@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 
 # ---- Project ----
-project(RAYX VERSION 0.21.27)
+project(RAYX VERSION 0.21.41)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 20)
@@ -38,8 +38,8 @@ elseif(UNIX AND NOT APPLE)
     set(INSTALL_DATA_DIR "share/${PROJECT_NAME}")
     set(INSTALL_FONTS_DIR "share/fonts/${PROJECT_NAME}")
 elseif(WIN32)
-    set(INSTALL_DATA_DIR "Data")
-    set(INSTALL_FONTS_DIR "Fonts")
+    set(INSTALL_DATA_DIR ".")
+    set(INSTALL_FONTS_DIR ".")
 endif()
 # ------------------
 
