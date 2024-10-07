@@ -1,10 +1,19 @@
 # RAYX
 
-RAYX is a simulation tool designed for beamlines at electron storage rings. Currently, it is intended to be used in conjunction with [RAY-UI](https://www.helmholtz-berlin.de/forschung/oe/wi/optik-strahlrohre/arbeitsgebiete/ray_en.html). Our primary focus with RAYX is on high-performance tracing, achieved through the utilization of GPUs via the Vulkan API.
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/d12229b0-7820-475f-8f02-6b2f253c5081" alt="RAYX Logo" width="600">
+    </td>
+    <td>
+      <strong>RAYX</strong> is a powerful, multi-component simulation platform designed to streamline the design and optimization of beamlines in synchrotron light source facilities. At the core of the platform is <i>rayx-core</i>, a high-performance library that delivers precise light tracing capabilities on both CPUs and GPUs. This core library ensures that users can achieve detailed and accurate simulations at high speeds, making it an ideal solution for complex beamline designs.
+    </td>
+  </tr>
+</table>
 
-<div style="text-align:center">
-    <img src="https://user-images.githubusercontent.com/13185253/167402648-788eee6a-2ba4-466a-8a0a-62e59663e957.png" width="300" height="300"/>
-</div>
+To simplify the usage of _rayx-core_, the platform includes rayx, a command-line interface (CLI) tool designed for fast, one-shot tracing of beamlines. It provides comprehensive data on every ray-element intersection, making it especially valuable for generating large datasets efficiently. With its focus on ease of use, _rayx_ empowers users to quickly run simulations and retrieve detailed ray-tracing results.
+
+For users who prefer a more visual approach, _rayx-ui_ offers a graphical user interface (GUI) that includes a 3D viewport of the beamline, enabling interactive design and exploration. This GUI provides an intuitive interface to construct and modify beamlines, allowing users to visualize their designs in real-time. _rayx-ui_ not only enhances the design process but also allows users to iteratively optimize configurations based on immediate visual feedback.
 
 ## RAYX vs RAY-UI
 
