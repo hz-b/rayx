@@ -49,7 +49,7 @@ static Format FULL_FORMAT = {
     },
     FormatComponent{
         .name = "Event-type",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_eventType; },
+        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_eventType); },
     },
     FormatComponent{
         .name = "X-direction",

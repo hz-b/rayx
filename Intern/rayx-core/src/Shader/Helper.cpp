@@ -10,9 +10,9 @@ void init(InvState& inv) {
     inv.finalized = false;
 
     // TODO(Sven): dont waste time with initializing
-    // sets all output rays controlled by this shader call to ETYPE_UNINIT.
+    // sets all output rays controlled by this shader call to EventType::Uninit.
     for (uint32_t i = uint32_t(0); i < inv.pushConstants.maxEvents; i++) {
-        inv.outputRays[output_index(i, inv)].m_eventType = ETYPE_UNINIT;
+        inv.outputRays[output_index(i, inv)].m_eventType = EventType::Uninit;
     }
     inv.nextEventIndex = 0;
 
@@ -38,13 +38,13 @@ uint32_t output_index(uint32_t i, InvState& inv) {
 // record an event and store it in the next free spot in outputRays.
 // `r` will typically be ray, or some related ray.
 RAYX_FN_ACC
-void recordEvent(Ray r, double w, InvState& inv) {
+void recordEvent(Ray r, EventType w, InvState& inv) {
     if (inv.finalized) {
         return;
     }
 
     // recording of event type ETYPE_UINIT is forbidden.
-    if (w == ETYPE_UNINIT) {
+    if (w == EventType::Uninit) {
         _throw("recordEvent failed: weight UNINIT is invalid in recordEvent");
 
         return;
@@ -54,9 +54,9 @@ void recordEvent(Ray r, double w, InvState& inv) {
     if (inv.nextEventIndex >= inv.pushConstants.maxEvents) {
         inv.finalized = true;
 
-        // change the last event to "ETYPE_TOO_MANY_EVENTS".
+        // change the last event to "EventType::TooManyEvents".
         uint32_t idx = output_index(uint32_t(inv.pushConstants.maxEvents - 1), inv);
-        inv.outputRays[idx].m_eventType = ETYPE_TOO_MANY_EVENTS;
+        inv.outputRays[idx].m_eventType = EventType::TooManyEvents;
 
         _throw("recordEvent failed: too many events!");
 
@@ -74,7 +74,7 @@ void recordEvent(Ray r, double w, InvState& inv) {
 // Like `recordEvent` above, but it will prevent recording more events after this.
 // Is used for events terminating the path of the ray.
 RAYX_FN_ACC
-void recordFinalEvent(Ray r, double w, InvState& inv) {
+void recordFinalEvent(Ray r, EventType w, InvState& inv) {
     recordEvent(r, w, inv);
     inv.finalized = true;
 }

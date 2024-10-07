@@ -97,21 +97,27 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
             currentRayID = rayID;
         }
 
+        const auto* d = rayData + 2;
+        const auto position = glm::dvec3{d[0], d[1], d[2]};
+        const auto eventType = static_cast<RAYX::EventType>(d[3]);
+        const auto direction = glm::dvec3(d[4], d[5], d[6]);        
+        const auto energy = d[7];
+        const auto field = RAYX::ElectricField({d[8], d[9]}, {d[10], d[11]}, {d[12], d[13]});
+        const auto pathLength = d[14];
+        const auto order = d[15];
+        const auto lastElement = d[16];
+        const auto sourceID = d[17];
+
         const auto ray = RAYX::Ray{
-            .m_position = {rayData[2], rayData[3], rayData[4]},   // origin
-            .m_eventType = rayData[5],                            // eventType
-            .m_direction = {rayData[6], rayData[7], rayData[8]},  // direction
-            .m_energy = rayData[9],                               // energy
-            .m_field =
-                {
-                    {rayData[10], rayData[11]},
-                    {rayData[12], rayData[13]},
-                    {rayData[14], rayData[15]},
-                },
-            .m_pathLength = rayData[16],   // pathLength
-            .m_order = rayData[17],        // order
-            .m_lastElement = rayData[18],  // lastElement
-            .m_sourceID = rayData[19]      // sourceID
+            .m_position = position,
+            .m_eventType = eventType,
+            .m_direction = direction,
+            .m_energy = energy,
+            .m_field = field,
+            .m_pathLength = pathLength,
+            .m_order = order,
+            .m_lastElement = lastElement,
+            .m_sourceID = sourceID,
         };
 
         rayHist.push_back(ray);

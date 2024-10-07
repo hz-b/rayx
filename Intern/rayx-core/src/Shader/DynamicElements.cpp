@@ -64,7 +64,7 @@ void dynamicElements(int gid, InvState& inv) {
             break;
         }
 
-        recordEvent(ray, ETYPE_JUST_HIT_ELEM, inv);
+        recordEvent(ray, EventType::HitElement, inv);
 
         // transform back to WORLD coordinates
         ray = rayMatrixMult(ray, nextElement.m_outTrans);

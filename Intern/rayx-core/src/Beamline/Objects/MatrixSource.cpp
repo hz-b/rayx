@@ -61,7 +61,7 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
 
             const auto field = stokesToElectricField(m_pol, direction);
 
-            Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
+            Ray r = {position, EventType::Uninit, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
             returnList.push_back(r);
         }

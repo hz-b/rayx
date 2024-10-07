@@ -94,7 +94,7 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
 
         const auto field = stokesToElectricField(m_pol, direction);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, EventType::Uninit, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)
 #pragma omp critical
         { rayList.push_back(r); }

@@ -62,13 +62,13 @@ std::vector<Line> getRays(const RAYX::BundleHistory& bundleHist, const std::vect
     for (const auto& rayHist : bundleHist) {
         glm::vec3 rayLastPos = {0.0f, 0.0f, 0.0f};
         for (const auto& event : rayHist) {
-            if (event.m_eventType == ETYPE_JUST_HIT_ELEM || event.m_eventType == ETYPE_ABSORBED) {
+            if (event.m_eventType == EventType::HitElement || event.m_eventType == EventType::Absorbed) {
                 // Events where rays hit objects are in element coordinates
                 // We need to convert them to world coordinates
                 glm::vec4 worldPos = elements[(size_t)event.m_lastElement].m_element.m_outTrans * glm::vec4(event.m_position, 1.0f);
 
                 Vertex origin = {{rayLastPos.x, rayLastPos.y, rayLastPos.z, 1.0f}, YELLOW};
-                Vertex point = (event.m_eventType == ETYPE_JUST_HIT_ELEM) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
+                Vertex point = (event.m_eventType == EventType::HitElement) ? Vertex(worldPos, ORANGE) : Vertex(worldPos, RED);
 
                 rays.push_back(Line(origin, point));
                 rayLastPos = point.pos;

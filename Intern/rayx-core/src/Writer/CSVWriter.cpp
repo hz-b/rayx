@@ -118,19 +118,26 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
             RAYX_EXIT << "CSV line has incorrect length: " << d.size();
         }
 
-        const auto direction = glm::dvec3(d[4], d[5], d[6]);
+        const auto position = glm::dvec3{d[0], d[1], d[2]};
+        const auto eventType = static_cast<RAYX::EventType>(d[3]);
+        const auto direction = glm::dvec3(d[4], d[5], d[6]);        
+        const auto energy = d[7];
         const auto field = RAYX::ElectricField({d[8], d[9]}, {d[10], d[11]}, {d[12], d[13]});
+        const auto pathLength = d[14];
+        const auto order = d[15];
+        const auto lastElement = d[16];
+        const auto sourceID = d[17];
 
         // create the Ray from the loaded doubles from this line.
-        RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
-                         .m_eventType = d[3],
+        RAYX::Ray ray = {.m_position = position,
+                         .m_eventType = eventType,
                          .m_direction = direction,
-                         .m_energy = d[7],
+                         .m_energy = energy,
                          .m_field = field,
-                         .m_pathLength = d[14],
-                         .m_order = d[15],
-                         .m_lastElement = d[16],
-                         .m_sourceID = d[17]};
+                         .m_pathLength = pathLength,
+                         .m_order = order,
+                         .m_lastElement = lastElement,
+                         .m_sourceID = sourceID};
         // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
         // If so, we need to make place for it.
         if (out.size() <= ray_id) {
