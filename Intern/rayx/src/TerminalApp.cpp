@@ -80,7 +80,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 }
 
                 for (auto& event : ray) {
-                    if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
+                    if (event.m_eventType == RAYX::EventType::TooManyEvents) {
                         notEnoughEvents = true;
                     }
                 }
