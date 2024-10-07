@@ -72,13 +72,11 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
     size_t maxRayIndex = rayCache.size();
-    int counter = 0;
 
     // compile all elements
     std::vector<RAYX::Element> compiledElements;
     for (const auto& element : beamline.m_DesignElements) {
         compiledElements.push_back(element.compile());
-        counter++;
     }
 
     for (size_t i : rayIndices) {
@@ -93,8 +91,6 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         }
         glm::vec4 rayLastPos = glm::vec4(beamline.m_DesignSources[static_cast<size_t>(rayHist[0].m_sourceID)].getWorldPosition());
 
-        bool isFirstEvent = true;
-
         for (const RAYX::Ray& event : rayHist) {
             if (event.m_lastElement >= beamline.m_DesignElements.size()) {
                 RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
@@ -105,20 +101,15 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
                                    : (event.m_eventType == RAYX::ETYPE_ABSORBED)    ? RED
                                                                                     : WHITE;
 
-            if (!isFirstEvent) {
-                // Only execute if not the first event with > 0
-                ColorVertex origin = {rayLastPos, originColor};
-                ColorVertex point = {worldPos, pointColor};
-
-                rays.push_back(Line(origin, point));
-            }
-
-            rayLastPos = worldPos;  // Update rayLastPos in every case for the next iteration
-            isFirstEvent = false;   // Update the flag after the first iteration
+            ColorVertex origin = {rayLastPos, originColor};
+            ColorVertex point = {worldPos, pointColor};
+            rays.push_back(Line(origin, point));
+            rayLastPos = point.pos;
         }
     }
     return rays;
 }
+
 void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 

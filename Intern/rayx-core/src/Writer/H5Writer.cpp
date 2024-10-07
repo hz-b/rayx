@@ -4,6 +4,7 @@
 
 #include <highfive/H5DataSpace.hpp>
 #include <highfive/H5File.hpp>
+#include <limits>
 #include <string>
 
 #include "Debug/Debug.h"
@@ -65,27 +66,35 @@ void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const
 RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format& format) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     const size_t formatSize = format.size();
-    const size_t numRays = doubles.size() / formatSize;
+    const size_t numEntries = doubles.size() / formatSize;
 
     if (doubles.size() % formatSize != 0) {
         throw std::invalid_argument("Size of doubles does not match expected size based on format");
     }
 
     RAYX::BundleHistory bundleHist;
-    bundleHist.reserve(numRays / 2);  // Estimate: assume at least 2 events per ray on average
+    bundleHist.reserve(numEntries / 2);  // Estimate: assume at least 2 events per ray on average
 
     RAYX::RayHistory rayHist;
     rayHist.reserve(8);  // Estimate: assume 8 events per ray on average
 
     const double* data = doubles.data();
 
-    for (size_t i = 0; i < numRays; ++i) {
+    size_t currentRayID = std::numeric_limits<size_t>::max();  // Initialize with an invalid Ray-ID
+
+    for (size_t i = 0; i < numEntries; ++i) {
         const double* rayData = data + i * formatSize;
 
-        if (!rayHist.empty()) {
-            bundleHist.push_back(std::move(rayHist));
-            rayHist.clear();
-            rayHist.reserve(8);
+        size_t rayID = static_cast<size_t>(rayData[0]);  // Extract the Ray-ID
+
+        if (rayID != currentRayID) {
+            if (!rayHist.empty()) {
+                bundleHist.push_back(std::move(rayHist));
+                size_t lastRayHistSize = rayHist.size();
+                rayHist.clear();
+                rayHist.reserve(lastRayHistSize);
+            }
+            currentRayID = rayID;
         }
 
         const auto ray = RAYX::Ray{
@@ -95,7 +104,6 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
             .m_energy = rayData[9],                               // energy
             .m_field =
                 {
-                    // electric field
                     {rayData[10], rayData[11]},
                     {rayData[12], rayData[13]},
                     {rayData[14], rayData[15]},
