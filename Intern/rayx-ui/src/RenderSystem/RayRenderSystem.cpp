@@ -1,6 +1,6 @@
 #include "RayRenderSystem.h"
 
-#include "CanonicalizePath.h"
+#include "Data/Locate.h"
 #include "RenderObject.h"
 #include "Vertex.h"
 
@@ -21,8 +21,8 @@ void RayRenderSystem::render(FrameInfo& frameInfo, const std::vector<RenderObjec
 
 RenderSystem::Input RayRenderSystem::fillInput(VkRenderPass renderPass) const {
     return RenderSystem::Input{.renderPass = renderPass,
-                               .vertShaderPath = RAYX::getExecutablePath().string() + "/Shaders/ray_shader_vert.spv",
-                               .fragShaderPath = RAYX::getExecutablePath().string() + "/Shaders/ray_shader_frag.spv",
+                               .vertShaderPath = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/ray_shader_vert.spv").string(),
+                               .fragShaderPath = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/ray_shader_frag.spv").string(),
                                .bindingDescriptions = ColorVertex::getBindingDescriptions(),
                                .attributeDescriptions = ColorVertex::getAttributeDescriptions(),
                                .topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,

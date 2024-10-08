@@ -180,11 +180,18 @@ bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
 
 std::filesystem::path Parser::parseEnergyDistributionFile() const {
     std::filesystem::path datpath = Parser::parseStr("photonEnergyDistributionFile");
+    // Check if the path is empty
+    if (datpath.empty()) {
+        // Since the photon energy distribution file is optional, return an empty path
+        RAYX_VERB << "No photon energy distribution file specified.";
+        return std::filesystem::path();  // Or handle as per your application's logic
+    }
+
     std::filesystem::path combinedPath = rmlFile.parent_path() / datpath;
     try {
         combinedPath = std::filesystem::canonical(combinedPath);
     } catch (const std::exception& e) {
-        RAYX_EXIT << "Failed to canonicalize datfile path: " << e.what();
+        RAYX_EXIT << "Failed to canonicalize datfile path: " << combinedPath.string() << " -- Error: " << e.what();
     }
 
     RAYX_VERB << "Combined datfile path: " << combinedPath;

@@ -41,9 +41,9 @@ if(Vulkan_FOUND)
         GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets)
+        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})
     else()
-        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets)
+        set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE})
     endif()
 
     message(STATUS "Resource directory: ${RESOURCE_DIR}")
@@ -56,27 +56,29 @@ if(Vulkan_FOUND)
 
 
     # ---- CPack ----
-    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+    if(APPLE OR UNIX)
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+    elseif(WIN32)
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
+    endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Shaders
-                DESTINATION ./bin
-                FILES_MATCHING PATTERN "*_*.spv")
-        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Assets
-                DESTINATION ./bin
-                FILES_MATCHING PATTERN "*")
+                DESTINATION ${INSTALL_DATA_DIR})
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Textures
+                DESTINATION ${INSTALL_DATA_DIR})
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Fonts
+                DESTINATION ${INSTALL_FONTS_DIR})
     else()
         install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Shaders
-                DESTINATION ./bin
-                FILES_MATCHING PATTERN "*_*.spv")
-        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Assets
-                DESTINATION ./bin
-                FILES_MATCHING PATTERN "*")
+                DESTINATION ${INSTALL_DATA_DIR})
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Textures
+                DESTINATION ${INSTALL_DATA_DIR})
+        install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}/Fonts
+                DESTINATION ${INSTALL_FONTS_DIR})
     endif()
+
     include(InstallRequiredSystemLibraries)
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "rayx-ui - RAYX GUI Application")
     include(CPack)
     # -----------------
 

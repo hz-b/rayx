@@ -60,12 +60,6 @@ file(GLOB_RECURSE ALPAKA_SOURCE
 add_library(${PROJECT_NAME} SHARED ${SOURCE})
 alpaka_target(${PROJECT_NAME})
 alpaka_source(${ALPAKA_SOURCE})
-
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/static)
-
 # -----------------
 
 # -----OpenMP--------
@@ -140,6 +134,10 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE RAYX_BUILD_DLL
+    RAYX_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}"
+    RAYX_PACKAGE_INSTALL_DIR="${CPACK_PACKAGE_INSTALL_DIRECTORY}"
+    RAYX_DATA_DIR="${INSTALL_DATA_DIR}"
+    RAYX_FONTS_DIR="${INSTALL_FONTS_DIR}"
     PUBLIC ${COMPILE_PLATFORM}
     RAYX_PROJECT_DIR="${CMAKE_SOURCE_DIR}"
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
@@ -214,12 +212,25 @@ add_custom_command(
 # -----------------
 
 # ---- CPack ----
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Your Project Description")
-install(FILES ${SCRIPT_SRC_DIR} DESTINATION bin/Scripts)
-
+if(APPLE OR UNIX)
+    install(TARGETS ${PROJECT_NAME} 
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
+elseif(WIN32)
+    install(TARGETS ${PROJECT_NAME} 
+        RUNTIME DESTINATION .
+        LIBRARY DESTINATION .
+        ARCHIVE DESTINATION .
+    )
+endif()
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data/nff
+        DESTINATION ${INSTALL_DATA_DIR}/Data)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data/PALIK
+        DESTINATION ${INSTALL_DATA_DIR}/Data)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Scripts
+        DESTINATION ${INSTALL_DATA_DIR})
+include(InstallRequiredSystemLibraries)
 include(CPack)
-
 # -----------------

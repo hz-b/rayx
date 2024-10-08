@@ -15,7 +15,7 @@ class RAYX_API CircleSource : public LightSource {
 
   private:
     // Geometric Params
-    SourcePulseType m_sourceDistributionType;  // TODO unused.
+    // SourcePulseType m_sourceDistributionType;  // TODO unused.
     Misalignment m_misalignment;
 
     glm::dvec4 m_stokes;

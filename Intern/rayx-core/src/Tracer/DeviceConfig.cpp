@@ -191,15 +191,24 @@ DeviceConfig& DeviceConfig::enableDeviceByIndex(const Device::Index deviceIndex)
 DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
     auto compare_score = [](const Device& a, const Device& b) { return a.score < b.score; };
 
-    auto devicesByTypeView = devices | std::views::filter([deviceType](const Device& device) { return device.type & deviceType; });
-    auto bestIt = std::ranges::max_element(devicesByTypeView, compare_score);
+    // Manually filter devices by type
+    std::vector<Device*> filteredDevices;
+    for (auto& device : devices) {
+        if (device.type & deviceType) {
+            filteredDevices.push_back(&device);
+        }
+    }
 
-    if (bestIt == devicesByTypeView.end()) {
+    // Use std::max_element on the filtered devices
+    auto bestIt =
+        std::max_element(filteredDevices.begin(), filteredDevices.end(), [compare_score](Device* a, Device* b) { return compare_score(*a, *b); });
+
+    if (bestIt == filteredDevices.end()) {
         dumpDevices();
         RAYX_EXIT << "Could not find best device for types: " << deviceTypeToString(static_cast<DeviceType>(m_fetchedDeviceType & deviceType));
     }
 
-    bestIt->enable = true;
+    (*bestIt)->enable = true;
     return *this;
 }
 
