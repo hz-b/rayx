@@ -2,6 +2,7 @@
 #include <iostream>
 #include <filesystem>
 #include <vector>
+#include <algorithm>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -13,6 +14,16 @@
 #endif
 
 namespace RAYX {
+
+// Adds a new lookup path where the handler will search for resources
+void ResourceHandler::addLookUpPath(const std::filesystem::path& path) {
+    // Check if the path is already in the lookUpPaths
+    auto it = std::find(lookUpPaths.begin(), lookUpPaths.end(), path);
+    if (it == lookUpPaths.end()) {
+        // Insert at the beginning to prioritize newly added paths
+        lookUpPaths.insert(lookUpPaths.begin(), path);
+    }
+}
 
 // Check if a file exists
 bool ResourceHandler::fileExists(const std::string& path) { return std::filesystem::exists(path); }
@@ -53,33 +64,41 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
     }
 
 #else
-    throw std::runtime_error("getExecutablePath is not implemented for this platform");
+    static_assert(false, "macOS support is not implemented yet");
 #endif
     return std::filesystem::path(buffer.data());
 }
 
 // General method to get the full path based on the base directory (e.g., data or font directory)
 std::filesystem::path ResourceHandler::getFullPath(const std::string& baseDir, const std::string& relativePath) {
+    // First, check in user-defined lookup paths
+    for (const auto& lookupPath : lookUpPaths) {
+        std::filesystem::path path = lookupPath / baseDir / relativePath;
+        if (fileExists(path)) {
+            return path;
+        }
+    }
+
 #if defined(__linux__)
-    // First, check in /usr (package install)
-    std::string path = std::string("/usr/") + baseDir + "/" + relativePath;
+    // Check in /usr (package install)
+    std::filesystem::path path = std::filesystem::path("/usr") / baseDir / relativePath;
     if (fileExists(path)) return path;
 
-    // Next, check next to the executable (built from source)
-    std::string execDir = getExecutablePath().string();
-    execDir = execDir.substr(0, execDir.find_last_of("/\\"));
-    path = execDir + "/" + relativePath;
+    // Check next to the executable (built from source)
+    std::filesystem::path execDir = getExecutablePath().parent_path();
+    path = execDir / relativePath;
     if (fileExists(path)) return path;
 
-    // Lastly, check in /usr/local (make install)
-    path = std::string("/usr/local/") + baseDir + "/" + relativePath;
+    // Check in /usr/local (make install)
+    path = std::filesystem::path("/usr/local") / baseDir / relativePath;
     if (fileExists(path)) return path;
+
 #elif defined(_WIN32)
     // On Windows, only look next to the executable
-    std::string execDir = getExecutablePath().string();
-    execDir = execDir.substr(0, execDir.find_last_of("/\\"));
-    std::filesystem::path path = std::filesystem::path(execDir + "\\" + relativePath);
+    std::filesystem::path execDir = getExecutablePath().parent_path();
+    std::filesystem::path path = execDir / relativePath;
     if (fileExists(path)) return path;
+
 #elif defined(__APPLE__)
     static_assert(false, "macOS support is not implemented yet");
 
