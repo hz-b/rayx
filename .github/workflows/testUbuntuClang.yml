@@ -27,7 +27,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          CC="clang-17" CXX="clang++-17 -Werror" cmake -B ${{github.workspace}}/build \
+          CC="clang-17" CXX="clang++-17" cmake -B ${{github.workspace}}/build \
+          -DWERROR=YES \
           -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
           -DRAYX_ENABLE_CUDA=OFF \
           -DCMAKE_CXX_FLAGS="-fopenmp -Werror" \
@@ -45,4 +46,3 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build/bin/release
         run: ./rayx-core-tst -x
-
