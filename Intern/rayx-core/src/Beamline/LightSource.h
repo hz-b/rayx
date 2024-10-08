@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "Core.h"
-#include "Data/Strings.h"
-#include "Data/xml.h"
+#include "Element/Strings.h"
+#include "Rml/xml.h"
 #include "EnergyDistribution.h"
 #include "Shader/Ray.h"
 

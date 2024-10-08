@@ -3,7 +3,7 @@
 #include <variant>
 
 #include "Core.h"
-#include "Data/DatFile.h"
+#include "DatFile.h"
 
 namespace RAYX {
 
