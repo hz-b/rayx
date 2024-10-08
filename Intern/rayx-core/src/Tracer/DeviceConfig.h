@@ -49,7 +49,7 @@ struct RAYX_API DeviceConfig {
     std::vector<Device> devices;
 
   private:
-    const DeviceType m_fetchedDeviceType;
+    DeviceType m_fetchedDeviceType;
 };
 
 }  // namespace RAYX

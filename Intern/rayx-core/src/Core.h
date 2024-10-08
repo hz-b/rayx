@@ -27,13 +27,19 @@
 #else
 #define RAYX_API
 #endif
+#elif defined(RAYX_PLATFORM_CLANG)  //  Clang
+#ifdef RAYX_BUILD_DLL
+#define RAYX_API __attribute__((visibility("default")))
+#else
+#define RAYX_API
+#endif
 #else  //  do nothing and hope for the best?
 #ifdef RAYX_BUILD_DLL
 #define RAYX_API
 #else
 #define RAYX_API
 #endif
-#pragma warning Unknown dynamic link import / export semantics.
+#pragma warning Unknown dynamic link import / export semantics
 #endif
 
 // make string comparison available for msvc compiler

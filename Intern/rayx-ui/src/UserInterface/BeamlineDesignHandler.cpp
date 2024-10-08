@@ -151,7 +151,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
         }
 
         if (ImGui::BeginCombo("##combo", currentItem >= 0 ? RAYX::ElementStringMap[currentEl].c_str() : "")) {
-            int n = 0;
+            [[maybe_unused]] int n = 0;
             for (const auto& pair : RAYX::ElementStringMap) {
                 bool isSelected = (currentEl == pair.first);
                 if (ImGui::Selectable(pair.second.c_str(), isSelected)) {
