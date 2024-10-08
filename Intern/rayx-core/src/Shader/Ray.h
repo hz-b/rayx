@@ -19,10 +19,10 @@ struct RAYX_API Ray {
     glm::dvec3 m_position;
 
     /// The m_eventType expresses what is currently happening to the ray.
-    /// During tracing the eventType will be uninitialized (ETYPE_UNINIT).
+    /// During tracing the eventType will be uninitialized (EventType::Uninit).
     /// Only when an event will be recorded, the m_eventType will be set accordingly.
     /// See the potential values of `m_eventType` in `EventType.h`.
-    double m_eventType;
+    EventType m_eventType;
 
     /// The direction of the ray.
     /// The direction is normalized, so its L2 norm (aka length) is one.
