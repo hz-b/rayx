@@ -2,12 +2,14 @@
 
 
 - [Introduction](./Introduction/01-Introduction.md)
-    - [Getting Started](./Introduction/02-Getting-Started.md)
-    - [RAYX Commands](./Introduction/03-How-to-use-rayx.md)
+    - [How to Build](./Introduction/02-How-to-build.md)
+    - [How to Build](./Introduction/02-How-to-install.md)
+    - [Getting Started](./Introduction/03-Getting-Started.md)
     - [How to use RAYX-UI](./Introduction/04-How-to-use-rayx-ui.md)
-    - [How to Build](./Introduction/05-How-to-build.md)
-    - [Style Guide](./Introduction/06-Style-Guide.md)
-    - [Literature](./Introduction/07-Literature.md)
+    - [RAYX Commands](./Introduction/05-How-to-use-rayx.md)
+    - [Literature](./Introduction/06-Literature.md)
+    - [Style Guide](./Introduction/07-Style-Guide.md) 
+
 - [Model](./Model/Model.md)
     - [Beamline Objects](./Model/BeamlineObjects/BeamlineObjects.md)
         - [Optical Elements](./Model/BeamlineObjects/OpticalElements/OpticalElements.md)

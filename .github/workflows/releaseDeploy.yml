@@ -146,6 +146,15 @@ jobs:
             ${{github.workspace}}/build/RAYX-*.tar.gz
           if-no-files-found: error
 
+      - name: Extract version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Archive source code
+        run: |
+          git archive HEAD --format=zip --output=${{github.workspace}}/build/RAYX-source-v${{env.version}}.zip
+
+
   release:
     name: Create Release
     needs: build-and-release
@@ -176,5 +185,6 @@ jobs:
             ${{github.workspace}}/artifacts/ubuntu-artifacts/*.deb
             ${{github.workspace}}/artifacts/ubuntu-artifacts/*.rpm
             ${{github.workspace}}/artifacts/ubuntu-artifacts/*.tar.gz
+            ${{github.workspace}}/artifacts/ubuntu-artifacts/RAYX-source-v${{env.version}}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
