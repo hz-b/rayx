@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include <string>
-#include <set>
+#include <vector>
 
 #include "Core.h"
 
@@ -24,18 +24,16 @@ class RAYX_API ResourceHandler {
     // Retrieves a font file's full path based on the relative path
     std::filesystem::path getFontPath(const std::string& relativePath);
 
+    // Adds a new lookup path where the handler will search for resources
+    void addLookUpPath(const std::filesystem::path& path);
+
   private:
     ResourceHandler() = default;
     bool fileExists(const std::string& path);
     bool fileExists(const std::filesystem::path& path);
     std::filesystem::path getFullPath(const std::string& baseDir, const std::string& relativePath);
 
-    std::set<std::filesystem::path> lookUpPaths = {
-#if defined(__linux__)
-        std::filesystem::path("/usr"),        //
-        std::filesystem::path("/usr/local"),  //
-#endif
-    };
+    std::vector<std::filesystem::path> lookUpPaths;  // Maintains insertion order
 };
 
 }  // namespace RAYX
