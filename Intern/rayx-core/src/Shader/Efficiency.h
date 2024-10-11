@@ -233,7 +233,9 @@ inline ElectricField localToGlobalElectricField(LocalElectricField localField, g
 }
 
 RAYX_FN_ACC
-inline LocalElectricField globalToLocalElectricField(ElectricField field, glm::dvec3 forward) { return glm::transpose(rotationMatrix(forward)) * field; }
+inline LocalElectricField globalToLocalElectricField(ElectricField field, glm::dvec3 forward) {
+    return glm::transpose(rotationMatrix(forward)) * field;
+}
 
 RAYX_FN_ACC
 inline LocalElectricField globalToLocalElectricField(ElectricField field, glm::dvec3 forward, glm::vec3 up) {

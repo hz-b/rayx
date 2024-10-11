@@ -769,7 +769,7 @@ TEST_F(TestSuite, testBaseRotationConvention) {
         const auto steps = 100;
         const auto stepAngle = 1.0 / steps * PI * 2.0;
 
-        auto get_dir = [] (double angle) { return glm::dvec3(glm::cos(angle), glm::sin(angle), 0); };
+        auto get_dir = [](double angle) { return glm::dvec3(glm::cos(angle), glm::sin(angle), 0); };
 
         auto prev_vec = get_dir(0.0f);
 
