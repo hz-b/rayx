@@ -106,7 +106,6 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         if (i == 3 /*eventType*/ || i == 14 /*lastElem*/) {
             t = 0.5;
         }
-        if (8 <= i && i < 16){ t = 1.0e-5; }
 
         checkEq(filename, line, l + names[i], r + names[i], vl[i], vr[i], {vl[i]}, {vr[i]}, t);
     }
