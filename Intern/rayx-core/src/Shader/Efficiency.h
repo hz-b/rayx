@@ -210,7 +210,7 @@ struct RotationBase {
 // A convention for the up and right vectors is implemented, making this function well defined and for all forward directions
 // TODO(Sven): this convention should be exchanged with one that does not branch
 RAYX_FN_ACC
-inline RotationBase forwardVectorToBaseConvention(glm::dvec3 forward) {
+inline RotationBase forwardVectorToBaseConvention(const glm::dvec3 forward) {
     auto up = glm::dvec3(0, 1, 0);
     glm::dvec3 right;
 
@@ -246,22 +246,22 @@ inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) 
 }
 
 RAYX_FN_ACC
-inline ElectricField localToGlobalElectricField(LocalElectricField localField, glm::dvec3 forward) {
+inline ElectricField localToGlobalElectricField(const LocalElectricField localField, const glm::dvec3 forward) {
     return rotationMatrix(forward) * ElectricField(localField, complex::Complex{0, 0});
 }
 
 RAYX_FN_ACC
-inline ElectricField localToGlobalElectricField(LocalElectricField localField, glm::dvec3 forward, glm::dvec3 up) {
+inline ElectricField localToGlobalElectricField(const LocalElectricField localField, const glm::dvec3 forward, const glm::dvec3 up) {
     return rotationMatrix(forward, up) * ElectricField(localField, complex::Complex{0, 0});
 }
 
 RAYX_FN_ACC
-inline LocalElectricField globalToLocalElectricField(ElectricField field, glm::dvec3 forward) {
+inline LocalElectricField globalToLocalElectricField(const ElectricField field, const glm::dvec3 forward) {
     return glm::transpose(rotationMatrix(forward)) * field;
 }
 
 RAYX_FN_ACC
-inline LocalElectricField globalToLocalElectricField(ElectricField field, glm::dvec3 forward, glm::vec3 up) {
+inline LocalElectricField globalToLocalElectricField(const ElectricField field, const glm::dvec3 forward, const glm::vec3 up) {
     return glm::transpose(rotationMatrix(forward, up)) * field;
 }
 
