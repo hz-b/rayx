@@ -16,6 +16,7 @@ RAYX_FN_ACC
 inline Ray RAYX_API rayMatrixMult(Ray r, const glm::dmat4 m) {
     r.m_position = glm::dvec3(m * glm::dvec4(r.m_position, 1));
     r.m_direction = glm::dvec3(m * glm::dvec4(r.m_direction, 0));
+    r.m_field = glm::dmat3(m) * r.m_field;
     return r;
 }
 
