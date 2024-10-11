@@ -485,11 +485,12 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
     if (!inCutout(cutout, col.hitpoint.x, col.hitpoint.z)) {
         col.found = false;
     }
-
-    // Both r.m_direction and col.normal are in element-coordinates.
-    // The collision normal should point "out of the surface", i.e. in the direction that the ray came from.
-    // In other words we want `dot(r.m_direction, col.normal) <= 0`.
-    // Later on, we'd like to remove this hotfix, and each individual get*Collision function should already satisfy this constraint.
+    // Both r.m_direction and col.normal are in element coordinates.
+    // The collision normal should point 'outward from the surface', meaning it should oppose the ray's direction.
+    // In other words, we want `dot(r.m_direction, col.normal) <= 0`.
+    // The default normal may oppose the concave part of the overall shape
+    // Depending on whether the element is hit on a concave or convex surface,
+    // we flip the normal to ensure it points against the ray's direction.
     if (dot(r.m_direction, col.normal) > 0.0) {
         col.normal = col.normal * -1.0;
     }
