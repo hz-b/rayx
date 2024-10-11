@@ -1,3 +1,9 @@
+/*
+ * This code implements several formulas from the following book:
+ * Russel A. Chipman, Wai-Sze Tiffany Lam, Garam Young "Polarized Light and Optical Systems" (2019).
+ * For specific references, see the inline comments in the respective functions.
+ */
+
 #pragma once
 
 #include <glm.h>
@@ -8,39 +14,43 @@
 
 namespace RAYX {
 
-using Stokes = glm::dvec4;         // Stokes vector represents the polarization state of light in the ray local plane.
-using LocalElectricField = cvec2;  // Electric field in the ray local plane, as a complex 2D vector.
-using ElectricField = cvec3;       // Electric field as a complex 3D vector.
+using Stokes = glm::dvec4;         // Stokes vector represents the polarization state of light in the ray local plane
+using LocalElectricField = cvec2;  // Electric field in the ray local plane, as a complex 2D vector
+using ElectricField = cvec3;       // Electric field as a complex 3D vector
 
 struct FresnelCoeffs {
-    double s;  // Real component of Fresnel reflection/refraction coefficient for s-polarized light.
-    double p;  // Real component of Fresnel reflection/refraction coefficient for p-polarized light.
+    double s;  // Real component of Fresnel reflection/refraction coefficient for s-polarized light
+    double p;  // Real component of Fresnel reflection/refraction coefficient for p-polarized light
 };
 
 struct ComplexFresnelCoeffs {
-    complex::Complex s;  // Complex Fresnel coefficient for s-polarized light.
-    complex::Complex p;  // Complex Fresnel coefficient for p-polarized light.
+    complex::Complex s;  // Complex Fresnel coefficient for s-polarized light
+    complex::Complex p;  // Complex Fresnel coefficient for p-polarized light
 };
 
-// Computes the angle between two unit vectors in 3D space.
+// Computes the angle between two unit vectors in 3D space
 RAYX_FN_ACC
 inline double angleBetweenUnitVectors(glm::dvec3 a, glm::dvec3 b) { return glm::acos(glm::dot(a, b)); }
 
-// Calculates the refracted angle using Snell's Law, based on complex index of refraction.
+// Calculates the refracted angle using Snell's Law, based on complex index of refraction
+// Source: "Polarized Light and Optical Systems", p. 297, Formula 8.3
 RAYX_FN_ACC
 inline complex::Complex calcRefractAngle(const complex::Complex incidentAngle, const complex::Complex iorI, const complex::Complex iorT) {
     return complex::asin((iorI / iorT) * complex::sin(incidentAngle));
 }
 
-// Calculates Brewster's angle, the angle at which no reflection occurs for p-polarized light.
+// Calculates Brewster's angle, the angle at which no reflection occurs for p-polarized light
+// Source: "Polarized Light and Optical Systems", p. 305, Formula 8.26
 RAYX_FN_ACC
 inline complex::Complex calcBrewstersAngle(const complex::Complex iorI, const complex::Complex iorT) { return complex::atan(iorT / iorI); }
 
-// Calculates the critical angle for total internal reflection.
+// Calculates the critical angle for total internal reflection
+// Source: "Polarized Light and Optical Systems", p. 306, Formula 8.27
 RAYX_FN_ACC
 inline complex::Complex calcCriticalAngle(const complex::Complex iorI, const complex::Complex iorT) { return complex::asin(iorT / iorI); }
 
-// Computes the Fresnel reflection amplitude for s and p polarization states.
+// Computes the Fresnel reflection amplitude for s and p polarization states
+// Source: "Polarized Light and Optical Systems", p. 300, Formula 8.8 and 8.10
 RAYX_FN_ACC
 inline ComplexFresnelCoeffs calcReflectAmplitude(const complex::Complex incidentAngle, const complex::Complex refractAngle,
                                                  const complex::Complex iorI, const complex::Complex iorT) {
@@ -53,7 +63,8 @@ inline ComplexFresnelCoeffs calcReflectAmplitude(const complex::Complex incident
     return {.s = s, .p = p};
 }
 
-// Computes the Fresnel transmission (refracted) amplitude for s and p polarization states.
+// Computes the Fresnel transmission (refracted) amplitude for s and p polarization states
+// Source: "Polarized Light and Optical Systems", p. 300, Formula 8.9 and 8.11
 RAYX_FN_ACC
 inline ComplexFresnelCoeffs calcRefractAmplitude(const complex::Complex incidentAngle, const complex::Complex refractAngle,
                                                  const complex::Complex iorI, const complex::Complex iorT) {
@@ -66,32 +77,36 @@ inline ComplexFresnelCoeffs calcRefractAmplitude(const complex::Complex incident
     return {.s = s, .p = p};
 }
 
-// Computes the reflectance (intensity) based on the Fresnel reflection amplitudes.
+// Computes the reflectance (intensity) based on the Fresnel reflection amplitudes
+// Source: "Polarized Light and Optical Systems", p. 301, Formula 8.16 and 8.17
 RAYX_FN_ACC
 inline FresnelCoeffs calcReflectIntensity(const ComplexFresnelCoeffs reflectAmplitude) {
-    const auto s = (reflectAmplitude.s * complex::conj(reflectAmplitude.s)).real();  // s-polarized intensity.
-    const auto p = (reflectAmplitude.p * complex::conj(reflectAmplitude.p)).real();  // p-polarized intensity.
+    const auto s = (reflectAmplitude.s * complex::conj(reflectAmplitude.s)).real();  // s-polarized intensity
+    const auto p = (reflectAmplitude.p * complex::conj(reflectAmplitude.p)).real();  // p-polarized intensity
 
     return {.s = s, .p = p};
 }
 
-// Computes the transmittance (intensity) based on the Fresnel transmission amplitudes.
+// Computes the transmittance (intensity) based on the Fresnel transmission amplitudes
+// Source: "Polarized Light and Optical Systems", p. 302, Formula 8.19 and 8.20
 RAYX_FN_ACC
 inline FresnelCoeffs calcRefractIntensity(const ComplexFresnelCoeffs refract_amplitude, const complex::Complex incidentAngle,
                                           const complex::Complex refractAngle, const complex::Complex iorI, const complex::Complex iorT) {
     const auto r = ((iorT * complex::cos(refractAngle)) / (iorI * complex::cos(incidentAngle))).real();
 
-    const auto s = r * (refract_amplitude.s * complex::conj(refract_amplitude.s)).real();  // s-polarized intensity.
-    const auto p = r * (refract_amplitude.p * complex::conj(refract_amplitude.p)).real();  // p-polarized intensity.
+    const auto s = r * (refract_amplitude.s * complex::conj(refract_amplitude.s)).real();  // s-polarized intensity
+    const auto p = r * (refract_amplitude.p * complex::conj(refract_amplitude.p)).real();  // p-polarized intensity
 
     return {.s = s, .p = p};
 }
 
-// Computes the Jones matrix, representing the effect on the polarization state, based on Fresnel coefficients.
+// Computes the Jones matrix, representing the effect on the polarization state, based on Fresnel coefficients
+// Source: "Polarized Light and Optical Systems", p. 385, Formula 10.26
 RAYX_FN_ACC
 inline cmat3 calcJonesMatrix(const ComplexFresnelCoeffs amplitude) { return {amplitude.s, 0, 0, 0, amplitude.p, 0, 0, 0, 1}; }
 
-// Computes the polarization transformation matrix for reflection/refraction.
+// Computes the polarization transformation matrix for reflection/refraction
+// Source: "Polarized Light and Optical Systems", p. 386, Formula 10.22 and 10.31
 RAYX_FN_ACC
 inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::dvec3 reflectOrRefractVec, const glm::dvec3 normalVec,
                                       const ComplexFresnelCoeffs amplitude) {
@@ -100,7 +115,6 @@ inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::d
     const auto p0 = glm::cross(incidentVec, s0);
     const auto p1 = glm::cross(reflectOrRefractVec, s0);
 
-
     const auto out = glm::dmat3(s1, p1, reflectOrRefractVec);
     const auto in = glm::dmat3(s0.x, p0.x, incidentVec.x, s0.y, p0.y, incidentVec.y, s0.z, p0.z, incidentVec.z);
 
@@ -108,15 +122,16 @@ inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::d
     return out * jonesMatrix * in;
 }
 
-// Computes the polarization matrix for reflection at normal incidence (simplified case).
+// Computes the polarization matrix for reflection at normal incidence (simplified case)
+// Source: "Polarized Light and Optical Systems", p. 387, Formula 10.35
 RAYX_FN_ACC
 inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnelCoeffs amplitude) {
     return {
-        amplitude.s, 0, 0, 0, amplitude.s, 0, 0, 0, amplitude.s,  // All components equal since it's normal incidence.
+        amplitude.s, 0, 0, 0, amplitude.s, 0, 0, 0, amplitude.s,  // All components equal since it's normal incidence
     };
 }
 
-// Calculates the reflected electric field after intercepting a surface.
+// Calculates the reflected electric field after intercepting a surface
 RAYX_FN_ACC
 inline ElectricField interceptReflect(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
                                       const glm::dvec3 normalVec, const complex::Complex iorI, const complex::Complex iorT) {
@@ -125,39 +140,46 @@ inline ElectricField interceptReflect(const ElectricField incidentElectricField,
 
     const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, iorT);
 
-    const auto isNormalIncidence = incidentVec == -normalVec;  // Check for normal incidence.
+    const auto isNormalIncidence = incidentVec == -normalVec;  // Check for normal incidence
     const auto reflectPolarizationMatrix = isNormalIncidence ? calcReflectPolarizationMatrixAtNormalIncidence(reflectAmplitude)
                                                              : calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
 
-    const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;  // Reflect electric field.
+    const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;  // Reflect electric field
     return reflectElectricField;
 }
 
-// Computes the intensity from a 2D electric field (local).
+// Computes the intensity from a 2D electric field (local)
+// Source: "Polarized Light and Optical Systems", p. 76, Formula 3.25
 RAYX_FN_ACC
 inline double intensity(const LocalElectricField field) {
     const auto mag = complex::abs(field);
     return glm::dot(mag, mag);
 }
 
-// Computes the intensity from a 3D electric field (global).
+// Computes the intensity from a 3D electric field (global)
+// Source: "Polarized Light and Optical Systems", p. 76, Formula 3.25
 RAYX_FN_ACC
 inline double intensity(const ElectricField field) {
     const auto mag = complex::abs(field);
     return glm::dot(mag, mag);
 }
 
-// Returns the intensity from a Stokes vector.
+// Returns the intensity from a Stokes vector
+// Source: https://en.wikipedia.org/wiki/Stokes_parameters
 RAYX_FN_ACC
 inline double intensity(const Stokes stokes) { return stokes.x; }
 
-// Computes the degree of polarization from a Stokes vector.
+// Computes the degree of polarization from a Stokes vector
+// Source: https://en.wikipedia.org/wiki/Stokes_parameters
 RAYX_FN_ACC
 inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
 
-// Converts an electric field to a Stokes vector.
+// Converts a local electric field to a Stokes vector
+// Source: "Polarized Light and Optical Systems", p. 76, Formula 3.25
 RAYX_FN_ACC
 inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
+    // note that we omit the magnitude scale with the impedance of free space (https://en.wikipedia.org/wiki/Impedance_of_free_space)
+
     const auto mag = complex::abs(field);
     const auto theta = complex::arg(field);
 
@@ -165,7 +187,8 @@ inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
                   2.0 * mag.x * mag.y * glm::sin(theta.x - theta.y));
 }
 
-// Converts a Stokes vector back into a local electric field.
+// Converts a Stokes vector into a local electric field
+// Source: "Polarized Light and Optical Systems", p. 77, Formula 3.28
 RAYX_FN_ACC
 inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
     const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
@@ -183,8 +206,8 @@ struct RotationBase {
     glm::dvec3 forward;
 };
 
-// Computes a base given a forward vector.
-// A convention for the up and right vectors is implemented, making this function well defined and for all forward directions.
+// Computes a base given a forward vector
+// A convention for the up and right vectors is implemented, making this function well defined and for all forward directions
 // TODO(Sven): this convention should be exchanged with one that does not branch
 RAYX_FN_ACC
 inline RotationBase forwardVectorToBaseConvention(glm::dvec3 forward) {
@@ -208,14 +231,14 @@ inline RotationBase forwardVectorToBaseConvention(glm::dvec3 forward) {
     };
 }
 
-// Computes a rotation matrix given a forward vector. This matrix can be used to align an object with a direction.
+// Computes a rotation matrix given a forward vector. This matrix can be used to align an object with a direction
 RAYX_FN_ACC
 inline glm::dmat3 rotationMatrix(const glm::dvec3 forward) {
     const auto base = forwardVectorToBaseConvention(forward);
     return glm::dmat3(base.right, base.up, base.forward);
 }
 
-// Computes a rotation matrix given both forward and up vectors, used to align objects in space.
+// Computes a rotation matrix given both forward and up vectors, used to align objects in space
 RAYX_FN_ACC
 inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) {
     const auto right = glm::cross(forward, up);
