@@ -5,16 +5,17 @@
 #include <rapidxml.hpp>
 #include <sstream>
 #include <string>
+#include <stdexcept>
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Objects/Objects.h"
-#include "Data/xml.h"
+#include "Rml/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-#include "Strings.h"
+#include "Element/Strings.h"
 
 using RAYX::ElementType;
 
@@ -77,7 +78,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
     de.m_elementParameters = Map();
 
     // Light sources have constructors that accept a const DesignObject& as argument.
-    // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
+    // They use the param* functions declared in <RML/xml.h> to retrieve the relevant information.
     if (type == ElementType::PointSource) {
         setPointSource(parser, &ds);
         beamline->m_DesignSources.push_back(ds);
@@ -124,7 +125,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline
             if (success) {
                 group_context->push_back(g);
             } else {
-                RAYX_EXIT << "parseGroup failed!";
+                RAYX_THROW << "parseGroup failed!" ;
             }
             // recursively parse all objects from within the group.
             handleObjectCollection(object, beamline, group_context, filename);
@@ -170,7 +171,16 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     // go through all objects of the file, and parse them.
     // The group context stores the set of group in which the algorithm currently "is".
     // For each group we call handleObjectCollection recursively, and push the group onto the group context stack.
-    handleObjectCollection(xml_beamline, &beamline, &group_context, filename);
+    try
+    {
+        handleObjectCollection(xml_beamline, &beamline, &group_context, filename);
+    }
+    catch(...)
+    {
+        RAYX_D_ERR << "Error calling importBeamline()" ;
+        throw;
+    }
+    
     return beamline;
 }
 

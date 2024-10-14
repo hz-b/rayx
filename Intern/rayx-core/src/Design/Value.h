@@ -42,7 +42,8 @@ enum class ValueType {
     SigmaType,
     BehaviourType,
     ElementType,
-    GratingMount
+    GratingMount,
+    DatFile
 };
 
 class Undefined {};
@@ -87,6 +88,7 @@ class DesignMap {
     DesignMap(BehaviourType x) : m_variant(x) {}
     DesignMap(ElementType x) : m_variant(x) {}
     DesignMap(GratingMount x) : m_variant(x) {}
+    DesignMap(DatFile x) : m_variant(x) {}
 
     void operator=(double x) { m_variant = x; }
     void operator=(int x) { m_variant = x; }
@@ -113,6 +115,7 @@ class DesignMap {
     void operator=(BehaviourType x) { m_variant = x; }
     void operator=(GratingMount x) { m_variant = x; }
     void operator=(ElementType x) { m_variant = x; }
+    void operator=(DatFile x) { m_variant = x; }
 
     inline ValueType type() const {
         const ValueType types[] = {
@@ -142,6 +145,7 @@ class DesignMap {
             ValueType::BehaviourType,
             ValueType::ElementType,
             ValueType::GratingMount,
+            ValueType::DatFile,
         };
         return types[m_variant.index()];
     }
@@ -254,9 +258,9 @@ class DesignMap {
         return *x;
     }
 
-    inline EnergyDistributionType as_energyDistType() const {
+    inline EnergyDistributionType as_energyDistributionType() const {
         auto* x = std::get_if<EnergyDistributionType>(&m_variant);
-        if (!x) throw std::runtime_error("as_energyDistType() called on non-energyDistType!");
+        if (!x) throw std::runtime_error("as_energyDistributionType() called on non-energyDistributionType!");
         return *x;
     }
 
@@ -293,6 +297,12 @@ class DesignMap {
     inline GratingMount as_gratingMount() const {
         auto* x = std::get_if<GratingMount>(&m_variant);
         if (!x) throw std::runtime_error("as_gratingMount() called on non-gratingMount!");
+        return *x;
+    }
+
+    inline DatFile as_DatFile() const {
+        auto* x = std::get_if<DatFile>(&m_variant);
+        if (!x) throw std::runtime_error("sa_Datfile() called on non-DatFile!");
         return *x;
     }
 
@@ -415,7 +425,7 @@ class DesignMap {
   private:
     std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
                  CentralBeamstop, Cutout, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
-                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount>
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, DatFile>
         m_variant;
 };
 }  // namespace RAYX

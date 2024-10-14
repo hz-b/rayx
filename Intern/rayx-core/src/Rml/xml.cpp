@@ -10,7 +10,7 @@
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
 #include "Shader/Constants.h"
-#include "Strings.h"
+#include "Element/Strings.h"
 
 namespace RAYX::xml {
 
@@ -184,7 +184,7 @@ std::filesystem::path Parser::parseEnergyDistributionFile() const {
     try {
         combinedPath = std::filesystem::canonical(combinedPath);
     } catch (const std::exception& e) {
-        RAYX_EXIT << "Failed to canonicalize datfile path: " << e.what();
+        RAYX_THROW << "Failed to canonicalize datfile path: " << e.what();
     }
 
     RAYX_VERB << "Combined datfile path: " << combinedPath;

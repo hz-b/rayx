@@ -10,7 +10,7 @@
 #include <unordered_set>
 
 #include "Beamline/StringConversion.h"
-#include "Data/Strings.cpp"
+#include "Element/Strings.cpp"
 #include "Debug/Instrumentor.h"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
@@ -321,7 +321,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 break;
             }
             case RAYX::ValueType::EnergyDistributionType: {
-                auto currentValue = element.as_energyDistType();
+                auto currentValue = element.as_energyDistributionType();
                 if (ImGui::BeginCombo("##energydisttype", RAYX::EnergyDistributionTypeToString.at(currentValue).c_str())) {
                     for (const auto& [value, name] : RAYX::EnergyDistributionTypeToString) {
                         bool isSelected = (currentValue == value);
