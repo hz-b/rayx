@@ -1,22 +1,21 @@
 # Matrix Source
 
-TBA
 
 ## Light Properties
 
-In RAYX every ray is described by four properties. The values are randomly generated for the given distirubution. This guarantees that minimal systematic errors are impacting the simulation. 
+In RAYX, every ray is described by four properties. The values are randomly generated within the given distribution. This guarantees that minimal systematic errors impact the simulation.
 
-light properties:
+Light properties:
 - Origin
 - Direction
-- Photonenergy
-- Polarisation
+- Photon Energy
+- Polarization
 
 ### Origin
 
-The Origin for each Ray is described by x, y and z Position. 
+The origin for each ray is described by its x, y, and z position.
 
-## Tracing Parameter
+## Tracing Parameters
 
 - Ver Div
 - Hor Div
@@ -32,12 +31,11 @@ The Origin for each Ray is described by x, y and z Position.
 - Energy Distribution Type
 - Energy Distribution File
 
-
 ## RML Object
 
-To trace a Pixel Source through an RML File, utilize an XML Object to encompass all pertinent information for the light source. The default configuration for the light source from RAY-UI is presented here for your ease of use. It is recommended to include an Imageplane at the end for clearer results.
+To trace a **Pixel Source** through an RML file, use an XML object to encompass all pertinent information for the light source. The default configuration for the light source from RAY-UI is presented here for ease of use. It is recommended to include an Imageplane at the end for clearer results.
 
-```XML
+```xml
 <object name="Pixel Source" type="Pixel Source">
    <param id="numberRays" enabled="T">20000</param>
    <param id="sourceWidth" enabled="T">0.065</param>
@@ -46,24 +44,24 @@ To trace a Pixel Source through an RML File, utilize an XML Object to encompass 
    <param id="horDiv" enabled="T">1</param>
    <param id="verDiv" enabled="T">1</param>
    <param id="worldPosition" enabled="F">
-    <x>0.0000000000000000</x>
-    <y>0.0000000000000000</y>
-    <z>0.0000000000000000</z>
+      <x>0.0000000000000000</x>
+      <y>0.0000000000000000</y>
+      <z>0.0000000000000000</z>
    </param>
    <param id="worldXdirection" enabled="F">
-    <x>1.0000000000000000</x>
-    <y>0.0000000000000000</y>
-    <z>0.0000000000000000</z>
+      <x>1.0000000000000000</x>
+      <y>0.0000000000000000</y>
+      <z>0.0000000000000000</z>
    </param>
    <param id="worldYdirection" enabled="F">
-    <x>0.0000000000000000</x>
-    <y>1.0000000000000000</y>
-    <z>0.0000000000000000</z>
+      <x>0.0000000000000000</x>
+      <y>1.0000000000000000</y>
+      <z>0.0000000000000000</z>
    </param>
    <param id="worldZdirection" enabled="F">
-    <x>0.0000000000000000</x>
-    <y>0.0000000000000000</y>
-    <z>1.0000000000000000</z>
+      <x>0.0000000000000000</x>
+      <y>0.0000000000000000</y>
+      <z>1.0000000000000000</z>
    </param>
    <param id="energyDistributionType" comment="Values" enabled="T">1</param>
    <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
@@ -75,7 +73,5 @@ To trace a Pixel Source through an RML File, utilize an XML Object to encompass 
    <param id="circularPol" enabled="T">0</param>
    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
    <param id="sourcePulseLength" enabled="F">0</param>
-  </object>
-
-
+</object>
 ```

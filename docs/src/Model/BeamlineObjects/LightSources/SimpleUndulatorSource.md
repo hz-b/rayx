@@ -1,48 +1,48 @@
 # Simple Undulator Source
 
-The simple Undulator source mimics the physics of a real undulator source and allows the user to trace an approximated undulator lightbeam much faster. 
-This light source utilieses the Gaussian Beam Theorie which allows us to simplify the beam Properties a lot. We already treat the lightbeam as a group of individual rays. This gives us the possibility to substitute all complex wave theory laws on our light beam with approximations.[1]
-Simply put the Gaussian Beam Theory says that some beam properties are distributed in gaussian patterns. And that the pattern flattens or sqishes from collisions with optical elements but generaly remains a gaussian bellcurve. 
+The Simple Undulator source in RAYX approximates the physics of a real undulator source, allowing for faster tracing of an undulator light beam. This light source uses **Gaussian Beam Theory**, which simplifies the beam properties significantly. By treating the light beam as a collection of individual rays, complex wave theory can be substituted with approximations.
 
+Simply put, **Gaussian Beam Theory** states that certain beam properties are distributed in Gaussian patterns. These patterns flatten or squeeze after collisions with optical elements, but generally, the beam maintains a Gaussian bell curve shape.
 
 ## Light Properties
 
-In RAYX every ray is described by four properties. The values are randomly generated for the given distirubution. This guarantees that minimal systematic errors are impacting the simulation. 
+In RAYX, every ray is characterized by four properties, which are randomly generated to ensure minimal systematic errors in the simulation:
 
-light properties:
-- Origin
-- Direction
-- Photonenergy
-- Polarisation
+- **Origin**: Position in x, y, and z coordinates.
+- **Direction**: Direction vector of the ray.
+- **Photon Energy**: Energy of the photon carried by the ray.
+- **Polarization**: Polarization state of the photon.
 
 ### Origin
 
-The Origin for each Ray is described by x, y and z Position. 
+The origin for each ray is described by x, y, and z positions.
 
-## Tracing Parameter
+## Tracing Parameters
 
-- sourceDepth
-- linearPol0
-- linearPol45
-- circularPol
-- undulatorLength
-- photonEnergy
-- sigmaType
-- electronSigmaX
-- electronSigmaXs
-- electronSigmaY
-- electronSigmaYs
-- Energy
-- Energy Spread
-- Energy Spread Type
-- Energy Distribution Type
-- Energy Distribution File
+Key parameters used for tracing an undulator source include:
+
+- **sourceDepth**: Depth of the light source.
+- **linearPol0**: Linear polarization at 0 degrees.
+- **linearPol45**: Linear polarization at 45 degrees.
+- **circularPol**: Circular polarization.
+- **undulatorLength**: Length of the undulator.
+- **photonEnergy**: Energy of the photons.
+- **sigmaType**: Type of sigma (distribution type).
+- **electronSigmaX**: Horizontal electron beam size.
+- **electronSigmaXs**: Horizontal electron beam divergence.
+- **electronSigmaY**: Vertical electron beam size.
+- **electronSigmaYs**: Vertical electron beam divergence.
+- **Energy**: Photon energy level.
+- **Energy Spread**: Spread in energy.
+- **Energy Spread Type**: Type of energy spread (e.g., white band).
+- **Energy Distribution Type**: Distribution type of the photon energy.
+- **Energy Distribution File**: File used to define energy distribution.
 
 ## RML Object
 
-To trace a simple Undulator Source through an RML File, utilize an XML Object to encompass all pertinent information for the light source. The default configuration for the light source from RAY-UI is presented here for your ease of use. It is recommended to include an Imageplane at the end for clearer results.
+To trace a Simple Undulator Source using an RML file, you can define the source in an XML format. The default configuration from RAY-UI is provided here, which can be customized for your specific needs. It is advisable to include an Imageplane at the end for more accurate results.
 
-```XML
+```xml
 <object name="Simple Undulator" type="Simple Undulator">
    <param id="numberRays" enabled="T">20000</param>
    <param id="sigmaType" comment="standard" enabled="T">0</param>
@@ -67,12 +67,12 @@ To trace a simple Undulator Source through an RML File, utilize an XML Object to
    <param id="worldXdirection" enabled="F">
     <x>1.0000000000000000</x>
     <y>0.0000000000000000</y>
-    <z>0.0000000000000000</z>
+    <z>0.0000000000000000</x>
    </param>
    <param id="worldYdirection" enabled="F">
     <x>0.0000000000000000</x>
     <y>1.0000000000000000</y>
-    <z>0.0000000000000000</z>
+    <z>0.0000000000000000</x>
    </param>
    <param id="worldZdirection" enabled="F">
     <x>0.0000000000000000</x>
@@ -90,11 +90,8 @@ To trace a simple Undulator Source through an RML File, utilize an XML Object to
    <param id="circularPol" enabled="T">0</param>
    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
    <param id="sourcePulseLength" enabled="F">0</param>
-  </object>
-
+</object>
 ```
-# Literature
-[1]Representation of a Gaussian beam by rays
-P. P. Crooker,a兲 W. B. Colson, and J. Blau
-Physics Department, Naval Postgraduate School, Monterey, California 93943
-Received 3 October 2005; accepted 7 April 2006兲
+
+## Literature
+[1] Representation of a Gaussian Beam by Rays, P. P. Crooker, W. B. Colson, and J. Blau, Physics Department, Naval Postgraduate School, Monterey, California. Published 2006.

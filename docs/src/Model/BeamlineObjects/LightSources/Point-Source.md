@@ -1,22 +1,20 @@
 # Point Source
 
-TBA
-
 ## Light Properties
 
-In RAYX every ray is described by four properties. The values are randomly generated for the given distirubution. This guarantees that minimal systematic errors are impacting the simulation. 
+In RAYX, every ray is described by four properties. The values are randomly generated within the given distribution to ensure minimal systematic errors during simulation.
 
-light properties:
+Light properties:
 - Origin
 - Direction
-- Photonenergy
-- Polarisation
+- Photon Energy
+- Polarization
 
 ### Origin
 
-The Origin for each Ray is described by x, y and z Position. 
+The origin for each ray is described by its x, y, and z position.
 
-## Tracing Parameter
+## Tracing Parameters
 
 - sourceWidthDistribution
 - sourceHeightDistribution
@@ -36,12 +34,11 @@ The Origin for each Ray is described by x, y and z Position.
 - Energy Distribution Type
 - Energy Distribution File
 
-
 ## RML Object
 
-To trace a Point Source through an RML File, utilize an XML Object to encompass all pertinent information for the light source. The default configuration for the light source from RAY-UI is presented here for your ease of use. It is recommended to include an Imageplane at the end for clearer results.
+To trace a **Point Source** through an RML file, use an XML object to encapsulate all relevant information about the light source. Below is the default configuration for a point source from RAY-UI, which can be used as a template. It is recommended to include an Imageplane at the end for clearer simulation results.
 
-```XML
+```xml
 <object name="Point Source" type="Point Source">
     <param id="numberRays" enabled="T">200</param>
     <param id="sourceWidthDistribution" comment="gaussian (sigma)" enabled="T">1</param>
@@ -89,7 +86,5 @@ To trace a Point Source through an RML File, utilize an XML Object to encompass 
       <y>0</y>
       <z>1</z>
     </param>
-  </object>
-
-
+</object>
 ```

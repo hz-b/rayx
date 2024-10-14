@@ -1,23 +1,20 @@
 # Circle Source
 
-TBA
-
 ## Light Properties
 
-In RAYX every ray is described by four properties. The values are randomly generated for the given distirubution. This guarantees that minimal systematic errors are impacting the simulation. 
+In RAYX, every ray is described by four properties. The values are randomly generated according to the given distribution. This ensures that minimal systematic errors impact the simulation.
 
-light properties:
+Light properties include:
 - Origin
 - Direction
-- Photonenergy
-- Polarisation
+- Photon Energy
+- Polarization
 
 ### Origin
 
-The Origin for each Ray is described by x, y and z Position. 
+The origin of each ray is described by its x, y, and z positions.
 
-## Tracing Parameter
-
+## Tracing Parameters
 
 - Source Depth
 - Source Height
@@ -25,8 +22,8 @@ The Origin for each Ray is described by x, y and z Position.
 - Linear Pol 0
 - Linear Pol 45
 - Circular Pol
-- numOfEquidistantCircles 
-- maxOpeningAngle 
+- numOfEquidistantCircles
+- maxOpeningAngle
 - minOpeningAngle
 - deltaOpeningAngle
 - Energy
@@ -37,9 +34,9 @@ The Origin for each Ray is described by x, y and z Position.
 
 ## RML Object
 
-To trace a Circle Source through an RML File, utilize an XML Object to encompass all pertinent information for the light source. The default configuration for the light source from RAY-UI is presented here for your ease of use. It is recommended to include an Imageplane at the end for clearer results.
+To trace a Circle Source through an RML file, use an XML object to contain all relevant information for the light source. Below is the default configuration for the light source from RAY-UI for your convenience. It is recommended to include an Image Plane at the end for clearer results.
 
-```XML
+```xml
 <object name="Circle Source" type="Circle Source">
    <param id="numberRays" enabled="T">20000</param>
    <param id="sourceWidth" enabled="T">0.065</param>
@@ -84,5 +81,5 @@ To trace a Circle Source through an RML File, utilize an XML Object to encompass
    <param id="circularPol" enabled="T">0</param>
    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
    <param id="sourcePulseLength" enabled="F">0</param>
-  </object>
+</object>
 ```

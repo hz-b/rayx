@@ -15,7 +15,7 @@ Toroid:
 - Long Radius
 
 Grating:
-- vls parameter
+- Varied line spaceing parameter 
 - Line Density
 - Order Of Diffraction
 
