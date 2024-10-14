@@ -2,6 +2,8 @@
 
 #include <sstream>
 #include <utility>
+#include <stdexcept>
+
 
 namespace RAYX {
 
@@ -84,6 +86,15 @@ Verb::~Verb() {
     if (getDebugVerbose()) {
         std::cout << std::endl;
     }
+}
+
+Throw::Throw(std::string filename, int line){
+    formatDebugMsg(filename, line, std::cout);
+    throw std::runtime_error(filename);
+}
+
+Throw::~Throw(){
+    std::cout << std::endl;
 }
 
 // The default error_fn value. Exit with an error code of 1.

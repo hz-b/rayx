@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "Beamline/Objects/Objects.h"
+#include "Beamline/DatFile.h"
 #include "Debug/Debug.h"
 namespace RAYX {
 
@@ -196,7 +197,10 @@ EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return m_elementPar
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { m_elementParameters["energyDistributionType"] = value; }
 EnergyDistributionType DesignSource::getEnergyDistributionType() const { return m_elementParameters["energyDistributionType"].as_energyDistributionType(); }
 
-void DesignSource::setEnergyDistributionFile(std::string value) { m_elementParameters["photonEnergyDistributionFile"] = value; }
+void DesignSource::setEnergyDistributionFile(std::string filename) { 
+    DatFile df;
+    DatFile::load(filename, &df);
+    m_elementParameters["DatFile"] = df; }
 
 void DesignSource::setEnergySpreadType(SpreadType value) { m_elementParameters["energyDistribution"] = value; }
 SpreadType DesignSource::getEnergySpreadType() const { return m_elementParameters["energyDistribution"].as_energySpreadType(); }
@@ -212,10 +216,7 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
     EnergyDistributionType energyDistributionType = m_elementParameters["energyDistributionType"].as_energyDistributionType();
 
     if (energyDistributionType == EnergyDistributionType::File) {
-        std::string filename = m_elementParameters["photonEnergyDistributionFile"].as_string();
-
-        DatFile df;
-        DatFile::load(filename, &df);
+        DatFile df = m_elementParameters["DatFile"].as_DatFile();
 
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
         en = EnergyDistribution(df);

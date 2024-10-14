@@ -114,6 +114,22 @@ struct RAYX_API Verb {
     }
 };
 
+
+// The implementation of RAYX_THROW
+struct RAYX_API Throw {
+    Throw(std::string filename, int line);
+    ~Throw();
+
+    template <typename T>
+    Throw& operator<<(T t) {
+        if (getDebugVerbose()) {
+            std::cout << t;
+        }
+        return *this;
+    }
+};
+
+
 // An empty implementation used in release when using "debug-only" prints like RAYX_D_LOG.
 struct RAYX_API IgnoreLog {
     template <typename T>
@@ -133,6 +149,7 @@ extern void RAYX_API (*error_fn)();
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
 #define RAYX_EXIT RAYX::Exit(__FILE__, __LINE__)
 #define RAYX_VERB RAYX::Verb(__FILE__, __LINE__)
+#define RAYX_THROW RAYX::Throw(__FILE__, __LINE__)
 
 #ifdef RAYX_DEBUG_MODE
 // In debug mode, RAYX_D_LOG is just the same as RAYX_LOG.
