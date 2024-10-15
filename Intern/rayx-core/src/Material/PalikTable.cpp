@@ -12,7 +12,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath("Data/PALIK/" + elementString + ".NKP");
+    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath(std::filesystem::path("Data") / "PALIK" / (elementString + ".NKP"));
     RAYX_VERB << "Loading PalikTable from " << f;
     std::ifstream s(f);
 
