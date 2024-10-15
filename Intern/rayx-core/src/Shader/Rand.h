@@ -2,6 +2,8 @@
 
 #include "Core.h"
 
+#include <cstdint>
+
 namespace RAYX {
 
 /*

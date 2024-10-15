@@ -14,7 +14,7 @@ bool NffTable::load(const char* element, NffTable* out) {
 
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::tolower(c); });
 
-    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath("Data/nff/" + elementString + ".nff");
+    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath(std::filesystem::path("Data") / "nff" / (elementString + ".nff"));
     RAYX_VERB << "Loading NffTable from " << f;
     std::ifstream s(f);
 

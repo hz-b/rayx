@@ -70,7 +70,7 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
 }
 
 // General method to get the full path based on the base directory (e.g., data or font directory)
-std::filesystem::path ResourceHandler::getFullPath(const std::string& baseDir, const std::string& relativePath) {
+std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& baseDir, const std::filesystem::path& relativePath) {
     // First, check in user-defined lookup paths
     for (const auto& lookupPath : lookUpPaths) {
         std::filesystem::path path = lookupPath / baseDir / relativePath;
@@ -108,9 +108,9 @@ std::filesystem::path ResourceHandler::getFullPath(const std::string& baseDir, c
 }
 
 // Retrieve the full path of a resource based on the platform
-std::filesystem::path ResourceHandler::getResourcePath(const std::string& relativePath) { return getFullPath(RAYX_DATA_DIR, relativePath); }
+std::filesystem::path ResourceHandler::getResourcePath(const std::filesystem::path& relativePath) { return getFullPath(RAYX_DATA_DIR, relativePath); }
 
 // Retrieve the full path of a font based on the platform
-std::filesystem::path ResourceHandler::getFontPath(const std::string& relativePath) { return getFullPath(RAYX_FONTS_DIR, relativePath); }
+std::filesystem::path ResourceHandler::getFontPath(const std::filesystem::path& relativePath) { return getFullPath(RAYX_FONTS_DIR, relativePath); }
 
 }  // namespace RAYX
