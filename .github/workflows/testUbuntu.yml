@@ -36,7 +36,7 @@ jobs:
         uses: Jimver/cuda-toolkit@v0.2.16
         id: cuda-toolkit
         with:
-          cuda: '12.3.2'
+          cuda: '12.6.1'
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DRAYX_REQUIRE_CUDA=ON
