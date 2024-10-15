@@ -4,8 +4,11 @@ For building and running the project, we recommend using [Visual Studio Code](ht
 
 ## CMake Options:
 
-- `RAYX_ENABLE_CUDA:BOOL` `default = ON` `enable search for Cuda on your system. If found, build with Cuda`
-- `RAYX_REQUIRES_CUDA:BOOL` `default = OFF` `require Cuda to be found on your system. Otherwise throw an error`
+|Option|Type|Default|Description|
+|--|--|--|--|
+|WERROR|BOOL|OFF|Treat warnings as errors. If warnings occur, compilation is aborted.|
+|RAYX_ENABLE_CUDA|BOOL|ON|Enable search for Cuda on your system, if it is found, the project will be built with cuda.|
+|RAYX_REQUIRE_CUDA|BOOL|OFF|Abort compilation if Cuda can not be found on your system.|
 
 ## Cloning the Repository
 
@@ -22,73 +25,103 @@ Clone the git repository by running one of the following commands:
 ## On Windows
 
 ### Prerequisites
-- Install [CMake](https://cmake.org/download/).
-- Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home#windows) for Windows (at least version 1.3 or newer).
-- Install the [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library.
-- Install Python3, python3-dev, and python3-matplotlib.
-- We recommend using the MSVC compiler for Windows, available through [Visual Studio](https://visualstudio.microsoft.com/downloads/) (2019 or newer).
-- Install the [Boost](https://www.boost.org/users/download/) library.
-- Add Boost to your PATH.
+
+- We recommend using the MSVC compiler for Windows, available through [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
+- Install [CMake](https://cmake.org/download/)
+- Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home#windows) for Windows (at least version 1.3 or newer)
+- Install the [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library
+- Install Python3, python3-dev, and python3-matplotlib
+- Install the [Boost](https://www.boost.org/users/download/) library
+    - Add Boost to your PATH
 - Optional (required for Tracing on the GPU):
-    - Install [Cuda](https://developer.nvidia.com/Cuda-downloads?target_os=Windows).
-    Tested with Cuda version 12.5.1
-    - Add Cuda to your PATH.
+    - Install [Cuda](https://developer.nvidia.com/Cuda-downloads?target_os=Windows&target_arch=x86_64) (Tested with [Cuda 12.5.1](https://developer.nvidia.com/cuda-12-5-1-download-archive?target_os=Windows&target_arch=x86_64))
+	See: [Determining-compiler-and-Cuda-version](#determining-compiler-and-cuda-version)
+	- Add Cuda to your PATH.
+
+### Building with VSCode
+- Open the project in VSCode. You will be prompted to select a build kit (e.g., Visual Studio 2022).
+- Allow the CMake Extension to configure the project.
+- You can then build the project using the build button in the bottom panel.
+
+To configure CMake options, press `ctrl` + `shift` + `p` and run: `Preferences: Open Workspace Settings (JSON)`. Here is an example of a possible configuration:
+```json
+{
+    "cmake.generator": "Ninja", // Generate Ninja build files
+    "cmake.configureSettings": {
+        "RAYX_ENABLE_CUDA": "OFF", // Disable building with Cuda
+    },
+}
+```
+see: [Cmake Options](#cmake-options)
 
 ### Known Issues
 - Installing the VulkanSDK at the root directory of your drive may cause issues. If you encounter problems with the VulkanSDK, consider installing it in a different directory.
 
-### Building with VSCode
-- Open the project in VSCode. You will be prompted to select a build kit (e.g., gcc).
-- Allow the CMake Extension to configure the project.
-- You can then build the project using the build button in the bottom panel.
-
-To use a custom generator for CMake, such as Ninja for faster builds, you can set it in the `.vscode/settings.json` file. The following is an example configuration for the generator in VSCode:
-![](../res/vscode_ninja_config.png)
-
-### Building with Visual Studio
-- Open a terminal in the project folder.
-- Run the following command, replacing it with your version of Visual Studio:
-
-`cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release`
-
-see: [Cmake Options](#cmake-options)
-
 ## On Linux
 
 ### Prerequisites
-- Ensure cmake, gcc, gdb, and make are installed and up to date.
+
+- CMake
+- Boost
+- Vulkan SDK
+- HDF5
+- OpenMP
+	(`openmp` for GCC, or `openmpi` for Clang)
+- Optional:
+	- Cuda [Determining-compiler-and-Cuda-version](#determining-compiler-and-cuda-version)
+	- Python3
+		- matplotlib
+
+#### Ubuntu
+
 - Install the Vulkan SDK from [here](https://vulkan.lunarg.com/sdk/home). Select a version under Linux -> Ubuntu Packages.
-- Install Python3, python3-dev, and python3-matplotlib.
+
 - The project leverages [libhdf5](https://github.com/BlueBrain/HighFive) for data management and incorporates various other libraries for graphical user interfaces, linear algebra computations, and handling different aspects of the X11 window system. Install the necessary libraries with the following command:
-- Install boost
-- Optional (required for Tracing on the GPU):
-    - Install Cuda
-    - see [Determining Cuda and compiler version](#determining-cuda-and-compiler-version)
 
-### Ubuntu
-`apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev`
-- Ensure the libraries are installed at `/usr/include/hdf5/serial` and `/usr/lib/x86_64-linux-gnu/hdf5/serial`.
+	`apt update && apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev`
 
-### Arch Linux
-Arch Linux users can obtain all necessary packages through pacman, yay, or other package managers. Specific instructions will be provided later.
+### Determining compiler and Cuda version
 
-### Fedora
-To install the required packages on Fedora, run the following command:
+- MSVC:
+	Depending on the Cuda version, different versions of MSVC may be supported.
+    - Please take a look at the supported versions of MSVC for your Cuda installation:
+        - <https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html>
+        - Visual Studio 2019 is no longer supported, beginning at Cuda version 12.5.1
+    - This projects was tested with:
+        - Cuda version 12.5.1 and Visual Studio 2022
+- GCC:
+	Depending on the Cuda version, different versions of GCC may be supported.
+	We recommend using the associated compiler shipped with your package manager.
+    - Ubuntu:
+    install `nvidia-cuda-dev` and `nvidia-cuda-toolkit-gcc`
+    shipped compiler: `/usr/bin/cuda-g++`
+    - Arch / Manjaro:
+    install `cuda`
+    shipped compiler: `/opt/cuda/bin/g++`
+	- This projects was tested with:
+		- Cuda version 12.3.2 and GCC version 13.3
+		- Cuda version 12.5.1 and GCC version 13.3
+	- For more information on compatible versions:
+       - <https://stackoverflow.com/questions/6622454/Cuda-incompatible-with-my-gcc-version>
+       - <https://gist.github.com/ax3l/9489132>
+- Clang: Using clang as Cuda compiler is currently not supported. Only builds with cuda disabled are supported. See [Cmake Options](#cmake-options).
 
-`sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc blas-devel lapack-devel gtk3-devel pkg-config libXi-devel libXcursor-devel libXinerama-devel libXrandr-devel boost`
+### Building with compile.sh
 
-### Determining Cuda and compiler version
-- GCC: Depending on the Cuda version, different versions of GCC may be supported.
-This projects is tested with Cuda version 12.4.1 and GCC version 13.3
-Please take a look at the supported versions of GCC for your Cuda installation:
-    - <https://stackoverflow.com/questions/6622454/Cuda-incompatible-with-my-gcc-version>
-    - <https://gist.github.com/ax3l/9489132>
-- Clang: Using clang as Cuda compiler is currently not supported.
-
-### Using compile.sh
-usage: `./compile.sh`
+usage: `CXX=<path/to/compiler> ./compile.sh [OPTIONS]...`
 #### Options:
 - `--release` build in release mode (default: build in debug mode)
 - `--cuda` enable compilation with Cuda (default: build without Cuda)\
-see [Determining Cuda and compiler version](#determining-cuda-and-compiler-version) \
-example usage: `CXX=g++-13 ./compile.sh --cuda`
+see [Determining-compiler-and-Cuda-version](#determining-compiler-and-cuda-version) \
+example usage: `CXX=cuda-g++ ./compile.sh --cuda`
+
+### Building with CMake
+
+`mkdir build && cd build`
+`cmake [OPTIONS...] -G Ninja ..`
+See [Cmake Options](#cmake-options).
+
+## Troubleshooting:
+
+In case you encounter issues, feel free to seek help on [github issues](https://github.com/hz-b/rayx/issues).
+Please provide **system information**, the **build command** and the **error log**.
