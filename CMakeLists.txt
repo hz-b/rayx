@@ -12,6 +12,8 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 option(WERROR "add -Werror option" "NO") # inactive per default
 option(RAYX_ENABLE_CUDA "This option enables the search for CUDA. Project will be compiled without cuda if not found." ON)
 option(RAYX_REQUIRE_CUDA "If option 'RAYX_ENABLE_CUDA' is ON, this option will add the requirement that cuda must be found." OFF)
+option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
+
 # ------------------
 
 # ---- Code Coverage ----

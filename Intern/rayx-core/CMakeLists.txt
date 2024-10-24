@@ -57,7 +57,14 @@ file(GLOB_RECURSE ALPAKA_SOURCE
     ${PROJECT_SOURCE_DIR}/src/Shader/*.cpp
     ${PROJECT_SOURCE_DIR}/src/Tracer/*.cpp
 )
-add_library(${PROJECT_NAME} SHARED ${SOURCE})
+
+if(RAYX_STATIC_LIB)
+    add_library(${PROJECT_NAME} STATIC ${SOURCE})
+    set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+else()
+    add_library(${PROJECT_NAME} SHARED ${SOURCE})
+endif()
+
 alpaka_target(${PROJECT_NAME})
 alpaka_source(${ALPAKA_SOURCE})
 # -----------------
