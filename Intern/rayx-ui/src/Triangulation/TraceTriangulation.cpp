@@ -24,13 +24,12 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
             constexpr double distanceToObj = 2000.0f;
             pos = glm::dvec3(x, distanceToObj, z);
             dir = glm::dvec3(0.0f, -1.0f, 0.0f);
-            const auto rotation = RAYX::rotationMatrix(dir);
             const auto stokes = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
-            const auto field = rotation * RAYX::stokesToElectricField(stokes);
+            const auto field = RAYX::stokesToElectricField(stokes, dir);
 
             RAYX::Ray ray = {
                 .m_position = pos,
-                .m_eventType = RAYX::ETYPE_UNINIT,
+                .m_eventType = RAYX::EventType::Uninit,
                 .m_direction = dir,
                 .m_energy = 1.0f,
                 .m_field = field,
