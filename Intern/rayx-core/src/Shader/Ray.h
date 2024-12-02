@@ -33,7 +33,7 @@ struct RAYX_API Ray {
     double m_energy;
 
     /// The complex electric field
-    ElectricField m_field = ElectricField{{0, 0}, {0, 0}, {0, 0}};
+    ElectricField m_field;
 
     /// The distance that this ray has already traveled (in mm).
     double m_pathLength;
