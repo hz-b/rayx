@@ -61,43 +61,42 @@ namespace RAYX {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
                               std::filesystem::path filename) {
-    // the following three blocks of code are lambda expressions (see
-    // https://en.cppreference.com/w/cpp/language/lambda) They define functions
-    // to be used in the if-else-chain below to keep it structured and readable.
-
-    // //addLightSource(s, node) is a function adding a light source to the
-    // beamline (if it's not nullptr)
-
     RAYX::xml::Parser parser(node, group_context, filename);
     ElementType type = parser.type();
+
     DesignSource ds;
     ds.m_elementParameters = Map();
 
     DesignElement de;
     de.m_elementParameters = Map();
 
-    // Light sources have constructors that accept a const DesignObject& as argument.
-    // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
-    if (type == ElementType::PointSource) {
-        setPointSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::MatrixSource) {
-        setMatrixSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::DipoleSource) {
-        setDipoleSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::DipoleSrc) {
-        setDipoleSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::PixelSource) {
-        setPixelSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::CircleSource) {
-        setCircleSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::SimpleUndulatorSource) {
-        setSimpleUndulatorSource(parser, &ds);
+    bool isSource = true;
+    switch (type) {
+        case ElementType::PointSource:
+            setPointSource(parser, &ds);
+            break;
+        case ElementType::MatrixSource:
+            setMatrixSource(parser, &ds);
+            break;
+        case ElementType::DipoleSource:
+        case ElementType::DipoleSrc:
+            setDipoleSource(parser, &ds);
+            break;
+        case ElementType::PixelSource:
+            setPixelSource(parser, &ds);
+            break;
+        case ElementType::CircleSource:
+            setCircleSource(parser, &ds);
+            break;
+        case ElementType::SimpleUndulatorSource:
+            setSimpleUndulatorSource(parser, &ds);
+            break;
+        default:
+            isSource = false;
+            break;
+    }
+
+    if (isSource) {
         beamline->m_DesignSources.push_back(ds);
     } else {
         parseElement(parser, &de);

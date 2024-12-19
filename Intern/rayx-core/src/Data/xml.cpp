@@ -460,7 +460,7 @@ bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
     out->m_position = glm::vec4(0, 0, 0, 1);
     out->m_orientation = glm::dmat4x4();
 
-    if (strcmp(node->name(), "group") != 0) {
+    if (std::strcmp(node->name(), "group") != 0) {
         return false;
     }
 

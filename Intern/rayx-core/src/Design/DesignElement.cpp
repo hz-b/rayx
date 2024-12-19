@@ -8,20 +8,17 @@ namespace RAYX {
 
 Element DesignElement::compile() const {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    Surface surface;
-    Behaviour behav;
-
     if (getType() == ElementType::ExpertsMirror) {
         return makeElement(*this, serializeMirror(), makeQuadric(*this));
     } else {
-        surface = makeSurface(*this);
-        behav = makeBehaviour(*this);
+        Surface surface = makeSurface(*this);
+        Behaviour behavior = makeBehaviour(*this);
         if (getType() == ElementType::Slit) {
-            return makeElement(*this, behav, surface, {}, DesignPlane::XY);
+            return makeElement(*this, behavior, surface, {}, DesignPlane::XY);
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*this, behav, surface, serializeUnlimited(), DesignPlane::XY);
+            return makeElement(*this, behavior, surface, serializeUnlimited(), DesignPlane::XY);
         } else {
-            return makeElement(*this, behav, surface);
+            return makeElement(*this, behavior, surface);
         }
     }
 }
