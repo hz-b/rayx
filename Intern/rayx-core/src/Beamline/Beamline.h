@@ -7,22 +7,21 @@
 #include "Core.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
+#include "Design/Group.h"
 #include "Material/Material.h"
 #include "Shader/Ray.h"
 
 namespace RAYX {
-class LightSource;
 
 /*
- * The Beamline class is a container for OpticalElements and LightSources.
+ * The Beamline class is a container for a hierarchical tree of OpticalElements and LightSources.
  * It represents a central structure in our simulation process.
  */
 class RAYX_API Beamline {
   public:
     Beamline();
-    ~Beamline();
 
-    // iterates over the m_LightSources, and collects the rays they emit.
+    // Iterates over the m_DesignSources, and collects the rays they emit.
     std::vector<Ray> getInputRays(int thread_count = 1) const;
 
     /**
@@ -33,8 +32,16 @@ class RAYX_API Beamline {
      */
     MaterialTables calcMinimalMaterialTables() const;
 
-    std::vector<DesignElement> m_DesignElements;
-    std::vector<DesignSource> m_DesignSources;
+    /**
+     * @brief Adds a node to the root Group of the beamline hierarchy.
+     * @param node The BeamlineNode to add (can be a DesignElement, DesignSource, or nested Group).
+     */
+    void addNodeToRoot(
+        BeamlineNode&& node);  // TODO: Adding only to root note seems good practice but means we need to create nested structures during parsing
+
+  private:
+    // Root node of the beamline hierarchy. This group will always be positioned at 0,0,0 with an identity matrix for the orientation
+    Group m_RootGroup;  // TODO: Should the group just be the new beamline? Both are the same thing conceptually
 };
 
 }  // namespace RAYX
