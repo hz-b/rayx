@@ -7,7 +7,7 @@ namespace RAYX {
 
 struct RAYX_API DesignElement {
     DesignMap m_elementParameters;
-    Element compile() const;
+    OpticalElement compile() const;
 
     void setName(std::string s);
     void setType(ElementType s);

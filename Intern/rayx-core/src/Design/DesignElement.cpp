@@ -6,7 +6,7 @@
 
 namespace RAYX {
 
-Element DesignElement::compile() const {
+OpticalElement DesignElement::compile() const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     if (getType() == ElementType::ExpertsMirror) {
         return makeElement(*this, serializeMirror(), makeQuadric(*this));

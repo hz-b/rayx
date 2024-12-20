@@ -16,7 +16,7 @@ void dynamicElements(int gid, InvState& inv) {
 
     Ray ray = inv.inputRays[gid];
 
-    Element nextElement;
+    OpticalElement nextElement;
     // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
     nextElement.m_inTrans = glm::dmat4(1);
     nextElement.m_outTrans = glm::dmat4(1);

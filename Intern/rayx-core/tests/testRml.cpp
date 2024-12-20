@@ -89,7 +89,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
-    Element para = beamline.m_DesignElements[0].compile();
+    OpticalElement para = beamline.m_DesignElements[0].compile();
     auto parabo = deserializeQuadric(para.m_surface);
 
     CHECK_EQ(1, parabo.m_a11);
@@ -107,7 +107,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
 
 TEST_F(TestSuite, testSphereQuad) {
     auto beamline = loadBeamline("SphereMirrorDefault");
-    Element sph = beamline.m_DesignElements[0].compile();
+    OpticalElement sph = beamline.m_DesignElements[0].compile();
     auto sphere = deserializeQuadric(sph.m_surface);
 
     CHECK_EQ(1, sphere.m_a11);
@@ -125,7 +125,7 @@ TEST_F(TestSuite, testSphereQuad) {
 
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
-    Element elli = beamline.m_DesignElements[0].compile();
+    OpticalElement elli = beamline.m_DesignElements[0].compile();
     auto ellips = deserializeQuadric(elli.m_surface);
 
     CHECK_EQ(1, ellips.m_a11);
@@ -143,7 +143,7 @@ TEST_F(TestSuite, testEllipsoidQuad) {
 
 TEST_F(TestSuite, testCylinderQuad) {
     auto beamline = loadBeamline("CylinderDefault");
-    Element cyli = beamline.m_DesignElements[0].compile();
+    OpticalElement cyli = beamline.m_DesignElements[0].compile();
     auto cylinder = deserializeQuadric(cyli.m_surface);
 
     CHECK_EQ(0, cylinder.m_a11);
@@ -161,7 +161,7 @@ TEST_F(TestSuite, testCylinderQuad) {
 
 TEST_F(TestSuite, testConeQuad) {
     auto beamline = loadBeamline("Cone");
-    Element con = beamline.m_DesignElements[0].compile();
+    OpticalElement con = beamline.m_DesignElements[0].compile();
     auto cone = deserializeQuadric(con.m_surface);
 
     CHECK_EQ(0.903353, cone.m_a11, 0.001);
@@ -179,7 +179,7 @@ TEST_F(TestSuite, testConeQuad) {
 
 TEST_F(TestSuite, testToroidSurface) {
     auto beamline = loadBeamline("toroid");
-    Element trid = beamline.m_DesignElements[0].compile();
+    OpticalElement trid = beamline.m_DesignElements[0].compile();
     auto toroid = deserializeToroid(trid.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
@@ -189,7 +189,7 @@ TEST_F(TestSuite, testToroidSurface) {
 
 TEST_F(TestSuite, testExpertsOptic) {
     auto beamline = loadBeamline("toroid");
-    Element trid = beamline.m_DesignElements[0].compile();
+    OpticalElement trid = beamline.m_DesignElements[0].compile();
     auto toroid = deserializeToroid(trid.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);

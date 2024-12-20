@@ -36,7 +36,7 @@ void BeamlineOutliner::renderImGuiTree(const TreeNode& treeNode, CameraControlle
         bool validIndex = (child.index >= 0 && static_cast<size_t>(child.index) < elements.size());
         if (!validIndex) ImGui::BeginDisabled();  // Groups are not fully supported yet, so child.index of groups is -1
         if (ImGui::Button(buttonId.c_str())) {
-            RAYX::Element compiled = elements[child.index].compile();
+            RAYX::OpticalElement compiled = elements[child.index].compile();
             if (child.category == SelectedType::OpticalElement && child.index >= 0 && static_cast<size_t>(child.index) < elements.size()) {
                 glm::vec3 translationVec = {compiled.m_outTrans[3][0], compiled.m_outTrans[3][1], compiled.m_outTrans[3][2]};
                 camController.lookAtPoint(translationVec);

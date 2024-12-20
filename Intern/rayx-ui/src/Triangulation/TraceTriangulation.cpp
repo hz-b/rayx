@@ -51,7 +51,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
-void traceTriangulation(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     using DeviceType = RAYX::DeviceConfig::DeviceType;
     auto tracer = RAYX::Tracer(RAYX::DeviceConfig(DeviceType::Cpu).enableBestDevice());
 

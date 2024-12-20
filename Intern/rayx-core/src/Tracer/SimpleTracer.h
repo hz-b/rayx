@@ -69,7 +69,7 @@ class SimpleTracer : public DeviceTracer {
 
     /// BeamlineInput contains beamline data, that is constant across all batches
     struct BeamlineInput {
-        Buffer<Element> elements;
+        Buffer<OpticalElement> elements;
         Buffer<int> materialIndices;
         Buffer<double> materialData;
     } m_beamlineInput;
@@ -136,7 +136,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64
 
     // prepare input data
     auto extractElements = [&b] {
-        std::vector<Element> elements;
+        std::vector<OpticalElement> elements;
         elements.reserve(b.m_DesignElements.size());
         for (const auto& e : b.m_DesignElements) elements.push_back(e.compile());
         return elements;

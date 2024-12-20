@@ -74,7 +74,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     size_t maxRayIndex = rayCache.size();
 
     // compile all elements
-    std::vector<RAYX::Element> compiledElements;
+    std::vector<RAYX::OpticalElement> compiledElements;
     for (const auto& element : beamline.m_DesignElements) {
         compiledElements.push_back(element.compile());
     }
