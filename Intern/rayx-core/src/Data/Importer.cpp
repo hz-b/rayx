@@ -12,7 +12,6 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
-#include "Design/Group.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 #include "Strings.h"

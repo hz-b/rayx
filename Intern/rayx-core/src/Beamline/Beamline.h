@@ -1,47 +1,69 @@
 #pragma once
 
+#include <functional>
 #include <memory>
+#include <variant>
 #include <vector>
 
-#include "Beamline/LightSource.h"
-#include "Core.h"
+#include <glm.hpp>
+
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
-#include "Design/Group.h"
-#include "Material/Material.h"
-#include "Shader/Ray.h"
 
 namespace RAYX {
 
-/*
- * The Beamline class is a container for a hierarchical tree of OpticalElements and LightSources.
- * It represents a central structure in our simulation process.
- */
-class RAYX_API Beamline {
+class Group;
+using BeamlineNode = std::variant<DesignElement, DesignSource, Group>;
+enum class NodeType { OpticalElement, LightSource, Group };
+
+class Group {
   public:
-    Beamline();
+    NodeType getNodeType() const;
+    const BeamlineNode& getNode(size_t index) const;
 
-    // Iterates over the m_DesignSources, and collects the rays they emit.
+    void traverse(const std::function<void(const BeamlineNode&)>& callback) const;
+
+    void addChild(BeamlineNode&& child);
+    void addChild(const BeamlineNode& child);
+
+    // Returns the rays emitted by the sources in the group
     std::vector<Ray> getInputRays(int thread_count = 1) const;
-
-    /**
-     * @brief Quality-of-life function to calculate the smallest possible
-     * MaterialTables which cover all materials from this beamline
-     *
-     * @return MaterialTables
-     */
+    // Returns the smallest possible MaterialTables which cover all materials of the elements in the group
     MaterialTables calcMinimalMaterialTables() const;
 
-    /**
-     * @brief Adds a node to the root Group of the beamline hierarchy.
-     * @param node The BeamlineNode to add (can be a DesignElement, DesignSource, or nested Group).
-     */
-    void addNodeToRoot(
-        BeamlineNode&& node);  // TODO: Adding only to root note seems good practice but means we need to create nested structures during parsing
+    // New methods for retrieving elements, sources, and groups
+    std::vector<DesignElement> getAllElements() const;
+    std::vector<DesignSource> getAllSources() const;
+    std::vector<Group> getAllGroups() const;
+
+    // Getter & Setter
+    const glm::dvec4& getPosition() const { return m_position; }
+    const glm::dmat4& getOrientation() const { return m_orientation; }
+
+    void setPosition(const glm::dvec4& pos) { m_position = pos; }
+    void setOrientation(const glm::dmat4& orientation) { m_orientation = orientation; }
 
   private:
-    // Root node of the beamline hierarchy. This group will always be positioned at 0,0,0 with an identity matrix for the orientation
-    Group m_RootGroup;  // TODO: Should the group just be the new beamline? Both are the same thing conceptually
-};
+    glm::dvec4 m_position = glm::dvec4(0, 0, 0, 1);
+    glm::dmat4 m_orientation = glm::dmat4(1);
 
+    std::vector<BeamlineNode> children;  // Children of the node
+};
+using Beamline = Group;  // Conceptually, a Beamline is a Group
+
+// Utility function to determine node type
+inline NodeType getNodeType(const BeamlineNode& node) {
+    return std::visit(
+        [](auto&& element) -> NodeType {
+            using T = std::decay_t<decltype(element)>;
+            if constexpr (std::is_same_v<T, DesignElement>) {
+                return NodeType::OpticalElement;
+            } else if constexpr (std::is_same_v<T, DesignSource>) {
+                return NodeType::LightSource;
+            } else if constexpr (std::is_same_v<T, Group>) {
+                return NodeType::Group;
+            }
+        },
+        node);
+}
 }  // namespace RAYX

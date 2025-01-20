@@ -9,7 +9,7 @@
 #include "Beamline/EnergyDistribution.h"
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
-#include "Design/Group.h"
+#include "Beamline/Beamline.h"
 #include "Shader/Constants.h"
 #include "Strings.h"
 
