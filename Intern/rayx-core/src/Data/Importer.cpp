@@ -12,6 +12,7 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
+#include "Design/Group.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
 #include "Strings.h"
@@ -59,9 +60,8 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
 
 namespace RAYX {
 
-void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
-                              std::filesystem::path filename) {
-    RAYX::xml::Parser parser(node, group_context, filename);
+void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::filesystem::path filename) {
+    RAYX::xml::Parser parser(node, filename);
     ElementType type = parser.type();
 
     DesignSource ds;
@@ -96,11 +96,12 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
             break;
     }
 
+    // TODO: could likely be made nicer
     if (isSource) {
-        beamline->m_DesignSources.push_back(ds);
+        group.addChild(ds);
     } else {
         parseElement(parser, &de);
-        beamline->m_DesignElements.push_back(de);
+        group.addChild(de);
     }
 }
 
@@ -109,29 +110,22 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
 // `collection` may either be a <beamline> or a <group>.
 // the group-context represents the stack of groups within which we currently are.
 // Whenever we look into a group, this group has to be pushed onto the group context stack. And when we are done, it will be popped again.
-void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline, std::vector<xml::Group>* group_context,
-                            const std::filesystem::path& filename) {
+void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, const std::filesystem::path& filename) {
     // Iterating through XML objects
     for (rapidxml::xml_node<>* object = collection->first_node(); object; object = object->next_sibling()) {
         if (strcmp(object->name(), "object") == 0) {
-            // if it's an object, parse it.
-            addBeamlineObjectFromXML(object, beamline, *group_context, filename);
+            addBeamlineObjectFromXML(object, group, filename);
         } else if (strcmp(object->name(), "group") == 0) {
-            // if it's a group, add it: parse it and add it to the group context.
-            xml::Group g{};
-            bool success = xml::parseGroup(object, &g);
-            if (success) {
-                group_context->push_back(g);
-            } else {
+            Group group;
+            auto groupOpt = xml::parseGroup(object);
+            if (!groupOpt) {
                 RAYX_EXIT << "parseGroup failed!";
             }
-            // recursively parse all objects from within the group.
-            handleObjectCollection(object, beamline, group_context, filename);
+            auto g = groupOpt.value();
 
-            // "pop" the group stack.
-            if (success) {
-                group_context->pop_back();
-            }
+            // Recursively parse all objects from within the group.
+            handleObjectCollection(object, group, filename);
+
         } else if (strcmp(object->name(), "param") != 0) {
             RAYX_EXIT << "received weird object->name(): " << object->name();
         }
@@ -163,13 +157,15 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     RAYX_VERB << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
 
-    Beamline beamline;
-    std::vector<xml::Group> group_context;
+    Group root;
 
     // go through all objects of the file, and parse them.
     // The group context stores the set of group in which the algorithm currently "is".
     // For each group we call handleObjectCollection recursively, and push the group onto the group context stack.
-    handleObjectCollection(xml_beamline, &beamline, &group_context, filename);
+    handleObjectCollection(xml_beamline, root, filename);
+
+    Beamline beamline;
+    // TODO
     return beamline;
 }
 

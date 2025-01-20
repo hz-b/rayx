@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <vector>
 
 #include "Core.h"
 #include "Shader/InvocationState.h"

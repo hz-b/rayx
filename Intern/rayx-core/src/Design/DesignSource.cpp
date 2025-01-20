@@ -38,59 +38,59 @@ void DesignSource::setType(ElementType s) { m_elementParameters["type"] = s; }
 std::string DesignSource::getName() const { return m_elementParameters["name"].as_string(); }
 ElementType DesignSource::getType() const { return m_elementParameters["type"].as_elementType(); }
 
-void DesignSource::setWorldPosition(glm::dvec4 p) {
-    m_elementParameters["worldPosition"] = Map();
-    m_elementParameters["worldPosition"]["x"] = p.x;
-    m_elementParameters["worldPosition"]["y"] = p.y;
-    m_elementParameters["worldPosition"]["z"] = p.z;
-    m_elementParameters["worldPosition"]["w"] = p.w;
+void DesignSource::setPosition(glm::dvec4 p) {
+    m_elementParameters["position"] = Map();
+    m_elementParameters["position"]["x"] = p.x;
+    m_elementParameters["position"]["y"] = p.y;
+    m_elementParameters["position"]["z"] = p.z;
+    m_elementParameters["position"]["w"] = p.w;
 }
 
-glm::dvec4 DesignSource::getWorldPosition() const {
+glm::dvec4 DesignSource::getPosition() const {
     glm::dvec4 d;
-    d[0] = m_elementParameters["worldPosition"]["x"].as_double();
-    d[1] = m_elementParameters["worldPosition"]["y"].as_double();
-    d[2] = m_elementParameters["worldPosition"]["z"].as_double();
+    d[0] = m_elementParameters["position"]["x"].as_double();
+    d[1] = m_elementParameters["position"]["y"].as_double();
+    d[2] = m_elementParameters["position"]["z"].as_double();
     d[3] = 1;
     return d;
 }
 
-void DesignSource::setWorldOrientation(glm::dmat4x4 orientation) {
-    m_elementParameters["worldXDirection"] = Map();
-    m_elementParameters["worldXDirection"]["x"] = orientation[0][0];
-    m_elementParameters["worldXDirection"]["y"] = orientation[0][1];
-    m_elementParameters["worldXDirection"]["z"] = orientation[0][2];
-    m_elementParameters["worldXDirection"]["w"] = orientation[0][3];
+void DesignSource::setOrientation(glm::dmat4x4 orientation) {
+    m_elementParameters["xDirection"] = Map();
+    m_elementParameters["xDirection"]["x"] = orientation[0][0];
+    m_elementParameters["xDirection"]["y"] = orientation[0][1];
+    m_elementParameters["xDirection"]["z"] = orientation[0][2];
+    m_elementParameters["xDirection"]["w"] = orientation[0][3];
 
-    m_elementParameters["worldYDirection"] = Map();
-    m_elementParameters["worldYDirection"]["x"] = orientation[1][0];
-    m_elementParameters["worldYDirection"]["y"] = orientation[1][1];
-    m_elementParameters["worldYDirection"]["z"] = orientation[1][2];
-    m_elementParameters["worldYDirection"]["w"] = orientation[1][3];
+    m_elementParameters["yDirection"] = Map();
+    m_elementParameters["yDirection"]["x"] = orientation[1][0];
+    m_elementParameters["yDirection"]["y"] = orientation[1][1];
+    m_elementParameters["yDirection"]["z"] = orientation[1][2];
+    m_elementParameters["yDirection"]["w"] = orientation[1][3];
 
-    m_elementParameters["worldZDirection"] = Map();
-    m_elementParameters["worldZDirection"]["x"] = orientation[2][0];
-    m_elementParameters["worldZDirection"]["y"] = orientation[2][1];
-    m_elementParameters["worldZDirection"]["z"] = orientation[2][2];
-    m_elementParameters["worldZDirection"]["w"] = orientation[2][3];
+    m_elementParameters["zDirection"] = Map();
+    m_elementParameters["zDirection"]["x"] = orientation[2][0];
+    m_elementParameters["zDirection"]["y"] = orientation[2][1];
+    m_elementParameters["zDirection"]["z"] = orientation[2][2];
+    m_elementParameters["zDirection"]["w"] = orientation[2][3];
 }
 
-glm::dmat4x4 DesignSource::getWorldOrientation() const {
+glm::dmat4x4 DesignSource::getOrientation() const {
     glm::dmat4x4 orientation;
 
-    orientation[0][0] = m_elementParameters["worldXDirection"]["x"].as_double();
-    orientation[0][1] = m_elementParameters["worldXDirection"]["y"].as_double();
-    orientation[0][2] = m_elementParameters["worldXDirection"]["z"].as_double();
+    orientation[0][0] = m_elementParameters["xDirection"]["x"].as_double();
+    orientation[0][1] = m_elementParameters["xDirection"]["y"].as_double();
+    orientation[0][2] = m_elementParameters["xDirection"]["z"].as_double();
     orientation[0][3] = 0;
 
-    orientation[1][0] = m_elementParameters["worldYDirection"]["x"].as_double();
-    orientation[1][1] = m_elementParameters["worldYDirection"]["y"].as_double();
-    orientation[1][2] = m_elementParameters["worldYDirection"]["z"].as_double();
+    orientation[1][0] = m_elementParameters["yDirection"]["x"].as_double();
+    orientation[1][1] = m_elementParameters["yDirection"]["y"].as_double();
+    orientation[1][2] = m_elementParameters["yDirection"]["z"].as_double();
     orientation[1][3] = 0;
 
-    orientation[2][0] = m_elementParameters["worldZDirection"]["x"].as_double();
-    orientation[2][1] = m_elementParameters["worldZDirection"]["y"].as_double();
-    orientation[2][2] = m_elementParameters["worldZDirection"]["z"].as_double();
+    orientation[2][0] = m_elementParameters["zDirection"]["x"].as_double();
+    orientation[2][1] = m_elementParameters["zDirection"]["y"].as_double();
+    orientation[2][2] = m_elementParameters["zDirection"]["z"].as_double();
     orientation[2][3] = 0;
 
     orientation[3][0] = 0;

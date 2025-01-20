@@ -16,8 +16,8 @@ void setAllMandatory(xml::Parser parser, DesignSource* ds) {
     ds->setType(parser.type());
     ds->setMisalignment(parser.parseMisalignment());
     ds->setNumberOfRays(parser.parseNumberRays());
-    ds->setWorldOrientation(parser.parseOrientation());
-    ds->setWorldPosition(parser.parsePosition());
+    ds->setOrientation(parser.parseOrientation());
+    ds->setPosition(parser.parsePosition());
 
     ds->setSeparateEnergies(1);
 }

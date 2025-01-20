@@ -86,11 +86,11 @@ struct RAYX_API DesignSource {
     void setNumberOfRays(double value);
     double getNumberOfRays() const;
 
-    void setWorldPosition(glm::dvec4 p);
-    glm::dvec4 getWorldPosition() const;
+    void setPosition(glm::dvec4 p);
+    glm::dvec4 getPosition() const;
 
-    void setWorldOrientation(glm::dmat4x4 o);
-    glm::dmat4x4 getWorldOrientation() const;
+    void setOrientation(glm::dmat4x4 o);
+    glm::dmat4x4 getOrientation() const;
 
     void setNumOfCircles(int value);
     int getNumOfCircles() const;

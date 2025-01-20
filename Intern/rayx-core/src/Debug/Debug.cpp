@@ -70,7 +70,7 @@ Exit::~Exit() {
     formatDebugMsg(filename, line, std::cerr);
     std::cerr << "Terminating...\033[0m" << std::endl;  // color reset
 
-    error_fn();
+    std::exit(1);
 }
 
 Verb::Verb(std::string filename, int line) {
@@ -85,10 +85,6 @@ Verb::~Verb() {
         std::cout << std::endl;
     }
 }
-
-// The default error_fn value. Exit with an error code of 1.
-void exit1() { exit(1); }
-void (*error_fn)() = exit1;
 
 const int PREC = 17;  // precision
 
