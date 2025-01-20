@@ -65,7 +65,7 @@ Exit::Exit(const std::string& filename, int line) : filename(filename), line(lin
     formatDebugMsg(filename, line, std::cerr);
 }
 
-Exit::~Exit() {
+[[noreturn]] Exit::~Exit() {
     std::cerr << "\n";
     formatDebugMsg(filename, line, std::cerr);
     std::cerr << "Terminating...\033[0m" << std::endl;  // color reset

@@ -91,6 +91,16 @@ MaterialTables Group::calcMinimalMaterialTables() const {
     return loadMaterialTables(relevantMaterials);
 }
 
+std::vector<OpticalElement> Group::compile() const {
+    std::vector<OpticalElement> elements;
+    traverse([&elements](const BeamlineNode& node) {
+        if (std::holds_alternative<DesignElement>(node)) {
+            elements.push_back(std::get<DesignElement>(node).compile());
+        }
+    });
+    return elements;
+}
+
 // Retrieve all DesignElements (deep)
 std::vector<DesignElement> Group::getAllElements() const {
     std::vector<DesignElement> elements;
@@ -102,6 +112,16 @@ std::vector<DesignElement> Group::getAllElements() const {
     return elements;
 }
 
+size_t Group::numberOfElements() const {
+    size_t count = 0;
+    traverse([&count](const BeamlineNode& node) {
+        if (std::holds_alternative<DesignElement>(node)) {
+            count++;
+        }
+    });
+    return count;
+}
+
 // Retrieve all DesignSources (deep)
 std::vector<DesignSource> Group::getAllSources() const {
     std::vector<DesignSource> sources;
@@ -111,6 +131,16 @@ std::vector<DesignSource> Group::getAllSources() const {
         }
     });
     return sources;
+}
+
+size_t Group::numberOfSources() const {
+    size_t count = 0;
+    traverse([&count](const BeamlineNode& node) {
+        if (std::holds_alternative<DesignSource>(node)) {
+            count++;
+        }
+    });
+    return count;
 }
 
 // Retrieve all Groups (deep)

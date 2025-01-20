@@ -16,6 +16,7 @@ class Group;
 using BeamlineNode = std::variant<DesignElement, DesignSource, Group>;
 enum class NodeType { OpticalElement, LightSource, Group };
 
+// TODO: think about caching to avoid unnecessary recompilation/traversal
 class Group {
   public:
     NodeType getNodeType() const;
@@ -30,10 +31,14 @@ class Group {
     std::vector<Ray> getInputRays(int thread_count = 1) const;
     // Returns the smallest possible MaterialTables which cover all materials of the elements in the group
     MaterialTables calcMinimalMaterialTables() const;
+    // Compiles all elements and return vector of OpticalElements
+    std::vector<OpticalElement> compile() const;
 
     // New methods for retrieving elements, sources, and groups
     std::vector<DesignElement> getAllElements() const;
     std::vector<DesignSource> getAllSources() const;
+    size_t numberOfElements() const;
+    size_t numberOfSources() const;
     std::vector<Group> getAllGroups() const;
 
     // Getter & Setter
