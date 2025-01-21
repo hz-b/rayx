@@ -16,7 +16,6 @@ double parseDouble(std::string s) {
 #endif
         RAYX_WARN << "parseDouble failed for string:";
         RAYX_EXIT << s;
-        return false;
     }
     return d;
 }

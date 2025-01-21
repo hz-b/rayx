@@ -29,7 +29,6 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
             return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
 #else
             RAYX_EXIT << "Failed to create Tracer with Hip device. Hip was disabled during build.";
-            return nullptr;
 #endif
         default:  // case DeviceType::Cpu
             using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;

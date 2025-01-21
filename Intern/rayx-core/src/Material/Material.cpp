@@ -30,7 +30,6 @@ const char* getMaterialName(Material m) {
 #undef X
     }
     RAYX_EXIT << "unknown material in getMaterialName()!";
-    return nullptr;
 }
 
 // std::vector over all materials
@@ -51,7 +50,6 @@ bool materialFromString(const char* matname, Material* out) {
         }
     }
     RAYX_EXIT << "materialFromString(): material \"" << matname << "\" not found";
-    return false;
 }
 
 MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {

@@ -48,7 +48,6 @@ Cutout mkOpeningCutout(const DesignElement& dele) {
         });
     } else {
         RAYX_EXIT << "unsupported opening type!";
-        return {};
     }
 }
 
@@ -72,7 +71,6 @@ Cutout mkBeamstopCutout(const DesignElement& dele) {
         });
     } else {
         RAYX_EXIT << "unsupported CentralBeamstop type!";
-        return {};
     }
 }
 

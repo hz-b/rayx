@@ -375,7 +375,6 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
         RAYX_EXIT << "paramEnergyDistribution is not implemented for "
                      "energyDistributionType"
                   << static_cast<int>(energyDistributionType) << "!";
-        return false;
     }
 }
 
@@ -569,7 +568,6 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
             return parseTotalLength();
         } else {
             RAYX_EXIT << "parseCutout encountered an invalid design plane!";
-            return 0.0;
         }
     };
 
@@ -592,7 +590,6 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
         return serializeTrapezoid(trapezoid);
     } else {
         RAYX_EXIT << "invalid geometrical shape!";
-        return {0, {0.0, 0.0, 0.0}};
     }
 }
 
