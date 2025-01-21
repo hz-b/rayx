@@ -86,6 +86,10 @@ Verb::~Verb() {
     }
 }
 
+// The default error_fn value. Exit with an error code of 1.
+void exit1() { exit(1); }
+void (*error_fn)() = exit1;
+
 const int PREC = 17;  // precision
 
 // the implementation of RAYX_DBG.

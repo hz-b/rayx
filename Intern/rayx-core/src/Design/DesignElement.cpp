@@ -6,6 +6,7 @@
 
 namespace RAYX {
 
+// TODO: This needs to apply group transformations
 OpticalElement DesignElement::compile() const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     if (getType() == ElementType::ExpertsMirror) {

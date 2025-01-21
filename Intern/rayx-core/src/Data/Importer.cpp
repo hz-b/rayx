@@ -115,16 +115,17 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, cons
         if (strcmp(object->name(), "object") == 0) {
             addBeamlineObjectFromXML(object, group, filename);
         } else if (strcmp(object->name(), "group") == 0) {
-            Group group;
             auto groupOpt = xml::parseGroup(object);
             if (!groupOpt) {
                 RAYX_EXIT << "parseGroup failed!";
             }
-            auto g = groupOpt.value();
+            Group nestedGroup = groupOpt.value();
 
             // Recursively parse all objects from within the group.
-            handleObjectCollection(object, group, filename);
+            handleObjectCollection(object, nestedGroup, filename);
 
+            // Add the group to the beamline.
+            group.addChild(nestedGroup);
         } else if (strcmp(object->name(), "param") != 0) {
             RAYX_EXIT << "received weird object->name(): " << object->name();
         }
@@ -163,9 +164,7 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     // For each group we call handleObjectCollection recursively, and push the group onto the group context stack.
     handleObjectCollection(xml_beamline, root, filename);
 
-    Beamline beamline;
-    // TODO
-    return beamline;
+    return root;
 }
 
 }  // namespace RAYX

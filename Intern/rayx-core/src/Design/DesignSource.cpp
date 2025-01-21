@@ -6,30 +6,31 @@
 #include "Debug/Debug.h"
 namespace RAYX {
 
-std::vector<Ray> DesignSource::compile(int i) const {
-    std::vector<Ray> ray;
+// TODO: This needs to apply group transformations
+std::vector<Ray> DesignSource::compile(int numThreads) const {
+    std::vector<Ray> rays;
 
     if (getType() == ElementType::PointSource) {
         PointSource ps(*this);
-        ray = ps.getRays(i);
+        rays = ps.getRays(numThreads);
     } else if (getType() == ElementType::MatrixSource) {
         MatrixSource ms(*this);
-        ray = ms.getRays(i);
+        rays = ms.getRays(numThreads);
     } else if (getType() == ElementType::DipoleSource) {
         DipoleSource ds(*this);
-        ray = ds.getRays(i);
+        rays = ds.getRays(numThreads);
     } else if (getType() == ElementType::PixelSource) {
         PixelSource ps(*this);
-        ray = ps.getRays(i);
+        rays = ps.getRays(numThreads);
     } else if (getType() == ElementType::CircleSource) {
         CircleSource cs(*this);
-        ray = cs.getRays(i);
+        rays = cs.getRays(numThreads);
     } else if (getType() == ElementType::SimpleUndulatorSource) {
         SimpleUndulatorSource su(*this);
-        ray = su.getRays(i);
+        rays = su.getRays(numThreads);
     }
 
-    return ray;
+    return rays;
 }
 
 void DesignSource::setName(std::string s) { m_elementParameters["name"] = s; }

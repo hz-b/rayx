@@ -35,11 +35,11 @@ class Group {
     std::vector<OpticalElement> compile() const;
 
     // New methods for retrieving elements, sources, and groups
-    std::vector<DesignElement> getAllElements() const;
-    std::vector<DesignSource> getAllSources() const;
-    size_t numberOfElements() const;
-    size_t numberOfSources() const;
-    std::vector<Group> getAllGroups() const;
+    std::vector<DesignElement> getElements() const;
+    std::vector<DesignSource> getSources() const;
+    std::vector<Group> getGroups() const;
+    size_t numElements() const;
+    size_t numSources() const;
 
     // Getter & Setter
     const glm::dvec4& getPosition() const { return m_position; }

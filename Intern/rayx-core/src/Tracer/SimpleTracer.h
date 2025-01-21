@@ -128,7 +128,7 @@ BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint6
     RAYX_VERB << "maxEvents: " << maxEvents;
 
     // don't trace if there are no optical elements
-    if (group.numberOfElements() == 0) {
+    if (group.numElements() == 0) {
         // an empty history suffices, nothing is happening to the rays!
         BundleHistory result;
         return result;

@@ -434,13 +434,13 @@ std::optional<Group> parseGroup(rapidxml::xml_node<>* node) {
     if (auto position = paramPosition(node); position) {
         group.setPosition(*position);
     } else {
-        return std::nullopt;
+        group.setPosition(glm::dvec4(0, 0, 0, 1));
     }
 
     if (auto orientation = paramOrientation(node); orientation) {
         group.setOrientation(*orientation);
     } else {
-        return std::nullopt;
+        group.setOrientation(glm::dmat4(1));
     }
 
     return group;

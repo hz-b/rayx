@@ -41,7 +41,7 @@ void Group::addChild(const BeamlineNode& child) { children.push_back(child); }
 std::vector<Ray> Group::getInputRays(int thread_count) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    std::vector<DesignSource> sources = getAllSources();
+    std::vector<DesignSource> sources = getSources();
 
     if (sources.size() == 0) {
         return {};
@@ -76,7 +76,7 @@ std::vector<Ray> Group::getInputRays(int thread_count) const {
 }
 
 MaterialTables Group::calcMinimalMaterialTables() const {
-    std::vector<DesignElement> elements = getAllElements();
+    std::vector<DesignElement> elements = getElements();
 
     std::array<bool, 92> relevantMaterials{};
     relevantMaterials.fill(false);
@@ -102,7 +102,7 @@ std::vector<OpticalElement> Group::compile() const {
 }
 
 // Retrieve all DesignElements (deep)
-std::vector<DesignElement> Group::getAllElements() const {
+std::vector<DesignElement> Group::getElements() const {
     std::vector<DesignElement> elements;
     traverse([&elements](const BeamlineNode& node) {
         if (std::holds_alternative<DesignElement>(node)) {
@@ -112,18 +112,8 @@ std::vector<DesignElement> Group::getAllElements() const {
     return elements;
 }
 
-size_t Group::numberOfElements() const {
-    size_t count = 0;
-    traverse([&count](const BeamlineNode& node) {
-        if (std::holds_alternative<DesignElement>(node)) {
-            count++;
-        }
-    });
-    return count;
-}
-
 // Retrieve all DesignSources (deep)
-std::vector<DesignSource> Group::getAllSources() const {
+std::vector<DesignSource> Group::getSources() const {
     std::vector<DesignSource> sources;
     traverse([&sources](const BeamlineNode& node) {
         if (std::holds_alternative<DesignSource>(node)) {
@@ -133,7 +123,17 @@ std::vector<DesignSource> Group::getAllSources() const {
     return sources;
 }
 
-size_t Group::numberOfSources() const {
+size_t Group::numElements() const {
+    size_t count = 0;
+    traverse([&count](const BeamlineNode& node) {
+        if (std::holds_alternative<DesignElement>(node)) {
+            count++;
+        }
+    });
+    return count;
+}
+
+size_t Group::numSources() const {
     size_t count = 0;
     traverse([&count](const BeamlineNode& node) {
         if (std::holds_alternative<DesignSource>(node)) {
@@ -144,7 +144,7 @@ size_t Group::numberOfSources() const {
 }
 
 // Retrieve all Groups (deep)
-std::vector<Group> Group::getAllGroups() const {
+std::vector<Group> Group::getGroups() const {
     std::vector<Group> groups;
     traverse([&groups](const BeamlineNode& node) {
         if (std::holds_alternative<Group>(node)) {

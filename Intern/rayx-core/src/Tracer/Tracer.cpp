@@ -75,7 +75,7 @@ BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
 }
 
 int Tracer::defaultMaxEvents(const Group* group) {
-    if (group) return group->numberOfElements() * 2 + 8;
+    if (group) return group->numElements() * 2 + 8;
     return 32;
 }
 
