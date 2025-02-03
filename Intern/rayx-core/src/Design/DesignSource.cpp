@@ -6,13 +6,26 @@
 #include "Debug/Debug.h"
 namespace RAYX {
 
+DesignSource::DesignSource(DesignSource&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
+
+DesignSource& DesignSource::operator=(DesignSource&& other) noexcept {
+    m_elementParameters = std::move(other.m_elementParameters);
+    return *this;
+}
+
+DesignSource DesignSource::clone() const {
+    DesignSource clone;
+    clone.m_elementParameters = m_elementParameters.clone();
+    return clone;
+}
+
 std::vector<Ray> DesignSource::compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const {
     // Apply group transformations
     glm::dvec4 position = groupOrientation * getPosition() + groupPosition;
     glm::dmat4 orientation = groupOrientation * getOrientation();
 
     // Create a temporary copy with updated position/orientation
-    DesignSource ds(*this);
+    DesignSource ds = clone();
     ds.setPosition(position);
     ds.setOrientation(orientation);
 

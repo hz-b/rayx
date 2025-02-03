@@ -6,9 +6,6 @@
 namespace RAYX {
 
 struct RAYX_API DesignElement {
-    DesignMap m_elementParameters;
-    OpticalElement compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
-
     DesignElement() = default;
     ~DesignElement() = default;
     // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
@@ -19,6 +16,9 @@ struct RAYX_API DesignElement {
     DesignElement& operator=(DesignElement&& other) noexcept;
     // Allow intentional copies
     DesignElement clone() const;
+
+    DesignMap m_elementParameters;
+    OpticalElement compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
 
     void setName(std::string s);
     void setType(ElementType s);

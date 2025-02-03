@@ -6,6 +6,17 @@
 namespace RAYX {
 
 struct RAYX_API DesignSource {
+    DesignSource() = default;
+    ~DesignSource() = default;
+    // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
+    DesignSource(const DesignSource& other) = delete;
+    DesignSource& operator=(const DesignSource& other) = delete;
+    // Allow move
+    DesignSource(DesignSource&& other) noexcept;
+    DesignSource& operator=(DesignSource&& other) noexcept;
+    // Allow intentional copies
+    DesignSource clone() const;
+
     DesignMap m_elementParameters;
     std::vector<Ray> compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
 
