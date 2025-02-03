@@ -1,25 +1,47 @@
 #include "DesignElement.h"
 
+#include <iostream>
+
 #include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {
 
-// TODO: This needs to apply group transformations
-OpticalElement DesignElement::compile() const {
-    RAYX_PROFILE_FUNCTION_STDOUT();
+DesignElement::DesignElement(DesignElement&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
+
+DesignElement& DesignElement::operator=(DesignElement&& other) noexcept {
+    m_elementParameters = std::move(other.m_elementParameters);
+    return *this;
+}
+
+DesignElement DesignElement::clone() const {
+    DesignElement clone;
+    clone.m_elementParameters = m_elementParameters.clone();
+    return clone;
+}
+
+OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dmat4& parentOri) const {
+    // Combine the parent's global transform with *my local* transform
+    glm::dvec4 worldPos = parentOri * getPosition() + parentPos;
+    glm::dmat4 worldOri = parentOri * getOrientation();
+
+    // Then produce the final OpticalElement with these "world" coords
+    DesignElement de = clone();
+    de.setPosition(worldPos);
+    de.setOrientation(worldOri);
+
     if (getType() == ElementType::ExpertsMirror) {
-        return makeElement(*this, serializeMirror(), makeQuadric(*this));
+        return makeElement(de, serializeMirror(), makeQuadric(de));
     } else {
-        Surface surface = makeSurface(*this);
-        Behaviour behavior = makeBehaviour(*this);
+        Surface surface = makeSurface(de);
+        Behaviour behavior = makeBehaviour(de);
         if (getType() == ElementType::Slit) {
-            return makeElement(*this, behavior, surface, {}, DesignPlane::XY);
+            return makeElement(de, behavior, surface, {}, DesignPlane::XY);
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*this, behavior, surface, serializeUnlimited(), DesignPlane::XY);
+            return makeElement(de, behavior, surface, serializeUnlimited(), DesignPlane::XY);
         } else {
-            return makeElement(*this, behavior, surface);
+            return makeElement(de, behavior, surface);
         }
     }
 }

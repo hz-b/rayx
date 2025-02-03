@@ -19,41 +19,54 @@
 using RAYX::ElementType;
 
 void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
-    ElementType type = parser.type();
-
-    if (type == ElementType::ImagePlane) {
-        getImageplane(parser, de);
-    } else if (type == ElementType::ConeMirror) {
-        getCone(parser, de);
-    } else if (type == ElementType::CylinderMirror) {
-        getCylinder(parser, de);
-    } else if (type == ElementType::EllipsoidMirror) {
-        getEllipsoid(parser, de);
-    } else if (type == ElementType::ExpertsMirror) {
-        getExpertsOptics(parser, de);
-    } else if (type == ElementType::ParaboloidMirror) {
-        getParaboloid(parser, de);
-    } else if (type == ElementType::PlaneGrating) {
-        getPlaneGrating(parser, de);
-    } else if (type == ElementType::PlaneMirror) {
-        getPlaneMirror(parser, de);
-    } else if (type == ElementType::ReflectionZoneplate) {
-        getRZP(parser, de);
-    } else if (type == ElementType::Slit) {
-        getSlit(parser, de);
-    } else if (type == ElementType::SphereGrating) {
-        getSphereGrating(parser, de);
-    } else if (type == ElementType::Sphere) {
-        getSphereMirror(parser, de);
-    } else if (type == ElementType::SphereMirror) {
-        getSphereMirror(parser, de);
-    } else if (type == ElementType::ToroidMirror) {
-        getToroidMirror(parser, de);
-    } else if (type == ElementType::ToroidGrating) {
-        getToroidalGrating(parser, de);
-    } else {
-        RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
-                 << "; Type: " << int(parser.type());  // TODO: write type as string not enum id
+    switch (parser.type()) {
+        case ElementType::ImagePlane:
+            getImageplane(parser, de);
+            break;
+        case ElementType::ConeMirror:
+            getCone(parser, de);
+            break;
+        case ElementType::CylinderMirror:
+            getCylinder(parser, de);
+            break;
+        case ElementType::EllipsoidMirror:
+            getEllipsoid(parser, de);
+            break;
+        case ElementType::ExpertsMirror:
+            getExpertsOptics(parser, de);
+            break;
+        case ElementType::ParaboloidMirror:
+            getParaboloid(parser, de);
+            break;
+        case ElementType::PlaneGrating:
+            getPlaneGrating(parser, de);
+            break;
+        case ElementType::PlaneMirror:
+            getPlaneMirror(parser, de);
+            break;
+        case ElementType::ReflectionZoneplate:
+            getRZP(parser, de);
+            break;
+        case ElementType::Slit:
+            getSlit(parser, de);
+            break;
+        case ElementType::SphereGrating:
+            getSphereGrating(parser, de);
+            break;
+        case ElementType::Sphere:
+        case ElementType::SphereMirror:
+            getSphereMirror(parser, de);
+            break;
+        case ElementType::ToroidMirror:
+            getToroidMirror(parser, de);
+            break;
+        case ElementType::ToroidGrating:
+            getToroidalGrating(parser, de);
+            break;
+        default:
+            RAYX_LOG << "Could not classify beamline object with Name: " << parser.name()
+                     << "; Type: " << static_cast<int>(parser.type());  // TODO: write type as string not enum id
+            break;
     }
 }
 
@@ -97,10 +110,10 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::fil
 
     // TODO: could likely be made nicer
     if (isSource) {
-        group.addChild(ds);
+        group.addChild(std::move(ds));
     } else {
         parseElement(parser, &de);
-        group.addChild(de);
+        group.addChild(std::move(de));
     }
 }
 
@@ -119,13 +132,13 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, cons
             if (!groupOpt) {
                 RAYX_EXIT << "parseGroup failed!";
             }
-            Group nestedGroup = groupOpt.value();
+            Group nestedGroup = std::move(groupOpt.value());
 
             // Recursively parse all objects from within the group.
             handleObjectCollection(object, nestedGroup, filename);
 
             // Add the group to the beamline.
-            group.addChild(nestedGroup);
+            group.addChild(std::move(nestedGroup));
         } else if (strcmp(object->name(), "param") != 0) {
             RAYX_EXIT << "received weird object->name(): " << object->name();
         }

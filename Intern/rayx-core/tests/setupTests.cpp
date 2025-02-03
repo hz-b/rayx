@@ -190,7 +190,7 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            double btype = beamline.getElements()[elem].compile().m_behaviour.m_type;  // m_element.m_behaviour.m_type;
+            double btype = beamline.compileElements()[elem].m_behaviour.m_type;  // m_element.m_behaviour.m_type;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
             if (btype == BTYPE_IMAGE_PLANE || btype == BTYPE_SLIT) {

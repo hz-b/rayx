@@ -7,6 +7,7 @@
 
 #include <glm.hpp>
 
+#include "Core.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
 
@@ -16,28 +17,32 @@ class Group;
 using BeamlineNode = std::variant<DesignElement, DesignSource, Group>;
 enum class NodeType { OpticalElement, LightSource, Group };
 
-// TODO: think about caching to avoid unnecessary recompilation/traversal
-class Group {
+class RAYX_API Group {
   public:
+    Group() = default;
+    ~Group() = default;
+    Group(Group&& other) noexcept;
+    Group& operator=(Group&& other) noexcept;
+    Group(const Group&) = delete;
+    Group& operator=(const Group&) = delete;
+
     NodeType getNodeType() const;
     const BeamlineNode& getNode(size_t index) const;
 
     void traverse(const std::function<void(const BeamlineNode&)>& callback) const;
 
     void addChild(BeamlineNode&& child);
-    void addChild(const BeamlineNode& child);
 
-    // Returns the rays emitted by the sources in the group
-    std::vector<Ray> getInputRays(int thread_count = 1) const;
     // Returns the smallest possible MaterialTables which cover all materials of the elements in the group
     MaterialTables calcMinimalMaterialTables() const;
     // Compiles all elements and return vector of OpticalElements
-    std::vector<OpticalElement> compile() const;
+    std::vector<OpticalElement> compileElements() const;
+    std::vector<Ray> compileSources(int thread_count = 1) const;
 
     // New methods for retrieving elements, sources, and groups
-    std::vector<DesignElement> getElements() const;
-    std::vector<DesignSource> getSources() const;
-    std::vector<Group> getGroups() const;
+    std::vector<const DesignElement*> getElements() const;
+    std::vector<const DesignSource*> getSources() const;
+    std::vector<const Group*> getGroups() const;
     size_t numElements() const;
     size_t numSources() const;
 

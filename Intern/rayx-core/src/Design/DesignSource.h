@@ -7,7 +7,7 @@ namespace RAYX {
 
 struct RAYX_API DesignSource {
     DesignMap m_elementParameters;
-    std::vector<Ray> compile(int numThreads) const;
+    std::vector<Ray> compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
 
     void setStokeslin0(double value);
     void setStokeslin45(double value);

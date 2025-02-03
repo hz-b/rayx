@@ -15,11 +15,11 @@ TEST_F(TestSuite, loadDatFile) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    RAYX::DesignSource source0 = bl.getSources()[0];
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 15, 0.1);
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 12, 0.1);
+    const auto* source0 = bl.getSources()[0];
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 15, 0.1);
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 12, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
@@ -29,10 +29,10 @@ TEST_F(TestSuite, loadDatFile2) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    RAYX::DesignSource source0 = bl.getSources()[0];
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 14.7, 0.1);
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 17.1, 0.1);
-    CHECK_EQ(source0.getEnergyDistribution().selectEnergy(), 16.7, 0.1);
+    const auto* source0 = bl.getSources()[0];
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 14.7, 0.1);
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17.1, 0.1);
+    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 16.7, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -45,7 +45,7 @@ TEST_F(TestSuite, groupTransform) {
     RAYX::Beamline bl = loadBeamline("groupTransform");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
-    auto m = bl.getElements()[0].compile().m_inTrans;
+    auto m = bl.compileElements()[0].m_inTrans;
     glm::dmat4x4 correct = {
         1,   0,     0,  0,  //
         0,   1,     0,  0,  //
@@ -82,7 +82,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
 
     for (auto values : testinput) {
         auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.getSources()[0].getEnergyDistribution().selectEnergy();
+        auto energy = beamline.getSources()[0]->getEnergyDistribution().selectEnergy();
 
         CHECK_EQ(energy, values.energy, 0.1);
     }
@@ -91,7 +91,7 @@ TEST_F(TestSuite, testEnergyDistribution) {
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
-    OpticalElement para = beamline.getElements()[0].compile();
+    OpticalElement para = beamline.compileElements()[0];
     auto parabo = deserializeQuadric(para.m_surface);
 
     CHECK_EQ(1, parabo.m_a11);
@@ -109,7 +109,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
 
 TEST_F(TestSuite, testSphereQuad) {
     auto beamline = loadBeamline("SphereMirrorDefault");
-    OpticalElement sph = beamline.getElements()[0].compile();
+    OpticalElement sph = beamline.compileElements()[0];
     auto sphere = deserializeQuadric(sph.m_surface);
 
     CHECK_EQ(1, sphere.m_a11);
@@ -127,7 +127,7 @@ TEST_F(TestSuite, testSphereQuad) {
 
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
-    OpticalElement elli = beamline.getElements()[0].compile();
+    OpticalElement elli = beamline.compileElements()[0];
     auto ellips = deserializeQuadric(elli.m_surface);
 
     CHECK_EQ(1, ellips.m_a11);
@@ -145,7 +145,7 @@ TEST_F(TestSuite, testEllipsoidQuad) {
 
 TEST_F(TestSuite, testCylinderQuad) {
     auto beamline = loadBeamline("CylinderDefault");
-    OpticalElement cyli = beamline.getElements()[0].compile();
+    OpticalElement cyli = beamline.compileElements()[0];
     auto cylinder = deserializeQuadric(cyli.m_surface);
 
     CHECK_EQ(0, cylinder.m_a11);
@@ -163,7 +163,7 @@ TEST_F(TestSuite, testCylinderQuad) {
 
 TEST_F(TestSuite, testConeQuad) {
     auto beamline = loadBeamline("Cone");
-    OpticalElement con = beamline.getElements()[0].compile();
+    OpticalElement con = beamline.compileElements()[0];
     auto cone = deserializeQuadric(con.m_surface);
 
     CHECK_EQ(0.903353, cone.m_a11, 0.001);
@@ -181,7 +181,7 @@ TEST_F(TestSuite, testConeQuad) {
 
 TEST_F(TestSuite, testToroidSurface) {
     auto beamline = loadBeamline("toroid");
-    OpticalElement trid = beamline.getElements()[0].compile();
+    OpticalElement trid = beamline.compileElements()[0];
     auto toroid = deserializeToroid(trid.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
@@ -191,7 +191,7 @@ TEST_F(TestSuite, testToroidSurface) {
 
 TEST_F(TestSuite, testExpertsOptic) {
     auto beamline = loadBeamline("toroid");
-    OpticalElement trid = beamline.getElements()[0].compile();
+    OpticalElement trid = beamline.compileElements()[0];
     auto toroid = deserializeToroid(trid.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
@@ -206,15 +206,15 @@ TEST_F(TestSuite, testExpertsOptic) {
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
     auto beamline = loadBeamline("twoSourcesTest");
 
-    DesignSource dipolesource = beamline.getSources()[0];
+    const auto* dipolesource = beamline.getSources()[0];
 
-    DesignSource pointsource = beamline.getSources()[1];
+    const auto* pointsource = beamline.getSources()[1];
 
-    CHECK_EQ(100, dipolesource.getEnergy());
-    CHECK_EQ(150.24724068638105, pointsource.getEnergyDistribution().selectEnergy());
+    CHECK_EQ(100, dipolesource->getEnergy());
+    CHECK_EQ(150.24724068638105, pointsource->getEnergyDistribution().selectEnergy());
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    CHECK_EQ(0, pointsource.getSourceWidth(), 0.1);
+    CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
 }
 
 TEST_F(TestSuite, groupTransform2) {
@@ -243,8 +243,8 @@ TEST_F(TestSuite, groupTransform2) {
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
 
-    glm::dmat4x4 inTrans = bl.getElements()[0].compile().m_inTrans * yz_swap;
-    glm::dmat4x4 outTrans = bl.getElements()[0].compile().m_outTrans * yz_swap;
+    glm::dmat4x4 inTrans = bl.compileElements()[0].m_inTrans * yz_swap;
+    glm::dmat4x4 outTrans = bl.compileElements()[0].m_outTrans * yz_swap;
 
     glm::dmat4x4 orientationResult = glm::dmat4x4(glm::dmat3x3(inTrans));
     glm::dvec4 positionResult = outTrans * glm::dvec4(0, 0, 0, 1);

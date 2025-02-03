@@ -6,31 +6,32 @@
 #include "Debug/Debug.h"
 namespace RAYX {
 
-// TODO: This needs to apply group transformations
-std::vector<Ray> DesignSource::compile(int numThreads) const {
-    std::vector<Ray> rays;
+std::vector<Ray> DesignSource::compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const {
+    // Apply group transformations
+    glm::dvec4 position = groupOrientation * getPosition() + groupPosition;
+    glm::dmat4 orientation = groupOrientation * getOrientation();
 
-    if (getType() == ElementType::PointSource) {
-        PointSource ps(*this);
-        rays = ps.getRays(numThreads);
-    } else if (getType() == ElementType::MatrixSource) {
-        MatrixSource ms(*this);
-        rays = ms.getRays(numThreads);
-    } else if (getType() == ElementType::DipoleSource) {
-        DipoleSource ds(*this);
-        rays = ds.getRays(numThreads);
-    } else if (getType() == ElementType::PixelSource) {
-        PixelSource ps(*this);
-        rays = ps.getRays(numThreads);
-    } else if (getType() == ElementType::CircleSource) {
-        CircleSource cs(*this);
-        rays = cs.getRays(numThreads);
-    } else if (getType() == ElementType::SimpleUndulatorSource) {
-        SimpleUndulatorSource su(*this);
-        rays = su.getRays(numThreads);
+    // Create a temporary copy with updated position/orientation
+    DesignSource ds(*this);
+    ds.setPosition(position);
+    ds.setOrientation(orientation);
+
+    switch (ds.getType()) {
+        case ElementType::PointSource:
+            return PointSource(ds).getRays(numThreads);
+        case ElementType::MatrixSource:
+            return MatrixSource(ds).getRays(numThreads);
+        case ElementType::DipoleSource:
+            return DipoleSource(ds).getRays(numThreads);
+        case ElementType::PixelSource:
+            return PixelSource(ds).getRays(numThreads);
+        case ElementType::CircleSource:
+            return CircleSource(ds).getRays(numThreads);
+        case ElementType::SimpleUndulatorSource:
+            return SimpleUndulatorSource(ds).getRays(numThreads);
+        default:
+            throw std::runtime_error("Unknown source type");
     }
-
-    return rays;
 }
 
 void DesignSource::setName(std::string s) { m_elementParameters["name"] = s; }

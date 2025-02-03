@@ -135,8 +135,8 @@ BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint6
     }
 
     // prepare input data
-    const auto elements = group.compile();
-    const auto rays = group.getInputRays(getInputRaysThreadCount);
+    const auto elements = group.compileElements();
+    const auto rays = group.compileSources(getInputRaysThreadCount);
     const auto materialTables = group.calcMinimalMaterialTables();
     const auto randomSeed = randomDouble();
 
