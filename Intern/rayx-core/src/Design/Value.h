@@ -52,7 +52,7 @@ class Undefined {};
 class DesignMap;
 using Map = std::unordered_map<std::string, std::shared_ptr<DesignMap>>;
 
-class DesignMap {
+class RAYX_API DesignMap {
   public:
     // Constructors
     DesignMap() : m_variant(Undefined()) {}

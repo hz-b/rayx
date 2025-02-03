@@ -212,7 +212,7 @@ std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
     // getElements() returns a vector of pointers to DesignElement, traversing the entire tree.
     auto elements = m_Beamline->getElements();
     names.reserve(elements.size());
-    for (const auto* elem : elements) {
+    for (const auto elem : elements) {
         // Assuming DesignElement provides a getName() method.
         names.push_back(elem->getName());
     }
@@ -229,7 +229,7 @@ std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
     // getSources() returns a vector of pointers to DesignSource.
     auto sources = m_Beamline->getSources();
     names.reserve(sources.size());
-    for (const auto* src : sources) {
+    for (const auto src : sources) {
         names.push_back(src->getName());
     }
     return names;

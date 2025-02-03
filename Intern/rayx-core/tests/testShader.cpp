@@ -1345,7 +1345,7 @@ TEST_F(TestSuite, testBesselDipole) {
                                      }};
 
     auto beamline = loadBeamline("dipole_plain");
-    const auto* src = beamline.getSources()[0];
+    const auto src = beamline.getSources()[0];
     DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
@@ -1382,7 +1382,7 @@ TEST_F(TestSuite, testSchwingerDipole) {
                                      }};
 
     auto beamline = loadBeamline("dipole_plain");
-    const auto* src = beamline.getSources()[0];
+    const auto src = beamline.getSources()[0];
 
     DipoleSource dipolesource(*src);
 

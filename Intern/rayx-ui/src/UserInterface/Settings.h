@@ -33,8 +33,8 @@ struct UISimulationInfo {
     bool fixedSeed = false;
     int seed;
 
-    UISimulationInfo(int maxEvents, int maxBatchSize, bool sequential, const std::vector<std::string>& availableDevices,
-                     int deviceIndex, bool fixedSeed = false, int seed = 0)
+    UISimulationInfo(int maxEvents, int maxBatchSize, bool sequential, const std::vector<std::string>& availableDevices, int deviceIndex,
+                     bool fixedSeed = false, int seed = 0)
         : maxEvents(maxEvents),
           maxBatchSize(maxBatchSize),
           sequential(sequential),
@@ -46,9 +46,9 @@ struct UISimulationInfo {
 
 enum class SelectedType { None = -1, LightSource = 0, OpticalElement = 1, Group = 2 };
 struct UIBeamlineInfo {
-    std::vector<glm::dvec3> rSourcePositions;
-    std::vector<RAYX::DesignElement> elements;
-    std::vector<RAYX::DesignSource> sources;
+    std::vector<glm::dvec4> rSourcePositions;
+    std::vector<std::shared_ptr<RAYX::DesignElement>> elements;
+    std::vector<std::shared_ptr<RAYX::DesignSource>> sources;
     SelectedType selectedType = SelectedType::None;
     int selectedIndex = -1;
     bool elementsChanged = false;

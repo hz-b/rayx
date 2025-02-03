@@ -284,7 +284,7 @@ void UIHandler::setupUI(UIParameters& uiParams) {
     showUISettingsWindow(uiParams);
     showMissingFilePopupWindow(uiParams);
     showSimulationSettingsPopupWindow(uiParams);
-    m_BeamlineOutliner.showBeamlineOutlineWindow(uiParams);
+    m_BeamlineOutliner.showBeamlineOutlineWindow();
     showHotkeysWindow();
     ImGui::End();
     ImGui::End();
@@ -584,8 +584,7 @@ void UIHandler::showSimulationSettingsPopupWindow(UIParameters& uiParams) {
             ImGui::Combo("Device", reinterpret_cast<int*>(&uiParams.simulationInfo.deviceIndex), &deviceItems[0],
                          static_cast<int>(deviceItems.size()));
 
-            
-            // maxEvents selection
+                        // maxEvents selection
             ImGui::InputScalar("Max Events", ImGuiDataType_U32, &uiParams.simulationInfo.maxEvents);
 
             if (!uiParams.simulationInfo.fixedSeed) {

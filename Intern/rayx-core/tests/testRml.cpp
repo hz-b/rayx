@@ -15,7 +15,7 @@ TEST_F(TestSuite, loadDatFile) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    const auto* source0 = bl.getSources()[0];
+    const auto source0 = bl.getSources()[0];
     CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 15, 0.1);
     CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
     CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
@@ -29,7 +29,7 @@ TEST_F(TestSuite, loadDatFile2) {
 
     // This only works due to fixed seeding!
     // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    const auto* source0 = bl.getSources()[0];
+    const auto source0 = bl.getSources()[0];
     CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 14.7, 0.1);
     CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17.1, 0.1);
     CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 16.7, 0.1);
@@ -206,9 +206,9 @@ TEST_F(TestSuite, testExpertsOptic) {
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
     auto beamline = loadBeamline("twoSourcesTest");
 
-    const auto* dipolesource = beamline.getSources()[0];
+    const auto dipolesource = beamline.getSources()[0];
 
-    const auto* pointsource = beamline.getSources()[1];
+    const auto pointsource = beamline.getSources()[1];
 
     CHECK_EQ(100, dipolesource->getEnergy());
     CHECK_EQ(150.24724068638105, pointsource->getEnergyDistribution().selectEnergy());

@@ -76,32 +76,32 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::fil
     RAYX::xml::Parser parser(node, filename);
     ElementType type = parser.type();
 
-    DesignSource ds;
-    ds.m_elementParameters = Map();
+    std::unique_ptr<DesignSource> ds = std::make_unique<DesignSource>();
+    ds->m_elementParameters = Map();
 
-    DesignElement de;
-    de.m_elementParameters = Map();
+    std::unique_ptr<DesignElement> de = std::make_unique<DesignElement>();
+    de->m_elementParameters = Map();
 
     bool isSource = true;
     switch (type) {
         case ElementType::PointSource:
-            setPointSource(parser, &ds);
+            setPointSource(parser, ds.get());
             break;
         case ElementType::MatrixSource:
-            setMatrixSource(parser, &ds);
+            setMatrixSource(parser, ds.get());
             break;
         case ElementType::DipoleSource:
         case ElementType::DipoleSrc:
-            setDipoleSource(parser, &ds);
+            setDipoleSource(parser, ds.get());
             break;
         case ElementType::PixelSource:
-            setPixelSource(parser, &ds);
+            setPixelSource(parser, ds.get());
             break;
         case ElementType::CircleSource:
-            setCircleSource(parser, &ds);
+            setCircleSource(parser, ds.get());
             break;
         case ElementType::SimpleUndulatorSource:
-            setSimpleUndulatorSource(parser, &ds);
+            setSimpleUndulatorSource(parser, ds.get());
             break;
         default:
             isSource = false;
@@ -112,7 +112,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::fil
     if (isSource) {
         group.addChild(std::move(ds));
     } else {
-        parseElement(parser, &de);
+        parseElement(parser, de.get());
         group.addChild(std::move(de));
     }
 }
@@ -132,10 +132,10 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, cons
             if (!groupOpt) {
                 RAYX_EXIT << "parseGroup failed!";
             }
-            Group nestedGroup = std::move(groupOpt.value());
+            std::unique_ptr<Group> nestedGroup = std::make_unique<Group>(std::move(*groupOpt));
 
             // Recursively parse all objects from within the group.
-            handleObjectCollection(object, nestedGroup, filename);
+            handleObjectCollection(object, *nestedGroup, filename);
 
             // Add the group to the beamline.
             group.addChild(std::move(nestedGroup));

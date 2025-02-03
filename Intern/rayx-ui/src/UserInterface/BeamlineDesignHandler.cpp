@@ -18,16 +18,18 @@ void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineI
 
     if (uiBeamlineInfo.selectedType == SelectedType::LightSource) {  // source
         if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.sources.size())) {
-            auto sourceParameters = uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex].m_elementParameters;
-            showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
+            showParameters(uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex]->m_elementParameters,  //
+                           uiBeamlineInfo.elementsChanged,                                             //
+                           uiBeamlineInfo.selectedType);
         } else {
             // Handle out-of-bounds access for sources
             RAYX_EXIT << "Error: selectedIndex is out of bounds for sources.";
         }
     } else if (uiBeamlineInfo.selectedType == SelectedType::OpticalElement) {  // element
         if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.elements.size())) {
-            auto elementParameters = uiBeamlineInfo.elements[uiBeamlineInfo.selectedIndex].m_elementParameters;
-            showParameters(elementParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
+            showParameters(uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex]->m_elementParameters,  //
+                           uiBeamlineInfo.elementsChanged,                                             //
+                           uiBeamlineInfo.selectedType);
         } else {
             // Handle out-of-bounds access for elements
             RAYX_EXIT << "Error: selectedIndex is out of bounds for elements.";

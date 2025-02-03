@@ -2,6 +2,7 @@
 #include <functional>
 #include <vector>
 
+#include "Beamline/Beamline.h"
 #include "RenderObject.h"
 #define MAX_RAYS 1000
 
