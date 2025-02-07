@@ -9,33 +9,33 @@
 #include <string>
 #include <unordered_set>
 
+#include "Beamline/Beamline.h"
 #include "Beamline/StringConversion.h"
 #include "Data/Strings.cpp"
 #include "Debug/Instrumentor.h"
 
-void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
-    // RAYX_PROFILE_FUNCTION_STDOUT();
+void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiInfo) {
+    // If no node is selected, do nothing
+    if (!uiInfo.selectedNode) {
+        ImGui::Text("No node selected");
+        return;
+    }
 
-    if (uiBeamlineInfo.selectedType == SelectedType::LightSource) {  // source
-        if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.sources.size())) {
-            showParameters(uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex]->m_elementParameters,  //
-                           uiBeamlineInfo.elementsChanged,                                             //
-                           uiBeamlineInfo.selectedType);
-        } else {
-            // Handle out-of-bounds access for sources
-            RAYX_EXIT << "Error: selectedIndex is out of bounds for sources.";
+    // The node is a std::variant<...>, so figure out which alternative we have
+    const auto& node = *uiInfo.selectedNode;
+
+    if (std::holds_alternative<std::unique_ptr<RAYX::DesignSource>>(node)) {
+        const auto& srcPtr = std::get<std::unique_ptr<RAYX::DesignSource>>(node);
+        if (srcPtr) {
+            // showParameters can now edit srcPtr->m_elementParameters
+            showParameters(srcPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::LightSource);
         }
-    } else if (uiBeamlineInfo.selectedType == SelectedType::OpticalElement) {  // element
-        if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.elements.size())) {
-            showParameters(uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex]->m_elementParameters,  //
-                           uiBeamlineInfo.elementsChanged,                                             //
-                           uiBeamlineInfo.selectedType);
-        } else {
-            // Handle out-of-bounds access for elements
-            RAYX_EXIT << "Error: selectedIndex is out of bounds for elements.";
+    } else if (std::holds_alternative<std::unique_ptr<RAYX::DesignElement>>(node)) {
+        const auto& elemPtr = std::get<std::unique_ptr<RAYX::DesignElement>>(node);
+        if (elemPtr) {
+            showParameters(elemPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::OpticalElement);
         }
-    } else if (uiBeamlineInfo.selectedType == SelectedType::Group) {  // group
-        // Handle group if needed
+    } else if (std::holds_alternative<std::unique_ptr<RAYX::Group>>(node)) {
     }
 }
 

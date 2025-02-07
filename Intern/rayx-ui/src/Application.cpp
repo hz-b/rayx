@@ -151,24 +151,18 @@ void Application::run() {
                         m_Scene = std::make_unique<Scene>(m_Device);
 
                         // Update elements and sources for UI
-                        m_UIParams.beamlineInfo.elements = m_Beamline->getElements();
-                        m_UIParams.beamlineInfo.sources = m_Beamline->getSources();
+                        m_UIParams.beamlineInfo.beamline = m_Beamline.get();
 
-                        // Store source positions in UI parameters
-                        m_UIParams.beamlineInfo.rSourcePositions.clear();
-                        RAYX::Group::accumulateLightSourcesWorldPositions(*m_Beamline, glm::dvec4(0, 0, 0, 1), glm::dmat4(1),
-                                                                          m_UIParams.beamlineInfo.rSourcePositions);
-
-                        // Set default selection in UI based on available sources or elements
-                        if (m_UIParams.beamlineInfo.sources.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::LightSource;
-                            m_UIParams.beamlineInfo.selectedIndex = 0;
-                        } else if (m_UIParams.beamlineInfo.elements.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::OpticalElement;
-                            m_UIParams.beamlineInfo.selectedIndex = 0;
-                        } else {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::None;
-                        }
+                        // TODO: Set default selection in UI based on available sources or elements
+                        // if (m_UIParams.beamlineInfo.sources.size() > 0) {
+                        //     m_UIParams.beamlineInfo.selectedType = SelectedType::LightSource;
+                        //     m_UIParams.beamlineInfo.selectedIndex = 0;
+                        // } else if (m_UIParams.beamlineInfo.elements.size() > 0) {
+                        //     m_UIParams.beamlineInfo.selectedType = SelectedType::OpticalElement;
+                        //     m_UIParams.beamlineInfo.selectedIndex = 0;
+                        // } else {
+                        //     m_UIParams.beamlineInfo.selectedType = SelectedType::None;
+                        // }
 
                         // Prepare for ray loading or element preparation
                         size_t numElements = m_Beamline->numElements();

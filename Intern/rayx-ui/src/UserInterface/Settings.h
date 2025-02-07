@@ -3,7 +3,10 @@
 #include <vulkan/vulkan.h>
 
 #include <filesystem>
+#include <memory>
+#include <optional>
 
+#include "Beamline/Beamline.h"
 #include "Camera.h"
 #include "Debug/Debug.h"
 #include "Design/DesignElement.h"
@@ -45,14 +48,13 @@ struct UISimulationInfo {
 };
 
 enum class SelectedType { None = -1, LightSource = 0, OpticalElement = 1, Group = 2 };
+
 struct UIBeamlineInfo {
-    std::vector<glm::dvec4> rSourcePositions;
-    std::vector<std::shared_ptr<RAYX::DesignElement>> elements;
-    std::vector<std::shared_ptr<RAYX::DesignSource>> sources;
-    SelectedType selectedType = SelectedType::None;
-    int selectedIndex = -1;
+    RAYX::Beamline* beamline = nullptr;          // Beamline optional, lifetime managed by Application
+    RAYX::BeamlineNode* selectedNode = nullptr;  // Selection optional, lifetime managed by Beamline
     bool elementsChanged = false;
 };
+
 struct UIParameters {
     VkExtent2D sceneExtent;
     VkDescriptorSet sceneDescriptorSet;

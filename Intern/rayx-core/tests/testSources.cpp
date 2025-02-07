@@ -93,7 +93,7 @@ TEST_F(TestSuite, DipoleEnergyDistribution) {
 TEST_F(TestSuite, PixelPositionTest) {
     auto beamline = loadBeamline("PixelSource");
     auto rays = beamline.compileSources();
-    const DesignSource* src = beamline.getSources()[0].get();
+    const DesignSource* src = beamline.getSources()[0];
     auto width = src->getSourceWidth();
     auto height = src->getSourceHeight();
     auto hordiv = src->getHorDivergence();
@@ -145,7 +145,7 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     };
 
     auto beamline = loadBeamline("dipole_plain");
-    const DesignSource* src = beamline.getSources()[0].get();
+    const DesignSource* src = beamline.getSources()[0];
     DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
@@ -167,7 +167,7 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     }};
 
     auto beamline = loadBeamline("dipole_plain");
-    const DesignSource* src = beamline.getSources()[0].get();
+    const DesignSource* src = beamline.getSources()[0];
     DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
@@ -194,7 +194,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
     }};
     for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
-        const DesignSource* src = beamline.getSources()[0].get();
+        const DesignSource* src = beamline.getSources()[0];
 
         auto test2 = values.horDivergence;
         auto test4 = values.sourceDepth;

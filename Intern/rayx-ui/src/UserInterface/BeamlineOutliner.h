@@ -14,16 +14,10 @@ class BeamlineOutliner {
     BeamlineOutliner();
     ~BeamlineOutliner();
 
-    // Set (or update) the beamline pointer.
-    void setBeamline(const RAYX::Beamline* beamline);
-
     // Show the outline window (to be called every frame in your UI loop)
-    void showBeamlineOutlineWindow();
+    void showBeamlineOutlineWindow(UIBeamlineInfo& blInfo);
 
   private:
-    // Pointer to the beamline (the Group that is the root of the tree)
-    const RAYX::Beamline* m_Beamline = nullptr;
-
     // Recursive helper that renders the tree starting at a given Group.
-    void renderImGuiTreeFromGroup(const RAYX::Group& group, int depth = 0);
+    void renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::BeamlineNode*& selected, int depth = 0);
 };

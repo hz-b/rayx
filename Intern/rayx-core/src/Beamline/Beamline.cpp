@@ -1,5 +1,6 @@
 #include "Beamline.h"
 
+#include <stack>
 #include <stdexcept>
 #include <sstream>
 
@@ -11,14 +12,14 @@ namespace RAYX {
 
 // Move constructor
 Group::Group(Group&& other) noexcept
-    : m_position(std::move(other.m_position)), m_orientation(std::move(other.m_orientation)), children(std::move(other.children)) {}
+    : m_position(std::move(other.m_position)), m_orientation(std::move(other.m_orientation)), m_children(std::move(other.m_children)) {}
 
 // Move assignment operator
 Group& Group::operator=(Group&& other) noexcept {
     if (this != &other) {
         m_position = std::move(other.m_position);
         m_orientation = std::move(other.m_orientation);
-        children = std::move(other.children);
+        m_children = std::move(other.m_children);
     }
     return *this;
 }
@@ -29,7 +30,7 @@ Group Group::clone() const {
     copy.setPosition(m_position);
     copy.setOrientation(m_orientation);
     // For each child, clone it and add a new shared pointer.
-    for (const auto& child : children) {
+    for (const auto& child : m_children) {
         std::visit(
             [&copy](auto& ptr) {
                 using T = std::decay_t<decltype(ptr)>;
@@ -46,11 +47,21 @@ Group Group::clone() const {
     return copy;
 }
 
+template <typename Callback>
+void Group::traverse(Callback&& callback) const {
+    for (const auto& child : m_children) {
+        callback(child);
+        if (auto* groupPtr = std::get_if<std::unique_ptr<Group>>(&child)) {
+            if (*groupPtr) (*groupPtr)->traverse(std::forward<Callback>(callback));
+        }
+    }
+}
+
 // A Group is always a Group.
 NodeType Group::getNodeType() const { return NodeType::Group; }
 
 // Add a child node.
-void Group::addChild(BeamlineNode&& child) { children.push_back(std::move(child)); }
+void Group::addChild(BeamlineNode&& child) { m_children.push_back(std::move(child)); }
 
 MaterialTables Group::calcMinimalMaterialTables() const {
     auto elements = getElements();
@@ -70,34 +81,47 @@ void Group::accumulateLightSourcesWorldPositions(const Group& group, const glm::
     glm::dvec4 currentPos = parentOri * group.getPosition() + parentPos;
     glm::dmat4 currentOri = parentOri * group.getOrientation();
 
-    traverseGroup(group, [&](const BeamlineNode& node) {
-        if (std::holds_alternative<std::shared_ptr<DesignSource>>(node)) {
-            const auto& src = std::get<std::shared_ptr<DesignSource>>(node);
-            glm::dvec4 worldPos = currentOri * src->getPosition() + currentPos;
-            positions.push_back(worldPos);
-        } else if (std::holds_alternative<std::shared_ptr<Group>>(node)) {
-            const auto& childGroup = std::get<std::shared_ptr<Group>>(node);
-            accumulateLightSourcesWorldPositions(*childGroup, currentPos, currentOri, positions);
+    for (const auto& child : group) {
+        if (std::holds_alternative<std::unique_ptr<DesignSource>>(child)) {
+            auto& srcPtr = std::get<std::unique_ptr<DesignSource>>(child);
+            if (srcPtr) {
+                glm::dvec4 worldPos = currentOri * srcPtr->getPosition() + currentPos;
+                positions.push_back(worldPos);
+            }
+        } else if (std::holds_alternative<std::unique_ptr<Group>>(child)) {
+            auto& childGroupPtr = std::get<std::unique_ptr<Group>>(child);
+            if (childGroupPtr) {
+                accumulateLightSourcesWorldPositions(*childGroupPtr, currentPos, currentOri, positions);
+            }
         }
-        // DesignElements are ignored.
-    });
+    }
 }
 
 std::vector<OpticalElement> Group::compileElements() const {
     std::vector<OpticalElement> elements;
+
     auto recurse = [&](auto& self, const Group& grp, const glm::dvec4& parentPos, const glm::dmat4& parentOri) -> void {
         glm::dvec4 thisGroupPos = parentOri * grp.getPosition() + parentPos;
         glm::dmat4 thisGroupOri = parentOri * grp.getOrientation();
-        for (const auto& child : grp.children) {
-            if (std::holds_alternative<std::shared_ptr<DesignElement>>(child)) {
-                const auto& de = std::get<std::shared_ptr<DesignElement>>(child);
-                elements.push_back(de->compile(thisGroupPos, thisGroupOri));
-            } else if (std::holds_alternative<std::shared_ptr<Group>>(child)) {
-                self(self, *std::get<std::shared_ptr<Group>>(child), thisGroupPos, thisGroupOri);
-            }
-            // Sources are ignored for optical element compilation.
+
+        for (const auto& child : grp.m_children) {  // For each child...
+            if (std::holds_alternative<std::unique_ptr<DesignElement>>(child)) {
+                const auto& dePtr = std::get<std::unique_ptr<DesignElement>>(child);
+                if (dePtr) {
+                    // Compile an OpticalElement from the DesignElement
+                    elements.push_back(dePtr->compile(thisGroupPos, thisGroupOri));
+                }
+            } else if (std::holds_alternative<std::unique_ptr<Group>>(child)) {
+                const auto& groupPtr = std::get<std::unique_ptr<Group>>(child);
+                if (groupPtr) {
+                    // Recurse into the child group
+                    self(self, *groupPtr, thisGroupPos, thisGroupOri);
+                }
+            }  // Ignore DesignSources
         }
     };
+
+    // Start recursion at this group
     recurse(recurse, *this, glm::dvec4(0, 0, 0, 1), glm::dmat4(1.0));
     return elements;
 }
@@ -105,65 +129,71 @@ std::vector<OpticalElement> Group::compileElements() const {
 std::vector<Ray> Group::compileSources(int thread_count) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Ray> rays;
+
     auto traverseWithTransforms = [&rays, thread_count](const Group& group, const glm::dvec4& parentPosition, const glm::dmat4& parentOrientation,
                                                         const auto& self) -> void {
+        // Compute the transform for this group
         glm::dvec4 currentPosition = parentOrientation * group.getPosition() + parentPosition;
         glm::dmat4 currentOrientation = parentOrientation * group.getOrientation();
 
-        for (const auto& child : group.children) {
-            if (std::holds_alternative<std::shared_ptr<DesignSource>>(child)) {
-                const auto& src = std::get<std::shared_ptr<DesignSource>>(child);
-                auto sourceRays = src->compile(thread_count, currentPosition, currentOrientation);
-                for (auto& ray : sourceRays) {
-                    ray.m_sourceID = static_cast<uint32_t>(rays.size());
+        for (const auto& child : group.m_children) {  // For each child...
+            if (std::holds_alternative<std::unique_ptr<DesignSource>>(child)) {
+                const auto& srcPtr = std::get<std::unique_ptr<DesignSource>>(child);
+                if (srcPtr) {
+                    // Compile the rays for this source
+                    auto sourceRays = srcPtr->compile(thread_count, currentPosition, currentOrientation);
+                    for (auto& ray : sourceRays) {
+                        ray.m_sourceID = static_cast<uint32_t>(rays.size());
+                    }
+                    rays.insert(rays.end(), sourceRays.begin(), sourceRays.end());
                 }
-                rays.insert(rays.end(), sourceRays.begin(), sourceRays.end());
-            } else if (std::holds_alternative<std::shared_ptr<Group>>(child)) {
-                self(*std::get<std::shared_ptr<Group>>(child), currentPosition, currentOrientation, self);
+            } else if (std::holds_alternative<std::unique_ptr<Group>>(child)) {
+                const auto& childGroupPtr = std::get<std::unique_ptr<Group>>(child);
+                if (childGroupPtr) {
+                    self(*childGroupPtr, currentPosition, currentOrientation, self);
+                }
             }
         }
     };
+
     traverseWithTransforms(*this, glm::dvec4(0, 0, 0, 1), glm::dmat4(1), traverseWithTransforms);
     return rays;
 }
 
-// Retrieve all DesignElements (deep)
-std::vector<std::shared_ptr<DesignElement>> Group::getElements() const {
-    std::vector<std::shared_ptr<DesignElement>> elements;
-    traverseGroup(*this, [&elements](const BeamlineNode& node) {
-        if (std::holds_alternative<std::shared_ptr<DesignElement>>(node)) {
-            elements.push_back(std::get<std::shared_ptr<DesignElement>>(node));
+std::vector<DesignElement*> Group::getElements() const {
+    std::vector<DesignElement*> elements;
+    for (const auto& node : m_children) {
+        if (std::holds_alternative<std::unique_ptr<DesignElement>>(node)) {
+            elements.push_back(std::get<std::unique_ptr<DesignElement>>(node).get());
         }
-    });
+    }
     return elements;
 }
 
-// Retrieve all DesignSources (deep)
-std::vector<std::shared_ptr<DesignSource>> Group::getSources() const {
-    std::vector<std::shared_ptr<DesignSource>> sources;
-    traverseGroup(*this, [&sources](const BeamlineNode& node) {
-        if (std::holds_alternative<std::shared_ptr<DesignSource>>(node)) {
-            sources.push_back(std::get<std::shared_ptr<DesignSource>>(node));
+std::vector<DesignSource*> Group::getSources() const {
+    std::vector<DesignSource*> sources;
+    for (const auto& node : m_children) {
+        if (std::holds_alternative<std::unique_ptr<DesignSource>>(node)) {
+            sources.push_back(std::get<std::unique_ptr<DesignSource>>(node).get());
         }
-    });
+    }
     return sources;
 }
 
-// Retrieve all Groups (deep)
-std::vector<std::shared_ptr<Group>> Group::getGroups() const {
-    std::vector<std::shared_ptr<Group>> groups;
-    traverseGroup(*this, [&groups](const BeamlineNode& node) {
-        if (std::holds_alternative<std::shared_ptr<Group>>(node)) {
-            groups.push_back(std::get<std::shared_ptr<Group>>(node));
+std::vector<Group*> Group::getGroups() const {
+    std::vector<Group*> groups;
+    for (const auto& node : m_children) {
+        if (std::holds_alternative<std::unique_ptr<Group>>(node)) {
+            groups.push_back(std::get<std::unique_ptr<Group>>(node).get());
         }
-    });
+    }
     return groups;
 }
 
 size_t Group::numElements() const {
     size_t count = 0;
-    traverseGroup(*this, [&count](const BeamlineNode& node) {
-        if (std::holds_alternative<std::shared_ptr<DesignElement>>(node)) {
+    traverse([&count](const BeamlineNode& node) {
+        if (std::holds_alternative<std::unique_ptr<DesignElement>>(node)) {
             ++count;
         }
     });
@@ -172,39 +202,12 @@ size_t Group::numElements() const {
 
 size_t Group::numSources() const {
     size_t count = 0;
-    traverseGroup(*this, [&count](const BeamlineNode& node) {
-        if (std::holds_alternative<std::shared_ptr<DesignSource>>(node)) {
+    traverse([&count](const BeamlineNode& node) {
+        if (std::holds_alternative<std::unique_ptr<DesignSource>>(node)) {
             ++count;
         }
     });
     return count;
-}
-
-// Non‑const overload.
-template <typename Callback>
-void traverseGroup(Group& group, Callback&& callback) {
-    // Iterate over the mutable children.
-    for (auto& child : group.getChildren()) {
-        callback(child);
-        // If the child is a Group, then recursively traverse it.
-        if (std::holds_alternative<std::shared_ptr<Group>>(child)) {
-            traverseGroup(*std::get<std::shared_ptr<Group>>(child), callback);
-        }
-    }
-}
-
-// Const overload.
-template <typename Callback>
-void traverseGroup(const Group& group, Callback&& callback) {
-    // Iterate over the children (as read‑only).
-    for (const auto& child : group.getChildren()) {
-        callback(child);
-        // Even in a const context, our variant is defined as holding std::shared_ptr<Group>.
-        // We can still call traverseGroup on the pointed-to Group.
-        if (std::holds_alternative<std::shared_ptr<Group>>(child)) {
-            traverseGroup(*std::get<std::shared_ptr<Group>>(child), callback);
-        }
-    }
 }
 
 }  // namespace RAYX

@@ -14,7 +14,7 @@
 namespace RAYX {
 
 class Group;
-using BeamlineNode = std::variant<std::shared_ptr<DesignElement>, std::shared_ptr<DesignSource>, std::shared_ptr<Group>>;
+using BeamlineNode = std::variant<std::unique_ptr<DesignElement>, std::unique_ptr<DesignSource>, std::unique_ptr<Group>>;
 enum class NodeType { OpticalElement, LightSource, Group };
 
 class RAYX_API Group {
@@ -29,25 +29,38 @@ class RAYX_API Group {
     // Clone returns a deep copy of the group and its children.
     Group clone() const;
 
+    template <typename Callback>
+    void traverse(Callback&& callback) const;
+
+    // Iterators for non-const access
+    auto begin() { return m_children.begin(); }
+    auto end() { return m_children.end(); }
+
+    // Iterators for const access
+    auto begin() const { return m_children.cbegin(); }
+    auto end() const { return m_children.cend(); }
+    auto cbegin() const { return m_children.cbegin(); }
+    auto cend() const { return m_children.cend(); }
+
     NodeType getNodeType() const;
-    const std::vector<BeamlineNode>& getChildren() const { return children; }
+    std::vector<BeamlineNode>& getChildren() { return m_children; }
 
     // Add a child (by move).
     void addChild(BeamlineNode&& child);
 
-    // Other member functions.
-    MaterialTables calcMinimalMaterialTables() const;
-    static void accumulateLightSourcesWorldPositions(const Group& group, const glm::dvec4& parentPos, const glm::dmat4& parentOri,
-                                                     std::vector<glm::dvec4>& positions);
-    std::vector<OpticalElement> compileElements() const;
-    std::vector<Ray> compileSources(int thread_count = 1) const;
+    // Getters returning raw pointers. This follows more the old way of handling beamlines and is to be used with care.
+    std::vector<DesignElement*> getElements() const;
+    std::vector<DesignSource*> getSources() const;
+    std::vector<Group*> getGroups() const;
 
-    // Getters returning smart pointers.
-    std::vector<std::shared_ptr<DesignElement>> getElements() const;
-    std::vector<std::shared_ptr<DesignSource>> getSources() const;
-    std::vector<std::shared_ptr<Group>> getGroups() const;
+    // Helper
     size_t numElements() const;
     size_t numSources() const;
+    MaterialTables calcMinimalMaterialTables() const;
+    std::vector<OpticalElement> compileElements() const;
+    std::vector<Ray> compileSources(int thread_count = 1) const;
+    static void accumulateLightSourcesWorldPositions(const Group& group, const glm::dvec4& parentPos, const glm::dmat4& parentOri,
+                                                     std::vector<glm::dvec4>& positions);
 
     // Getters & setters for transforms.
     const glm::dvec4& getPosition() const { return m_position; }
@@ -58,26 +71,20 @@ class RAYX_API Group {
   private:
     glm::dvec4 m_position = glm::dvec4(0, 0, 0, 1);
     glm::dmat4 m_orientation = glm::dmat4(1);
-    std::vector<BeamlineNode> children;
+    std::vector<BeamlineNode> m_children;
 };
-
 using Beamline = Group;  // Conceptually, a Beamline is a Group
-
-template <typename Callback>
-void traverseGroup(Group& group, Callback&& callback);
-template <typename Callback>
-void traverseGroup(const Group& group, Callback&& callback);
 
 // Utility function to determine node type.
 inline NodeType getNodeType(const BeamlineNode& node) {
     return std::visit(
         [](auto&& element) -> NodeType {
             using T = std::decay_t<decltype(element)>;
-            if constexpr (std::is_same_v<T, std::shared_ptr<DesignElement>>) {
+            if constexpr (std::is_same_v<T, std::unique_ptr<DesignElement>>) {
                 return NodeType::OpticalElement;
-            } else if constexpr (std::is_same_v<T, std::shared_ptr<DesignSource>>) {
+            } else if constexpr (std::is_same_v<T, std::unique_ptr<DesignSource>>) {
                 return NodeType::LightSource;
-            } else if constexpr (std::is_same_v<T, std::shared_ptr<Group>>) {
+            } else if constexpr (std::is_same_v<T, std::unique_ptr<Group>>) {
                 return NodeType::Group;
             }
         },
