@@ -417,7 +417,7 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
     return indices;
 }
 
-void planarTriangulation(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
     if (compiled.m_behaviour.m_type == RAYX::BTYPE_SLIT) {
@@ -440,7 +440,7 @@ bool isPlanar(const RAYX::QuadricSurface& q) {
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
-void triangulateObject(const RAYX::Element compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     switch (static_cast<int>(compiled.m_surface.m_type)) {
         case RAYX::STYPE_PLANE_XZ: {

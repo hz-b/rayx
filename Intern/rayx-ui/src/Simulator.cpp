@@ -33,7 +33,6 @@ void Simulator::runSimulation() {
     if (notEnoughEvents) {
         RAYX_LOG << "Not enough events (" << m_maxEvents << ")! Consider increasing m_maxEvents.";
     }
-    
 
     // Export Rays to external data.
     std::string path = m_RMLPath.string();
@@ -46,10 +45,11 @@ void Simulator::runSimulation() {
     Format fmt = formatFromString(defaultFormatString());
 
     std::vector<std::string> names;
-    names.reserve(m_Beamline.m_DesignElements.size());
+    auto elements = m_Beamline.getElements();
+    names.reserve(elements.size());
 
-    for (const auto& designElement : m_Beamline.m_DesignElements) {
-        names.push_back(designElement.getName());
+    for (const auto designElement : elements) {
+        names.push_back(designElement->getName());
     }
 
     path += ".h5";
@@ -69,7 +69,7 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
     }
 
     m_RMLPath = RMLPath;
-    m_Beamline = std::move(beamline);
+    m_Beamline = std::move(*static_cast<RAYX::Beamline*>(beamline.clone().get()));
     m_max_batch_size = simulationInfo.maxBatchSize;
     m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
     m_maxEvents = simulationInfo.maxEvents;

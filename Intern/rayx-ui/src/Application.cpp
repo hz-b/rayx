@@ -129,6 +129,7 @@ void Application::run() {
 
             if (m_UIParams.rmlReady) {
                 m_RMLPath = m_UIParams.rmlPath.string();
+                m_UIParams.beamlineInfo = {};
                 beamlineFuture = std::async(std::launch::async, &Application::loadBeamline, this, m_RMLPath);
                 m_State = State::LoadingBeamline;
                 m_UIParams.rmlReady = false;
@@ -151,28 +152,10 @@ void Application::run() {
                         m_Scene = std::make_unique<Scene>(m_Device);
 
                         // Update elements and sources for UI
-                        m_UIParams.beamlineInfo.elements = m_Beamline->m_DesignElements;
-                        m_UIParams.beamlineInfo.sources = m_Beamline->m_DesignSources;
-
-                        // Store source positions in UI parameters
-                        m_UIParams.beamlineInfo.rSourcePositions.clear();
-                        for (auto& source : m_UIParams.beamlineInfo.sources) {
-                            m_UIParams.beamlineInfo.rSourcePositions.push_back(source.getWorldPosition());
-                        }
-
-                        // Set default selection in UI based on available sources or elements
-                        if (m_UIParams.beamlineInfo.sources.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::LightSource;
-                            m_UIParams.beamlineInfo.selectedIndex = 0;
-                        } else if (m_UIParams.beamlineInfo.elements.size() > 0) {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::OpticalElement;
-                            m_UIParams.beamlineInfo.selectedIndex = 0;
-                        } else {
-                            m_UIParams.beamlineInfo.selectedType = SelectedType::None;
-                        }
+                        m_UIParams.beamlineInfo.beamline = m_Beamline.get();
 
                         // Prepare for ray loading or element preparation
-                        size_t numElements = m_Beamline->m_DesignElements.size();
+                        size_t numElements = m_Beamline->numElements();
                         m_sortedRays.resize(numElements);
                         if (m_UIParams.h5Ready) {
                             raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, numElements);
@@ -191,7 +174,7 @@ void Application::run() {
 
                 case State::Simulating:
                     if (simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->m_DesignElements.size());
+                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->numElements());
                         m_State = State::LoadingRays;
                     }
                     break;
@@ -211,7 +194,7 @@ void Application::run() {
                         } else {
                             for (auto ray : m_rays) {
                                 size_t id = static_cast<size_t>(ray.back().m_lastElement);
-                                if (id > m_Beamline->m_DesignElements.size()) {
+                                if (id > m_Beamline->numElements()) {
                                     m_UIParams.showH5NotExistPopup = true;
                                     break;
                                 }
@@ -247,8 +230,8 @@ void Application::run() {
                     // only start async task if one is not already running
                     if (!getRObjInputsFuture.valid() ||
                         (getRObjInputsFuture.valid() && getRObjInputsFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
-                        getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(),
-                                                         std::ref(m_UIParams.beamlineInfo.elements), m_sortedRays, m_buildTextureNeeded);
+                        getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(*m_Beamline),
+                                                         m_sortedRays, m_buildTextureNeeded);
                     } else {
                         RAYX_VERB << "Skipping PrepareElements, async task already running.";
                     }
