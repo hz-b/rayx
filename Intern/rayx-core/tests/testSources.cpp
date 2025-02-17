@@ -42,14 +42,14 @@ void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
 
 TEST_F(TestSuite, MatrixSource) {
     auto beamline = loadBeamline("MatrixSource");
-    auto a = beamline.getInputRays();
+    auto a = beamline.compileSources();
     auto b = loadCSVRayUI("MatrixSource");
     roughCompare(a, b);
 }
 
 TEST_F(TestSuite, MatrixSourceMoved) {
     auto beamline = loadBeamline("MatrixSourceMoved");
-    auto a = beamline.getInputRays();
+    auto a = beamline.compileSources();
     auto b = loadCSVRayUI("MatrixSource");
     for (auto& r : b) {
         r.m_position += glm::dvec3(5, -5, 3);
@@ -66,37 +66,37 @@ TEST_F(TestSuite, MatrixSourceTracedRayUI) {
 }
 
 TEST_F(TestSuite, PointSourceHardEdge) {
-    auto rays = loadBeamline("PointSourceHardEdge").getInputRays();
+    auto rays = loadBeamline("PointSourceHardEdge").compileSources();
     checkEnergyDistribution(rays, 120.97, 12.1);
 }
 
 TEST_F(TestSuite, PointSourceSoftEdge) {
-    auto rays = loadBeamline("PointSourceSoftEdge").getInputRays();
+    auto rays = loadBeamline("PointSourceSoftEdge").compileSources();
     checkEnergyDistribution(rays, 151, 6);
 }
 
 TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
-    auto rays = loadBeamline("MatrixSourceSpreaded").getInputRays();
+    auto rays = loadBeamline("MatrixSourceSpreaded").compileSources();
     checkEnergyDistribution(rays, 42, 10);
 }
 
 TEST_F(TestSuite, DipoleSourcePosition) {
-    auto rays = loadBeamline("dipole_plain").getInputRays();
+    auto rays = loadBeamline("dipole_plain").compileSources();
     checkPositionDistribution(rays, 0.065, 0.04);
 }
 
 TEST_F(TestSuite, DipoleEnergyDistribution) {
-    auto rays = loadBeamline("dipole_energySpread").getInputRays();
+    auto rays = loadBeamline("dipole_energySpread").compileSources();
     checkEnergyDistribution(rays, 1000, 23000);
 }
 
 TEST_F(TestSuite, PixelPositionTest) {
     auto beamline = loadBeamline("PixelSource");
-    auto rays = beamline.getInputRays();
-    DesignSource src = beamline.m_DesignSources[0];
-    auto width = src.getSourceWidth();
-    auto height = src.getSourceHeight();
-    auto hordiv = src.getHorDivergence();
+    auto rays = beamline.compileSources();
+    const DesignSource* src = beamline.getSources()[0];
+    auto width = src->getSourceWidth();
+    auto height = src->getSourceHeight();
+    auto hordiv = src->getHorDivergence();
     for (auto ray : rays) {
         CHECK_IN(abs(ray.m_position.x), width / 6.0, width / 2.0);
         CHECK_IN(abs(ray.m_position.y), height / 6.0, height / 2.0);
@@ -107,14 +107,12 @@ TEST_F(TestSuite, PixelPositionTest) {
 
 TEST_F(TestSuite, DipoleZDistribution) {
     auto beamline = loadBeamline("dipole_plain");
-    DesignSource src = beamline.m_DesignSources[0];
-
-    auto rays = beamline.getInputRays();
+    auto rays = beamline.compileSources();
     checkZDistribution(rays, 0, 2.2);
 }
 
 TEST_F(TestSuite, CircleSourcetest) {
-    auto rays = loadBeamline("CircleSource_default").getInputRays();
+    auto rays = loadBeamline("CircleSource_default").compileSources();
     checkPositionDistribution(rays, 0.065, 0.04);
     checkEnergyDistribution(rays, 99.5, 100.5);
 }
@@ -147,8 +145,8 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     };
 
     auto beamline = loadBeamline("dipole_plain");
-    DesignSource src = beamline.m_DesignSources[0];
-    DipoleSource dipolesource(src);
+    const DesignSource* src = beamline.getSources()[0];
+    DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
         auto result = dipolesource.getInterpolation(values.in);
@@ -169,8 +167,8 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     }};
 
     auto beamline = loadBeamline("dipole_plain");
-    DesignSource src = beamline.m_DesignSources[0];
-    DipoleSource dipolesource(src);
+    const DesignSource* src = beamline.getSources()[0];
+    DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
         auto result = dipolesource.vDivergence(values.energy, values.sigv);
@@ -196,14 +194,14 @@ TEST_F(TestSuite, testLightsourceGetters) {
     }};
     for (auto values : rmlinputs) {
         auto beamline = loadBeamline(values.rmlFile);
-        DesignSource src = beamline.m_DesignSources[0];
+        const DesignSource* src = beamline.getSources()[0];
 
         auto test2 = values.horDivergence;
         auto test4 = values.sourceDepth;
         auto test6 = values.sourceWidth;
-        auto horResult = src.getHorDivergence();
-        auto heightResult = src.getSourceHeight();
-        auto widthResult = src.getSourceWidth();
+        auto horResult = src->getHorDivergence();
+        auto heightResult = src->getSourceHeight();
+        auto widthResult = src->getSourceWidth();
 
         CHECK_EQ(horResult, values.horDivergence);
         CHECK_EQ(heightResult, values.sourceHeight);

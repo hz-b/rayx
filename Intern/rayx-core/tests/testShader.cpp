@@ -1345,8 +1345,8 @@ TEST_F(TestSuite, testBesselDipole) {
                                      }};
 
     auto beamline = loadBeamline("dipole_plain");
-    DesignSource src = beamline.m_DesignSources[0];
-    DipoleSource dipolesource(src);
+    const auto src = beamline.getSources()[0];
+    DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
         auto result = dipolesource.bessel(values.proportion, values.zeta);
@@ -1382,9 +1382,9 @@ TEST_F(TestSuite, testSchwingerDipole) {
                                      }};
 
     auto beamline = loadBeamline("dipole_plain");
-    DesignSource src = beamline.m_DesignSources[0];
+    const auto src = beamline.getSources()[0];
 
-    DipoleSource dipolesource(src);
+    DipoleSource dipolesource(*src);
 
     for (auto values : inouts) {
         auto result = dipolesource.schwinger(values.energy);
