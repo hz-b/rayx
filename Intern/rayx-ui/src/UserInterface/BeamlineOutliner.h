@@ -1,42 +1,23 @@
 #pragma once
 
-#include <glm.h>
+#include <glm.hpp>
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "Beamline/Beamline.h"
 
-#include "UserInterface/Settings.h"
-
-// Simple TreeNode
-struct TreeNode {
-    std::string name;
-    std::string type;
-    SelectedType category = SelectedType::None;
-    int index = -1;
-    std::vector<TreeNode> children;
-
-    TreeNode(const std::string& name, const std::string& type = "", SelectedType category = SelectedType::None)
-        : name(name), type(type), category(category) {}
-};
+// Forward declarations for your UI types
+class CameraController;
+struct UIBeamlineInfo;
+struct UIParameters;
 
 class BeamlineOutliner {
   public:
     BeamlineOutliner();
     ~BeamlineOutliner();
 
+    // Show the outline window (to be called every frame in your UI loop)
     void showBeamlineOutlineWindow(UIParameters& uiParams);
 
   private:
-    std::unique_ptr<TreeNode> m_pTreeRoot = nullptr;
-
-    int m_lightSourceIndex = 0;
-    int m_opticalElementIndex = 0;
-    std::filesystem::path m_currentRML;
-
-    void renderImGuiTree(const TreeNode& treeNode, CameraController& camController, std::vector<RAYX::DesignElement>& rObjects,
-                         std::vector<glm::dvec3>& rSourcePositions, UIBeamlineInfo& beamlineInfo) const;
-    void buildTreeFromXMLNode(rapidxml::xml_node<>* node, TreeNode& treeNode);
-    void renderImGuiTreeFromRML(const std::filesystem::path& filename, CameraController& camController, std::vector<RAYX::DesignElement>& rObjects,
-                                std::vector<glm::dvec3>& rSourcePositions, UIBeamlineInfo& beamlineInfo);
+    // Recursive helper that renders the tree starting at a given Group.
+    void renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::BeamlineNode*& selected, CameraController& cam, int depth = 0);
 };

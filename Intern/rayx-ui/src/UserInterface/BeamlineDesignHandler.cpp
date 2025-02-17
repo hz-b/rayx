@@ -9,31 +9,31 @@
 #include <string>
 #include <unordered_set>
 
+#include "Beamline/Beamline.h"
 #include "Beamline/StringConversion.h"
 #include "Element/Strings.cpp"
 #include "Debug/Instrumentor.h"
 
-void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo) {
-    // RAYX_PROFILE_FUNCTION_STDOUT();
+void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiInfo) {
+    if (!uiInfo.selectedNode) {
+        ImGui::Text("No node selected");
+        return;
+    }
 
-    if (uiBeamlineInfo.selectedType == SelectedType::LightSource) {  // source
-        if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.sources.size())) {
-            auto sourceParameters = uiBeamlineInfo.sources[uiBeamlineInfo.selectedIndex].m_elementParameters;
-            showParameters(sourceParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
-        } else {
-            // Handle out-of-bounds access for sources
-            RAYX_EXIT << "Error: selectedIndex is out of bounds for sources.";
+    if (uiInfo.selectedNode->isSource()) {
+        const auto srcPtr = static_cast<RAYX::DesignSource*>(uiInfo.selectedNode);
+        if (srcPtr) {
+            showParameters(srcPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::LightSource);
         }
-    } else if (uiBeamlineInfo.selectedType == SelectedType::OpticalElement) {  // element
-        if (uiBeamlineInfo.selectedIndex >= 0 && uiBeamlineInfo.selectedIndex < static_cast<int>(uiBeamlineInfo.elements.size())) {
-            auto elementParameters = uiBeamlineInfo.elements[uiBeamlineInfo.selectedIndex].m_elementParameters;
-            showParameters(elementParameters, uiBeamlineInfo.elementsChanged, uiBeamlineInfo.selectedType);
-        } else {
-            // Handle out-of-bounds access for elements
-            RAYX_EXIT << "Error: selectedIndex is out of bounds for elements.";
+    } else if (uiInfo.selectedNode->isElement()) {
+        const auto elemPtr = static_cast<RAYX::DesignElement*>(uiInfo.selectedNode);
+        if (elemPtr) {
+            showParameters(elemPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::OpticalElement);
         }
-    } else if (uiBeamlineInfo.selectedType == SelectedType::Group) {  // group
-        // Handle group if needed
+    } else if (uiInfo.selectedNode->isGroup()) {
+        ImGui::Text("Group editing is to be implemented still...");
+    } else {
+        throw std::runtime_error("Tree element of unknown type encountered!");
     }
 }
 

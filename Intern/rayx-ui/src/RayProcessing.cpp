@@ -9,6 +9,7 @@
 #include <unordered_set>
 
 #include "Application.h"
+#include "Beamline/Beamline.h"
 #include "Colors.h"
 #include "Debug/Instrumentor.h"
 
@@ -61,8 +62,6 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
  * Depending on the event type associated with the ray, the function produces visual lines that represent
  * ray segments, colored based on the event type.
  */
-// Define the type of the filter function
-
 std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
                           uint32_t amountOfRays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
@@ -74,10 +73,9 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     size_t maxRayIndex = rayCache.size();
 
     // compile all elements
-    std::vector<RAYX::Element> compiledElements;
-    for (const auto& element : beamline.m_DesignElements) {
-        compiledElements.push_back(element.compile());
-    }
+    auto compiledElements = beamline.compileElements();
+    std::vector<glm::dvec4> sourceWorldPositions;
+    RAYX::Group::accumulateLightSourcesWorldPositions(beamline, glm::dvec4(0, 0, 0, 1), glm::dmat4(1), sourceWorldPositions);
 
     for (size_t i : rayIndices) {
         if (i >= maxRayIndex) {
@@ -86,13 +84,13 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         }
         auto& rayHist = rayCache[i];
 
-        if (beamline.m_DesignSources.size() <= rayHist[0].m_sourceID) {
+        if (beamline.numSources() <= rayHist[0].m_sourceID) {
             RAYX_EXIT << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
         }
-        glm::vec4 rayLastPos = glm::vec4(beamline.m_DesignSources[static_cast<size_t>(rayHist[0].m_sourceID)].getWorldPosition());
+        glm::vec4 rayLastPos = sourceWorldPositions[static_cast<size_t>(rayHist[0].m_sourceID)];
 
         for (const RAYX::Ray& event : rayHist) {
-            if (event.m_lastElement >= beamline.m_DesignElements.size()) {
+            if (event.m_lastElement >= beamline.numElements()) {
                 RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);

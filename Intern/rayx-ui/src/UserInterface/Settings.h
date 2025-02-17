@@ -3,7 +3,10 @@
 #include <vulkan/vulkan.h>
 
 #include <filesystem>
+#include <memory>
+#include <optional>
 
+#include "Beamline/Beamline.h"
 #include "Camera.h"
 #include "Debug/Debug.h"
 #include "Design/DesignElement.h"
@@ -33,8 +36,8 @@ struct UISimulationInfo {
     bool fixedSeed = false;
     int seed;
 
-    UISimulationInfo(int maxEvents, int maxBatchSize, bool sequential, const std::vector<std::string>& availableDevices,
-                     int deviceIndex, bool fixedSeed = false, int seed = 0)
+    UISimulationInfo(int maxEvents, int maxBatchSize, bool sequential, const std::vector<std::string>& availableDevices, int deviceIndex,
+                     bool fixedSeed = false, int seed = 0)
         : maxEvents(maxEvents),
           maxBatchSize(maxBatchSize),
           sequential(sequential),
@@ -45,14 +48,13 @@ struct UISimulationInfo {
 };
 
 enum class SelectedType { None = -1, LightSource = 0, OpticalElement = 1, Group = 2 };
+
 struct UIBeamlineInfo {
-    std::vector<glm::dvec3> rSourcePositions;
-    std::vector<RAYX::DesignElement> elements;
-    std::vector<RAYX::DesignSource> sources;
-    SelectedType selectedType = SelectedType::None;
-    int selectedIndex = -1;
+    RAYX::Beamline* beamline = nullptr;          // Beamline optional, lifetime managed by Application
+    RAYX::BeamlineNode* selectedNode = nullptr;  // Selection optional, lifetime managed by Beamline
     bool elementsChanged = false;
 };
+
 struct UIParameters {
     VkExtent2D sceneExtent;
     VkDescriptorSet sceneDescriptorSet;
