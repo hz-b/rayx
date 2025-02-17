@@ -3,6 +3,7 @@
 #include <chrono>
 #include <filesystem>
 
+#include "Beamline/Beamline.h"
 #include "CommandParser.h"
 #include "RAY-Core.h"
 #include "TerminalAppConfig.h"
