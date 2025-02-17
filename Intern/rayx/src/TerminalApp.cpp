@@ -203,19 +203,19 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
 }
 
 /**
- * @brief Get all beamline optical elemet names
+ * @brief Get all beamline optical element names
  *
  * @return std::vector<std::string> list of names
  */
 std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
     std::vector<std::string> names;
-    names.reserve(m_Beamline->m_DesignElements.size());
-
-    for (const auto& designElement : m_Beamline->m_DesignElements) {
-        names.push_back("name!");
-        // TODO find the actual names!
+    // getElements() returns a vector of pointers to DesignElement, traversing the entire tree.
+    auto elements = m_Beamline->getElements();
+    names.reserve(elements.size());
+    for (const auto elem : elements) {
+        // Assuming DesignElement provides a getName() method.
+        names.push_back(elem->getName());
     }
-
     return names;
 }
 
@@ -226,11 +226,11 @@ std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
  */
 std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
     std::vector<std::string> names;
-    names.reserve(m_Beamline->m_DesignSources.size());
-
-    for (const auto& lightSources : m_Beamline->m_DesignSources) {
-        names.push_back(lightSources.getName());
+    // getSources() returns a vector of pointers to DesignSource.
+    auto sources = m_Beamline->getSources();
+    names.reserve(sources.size());
+    for (const auto src : sources) {
+        names.push_back(src->getName());
     }
-
     return names;
 }
