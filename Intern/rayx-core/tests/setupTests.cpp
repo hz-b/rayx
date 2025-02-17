@@ -78,7 +78,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
+    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, 1, beamline.numElements() + 2);
 }
 
 std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
@@ -180,18 +180,20 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No) {
     auto beamline = loadBeamline(filename);
-    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, 1, beamline.m_DesignElements.size() + 2);
+    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, 1, beamline.numElements() + 2);
 
     std::vector<RAYX::Ray> out;
 
+    auto compiled = beamline.compileElements();
+
     for (auto ray_hist : hist) {
-        auto opt_ray = lastSequentialHit(ray_hist, beamline.m_DesignElements.size());
+        auto opt_ray = lastSequentialHit(ray_hist, beamline.numElements());
 
         if (opt_ray) {
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            double btype = beamline.m_DesignElements[elem].compile().m_behaviour.m_type;  // m_element.m_behaviour.m_type;
+            double btype = compiled[elem].m_behaviour.m_type;  // m_element.m_behaviour.m_type;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
             if (btype == BTYPE_IMAGE_PLANE || btype == BTYPE_SLIT) {
