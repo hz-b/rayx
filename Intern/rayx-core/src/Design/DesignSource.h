@@ -1,13 +1,26 @@
 #pragma once
 
+#include "Beamline/Node.h"
 #include "Shader/Ray.h"
 #include "Value.h"
 
 namespace RAYX {
 
-struct RAYX_API DesignSource {
+struct RAYX_API DesignSource : public BeamlineNode {
+    DesignSource() = default;
+    ~DesignSource() = default;
+    // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
+    DesignSource(const DesignSource& other) = delete;
+    DesignSource& operator=(const DesignSource& other) = delete;
+    // Allow move
+    DesignSource(DesignSource&& other) noexcept;
+    DesignSource& operator=(DesignSource&& other) noexcept;
+    // Allow intentional copies
+    std::unique_ptr<BeamlineNode> clone() const override;
+
     DesignMap m_elementParameters;
-    std::vector<Ray> compile(int thread_count) const;
+    std::vector<Ray> compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
+    bool isSource() const override { return true; }
 
     void setStokeslin0(double value);
     void setStokeslin45(double value);
@@ -88,11 +101,11 @@ struct RAYX_API DesignSource {
     void setNumberOfRays(double value);
     double getNumberOfRays() const;
 
-    void setWorldPosition(glm::dvec4 p);
-    glm::dvec4 getWorldPosition() const;
+    void setPosition(glm::dvec4 p);
+    glm::dvec4 getPosition() const override;
 
-    void setWorldOrientation(glm::dmat4x4 o);
-    glm::dmat4x4 getWorldOrientation() const;
+    void setOrientation(glm::dmat4x4 o);
+    glm::dmat4x4 getOrientation() const override;
 
     void setNumOfCircles(int value);
     int getNumOfCircles() const;

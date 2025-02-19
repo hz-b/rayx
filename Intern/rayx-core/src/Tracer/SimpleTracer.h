@@ -48,7 +48,7 @@ class SimpleTracer : public DeviceTracer {
   public:
     SimpleTracer(int deviceIndex);
 
-    BundleHistory trace(const Beamline&, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) override;
+    BundleHistory trace(const Group&, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) override;
 
   private:
     struct TraceResult {
@@ -69,7 +69,7 @@ class SimpleTracer : public DeviceTracer {
 
     /// BeamlineInput contains beamline data, that is constant across all batches
     struct BeamlineInput {
-        Buffer<Element> elements;
+        Buffer<OpticalElement> elements;
         Buffer<int> materialIndices;
         Buffer<double> materialData;
     } m_beamlineInput;
@@ -123,27 +123,21 @@ template <typename Acc>
 SimpleTracer<Acc>::SimpleTracer(int deviceIndex) : m_deviceIndex(deviceIndex) {}
 
 template <typename Acc>
-BundleHistory SimpleTracer<Acc>::trace(const Beamline& b, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) {
+BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "maxEvents: " << maxEvents;
 
     // don't trace if there are no optical elements
-    if (b.m_DesignElements.size() == 0) {
+    if (group.numElements() == 0) {
         // an empty history suffices, nothing is happening to the rays!
         BundleHistory result;
         return result;
     }
 
     // prepare input data
-    auto extractElements = [&b] {
-        std::vector<Element> elements;
-        elements.reserve(b.m_DesignElements.size());
-        for (const auto& e : b.m_DesignElements) elements.push_back(e.compile());
-        return elements;
-    };
-    const auto elements = extractElements();
-    const auto rays = b.getInputRays(getInputRaysThreadCount);
-    const auto materialTables = b.calcMinimalMaterialTables();
+    const auto elements = group.compileElements();
+    const auto rays = group.compileSources(getInputRaysThreadCount);
+    const auto materialTables = group.calcMinimalMaterialTables();
     const auto randomSeed = randomDouble();
 
     const auto cpu = getDevice<Cpu>(0);

@@ -19,89 +19,101 @@
 using RAYX::ElementType;
 
 void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
-    ElementType type = parser.type();
-
-    if (type == ElementType::ImagePlane) {
-        getImageplane(parser, de);
-    } else if (type == ElementType::ConeMirror) {
-        getCone(parser, de);
-    } else if (type == ElementType::CylinderMirror) {
-        getCylinder(parser, de);
-    } else if (type == ElementType::EllipsoidMirror) {
-        getEllipsoid(parser, de);
-    } else if (type == ElementType::ExpertsMirror) {
-        getExpertsOptics(parser, de);
-    } else if (type == ElementType::ParaboloidMirror) {
-        getParaboloid(parser, de);
-    } else if (type == ElementType::PlaneGrating) {
-        getPlaneGrating(parser, de);
-    } else if (type == ElementType::PlaneMirror) {
-        getPlaneMirror(parser, de);
-    } else if (type == ElementType::ReflectionZoneplate) {
-        getRZP(parser, de);
-    } else if (type == ElementType::Slit) {
-        getSlit(parser, de);
-    } else if (type == ElementType::SphereGrating) {
-        getSphereGrating(parser, de);
-    } else if (type == ElementType::Sphere) {
-        getSphereMirror(parser, de);
-    } else if (type == ElementType::SphereMirror) {
-        getSphereMirror(parser, de);
-    } else if (type == ElementType::ToroidMirror) {
-        getToroidMirror(parser, de);
-    } else if (type == ElementType::ToroidGrating) {
-        getToroidalGrating(parser, de);
-    } else {
-        RAYX_LOG << "could not classify beamline object with Name: " << parser.name()
-                 << "; Type: " << int(parser.type());  // TODO: write type as string not enum id
+    switch (parser.type()) {
+        case ElementType::ImagePlane:
+            getImageplane(parser, de);
+            break;
+        case ElementType::ConeMirror:
+            getCone(parser, de);
+            break;
+        case ElementType::CylinderMirror:
+            getCylinder(parser, de);
+            break;
+        case ElementType::EllipsoidMirror:
+            getEllipsoid(parser, de);
+            break;
+        case ElementType::ExpertsMirror:
+            getExpertsOptics(parser, de);
+            break;
+        case ElementType::ParaboloidMirror:
+            getParaboloid(parser, de);
+            break;
+        case ElementType::PlaneGrating:
+            getPlaneGrating(parser, de);
+            break;
+        case ElementType::PlaneMirror:
+            getPlaneMirror(parser, de);
+            break;
+        case ElementType::ReflectionZoneplate:
+            getRZP(parser, de);
+            break;
+        case ElementType::Slit:
+            getSlit(parser, de);
+            break;
+        case ElementType::SphereGrating:
+            getSphereGrating(parser, de);
+            break;
+        case ElementType::Sphere:
+        case ElementType::SphereMirror:
+            getSphereMirror(parser, de);
+            break;
+        case ElementType::ToroidMirror:
+            getToroidMirror(parser, de);
+            break;
+        case ElementType::ToroidGrating:
+            getToroidalGrating(parser, de);
+            break;
+        default:
+            RAYX_LOG << "Could not classify beamline object with Name: " << parser.name()
+                     << "; Type: " << static_cast<int>(parser.type());  // TODO: write type as string not enum id
+            break;
     }
 }
 
 namespace RAYX {
 
-void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, const std::vector<xml::Group>& group_context,
-                              std::filesystem::path filename) {
-    // the following three blocks of code are lambda expressions (see
-    // https://en.cppreference.com/w/cpp/language/lambda) They define functions
-    // to be used in the if-else-chain below to keep it structured and readable.
-
-    // //addLightSource(s, node) is a function adding a light source to the
-    // beamline (if it's not nullptr)
-
-    RAYX::xml::Parser parser(node, group_context, filename);
+void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::filesystem::path filename) {
+    RAYX::xml::Parser parser(node, filename);
     ElementType type = parser.type();
-    DesignSource ds;
-    ds.m_elementParameters = Map();
 
-    DesignElement de;
-    de.m_elementParameters = Map();
+    std::unique_ptr<DesignSource> ds = std::make_unique<DesignSource>();
+    ds->m_elementParameters = Map();
 
-    // Light sources have constructors that accept a const DesignObject& as argument.
-    // They use the param* functions declared in <Data/xml.h> to retrieve the relevant information.
-    if (type == ElementType::PointSource) {
-        setPointSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::MatrixSource) {
-        setMatrixSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::DipoleSource) {
-        setDipoleSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::DipoleSrc) {
-        setDipoleSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::PixelSource) {
-        setPixelSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::CircleSource) {
-        setCircleSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
-    } else if (type == ElementType::SimpleUndulatorSource) {
-        setSimpleUndulatorSource(parser, &ds);
-        beamline->m_DesignSources.push_back(ds);
+    std::unique_ptr<DesignElement> de = std::make_unique<DesignElement>();
+    de->m_elementParameters = Map();
+
+    bool isSource = true;
+    switch (type) {
+        case ElementType::PointSource:
+            setPointSource(parser, ds.get());
+            break;
+        case ElementType::MatrixSource:
+            setMatrixSource(parser, ds.get());
+            break;
+        case ElementType::DipoleSource:
+        case ElementType::DipoleSrc:
+            setDipoleSource(parser, ds.get());
+            break;
+        case ElementType::PixelSource:
+            setPixelSource(parser, ds.get());
+            break;
+        case ElementType::CircleSource:
+            setCircleSource(parser, ds.get());
+            break;
+        case ElementType::SimpleUndulatorSource:
+            setSimpleUndulatorSource(parser, ds.get());
+            break;
+        default:
+            isSource = false;
+            break;
+    }
+
+    // TODO: could likely be made nicer
+    if (isSource) {
+        group.addChild(std::move(ds));
     } else {
-        parseElement(parser, &de);
-        beamline->m_DesignElements.push_back(de);
+        parseElement(parser, de.get());
+        group.addChild(std::move(de));
     }
 }
 
@@ -110,29 +122,21 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Beamline* beamline, co
 // `collection` may either be a <beamline> or a <group>.
 // the group-context represents the stack of groups within which we currently are.
 // Whenever we look into a group, this group has to be pushed onto the group context stack. And when we are done, it will be popped again.
-void handleObjectCollection(rapidxml::xml_node<>* collection, Beamline* beamline, std::vector<xml::Group>* group_context,
-                            const std::filesystem::path& filename) {
+void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, const std::filesystem::path& filename) {
     // Iterating through XML objects
     for (rapidxml::xml_node<>* object = collection->first_node(); object; object = object->next_sibling()) {
         if (strcmp(object->name(), "object") == 0) {
-            // if it's an object, parse it.
-            addBeamlineObjectFromXML(object, beamline, *group_context, filename);
+            addBeamlineObjectFromXML(object, group, filename);
         } else if (strcmp(object->name(), "group") == 0) {
-            // if it's a group, add it: parse it and add it to the group context.
-            xml::Group g{};
-            bool success = xml::parseGroup(object, &g);
-            if (success) {
-                group_context->push_back(g);
-            } else {
+            auto groupOpt = xml::parseGroup(object);
+            if (!groupOpt) {
                 RAYX_EXIT << "parseGroup failed!";
             }
-            // recursively parse all objects from within the group.
-            handleObjectCollection(object, beamline, group_context, filename);
+            std::unique_ptr<Group> nestedGroup = std::make_unique<Group>(std::move(*groupOpt));
 
-            // "pop" the group stack.
-            if (success) {
-                group_context->pop_back();
-            }
+            // Recursively parse all objects from within the group.
+            handleObjectCollection(object, *nestedGroup, filename);
+            group.addChild(std::move(nestedGroup));
         } else if (strcmp(object->name(), "param") != 0) {
             RAYX_EXIT << "received weird object->name(): " << object->name();
         }
@@ -164,14 +168,14 @@ Beamline importBeamline(const std::filesystem::path& filename) {
     RAYX_VERB << "\t Version: " << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
 
-    Beamline beamline;
-    std::vector<xml::Group> group_context;
+    Group root;
 
     // go through all objects of the file, and parse them.
     // The group context stores the set of group in which the algorithm currently "is".
     // For each group we call handleObjectCollection recursively, and push the group onto the group context stack.
-    handleObjectCollection(xml_beamline, &beamline, &group_context, filename);
-    return beamline;
+    handleObjectCollection(xml_beamline, root, filename);
+
+    return root;
 }
 
 }  // namespace RAYX

@@ -1,13 +1,12 @@
 #pragma once
 
 #include <cstring>
+#include <vector>
 
 #include "Core.h"
 #include "Shader/InvocationState.h"
 
 namespace RAYX {
-
-class Beamline;
 
 /// Expresses whether we force sequential tracing, or we use dynamic tracing.
 /// We prefer this over a boolean, as calling eg. the trace function with an argument of `true` has no obvious meaning.
@@ -30,7 +29,7 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual BundleHistory trace(const Beamline&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, uint32_t maxEvents = 1) = 0;
+    virtual BundleHistory trace(const Group&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, uint32_t maxEvents = 1) = 0;
 
   protected:
     PushConstants m_pushConstants;

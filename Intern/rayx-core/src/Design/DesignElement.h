@@ -1,25 +1,38 @@
 #pragma once
 
 #include "Element/Element.h"
+#include "Beamline/Node.h"
 #include "Value.h"
 
 namespace RAYX {
 
-struct RAYX_API DesignElement {
+struct RAYX_API DesignElement : public BeamlineNode {
+    DesignElement() = default;
+    ~DesignElement() = default;
+    // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
+    DesignElement(const DesignElement& other) = delete;
+    DesignElement& operator=(const DesignElement& other) = delete;
+    // Allow move
+    DesignElement(DesignElement&& other) noexcept;
+    DesignElement& operator=(DesignElement&& other) noexcept;
+    // Allow intentional copies
+    std::unique_ptr<BeamlineNode> clone() const override;
+
     DesignMap m_elementParameters;
-    Element compile() const;
+    OpticalElement compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
 
     void setName(std::string s);
     void setType(ElementType s);
+    bool isElement() const override { return true; }
 
     std::string getName() const;
     ElementType getType() const;
 
-    void setWorldPosition(glm::dvec4 p);
-    glm::dvec4 getWorldPosition() const;
+    void setPosition(glm::dvec4 p);
+    glm::dvec4 getPosition() const override;
 
-    void setWorldOrientation(glm::dmat4x4 o);
-    glm::dmat4x4 getWorldOrientation() const;
+    void setOrientation(glm::dmat4x4 o);
+    glm::dmat4x4 getOrientation() const override;
 
     void setMisalignment(Misalignment m);
     Misalignment getMisalignment() const;

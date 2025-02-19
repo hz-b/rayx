@@ -35,7 +35,7 @@ struct RAYX_API InvState {
     std::span<const Ray> inputRays;
     std::span<Ray> outputRays;
     std::span<int> outputRayCounts;
-    std::span<const Element> elements;
+    std::span<const OpticalElement> elements;
     std::span<const int> matIdx;
     std::span<const double> mat;
 

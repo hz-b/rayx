@@ -42,16 +42,16 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
 }
 
 inline glm::dmat4x4 defaultInMatrix(const DesignElement& dele, DesignPlane plane) {
-    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), true, plane);
+    return calcTransformationMatrices(dele.getPosition(), dele.getOrientation(), true, plane);
 }
 
 inline glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plane) {
-    return calcTransformationMatrices(dele.getWorldPosition(), dele.getWorldOrientation(), false, plane);
+    return calcTransformationMatrices(dele.getPosition(), dele.getOrientation(), false, plane);
 }
 
 inline double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
 
-Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
+OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {
         cutout = dele.getCutout();
     }
@@ -59,7 +59,7 @@ Element makeElement(const DesignElement& dele, Behaviour behaviour, Surface surf
     auto inMat = defaultInMatrix(dele, plane);
     auto outMat = defaultOutMatrix(dele, plane);
 
-    return Element{
+    return OpticalElement{
         .m_inTrans = inMat,
         .m_outTrans = outMat,
         .m_behaviour = behaviour,
