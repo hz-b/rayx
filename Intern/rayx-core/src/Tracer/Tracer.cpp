@@ -53,8 +53,8 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-BundleHistory Tracer::trace(const Beamline& beamline, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT, uint32_t maxEvents) {
-    return m_deviceTracer->trace(beamline, sequential, max_batch_size, THREAD_COUNT, maxEvents);
+BundleHistory Tracer::trace(const Group& group, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT, uint32_t maxEvents) {
+    return m_deviceTracer->trace(group, sequential, max_batch_size, THREAD_COUNT, maxEvents);
 }
 
 /// Get the last event for each ray of the bundle.
@@ -75,8 +75,8 @@ BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
     return out;
 }
 
-int Tracer::defaultMaxEvents(const Beamline* beamline) {
-    if (beamline) return beamline->m_DesignElements.size() * 2 + 8;
+int Tracer::defaultMaxEvents(const Group* group) {
+    if (group) return group->numElements() * 2 + 8;
     return 32;
 }
 

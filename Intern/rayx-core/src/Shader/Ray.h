@@ -42,7 +42,7 @@ struct RAYX_API Ray {
     /// Is currently only set to a non-zero value by the RZP.
     double m_order;
 
-    /// the index of the last Element that this ray collided/interacted with.
+    /// the index of the last OpticalElement that this ray collided/interacted with.
     /// is initially set to -1 upon construction by the LightSources.
     double m_lastElement;
 

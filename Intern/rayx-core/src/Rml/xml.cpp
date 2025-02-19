@@ -9,6 +9,7 @@
 #include "Beamline/EnergyDistribution.h"
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
+#include "Beamline/Beamline.h"
 #include "Shader/Constants.h"
 #include "Element/Strings.h"
 
@@ -164,18 +165,16 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
 
 // loads the "raw" position without considering how the group context affects the position.
 // In other words, this is the position "within" the group.
-bool paramPositionNoGroup(const rapidxml::xml_node<>* node, glm::dvec4* out) {
-    if (!node || !out) {
-        return false;
+std::optional<glm::dvec4> paramPosition(const rapidxml::xml_node<>* node) {
+    if (!node) {
+        return std::nullopt;
     }
 
     glm::dvec3 position3;
     if (!xml::paramDvec3(node, "worldPosition", &position3)) {
-        return false;
+        return std::nullopt;
     }
-    *out = glm::dvec4(position3, 1);
-
-    return true;
+    return glm::dvec4(position3, 1);
 }
 
 std::filesystem::path Parser::parseEnergyDistributionFile() const {
@@ -198,21 +197,21 @@ std::filesystem::path Parser::parseEnergyDistributionFile() const {
     return combinedPath;
 }
 
-// analoguous to paramPositionNoGroup but for orientation.
-bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out) {
-    if (!node || !out) {
-        return false;
+// analoguous to paramPosition but for orientation.
+std::optional<glm::dmat4x4> paramOrientation(const rapidxml::xml_node<>* node) {
+    if (!node) {
+        return std::nullopt;
     }
 
     glm::dvec3 worldXdirection, worldYdirection, worldZdirection;
     if (!xml::paramDvec3(node, "worldXdirection", &worldXdirection)) {
-        return false;
+        return std::nullopt;
     }
     if (!xml::paramDvec3(node, "worldYdirection", &worldYdirection)) {
-        return false;
+        return std::nullopt;
     }
     if (!xml::paramDvec3(node, "worldZdirection", &worldZdirection)) {
-        return false;
+        return std::nullopt;
     }
 
 #ifdef RAYX_DEBUG_MODE
@@ -235,12 +234,13 @@ bool paramOrientationNoGroup(const rapidxml::xml_node<>* node, glm::dmat4x4* out
 
 #endif
 
-    (*out)[0] = glm::dvec4(worldXdirection, 0);
-    (*out)[1] = glm::dvec4(worldYdirection, 0);
-    (*out)[2] = glm::dvec4(worldZdirection, 0);
-    (*out)[3] = glm::dvec4(0, 0, 0, 1);
+    glm::dmat4x4 orientation;
+    orientation[0] = glm::dvec4(worldXdirection, 0);
+    orientation[1] = glm::dvec4(worldYdirection, 0);
+    orientation[2] = glm::dvec4(worldZdirection, 0);
+    orientation[3] = glm::dvec4(0, 0, 0, 1);
 
-    return true;
+    return orientation;
 }
 
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out) {
@@ -405,36 +405,6 @@ bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out
     return false;
 }
 
-// loads the *global* position and orientation, so incorporating the effect that the group context has on the position and orientation.
-bool paramPositionAndOrientation(const rapidxml::xml_node<>* node, const std::vector<xml::Group>& group_context, glm::dvec4* out_pos,
-                                 glm::dmat4x4* out_ori) {
-    Misalignment misalignment = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
-
-    // Always returns True!
-    paramPositionNoGroup(node, out_pos);
-    paramOrientationNoGroup(node, out_ori);
-    paramMisalignment(node, &misalignment);
-
-    // TODO: What do we want to do with misalignment?
-    // Currently, the world-position & world-orientation as given by the RML file already incorporates the misalignment.
-
-    // This was the old approach: We remove the misalignment from the position&orientation to obtain the non-misaligned position&orientation.
-
-    // glm::dmat4x4 misOrientation = getRotationMatrix(-misalignment.m_rotationXerror.rad, misalignment.m_rotationYerror.rad,
-    // misalignment.m_rotationZerror.rad); glm::dvec4 offset = glm::dvec4(misalignment.m_translationXerror, misalignment.m_translationYerror,
-    // misalignment.m_translationZerror, 1); *out_pos -= *out_ori * offset; *out_ori = *out_ori * glm::transpose(misOrientation); out_pos->w = 1;
-
-    if (!group_context.empty()) {
-        for (auto i = group_context.size(); i-- > 0;) {
-            *out_ori = group_context[i].m_orientation * *out_ori;
-            *out_pos = group_context[i].m_orientation * *out_pos;
-            *out_pos += group_context[i].m_position;  // this gives us w=2!
-            out_pos->w = 1;
-        }
-    }
-    return true;
-}
-
 bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
     if (!node || !out) {
         return false;
@@ -455,27 +425,31 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
     return materialFromString(str, out);
 }
 
-bool parseGroup(rapidxml::xml_node<>* node, xml::Group* out) {
-    // default initialization
-    out->m_position = glm::vec4(0, 0, 0, 1);
-    out->m_orientation = glm::dmat4x4();
-
-    if (strcmp(node->name(), "group") != 0) {
-        return false;
+std::optional<Group> parseGroup(rapidxml::xml_node<>* node) {
+    if (!node || (std::strcmp(node->name(), "group") != 0)) {
+        return std::nullopt;
     }
 
-    // no return-value checks are done, as groups don't need to alter
-    // position or orientation
-    paramPositionNoGroup(node, &out->m_position);
-    paramOrientationNoGroup(node, &out->m_orientation);
+    Group group;
 
-    return true;
+    if (auto position = paramPosition(node); position) {
+        group.setPosition(*position);
+    } else {
+        group.setPosition(glm::dvec4(0, 0, 0, 1));
+    }
+
+    if (auto orientation = paramOrientation(node); orientation) {
+        group.setOrientation(*orientation);
+    } else {
+        group.setOrientation(glm::dmat4(1));
+    }
+
+    return group;
 }
 
 // Parser implementation
 
-Parser::Parser(rapidxml::xml_node<>* node, std::vector<xml::Group> group_context, std::filesystem::path rmlFile)
-    : node(node), group_context(std::move(group_context)), rmlFile(std::move(rmlFile)) {}
+Parser::Parser(rapidxml::xml_node<>* node, std::filesystem::path rmlFile) : node(node), rmlFile(std::move(rmlFile)) {}
 
 const char* Parser::name() const { return node->first_attribute("name")->value(); }
 
@@ -551,21 +525,19 @@ EnergyDistribution Parser::parseEnergyDistribution() const {
 }
 
 glm::dvec4 Parser::parsePosition() const {
-    glm::dvec4 x;
-    glm::dmat4x4 y;
-    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
+    auto positionOpt = paramPosition(node);
+    if (!positionOpt) {
         RAYX_EXIT << "parsePosition failed";
     }
-    return x;
+    return *positionOpt;
 }
 
 glm::dmat4x4 Parser::parseOrientation() const {
-    glm::dvec4 x;
-    glm::dmat4x4 y;
-    if (!paramPositionAndOrientation(node, group_context, &x, &y)) {
+    auto orientationOpt = paramOrientation(node);
+    if (!orientationOpt) {
         RAYX_EXIT << "parseOrientation failed";
     }
-    return y;
+    return *orientationOpt;
 }
 
 Material Parser::parseMaterial() const {

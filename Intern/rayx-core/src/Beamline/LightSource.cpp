@@ -11,8 +11,8 @@ LightSource::LightSource(const DesignSource& dSource)
       m_EnergyDistribution(dSource.getEnergyDistribution()),
       m_numberOfRays(static_cast<uint32_t>(dSource.getNumberOfRays())),
       m_verDivergence(0.0),
-      m_orientation(dSource.getWorldOrientation()),
-      m_position(dSource.getWorldPosition()),
+      m_orientation(dSource.getOrientation()),
+      m_position(dSource.getPosition()),
       m_misalignmentParams(dSource.getMisalignment()) {}
 
 Misalignment LightSource::getMisalignmentParams() const { return m_misalignmentParams; }

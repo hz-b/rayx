@@ -6,25 +6,24 @@
 namespace RAYX {
 
 Surface makeSurface(const DesignElement& dele) {
-    auto surface = dele.getCurvatureType();
-    if (surface == CurvatureType::Plane) {
-        return makePlane();
-    } else if (surface == CurvatureType::Toroidal) {
-        return makeToroid(dele);
-    } else if (surface == CurvatureType::Spherical) {
-        return makeSphere(dele.getRadius());
-    } else if (surface == CurvatureType::RzpSphere) {
-        return makeSphere(dele.getLongRadius());
-    } else if (surface == CurvatureType::Cone) {
-        return makeCone(dele);
-    } else if (surface == CurvatureType::Cylinder) {
-        return makeCylinder(dele);
-    } else if (surface == CurvatureType::Ellipsoid) {
-        return makeEllipsoid(dele);
-    } else if (surface == CurvatureType::Paraboloid) {
-        return makeParaboloid(dele);
-    } else {
-        return serializePlaneXZ();
+    switch (dele.getCurvatureType()) {
+        case CurvatureType::Toroidal:
+            return makeToroid(dele);
+        case CurvatureType::Spherical:
+            return makeSphere(dele.getRadius());
+        case CurvatureType::RzpSphere:
+            return makeSphere(dele.getLongRadius());
+        case CurvatureType::Cone:
+            return makeCone(dele);
+        case CurvatureType::Cylinder:
+            return makeCylinder(dele);
+        case CurvatureType::Ellipsoid:
+            return makeEllipsoid(dele);
+        case CurvatureType::Paraboloid:
+            return makeParaboloid(dele);
+        case CurvatureType::Plane:
+        default:
+            return makePlane();
     }
 }
 
@@ -77,7 +76,7 @@ Surface makeCylinder(const DesignElement& dele) {
 }
 
 Surface makeCone(const DesignElement& dele) {
-    auto incidence = dele.getGrazingIncAngle();
+    RAYX::Rad incidence = dele.getGrazingIncAngle();
     double entranceArmLength = dele.getEntranceArmLength();
     double exitArmLength = dele.getExitArmLength();
 

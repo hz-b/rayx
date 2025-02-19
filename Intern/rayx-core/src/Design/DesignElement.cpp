@@ -1,27 +1,48 @@
 #include "DesignElement.h"
 
+#include <iostream>
+#include <memory>
+
 #include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {
 
-Element DesignElement::compile() const {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-    Surface surface;
-    Behaviour behav;
+DesignElement::DesignElement(DesignElement&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
+
+DesignElement& DesignElement::operator=(DesignElement&& other) noexcept {
+    m_elementParameters = std::move(other.m_elementParameters);
+    return *this;
+}
+
+std::unique_ptr<BeamlineNode> DesignElement::clone() const {
+    DesignElement clone;
+    clone.m_elementParameters = m_elementParameters.clone();
+    return std::make_unique<DesignElement>(std::move(clone));
+}
+
+OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dmat4& parentOri) const {
+    glm::dvec4 worldPos = parentOri * getPosition() + parentPos;
+    glm::dmat4 worldOri = parentOri * getOrientation();
+
+    // Create a temporary copy with world instead of local pos/ori
+    std::unique_ptr<BeamlineNode> de = this->clone();
+    DesignElement* dePtr = static_cast<DesignElement*>(de.get());
+    dePtr->setPosition(worldPos);
+    dePtr->setOrientation(worldOri);
 
     if (getType() == ElementType::ExpertsMirror) {
-        return makeElement(*this, serializeMirror(), makeQuadric(*this));
+        return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr));
     } else {
-        surface = makeSurface(*this);
-        behav = makeBehaviour(*this);
+        Surface surface = makeSurface(*dePtr);
+        Behaviour behavior = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
-            return makeElement(*this, behav, surface, {}, DesignPlane::XY);
+            return makeElement(*dePtr, behavior, surface, {}, DesignPlane::XY);
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*this, behav, surface, serializeUnlimited(), DesignPlane::XY);
+            return makeElement(*dePtr, behavior, surface, serializeUnlimited(), DesignPlane::XY);
         } else {
-            return makeElement(*this, behav, surface);
+            return makeElement(*dePtr, behavior, surface);
         }
     }
 }
@@ -32,59 +53,59 @@ void DesignElement::setType(ElementType s) { m_elementParameters["type"] = s; }
 std::string DesignElement::getName() const { return m_elementParameters["name"].as_string(); }
 ElementType DesignElement::getType() const { return m_elementParameters["type"].as_elementType(); }
 
-void DesignElement::setWorldPosition(glm::dvec4 p) {
-    m_elementParameters["worldPosition"] = Map();
-    m_elementParameters["worldPosition"]["x"] = p.x;
-    m_elementParameters["worldPosition"]["y"] = p.y;
-    m_elementParameters["worldPosition"]["z"] = p.z;
-    m_elementParameters["worldPosition"]["w"] = p.w;
+void DesignElement::setPosition(glm::dvec4 p) {
+    m_elementParameters["position"] = Map();
+    m_elementParameters["position"]["x"] = p.x;
+    m_elementParameters["position"]["y"] = p.y;
+    m_elementParameters["position"]["z"] = p.z;
+    m_elementParameters["position"]["w"] = p.w;
 }
 
-glm::dvec4 DesignElement::getWorldPosition() const {
+glm::dvec4 DesignElement::getPosition() const {
     glm::dvec4 d;
-    d[0] = m_elementParameters["worldPosition"]["x"].as_double();
-    d[1] = m_elementParameters["worldPosition"]["y"].as_double();
-    d[2] = m_elementParameters["worldPosition"]["z"].as_double();
+    d[0] = m_elementParameters["position"]["x"].as_double();
+    d[1] = m_elementParameters["position"]["y"].as_double();
+    d[2] = m_elementParameters["position"]["z"].as_double();
     d[3] = 0;
     return d;
 }
 
-void DesignElement::setWorldOrientation(glm::dmat4x4 o) {
-    m_elementParameters["worldXDirection"] = Map();
-    m_elementParameters["worldXDirection"]["x"] = o[0][0];
-    m_elementParameters["worldXDirection"]["y"] = o[0][1];
-    m_elementParameters["worldXDirection"]["z"] = o[0][2];
-    m_elementParameters["worldXDirection"]["w"] = o[0][3];
+void DesignElement::setOrientation(glm::dmat4x4 o) {
+    m_elementParameters["xDirection"] = Map();
+    m_elementParameters["xDirection"]["x"] = o[0][0];
+    m_elementParameters["xDirection"]["y"] = o[0][1];
+    m_elementParameters["xDirection"]["z"] = o[0][2];
+    m_elementParameters["xDirection"]["w"] = o[0][3];
 
-    m_elementParameters["worldYDirection"] = Map();
-    m_elementParameters["worldYDirection"]["x"] = o[1][0];
-    m_elementParameters["worldYDirection"]["y"] = o[1][1];
-    m_elementParameters["worldYDirection"]["z"] = o[1][2];
-    m_elementParameters["worldYDirection"]["w"] = o[1][3];
+    m_elementParameters["yDirection"] = Map();
+    m_elementParameters["yDirection"]["x"] = o[1][0];
+    m_elementParameters["yDirection"]["y"] = o[1][1];
+    m_elementParameters["yDirection"]["z"] = o[1][2];
+    m_elementParameters["yDirection"]["w"] = o[1][3];
 
-    m_elementParameters["worldZDirection"] = Map();
-    m_elementParameters["worldZDirection"]["x"] = o[2][0];
-    m_elementParameters["worldZDirection"]["y"] = o[2][1];
-    m_elementParameters["worldZDirection"]["z"] = o[2][2];
-    m_elementParameters["worldZDirection"]["w"] = o[2][3];
+    m_elementParameters["zDirection"] = Map();
+    m_elementParameters["zDirection"]["x"] = o[2][0];
+    m_elementParameters["zDirection"]["y"] = o[2][1];
+    m_elementParameters["zDirection"]["z"] = o[2][2];
+    m_elementParameters["zDirection"]["w"] = o[2][3];
 }
 
-glm::dmat4x4 DesignElement::getWorldOrientation() const {
+glm::dmat4x4 DesignElement::getOrientation() const {
     glm::dmat4x4 o;
 
-    o[0][0] = m_elementParameters["worldXDirection"]["x"].as_double();
-    o[0][1] = m_elementParameters["worldXDirection"]["y"].as_double();
-    o[0][2] = m_elementParameters["worldXDirection"]["z"].as_double();
+    o[0][0] = m_elementParameters["xDirection"]["x"].as_double();
+    o[0][1] = m_elementParameters["xDirection"]["y"].as_double();
+    o[0][2] = m_elementParameters["xDirection"]["z"].as_double();
     o[0][3] = 0;
 
-    o[1][0] = m_elementParameters["worldYDirection"]["x"].as_double();
-    o[1][1] = m_elementParameters["worldYDirection"]["y"].as_double();
-    o[1][2] = m_elementParameters["worldYDirection"]["z"].as_double();
+    o[1][0] = m_elementParameters["yDirection"]["x"].as_double();
+    o[1][1] = m_elementParameters["yDirection"]["y"].as_double();
+    o[1][2] = m_elementParameters["yDirection"]["z"].as_double();
     o[1][3] = 0;
 
-    o[2][0] = m_elementParameters["worldZDirection"]["x"].as_double();
-    o[2][1] = m_elementParameters["worldZDirection"]["y"].as_double();
-    o[2][2] = m_elementParameters["worldZDirection"]["z"].as_double();
+    o[2][0] = m_elementParameters["zDirection"]["x"].as_double();
+    o[2][1] = m_elementParameters["zDirection"]["y"].as_double();
+    o[2][2] = m_elementParameters["zDirection"]["z"].as_double();
     o[2][3] = 0;
 
     return o;

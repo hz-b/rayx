@@ -8,19 +8,17 @@
 namespace RAYX {
 
 Behaviour makeBehaviour(const DesignElement& dele) {
-    BehaviourType behave = dele.getBehaviourType();
-    if (behave == BehaviourType::Grating) {
-        return makeGrating(dele);
-    } else if (behave == BehaviourType::Mirror) {
-        return serializeMirror();
-    } else if (behave == BehaviourType::Rzp) {
-        return makeRZPBehaviour(dele);
-    } else if (behave == BehaviourType::Slit) {
-        return makeSlit(dele);
-    } else if (behave == BehaviourType::Mirror) {
-        return serializeMirror();
-    } else {
-        return serializeImagePlane();
+    switch (dele.getBehaviourType()) {
+        case BehaviourType::Grating:
+            return makeGrating(dele);
+        case BehaviourType::Mirror:
+            return serializeMirror();
+        case BehaviourType::Rzp:
+            return makeRZPBehaviour(dele);
+        case BehaviourType::Slit:
+            return makeSlit(dele);
+        default:
+            return serializeImagePlane();
     }
 }
 
