@@ -54,6 +54,10 @@ void Application::init() {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     m_CommandParser.analyzeCommands();
+    if (m_CommandParser.m_args.m_verbose) {
+        RAYX::setDebugVerbose(true);
+        RAYX_VERB << "Verbose logging enabled.";
+    }
     if (m_CommandParser.m_args.m_benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
