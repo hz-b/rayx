@@ -11,13 +11,11 @@ if(Vulkan_FOUND)
     project(rayx-ui VERSION ${RAYX_VERSION})
 
     set(IMGUI_DIR ../../Extern/imgui/)
-    set(GLFW_DIR ../../Extern/glfw/)
     set(GLM_DIR ../../Extern/glm/)
     set(STB_DIR ../../Extern/stb/)
-    add_subdirectory(${GLFW_DIR} binary_dir EXCLUDE_FROM_ALL)
 
     file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
-    set(IMGUI_SOURCES ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_demo.cpp ${IMGUI_DIR}/imgui_tables.cpp ${IMGUI_DIR}/imgui_widgets.cpp)
+    set(IMGUI_SOURCES ${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_demo.cpp ${IMGUI_DIR}/imgui_tables.cpp ${IMGUI_DIR}/imgui_widgets.cpp)
 
     add_executable(${PROJECT_NAME} ${SOURCE} ${IMGUI_SOURCES})
 
@@ -91,7 +89,7 @@ if(Vulkan_FOUND)
     # ----------------------
 
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 Vulkan::Vulkan portable_file_dialogs)
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 Vulkan::Vulkan portable_file_dialogs SDL3::SDL3)
     target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE 
         ${GLFW_DIR}/include
         ${GLFW_DIR}/deps
