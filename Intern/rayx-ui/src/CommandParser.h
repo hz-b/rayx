@@ -5,18 +5,10 @@
 
 class CommandParser {
   public:
-    // Default constructor
-    CommandParser() = default;
     // Custom constructor
     CommandParser(int _argc, char* const* _argv);
 
     ~CommandParser() = default;
-
-    /**
-     * @brief Set command restrictions here (for ex int intervals etc.)
-     *
-     */
-    void analyzeCommands() const;
 
     std::shared_ptr<CLI::App> m_cli11;
     // CLI Arguments
@@ -30,7 +22,6 @@ class CommandParser {
     } m_args;
 
   private:
-    int m_cli11_return;
     enum OptionType { BOOL, INT, STRING, BOOL_STRING, OPTIONAL_INT };
     struct Options {
         // CLI::Option cli11_option;

@@ -5,6 +5,8 @@
 #include <set>
 #include <unordered_set>
 
+#include <SDL3/SDL_vulkan.h>
+
 #include "Debug/Debug.h"
 
 // local callback functions (needs to have this signature to be passed to vulkan)
@@ -257,11 +259,10 @@ bool Device::checkValidationLayerSupport() const {
 }
 
 std::vector<const char*> Device::getRequiredExtensions() const {
-    uint32_t glfwExtensionCount = 0;
-    const char** glfwExtensions;
-    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    uint32_t sdl3ExtensionCount = 0;
+    auto sdl3Extensions = SDL_Vulkan_GetInstanceExtensions(&sdl3ExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+    std::vector<const char*> extensions(sdl3Extensions, sdl3Extensions + sdl3ExtensionCount);
 
     if (enableValidationLayers) {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

@@ -14,10 +14,10 @@ if(Vulkan_FOUND)
     set(GLM_DIR ../../Extern/glm/)
     set(STB_DIR ../../Extern/stb/)
 
-    file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
+    file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/**.cpp)
     set(IMGUI_SOURCES ${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_demo.cpp ${IMGUI_DIR}/imgui_tables.cpp ${IMGUI_DIR}/imgui_widgets.cpp)
 
-    add_executable(${PROJECT_NAME} ${SOURCE} ${IMGUI_SOURCES})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCE} ${IMGUI_SOURCES})
 
     if(MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE /W4)
@@ -80,19 +80,9 @@ if(Vulkan_FOUND)
     include(CPack)
     # -----------------
 
-    # ---- GLFW Options ----
-    option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" OFF)
-    option(GLFW_BUILD_TESTS "Build the GLFW test programs" OFF)
-    option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
-    option(GLFW_INSTALL "Generate installation target" OFF)
-    option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
-    # ----------------------
-
     # ---- Dependencies ----
-    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core glfw CLI11::CLI11 Vulkan::Vulkan portable_file_dialogs SDL3::SDL3)
+    target_link_libraries(${PROJECT_NAME} PRIVATE rayx-core CLI11::CLI11 Vulkan::Vulkan portable_file_dialogs SDL3::SDL3)
     target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE 
-        ${GLFW_DIR}/include
-        ${GLFW_DIR}/deps
         ${IMGUI_DIR}
         ${IMGUI_DIR}/backends
         ${GLM_DIR}
