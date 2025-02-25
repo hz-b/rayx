@@ -58,4 +58,4 @@ else()
 endif()
 
 add_subdirectory(alpaka)
-add_subdirectory(SDL)
+add_subdirectory(SDL EXCLUDE_FROM_ALL)

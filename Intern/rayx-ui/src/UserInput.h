@@ -1,30 +1,52 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
+#include <SDL3/SDL.h>
+
+// Forward declaration of the CameraController class.
+class CameraController;
 
 /**
- * @brief Callback for key presses and releases in a GLFW window.
- * @param window   Pointer to the GLFW window that received the event.
- * @param key      Key code of the key that was pressed or released.
- * @param scancode System-specific scancode of the key.
- * @param action   Action type (GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT).
- * @param mods     Bit field describing which modifier keys were held down.
+ * @brief Context for user input.
+ *
+ * Encapsulates parameters that might be needed for input processing.
  */
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+struct UserInputContext {
+    CameraController* camController;
+    bool isSceneWindowHovered;
+};
 
 /**
- * @brief Callback for mouse button presses and releases in a GLFW window.
- * @param window  Pointer to the GLFW window that received the event.
- * @param button  Mouse button that was pressed or released.
- * @param action  Action type (GLFW_PRESS or GLFW_RELEASE).
- * @param mods    Bit field describing which modifier keys were held down.
+ * @brief Handles keyboard events from SDL.
+ *
+ * Processes SDL_EVENT_KEY_DOWN and SDL_EVENT_KEY_UP events. The event is first forwarded to ImGui;
+ * if ImGui is not capturing keyboard input, this function performs camera and window control actions.
+ *
+ * @param window  Pointer to the SDL_Window.
+ * @param event   Pointer to the SDL_Event.
+ * @param context User input context containing the camera controller and hover state.
  */
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+void keyEventHandler(const SDL_Event* event, const UserInputContext& context);
 
 /**
- * @brief Callback for mouse cursor movement in a GLFW window.
- * @param window Pointer to the GLFW window that received the event.
- * @param xpos   X-coordinate of the cursor.
- * @param ypos   Y-coordinate of the cursor.
+ * @brief Handles mouse button events from SDL.
+ *
+ * Processes SDL_EVENT_MOUSE_BUTTON_DOWN and SDL_EVENT_MOUSE_BUTTON_UP events. The event is forwarded to ImGui;
+ * if ImGui is not capturing mouse input, the function manages camera control actions (for the right mouse button).
+ *
+ * @param window  Pointer to the SDL_Window.
+ * @param event   Pointer to the SDL_Event.
+ * @param context User input context containing the camera controller and hover state.
  */
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+void mouseButtonEventHandler(const SDL_Event* event, const UserInputContext& context);
+
+/**
+ * @brief Handles mouse motion events from SDL.
+ *
+ * Processes SDL_EVENT_MOUSE_MOTION events. The event is forwarded to ImGui;
+ * if ImGui is not capturing mouse input, the camera’s view direction is updated.
+ *
+ * @param window  Pointer to the SDL_Window.
+ * @param event   Pointer to the SDL_Event.
+ * @param context User input context containing the camera controller and hover state.
+ */
+void mouseMotionEventHandler(const SDL_Event* event, const UserInputContext& context);

@@ -1,6 +1,7 @@
 #include "Window.h"
 
 #include <stdexcept>
+#include <SDL3/SDL_vulkan.h>
 
 #include "Debug/Debug.h"
 
@@ -19,28 +20,25 @@ Window::Window(uint32_t width, uint32_t height, const char* title) {
     m_height = height;
     m_title = title;
 
-    glfwInit();
+    SDL_SetHint(SDL_HINT_WINDOWS_GAMEINPUT, "0");
+    SDL_Init(SDL_INIT_VIDEO);
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-    m_Window = glfwCreateWindow(m_width, m_height, m_title, nullptr, nullptr);
-    glfwSetWindowUserPointer(m_Window, this);
-    glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
+    m_Window = SDL_CreateWindow(title, width, height, SDL_WINDOW_VULKAN);
+    SDL_SetWindowResizable(m_Window, true);
+    // glfwSetWindowUserPointer(m_Window, this);
+    // glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
 }
 
-Window::~Window() {
-    glfwDestroyWindow(m_Window);
-    glfwTerminate();
-}
+Window::~Window() { SDL_Quit(); }
 
 /**
  * Callback function for when the framebuffer is resized. Sets the framebufferResized flag to true.
  * Resizes the window to the new framebuffer size.
  */
-void Window::framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height) {
-    auto window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(rawWindow));
+void Window::framebufferResizeCallback(SDL_Window* rawWindow, int width, int height) {
+    auto window = reinterpret_cast<Window*>(rawWindow);  // TODO: This...
     if (window) {
-        window->onFramebufferResize(width, height);
+        window->onFramebufferResize(width, height);  // TODO: and this is pretty weird
     } else {
         RAYX_EXIT << "Failed to get window pointer in framebuffer resize callback!";
     }
@@ -56,7 +54,7 @@ void Window::onFramebufferResize(int width, int height) {
  * Creates a Vulkan surface associated with the window.
  */
 void Window::createSurface(VkInstance instance, VkSurfaceKHR* surface) {
-    if (glfwCreateWindowSurface(instance, m_Window, nullptr, surface) != VK_SUCCESS) {
+    if (!SDL_Vulkan_CreateSurface(m_Window, instance, nullptr, surface)) {
         throw std::runtime_error("failed to create window surface!");
     }
 }

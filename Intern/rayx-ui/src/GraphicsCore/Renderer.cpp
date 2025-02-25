@@ -30,12 +30,7 @@ Renderer::~Renderer() {
 
 void Renderer::recreateSwapChain() {
     int width = 0, height = 0;
-    glfwGetFramebufferSize(m_Window.window(), &width, &height);
-    while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(m_Window.window(), &width, &height);
-        glfwWaitEvents();
-    }
-    vkDeviceWaitIdle(m_Device.device());
+    SDL_GetWindowSize(m_Window.window(), &width, &height);
 
     if (m_SwapChain == nullptr) {
         m_SwapChain = std::make_unique<SwapChain>(m_Device, VkExtent2D(width, height));

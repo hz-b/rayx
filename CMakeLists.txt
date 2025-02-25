@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # ---- Project ----
 project(RAYX VERSION 0.21.7)
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 20)
@@ -15,7 +18,16 @@ option(RAYX_REQUIRE_CUDA "If option 'RAYX_ENABLE_CUDA' is ON, this option will a
 option(RAYX_ENABLE_OPENMP "This option enables the search for OPENMP. Project will be compiled without openmp if not found." ON)
 option(RAYX_REQUIRE_OPENMP "If option 'RAYX_ENABLE_OPENMP' is ON, this option will add the requirement that openmp must be found." OFF)
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
+# ------------------
 
+
+# ---- Build options ----
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib/release)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib/release)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/debug)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib/debug)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib/debug)
 # ------------------
 
 # ---- Code Coverage ----
