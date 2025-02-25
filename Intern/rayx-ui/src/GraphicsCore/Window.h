@@ -1,7 +1,8 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
+#include <SDL3/SDL_main.h>
+
+#include <vulkan/vulkan.hpp>
 
 struct [[maybe_unused]] Extent2D {
     uint32_t width;

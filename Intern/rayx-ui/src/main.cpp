@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
     // Set locale to C to avoid issues with scanf
     std::setlocale(LC_NUMERIC, "C");
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include "CommandParser.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
