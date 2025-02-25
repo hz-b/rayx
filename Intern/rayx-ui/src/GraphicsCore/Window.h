@@ -1,7 +1,8 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
+#include <SDL3/SDL.h>
+
+#include <vulkan/vulkan.hpp>
 
 struct [[maybe_unused]] Extent2D {
     uint32_t width;
@@ -41,11 +42,8 @@ class Window {
      */
     void createSurface(VkInstance instance, VkSurfaceKHR* surface);
 
-    GLFWwindow* window() const { return m_Window; }
+    SDL_Window* window() const { return m_Window; }
     VkExtent2D getExtent() const { return {m_width, m_height}; }
-
-    bool shouldClose() const { return glfwWindowShouldClose(m_Window); }
-    bool isMinimized() const { return glfwGetWindowAttrib(m_Window, GLFW_ICONIFIED); }
 
     bool wasWindowResized() { return m_framebufferResized; }
     void resetWindowResizedFlag() { m_framebufferResized = false; }
@@ -57,7 +55,7 @@ class Window {
      * @param width The new width of the framebuffer.
      * @param height The new height of the framebuffer.
      */
-    static void framebufferResizeCallback(GLFWwindow* rawWindow, int width, int height);
+    static void framebufferResizeCallback(SDL_Window* rawWindow, int width, int height);
     void onFramebufferResize(int width, int height);
 
     uint32_t m_width;
@@ -65,5 +63,5 @@ class Window {
     bool m_framebufferResized = false;
     const char* m_title;
 
-    GLFWwindow* m_Window;
+    SDL_Window* m_Window;
 };

@@ -3,6 +3,8 @@
 #include <chrono>
 #include <future>
 
+#include <SDL3/SDL.h>
+
 #include "CanonicalizePath.h"
 #include "Colors.h"
 #include "Rml/Importer.h"
@@ -21,8 +23,6 @@
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
 
-bool isSceneWindowHovered = false;  // TODO: remove this global variable (doing this will require a refactor of the way we use glfw)
-
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
     : m_Window(width, height, name),                                   //
@@ -35,6 +35,14 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
       m_UIParams(m_CamController, m_Simulator.getAvailableDevices()),  //
       m_UIHandler(m_Window, m_Device, m_Renderer.getSwapChainImageFormat(), m_Renderer.getSwapChainDepthFormat(),
                   m_Renderer.getSwapChainImageCount()) {
+    init();
+}
+
+Application::~Application() = default;
+
+void Application::init() {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     m_GlobalDescriptorPool = DescriptorPool::Builder(m_Device)
                                  .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
                                  .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -44,24 +52,6 @@ Application::Application(uint32_t width, uint32_t height, const char* name, int 
                         .setMaxSets(1000)
                         .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
                         .build();
-
-    init();
-}
-
-Application::~Application() = default;
-
-void Application::init() {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
-    m_CommandParser.analyzeCommands();
-    if (m_CommandParser.m_args.m_verbose) {
-        RAYX::setDebugVerbose(true);
-        RAYX_VERB << "Verbose logging enabled.";
-    }
-    if (m_CommandParser.m_args.m_benchmark) {
-        RAYX_VERB << "Starting in Benchmark Mode.\n";
-        RAYX::BENCH_FLAG = true;
-    }
 
     std::string rmlPathCli = m_CommandParser.m_args.m_providedFile;
     UIRayInfo rayInfo{
@@ -77,150 +67,103 @@ void Application::init() {
     m_UIParams.updatePath(rmlPathCli);
     m_UIParams.rayInfo = rayInfo;
 
-    glfwSetKeyCallback(m_Window.window(), keyCallback);
-    glfwSetMouseButtonCallback(m_Window.window(), mouseButtonCallback);
-    glfwSetCursorPosCallback(m_Window.window(), cursorPosCallback);
-    glfwSetWindowUserPointer(m_Window.window(), &m_CamController);
-}
-
-void Application::run() {
+    // glfwSetKeyCallback(m_Window.window(), keyCallback);
+    // glfwSetMouseButtonCallback(m_Window.window(), mouseButtonCallback);
+    // glfwSetCursorPosCallback(m_Window.window(), cursorPosCallback);
     // Create UBOs (Uniform Buffer Object)
-    std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (auto& uboBuffer : uboBuffers) {
+    m_uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+    for (auto& uboBuffer : m_uboBuffers) {
         uboBuffer = std::make_unique<Buffer>(m_Device, "uboBuffer", sizeof(Camera), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         uboBuffer->map();
     }
 
-    auto globalSetLayout = DescriptorSetLayout::Builder(m_Device)
-                               .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
-                               .build();
-    std::vector<VkDescriptorSet> descriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (uint64_t i = 0; i < descriptorSets.size(); i++) {
-        auto bufferInfo = uboBuffers[i]->descriptorInfo();
-        DescriptorWriter(*globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(descriptorSets[i]);
+    // ? Should render systems handle their own descriptors?  Pool, set layout and sets are not really used outside apart from registering textures
+    m_globalSetLayout = DescriptorSetLayout::Builder(m_Device)
+                            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
+                            .build();
+    for (auto i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; i++) {
+        auto bufferInfo = m_uboBuffers[i]->descriptorInfo();
+        VkDescriptorSet set;
+        DescriptorWriter(*m_globalSetLayout, *m_GlobalDescriptorPool).writeBuffer(0, &bufferInfo).build(set);
+        m_descriptorSets.push_back(std::move(set));
     }
-    auto textureSetLayout =
+    m_textureSetLayout =
         DescriptorSetLayout::Builder(m_Device).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
     // Init render systems
-    GridRenderSystem gridRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
-    ObjectRenderSystem objectRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(),
-                                          {globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout()});
-    RayRenderSystem rayRenderSystem(m_Device, m_Renderer.getOffscreenRenderPass(), {globalSetLayout->getDescriptorSetLayout()});
+    m_gridRenderSystem = std::make_unique<GridRenderSystem>(m_Device,                             //
+                                                            m_Renderer.getOffscreenRenderPass(),  //
+                                                            std::vector{m_globalSetLayout->getDescriptorSetLayout()});
+    m_objectRenderSystem = std::make_unique<ObjectRenderSystem>(m_Device,                                                 //
+                                                                m_Renderer.getOffscreenRenderPass(),                      //
+                                                                std::vector{m_globalSetLayout->getDescriptorSetLayout(),  //
+                                                                            m_textureSetLayout->getDescriptorSetLayout()});
+    m_rayRenderSystem = std::make_unique<RayRenderSystem>(m_Device,                             //
+                                                          m_Renderer.getOffscreenRenderPass(),  //
+                                                          std::vector{m_globalSetLayout->getDescriptorSetLayout()});
 
-    auto currentTime = std::chrono::high_resolution_clock::now();
+    m_State = State::RunningWithoutScene;  // glfwSetWindowUserPointer(m_Window.window(), &m_CamController);
+}
 
-    std::future<void> beamlineFuture;
-    std::future<void> raysFuture;
-    std::future<void> buildRayCacheFuture;
-    std::future<void> simulationFuture;
-    std::future<std::vector<Scene::RenderObjectInput>> getRObjInputsFuture;
-    // Main loop
-    VkExtent2D sceneExtent = {1920, 1080};
-    m_State = State::RunningWithoutScene;
-    while (!m_Window.shouldClose()) {
-        // Skip rendering when minimized
-        if (m_Window.isMinimized()) {
-            continue;
+void Application::run() {
+    if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
+        if (m_UIParams.rmlReady) {
+            m_RMLPath = m_UIParams.rmlPath.string();
+            m_UIParams.beamlineInfo = {};
+            m_beamlineFuture = std::async(std::launch::async, &Application::loadBeamline, this, m_RMLPath);
+            m_State = State::LoadingBeamline;
+            m_UIParams.rmlReady = false;
         }
-        glfwPollEvents();
-
-        if (VkCommandBuffer commandBuffer = m_Renderer.beginFrame()) {
-            // Params to pass to UI
-            auto newTime = std::chrono::high_resolution_clock::now();
-            m_UIParams.frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
-            currentTime = newTime;
-
-            if (m_UIParams.rmlReady) {
-                m_RMLPath = m_UIParams.rmlPath.string();
-                m_UIParams.beamlineInfo = {};
-                beamlineFuture = std::async(std::launch::async, &Application::loadBeamline, this, m_RMLPath);
-                m_State = State::LoadingBeamline;
-                m_UIParams.rmlReady = false;
+        if (m_UIParams.runSimulation) {
+            if (m_UIParams.simulationSettingsReady) {
+                // open simulation dialog
+                m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo);
+                m_UIParams.simulationSettingsReady = false;
+                m_State = State::InitializeSimulation;
             }
-            if (m_UIParams.runSimulation) {
-                if (m_UIParams.simulationSettingsReady) {
-                    // open simulation dialog
-                    m_Simulator.setSimulationParameters(m_RMLPath, *m_Beamline, m_UIParams.simulationInfo);
-                    m_UIParams.simulationSettingsReady = false;
-                    m_State = State::InitializeSimulation;
-                }
-            }
+        }
 
-            switch (m_State) {
-                case State::LoadingBeamline:
-                    if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        // Clear existing rays and reset scene
-                        m_rays.clear();
-                        m_UIParams.rayInfo.raysLoaded = false;
-                        m_Scene = std::make_unique<Scene>(m_Device);
+        switch (m_State) {
+            case State::LoadingBeamline:
+                if (m_beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    // Clear existing rays and reset scene
+                    m_rays.clear();
+                    m_UIParams.rayInfo.raysLoaded = false;
+                    m_Scene = std::make_unique<Scene>(m_Device);
 
-                        // Update elements and sources for UI
-                        m_UIParams.beamlineInfo.beamline = m_Beamline.get();
+                    // Update elements and sources for UI
+                    m_UIParams.beamlineInfo.beamline = m_Beamline.get();
 
-                        // Prepare for ray loading or element preparation
-                        size_t numElements = m_Beamline->numElements();
-                        m_sortedRays.resize(numElements);
-                        if (m_UIParams.h5Ready) {
-                            raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, numElements);
-                            m_State = State::LoadingRays;
-                        } else {
-                            m_State = State::PrepareElements;
-                        }
-                    }
-                    break;
-
-                case State::InitializeSimulation:
-                    simulationFuture = std::async(std::launch::async, std::bind(&Simulator::runSimulation, &m_Simulator));
-                    m_State = State::Simulating;
-                    m_UIParams.runSimulation = false;
-                    break;
-
-                case State::Simulating:
-                    if (simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->numElements());
+                    // Prepare for ray loading or element preparation
+                    size_t numElements = m_Beamline->numElements();
+                    m_sortedRays.resize(numElements);
+                    if (m_UIParams.h5Ready) {
+                        m_raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, numElements);
                         m_State = State::LoadingRays;
+                    } else {
+                        m_State = State::PrepareElements;
                     }
-                    break;
-                case State::LoadingRays:
-                    if (beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready &&
-                        raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        // Wait for loadBeamline and loadRays to finish
-                        RAYX_VERB << "Loaded RML file: " << m_RMLPath;
-                        if (m_rays.size() == 0) {
-                            if (m_buildElementsNeeded) {
-                                m_buildTextureNeeded = true;
-                                m_State = State::PrepareElements;
-                            } else {
-                                m_State = State::Running;
-                                m_buildElementsNeeded = true;
-                            }
-                        } else {
-                            for (auto ray : m_rays) {
-                                size_t id = static_cast<size_t>(ray.back().m_lastElement);
-                                if (id > m_Beamline->numElements()) {
-                                    m_UIParams.showH5NotExistPopup = true;
-                                    break;
-                                }
-                            }
-                            if (m_UIParams.showH5NotExistPopup) {
-                                RAYX_VERB << "H5 file not compatible with RML file";
-                                m_State = State::RunningWithoutScene;
-                                break;
-                            }
+                }
+                break;
 
-                            RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
-                            // We do not need to check the future state here as the loop will not come back here until user interacts with UI again
-                            buildRayCacheFuture =
-                                std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
-                            m_State = State::BuildingRays;
-                        }
-                    }
-                    break;
-                case State::BuildingRays:
-                    if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, textureSetLayout, m_TexturePool);
-                        m_UIParams.rayInfo.raysLoaded = true;
+            case State::InitializeSimulation:
+                m_simulationFuture = std::async(std::launch::async, std::bind(&Simulator::runSimulation, &m_Simulator));
+                m_State = State::Simulating;
+                m_UIParams.runSimulation = false;
+                break;
+
+            case State::Simulating:
+                if (m_simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    m_raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->numElements());
+                    m_State = State::LoadingRays;
+                }
+                break;
+            case State::LoadingRays:
+                if (m_beamlineFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready &&
+                    m_raysFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    // Wait for loadBeamline and loadRays to finish
+                    RAYX_VERB << "Loaded RML file: " << m_RMLPath;
+                    if (m_rays.size() == 0) {
                         if (m_buildElementsNeeded) {
                             m_buildTextureNeeded = true;
                             m_State = State::PrepareElements;
@@ -228,94 +171,148 @@ void Application::run() {
                             m_State = State::Running;
                             m_buildElementsNeeded = true;
                         }
-                    }
-                    break;
-                case State::PrepareElements:
-                    // only start async task if one is not already running
-                    if (!getRObjInputsFuture.valid() ||
-                        (getRObjInputsFuture.valid() && getRObjInputsFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
-                        getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(*m_Beamline),
-                                                         m_sortedRays, m_buildTextureNeeded);
                     } else {
-                        RAYX_VERB << "Skipping PrepareElements, async task already running.";
-                    }
+                        for (auto ray : m_rays) {
+                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
+                            if (id > m_Beamline->numElements()) {
+                                m_UIParams.showH5NotExistPopup = true;
+                                break;
+                            }
+                        }
+                        if (m_UIParams.showH5NotExistPopup) {
+                            RAYX_VERB << "H5 file not compatible with RML file";
+                            m_State = State::RunningWithoutScene;
+                            break;
+                        }
 
-                    m_State = State::BuildingElements;
-                    break;
-                case State::BuildingElements:
-                    if (getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                        m_Scene->buildRObjectsFromInput(getRObjInputsFuture.get(), textureSetLayout, m_TexturePool, m_buildTextureNeeded);
-                        m_buildTextureNeeded = false;
-                        m_State = State::Running;
+                        RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
+                        // We do not need to check the future state here as the loop will not come back here until user interacts with UI again
+                        m_buildRayCacheFuture =
+                            std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                        m_State = State::BuildingRays;
                     }
-                    break;
-                case State::Running:
-                    break;
-                default:
-                    break;
-            }
-
-            if (m_UIParams.rayInfo.cacheChanged) {
-                // only start async task if one is not already running
-                if (buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    buildRayCacheFuture =
-                        std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
-                    m_UIParams.rayInfo.cacheChanged = false;
-                    m_State = State::BuildingRays;
                 }
-            }
+                break;
+            case State::BuildingRays:
+                if (m_buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    m_Scene->buildRaysRObject(*m_Beamline, m_UIParams.rayInfo, m_textureSetLayout, m_TexturePool);
+                    m_UIParams.rayInfo.raysLoaded = true;
+                    if (m_buildElementsNeeded) {
+                        m_buildTextureNeeded = true;
+                        m_State = State::PrepareElements;
+                    } else {
+                        m_State = State::Running;
+                        m_buildElementsNeeded = true;
+                    }
+                }
+                break;
+            case State::PrepareElements:
+                // only start async task if one is not already running
+                if (!m_getRObjInputsFuture.valid() ||
+                    (m_getRObjInputsFuture.valid() && m_getRObjInputsFuture.wait_for(std::chrono::seconds(0)) != std::future_status::ready)) {
+                    m_getRObjInputsFuture = std::async(std::launch::async, &Scene::getRObjectInputs, m_Scene.get(), std::ref(*m_Beamline),
+                                                       m_sortedRays, m_buildTextureNeeded);
+                } else {
+                    RAYX_VERB << "Skipping PrepareElements, async task already running.";
+                }
 
-            if (m_UIParams.rayInfo.raysChanged) {
-                m_State = State::BuildingRays;
-                m_UIParams.rayInfo.raysChanged = false;
-                m_buildElementsNeeded = false;
-                m_buildTextureNeeded = true;
-            }
-            if (m_UIParams.beamlineInfo.elementsChanged) {
-                m_State = State::PrepareElements;
-                m_UIParams.beamlineInfo.elementsChanged = false;
-            }
-
-            // Update UBO
-            uint32_t frameIndex = m_Renderer.getFrameIndex();
-            m_CamController.update(m_Camera, m_Renderer.getAspectRatio());
-            uboBuffers[frameIndex]->writeToBuffer(&m_Camera);
-
-            // Render
-            FrameInfo frameInfo = {
-                .camera = m_Camera,                          //
-                .frameIndex = frameIndex,                    //
-                .sceneExtent = m_UIParams.sceneExtent,       //
-                .commandBuffer = VK_NULL_HANDLE,             //
-                .descriptorSet = descriptorSets[frameIndex]  //
-            };
-            if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
-                m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
-                m_Renderer.offscreenDescriptorSetUpdate(*textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
-                sceneExtent = m_UIParams.sceneExtent;
-            }
-            m_Renderer.beginOffscreenRenderPass(frameInfo, m_UIHandler.getClearValue());
-            if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
-                objectRenderSystem.render(frameInfo, m_Scene->getRObjects());
-                if (m_UIParams.rayInfo.displayRays) rayRenderSystem.render(frameInfo, m_Scene->getRaysRObject());
-            }
-            gridRenderSystem.render(frameInfo, {});
-            m_Renderer.endOffscreenRenderPass(frameInfo);
-
-            m_Renderer.beginSwapChainRenderPass(commandBuffer);
-            // UI
-            m_UIHandler.beginUIRender();
-            m_UIHandler.setupUI(m_UIParams);
-            m_UIHandler.endUIRender(commandBuffer);
-
-            m_Renderer.endSwapChainRenderPass(commandBuffer);
-            m_Renderer.endFrame();
-        } else {
-            RAYX_LOG << "Failed to acquire swap chain image";
-            break;
+                m_State = State::BuildingElements;
+                break;
+            case State::BuildingElements:
+                if (m_getRObjInputsFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    m_Scene->buildRObjectsFromInput(m_getRObjInputsFuture.get(), m_textureSetLayout, m_TexturePool, m_buildTextureNeeded);
+                    m_buildTextureNeeded = false;
+                    m_State = State::Running;
+                }
+                break;
+            case State::Running:
+                break;
+            default:
+                break;
         }
+
+        if (m_UIParams.rayInfo.cacheChanged) {
+            // only start async task if one is not already running
+            if (m_buildRayCacheFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                m_buildRayCacheFuture =
+                    std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
+                m_UIParams.rayInfo.cacheChanged = false;
+                m_State = State::BuildingRays;
+            }
+        }
+
+        if (m_UIParams.rayInfo.raysChanged) {
+            m_State = State::BuildingRays;
+            m_UIParams.rayInfo.raysChanged = false;
+            m_buildElementsNeeded = false;
+            m_buildTextureNeeded = true;
+        }
+        if (m_UIParams.beamlineInfo.elementsChanged) {
+            m_State = State::PrepareElements;
+            m_UIParams.beamlineInfo.elementsChanged = false;
+        }
+
+        // Update UBO
+        uint32_t frameIndex = m_Renderer.getFrameIndex();
+        m_CamController.update(m_Camera, m_Renderer.getAspectRatio());
+        m_uboBuffers[frameIndex]->writeToBuffer(&m_Camera);
+
+        // Render
+        FrameInfo frameInfo = {
+            .camera = m_Camera,                            //
+            .frameIndex = frameIndex,                      //
+            .sceneExtent = m_UIParams.sceneExtent,         //
+            .commandBuffer = VK_NULL_HANDLE,               //
+            .descriptorSet = m_descriptorSets[frameIndex]  //
+        };
+        if (m_UIParams.sceneExtent.height != sceneExtent.height || m_UIParams.sceneExtent.width != sceneExtent.width) {
+            m_Renderer.resizeOffscreenResources(m_UIParams.sceneExtent);
+            m_Renderer.offscreenDescriptorSetUpdate(*m_textureSetLayout, *m_TexturePool, m_UIParams.sceneDescriptorSet);
+            sceneExtent = m_UIParams.sceneExtent;
+        }
+        m_Renderer.beginOffscreenRenderPass(frameInfo, m_UIHandler.getClearValue());
+        if (m_Scene && State::LoadingRays != m_State && m_State != State::InitializeSimulation && m_State != State::Simulating) {
+            m_objectRenderSystem->render(frameInfo, m_Scene->getRObjects());
+            if (m_UIParams.rayInfo.displayRays) m_rayRenderSystem->render(frameInfo, m_Scene->getRaysRObject());
+        }
+        m_gridRenderSystem->render(frameInfo, {});
+        m_Renderer.endOffscreenRenderPass(frameInfo);
+
+        m_Renderer.beginSwapChainRenderPass(commandBuffer);
+        // UI
+        m_UIHandler.beginUIRender();
+        m_UIHandler.setupUI(m_UIParams);
+        m_UIHandler.endUIRender(commandBuffer);
+
+        m_Renderer.endSwapChainRenderPass(commandBuffer);
+        m_Renderer.endFrame();
+    } else {
+        RAYX_LOG << "Failed to acquire swap chain image";
+        return;
     }
-    vkDeviceWaitIdle(m_Device.device());
+    vkDeviceWaitIdle(m_Device.device());  // TODO: check if necessary and if yes remove and find better solution
+}
+
+void Application::handleEvent(const SDL_Event* event) {
+    UserInputContext context = {
+        .camController = &m_CamController,
+        .isSceneWindowHovered = m_UIParams.isSceneWindowHovered,
+    };
+    switch (event->type) {
+        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_UP:
+            keyEventHandler(event, context);
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            mouseButtonEventHandler(event, context);
+            break;
+        case SDL_EVENT_MOUSE_MOTION:
+            mouseMotionEventHandler(event, context);
+            break;
+        default:
+            return;
+    }
 }
 
 void Application::loadRays(const std::filesystem::path& rmlPath, const size_t numElements) {

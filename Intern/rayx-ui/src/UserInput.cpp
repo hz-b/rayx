@@ -1,90 +1,110 @@
 #include "UserInput.h"
 
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
+#include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
+#include <SDL3/SDL_keycode.h>
 
 #include "Camera.h"
 
-extern bool isSceneWindowHovered;
+//------------------------------------------------------------------------------
+// keyEventHandler
+//------------------------------------------------------------------------------
+void keyEventHandler(const SDL_Event* event, const UserInputContext& context) {
+    // Process only keyboard events.
+    if (event->type != SDL_EVENT_KEY_DOWN && event->type != SDL_EVENT_KEY_UP) return;
 
-/**
- * This function handles various keyboard events including window manipulation and camera movement.
- * It integrates ImGui for GUI events and directly manipulates a CameraController object for 3D navigation.
- */
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+    // Forward the event to ImGui.
+    ImGui_ImplSDL3_ProcessEvent(event);
+
+    // If ImGui wants to capture keyboard input, do not process further.
     if (ImGui::GetIO().WantCaptureKeyboard) return;
 
-    auto camController = reinterpret_cast<CameraController*>(glfwGetWindowUserPointer(window));
+    // Get the camera controller from the context.
+    CameraController* camController = context.camController;
+    if (!camController) return;
 
-    // The movement speed factor
-    float speed = (mods & GLFW_MOD_SHIFT) ? 20.0f : 0.5f;
+    // Determine movement speed; holding shift yields faster movement.
+    Uint32 mod = event->key.mod;
+    float speed = (mod & SDL_KMOD_SHIFT) ? 50.0f : 2.0f;
 
-    // Quit
-    if (key == GLFW_KEY_ESCAPE) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
-    // Fullscreen
-    else if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
-        auto monitor = glfwGetPrimaryMonitor();
-        auto mode = glfwGetVideoMode(monitor);
-        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-    }
-    // Windowed
-    else if (key == GLFW_KEY_F10 && action == GLFW_PRESS) {
-        glfwSetWindowMonitor(window, nullptr, 100, 100, 1280, 720, 60);
-    }
-    // wasd movement (+ faster movement with shift)
-    if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-        camController->moveForward(speed);
-    } else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-        camController->moveForward(-speed);
-    } else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-        camController->moveSideways(-speed);
-    } else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-        camController->moveSideways(speed);
-    } else if (key == GLFW_KEY_Q && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-        camController->moveUp(-speed);
-    } else if (key == GLFW_KEY_E && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-        camController->moveUp(speed);
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.key) {
+            case SDLK_W:
+                camController->moveForward(speed);
+                break;
+            case SDLK_S:
+                camController->moveForward(-speed);
+                break;
+            case SDLK_A:
+                camController->moveSideways(-speed);
+                break;
+            case SDLK_D:
+                camController->moveSideways(speed);
+                break;
+            case SDLK_Q:
+                camController->moveUp(-speed);
+                break;
+            case SDLK_E:
+                camController->moveUp(speed);
+                break;
+            default:
+                break;
+        }
     }
 }
 
-/**
- * This function handles mouse button events, mainly focusing on the right mouse button for camera
- * control. It also checks if ImGui wants to capture the keyboard and mouse events.
- */
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-    if (ImGui::GetIO().WantCaptureKeyboard) return;
+//------------------------------------------------------------------------------
+// mouseButtonEventHandler
+//------------------------------------------------------------------------------
+void mouseButtonEventHandler(const SDL_Event* event, const UserInputContext& context) {
+    // Process only mouse button events.
+    if (event->type != SDL_EVENT_MOUSE_BUTTON_DOWN && event->type != SDL_EVENT_MOUSE_BUTTON_UP) return;
 
-    auto camController = reinterpret_cast<CameraController*>(glfwGetWindowUserPointer(window));
+    // Forward the event to ImGui.
+    ImGui_ImplSDL3_ProcessEvent(event);
 
-    if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-        if (action == GLFW_PRESS) {
-            if (!isSceneWindowHovered) return;
+    // If ImGui is capturing mouse events, do not process further.
+    if (ImGui::GetIO().WantCaptureMouse && !context.isSceneWindowHovered) return;
+
+    CameraController* camController = context.camController;
+    if (!camController) return;
+    // printf("Mouse hovers scene: %i\n", context.isSceneWindowHovered);
+
+    // Process only the right mouse button.
+    if (event->button.button == SDL_BUTTON_RIGHT) {
+        if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+            // Only start mouse look if the scene window is hovered.
+            if (!context.isSceneWindowHovered) return;
             camController->startMouseLook();
-            double mouseX, mouseY;
-            glfwGetCursorPos(window, &mouseX, &mouseY);
-            camController->setLastMousePos((float)mouseX, (float)mouseY);
-        } else if (action == GLFW_RELEASE) {
+
+            float mouseX, mouseY;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            camController->setLastMousePos(mouseX, mouseY);
+        } else if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
             camController->stopMouseLook();
         }
     }
 }
 
-/**
- * This function updates the direction of the camera when the mouse is moved. It also integrates
- * ImGui for cursor position callbacks.
- */
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-    ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
-    if (ImGui::GetIO().WantCaptureKeyboard) return;
+//------------------------------------------------------------------------------
+// mouseMotionEventHandler
+//------------------------------------------------------------------------------
+void mouseMotionEventHandler(const SDL_Event* event, const UserInputContext& context) {
+    // Process only mouse motion events.
+    if (event->type != SDL_EVENT_MOUSE_MOTION) return;
 
-    auto camController = reinterpret_cast<CameraController*>(glfwGetWindowUserPointer(window));
+    // Forward the event to ImGui.
+    ImGui_ImplSDL3_ProcessEvent(event);
 
+    // If ImGui is capturing mouse events, do not process further.
+    if (ImGui::GetIO().WantCaptureMouse && !context.isSceneWindowHovered) return;
+
+    CameraController* camController = context.camController;
+    if (!camController) return;
+
+    // Update the camera's direction if mouse look is active.
     if (camController->isMouseLooking()) {
-        camController->updateDirectionViaMouse((float)xpos, (float)ypos);
+        camController->updateDirectionViaMouse(static_cast<float>(event->motion.x), static_cast<float>(event->motion.y));
     }
 }
