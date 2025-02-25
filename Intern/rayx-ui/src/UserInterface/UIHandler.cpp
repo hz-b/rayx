@@ -1,7 +1,7 @@
 #include "UIHandler.h"
 
 #undef APIENTRY
-#include <imgui_impl_glfw.h>
+#include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
 #include <imgui_internal.h>
 #include <portable-file-dialogs.h>
@@ -125,7 +125,7 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
     initInfo.ImageCount = imageCount;
     initInfo.CheckVkResultFn = nullptr;
 
-    ImGui_ImplGlfw_InitForVulkan(m_Window.window(), true);
+    ImGui_ImplSDL3_InitForVulkan(m_Window.window());
     ImGui_ImplVulkan_Init(&initInfo);
 
     // Upload fonts
@@ -163,7 +163,7 @@ UIHandler::UIHandler(const Window& window, const Device& device, VkFormat imageF
 
 UIHandler::~UIHandler() {
     ImGui_ImplVulkan_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
     vkDestroyDescriptorPool(m_Device.device(), m_DescriptorPool, nullptr);
     vkDestroyRenderPass(m_Device.device(), m_RenderPass, nullptr);
@@ -171,7 +171,7 @@ UIHandler::~UIHandler() {
 
 void UIHandler::beginUIRender() {
     ImGui_ImplVulkan_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 }
 

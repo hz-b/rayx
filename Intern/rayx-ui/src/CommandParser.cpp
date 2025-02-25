@@ -2,6 +2,9 @@
 
 #include <cstring>
 
+#include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
+
 CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_shared<CLI::App>("for rayx-ui CLI")} {
     for (const std::pair<char, Options> option : m_ParserCommands) {
         // Full name string
@@ -32,13 +35,20 @@ CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_
     try {
         m_cli11->parse(_argc, _argv);
     } catch (const CLI::ParseError& e) {
-        m_cli11_return = m_cli11->exit(e);
+        int result = m_cli11->exit(e);
         if ((e.get_name() == "CallForHelp") || (e.get_name() == "CallForAllHelp"))
             exit(1);
         else
-            std::cout << "CLI ERROR" << m_cli11_return << " " << e.get_name();
+            std::cout << "CLI ERROR" << result << " " << e.get_name();
         exit(1);
     }
-}
 
-void CommandParser::analyzeCommands() const {}
+    if (m_args.m_verbose) {
+        RAYX::setDebugVerbose(true);
+        RAYX_VERB << "Verbose logging enabled.";
+    }
+    if (m_args.m_benchmark) {
+        RAYX_VERB << "Starting in Benchmark Mode.\n";
+        RAYX::BENCH_FLAG = true;
+    }
+}
