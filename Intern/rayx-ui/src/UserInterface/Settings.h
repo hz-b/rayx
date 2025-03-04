@@ -62,6 +62,7 @@ struct UIParameters {
     std::filesystem::path rmlPath;
     bool rmlReady;
     bool h5Ready;
+    bool isSceneWindowHovered = false;
     bool showH5NotExistPopup = false;
     float frameTime;
     UIRayInfo rayInfo;

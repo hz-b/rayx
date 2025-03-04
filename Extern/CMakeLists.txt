@@ -44,3 +44,4 @@ else()
 endif()
 
 add_subdirectory(alpaka)
+add_subdirectory(SDL)
