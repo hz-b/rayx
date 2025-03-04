@@ -23,6 +23,7 @@ Window::Window(uint32_t width, uint32_t height, const char* title) {
     SDL_Init(SDL_INIT_VIDEO);
 
     m_Window = SDL_CreateWindow(title, width, height, SDL_WINDOW_VULKAN);
+    SDL_SetWindowResizable(m_Window, true);
     // glfwSetWindowUserPointer(m_Window, this);
     // glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
 }

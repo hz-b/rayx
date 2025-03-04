@@ -14,8 +14,6 @@
 #include "Debug/Instrumentor.h"
 #include "RayProcessing.h"
 
-extern bool isSceneWindowHovered;
-
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {
         printf("%s\n", message);
@@ -274,7 +272,7 @@ void UIHandler::setupUI(UIParameters& uiParams) {
                          ImVec4(0, 0, 0, 0));
         }
     }
-    isSceneWindowHovered = ImGui::IsWindowHovered();
+    uiParams.isSceneWindowHovered = ImGui::IsWindowHovered();
     // ImGui::End();
 
     // Pop the style variable to restore default padding

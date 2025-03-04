@@ -43,6 +43,7 @@ class Application {
     Application& operator=(const Application&) = delete;
 
     void run();
+    void handleEvent(const SDL_Event* event);
 
   private:
     enum class State {

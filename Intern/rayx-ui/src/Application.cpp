@@ -3,6 +3,8 @@
 #include <chrono>
 #include <future>
 
+#include <SDL3/SDL.h>
+
 #include "CanonicalizePath.h"
 #include "Colors.h"
 #include "Rml/Importer.h"
@@ -17,10 +19,9 @@
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
 #include "Triangulation/GeometryUtils.h"
+#include "UserInput.h"
 #include "Writer/CSVWriter.h"
 #include "Writer/H5Writer.h"
-
-bool isSceneWindowHovered = false;  // TODO: remove this global variable (doing this will require a refactor of the way we use glfw)
 
 // --------- Start of Application code --------- //
 Application::Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv)
@@ -293,6 +294,28 @@ void Application::run() {
         return;
     }
     vkDeviceWaitIdle(m_Device.device());  // TODO: check if necessary and if yes remove and find better solution
+}
+
+void Application::handleEvent(const SDL_Event* event) {
+    UserInputContext context = {
+        .camController = &m_CamController,
+        .isSceneWindowHovered = m_UIParams.isSceneWindowHovered,
+    };
+    switch (event->type) {
+        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_UP:
+            keyEventHandler(m_Window.window(), event, context);
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            mouseButtonEventHandler(m_Window.window(), event, context);
+            break;
+        case SDL_EVENT_MOUSE_MOTION:
+            mouseMotionEventHandler(m_Window.window(), event, context);
+            break;
+        default:
+            return;
+    }
 }
 
 void Application::loadRays(const std::filesystem::path& rmlPath, const size_t numElements) {
