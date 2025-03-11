@@ -27,7 +27,7 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
     bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
 
     if (!withinOpening || withinBeamstop) {
-        recordFinalEvent(r, ETYPE_ABSORBED, inv);
+        recordFinalEvent(r, EventType::Absorbed, inv);
         return r;
     }
 
