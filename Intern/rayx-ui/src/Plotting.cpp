@@ -3,7 +3,7 @@
 #include "Debug/Instrumentor.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <glm.h>
+#include <glm.hpp>
 #include <stb_image_write.h>
 
 #include <array>

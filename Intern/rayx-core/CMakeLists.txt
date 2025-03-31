@@ -152,6 +152,9 @@ target_compile_definitions(${PROJECT_NAME}
     RAYX_PROJECT_DIR="${CMAKE_SOURCE_DIR}"
     $<$<CONFIG:Debug>:RAYX_DEBUG_MODE>
     $<$<CONFIG:RelWithDebInfo>:RAYX_DEBUG_MODE>
+    PUBLIC GLM_ENABLE_EXPERIMENTAL
+    PUBLIC GLM_FORCE_UNRESTRICTED_GENTYPE
+    PUBLIC GLM_FORCE_XYZW_ONLY
 )
 
 # Inform about the cuda and hip config of alpaka
