@@ -500,32 +500,24 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 RAYX_FN_ACC
-Collision findCollisionWith(Ray r, uint32_t id, InvState& inv) {
+Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict__ element, Rand& __restrict__ rand) {
     // misalignment
-    r = rayMatrixMult(r, inv.elements[id].m_inTrans);  // image plane is the x-y plane of the coordinate system
-    Collision col = findCollisionInElementCoords(r, inv.elements[id].m_surface, inv.elements[id].m_cutout, false);
+    r = rayMatrixMult(r, element.m_inTrans);  // image plane is the x-y plane of the coordinate system
+    Collision col = findCollisionInElementCoords(r, element.m_surface, element.m_cutout, false);
     if (col.found) {
-        col.elementIndex = int(id);
+        col.elementIndex = elementIndex;
     }
 
-    SlopeError sE = inv.elements[id].m_slopeError;
-    col.normal = applySlopeError(col.normal, sE, 0, inv);
+    SlopeError sE = element.m_slopeError;
+    col.normal = applySlopeError(col.normal, sE, 0, rand);
 
     return col;
 }
 
 // Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const Ray& ray, InvState& inv) {
-    // If sequential tracing is enabled, we only check collision with the "next element".
-    if (inv.pushConstants.sequential == 1.0) {
-        if (ray.m_lastElement >= inv.elements.size() - 1) {
-            Collision col;
-            col.found = false;
-            return col;
-        }
-        return findCollisionWith(ray, uint32_t(ray.m_lastElement + 1), inv);
-    }
+Collision findCollision(const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand) {
+    // TODO: add findCollision function for serial tracing
 
     // global coordinates of first intersection point of ray among all elements in beamline
     Collision best_col;
@@ -541,13 +533,14 @@ Collision findCollision(const Ray& ray, InvState& inv) {
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
     // Find intersection points through all elements
-    for (uint32_t elementIndex = 0; elementIndex < uint32_t(inv.elements.size()); elementIndex++) {
-        Collision current_col = findCollisionWith(r, elementIndex, inv);
+    for (int elementIndex = 0; elementIndex < numElements; elementIndex++) {
+        const auto& element = elements[elementIndex];
+        Collision current_col = findCollisionWith(r, elementIndex, element, rand);
         if (!current_col.found) {
             continue;
         }
 
-        glm::dvec3 global_hitpoint = glm::dvec3(inv.elements[elementIndex].m_outTrans * glm::dvec4(current_col.hitpoint, 1));
+        glm::dvec3 global_hitpoint = glm::dvec3(element.m_outTrans * glm::dvec4(current_col.hitpoint, 1));
         double current_dist = glm::length(global_hitpoint - ray.m_position);
 
         if (current_dist < best_dist) {
@@ -556,6 +549,7 @@ Collision findCollision(const Ray& ray, InvState& inv) {
         }
     }
 
+    _debug_assert(best_col.found && best_col.elementIndex >= 0 && best_col.elementIndex < numElements, "found collision, but element index is out of range!");
     return best_col;
 }
 

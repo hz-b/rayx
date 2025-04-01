@@ -1,7 +1,6 @@
 #include "Refrac.h"
 
-#include "EventType.h"
-#include "Helper.h"
+#include "Ray.h"
 
 namespace RAYX {
 
@@ -15,7 +14,7 @@ calculates refracted ray
 "ray beyond horizon"
 */
 RAYX_FN_ACC
-Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x, InvState& inv) {
+Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x) {
     // Rotation to fit collision normal to element normal (see Wiki)
     double eps1 = -glm::atan(normal.x / normal.y);
     double del1 = glm::asin(normal.z);
@@ -41,7 +40,7 @@ Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x, InvSt
         r.m_direction.z = z1;
         r.m_direction = inv_rot * r.m_direction;
     } else {  // beyond horizon - when divergence too large
-        recordFinalEvent(r, ETYPE_BEYOND_HORIZON, inv);
+        return terminateRay(r, ETYPE_BEYOND_HORIZON);
     }
     return r;
 }
