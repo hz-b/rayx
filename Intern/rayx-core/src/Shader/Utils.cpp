@@ -1,10 +1,6 @@
 #include "Utils.h"
 
 #include "Constants.h"
-#include "Helper.h"
-#include "InvocationState.h"
-#include "Rand.h"
-#include "RefractiveIndex.h"
 
 namespace RAYX {
 

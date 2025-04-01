@@ -2,7 +2,6 @@
 
 #include "Approx.h"
 #include "Constants.h"
-#include "InvocationState.h"
 #include "Rand.h"
 
 namespace RAYX {
@@ -51,7 +50,7 @@ zoneplates
     results stored in dphi, dpsi (inout)
 */
 RAYX_FN_ACC
-void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState& inv) {
+void bessel_diff(double radius, double wl, double& __restrict__ dphi, double& __restrict__ dpsi, Rand& __restrict__ rand) {
     double b = glm::abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -59,7 +58,7 @@ void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState&
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
         for (int i = 0; i < 3; i++) {
-            rn1[i] = squaresDoubleRNG(inv.ctr);
+            rn1[i] = rand.randomDouble();
         }
 
         dphi = rn1[0] * ximax;
@@ -75,8 +74,8 @@ void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState&
     }
 
     // 50% neg/pos sign
-    dphi = glm::sign(squaresDoubleRNG(inv.ctr) - 0.5) * dphi;
-    dpsi = glm::sign(squaresDoubleRNG(inv.ctr) - 0.5) * dpsi;
+    dphi = glm::sign(rand.randomDouble() - 0.5) * dphi;
+    dpsi = glm::sign(rand.randomDouble() - 0.5) * dpsi;
 }
 
 /**
@@ -87,7 +86,7 @@ void bessel_diff(double radius, double wl, double& dphi, double& dpsi, InvState&
  * @return result stored in dAngle
  */
 RAYX_FN_ACC
-void fraun_diff(double dim, double wl, double& dAngle, InvState& inv) {
+void fraun_diff(double dim, double wl, double& __restrict__ dAngle, Rand& __restrict__ rand) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
@@ -96,7 +95,7 @@ void fraun_diff(double dim, double wl, double& dAngle, InvState& inv) {
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
         for (int i = 0; i < 2; i++) {
-            rna[i] = squaresDoubleRNG(inv.ctr);
+            rna[i] = rand.randomDouble();
         }
         dAngle = (rna[0] - 0.5) * div;
         double u = PI * b * glm::sin(dAngle) / wl;

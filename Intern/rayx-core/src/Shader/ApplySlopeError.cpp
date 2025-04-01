@@ -66,14 +66,14 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FN_ACC
-glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, InvState& inv) {
+glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand& __restrict__ rand) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 
     // only calculate the random number if at least one slope error is not 0,
     // since the calculation is costly (sin, cos, log involved)
     if (slopeX != 0 || slopeZ != 0) {
-        double random_values[2] = {squaresNormalRNG(inv.ctr, 0, slopeX), squaresNormalRNG(inv.ctr, 0, slopeZ)};
+        double random_values[2] = {rand.randomDoubleNormalDistributed(0, slopeX), rand.randomDoubleNormalDistributed(0, slopeZ)};
 
         /*double x = random_values[0] * slopeX; // to get normal distribution
         from std.-norm. multiply by sigma (=slopeX) -> mu + x * sigma but mu=0
