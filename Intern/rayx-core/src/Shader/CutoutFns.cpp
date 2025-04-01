@@ -131,9 +131,7 @@ void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
     for (int i = 0; i < 4; i++) {
         double x = keypoints[i][0];
         double z = keypoints[i][2];
-        if (!inCutout(c2, x, z)) {
-            _throw("assertCutoutSubset failed!");
-        }
+        _assert(inCutout(c2, x, z), "assertCutoutSubset failed!");
     }
 }
 

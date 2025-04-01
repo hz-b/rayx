@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core.h"
 #include "Ray.h"
 
 namespace RAYX {
@@ -21,5 +20,18 @@ inline Ray RAYX_API rayMatrixMult(Ray r, const glm::dmat4 m) {
 
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FN_ACC double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal);
+
+RAYX_FN_ACC
+inline constexpr bool isRayActive(const double eventType) {
+    return eventType == ETYPE_EMITTED || eventType == ETYPE_JUST_HIT_ELEM;
+}
+
+RAYX_FN_ACC
+[[nodiscard]] inline constexpr Ray terminateRay(Ray r, const double eventType) {
+    _debug_warn(isRayActive(r.m_eventType), "ray about to be terminated, but ray is already terminated!");
+    _debug_assert(!isRayActive(eventType), "ray about to be terminated, but provided event type is not a valid termination event type!");
+    r.m_eventType = eventType;
+    return r;
+}
 
 }  // namespace RAYX
