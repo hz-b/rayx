@@ -113,6 +113,11 @@ Cutout DesignMap::as_cutout() const {
     throw std::runtime_error("as_cutout() called on non-cutout!");
 }
 
+CutoutType DesignMap::as_openingShape() const {
+    if (auto* x = std::get_if<CutoutType>(&m_variant)) return *x;
+    throw std::runtime_error("as_cutout() called on non-openingshape!");
+}
+
 CylinderDirection DesignMap::as_cylinderDirection() const {
     if (auto* x = std::get_if<CylinderDirection>(&m_variant)) return *x;
     throw std::runtime_error("as_cylinderDirection() called on non-cylinderDirection!");
