@@ -6,8 +6,7 @@
 #include "Element/Cutout.h"
 #include "InvocationState.h"
 #include "Ray.h"
-
-#define COLLISION_EPSILON 1e-6
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -26,10 +25,12 @@ struct RAYX_API Collision {
     bool found;
 };
 
+static_assert(std::is_trivially_copyable_v<Collision>);
+
 RAYX_FN_ACC Collision getQuadricCollision(Ray r, QuadricSurface q);
 RAYX_FN_ACC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
 RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
-RAYX_FN_ACC Collision findCollisionWith(Ray r, uint32_t id, InvState& inv);
-RAYX_FN_ACC Collision findCollision(const Ray& ray, InvState& inv);
+RAYX_FN_ACC Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict__ element, Rand& __restrict__ rand);
+RAYX_FN_ACC Collision findCollision(const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand);
 
 }  // namespace RAYX
