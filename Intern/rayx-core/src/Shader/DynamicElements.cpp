@@ -35,26 +35,26 @@ void dynamicElements(int gid, InvState& inv) {
         ray = rayMatrixMult(ray, nextElement.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        int btype = int(nextElement.m_behaviour.m_type);
+        auto behaveType = nextElement.m_behaviour.m_type;
 
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
         ray.m_lastElement = col.elementIndex;
 
-        switch (btype) {
-            case BTYPE_MIRROR:
+        switch (behaveType) {
+            case BehaveType::Mirror:
                 ray = behaveMirror(ray, col.elementIndex, col, inv);
                 break;
-            case BTYPE_GRATING:
+            case BehaveType::Grating:
                 ray = behaveGrating(ray, col.elementIndex, col, inv);
                 break;
-            case BTYPE_SLIT:
+            case BehaveType::Slit:
                 ray = behaveSlit(ray, col.elementIndex, col, inv);
                 break;
-            case BTYPE_RZP:
+            case BehaveType::RZP:
                 ray = behaveRZP(ray, col.elementIndex, col, inv);
                 break;
-            case BTYPE_IMAGE_PLANE:
+            case BehaveType::ImagePlane:
                 ray = behaveImagePlane(ray, col.elementIndex, col, inv);
                 break;
         }

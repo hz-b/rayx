@@ -30,7 +30,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
 
             RAYX::Ray ray = {
                 .m_position = pos,
-                .m_eventType = RAYX::ETYPE_UNINIT,
+                .m_eventType = RAYX::ETYPE_EMITTED,
                 .m_direction = dir,
                 .m_energy = 1.0f,
                 .m_field = field,

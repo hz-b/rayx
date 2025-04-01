@@ -41,11 +41,11 @@ Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
-        if (openingCutout.m_type == CTYPE_RECT) {
+        if (openingCutout.m_type == CutoutType::Rect) {
             RectCutout r = deserializeRect(openingCutout);
             fraun_diff(r.m_width, wavelength, dPhi, inv);
             fraun_diff(r.m_length, wavelength, dPsi, inv);
-        } else if (openingCutout.m_type == CTYPE_ELLIPTICAL) {
+        } else if (openingCutout.m_type == CutoutType::Elliptical) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
             bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, inv);
         } else {

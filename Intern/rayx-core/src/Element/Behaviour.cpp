@@ -36,12 +36,12 @@ Cutout mkOpeningCutout(const DesignElement& dele) {
 
     // This converts y (height) to z (length), as the RML file uses DesignPlane::XY for slits, whereas our model uses XZ.
 
-    if (shape == CTYPE_RECT) {
+    if (shape == CutoutType::Rect) {
         return serializeRect({
             .m_width = dele.getOpeningWidth(),
             .m_length = dele.getOpeningHeight(),
         });
-    } else if (shape == CTYPE_ELLIPTICAL) {  // elliptical
+    } else if (shape == CutoutType::Elliptical) {  // elliptical
         return serializeElliptical({
             .m_diameter_x = dele.getOpeningWidth(),
             .m_diameter_z = dele.getOpeningHeight(),
