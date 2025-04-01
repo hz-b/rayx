@@ -27,6 +27,7 @@ cmake-build-release/
 CMakeCache.txm
 cmake.check_cache
 imgui.ini
+*.h5
 
 # VSCode Debugger files
 results.json
