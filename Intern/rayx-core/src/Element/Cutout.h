@@ -9,15 +9,17 @@ namespace RAYX {
 // Cutout types:
 // a subset of points of the XZ-plane. used to limit the potentially infinite surfaces.
 // note that the first 3 need to be RECT; ELLIPTICAL; TRAPEZOID in order to be compatible with `geometricalShape` from Ray-UI.
-constexpr int CTYPE_RECT = 0;
-constexpr int CTYPE_ELLIPTICAL = 1;
-constexpr int CTYPE_TRAPEZOID = 2;
-constexpr int CTYPE_UNLIMITED = 3;
+enum class CutoutType {
+    Rect,
+    Elliptical,
+    Trapezoid,
+    Unlimited,
+};
 
 struct RAYX_API Cutout {
     // This types is one of the `CTYPE` constants.
     // It expresses what kind of Cutout this represents.
-    double m_type;
+    CutoutType m_type;
 
     // Parameters that hold information about the cutout.
     // What they mean depends on `m_type`.
@@ -38,7 +40,7 @@ struct RAYX_API RectCutout {
 RAYX_FN_ACC
 inline Cutout serializeRect(RectCutout cut) {
     Cutout ser;
-    ser.m_type = CTYPE_RECT;
+    ser.m_type = CutoutType::Rect;
     ser.m_private_serialization_params[0] = cut.m_width;
     ser.m_private_serialization_params[1] = cut.m_length;
     return ser;
@@ -69,7 +71,7 @@ struct RAYX_API EllipticalCutout {
 RAYX_FN_ACC
 inline Cutout serializeElliptical(EllipticalCutout cut) {
     Cutout ser;
-    ser.m_type = CTYPE_ELLIPTICAL;
+    ser.m_type = CutoutType::Elliptical;
     ser.m_private_serialization_params[0] = cut.m_diameter_x;
     ser.m_private_serialization_params[1] = cut.m_diameter_z;
     return ser;
@@ -101,7 +103,7 @@ struct RAYX_API TrapezoidCutout {
 RAYX_FN_ACC
 inline Cutout serializeTrapezoid(TrapezoidCutout cut) {
     Cutout ser;
-    ser.m_type = CTYPE_TRAPEZOID;
+    ser.m_type = CutoutType::Trapezoid;
     ser.m_private_serialization_params[0] = cut.m_widthA;
     ser.m_private_serialization_params[1] = cut.m_widthB;
     ser.m_private_serialization_params[2] = cut.m_length;
@@ -127,7 +129,7 @@ inline TrapezoidCutout deserializeTrapezoid(Cutout ser) {
 RAYX_FN_ACC
 inline Cutout serializeUnlimited() {
     Cutout ser;
-    ser.m_type = CTYPE_UNLIMITED;
+    ser.m_type = CutoutType::Unlimited;
     return ser;
 }
 

@@ -13,26 +13,26 @@ std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
     double width = 0.0;
     double length = 0.0;
 
-    switch (static_cast<int>(cutout.m_type)) {
-        case RAYX::CTYPE_RECT: {
+    switch (cutout.m_type) {
+        case RAYX::CutoutType::Rect: {
             RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
             width = rect.m_width;
             length = rect.m_length;
             break;
         }
-        case RAYX::CTYPE_ELLIPTICAL: {
+        case RAYX::CutoutType::Elliptical: {
             RAYX::EllipticalCutout ell = RAYX::deserializeElliptical(cutout);
             width = ell.m_diameter_x;   // Diameter is essentially the max width
             length = ell.m_diameter_z;  // Diameter is the max length
             break;
         }
-        case RAYX::CTYPE_TRAPEZOID: {
+        case RAYX::CutoutType::Trapezoid: {
             RAYX::TrapezoidCutout trap = RAYX::deserializeTrapezoid(cutout);
             width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
             length = trap.m_length;
             break;
         }
-        default: {  // RAYX::CTYPE_UNLIMITED and unknown types
+        default: {  // RAYX::CutoutType::Unlimited and unknown types
             return {50.0, 50.0};
             break;
         }
