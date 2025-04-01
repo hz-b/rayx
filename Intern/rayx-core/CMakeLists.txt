@@ -105,6 +105,7 @@ else()
 
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
     target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>)
+    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas="-v">) # print cuda device function properties
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")

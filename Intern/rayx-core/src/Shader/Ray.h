@@ -3,7 +3,8 @@
 #include <glm.hpp>
 
 #include "Core.h"
-#include "Efficiency.h"
+#include "ElectricField.h"
+#include "EventType.h"
 
 namespace RAYX {
 
