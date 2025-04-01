@@ -1,16 +1,8 @@
 #pragma once
 
-#include <glm.hpp>
-
-#include "Complex.h"
-#include "Constants.h"
-#include "Core.h"
+#include "ElectricField.h"
 
 namespace RAYX {
-
-using Stokes = glm::dvec4;
-using ElectricField = cvec3;
-using LocalElectricField = cvec2;
 
 struct FresnelCoeffs {
     double s;
@@ -101,6 +93,10 @@ inline cmat3 calcJonesMatrix(const ComplexFresnelCoeffs amplitude) {
 RAYX_FN_ACC
 inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::dvec3 reflectOrRefractVec, const glm::dvec3 normalVec,
                                       const ComplexFresnelCoeffs amplitude) {
+    // TODO: cross product is not numerically stable here, if indicentVec == reflectOrRefractVec 
+    // we dont need the lenght of the vector resulting from the cross product, but only the direciton.
+    // this may could be done by calculation angles instead of a vector.
+    // fixing this removes the check in interceptReflect, that specializes for normal incidence
     const auto s0 = glm::normalize(glm::cross(incidentVec, -normalVec));
     const auto s1 = s0;
     const auto p0 = glm::cross(incidentVec, s0);
@@ -140,73 +136,6 @@ inline ElectricField interceptReflect(const ElectricField incidentElectricField,
 
     const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
     return reflectElectricField;
-}
-
-RAYX_FN_ACC
-inline double intensity(const LocalElectricField field) {
-    const auto mag = complex::abs(field);
-    return glm::dot(mag, mag);
-}
-
-RAYX_FN_ACC
-inline double intensity(const ElectricField field) {
-    const auto mag = complex::abs(field);
-    return glm::dot(mag, mag);
-}
-
-RAYX_FN_ACC
-inline double intensity(const Stokes stokes) { return stokes.x; }
-
-RAYX_FN_ACC
-inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
-
-RAYX_FN_ACC
-inline Stokes fieldToStokes(const LocalElectricField field) {
-    const auto mag = complex::abs(field);
-    const auto theta = complex::arg(field);
-
-    return Stokes(mag.x * mag.x + mag.y * mag.y, mag.x * mag.x - mag.y * mag.y, 2.0 * mag.x * mag.y * glm::cos(theta.x - theta.y),
-                  2.0 * mag.x * mag.y * glm::sin(theta.x - theta.y));
-}
-
-RAYX_FN_ACC
-inline Stokes fieldToStokes(const ElectricField field) { return fieldToStokes(LocalElectricField(field)); }
-
-RAYX_FN_ACC
-inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
-    const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
-
-    const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
-    const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
-    const auto y = complex::polar(y_mag, y_theta);
-
-    return LocalElectricField({x_real, 0}, y);
-}
-
-RAYX_FN_ACC
-inline ElectricField stokesToElectricField(const Stokes stokes) { return ElectricField(stokesToLocalElectricField(stokes), complex::Complex(0, 0)); }
-
-RAYX_FN_ACC
-inline glm::dmat3 rotationMatrix(const glm::dvec3 forward) {
-    auto up = glm::dvec3(0, 1, 0);
-    glm::dvec3 right;
-
-    if (glm::abs(glm::dot(forward, up)) < .5) {
-        right = glm::normalize(glm::cross(forward, up));
-        up = glm::normalize(glm::cross(right, forward));
-    } else {
-        right = glm::dvec3(1, 0, 0);
-        up = glm::normalize(glm::cross(forward, right));
-        right = glm::normalize(glm::cross(forward, up));
-    }
-
-    return glm::dmat3(right, up, forward);
-}
-
-RAYX_FN_ACC
-inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) {
-    const auto right = glm::cross(forward, up);
-    return glm::dmat3(right, up, forward);
 }
 
 }  // namespace RAYX
