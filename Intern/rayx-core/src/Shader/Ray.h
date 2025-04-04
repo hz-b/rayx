@@ -20,10 +20,10 @@ struct RAYX_API Ray {
     glm::dvec3 m_position;
 
     /// The m_eventType expresses the kind of event of the previous event
-    /// Rays created may be initialized with ETYPE_EMITTED
-    /// When an intercept occours, the variable will be set accordingly, either to ETYPE_JUST_HIT_ELEM or to an error type.
+    /// Rays created may be initialized with EventType::Emitted
+    /// When an intercept occours, the variable will be set accordingly, either to EventType::HitElement or to an error type.
     /// See the potential values of `m_eventType` in `EventType.h`.
-    double m_eventType;
+    EventType m_eventType;
 
     /// The direction of the ray.
     /// The direction is normalized, so its L2 norm (aka length) is one.

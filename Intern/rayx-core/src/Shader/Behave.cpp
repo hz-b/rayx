@@ -26,7 +26,7 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict__ rand) {
     bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
 
     if (!withinOpening || withinBeamstop) {
-        return terminateRay(r, ETYPE_ABSORBED);
+        return terminateRay(r, EventType::Absorbed);
     }
 
     double phi;
@@ -129,7 +129,8 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
 }
 
 RAYX_FN_ACC Ray behaveImagePlane(Ray r) {
-    // return terminateRay(r, ETYPE_ABSORBED);
+    // TODO: should we add an option for image planes to absorb?
+    // return terminateRay(r, EventType::Absorbed);
     return r;
 }
 

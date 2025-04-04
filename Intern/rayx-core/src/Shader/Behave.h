@@ -15,7 +15,7 @@ namespace RAYX {
 /// The `behave*` functions, will
 /// - change the rays direction, typically by reflecting using the normal
 /// - change the rays stokes vector
-/// - potentially absorb the ray (by calling `recordFinalEvent(_, ETYPE_ABSORBED)`)
+/// - potentially absorb the ray (by calling `recordFinalEvent(_, EventType::Absorbed)`)
 
 RAYX_FN_ACC Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& rand);
 RAYX_FN_ACC Ray behaveRZP(Ray r, const Behaviour behaviour, Collision col, Rand& rand);

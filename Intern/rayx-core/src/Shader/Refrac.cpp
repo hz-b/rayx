@@ -10,7 +10,7 @@ calculates refracted ray
             normal: normal at intersection point of ray and element
             az: linedensity in z direction varied spacing for different collision angles is already considered
             ax: linedensity in x direction
-@returns: refracted ray (position unchanged, direction changed), weight = ETYPE_BEYOND_HORIZON if
+@returns: refracted ray (position unchanged, direction changed), weight = EventType::BeyondHorizon if
 "ray beyond horizon"
 */
 RAYX_FN_ACC
@@ -40,7 +40,7 @@ Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x) {
         r.m_direction.z = z1;
         r.m_direction = inv_rot * r.m_direction;
     } else {  // beyond horizon - when divergence too large
-        return terminateRay(r, ETYPE_BEYOND_HORIZON);
+        return terminateRay(r, EventType::BeyondHorizon);
     }
     return r;
 }
