@@ -37,10 +37,6 @@ extern char** GLOBAL_ARGV;
 
 const int PREC = 17;
 
-// declare invocation state globally
-// TODO(Sven): do we really need invocation state here, or just material tables individually?
-extern InvState inv;
-
 /// this is the underlying implementation of the CHECK_EQ macro.
 /// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.
 /// filename, line represents where CHECK_EQ is called.
@@ -210,4 +206,4 @@ void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);
 
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.
-void updateCpuTracerMaterialTables(std::vector<Material>);
+MaterialTables createMaterialTables(std::vector<Material>);

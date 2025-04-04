@@ -1,50 +1,35 @@
-// The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
 
 #pragma once
-
-#include <span>
 
 #include "Element/Element.h"
 #include "Ray.h"
 
 namespace RAYX {
 
-// Useful for GPU Tracing
-struct PushConstants {  // TODO(Jannis): PushConstants is not an expressive name. Rename to something like TracerConfig
-    double rayIdStart;
-    double numRays;
-    double randomSeed;
-    double maxEvents;
-    double sequential;
-};
+/// Expresses whether we force sequential tracing, or we use dynamic tracing.
+/// We prefer this over a boolean, as calling eg. the trace function with an argument of `true` has no obvious meaning.
+/// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
+enum class Sequential { No, Yes };
 
-struct _debug_struct {
-    glm::dmat4 _dMat;  // Can also be used as vectors or scalar
-};
-
-// we don't require forward declarations in GLSL, hence we only do them in C++:
-
-// TODO(Sven): restore RAYX_API attributes for members
+// The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
 struct RAYX_API InvState {
-    // these variables are only used during shader invocation
-    int globalInvocationId;
-    bool finalized;
-    uint64_t ctr;
-    uint64_t nextEventIndex;
+    int numRaysTotal;
+    int numRaysBatch;
+    int batchStartRayIndex;
+    int maxEvents;
+    double randomSeed;
+    Sequential sequential;
 
-    std::span<const Ray> inputRays;
-    std::span<Ray> outputRays;
-    std::span<int> outputRayCounts;
-    std::span<const OpticalElement> elements;
-    std::span<const int> matIdx;
-    std::span<const double> mat;
+    OpticalElement* elements;
+    int numElements;
+    int* materialIndices;
+    double* materialTables;
+    Ray* inputRays;
+};
 
-#ifdef RAYX_DEBUG_MODE
-    std::span<_debug_struct> d_struct;
-#endif
-
-    // TODO(Sven): make all inputs const
-    PushConstants pushConstants;
+struct RAYX_API OutputEvents {
+    Ray* events;
+    int* numEvents;
 };
 
 }  // namespace RAYX

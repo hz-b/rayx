@@ -41,13 +41,13 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict__ rand) {
     if (wavelength > 0) {
         if (openingCutout.m_type == CutoutType::Rect) {
             RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi, inv);
-            fraun_diff(r.m_length, wavelength, dPsi, inv);
+            fraun_diff(r.m_width, wavelength, dPhi, rand);
+            fraun_diff(r.m_length, wavelength, dPsi, rand);
         } else if (openingCutout.m_type == CutoutType::Elliptical) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
             bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, rand);
         } else {
-            _throw("encountered Slit with unsupported openingCutout");
+            _throw("encountered Slit with unsupported openingCutout: %d!", static_cast<int>(openingCutout.m_type));
         }
     }
 
@@ -129,7 +129,8 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
 }
 
 RAYX_FN_ACC Ray behaveImagePlane(Ray r) {
-    return terminateRay(r, ETYPE_ABSORBED);
+    // return terminateRay(r, ETYPE_ABSORBED);
+    return r;
 }
 
 }  // namespace RAYX

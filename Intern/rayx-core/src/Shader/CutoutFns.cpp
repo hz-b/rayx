@@ -7,9 +7,10 @@ namespace RAYX {
 // checks whether the point (x, z) is within the cutout.
 RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
-    if (cutout.m_type == CutoutType::Unlimited) {
+    switch (cutout.m_type) {
+    case CutoutType::Unlimited:
         return true;
-    } else if (cutout.m_type == CutoutType::Rect) {
+    case CutoutType::Rect: {
         RectCutout rect = deserializeRect(cutout);
         double x_min = -rect.m_width / 2.0;
         double x_max = rect.m_width / 2.0;
@@ -17,7 +18,8 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
         double z_max = rect.m_length / 2.0;
 
         return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-    } else if (cutout.m_type == CutoutType::Trapezoid) {
+    }
+    case CutoutType::Trapezoid: {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         // Check point is within the trapezoid
@@ -44,7 +46,8 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
         double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
         double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
         return l1 < 0 && l2 < 0;
-    } else if (cutout.m_type == CutoutType::Elliptical) {
+    }
+    case CutoutType::Elliptical: {
         EllipticalCutout ell = deserializeElliptical(cutout);
 
         double radius_x = ell.m_diameter_x / 2.0;
@@ -55,8 +58,9 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
 
         double rd2 = val1 * val1 + val2 * val2;
         return rd2 <= 1.0;
-    } else {
-        _throw("invalid cutout type in inCutout!");
+    }
+    default:
+        _throw("invalid cutout type in inCutout %d!", static_cast<int>(cutout.m_type));
         return false;
     }
 }

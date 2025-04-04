@@ -1229,17 +1229,17 @@ TEST_F(TestSuite, testGetAtomicMassAndRho) {
 }
 
 TEST_F(TestSuite, testPalik) {
-    auto mat = createMaterialTable({Material::Cu, Material::Au});
+    auto mat = createMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
     CHECK_EQ(getPalikEntryCount(Cu, mat.indices.data()), 324);
 
-    auto Cu0 = getPalikEntry(0, Cu, mat.indices.data(), mat.table.data());
+    auto Cu0 = getPalikEntry(0, Cu, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Cu0.m_energy, 1.0);
     CHECK_EQ(Cu0.m_n, 0.433);
     CHECK_EQ(Cu0.m_k, 8.46);
 
-    auto Cu10 = getPalikEntry(10, Cu, mat.indices.data(), mat.table.data());
+    auto Cu10 = getPalikEntry(10, Cu, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Cu10.m_energy, 2.3);
     CHECK_EQ(Cu10.m_n, 1.04);
     CHECK_EQ(Cu10.m_k, 2.59);
@@ -1247,30 +1247,30 @@ TEST_F(TestSuite, testPalik) {
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(getPalikEntryCount(Au, mat.indices.data()), 386);
 
-    auto Au0 = getPalikEntry(0, Au, mat.indices.data(), mat.table.data());
+    auto Au0 = getPalikEntry(0, Au, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Au0.m_energy, 0.04959);
     CHECK_EQ(Au0.m_n, 20.3);
     CHECK_EQ(Au0.m_k, 76.992);
 
-    auto Au10 = getPalikEntry(10, Au, mat.indices.data(), mat.table.data());
+    auto Au10 = getPalikEntry(10, Au, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Au10.m_energy, 0.11158);
     CHECK_EQ(Au10.m_n, 12.963);
     CHECK_EQ(Au10.m_k, 57.666);
 }
 
 TEST_F(TestSuite, testNff) {
-    auto mat = createMaterialTable({Material::Cu, Material::Au});
+    auto mat = createMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
     CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 504);
 
-    auto Cu0 = getNffEntry(0, Cu, mat.indices.data(), mat.table.data());
+    auto Cu0 = getNffEntry(0, Cu, mat.indices.data(), mat.materials.data());
 
     CHECK_EQ(Cu0.m_energy, 10.0);
     CHECK_EQ(Cu0.m_f1, -9999.0);
     CHECK_EQ(Cu0.m_f2, 1.30088);
 
-    auto Cu10 = getNffEntry(10, Cu, mat.indices.data(), mat.table.data());
+    auto Cu10 = getNffEntry(10, Cu, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Cu10.m_energy, 11.7404);
     CHECK_EQ(Cu10.m_f1, -9999.0);
     CHECK_EQ(Cu10.m_f2, 1.66946);
@@ -1278,33 +1278,33 @@ TEST_F(TestSuite, testNff) {
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(getNffEntryCount(Au, mat.indices.data()), 506);
 
-    auto Au0 = getNffEntry(0, Au, mat.indices.data(), mat.table.data());
+    auto Au0 = getNffEntry(0, Au, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Au0.m_energy, 10.0);
     CHECK_EQ(Au0.m_f1, -9999.0);
     CHECK_EQ(Au0.m_f2, 1.73645);
 
-    auto Au10 = getNffEntry(10, Au, mat.indices.data(), mat.table.data());
+    auto Au10 = getNffEntry(10, Au, mat.indices.data(), mat.materials.data());
     CHECK_EQ(Au10.m_energy, 11.7404);
     CHECK_EQ(Au10.m_f1, -9999.0);
     CHECK_EQ(Au10.m_f2, 2.67227);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {
-    auto mat = createMaterialTable({Material::Cu, Material::Au});
+    auto mat = createMaterialTables({Material::Cu, Material::Au});
 
     // vacuum
-    CHECK_EQ(getRefractiveIndex(42.0, -1, mat.indices.data(), mat.table.data()), glm::dvec2(1.0, 0.0));
+    CHECK_EQ(getRefractiveIndex(42.0, -1, mat.indices.data(), mat.materials.data()), glm::dvec2(1.0, 0.0));
 
     // palik tests for Cu
     // data taken from Data/PALIK
-    CHECK_EQ(getRefractiveIndex(1.0, 29, mat.indices.data(), mat.table.data()), glm::dvec2(0.433, 8.46));
-    CHECK_EQ(getRefractiveIndex(1.8, 29, mat.indices.data(), mat.table.data()), glm::dvec2(0.213, 4.05));
-    CHECK_EQ(getRefractiveIndex(1977.980, 29, mat.indices.data(), mat.table.data()), glm::dvec2(1.000032, 9.4646668E-05));
+    CHECK_EQ(getRefractiveIndex(1.0, 29, mat.indices.data(), mat.materials.data()), glm::dvec2(0.433, 8.46));
+    CHECK_EQ(getRefractiveIndex(1.8, 29, mat.indices.data(), mat.materials.data()), glm::dvec2(0.213, 4.05));
+    CHECK_EQ(getRefractiveIndex(1977.980, 29, mat.indices.data(), mat.materials.data()), glm::dvec2(1.000032, 9.4646668E-05));
 
     // nff tests for Cu
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
-    CHECK_EQ(getRefractiveIndex(25146.2, 29, mat.indices.data(), mat.table.data()), glm::dvec2(1.0, 1.0328e-7), 1e-5);
+    CHECK_EQ(getRefractiveIndex(25146.2, 29, mat.indices.data(), mat.materials.data()), glm::dvec2(1.0, 1.0328e-7), 1e-5);
 }
 
 TEST_F(TestSuite, testBesselDipole) {
