@@ -35,7 +35,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
         ray.m_lastElement = col.elementIndex;
-        ray.m_eventType = ETYPE_JUST_HIT_ELEM;
+        ray.m_eventType = EventType::HitElement;
 
         switch (behaviour.m_type) {
             case BehaveType::Mirror:

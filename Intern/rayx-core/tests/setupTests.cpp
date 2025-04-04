@@ -56,7 +56,7 @@ RAYX::Ray parseCSVline(std::string line) {
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
-    ray.m_eventType = -1;
+    ray.m_eventType = EventType::Uninitialized;
     ray.m_lastElement = -1;
     ray.m_order = -1;
 
@@ -85,13 +85,13 @@ std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
     std::vector<RAYX::Ray> outs;
     for (auto rr : hist) {
         Ray out;
-        out.m_eventType = ETYPE_UNINIT;
+        out.m_eventType = EventType::Uninitialized;
         for (auto r : rr) {
-            if (r.m_eventType == ETYPE_JUST_HIT_ELEM) {
+            if (r.m_eventType == EventType::HitElement) {
                 out = r;
             }
         }
-        if (out.m_eventType != ETYPE_UNINIT) {
+        if (out.m_eventType != EventType::Uninitialized) {
             outs.push_back(out);
         }
     }

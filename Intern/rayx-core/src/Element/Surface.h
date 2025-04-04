@@ -9,13 +9,15 @@ namespace RAYX {
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTYPE
 // constants)
-constexpr int STYPE_QUADRIC = 0;
-constexpr int STYPE_TOROID = 1;
-constexpr int STYPE_PLANE_XZ = 2;
-constexpr int STYPE_CUBIC = 3;
+enum class SurfaceType {
+    Quadric,
+    Toroid,
+    PlaneXZ,
+    Cubic,
+};
 
 struct Surface {
-    double m_type;
+    SurfaceType m_type;
 
     // These params are private. use the serialize & deserialize functions below instead.
     double m_private_serialization_params[32];
@@ -55,7 +57,7 @@ struct QuadricSurface {
 RAYX_FN_ACC
 inline Surface serializeQuadric(QuadricSurface surface) {
     Surface ser;
-    ser.m_type = STYPE_QUADRIC;
+    ser.m_type = SurfaceType::Quadric;
     ser.m_private_serialization_params[0] = double(surface.m_icurv);
     ser.m_private_serialization_params[1] = surface.m_a11;
     ser.m_private_serialization_params[2] = surface.m_a12;
@@ -104,7 +106,7 @@ struct ToroidSurface {
 RAYX_FN_ACC
 inline Surface serializeToroid(ToroidSurface surface) {
     Surface ser;
-    ser.m_type = STYPE_TOROID;
+    ser.m_type = SurfaceType::Toroid;
     ser.m_private_serialization_params[0] = surface.m_longRadius;
     ser.m_private_serialization_params[1] = surface.m_shortRadius;
     ser.m_private_serialization_params[2] = surface.m_toroidType;
@@ -129,7 +131,7 @@ inline ToroidSurface deserializeToroid(Surface ser) {
 RAYX_FN_ACC
 inline Surface serializePlaneXZ() {
     Surface ser;
-    ser.m_type = STYPE_PLANE_XZ;
+    ser.m_type = SurfaceType::PlaneXZ;
     return ser;
 }
 
@@ -163,7 +165,7 @@ struct CubicSurface {
 RAYX_FN_ACC
 inline Surface serializeCubic(CubicSurface surface) {
     Surface ser;
-    ser.m_type = STYPE_CUBIC;
+    ser.m_type = SurfaceType::Cubic;
     ser.m_private_serialization_params[0] = double(surface.m_icurv);
     ser.m_private_serialization_params[1] = surface.m_a11;
     ser.m_private_serialization_params[2] = surface.m_a12;

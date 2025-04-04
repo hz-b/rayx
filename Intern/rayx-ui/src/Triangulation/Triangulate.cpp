@@ -443,12 +443,12 @@ bool isPlanar(const RAYX::QuadricSurface& q) {
  */
 void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
-    switch (static_cast<int>(compiled.m_surface.m_type)) {
-        case RAYX::STYPE_PLANE_XZ: {
+    switch (compiled.m_surface.m_type) {
+        case RAYX::SurfaceType::PlaneXZ: {
             planarTriangulation(compiled, vertices, indices);
             break;
         }
-        case RAYX::STYPE_QUADRIC: {
+        case RAYX::SurfaceType::Quadric: {
             RAYX::QuadricSurface q = deserializeQuadric(compiled.m_surface);
             if (isPlanar(q)) {
                 planarTriangulation(compiled, vertices, indices);
@@ -457,12 +457,12 @@ void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureV
             }
             break;
         }
-        case RAYX::STYPE_TOROID: {
+        case RAYX::SurfaceType::Toroid: {
             traceTriangulation(compiled, vertices, indices);
             break;
         }
         default:
-            RAYX_EXIT << "Unknown element type: " << compiled.m_surface.m_type;
+            RAYX_EXIT << "Unknown element type: " << static_cast<int>(compiled.m_surface.m_type);
             break;
     }
 }
