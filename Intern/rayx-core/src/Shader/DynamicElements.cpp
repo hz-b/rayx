@@ -2,28 +2,23 @@
 
 #include "Behave.h"
 #include "Collision.h"
-#include "EventType.h"
-#include "Helper.h"
 #include "Utils.h"
 
 namespace RAYX {
 
 RAYX_FN_ACC
-void dynamicElements(int gid, InvState& inv) {
-    // initializes the global state.
-    inv.globalInvocationId = gid;
-    init(inv);
-
-    Ray ray = inv.inputRays[gid];
-
-    OpticalElement nextElement;
-    // at the end of this function we apply inTrans, if no collision happened (i.e. nextElement undefined), we want this to do nothing.
-    nextElement.m_inTrans = glm::dmat4(1);
-    nextElement.m_outTrans = glm::dmat4(1);
+void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEvents) {
+    auto ray = inv.inputRays[gid];
+    auto rand = Rand(gid + inv.batchStartRayIndex, inv.numRaysTotal, inv.randomSeed);
 
     // Iterate through all bounces
-    while (true) {
-        Collision col = findCollision(ray, inv);
+    int numEvents = 0;
+    for (int i = 0; i < inv.maxEvents; numEvents = ++i) {
+        // the ray might finalize due to being absorbed, or because an error occured while tracing!
+        if (!isRayActive(ray.m_eventType))
+            break;
+
+        Collision col = findCollision(i, inv.sequential, ray, inv.elements, inv.numElements, rand);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
@@ -31,49 +26,44 @@ void dynamicElements(int gid, InvState& inv) {
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
-        nextElement = inv.elements[col.elementIndex];
-        ray = rayMatrixMult(ray, nextElement.m_inTrans);
+        const auto element = inv.elements[col.elementIndex];
+        ray = rayMatrixMult(ray, element.m_inTrans);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        auto behaveType = nextElement.m_behaviour.m_type;
+        const auto behaviour = element.m_behaviour;
 
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
         ray.m_lastElement = col.elementIndex;
+        ray.m_eventType = ETYPE_JUST_HIT_ELEM;
 
-        switch (behaveType) {
+        switch (behaviour.m_type) {
             case BehaveType::Mirror:
-                ray = behaveMirror(ray, col.elementIndex, col, inv);
+                ray = behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
                 break;
             case BehaveType::Grating:
-                ray = behaveGrating(ray, col.elementIndex, col, inv);
+                ray = behaveGrating(ray, behaviour, col);
                 break;
             case BehaveType::Slit:
-                ray = behaveSlit(ray, col.elementIndex, col, inv);
+                ray = behaveSlit(ray, behaviour, rand);
                 break;
             case BehaveType::RZP:
-                ray = behaveRZP(ray, col.elementIndex, col, inv);
+                ray = behaveRZP(ray, behaviour, col, rand);
                 break;
             case BehaveType::ImagePlane:
-                ray = behaveImagePlane(ray, col.elementIndex, col, inv);
+                ray = behaveImagePlane(ray);
                 break;
         }
 
-        // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (inv.finalized) {
-            break;
-        }
-
-        recordEvent(ray, ETYPE_JUST_HIT_ELEM, inv);
+        // write ray in local element coordinates to global memory
+        outputEvents.events[gid*inv.maxEvents + i] = ray;
 
         // transform back to WORLD coordinates
-        ray = rayMatrixMult(ray, nextElement.m_outTrans);
+        ray = rayMatrixMult(ray, element.m_outTrans);
     }
 
     // store recorded events count
-    auto eventsCount = static_cast<int>(inv.nextEventIndex);
-    eventsCount = std::max(0, std::min(static_cast<int>(inv.pushConstants.maxEvents), eventsCount));
-    inv.outputRayCounts[gid] = eventsCount;
+    outputEvents.numEvents[gid] = numEvents;
 }
 
 }  // namespace RAYX

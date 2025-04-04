@@ -2,6 +2,7 @@
 
 #include "Collision.h"
 
+#include "InvocationState.h"
 #include "ApplySlopeError.h"
 #include "Cubic.h"
 #include "CutoutFns.h"
@@ -448,11 +449,12 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
 
 RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
-    // RAYX_PROFILE_FUNCTION_STDOUT();
-    double sty = surface.m_type;
+    const auto sty = static_cast<int>(surface.m_type);
+    static_assert(std::is_same_v<decltype(surface.m_type), double>); // TODO: remove static_cast above, when m_type is int
 
     Collision col;
-    if (sty == STYPE_PLANE_XZ) {
+    switch (sty) {
+    case STYPE_PLANE_XZ: {
         col.normal = glm::dvec3(0, -glm::sign(r.m_direction.y), 0);
 
         // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
@@ -468,16 +470,21 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
         // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set `found
         // = false`.
         col.found = time >= 0;
-    } else if (sty == STYPE_TOROID) {
+        break;
+    }
+    case STYPE_TOROID:
         col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
-    } else if (sty == STYPE_QUADRIC) {
+        break;
+    case STYPE_QUADRIC:
         col = getQuadricCollision(r, deserializeQuadric(surface));
-    } else if (sty == STYPE_CUBIC) {
+        break;
+    case STYPE_CUBIC:
         col = getCubicCollision(r, deserializeCubic(surface));
-    } else {
+        break;
+    default:
         col.found = false;
 
-        _throw("invalid surfaceType!");
+        _throw("invalid surfaceType: %d!", sty);
         return col;  // has found = false
     }
 
@@ -516,8 +523,13 @@ Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement&
 
 // Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand) {
-    // TODO: add findCollision function for serial tracing
+Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand) {
+    // Find intersection point in next element
+    if (sequential == Sequential::Yes) {
+        const auto elementIndex = eventIndex;
+        _debug_assert(elementIndex < numElements, "sequential tracing: element index out of range: %d!", elementIndex);
+        return findCollisionWith(ray, elementIndex, elements[elementIndex], rand);
+    }
 
     // global coordinates of first intersection point of ray among all elements in beamline
     Collision best_col;
@@ -532,7 +544,7 @@ Collision findCollision(const Ray& __restrict__ ray, const OpticalElement* __res
     Ray r = ray;
     r.m_position += r.m_direction * COLLISION_EPSILON;
 
-    // Find intersection points through all elements
+    // Find intersection point through all elements
     for (int elementIndex = 0; elementIndex < numElements; elementIndex++) {
         const auto& element = elements[elementIndex];
         Collision current_col = findCollisionWith(r, elementIndex, element, rand);
@@ -549,7 +561,7 @@ Collision findCollision(const Ray& __restrict__ ray, const OpticalElement* __res
         }
     }
 
-    _debug_assert(best_col.found && best_col.elementIndex >= 0 && best_col.elementIndex < numElements, "found collision, but element index is out of range!");
+    _debug_assert(!best_col.found || best_col.elementIndex >= 0 && best_col.elementIndex < numElements, "found collision, but element index is out of range!");
     return best_col;
 }
 
