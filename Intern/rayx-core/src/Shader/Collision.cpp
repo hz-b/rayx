@@ -481,7 +481,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
     default:
         col.found = false;
 
-        _throw("invalid surfaceType: %d!", surface.m_type);
+        _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_type));
         return col;  // has found = false
     }
 
