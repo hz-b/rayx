@@ -169,9 +169,6 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
         if (ray_hist[i].m_lastElement != i) {
             return {};
         }
-        if (ray_hist[i].m_eventType != ETYPE_JUST_HIT_ELEM) {
-            return {};
-        }
     }
 
     return ray_hist.back();
@@ -247,16 +244,11 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     compareBundleHistories(a, b, tolerance);
 }
 
-// store materialTables statically, to ensure lifetime while invocation state references it.
-MaterialTables materialTables;
-
-void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
+MaterialTables createMaterialTables(std::vector<Material> mats_vec) {
     std::array<bool, 92> mats;
     mats.fill(false);
     for (auto m : mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
-    materialTables = loadMaterialTables(mats);
-    inv.mat = materialTables.materialTable;
-    inv.matIdx = materialTables.indexTable;
+    return loadMaterialTables(mats);
 }

@@ -64,7 +64,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
 
     // add palik table content
     for (size_t i = 0; i < mats.size(); i++) {
-        out.indexTable.push_back(out.materialTable.size());
+        out.indices.push_back(out.materials.size());
         if (relevantMaterials[i]) {
             PalikTable t;
 
@@ -73,16 +73,16 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
             }
 
             for (auto x : t.m_Lines) {
-                out.materialTable.push_back(x.m_energy);
-                out.materialTable.push_back(x.m_n);
-                out.materialTable.push_back(x.m_k);
+                out.materials.push_back(x.m_energy);
+                out.materials.push_back(x.m_n);
+                out.materials.push_back(x.m_k);
             }
         }
     }
 
     // add nff table content
     for (size_t i = 0; i < mats.size(); i++) {
-        out.indexTable.push_back(out.materialTable.size());
+        out.indices.push_back(out.materials.size());
         if (relevantMaterials[i]) {
             NffTable t;
 
@@ -91,22 +91,22 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
             }
 
             for (auto x : t.m_Lines) {
-                out.materialTable.push_back(x.m_energy);
-                out.materialTable.push_back(x.m_f1);
-                out.materialTable.push_back(x.m_f2);
+                out.materials.push_back(x.m_energy);
+                out.materials.push_back(x.m_f1);
+                out.materials.push_back(x.m_f2);
             }
         }
     }
 
     // this extra index simplifies computation on the GPU, as then the table
-    // within indexTable[i]..indexTable[i+1] can be used without checks.
-    out.indexTable.push_back(out.materialTable.size());
+    // within indices[i]..indices[i+1] can be used without checks.
+    out.indices.push_back(out.materials.size());
 
-    // materialTable can't be empty, because
+    // materials can't be empty, because
     // Vulkan does not support empty buffers.
-    if (out.materialTable.empty()) {
+    if (out.materials.empty()) {
         // this number should never be accessed on the GPU.
-        out.materialTable.push_back(0);
+        out.materials.push_back(0);
     }
 
     return out;

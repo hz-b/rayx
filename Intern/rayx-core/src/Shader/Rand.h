@@ -27,19 +27,18 @@ RAYX_FN_ACC double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double si
 struct Rand {
     Rand() noexcept {}
 
-    // TODO: delete copy ctor to protect against function argument pass by copy
-    Rand(const Rand&) = default;
     Rand(Rand&&) = default;
     Rand& operator= (Rand&&) = default;
-    Rand& operator= (const Rand&) = default;
 
+    RAYX_FN_ACC
     explicit Rand(const uint64_t ctr) noexcept : m_ctr(ctr) {}
 
-    Rand(const int rayIndex, const int numRays, const double randomSeed) noexcept {
+    RAYX_FN_ACC
+    explicit Rand(const int rayIndex, const int numRaysTotal, const double randomSeed) noexcept {
         // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
         const uint64_t MAX_UINT64 = ~(static_cast<uint64_t>(0));
         const double MAX_UINT64_DOUBLE = 18446744073709551616.0;
-        uint64_t workerCounterNum = MAX_UINT64 / static_cast<uint64_t>(numRays);
+        uint64_t workerCounterNum = MAX_UINT64 / static_cast<uint64_t>(numRaysTotal);
         m_ctr = rayIndex * workerCounterNum + static_cast<uint64_t>(randomSeed * MAX_UINT64_DOUBLE);
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ray.h"
+#include "Throw.h"
 
 namespace RAYX {
 
