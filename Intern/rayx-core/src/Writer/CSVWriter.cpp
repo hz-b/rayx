@@ -126,7 +126,7 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
 
         // create the Ray from the loaded doubles from this line.
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
-                         .m_eventType = d[3],
+                         .m_eventType = static_cast<RAYX::EventType>(d[3]),
                          .m_direction = direction,
                          .m_energy = d[7],
                          .m_field = field,

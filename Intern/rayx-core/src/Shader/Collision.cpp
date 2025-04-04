@@ -449,12 +449,9 @@ Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul) {
 
 RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
-    const auto sty = static_cast<int>(surface.m_type);
-    static_assert(std::is_same_v<decltype(surface.m_type), double>); // TODO: remove static_cast above, when m_type is int
-
     Collision col;
-    switch (sty) {
-    case STYPE_PLANE_XZ: {
+    switch (surface.m_type) {
+    case SurfaceType::PlaneXZ: {
         col.normal = glm::dvec3(0, -glm::sign(r.m_direction.y), 0);
 
         // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
@@ -472,19 +469,19 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
         col.found = time >= 0;
         break;
     }
-    case STYPE_TOROID:
+    case SurfaceType::Toroid:
         col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
         break;
-    case STYPE_QUADRIC:
+    case SurfaceType::Quadric:
         col = getQuadricCollision(r, deserializeQuadric(surface));
         break;
-    case STYPE_CUBIC:
+    case SurfaceType::Cubic:
         col = getCubicCollision(r, deserializeCubic(surface));
         break;
     default:
         col.found = false;
 
-        _throw("invalid surfaceType: %d!", sty);
+        _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_type));
         return col;  // has found = false
     }
 
