@@ -8,11 +8,6 @@
 
 namespace RAYX {
 
-/// Expresses whether we force sequential tracing, or we use dynamic tracing.
-/// We prefer this over a boolean, as calling eg. the trace function with an argument of `true` has no obvious meaning.
-/// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
-enum class Sequential { No, Yes };
-
 /// Contains all the events of a single Ray in chronological order.
 using RayHistory = std::vector<Ray>;
 
@@ -30,9 +25,6 @@ class RAYX_API DeviceTracer {
     virtual ~DeviceTracer() = default;
 
     virtual BundleHistory trace(const Group&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, uint32_t maxEvents = 1) = 0;
-
-  protected:
-    PushConstants m_pushConstants;
 };
 
 }  // namespace RAYX
