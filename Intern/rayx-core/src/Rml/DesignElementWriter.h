@@ -48,7 +48,7 @@ void getSlit(xml::Parser parser, DesignElement* de) {
     de->setCurvatureType(CurvatureType::Plane);
     de->setBehaviourType(BehaviourType::Slit);
 
-    de->setOpeningShape(parser.parseOpeningShape());
+    de->setOpeningShape(static_cast<CutoutType>(parser.parseOpeningShape()));
     de->setOpeningWidth(parser.parseOpeningWidth());
     de->setOpeningHeight(parser.parseOpeningHeight());
     de->setCentralBeamstop(parser.parseCentralBeamstop());

@@ -379,27 +379,28 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
     constexpr double defWidthHeight = 50.0f;
     Outline outline;
 
-    switch (static_cast<int>(cutout.m_type)) {
-        case RAYX::CTYPE_TRAPEZOID: {
+    switch (cutout.m_type) {
+        case RAYX::CutoutType::Trapezoid: {
             RAYX::TrapezoidCutout trapezoid = RAYX::deserializeTrapezoid(cutout);
             outline.calculateForQuadrilateral(trapezoid.m_widthA, trapezoid.m_widthB, trapezoid.m_length, trapezoid.m_length);
             break;
         }
-        case RAYX::CTYPE_RECT: {
+        case RAYX::CutoutType::Rect: {
             RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
             outline.calculateForQuadrilateral(rect.m_width, rect.m_width, rect.m_length, rect.m_length);
             break;
         }
-        case RAYX::CTYPE_ELLIPTICAL: {
+        case RAYX::CutoutType::Elliptical: {
             RAYX::EllipticalCutout ellipse = RAYX::deserializeElliptical(cutout);
             outline.calculateForElliptical(ellipse.m_diameter_x, ellipse.m_diameter_z);
             break;
         }
-        case RAYX::CTYPE_UNLIMITED:
-        default: {
+        case RAYX::CutoutType::Unlimited: {
             outline.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
             break;
         }
+        default:
+            RAYX_EXIT << "Unknown cutout opening shape!";
     }
     uint32_t offset = static_cast<uint32_t>(vertices.size());
     vertices.insert(vertices.end(), outline.vertices.begin(), outline.vertices.end());
@@ -420,7 +421,7 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
 void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
-    if (compiled.m_behaviour.m_type == RAYX::BTYPE_SLIT) {
+    if (compiled.m_behaviour.m_type == RAYX::BehaveType::Slit) {
         RAYX::SlitBehaviour slit = deserializeSlit(compiled.m_behaviour);
         poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
         poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
@@ -442,12 +443,12 @@ bool isPlanar(const RAYX::QuadricSurface& q) {
  */
 void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
-    switch (static_cast<int>(compiled.m_surface.m_type)) {
-        case RAYX::STYPE_PLANE_XZ: {
+    switch (compiled.m_surface.m_type) {
+        case RAYX::SurfaceType::PlaneXZ: {
             planarTriangulation(compiled, vertices, indices);
             break;
         }
-        case RAYX::STYPE_QUADRIC: {
+        case RAYX::SurfaceType::Quadric: {
             RAYX::QuadricSurface q = deserializeQuadric(compiled.m_surface);
             if (isPlanar(q)) {
                 planarTriangulation(compiled, vertices, indices);
@@ -456,12 +457,12 @@ void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureV
             }
             break;
         }
-        case RAYX::STYPE_TOROID: {
+        case RAYX::SurfaceType::Toroid: {
             traceTriangulation(compiled, vertices, indices);
             break;
         }
         default:
-            RAYX_EXIT << "Unknown element type: " << compiled.m_surface.m_type;
+            RAYX_EXIT << "Unknown element type: " << static_cast<int>(compiled.m_surface.m_type);
             break;
     }
 }

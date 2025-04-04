@@ -7,9 +7,10 @@ namespace RAYX {
 // checks whether the point (x, z) is within the cutout.
 RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
-    if (cutout.m_type == CTYPE_UNLIMITED) {
+    switch (cutout.m_type) {
+    case CutoutType::Unlimited:
         return true;
-    } else if (cutout.m_type == CTYPE_RECT) {
+    case CutoutType::Rect: {
         RectCutout rect = deserializeRect(cutout);
         double x_min = -rect.m_width / 2.0;
         double x_max = rect.m_width / 2.0;
@@ -17,7 +18,8 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
         double z_max = rect.m_length / 2.0;
 
         return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-    } else if (cutout.m_type == CTYPE_TRAPEZOID) {
+    }
+    case CutoutType::Trapezoid: {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         // Check point is within the trapezoid
@@ -44,7 +46,8 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
         double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
         double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
         return l1 < 0 && l2 < 0;
-    } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
+    }
+    case CutoutType::Elliptical: {
         EllipticalCutout ell = deserializeElliptical(cutout);
 
         double radius_x = ell.m_diameter_x / 2.0;
@@ -55,8 +58,9 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
 
         double rd2 = val1 * val1 + val2 * val2;
         return rd2 <= 1.0;
-    } else {
-        _throw("invalid cutout type in inCutout!");
+    }
+    default:
+        _throw("invalid cutout type in inCutout %d!", static_cast<int>(cutout.m_type));
         return false;
     }
 }
@@ -68,15 +72,15 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
     glm::dmat4 ret;
     double w = 0;
     double l = 0;
-    if (cutout.m_type == CTYPE_UNLIMITED) {
+    if (cutout.m_type == CutoutType::Unlimited) {
         double inf = 1e100;
         w = inf;
         l = inf;
-    } else if (cutout.m_type == CTYPE_RECT) {
+    } else if (cutout.m_type == CutoutType::Rect) {
         RectCutout rect = deserializeRect(cutout);
         w = rect.m_width / 2.0;
         l = rect.m_length / 2.0;
-    } else if (cutout.m_type == CTYPE_TRAPEZOID) {
+    } else if (cutout.m_type == CutoutType::Trapezoid) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
         auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
@@ -89,7 +93,7 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         ret[2] = glm::dvec4(C[0], 0.0, C[1], 0.0);
         ret[3] = glm::dvec4(D[0], 0.0, D[1], 0.0);
         return ret;
-    } else if (cutout.m_type == CTYPE_ELLIPTICAL) {
+    } else if (cutout.m_type == CutoutType::Elliptical) {
         EllipticalCutout ell = deserializeElliptical(cutout);
         double rx = ell.m_diameter_x / 2.0;
         double rz = ell.m_diameter_z / 2.0;
@@ -131,9 +135,7 @@ void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
     for (int i = 0; i < 4; i++) {
         double x = keypoints[i][0];
         double z = keypoints[i][2];
-        if (!inCutout(c2, x, z)) {
-            _throw("assertCutoutSubset failed!");
-        }
+        _assert(inCutout(c2, x, z), "assertCutoutSubset failed!");
     }
 }
 

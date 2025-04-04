@@ -9,16 +9,18 @@ namespace RAYX {
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `Behave.h`.
-constexpr int BTYPE_MIRROR = 0;
-constexpr int BTYPE_GRATING = 1;
-constexpr int BTYPE_SLIT = 2;
-constexpr int BTYPE_RZP = 3;
-constexpr int BTYPE_IMAGE_PLANE = 4;
+enum class BehaveType {
+    Mirror,
+    Grating,
+    Slit,
+    RZP,
+    ImagePlane,
+};
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
     // the type describes how the m_private_serialization_params need to be interpreted.
-    double m_type;
+    BehaveType m_type;
 
     // These params are private. use the serialize & deserialize functions below instead.
     double m_private_serialization_params[16];
@@ -40,7 +42,7 @@ Behaviour makeRZPBehaviour(const DesignElement& dele);
 RAYX_FN_ACC
 inline Behaviour serializeMirror() {
     Behaviour b;
-    b.m_type = BTYPE_MIRROR;
+    b.m_type = BehaveType::Mirror;
     return b;
 }
 
@@ -57,7 +59,7 @@ struct GratingBehaviour {
 RAYX_FN_ACC
 inline Behaviour serializeGrating(GratingBehaviour g) {
     Behaviour b;
-    b.m_type = BTYPE_GRATING;
+    b.m_type = BehaveType::Grating;
 
     b.m_private_serialization_params[0] = g.m_vls[0];
     b.m_private_serialization_params[1] = g.m_vls[1];
@@ -102,14 +104,14 @@ struct RAYX_API SlitBehaviour {
 RAYX_FN_ACC
 inline Behaviour serializeSlit(SlitBehaviour s) {
     Behaviour b;
-    b.m_type = BTYPE_SLIT;
+    b.m_type = BehaveType::Slit;
 
-    b.m_private_serialization_params[0] = s.m_openingCutout.m_type;
+    b.m_private_serialization_params[0] = static_cast<double>(s.m_openingCutout.m_type);
     b.m_private_serialization_params[1] = s.m_openingCutout.m_private_serialization_params[0];
     b.m_private_serialization_params[2] = s.m_openingCutout.m_private_serialization_params[1];
     b.m_private_serialization_params[3] = s.m_openingCutout.m_private_serialization_params[2];
 
-    b.m_private_serialization_params[4] = s.m_beamstopCutout.m_type;
+    b.m_private_serialization_params[4] = static_cast<double>(s.m_beamstopCutout.m_type);
     b.m_private_serialization_params[5] = s.m_beamstopCutout.m_private_serialization_params[0];
     b.m_private_serialization_params[6] = s.m_beamstopCutout.m_private_serialization_params[1];
     b.m_private_serialization_params[7] = s.m_beamstopCutout.m_private_serialization_params[2];
@@ -120,12 +122,12 @@ RAYX_FN_ACC
 inline SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
 
-    s.m_openingCutout.m_type = b.m_private_serialization_params[0];
+    s.m_openingCutout.m_type = static_cast<CutoutType>(b.m_private_serialization_params[0]);
     s.m_openingCutout.m_private_serialization_params[0] = b.m_private_serialization_params[1];
     s.m_openingCutout.m_private_serialization_params[1] = b.m_private_serialization_params[2];
     s.m_openingCutout.m_private_serialization_params[2] = b.m_private_serialization_params[3];
 
-    s.m_beamstopCutout.m_type = b.m_private_serialization_params[4];
+    s.m_beamstopCutout.m_type = static_cast<CutoutType>(b.m_private_serialization_params[4]);
     s.m_beamstopCutout.m_private_serialization_params[0] = b.m_private_serialization_params[5];
     s.m_beamstopCutout.m_private_serialization_params[1] = b.m_private_serialization_params[6];
     s.m_beamstopCutout.m_private_serialization_params[2] = b.m_private_serialization_params[7];
@@ -156,7 +158,7 @@ struct RZPBehaviour {
 RAYX_FN_ACC
 inline Behaviour serializeRZP(RZPBehaviour r) {
     Behaviour b;
-    b.m_type = BTYPE_RZP;
+    b.m_type = BehaveType::RZP;
 
     b.m_private_serialization_params[0] = r.m_imageType;
     b.m_private_serialization_params[1] = r.m_rzpType;
@@ -203,7 +205,7 @@ inline RZPBehaviour deserializeRZP(Behaviour b) {
 RAYX_FN_ACC
 inline Behaviour serializeImagePlane() {
     Behaviour b;
-    b.m_type = BTYPE_IMAGE_PLANE;
+    b.m_type = BehaveType::ImagePlane;
     return b;
 }
 

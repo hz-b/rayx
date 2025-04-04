@@ -56,7 +56,7 @@ RAYX::Ray parseCSVline(std::string line) {
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
-    ray.m_eventType = -1;
+    ray.m_eventType = EventType::Uninitialized;
     ray.m_lastElement = -1;
     ray.m_order = -1;
 
@@ -85,13 +85,13 @@ std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
     std::vector<RAYX::Ray> outs;
     for (auto rr : hist) {
         Ray out;
-        out.m_eventType = ETYPE_UNINIT;
+        out.m_eventType = EventType::Uninitialized;
         for (auto r : rr) {
-            if (r.m_eventType == ETYPE_JUST_HIT_ELEM) {
+            if (r.m_eventType == EventType::HitElement) {
                 out = r;
             }
         }
-        if (out.m_eventType != ETYPE_UNINIT) {
+        if (out.m_eventType != EventType::Uninitialized) {
             outs.push_back(out);
         }
     }
@@ -169,9 +169,6 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
         if (ray_hist[i].m_lastElement != i) {
             return {};
         }
-        if (ray_hist[i].m_eventType != ETYPE_JUST_HIT_ELEM) {
-            return {};
-        }
     }
 
     return ray_hist.back();
@@ -193,10 +190,10 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            double btype = compiled[elem].m_behaviour.m_type;  // m_element.m_behaviour.m_type;
+            auto btype = compiled[elem].m_behaviour.m_type;  // m_element.m_behaviour.m_type;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
-            if (btype == BTYPE_IMAGE_PLANE || btype == BTYPE_SLIT) {
+            if (btype == BehaveType::ImagePlane || btype == BehaveType::Slit) {
                 r.m_position.y = orig_r.m_position.z;
                 r.m_position.z = orig_r.m_position.y;
                 r.m_direction.y = orig_r.m_direction.z;
@@ -247,16 +244,11 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     compareBundleHistories(a, b, tolerance);
 }
 
-// store materialTables statically, to ensure lifetime while invocation state references it.
-MaterialTables materialTables;
-
-void updateCpuTracerMaterialTables(std::vector<Material> mats_vec) {
+MaterialTables createMaterialTables(std::vector<Material> mats_vec) {
     std::array<bool, 92> mats;
     mats.fill(false);
     for (auto m : mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
     }
-    materialTables = loadMaterialTables(mats);
-    inv.mat = materialTables.materialTable;
-    inv.matIdx = materialTables.indexTable;
+    return loadMaterialTables(mats);
 }

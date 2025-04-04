@@ -550,13 +550,15 @@ Material Parser::parseMaterial() const {
 }
 
 Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
-    int geom_shape;
-    if (!paramInt(node, "geometricalShape", &geom_shape)) {
+    int geom_shape_int;
+    if (!paramInt(node, "geometricalShape", &geom_shape_int)) {
         if (type == "ImagePlane") {
             return serializeUnlimited();
         }
         RAYX_EXIT << "geometricalShape missing, but required!";
     }
+
+    auto geom_shape = static_cast<CutoutType>(geom_shape_int);
 
     auto x = [&] { return parseTotalWidth(); };
 
@@ -571,17 +573,17 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
         }
     };
 
-    if (geom_shape == CTYPE_RECT) {
+    if (geom_shape == CutoutType::Rect) {
         RectCutout rect;
         rect.m_width = x();
         rect.m_length = z();
         return serializeRect(rect);
-    } else if (geom_shape == CTYPE_ELLIPTICAL) {
+    } else if (geom_shape == CutoutType::Elliptical) {
         EllipticalCutout elliptical;
         elliptical.m_diameter_x = x();
         elliptical.m_diameter_z = z();
         return serializeElliptical(elliptical);
-    } else if (geom_shape == CTYPE_TRAPEZOID) {
+    } else if (geom_shape == CutoutType::Trapezoid) {
         TrapezoidCutout trapezoid;
         trapezoid.m_widthA = x();
         trapezoid.m_widthB = parseDouble("totalWidthB");
@@ -590,7 +592,7 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
         return serializeTrapezoid(trapezoid);
     } else {
         RAYX_EXIT << "invalid geometrical shape!";
-        return {0, {0.0, 0.0, 0.0}};
+        return {CutoutType::Unlimited, {0.0, 0.0, 0.0}};
     }
 }
 

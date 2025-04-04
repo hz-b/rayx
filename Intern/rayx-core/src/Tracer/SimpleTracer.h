@@ -13,21 +13,19 @@
 #include "Shader/DynamicElements.h"
 #include "Util.h"
 
-namespace {
+namespace RAYX {
 
+namespace {
 struct DynamicElementsKernel {
     template <typename Acc>
-    RAYX_FN_ACC void operator()(const Acc& acc, RAYX::InvState inv) const {
-        using Idx = alpaka::Idx<Acc>;
-        const Idx gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+    RAYX_FN_ACC
+    void operator()(const Acc& acc, const InvState inv, OutputEvents outputEvents) const {
+        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
-        if (gid < static_cast<Idx>(inv.inputRays.size())) dynamicElements(gid, inv);
+        if (gid < inv.numRaysBatch) dynamicElements(gid, inv, outputEvents);
     }
 };
-
 }  // unnamed namespace
-
-namespace RAYX {
 
 /**
  * @brief SimpleTracer sequentially executes tracing in batches the CPU or GPU
@@ -87,7 +85,7 @@ class SimpleTracer : public DeviceTracer {
         Buffer<Idx> compactEventCounts;
         Buffer<Idx> compactEventOffsets;
         Buffer<Ray> compactEvents;
-        // events is a buffer with capacity to hold a number of rays: maxEvents * numInputRays
+        // events is a buffer with capacity to hold a number of rays: maxEvents * numRaysTotal
         Buffer<Ray> events;
     } m_batchOutput;
 
@@ -116,26 +114,24 @@ class SimpleTracer : public DeviceTracer {
     template <typename T>
     std::span<T> bufferToSpan(Buffer<T>& buffer);
 
-    TraceResult traceBatch(Queue q, const Idx numInputRays);
+    TraceResult traceBatch(Queue q, int numRaysTotal, int numRaysBatch, int batchStartRayIndex, double randomSeed, int maxEvents, Sequential sequential);
 };
 
 template <typename Acc>
 SimpleTracer<Acc>::SimpleTracer(int deviceIndex) : m_deviceIndex(deviceIndex) {}
 
 template <typename Acc>
-BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) {
+BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, int getInputRaysThreadCount, uint32_t maxEvents) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "maxEvents: " << maxEvents;
+
+    const auto elements = group.compileElements();
 
     // don't trace if there are no optical elements
-    if (group.numElements() == 0) {
-        // an empty history suffices, nothing is happening to the rays!
-        BundleHistory result;
-        return result;
+    // an empty history suffices, nothing is happening to the rays!
+    if (elements.size() == 0) {
+        return {};
     }
 
-    // prepare input data
-    const auto elements = group.compileElements();
     const auto rays = group.compileSources(getInputRaysThreadCount);
     const auto materialTables = group.calcMinimalMaterialTables();
     const auto randomSeed = randomDouble();
@@ -143,6 +139,10 @@ BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint6
     const auto cpu = getDevice<Cpu>(0);
     const auto acc = getDevice<Acc>(m_deviceIndex);
     auto q = Queue(acc);
+
+    // in sequential mode, the max number of events is equal to the number of elements
+    if (sequential == Sequential::Yes)
+        maxEvents = elements.size();
 
     const auto firstBatchSize = static_cast<Idx>(glm::min(rays.size(), maxBatchSize));
     const auto maxOutputEventsCount = static_cast<Idx>(maxBatchSize * maxEvents);
@@ -152,8 +152,10 @@ BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint6
     resizeBufferIfNeeded(q, m_batchOutput.compactEventOffsets, firstBatchSize);
     resizeBufferIfNeeded(q, m_batchOutput.events, maxOutputEventsCount);
     transferToBuffer(q, cpu, m_beamlineInput.elements, elements, static_cast<Idx>(elements.size()));
-    transferToBuffer(q, cpu, m_beamlineInput.materialIndices, materialTables.indexTable, static_cast<Idx>(materialTables.indexTable.size()));
-    transferToBuffer(q, cpu, m_beamlineInput.materialData, materialTables.materialTable, static_cast<Idx>(materialTables.materialTable.size()));
+    transferToBuffer(q, cpu, m_beamlineInput.materialIndices, materialTables.indices, static_cast<Idx>(materialTables.indices.size()));
+    transferToBuffer(q, cpu, m_beamlineInput.materialData, materialTables.materials, static_cast<Idx>(materialTables.materials.size()));
+
+    RAYX_VERB << "Tracing Beamline" << ", num elements: " << elements.size() << ", num rays: " << rays.size() << ", sequential: " << static_cast<int>(sequential) << ", max events: " << maxEvents << ", first batch size " << firstBatchSize << ", max batch size: " << maxBatchSize;
 
     // This will be the complete BundleHistory.
     // All initialized events will have been put into this by the end of this function.
@@ -161,32 +163,25 @@ BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint6
 
     // iterate over all batches.
     for (int batch_id = 0; batch_id * maxBatchSize < rays.size(); batch_id++) {
-        // `rayIdStart` is the ray-id of the first ray of this batch.
+        // `batchStartRayIndex` is the ray-id of the first ray of this batch.
         // All previous batches consisted of `maxBatchSize`-many rays.
         // (Only the last batch might be smaller than maxBatchSize, if the number of rays isn't divisible by maxBatchSize).
-        const auto rayIdStart = batch_id * maxBatchSize;
+        const auto batchStartRayIndex = batch_id * maxBatchSize;
         const auto remaining_rays = rays.size() - batch_id * maxBatchSize;
         // The number of input-rays that we put into this batch.
         // Typically equal to maxBatchSize, except for the last batch.
         const auto batchSize = (maxBatchSize < remaining_rays) ? maxBatchSize : remaining_rays;
-        const auto numInputRays = batchSize;
+        const auto numRaysTotal = batchSize;
 
-        const auto sequential = (double)(seq == Sequential::Yes);
-        m_pushConstants = {.rayIdStart = (double)rayIdStart,
-                           .numRays = (double)rays.size(),
-                           .randomSeed = randomSeed,
-                           .maxEvents = (double)maxEvents,
-                           .sequential = sequential};
-
-        const auto inputRays = rays.data() + rayIdStart;
+        const auto inputRays = rays.data() + batchStartRayIndex;
         transferToBuffer(q, cpu, m_batchInput.rays, inputRays, static_cast<Idx>(batchSize));
 
         // run the actual tracer (GPU/CPU).
-        const auto traceResult = traceBatch(q, numInputRays);
+        const auto traceResult = traceBatch(q, numRaysTotal, rays.size(), batchStartRayIndex, randomSeed, maxEvents, sequential);
         RAYX_LOG << "Traced " << traceResult.totalEventsCount << " events.";
 
-        transferFromBuffer(q, cpu, m_batchResult.compactEventCounts, m_batchOutput.compactEventCounts, static_cast<Idx>(numInputRays));
-        transferFromBuffer(q, cpu, m_batchResult.compactEventOffsets, m_batchOutput.compactEventOffsets, static_cast<Idx>(numInputRays));
+        transferFromBuffer(q, cpu, m_batchResult.compactEventCounts, m_batchOutput.compactEventCounts, static_cast<Idx>(numRaysTotal));
+        transferFromBuffer(q, cpu, m_batchResult.compactEventOffsets, m_batchOutput.compactEventOffsets, static_cast<Idx>(numRaysTotal));
         transferFromBuffer(q, cpu, m_batchResult.compactEvents, m_batchOutput.compactEvents, static_cast<Idx>(traceResult.totalEventsCount));
 
         alpaka::wait(q);
@@ -210,45 +205,45 @@ BundleHistory SimpleTracer<Acc>::trace(const Group& group, Sequential seq, uint6
 }
 
 template <typename Acc>
-SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, const Idx numInputRays) {
+SimpleTracer<Acc>::TraceResult SimpleTracer<Acc>::traceBatch(Queue q, int numRaysTotal, int numRaysBatch, int batchStartRayIndex, double randomSeed, int maxEvents, Sequential sequential) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // reference resources
-
     auto inv = InvState{
-        // shader instance local variables
-        .globalInvocationId = {},
-        .finalized = {},
-        .ctr = {},
-        .nextEventIndex = {},
+        // constants
+        .numRaysTotal = numRaysTotal,
+        .numRaysBatch = numRaysBatch,
+        .batchStartRayIndex = batchStartRayIndex,
+        .maxEvents = maxEvents,
+        .randomSeed = randomSeed,
+        .sequential = sequential,
 
         // buffers
-        .inputRays = bufferToSpan(m_batchInput.rays),
-        .outputRays = bufferToSpan(m_batchOutput.events),
-        .outputRayCounts = bufferToSpan(m_batchOutput.compactEventCounts),
-        .elements = bufferToSpan(m_beamlineInput.elements),
-        .matIdx = bufferToSpan(m_beamlineInput.materialIndices),
-        .mat = bufferToSpan(m_beamlineInput.materialData),
+        .elements = alpaka::getPtrNative(*m_beamlineInput.elements.buf),
+        .numElements = m_beamlineInput.elements.size,
+        .materialIndices = alpaka::getPtrNative(*m_beamlineInput.materialIndices.buf),
+        .materialTables = alpaka::getPtrNative(*m_beamlineInput.materialData.buf),
+        .inputRays = alpaka::getPtrNative(*m_batchInput.rays.buf),
+    };
 
-#ifdef RAYX_DEBUG_MODE
-        .d_struct = {},
-#endif
-
-        .pushConstants = m_pushConstants,
+    auto outputEvents = OutputEvents{
+        // buffers
+        .events = alpaka::getPtrNative(*m_batchOutput.events.buf),
+        .numEvents = alpaka::getPtrNative(*m_batchOutput.compactEventCounts.buf),
     };
 
     // execute dynamic elements shader
 
-    alpaka::exec<Acc>(q, getWorkDivForAcc<Acc>(numInputRays), DynamicElementsKernel{}, inv);
+    alpaka::exec<Acc>(q, getWorkDivForAcc<Acc>(numRaysTotal), DynamicElementsKernel{}, inv, outputEvents);
 
     // make output events compact
 
-    auto totalEventsCount = scanSum<Acc, Idx>(q, *m_batchOutput.compactEventOffsets.buf, *m_batchOutput.compactEventCounts.buf, numInputRays);
+    auto totalEventsCount = scanSum<Acc, Idx>(q, *m_batchOutput.compactEventOffsets.buf, *m_batchOutput.compactEventCounts.buf, numRaysTotal);
 
     resizeBufferIfNeeded(q, m_batchOutput.compactEvents, totalEventsCount);
 
     gather<Acc, Ray>(q, *m_batchOutput.compactEvents.buf, *m_batchOutput.events.buf, *m_batchOutput.compactEventOffsets.buf,
-                     *m_batchOutput.compactEventCounts.buf, static_cast<Idx>(inv.pushConstants.maxEvents), numInputRays);
+                     *m_batchOutput.compactEventCounts.buf, maxEvents, numRaysTotal);
 
     return TraceResult{
         .totalEventsCount = totalEventsCount,
@@ -293,12 +288,6 @@ void SimpleTracer<Acc>::transferFromBuffer(Queue q, alpaka::DevCpu cpu, std::vec
     dst.resize(size);
     auto dstView = alpaka::createView(cpu, dst, Vec{size});
     alpaka::memcpy(q, dstView, *src.buf, Vec{size});
-}
-
-template <typename Acc>
-template <typename T>
-std::span<T> SimpleTracer<Acc>::bufferToSpan(Buffer<T>& buffer) {
-    return bufToSpan(*buffer.buf, buffer.size);
 }
 
 }  // namespace RAYX

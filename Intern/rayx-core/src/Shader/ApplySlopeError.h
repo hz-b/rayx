@@ -5,6 +5,8 @@
 
 namespace RAYX {
 
+struct Rand;
+
 /**
 turn the normal vector through x_rad and z_rad
 @params:  	normal: the normal vector
@@ -32,6 +34,6 @@ adds slope error to the normal
 1=cylindrical) (1 only for ellipsis relevant) returns new normal if there is a
 slope error in either x or z direction or the unmodified normal otherwise.
 */
-RAYX_FN_ACC glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, InvState& inv);
+RAYX_FN_ACC glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand& __restrict__ rand);
 
 }  // namespace RAYX

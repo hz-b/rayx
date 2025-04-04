@@ -99,7 +99,7 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
 
         const auto ray = RAYX::Ray{
             .m_position = {rayData[2], rayData[3], rayData[4]},   // origin
-            .m_eventType = rayData[5],                            // eventType
+            .m_eventType = static_cast<RAYX::EventType>(rayData[5]),    // eventType
             .m_direction = {rayData[6], rayData[7], rayData[8]},  // direction
             .m_energy = rayData[9],                               // energy
             .m_field =

@@ -2,11 +2,25 @@
 
 #include "Core.h"
 
-// throws an error, and termiantes the program
-// TODO(Sven): rethink error handling. just instantly terminate with RAYX_EXIT or use recordFinalEvent?
-// #define _throw(string) recordFinalEvent(_ray, ETYPE_FATAL_ERROR)
-// #define _throw(string) RAYX_ERR << string
-#define _throw(string)                                             \
-    printf("Error occurred while executing shader: %s\n", string); \
-    assert(false)
-// #endif
+#define _throw(string, ...) {                                                     \
+    printf("Error occurred while executing kernel: " string "\n", ##__VA_ARGS__); \
+    assert(false);                                                                \
+}
+
+#define _assert(condition, string, ...) \
+    if (!(condition))                   \
+        _throw("assert(" #condition "): " string, ##__VA_ARGS__)
+
+#define _warn(condition, string, ...)                                                  \
+    if (!(condition))                                                                  \
+        printf("Warning occurred while executing kernel: " string "\n", ##__VA_ARGS__)
+
+#ifdef RAYX_DEBUG_MODE
+#define _debug_throw_debug(string, ...) _throw(string, ##__VA_ARGS__)
+#define _debug_assert(condition, string, ...) _assert(condition, string, ##__VA_ARGS__)
+#define _debug_warn(condition, string, ...) _warn(condition, string, ##__VA_ARGS__)
+#else
+#define _debug_throw(string, ...)
+#define _debug_assert(condition, string, ...)
+#define _debug_warn(condition, string, ...)
+#endif
