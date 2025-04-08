@@ -157,27 +157,21 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setFresnelZOffset(double value);
     double getFresnelZOffset() const;
 
-    // Setter and Getter for designAlphaAngle
     void setDesignAlphaAngle(Rad value);
     Rad getDesignAlphaAngle() const;
 
-    // Setter and Getter for designBetaAngle
     void setDesignBetaAngle(Rad value);
     Rad getDesignBetaAngle() const;
 
-    // Setter and Getter for designOrderOfDiffraction
     void setDesignOrderOfDiffraction(double value);
     double getDesignOrderOfDiffraction() const;
 
-    // Setter and Getter for designEnergy
     void setDesignEnergy(double value);
     double getDesignEnergy() const;
 
-    // Setter and Getter for designSagittalEntranceArmLength
     void setDesignSagittalEntranceArmLength(double value);
     double getDesignSagittalEntranceArmLength() const;
 
-    // Setter and Getter for designSagittalExitArmLength
     void setDesignSagittalExitArmLength(double value);
     double getDesignSagittalExitArmLength() const;
 
@@ -204,5 +198,63 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setBehaviourType(BehaviourType value);
     BehaviourType getBehaviourType() const;
+
+    void setCrystalType(CrystalType value);
+    CrystalType getCrystalType() const;
+
+    void setCrystalMaterial(const std::string& value);
+    std::string getCrystalMaterial() const;
+
+    void setLatticeStructure(const std::string& value);
+    std::string getLatticeStructure() const;
+
+    void setLatticeConstant(double value);
+    double getLatticeConstant() const;
+
+    void setLatticeConstantSecond(double value);
+    double getLatticeConstantSecond() const;
+
+    void setOffsetAngleType(OffsetAngleType value);
+    OffsetAngleType getOffsetAngleType() const;
+
+    void setFirstMillerIndex(int value);
+    int getFirstMillerIndex() const;
+
+    void setSecondMillerIndex(int value);
+    int getSecondMillerIndex() const;
+
+    void setThirdMillerIndex(int value);
+    int getThirdMillerIndex() const;
+
+    void setStructureFactorReF0(double value);
+    double getStructureFactorReF0() const;
+
+    void setStructureFactorImF0(double value);
+    double getStructureFactorImF0() const;
+
+    void setStructureFactorReFH(double value);
+    double getStructureFactorReFH() const;
+
+    void setStructureFactorImFH(double value);
+    double getStructureFactorImFH() const;
+
+    void setStructureFactorReFHC(double value);
+    double getStructureFactorReFHC() const;
+
+    void setStructureFactorImFHC(double value);
+    double getStructureFactorImFHC() const;
+
+    void setUnitCellVolume(double value);
+    double getUnitCellVolume() const;
+
+    void setDSpacingGradient(double value);
+    double getDSpacingGradient() const;
+
+    void setDSpacing2(double value);
+    double getDSpacing2() const;
+
+    void setProfileKind(int value);
+    int getProfileKind() const;
+
 };
 }  // namespace RAYX

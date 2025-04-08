@@ -13,6 +13,7 @@ enum class ElementType {
     EllipsoidMirror,
     ExpertsMirror,
     ParaboloidMirror,
+    PlaneCrystal,
     PlaneGrating,
     PlaneMirror,
     ReflectionZoneplate,

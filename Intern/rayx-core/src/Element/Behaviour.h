@@ -14,6 +14,7 @@ constexpr int BTYPE_GRATING = 1;
 constexpr int BTYPE_SLIT = 2;
 constexpr int BTYPE_RZP = 3;
 constexpr int BTYPE_IMAGE_PLANE = 4;
+constexpr int BTYPE_CRYSTAL = 5;
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
@@ -31,6 +32,7 @@ Behaviour makeBehaviour(const DesignElement& dele);
 Behaviour makeGrating(const DesignElement& dele);  //< creates a Grating Behaviour from the parameters given in `dele`.
 Behaviour makeSlit(const DesignElement& dele);
 Behaviour makeRZPBehaviour(const DesignElement& dele);
+Behaviour makeCrystalBehaviour(const DesignElement& dele);
 
 ////////////////////
 // Mirror
@@ -206,6 +208,59 @@ inline Behaviour serializeImagePlane() {
     b.m_type = BTYPE_IMAGE_PLANE;
     return b;
 }
+
+
+
+//////////////
+// Crystal
+//////////////
+
+struct CrystalBehaviour {
+    double m_dSpacing;
+    double m_unitCellVolume;
+
+    double m_structureFactorReF0;
+    double m_structureFactorImF0;
+    double m_structureFactorReFH;
+    double m_structureFactorImFH;
+    double m_structureFactorReFHC;
+    double m_structureFactorImFHC;
+};
+
+RAYX_FN_ACC
+inline Behaviour serializeCrystal(const CrystalBehaviour& c) {
+    Behaviour b;
+    b.m_type = BTYPE_CRYSTAL;
+
+    b.m_private_serialization_params[0] = c.m_dSpacing;
+    b.m_private_serialization_params[1] = c.m_unitCellVolume;
+    b.m_private_serialization_params[2] = c.m_structureFactorReF0;
+    b.m_private_serialization_params[3] = c.m_structureFactorImF0;
+    b.m_private_serialization_params[4] = c.m_structureFactorReFH;
+    b.m_private_serialization_params[5] = c.m_structureFactorImFH;
+    b.m_private_serialization_params[6] = c.m_structureFactorReFHC;
+    b.m_private_serialization_params[7] = c.m_structureFactorImFHC;
+
+    return b;
+}
+
+RAYX_FN_ACC
+inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
+    CrystalBehaviour c;
+    c.m_dSpacing = b.m_private_serialization_params[0];
+    c.m_unitCellVolume = b.m_private_serialization_params[1];
+    c.m_structureFactorReF0 = b.m_private_serialization_params[2];
+    c.m_structureFactorImF0 = b.m_private_serialization_params[3];
+    c.m_structureFactorReFH = b.m_private_serialization_params[4];
+    c.m_structureFactorImFH = b.m_private_serialization_params[5];
+    c.m_structureFactorReFHC = b.m_private_serialization_params[6];
+    c.m_structureFactorImFHC = b.m_private_serialization_params[7];
+
+    return c;
+}
+
+
+
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

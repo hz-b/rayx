@@ -13,8 +13,20 @@
 #include "SphericalCoords.h"
 #include "Throw.h"
 #include "Utils.h"
+#include "Crystal.h"
 
 namespace RAYX {
+
+
+RAYX_FN_ACC
+Ray behaveCrystal(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
+    CrystalBehaviour b = deserializeCrystal(inv.elements[id].m_behaviour);
+
+    double theta = getTheta(r, col.normal);
+
+    
+    return r;
+}
 
 RAYX_FN_ACC
 Ray behaveSlit(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
