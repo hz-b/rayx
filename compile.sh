@@ -9,6 +9,7 @@ echo
 
 mode=Debug
 enable_cuda=0
+enable_openmp=1
 
 for var in "$@"
 do
@@ -16,12 +17,15 @@ do
         mode=Release
     elif [[ "$var" == "--cuda" ]]; then
         enable_cuda=1
+    elif [[ "$var" == "--no-openmp" ]]; then
+        enable_openmp=0
     elif [[ "$var" == "--help" ]]; then
         echo "Usage:"
         echo " ./compile.sh [OPTIONS]..."
         echo "Options:"
         echo "--release 'Build in Release mode. Otherwise build in Debug mode'"
         echo "--cuda 'Build with Cuda for tracing on GPU. Otherwise build without Cuda'"
+        echo "--no-openmp 'Force Build without OpenMP for multithreaded tracing on the CPU.'"
         exit
     else
         echo "Error: Unknown option '$var'"
@@ -36,6 +40,12 @@ if [ "$enable_cuda" -eq "1" ]; then
     conf="$conf -D RAYX_ENABLE_CUDA=ON -DRAYX_REQUIRE_CUDA=ON"
 else
     conf="$conf -D RAYX_ENABLE_CUDA=OFF"
+fi
+
+if [ "$enable_openmp" -eq "0" ]; then
+    conf="$conf -D RAYX_ENABLE_OPENMP=OFF"
+else
+    conf="$conf -D RAYX_ENABLE_OPENMP=ON"
 fi
 
 echo Updating git submodules ...
