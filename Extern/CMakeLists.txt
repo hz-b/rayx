@@ -21,9 +21,23 @@ add_subdirectory(CLI11)
 
 # -------------------
 
-# ---- Check for CUDA and configure Alpaka ----
-set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
+# ---- Check for CUDA and OPENMP support and configure Alpaka ----
 set(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
+
+if(RAYX_ENABLE_OPENMP)
+    find_package(OpenMP COMPONENTS CXX)
+    if(OpenMP_CXX_FOUND)
+       set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
+    else()
+        if(RAYX_REQUIRE_OPENMP)
+            message(FATAL_ERROR "No OpenMP CXX compiler found by CMake, but 'RAYX_REQUIRE_OPENMP is set.'")
+        else()
+            message(WARNING "No OpenMP CXX compiler found by CMake. OpenMP support will be disabled.'")
+        endif()
+    endif()
+else() # setting could be cached so force it off
+    set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE OFF CACHE BOOL "" FORCE)
+endif()
 
 if(RAYX_ENABLE_CUDA)
     check_language(CUDA)
