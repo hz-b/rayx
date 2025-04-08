@@ -476,4 +476,174 @@ CurvatureType DesignElement::getCurvatureType() const { return m_elementParamete
 void DesignElement::setBehaviourType(BehaviourType value) { m_elementParameters["behaviourType"] = value; }
 BehaviourType DesignElement::getBehaviourType() const { return m_elementParameters["behaviourType"].as_behaviourType(); }
 
+void DesignElement::setCrystalType(CrystalType value) { m_elementParameters["crystalType"] = value; }
+CrystalType DesignElement::getCrystalType() const { return m_elementParameters["crystalType"].as_int(); }
+
+void DesignElement::setCrystalMaterial(const std::string& value) { m_elementParameters["crystalMaterial"] = value; }
+std::string DesignElement::getCrystalMaterial() const { return m_elementParameters["crystalMaterial"].as_string(); }
+
+void DesignElement::setLatticeStructure(const std::string& value) { m_elementParameters["latticeStructure"] = value; }
+std::string DesignElement::getLatticeStructure() const { return m_elementParameters["latticeStructure"].as_string(); }
+
+void DesignElement::setLatticeConstant(double value) { m_elementParameters["latticeConstant"] = value; }
+double DesignElement::getLatticeConstant() const { return m_elementParameters["latticeConstant"].as_double(); }
+
+void DesignElement::setLatticeConstantSecond(double value) { m_elementParameters["latticeConstantSecond"] = value; }
+double DesignElement::getLatticeConstantSecond() const { return m_elementParameters["latticeConstantSecond"].as_double(); }
+
+void DesignElement::setOffsetAngleType(OffsetAngleType value) { m_elementParameters["offsetAngleType"] = value; }
+OffsetAngleType DesignElement::getOffsetAngleType() const { return m_elementParameters["offsetAngleType"].as_int(); }
+
+void DesignElement::setFirstMillerIndex(int value) { m_elementParameters["firstMillerIndex"] = value; }
+int DesignElement::getFirstMillerIndex() const { return m_elementParameters["firstMillerIndex"].as_int(); }
+
+void DesignElement::setSecondMillerIndex(int value) { m_elementParameters["secondMillerIndex"] = value; }
+int DesignElement::getSecondMillerIndex() const { return m_elementParameters["secondMillerIndex"].as_int(); }
+
+void DesignElement::setThirdMillerIndex(int value) { m_elementParameters["thirdMillerIndex"] = value; }
+int DesignElement::getThirdMillerIndex() const { return m_elementParameters["thirdMillerIndex"].as_int(); }
+
+void DesignElement::setStructureFactorReF0(double value) { m_elementParameters["structureFactorReF0"] = value; }
+double DesignElement::getStructureFactorReF0() const { return m_elementParameters["structureFactorReF0"].as_double(); }
+
+void DesignElement::setStructureFactorImF0(double value) { m_elementParameters["structureFactorImF0"] = value; }
+double DesignElement::getStructureFactorImF0() const { return m_elementParameters["structureFactorImF0"].as_double(); }
+
+void DesignElement::setStructureFactorReFH(double value) { m_elementParameters["structureFactorReFH"] = value; }
+double DesignElement::getStructureFactorReFH() const { return m_elementParameters["structureFactorReFH"].as_double(); }
+
+void DesignElement::setStructureFactorImFH(double value) { m_elementParameters["structureFactorImFH"] = value; }
+double DesignElement::getStructureFactorImFH() const { return m_elementParameters["structureFactorImFH"].as_double(); }
+
+void DesignElement::setStructureFactorReFHC(double value) { m_elementParameters["structureFactorReFHC"] = value; }
+double DesignElement::getStructureFactorReFHC() const { return m_elementParameters["structureFactorReFHC"].as_double(); }void DesignElement::setCrystalType(CrystalType value) { m_elementParameters["crystalType"] = value; }
+CrystalType DesignElement::getCrystalType() const { return m_elementParameters["crystalType"].as_int(); }
+
+void DesignElement::setCrystalMaterial(const std::string& value) { m_elementParameters["crystalMaterial"] = value; }
+std::string DesignElement::getCrystalMaterial() const { return m_elementParameters["crystalMaterial"].as_string(); }
+
+void DesignElement::setLatticeStructure(const std::string& value) { m_elementParameters["latticeStructure"] = value; }
+std::string DesignElement::getLatticeStructure() const { return m_elementParameters["latticeStructure"].as_string(); }
+
+void DesignElement::setLatticeConstant(double value) { m_elementParameters["latticeConstant"] = value; }
+double DesignElement::getLatticeConstant() const { return m_elementParameters["latticeConstant"].as_double(); }
+
+void DesignElement::setLatticeConstantSecond(double value) { m_elementParameters["latticeConstantSecond"] = value; }
+double DesignElement::getLatticeConstantSecond() const { return m_elementParameters["latticeConstantSecond"].as_double(); }
+
+void DesignElement::setOffsetAngleType(OffsetAngleType value) { m_elementParameters["offsetAngleType"] = value; }
+OffsetAngleType DesignElement::getOffsetAngleType() const { return m_elementParameters["offsetAngleType"].as_int(); }
+
+void DesignElement::setFirstMillerIndex(int value) { m_elementParameters["firstMillerIndex"] = value; }
+int DesignElement::getFirstMillerIndex() const { return m_elementParameters["firstMillerIndex"].as_int(); }
+
+void DesignElement::setSecondMillerIndex(int value) { m_elementParameters["secondMillerIndex"] = value; }
+int DesignElement::getSecondMillerIndex() const { return m_elementParameters["secondMillerIndex"].as_int(); }
+
+void DesignElement::setThirdMillerIndex(int value) { m_elementParameters["thirdMillerIndex"] = value; }
+int DesignElement::getThirdMillerIndex() const { return m_elementParameters["thirdMillerIndex"].as_int(); }
+
+void DesignElement::setStructureFactorReF0(double value) { m_elementParameters["structureFactorReF0"] = value; }
+double DesignElement::getStructureFactorReF0() const { return m_elementParameters["structureFactorReF0"].as_double(); }
+
+void DesignElement::setStructureFactorImF0(double value) { m_elementParameters["structureFactorImF0"] = value; }
+double DesignElement::getStructureFactorImF0() const { return m_elementParameters["structureFactorImF0"].as_double(); }
+
+void DesignElement::setStructureFactorReFH(double value) { m_elementParameters["structureFactorReFH"] = value; }
+double DesignElement::getStructureFactorReFH() const { return m_elementParameters["structureFactorReFH"].as_double(); }
+
+void DesignElement::setStructureFactorImFH(double value) { m_elementParameters["structureFactorImFH"] = value; }
+double DesignElement::getStructureFactorImFH() const { return m_elementParameters["structureFactorImFH"].as_double(); }
+
+void DesignElement::setStructureFactorReFHC(double value) { m_elementParameters["structureFactorReFHC"] = value; }
+double DesignElement::getStructureFactorReFHC() const { return m_elementParameters["structureFactorReFHC"].as_double(); }
+
+void DesignElement::setStructureFactorImFHC(double value) { m_elementParameters["structureFactorImFHC"] = value; }
+double DesignElement::getStructureFactorImFHC() const { return m_elementParameters["structureFactorImFHC"].as_double(); }
+
+void DesignElement::setUnitCellVolume(double value) { m_elementParameters["unitCellVolume"] = value; }
+double DesignElement::getUnitCellVolume() const { return m_elementParameters["unitCellVolume"].as_double(); }
+
+void DesignElement::setDSpacingGradient(double value) { m_elementParameters["dSpacingGradient"] = value; }
+double DesignElement::getDSpacingGradient() const { return m_elementParameters["dSpacingGradient"].as_double(); }
+
+void DesignElement::setDSpacing2(double value) { m_elementParameters["dSpacing2"] = value; }
+double DesignElement::getDSpacing2() const { return m_elementParameters["dSpacing2"].as_double(); }
+
+void DesignElement::setProfileKind(int value) { m_elementParameters["profileKind"] = value; }
+int DesignElement::getProfileKind() const { return m_elementParameters["profileKind"].as_int(); }
+
+void DesignElement::setStructureFactorImFHC(double value) { m_elementParameters["structureFactorImFHC"] = value; }
+double DesignElement::getStructureFactorImFHC() const { return m_elementParameters["structureFactorImFHC"].as_double(); }
+
+void DesignElement::setCrystalType(CrystalType value) { m_elementParameters["crystalType"] = value; }
+CrystalType DesignElement::getCrystalType() const { return m_elementParameters["crystalType"].as_int(); }
+
+void DesignElement::setCrystalMaterial(const std::string& value) { m_elementParameters["crystalMaterial"] = value; }
+std::string DesignElement::getCrystalMaterial() const { return m_elementParameters["crystalMaterial"].as_string(); }
+
+void DesignElement::setLatticeStructure(const std::string& value) { m_elementParameters["latticeStructure"] = value; }
+std::string DesignElement::getLatticeStructure() const { return m_elementParameters["latticeStructure"].as_string(); }
+
+void DesignElement::setLatticeConstant(double value) { m_elementParameters["latticeConstant"] = value; }
+double DesignElement::getLatticeConstant() const { return m_elementParameters["latticeConstant"].as_double(); }
+
+void DesignElement::setLatticeConstantSecond(double value) { m_elementParameters["latticeConstantSecond"] = value; }
+double DesignElement::getLatticeConstantSecond() const { return m_elementParameters["latticeConstantSecond"].as_double(); }
+
+void DesignElement::setOffsetAngleType(OffsetAngleType value) { m_elementParameters["offsetAngleType"] = value; }
+OffsetAngleType DesignElement::getOffsetAngleType() const { return m_elementParameters["offsetAngleType"].as_int(); }
+
+void DesignElement::setFirstMillerIndex(int value) { m_elementParameters["firstMillerIndex"] = value; }
+int DesignElement::getFirstMillerIndex() const { return m_elementParameters["firstMillerIndex"].as_int(); }
+
+void DesignElement::setSecondMillerIndex(int value) { m_elementParameters["secondMillerIndex"] = value; }
+int DesignElement::getSecondMillerIndex() const { return m_elementParameters["secondMillerIndex"].as_int(); }
+
+void DesignElement::setThirdMillerIndex(int value) { m_elementParameters["thirdMillerIndex"] = value; }
+int DesignElement::getThirdMillerIndex() const { return m_elementParameters["thirdMillerIndex"].as_int(); }
+
+void DesignElement::setStructureFactorReF0(double value) { m_elementParameters["structureFactorReF0"] = value; }
+double DesignElement::getStructureFactorReF0() const { return m_elementParameters["structureFactorReF0"].as_double(); }
+
+void DesignElement::setStructureFactorImF0(double value) { m_elementParameters["structureFactorImF0"] = value; }
+double DesignElement::getStructureFactorImF0() const { return m_elementParameters["structureFactorImF0"].as_double(); }
+
+void DesignElement::setStructureFactorReFH(double value) { m_elementParameters["structureFactorReFH"] = value; }
+double DesignElement::getStructureFactorReFH() const { return m_elementParameters["structureFactorReFH"].as_double(); }
+
+void DesignElement::setStructureFactorImFH(double value) { m_elementParameters["structureFactorImFH"] = value; }
+double DesignElement::getStructureFactorImFH() const { return m_elementParameters["structureFactorImFH"].as_double(); }
+
+void DesignElement::setStructureFactorReFHC(double value) { m_elementParameters["structureFactorReFHC"] = value; }
+double DesignElement::getStructureFactorReFHC() const { return m_elementParameters["structureFactorReFHC"].as_double(); }
+
+void DesignElement::setStructureFactorImFHC(double value) { m_elementParameters["structureFactorImFHC"] = value; }
+double DesignElement::getStructureFactorImFHC() const { return m_elementParameters["structureFactorImFHC"].as_double(); }
+
+void DesignElement::setUnitCellVolume(double value) { m_elementParameters["unitCellVolume"] = value; }
+double DesignElement::getUnitCellVolume() const { return m_elementParameters["unitCellVolume"].as_double(); }
+
+void DesignElement::setDSpacingGradient(double value) { m_elementParameters["dSpacingGradient"] = value; }
+double DesignElement::getDSpacingGradient() const { return m_elementParameters["dSpacingGradient"].as_double(); }
+
+void DesignElement::setDSpacing2(double value) { m_elementParameters["dSpacing2"] = value; }
+double DesignElement::getDSpacing2() const { return m_elementParameters["dSpacing2"].as_double(); }
+
+void DesignElement::setProfileKind(int value) { m_elementParameters["profileKind"] = value; }
+int DesignElement::getProfileKind() const { return m_elementParameters["profileKind"].as_int(); }
+
+void DesignElement::setUnitCellVolume(double value) { m_elementParameters["unitCellVolume"] = value; }
+double DesignElement::getUnitCellVolume() const { return m_elementParameters["unitCellVolume"].as_double(); }
+
+void DesignElement::setDSpacingGradient(double value) { m_elementParameters["dSpacingGradient"] = value; }
+double DesignElement::getDSpacingGradient() const { return m_elementParameters["dSpacingGradient"].as_double(); }
+
+void DesignElement::setDSpacing2(double value) { m_elementParameters["dSpacing2"] = value; }
+double DesignElement::getDSpacing2() const { return m_elementParameters["dSpacing2"].as_double(); }
+
+void DesignElement::setProfileKind(int value) { m_elementParameters["profileKind"] = value; }
+int DesignElement::getProfileKind() const { return m_elementParameters["profileKind"].as_int(); }
+
+
 }  // namespace RAYX

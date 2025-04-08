@@ -9,6 +9,8 @@ namespace RAYX {
 
 Behaviour makeBehaviour(const DesignElement& dele) {
     switch (dele.getBehaviourType()) {
+        case BehaviourType::Crystal:
+            return makeCrystal(dele);
         case BehaviourType::Grating:
             return makeGrating(dele);
         case BehaviourType::Mirror:
@@ -21,6 +23,12 @@ Behaviour makeBehaviour(const DesignElement& dele) {
             return serializeImagePlane();
     }
 }
+
+Behaviour makeCrystal(const DesignElement& dele) {
+    
+
+}
+
 
 Behaviour makeGrating(const DesignElement& dele) {
     auto vls = dele.getVLSParameters();

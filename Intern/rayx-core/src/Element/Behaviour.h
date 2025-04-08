@@ -15,6 +15,7 @@ enum class BehaveType {
     Slit,
     RZP,
     ImagePlane,
+    Crystal,
 };
 
 struct Behaviour {
@@ -33,6 +34,7 @@ Behaviour makeBehaviour(const DesignElement& dele);
 Behaviour makeGrating(const DesignElement& dele);  //< creates a Grating Behaviour from the parameters given in `dele`.
 Behaviour makeSlit(const DesignElement& dele);
 Behaviour makeRZPBehaviour(const DesignElement& dele);
+Behaviour makeCrystalBehaviour(const DesignElement& dele);
 
 ////////////////////
 // Mirror
@@ -208,6 +210,68 @@ inline Behaviour serializeImagePlane() {
     b.m_type = BehaveType::ImagePlane;
     return b;
 }
+
+
+
+//////////////
+// Crystal
+//////////////
+
+struct CrystalBehaviour {
+    double m_dSpacing;
+    double m_unitCellVolume;
+    double m_offsetAngle;
+    double m_orderOfDiffraction;
+
+    double m_structureFactorReF0;
+    double m_structureFactorImF0;
+    double m_structureFactorReFH;
+    double m_structureFactorImFH;
+    double m_structureFactorReFHC;
+    double m_structureFactorImFHC;
+};
+
+RAYX_FN_ACC
+inline Behaviour serializeCrystal(const CrystalBehaviour& c) {
+    Behaviour b;
+    b.m_type = BTYPE_CRYSTAL;
+
+    b.m_private_serialization_params[0] = c.m_dSpacing;
+    b.m_private_serialization_params[1] = c.m_unitCellVolume;
+    b.m_private_serialization_params[2] = c.m_orderOfDiffraction;
+    b.m_private_serialization_params[3] = c.m_offsetAngle;
+
+    b.m_private_serialization_params[4] = c.m_structureFactorReF0;
+    b.m_private_serialization_params[5] = c.m_structureFactorImF0;
+    b.m_private_serialization_params[6] = c.m_structureFactorReFH;
+    b.m_private_serialization_params[7] = c.m_structureFactorImFH;
+    b.m_private_serialization_params[8] = c.m_structureFactorReFHC;
+    b.m_private_serialization_params[9] = c.m_structureFactorImFHC;
+
+    return b;
+}
+
+RAYX_FN_ACC
+inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
+    CrystalBehaviour c;
+
+    c.m_dSpacing = b.m_private_serialization_params[0];
+    c.m_unitCellVolume = b.m_private_serialization_params[1];
+    c.m_orderOfDiffraction = b.m_private_serialization_params[2];
+    c.m_offsetAngle = b.m_private_serialization_params[3];
+
+    c.m_structureFactorReF0 = b.m_private_serialization_params[4];
+    c.m_structureFactorImF0 = b.m_private_serialization_params[5];
+    c.m_structureFactorReFH = b.m_private_serialization_params[6];
+    c.m_structureFactorImFH = b.m_private_serialization_params[7];
+    c.m_structureFactorReFHC = b.m_private_serialization_params[8];
+    c.m_structureFactorImFHC = b.m_private_serialization_params[9];
+
+    return c;
+}
+
+
+
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

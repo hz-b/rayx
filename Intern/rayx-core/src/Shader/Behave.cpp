@@ -12,8 +12,37 @@
 #include "SphericalCoords.h"
 #include "Throw.h"
 #include "Utils.h"
+#include "Crystal.h"
 
 namespace RAYX {
+
+
+RAYX_FN_ACC
+Ray behaveCrystal(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
+    CrystalBehaviour b = deserializeCrystal(inv.elements[id].m_behaviour);
+
+    double theta = getTheta(r, col.normal);
+    double bragg = getBraggAngle(r.m_energy, b.m_dSpacing, b.m_orderOfDiffraction);
+    double asymmetryFactor = getAsymmetryFactor(r.m_energy, bragg, b.m_offsetAngle);
+    
+    double polFactorNormal = 1.0;                                   // polarization factor for normal polarization
+    double polFactorParallel = std::abs(cos(2 * bragg));            // polarization factor for parallel polarization
+
+
+    double unitCellVolume = std::pow(b.m_latticeConstant, 3);  // e.g. 5.4309e-10 m for silicon
+    double wavelength = getWavelengthFromEnergy(r.m_energy);  // you need this helper (see below)
+    double preFactor = getDiffractionPrefactor(wavelength, unitCellVolume);
+
+    double angularDeviation = computeW(theta, bragg, asymmetryFactor, b.m_structureFactorReFH, b.m_structureFactorReF0, polFactorNormal, preFactor);
+
+    double absorption = getAbsorptionParameterAsymmetric(b.m_structureFactorImF0, preFactor, polFactorNormal, asymmetryFactor);
+
+    double dispersion = getPhaseShiftParameter(b.m_structureFactorReFH, b.m_structureFactorImFH, preFactor);
+
+    double reflectionProfile = computeReflectionProfile(angularDeviation, absorption, dispersion);
+
+    return r;
+}
 
 RAYX_FN_ACC
 Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {

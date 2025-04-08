@@ -15,7 +15,7 @@ enum class CurvatureType {
     Quadric,
     RzpSphere
 };  // order is crucial for xml prser
-enum class BehaviourType { Mirror, Grating, Slit, Rzp, ImagePlane };
+enum class BehaviourType { Mirror, Grating, Slit, Rzp, ImagePlane, Crystal };
 enum class FigureRotation { Yes, Plane, A11 };
 
 // the direction of a plane, either XY or XZ. This is only used in the parsing.
