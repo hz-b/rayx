@@ -166,8 +166,9 @@ inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
 
 inline std::vector<double> formatAsVec(const Ray arg) {
+    const auto eventType = static_cast<double>(arg.m_eventType);
     return {
-        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     arg.m_eventType,      arg.m_direction.x,    arg.m_direction.y,
+        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     eventType,            arg.m_direction.x,    arg.m_direction.y,
         arg.m_direction.z,    arg.m_energy,         arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(),
         arg.m_field.z.real(), arg.m_field.z.imag(), arg.m_pathLength,     arg.m_order,          arg.m_lastElement,    arg.m_sourceID,
     };
