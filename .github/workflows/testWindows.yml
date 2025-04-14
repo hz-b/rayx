@@ -61,7 +61,7 @@ jobs:
           INPUT_CUDA_VERSION: 12.5.1
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DRAYX_REQUIRE_CUDA=ON
+        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DRAYX_REQUIRE_CUDA=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
         run: |
