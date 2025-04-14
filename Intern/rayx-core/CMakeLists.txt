@@ -188,7 +188,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka)
 
 # ---- Data ----
 # Define the source and destination paths
-set(DATA_SRC_DIR "${CMAKE_SOURCE_DIR}/Data")
+set(DATA_SRC_DIR "${RAYX_SOURCE_DIR}/Data")
 # Set the destination directory for the Data directory based on the build type
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(DATA_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Data")
@@ -207,7 +207,7 @@ add_custom_command(
 
 # ---- Scripts ----
 # Define the source and destination paths
-set(SCRIPT_SRC_DIR "${CMAKE_SOURCE_DIR}/Scripts/plot.py")
+set(SCRIPT_SRC_DIR "${RAYX_SOURCE_DIR}/Scripts/plot.py")
 # Set the destination directory for the Scripts directory based on the build type
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(SCRIPT_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/Scripts/plot.py")

@@ -16,6 +16,20 @@ option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF
 
 # ------------------
 
+# ---- Defaults ----
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+# ------------------
+
+# ---- RAYX directory ----
+
+set(RAYX_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+# ------------------------
+
 # ---- Code Coverage ----
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)
 # ------------------
