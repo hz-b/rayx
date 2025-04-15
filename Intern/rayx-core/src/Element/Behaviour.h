@@ -218,6 +218,8 @@ inline Behaviour serializeImagePlane() {
 struct CrystalBehaviour {
     double m_dSpacing;
     double m_unitCellVolume;
+    double m_offsetAngle;
+    double m_orderOfDiffraction;
 
     double m_structureFactorReF0;
     double m_structureFactorImF0;
@@ -234,12 +236,15 @@ inline Behaviour serializeCrystal(const CrystalBehaviour& c) {
 
     b.m_private_serialization_params[0] = c.m_dSpacing;
     b.m_private_serialization_params[1] = c.m_unitCellVolume;
-    b.m_private_serialization_params[2] = c.m_structureFactorReF0;
-    b.m_private_serialization_params[3] = c.m_structureFactorImF0;
-    b.m_private_serialization_params[4] = c.m_structureFactorReFH;
-    b.m_private_serialization_params[5] = c.m_structureFactorImFH;
-    b.m_private_serialization_params[6] = c.m_structureFactorReFHC;
-    b.m_private_serialization_params[7] = c.m_structureFactorImFHC;
+    b.m_private_serialization_params[2] = c.m_orderOfDiffraction;
+    b.m_private_serialization_params[3] = c.m_offsetAngle;
+
+    b.m_private_serialization_params[4] = c.m_structureFactorReF0;
+    b.m_private_serialization_params[5] = c.m_structureFactorImF0;
+    b.m_private_serialization_params[6] = c.m_structureFactorReFH;
+    b.m_private_serialization_params[7] = c.m_structureFactorImFH;
+    b.m_private_serialization_params[8] = c.m_structureFactorReFHC;
+    b.m_private_serialization_params[9] = c.m_structureFactorImFHC;
 
     return b;
 }
@@ -247,14 +252,18 @@ inline Behaviour serializeCrystal(const CrystalBehaviour& c) {
 RAYX_FN_ACC
 inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
     CrystalBehaviour c;
+
     c.m_dSpacing = b.m_private_serialization_params[0];
     c.m_unitCellVolume = b.m_private_serialization_params[1];
-    c.m_structureFactorReF0 = b.m_private_serialization_params[2];
-    c.m_structureFactorImF0 = b.m_private_serialization_params[3];
-    c.m_structureFactorReFH = b.m_private_serialization_params[4];
-    c.m_structureFactorImFH = b.m_private_serialization_params[5];
-    c.m_structureFactorReFHC = b.m_private_serialization_params[6];
-    c.m_structureFactorImFHC = b.m_private_serialization_params[7];
+    c.m_orderOfDiffraction = b.m_private_serialization_params[2];
+    c.m_offsetAngle = b.m_private_serialization_params[3];
+
+    c.m_structureFactorReF0 = b.m_private_serialization_params[4];
+    c.m_structureFactorImF0 = b.m_private_serialization_params[5];
+    c.m_structureFactorReFH = b.m_private_serialization_params[6];
+    c.m_structureFactorImFH = b.m_private_serialization_params[7];
+    c.m_structureFactorReFHC = b.m_private_serialization_params[8];
+    c.m_structureFactorImFHC = b.m_private_serialization_params[9];
 
     return c;
 }
