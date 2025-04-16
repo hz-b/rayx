@@ -8,7 +8,7 @@ namespace RAYX {
 
 RAYX_FN_ACC
 void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEvents) {
-    auto ray = inv.inputRays[gid];
+    auto ray = inv.rays[gid];
     auto rand = Rand(gid + inv.batchStartRayIndex, inv.numRaysTotal, inv.randomSeed);
 
     // Iterate through all bounces
@@ -63,7 +63,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
     }
 
     // store recorded events count
-    outputEvents.numEvents[gid] = numEvents;
+    outputEvents.eventCounts[gid] = numEvents;
 }
 
 }  // namespace RAYX
