@@ -8,60 +8,60 @@ namespace RAYX {
 RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     switch (cutout.m_type) {
-    case CutoutType::Unlimited:
-        return true;
-    case CutoutType::Rect: {
-        RectCutout rect = deserializeRect(cutout);
-        double x_min = -rect.m_width / 2.0;
-        double x_max = rect.m_width / 2.0;
-        double z_min = -rect.m_length / 2.0;
-        double z_max = rect.m_length / 2.0;
+        case CutoutType::Unlimited:
+            return true;
+        case CutoutType::Rect: {
+            RectCutout rect = deserializeRect(cutout);
+            double x_min = -rect.m_width / 2.0;
+            double x_max = rect.m_width / 2.0;
+            double z_min = -rect.m_length / 2.0;
+            double z_max = rect.m_length / 2.0;
 
-        return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-    }
-    case CutoutType::Trapezoid: {
-        TrapezoidCutout t = deserializeTrapezoid(cutout);
+            return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
+        }
+        case CutoutType::Trapezoid: {
+            TrapezoidCutout t = deserializeTrapezoid(cutout);
 
-        // Check point is within the trapezoid
-        auto P = glm::dvec2(x, z);
+            // Check point is within the trapezoid
+            auto P = glm::dvec2(x, z);
 
-        // A, B, C, D are the four points on the trapezoid.
-        //
-        //    A--B    //
-        //   /    \   //
-        //  C------D  //
-        auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
-        auto B = glm::dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
-        auto C = glm::dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
-        auto D = glm::dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
+            // A, B, C, D are the four points on the trapezoid.
+            //
+            //    A--B    //
+            //   /    \   //
+            //  C------D  //
+            auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
+            auto B = glm::dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
+            auto C = glm::dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
+            auto D = glm::dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
 
-        glm::dvec2 PmA = P - A;
-        glm::dvec2 BmA = B - A;
-        glm::dvec2 PmD = P - D;
-        glm::dvec2 CmD = C - D;
-        glm::dvec2 DmA = D - A;
-        glm::dvec2 PmB = P - B;
-        glm::dvec2 CmB = C - B;
+            glm::dvec2 PmA = P - A;
+            glm::dvec2 BmA = B - A;
+            glm::dvec2 PmD = P - D;
+            glm::dvec2 CmD = C - D;
+            glm::dvec2 DmA = D - A;
+            glm::dvec2 PmB = P - B;
+            glm::dvec2 CmB = C - B;
 
-        double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
-        double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
-        return l1 < 0 && l2 < 0;
-    }
-    case CutoutType::Elliptical: {
-        EllipticalCutout ell = deserializeElliptical(cutout);
+            double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
+            double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
+            return l1 < 0 && l2 < 0;
+        }
+        case CutoutType::Elliptical: {
+            EllipticalCutout ell = deserializeElliptical(cutout);
 
-        double radius_x = ell.m_diameter_x / 2.0;
-        double radius_z = ell.m_diameter_z / 2.0;
+            double radius_x = ell.m_diameter_x / 2.0;
+            double radius_z = ell.m_diameter_z / 2.0;
 
-        double val1 = x / radius_x;
-        double val2 = z / radius_z;
+            double val1 = x / radius_x;
+            double val2 = z / radius_z;
 
-        double rd2 = val1 * val1 + val2 * val2;
-        return rd2 <= 1.0;
-    }
-    default:
-        _throw("invalid cutout type in inCutout %d!", static_cast<int>(cutout.m_type));
-        return false;
+            double rd2 = val1 * val1 + val2 * val2;
+            return rd2 <= 1.0;
+        }
+        default:
+            _throw("invalid cutout type in inCutout %d!", static_cast<int>(cutout.m_type));
+            return false;
     }
 }
 

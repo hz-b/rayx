@@ -96,8 +96,8 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);
             glm::vec4 originColor = (event.m_eventType == RAYX::EventType::HitElement) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == RAYX::EventType::HitElement) ? ORANGE
-                                   : (event.m_eventType == RAYX::EventType::Absorbed)    ? RED
-                                                                                    : WHITE;
+                                   : (event.m_eventType == RAYX::EventType::Absorbed) ? RED
+                                                                                      : WHITE;
 
             ColorVertex origin = {rayLastPos, originColor};
             ColorVertex point = {worldPos, pointColor};

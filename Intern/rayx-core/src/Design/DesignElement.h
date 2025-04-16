@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Element/Element.h"
 #include "Beamline/Node.h"
+#include "Element/Element.h"
 #include "Value.h"
 
 namespace RAYX {

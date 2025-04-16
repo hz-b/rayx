@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <fstream>
 
-#include "Rml/Locate.h"
 #include "Debug/Debug.h"
+#include "Rml/Locate.h"
 
 namespace RAYX {
 

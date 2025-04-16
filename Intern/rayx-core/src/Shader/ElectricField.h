@@ -75,4 +75,4 @@ inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) 
     const auto right = glm::cross(forward, up);
     return glm::dmat3(right, up, forward);
 }
-}
+}  // namespace RAYX

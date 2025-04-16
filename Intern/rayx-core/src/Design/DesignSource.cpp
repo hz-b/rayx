@@ -211,7 +211,9 @@ void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { m_elementParame
 EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return m_elementParameters["energySpreadUnit"].as_energySpreadUnit(); }
 
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { m_elementParameters["energyDistributionType"] = value; }
-EnergyDistributionType DesignSource::getEnergyDistributionType() const { return m_elementParameters["energyDistributionType"].as_energyDistributionType(); }
+EnergyDistributionType DesignSource::getEnergyDistributionType() const {
+    return m_elementParameters["energyDistributionType"].as_energyDistributionType();
+}
 
 void DesignSource::setEnergyDistributionFile(std::string value) { m_elementParameters["photonEnergyDistributionFile"] = value; }
 

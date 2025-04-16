@@ -1,9 +1,8 @@
 #pragma once
 
-#include <glm.hpp>
-
 #include <array>
 #include <filesystem>
+#include <glm.hpp>
 #include <optional>
 #include <rapidxml.hpp>
 #include <vector>
