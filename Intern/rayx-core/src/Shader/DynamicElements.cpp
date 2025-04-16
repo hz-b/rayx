@@ -15,8 +15,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
     int numEvents = 0;
     for (int i = 0; i < inv.maxEvents; numEvents = ++i) {
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
-        if (!isRayActive(ray.m_eventType))
-            break;
+        if (!isRayActive(ray.m_eventType)) break;
 
         Collision col = findCollision(i, inv.sequential, ray, inv.elements, inv.numElements, rand);
         if (!col.found) {
@@ -56,7 +55,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         }
 
         // write ray in local element coordinates to global memory
-        outputEvents.events[gid*inv.maxEvents + i] = ray;
+        outputEvents.events[gid * inv.maxEvents + i] = ray;
 
         // transform back to WORLD coordinates
         ray = rayMatrixMult(ray, element.m_outTrans);

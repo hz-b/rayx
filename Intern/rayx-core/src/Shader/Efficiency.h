@@ -93,7 +93,7 @@ inline cmat3 calcJonesMatrix(const ComplexFresnelCoeffs amplitude) {
 RAYX_FN_ACC
 inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::dvec3 reflectOrRefractVec, const glm::dvec3 normalVec,
                                       const ComplexFresnelCoeffs amplitude) {
-    // TODO: cross product is not numerically stable here, if indicentVec == reflectOrRefractVec 
+    // TODO: cross product is not numerically stable here, if indicentVec == reflectOrRefractVec
     // we dont need the lenght of the vector resulting from the cross product, but only the direciton.
     // this may could be done by calculation angles instead of a vector.
     // fixing this removes the check in interceptReflect, that specializes for normal incidence

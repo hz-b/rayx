@@ -98,7 +98,9 @@ std::vector<Ray> PointSource::getRays(int thread_count) const {
         Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)
 #pragma omp critical
-        { rayList.push_back(r); }
+        {
+            rayList.push_back(r);
+        }
 #else
         rayList.push_back(r);
 #endif

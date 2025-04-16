@@ -1,7 +1,7 @@
 #include "RayRenderSystem.h"
 
-#include "Rml/Locate.h"
 #include "RenderObject.h"
+#include "Rml/Locate.h"
 #include "Vertex.h"
 
 RayRenderSystem::RayRenderSystem(Device& device, VkRenderPass renderPass, const std::vector<VkDescriptorSetLayout>& setLayouts)

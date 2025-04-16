@@ -2,10 +2,10 @@
 
 #include "Collision.h"
 
-#include "InvocationState.h"
 #include "ApplySlopeError.h"
 #include "Cubic.h"
 #include "CutoutFns.h"
+#include "InvocationState.h"
 #include "Throw.h"
 #include "Utils.h"
 
@@ -451,38 +451,38 @@ RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul) {
     Collision col;
     switch (surface.m_type) {
-    case SurfaceType::PlaneXZ: {
-        col.normal = glm::dvec3(0, -glm::sign(r.m_direction.y), 0);
+        case SurfaceType::PlaneXZ: {
+            col.normal = glm::dvec3(0, -glm::sign(r.m_direction.y), 0);
 
-        // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
-        // velocity = distance/time <-> time = distance/velocity from school physics.
-        // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
-        // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
-        double time = -r.m_position.y / r.m_direction.y;
+            // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
+            // velocity = distance/time <-> time = distance/velocity from school physics.
+            // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
+            // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
+            double time = -r.m_position.y / r.m_direction.y;
 
-        col.hitpoint.x = r.m_position.x + r.m_direction.x * time;
-        col.hitpoint.z = r.m_position.z + r.m_direction.z * time;
-        col.hitpoint.y = 0;
+            col.hitpoint.x = r.m_position.x + r.m_direction.x * time;
+            col.hitpoint.z = r.m_position.z + r.m_direction.z * time;
+            col.hitpoint.y = 0;
 
-        // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set `found
-        // = false`.
-        col.found = time >= 0;
-        break;
-    }
-    case SurfaceType::Toroid:
-        col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
-        break;
-    case SurfaceType::Quadric:
-        col = getQuadricCollision(r, deserializeQuadric(surface));
-        break;
-    case SurfaceType::Cubic:
-        col = getCubicCollision(r, deserializeCubic(surface));
-        break;
-    default:
-        col.found = false;
+            // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set
+            // `found = false`.
+            col.found = time >= 0;
+            break;
+        }
+        case SurfaceType::Toroid:
+            col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
+            break;
+        case SurfaceType::Quadric:
+            col = getQuadricCollision(r, deserializeQuadric(surface));
+            break;
+        case SurfaceType::Cubic:
+            col = getCubicCollision(r, deserializeCubic(surface));
+            break;
+        default:
+            col.found = false;
 
-        _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_type));
-        return col;  // has found = false
+            _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_type));
+            return col;  // has found = false
     }
 
     // cutout is applied in the XZ plane.
@@ -520,7 +520,8 @@ Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement&
 
 // Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand) {
+Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements,
+                        const int numElements, Rand& __restrict__ rand) {
     // Find intersection point in next element
     if (sequential == Sequential::Yes) {
         const auto elementIndex = eventIndex;
@@ -558,7 +559,8 @@ Collision findCollision(const int eventIndex, const Sequential sequential, const
         }
     }
 
-    _debug_assert(!best_col.found || best_col.elementIndex >= 0 && best_col.elementIndex < numElements, "found collision, but element index is out of range!");
+    _debug_assert(!best_col.found || best_col.elementIndex >= 0 && best_col.elementIndex < numElements,
+                  "found collision, but element index is out of range!");
     return best_col;
 }
 

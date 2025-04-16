@@ -1,15 +1,14 @@
 #pragma once
 
-#include <glm.hpp>
-
 #include <array>
+#include <glm.hpp>
 #include <string>
 #include <vector>
 
 #include "Core.h"
 #include "Element/Strings.h"
-#include "Rml/xml.h"
 #include "EnergyDistribution.h"
+#include "Rml/xml.h"
 #include "Shader/Ray.h"
 
 namespace RAYX {

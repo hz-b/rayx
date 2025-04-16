@@ -6,12 +6,12 @@
 #include <utility>
 
 #include "Angle.h"
+#include "Beamline/Beamline.h"
 #include "Beamline/EnergyDistribution.h"
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
-#include "Beamline/Beamline.h"
-#include "Shader/Constants.h"
 #include "Element/Strings.h"
+#include "Shader/Constants.h"
 
 namespace RAYX::xml {
 

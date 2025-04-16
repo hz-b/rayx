@@ -5,8 +5,8 @@
 #include "Core.h"
 #include "Element/Cutout.h"
 #include "InvocationState.h"
-#include "Ray.h"
 #include "Rand.h"
+#include "Ray.h"
 
 namespace RAYX {
 
@@ -31,6 +31,7 @@ RAYX_FN_ACC Collision getQuadricCollision(Ray r, QuadricSurface q);
 RAYX_FN_ACC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
 RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
 RAYX_FN_ACC Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict__ element, Rand& __restrict__ rand);
-RAYX_FN_ACC Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand);
+RAYX_FN_ACC Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict__ ray,
+                                    const OpticalElement* __restrict__ elements, const int numElements, Rand& __restrict__ rand);
 
 }  // namespace RAYX

@@ -1,16 +1,17 @@
 #include "Locate.h"
-#include <iostream>
-#include <filesystem>
-#include <vector>
+
 #include <algorithm>
+#include <filesystem>
+#include <iostream>
+#include <vector>
 
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(__APPLE__)
 #include <cassert>
 #else
-#include <unistd.h>
 #include <limits.h>
+#include <unistd.h>
 #endif
 
 namespace RAYX {

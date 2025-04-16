@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core.h"
-
 #include <cstdint>
+
+#include "Core.h"
 
 namespace RAYX {
 
@@ -28,7 +28,7 @@ struct Rand {
     Rand() noexcept {}
 
     Rand(Rand&&) = default;
-    Rand& operator= (Rand&&) = default;
+    Rand& operator=(Rand&&) = default;
 
     RAYX_FN_ACC
     explicit Rand(const uint64_t ctr) noexcept : m_ctr(ctr) {}
@@ -43,19 +43,13 @@ struct Rand {
     }
 
     RAYX_FN_ACC
-    uint64_t randomInt() {
-        return squares64(m_ctr);
-    }
+    uint64_t randomInt() { return squares64(m_ctr); }
 
     RAYX_FN_ACC
-    double randomDouble() {
-        return squaresDoubleRNG(m_ctr);
-    }
+    double randomDouble() { return squaresDoubleRNG(m_ctr); }
 
     RAYX_FN_ACC
-    double randomDoubleNormalDistributed(double mu, double sigma) {
-        return squaresNormalRNG(m_ctr, mu, sigma);
-    }
+    double randomDoubleNormalDistributed(double mu, double sigma) { return squaresNormalRNG(m_ctr, mu, sigma); }
 
     uint64_t m_ctr;
 };

@@ -115,12 +115,10 @@ struct RAYX_API Verb {
 };
 
 // An empty implementation used in release when using "debug-only" prints like RAYX_D_LOG.
-struct RAYX_API IgnoreLog {
-    template <typename T>
-    IgnoreLog& operator<<(T) {
-        return *this;
-    }
-};
+struct RAYX_API IgnoreLog{template <typename T> IgnoreLog & operator<<(T){return *this;
+}  // namespace RAYX
+}
+;
 
 // the function to be called after RAYX_EXIT happens.
 // normally exit(1), but in the test suite it's ADD_FAILURE.
@@ -167,9 +165,11 @@ inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.rea
 
 inline std::vector<double> formatAsVec(const Ray arg) {
     return {
-        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     static_cast<double>(arg.m_eventType),      arg.m_direction.x,    arg.m_direction.y,
-        arg.m_direction.z,    arg.m_energy,         arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(),
-        arg.m_field.z.real(), arg.m_field.z.imag(), arg.m_pathLength,     arg.m_order,          arg.m_lastElement,    arg.m_sourceID,
+        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     static_cast<double>(arg.m_eventType),
+        arg.m_direction.x,    arg.m_direction.y,    arg.m_direction.z,    arg.m_energy,
+        arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(),
+        arg.m_field.z.real(), arg.m_field.z.imag(), arg.m_pathLength,     arg.m_order,
+        arg.m_lastElement,    arg.m_sourceID,
     };
 }
 

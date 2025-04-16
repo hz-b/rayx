@@ -5,7 +5,8 @@
 namespace RAYX {
 
 // The materialTable table consists of all the entries from the Palik & Nff tables for all materials that were loaded into the shader.
-// Thus, when you want to get some concrete palik entry for a particular element, you need the materialIndices table to "know where to look" in materialTable:
+// Thus, when you want to get some concrete palik entry for a particular element, you need the materialIndices table to "know where to look" in
+// materialTable:
 // * materialIndices[i] is the beginning of the Palik Table in materialTable for the element with atomic number i+1, for i in [0, 91].
 // * materialIndices[i+92] is the beginning of the Nff Table in materialTable for the element with atomic number i+1, for i in [0, 91].
 // The `i+1` is necessary as atomic numbers start at 1 (Hydrogen), while array indices start at 0.
@@ -75,7 +76,8 @@ NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict__ m
 
 // returns dvec2 to represent a complex number
 RAYX_FN_ACC
-complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict__ materialIndices, const double* __restrict__ materialTable) {
+complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict__ materialIndices,
+                                             const double* __restrict__ materialTable) {
     if (material == -1) {  // vacuum
         return complex::Complex(1., 0.);
     }
@@ -88,7 +90,7 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
 
     // try to get refractive index using Palik table
     if (getPalikEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
-        int low = 0;                                       // <= energy
+        int low = 0;                                                   // <= energy
         int high = getPalikEntryCount(material, materialIndices) - 1;  // >= energy
 
         PalikEntry low_entry = getPalikEntry(low, material, materialIndices, materialTable);
@@ -113,7 +115,7 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
 
     // get refractive index with Nff table
     if (getNffEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
-        int low = 0;                                     // <= energy
+        int low = 0;                                                 // <= energy
         int high = getNffEntryCount(material, materialIndices) - 1;  // >= energy
 
         // binary search

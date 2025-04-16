@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm.hpp>
-
 #include <vector>
 
 #include "GraphicsCore/Buffer.h"

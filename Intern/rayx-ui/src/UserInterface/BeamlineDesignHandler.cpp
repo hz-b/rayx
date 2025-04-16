@@ -11,8 +11,8 @@
 
 #include "Beamline/Beamline.h"
 #include "Beamline/StringConversion.h"
-#include "Element/Strings.cpp"
 #include "Debug/Instrumentor.h"
+#include "Element/Strings.cpp"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiInfo) {
     if (!uiInfo.selectedNode) {
