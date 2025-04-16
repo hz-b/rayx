@@ -2,8 +2,7 @@
 
 #include <algorithm>
 
-#include "Platform.h"
-#include "SimpleTracer.h"
+#include "MegaKernelTracer.h"
 
 namespace {
 
@@ -11,29 +10,28 @@ using DeviceType = RAYX::DeviceConfig::DeviceType;
 using DeviceIndex = RAYX::DeviceConfig::Device::Index;
 
 inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceType, DeviceIndex deviceIndex) {
-    using Dim = alpaka::DimInt<1>;
-    using Idx = int32_t;
-
     switch (deviceType) {
         case DeviceType::GpuCuda:
 #if defined(RAYX_CUDA_ENABLED)
-            using GpuAccCuda = RAYX::GpuAccCuda<Dim, Idx>;
-            return std::make_shared<RAYX::SimpleTracer<GpuAccCuda>>(deviceIndex);
+            return std::make_shared<RAYX::MegaKernelTracer<alpaka::TagGpuCudaRt>>(deviceIndex);
 #else
             RAYX_EXIT << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
             return nullptr;
 #endif
         case DeviceType::GpuHip:
 #if defined(RAYX_HIP_ENABLED)
-            using GpuAccHip = RAYX::GpuAccHip<Dim, Idx>;
-            return std::make_shared<RAYX::SimpleTracer<GpuAccHip>>(deviceIndex);
+            eturn std::make_shared<RAYX::MegaKernelTracer<alpaka::TagGpuHipRt>>(deviceIndex);
 #else
             RAYX_EXIT << "Failed to create Tracer with Hip device. Hip was disabled during build.";
             return nullptr;
 #endif
-        default:  // case DeviceType::Cpu
-            using CpuAcc = RAYX::DefaultCpuAcc<Dim, Idx>;
-            return std::make_shared<RAYX::SimpleTracer<CpuAcc>>(deviceIndex);
+        default: // case DeviceType::Cpu
+#if defined(RAYX_OPENMP_ENABLED)
+            using TagCpu = alpaka::TagCpuOmp2Blocks;
+#else
+            using TagCpu = alpaka::TagCpuSerial;
+#endif
+            return std::make_shared<RAYX::MegaKernelTracer<TagCpu>>(deviceIndex);
     }
 }
 
@@ -54,6 +52,10 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
 }
 
 BundleHistory Tracer::trace(const Group& group, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT, uint32_t maxEvents) {
+    // in sequential tracing, maxEvents should be equal to the number of elements
+    if (sequential == Sequential::Yes)
+        maxEvents = group.numElements();
+
     return m_deviceTracer->trace(group, sequential, max_batch_size, THREAD_COUNT, maxEvents);
 }
 

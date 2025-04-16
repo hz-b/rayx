@@ -10,7 +10,8 @@
 #include <sstream>
 
 #include "Debug/Debug.h"
-#include "Platform.h"
+
+#include <alpaka/alpaka.hpp>
 
 namespace {
 
@@ -41,40 +42,19 @@ DeviceType platformToDeviceType<alpaka::PlatformHipRt>() {
 }
 #endif
 
-template <typename Platform, typename Dim, typename Idx>
-struct AccForPlatform;
-
-template <typename Dim, typename Idx>
-struct AccForPlatform<alpaka::PlatformCpu, Dim, Idx> {
-    using type = RAYX::DefaultCpuAcc<Dim, Idx>;
-};
-
-#if defined(RAYX_CUDA_ENABLED)
-template <typename Dim, typename Idx>
-struct AccForPlatform<alpaka::PlatformCudaRt, Dim, Idx> {
-    using type = alpaka::AccGpuCudaRt<Dim, Idx>;
-};
-#endif
-
-#if defined(RAYX_HIP_ENABLED)
-template <typename Dim, typename Idx>
-struct AccForPlatform<alpaka::PlatformHipRt, Dim, Idx> {
-    using type = alpaka::AccGpuHipRt<Dim, Idx>;
-};
-#endif
-
-template <typename Platform, typename Dim, typename Idx>
-using AccForPlatform_t = typename AccForPlatform<Platform, Dim, Idx>::type;
-
-template <typename Platform>
-std::vector<Device> getAvailableDevicesForPlatform(const Platform platform) {
+template <typename AccTag>
+std::vector<Device> getAvailableDevicesProps() {
     std::vector<Device> devices;
 
-    const auto count = alpaka::getDevCount(platform);
-    for (size_t i = 0; i < count; ++i) {
-        using Dim = alpaka::DimInt<1>;
-        using Idx = int32_t;
-        using Acc = AccForPlatform_t<Platform, Dim, Idx>;
+    using Dim = alpaka::DimInt<1>;
+    using Idx = int32_t;
+    using Acc = alpaka::TagToAcc<AccTag, Dim, Idx>;
+    using Platform = alpaka::Platform<Acc>;
+
+    const auto platform = Platform{};
+    const auto numDevices = alpaka::getDevCount(platform);
+
+    for (size_t i = 0; i < numDevices; ++i) {
         const auto dev = alpaka::getDevByIdx(platform, i);
         const auto props = alpaka::getAccDevProps<Acc>(dev);
         const auto index = static_cast<Index>(i);
@@ -97,19 +77,19 @@ std::vector<Device> getAvailableDevicesForPlatform(const Platform platform) {
 std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All) {
     auto devices = std::vector<Device>();
 
-    auto append = [&devices](const auto platform) mutable {
-        auto platformDevices = getAvailableDevicesForPlatform(platform);
+    auto append = [&devices] <typename AccTag> (const AccTag&) mutable {
+        auto platformDevices = getAvailableDevicesProps<AccTag>();
         devices.insert(devices.end(), platformDevices.begin(), platformDevices.end());
     };
 
-    if (deviceType & DeviceType::Cpu) append(alpaka::PlatformCpu());
+    if (deviceType & DeviceType::Cpu) append(alpaka::TagCpuOmp2Blocks{});
 
 #if defined(RAYX_CUDA_ENABLED)
-    if (deviceType & DeviceType::GpuCuda) append(alpaka::PlatformCudaRt());
+    if (deviceType & DeviceType::GpuCuda) append(alpaka::TagGpuCudaRt{});
 #endif
 
 #if defined(RAYX_HIP_ENABLED)
-    if (deviceType & DeviceType::GpuHip) append(alpaka::PlatformHipRt());
+    if (deviceType & DeviceType::GpuHip) append(alpaka::TagGpuHipRt{});
 #endif
 
     return devices;
