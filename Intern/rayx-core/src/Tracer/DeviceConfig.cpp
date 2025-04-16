@@ -6,12 +6,11 @@
 #include "DeviceConfig.h"
 
 #include <algorithm>
+#include <alpaka/alpaka.hpp>
 #include <ranges>
 #include <sstream>
 
 #include "Debug/Debug.h"
-
-#include <alpaka/alpaka.hpp>
 
 namespace {
 
@@ -77,7 +76,7 @@ std::vector<Device> getAvailableDevicesProps() {
 std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All) {
     auto devices = std::vector<Device>();
 
-    auto append = [&devices] <typename AccTag> (const AccTag&) mutable {
+    auto append = [&devices]<typename AccTag>(const AccTag&) mutable {
         auto platformDevices = getAvailableDevicesProps<AccTag>();
         devices.insert(devices.end(), platformDevices.begin(), platformDevices.end());
     };

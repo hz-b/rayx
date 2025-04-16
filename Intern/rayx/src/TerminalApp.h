@@ -5,9 +5,9 @@
 
 #include "Beamline/Beamline.h"
 #include "CommandParser.h"
+#include "Debug/Instrumentor.h"
 #include "TerminalAppConfig.h"
 #include "Tracer/Tracer.h"
-#include "Debug/Instrumentor.h"
 
 class TerminalApp {
   public:

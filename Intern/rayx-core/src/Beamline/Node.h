@@ -1,8 +1,7 @@
 #pragma once
 
-#include <memory>
-
 #include <glm.hpp>
+#include <memory>
 
 #include "Core.h"
 

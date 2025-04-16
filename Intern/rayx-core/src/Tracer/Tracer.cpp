@@ -25,7 +25,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
             RAYX_EXIT << "Failed to create Tracer with Hip device. Hip was disabled during build.";
             return nullptr;
 #endif
-        default: // case DeviceType::Cpu
+        default:  // case DeviceType::Cpu
 #if defined(RAYX_OPENMP_ENABLED)
             using TagCpu = alpaka::TagCpuOmp2Blocks;
 #else
@@ -53,8 +53,7 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
 
 BundleHistory Tracer::trace(const Group& group, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT, uint32_t maxEvents) {
     // in sequential tracing, maxEvents should be equal to the number of elements
-    if (sequential == Sequential::Yes)
-        maxEvents = group.numElements();
+    if (sequential == Sequential::Yes) maxEvents = group.numElements();
 
     return m_deviceTracer->trace(group, sequential, max_batch_size, THREAD_COUNT, maxEvents);
 }

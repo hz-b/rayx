@@ -1,42 +1,38 @@
 #pragma once
 
+#include <alpaka/alpaka.hpp>
 #include <numeric>
 
-#include "DeviceTracer.h"
 #include "Beamline/Beamline.h"
+#include "Debug/Instrumentor.h"
+#include "DeviceTracer.h"
 #include "Material/Material.h"
 #include "Random.h"
 #include "Shader/DynamicElements.h"
-#include "Debug/Instrumentor.h"
-#include "Util.h"
 
 namespace RAYX {
 namespace {
 
-inline constexpr int calcNumBatches(const int batchSize, const int numRaysTotal) {
-    return (batchSize + numRaysTotal - 1) / batchSize;
-}
+inline constexpr int calcNumBatches(const int batchSize, const int numRaysTotal) { return (batchSize + numRaysTotal - 1) / batchSize; }
 
-inline constexpr int nextPowerOfTwo(const int value) {
-    return glm::pow(2, glm::ceil(glm::log(value) / glm::log(2)));
-}
+inline constexpr int nextPowerOfTwo(const int value) { return glm::pow(2, glm::ceil(glm::log(value) / glm::log(2))); }
 
 /// conditionally allocate buffer with specified minimum size.
 /// if the buffer already fulfills size requirements, this function does nothing. thus, this function never shrinks a buffer.
 /// actual allocation size is nextPowerOfTwo(size).
-/// this function is designed to optimize the repetitive use of the buffer with potentially different size requirements (e.g. tracing multiple beamlines one after the other)
+/// this function is designed to optimize the repetitive use of the buffer with potentially different size requirements (e.g. tracing multiple
+/// beamlines one after the other)
 template <typename Queue, typename Buf>
 inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
-    using Dim = alpaka::Dim<Buf>;
     using Idx = alpaka::Idx<Buf>;
     using Elem = alpaka::Elem<Buf>;
 
     const auto shouldAlloc = !buf || alpaka::getExtents(*buf)[0] < size;
-    if (shouldAlloc)
-        buf = alpaka::allocAsyncBufIfSupported<Elem, Idx>(q, nextPowerOfTwo(size));
+    if (shouldAlloc) buf = alpaka::allocAsyncBufIfSupported<Elem, Idx>(q, nextPowerOfTwo(size));
 }
 
-inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, const std::vector<Ray>& compactEvents, const std::vector<int>& compactEventCounts, const std::vector<int>& compactEventOffsets) {
+inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, const std::vector<Ray>& compactEvents,
+                                                  const std::vector<int>& compactEventCounts, const std::vector<int>& compactEventOffsets) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     for (int i = 0; i < static_cast<int>(compactEventCounts.size()); i++) {
@@ -45,14 +41,11 @@ inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, 
 
         // add events to history, only if there are events
         bool hasEvents = 0 < std::distance(begin, end);
-        if (hasEvents)
-            bundleHistory.emplace_back(begin, end);
+        if (hasEvents) bundleHistory.emplace_back(begin, end);
     }
 }
 
 }  // unnamed namespace
-
-
 
 /// keeps track of all resources used by the tracer. manages allocation and update of buffers
 /// note: members starting with h_ reside on host side, while d_ reside on device side
@@ -121,7 +114,7 @@ struct Resources {
         alpaka::memcpy(q, *d_elements, alpaka::createView(devHost, elements, numElements));
 
         // input rays
-        h_rays = group.compileSources(1); // TODO: generate rays on device
+        h_rays = group.compileSources(1);  // TODO: generate rays on device
         const auto numRaysTotal = static_cast<int>(h_rays.size());
         const auto preferredBatchSize = std::min(numRaysTotal, maxBatchSize);
         allocBuf(q, d_rays, preferredBatchSize);
@@ -146,14 +139,14 @@ struct Resources {
 // it takes care of creating, destroying and updating device resources
 template <typename AccTag>
 class MegaKernelTracer : public DeviceTracer {
-public:
+  public:
     explicit MegaKernelTracer(int deviceIndex) : m_deviceIndex(deviceIndex) {}
     MegaKernelTracer(const MegaKernelTracer&) = delete;
     MegaKernelTracer(MegaKernelTracer&&) = default;
-    MegaKernelTracer& operator= (const MegaKernelTracer&) = delete;
-    MegaKernelTracer& operator= (MegaKernelTracer&&) = default;
+    MegaKernelTracer& operator=(const MegaKernelTracer&) = delete;
+    MegaKernelTracer& operator=(MegaKernelTracer&&) = default;
 
-private:
+  private:
     using Dim = alpaka::DimInt<1>;
     using Idx = int;
     using Acc = alpaka::TagToAcc<AccTag, Dim, Idx>;
@@ -161,27 +154,23 @@ private:
     const int m_deviceIndex;
     Resources<Acc> m_resources;
 
-public:
-    virtual BundleHistory trace(
-        const Group& beamline,
-        const Sequential sequential,
-        const int maxBatchSize,
-        [[maybe_unused]] const int THREAD_COUNT, // TODO: remove
-        const int maxEvents
-    ) override {
+  public:
+    virtual BundleHistory trace(const Group& beamline, const Sequential sequential, const int maxBatchSize,
+                                [[maybe_unused]] const int THREAD_COUNT,  // TODO: remove
+                                const int maxEvents) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
         const auto devHost = alpaka::getDevByIdx(platformHost, 0);
         const auto platformAcc = alpaka::Platform<Acc>{};
         const auto devAcc = alpaka::getDevByIdx(platformAcc, m_deviceIndex);
-        using Queue = alpaka::Queue<Acc, alpaka::Blocking>; // TODO
+        using Queue = alpaka::Queue<Acc, alpaka::Blocking>;  // TODO
         auto q = Queue(devAcc);
 
         const auto conf = m_resources.update(q, beamline, maxEvents, maxBatchSize);
         const auto randomSeed = randomDouble();
 
-        auto bundleHistory = BundleHistory {};
+        auto bundleHistory = BundleHistory{};
 
         for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {
             const auto batchStartRayIndex = batchIndex * conf.preferredBatchSize;
@@ -216,17 +205,16 @@ public:
             alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsTotal), *m_resources.d_compactEvents, numEventsTotal);
             collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets);
 
-            RAYX_D_LOG << "batch (" << (batchIndex+1) << "/" << conf.numBatches << ") traced " << numEventsTotal << " events";
+            RAYX_D_LOG << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") traced " << numEventsTotal << " events";
         }
 
         return bundleHistory;
     }
 
-// private:
+    // private:
     struct DynamicElementsKernel {
         template <typename Acc>
-        RAYX_FN_ACC
-        void operator()(const Acc& acc, const InvState inv, OutputEvents outputEvents) const {
+        RAYX_FN_ACC void operator()(const Acc& acc, const InvState inv, OutputEvents outputEvents) const {
             const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
             if (gid < inv.batchSize) dynamicElements(gid, inv, outputEvents);
@@ -234,11 +222,12 @@ public:
     };
 
     template <typename DevAcc, typename Queue>
-    void traceBatch(DevAcc devAcc, Queue q, int numElements, int numRaysTotal, int batchSize, int batchStartRayIndex, int maxEvents, double randomSeed, Sequential sequential) {
+    void traceBatch(DevAcc devAcc, Queue q, int numElements, int numRaysTotal, int batchSize, int batchStartRayIndex, int maxEvents,
+                    double randomSeed, Sequential sequential) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         // inputs
-        const auto inv = InvState {
+        const auto inv = InvState{
             // constants
             .numRaysTotal = numRaysTotal,
             .batchSize = batchSize,
@@ -256,7 +245,7 @@ public:
         };
 
         // outputs
-        const auto outputEvents = OutputEvents {
+        const auto outputEvents = OutputEvents{
             // buffers
             .events = alpaka::getPtrNative(*m_resources.d_events),
             .eventCounts = alpaka::getPtrNative(*m_resources.d_compactEventCounts),
@@ -267,15 +256,8 @@ public:
 
     struct GatherKernel {
         template <typename Acc, typename T>
-        RAYX_FN_ACC void operator() (
-            const Acc& acc,
-            T* dst,
-            const T* src,
-            const int* srcSizes,
-            const int* srcOffsets,
-            const int srcMaxSize,
-            const int n
-        ) const {
+        RAYX_FN_ACC void operator()(const Acc& acc, T* dst, const T* src, const int* srcSizes, const int* srcOffsets, const int srcMaxSize,
+                                    const int n) const {
             const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
             if (gid < n) {
@@ -295,42 +277,22 @@ public:
     void gatherCompactEvents(DevAcc devAcc, Queue q, int batchSize, int maxEvents) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
-        execWithValidWorkDiv(
-            devAcc,
-            q,
-            batchSize,
-            GatherKernel{},
-            alpaka::getPtrNative(*m_resources.d_compactEvents),
-            alpaka::getPtrNative(*m_resources.d_events),
-            alpaka::getPtrNative(*m_resources.d_compactEventCounts),
-            alpaka::getPtrNative(*m_resources.d_compactEventOffsets),
-            maxEvents,
-            batchSize
-        );
+        execWithValidWorkDiv(devAcc, q, batchSize, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
+                             alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventCounts),
+                             alpaka::getPtrNative(*m_resources.d_compactEventOffsets), maxEvents, batchSize);
     }
 
-    template <typename Queue, typename DevAcc, typename Kernel, typename ...Args>
+    template <typename Queue, typename DevAcc, typename Kernel, typename... Args>
     void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, const Kernel& kernel, Args&&... args) {
         const auto conf = alpaka::KernelCfg<Acc>{numElements, 1};
-        const auto workDiv = alpaka::getValidWorkDiv(
-            conf,
-            devAcc,
-            kernel,
-            std::forward<Args>(args)...
-        );
+        const auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
 
         RAYX_D_LOG << "executing kernel with launch config: "
-            << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
-            << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
-            << "elements = " << workDiv.m_threadElemExtent[0]
-        ; // TODO: why does m_blockThreadExtent not divide by warpSize?
+                   << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
+                   << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
+                   << "elements = " << workDiv.m_threadElemExtent[0];  // TODO: why does m_blockThreadExtent not divide by warpSize?
 
-        alpaka::exec<Acc>(
-            q,
-            workDiv,
-            kernel,
-            std::forward<Args>(args)...
-        );
+        alpaka::exec<Acc>(q, workDiv, kernel, std::forward<Args>(args)...);
     }
 };
 

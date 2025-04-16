@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm.hpp>
-
 #include <optional>
 
 #include "Behaviour.h"
@@ -36,6 +35,6 @@ RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 o
 
 // constructs an OpticalElement given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
 OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {},
-                    DesignPlane plane = DesignPlane::XZ);
+                           DesignPlane plane = DesignPlane::XZ);
 
 }  // namespace RAYX

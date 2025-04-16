@@ -1,10 +1,10 @@
 #pragma once
 
+#include <iterator>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <variant>
-#include <iterator>
 
 // Include your other dependencies.
 #include "Angle.h"
@@ -231,8 +231,8 @@ class RAYX_API DesignMap {
 
   private:
     std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
-                 CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
-                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount>
+                 CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist,
+                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount>
         m_variant;
 };
 

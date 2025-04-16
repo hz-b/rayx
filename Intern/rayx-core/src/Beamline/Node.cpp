@@ -1,6 +1,8 @@
 #include "Node.h"
-#include "Beamline.h"
+
 #include <cassert>
+
+#include "Beamline.h"
 
 namespace RAYX {
 

@@ -1,9 +1,9 @@
 #include "UserInput.h"
 
+#include <SDL3/SDL_keycode.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
-#include <SDL3/SDL_keycode.h>
 
 #include "Camera.h"
 

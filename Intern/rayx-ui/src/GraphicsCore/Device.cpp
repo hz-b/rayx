@@ -1,11 +1,11 @@
 #include "Device.h"
 
+#include <SDL3/SDL_vulkan.h>
+
 #include <cstring>
 #include <iostream>
 #include <set>
 #include <unordered_set>
-
-#include <SDL3/SDL_vulkan.h>
 
 #include "Debug/Debug.h"
 
