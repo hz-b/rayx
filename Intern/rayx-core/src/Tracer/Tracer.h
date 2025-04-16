@@ -27,9 +27,9 @@ class RAYX_API Tracer {
     // This will call the trace implementation of a subclass
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
-    BundleHistory trace(const Group&, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT = 1, uint32_t maxEvents = 1);
+    BundleHistory trace(const Group& group, Sequential sequential, uint64_t max_batch_size, int THREAD_COUNT, uint32_t maxEvents);
 
-    static int defaultMaxEvents(const Group* group = nullptr);
+    static int defaultMaxEvents(const Group* group);
 
   private:
     std::shared_ptr<DeviceTracer> m_deviceTracer;

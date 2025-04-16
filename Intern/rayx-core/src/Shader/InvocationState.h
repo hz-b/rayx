@@ -14,7 +14,7 @@ enum class Sequential { No, Yes };
 // The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
 struct RAYX_API InvState {
     int numRaysTotal;
-    int numRaysBatch;
+    int batchSize;
     int batchStartRayIndex;
     int maxEvents;
     double randomSeed;
@@ -24,12 +24,12 @@ struct RAYX_API InvState {
     int numElements;
     int* materialIndices;
     double* materialTables;
-    Ray* inputRays;
+    Ray* rays;
 };
 
 struct RAYX_API OutputEvents {
     Ray* events;
-    int* numEvents;
+    int* eventCounts;
 };
 
 }  // namespace RAYX

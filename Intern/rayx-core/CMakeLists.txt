@@ -170,6 +170,10 @@ if(alpaka_ACC_GPU_CUDA_ENABLE OR alpaka_ACC_GPU_HIP_ENABLE)
 else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_NO_GPU_TRACER)
 endif()
+# Same for OpenMP
+if(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_OPENMP_ENABLED)
+endif()
 
 # -----------------
 

@@ -524,7 +524,7 @@ Collision findCollision(const int eventIndex, const Sequential sequential, const
     // Find intersection point in next element
     if (sequential == Sequential::Yes) {
         const auto elementIndex = eventIndex;
-        _debug_assert(elementIndex < numElements, "sequential tracing: element index out of range: %d!", elementIndex);
+        _debug_assert(elementIndex < numElements, "(sequential tracing) element index (%d) out of range!", elementIndex);
         return findCollisionWith(ray, elementIndex, elements[elementIndex], rand);
     }
 
