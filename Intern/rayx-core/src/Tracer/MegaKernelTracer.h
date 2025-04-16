@@ -13,9 +13,9 @@
 namespace RAYX {
 namespace {
 
-inline constexpr int calcNumBatches(const int batchSize, const int numRaysTotal) { return (batchSize + numRaysTotal - 1) / batchSize; }
+inline int calcNumBatches(const int batchSize, const int numRaysTotal) { return (batchSize + numRaysTotal - 1) / batchSize; }
 
-inline constexpr int nextPowerOfTwo(const int value) { return glm::pow(2, glm::ceil(glm::log(value) / glm::log(2))); }
+inline int nextPowerOfTwo(const int value) { return static_cast<int>(glm::pow(2, glm::ceil(glm::log(value) / glm::log(2)))); }
 
 /// conditionally allocate buffer with specified minimum size.
 /// if the buffer already fulfills size requirements, this function does nothing. thus, this function never shrinks a buffer.
@@ -155,9 +155,7 @@ class MegaKernelTracer : public DeviceTracer {
     Resources<Acc> m_resources;
 
   public:
-    virtual BundleHistory trace(const Group& beamline, const Sequential sequential, const int maxBatchSize,
-                                [[maybe_unused]] const int THREAD_COUNT,  // TODO: remove
-                                const int maxEvents) override {
+    virtual BundleHistory trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -169,6 +167,16 @@ class MegaKernelTracer : public DeviceTracer {
 
         const auto conf = m_resources.update(q, beamline, maxEvents, maxBatchSize);
         const auto randomSeed = randomDouble();
+
+        RAYX_D_LOG << "tracing beamline:";
+        RAYX_D_LOG << "\tnum elements: " << conf.numElements;
+        RAYX_D_LOG << "\tnum light sources: " << beamline.numSources();
+        RAYX_D_LOG << "\tsequential: " << (sequential == Sequential::Yes ? "yes" : "no");
+        RAYX_D_LOG << "\tmax events: " << maxEvents;
+        RAYX_D_LOG << "\tnum rays: " << conf.numRaysTotal;
+        RAYX_D_LOG << "\tmax batch size: " << maxBatchSize;
+        RAYX_D_LOG << "\tpreferred batch size: " << conf.preferredBatchSize;
+        RAYX_D_LOG << "\tnum batches: " << conf.numBatches;
 
         auto bundleHistory = BundleHistory{};
 
@@ -205,7 +213,8 @@ class MegaKernelTracer : public DeviceTracer {
             alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsTotal), *m_resources.d_compactEvents, numEventsTotal);
             collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets);
 
-            RAYX_D_LOG << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") traced " << numEventsTotal << " events";
+            RAYX_D_LOG << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << "traced "
+                       << numEventsTotal << " events";
         }
 
         return bundleHistory;

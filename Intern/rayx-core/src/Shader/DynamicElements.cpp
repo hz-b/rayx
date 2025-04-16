@@ -6,6 +6,8 @@
 
 namespace RAYX {
 
+// TODO: EventType::TooManyEvents is currently not used, but should be used to indicate that the trace job missed information in recorded output
+
 RAYX_FN_ACC
 void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEvents) {
     auto ray = inv.rays[gid];

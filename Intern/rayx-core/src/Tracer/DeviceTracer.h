@@ -24,7 +24,7 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual BundleHistory trace(const Group&, Sequential sequential, int max_batch_size, int THREAD_COUNT = 1, int maxEvents = 1) = 0;
+    virtual BundleHistory trace(const Group&, Sequential sequential, const int maxBatchSize, const int maxEvents) = 0;
 };
 
 }  // namespace RAYX
