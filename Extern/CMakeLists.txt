@@ -4,7 +4,10 @@ include(CheckLanguage)
 set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 
 add_subdirectory(googletest)
-add_subdirectory(portable-file-dialogs)
+
+# support version in CMakeLists.txt of portable-file-dialogs was removed from cmake. thus we include the header only library by hand
+add_library(portable_file_dialogs INTERFACE)
+target_include_directories(portable_file_dialogs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/portable-file-dialogs)
 
 # CLI11
 set(CLI11_SANITIZERS OFF)
