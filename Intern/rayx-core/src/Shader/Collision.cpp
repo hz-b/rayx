@@ -504,7 +504,7 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 RAYX_FN_ACC
-Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict__ element, Rand& __restrict__ rand) {
+Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict element, Rand& __restrict rand) {
     // misalignment
     r = rayMatrixMult(r, element.m_inTrans);  // image plane is the x-y plane of the coordinate system
     Collision col = findCollisionInElementCoords(r, element.m_surface, element.m_cutout, false);
@@ -520,8 +520,8 @@ Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement&
 
 // Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict__ ray, const OpticalElement* __restrict__ elements,
-                        const int numElements, Rand& __restrict__ rand) {
+Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict ray, const OpticalElement* __restrict elements,
+                        const int numElements, Rand& __restrict rand) {
     // Find intersection point in next element
     if (sequential == Sequential::Yes) {
         const auto elementIndex = eventIndex;
