@@ -180,6 +180,10 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_D_LOG << "\tmax batch size: " << maxBatchSize;
         RAYX_D_LOG << "\tpreferred batch size: " << conf.preferredBatchSize;
         RAYX_D_LOG << "\tnum batches: " << conf.numBatches;
+        RAYX_D_LOG << "\ttracing backend: " << AccTag{}.get_name();
+        RAYX_D_LOG << "\ttracing device index: " << m_deviceIndex;
+        RAYX_D_LOG << "\ttracing device name: " << alpaka::getName(devAcc);
+        RAYX_D_LOG << "\thost device name: " << alpaka::getName(devHost);
 
         auto bundleHistory = BundleHistory{};
         auto numEventsTotal = 0;
