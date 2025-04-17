@@ -25,7 +25,7 @@ struct OpticalElement {
     Cutout m_cutout;          ///< Limits the Surface to the dimensions of the actual OpticalElement.
     SlopeError m_slopeError;  ///< Describes a random noise in the normal vector of a particular surface point.
     double m_azimuthalAngle;  ///< Azimuthal angle at which this element is rotated around the "main-beam".
-    double m_material;        ///< The material that this object is made of (see `enum class Material` from Material.h).
+    int m_material;           ///< The material that this object is made of (see `enum class Material` from Material.h).
 };
 
 // Ensure OpticalElement does not introduce cost on copy or default construction.
