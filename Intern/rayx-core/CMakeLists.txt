@@ -90,6 +90,7 @@ if(MSVC)
     set(MSVC_CXX_FLAGS /W3) # enable warning level 3
     list(APPEND MSVC_CXX_FLAGS /wd4251) # disable warnings related to missing DLL export annotation on members of exported classes
     list(APPEND MSVC_CXX_FLAGS /wd4267) # disable warnings related to narrowing conversion
+    list(APPEND MSVC_CXX_FLAGS /Zc:preprocessor) # enable __VA_OPT__
     if(WERROR STREQUAL "YES")
         list(APPEND MSVC_CXX_FLAGS /WX) # handle warnings as errors
         message(STATUS "Werror mode")
