@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 
+#include "Analyze.h"
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Rml/Importer.h"
@@ -68,6 +69,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
         auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
+        auto analysis = RAYX::analyze(*m_Beamline);
 
         // TODO: print warning message when EventType::TooManyEvents occours
 

@@ -223,5 +223,12 @@ inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);
 
 #define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
+#ifdef RAYX_DEBUG_MODE
+#define RAYX_D_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
+#else
+#define RAYX_D_DBG(C) \
+    do {              \
+    } while (0)
+#endif
 
 }  // namespace RAYX
