@@ -50,7 +50,7 @@ zoneplates
     results stored in dphi, dpsi (inout)
 */
 RAYX_FN_ACC
-void bessel_diff(double radius, double wl, double& __restrict__ dphi, double& __restrict__ dpsi, Rand& __restrict__ rand) {
+void bessel_diff(double radius, double wl, double& __restrict dphi, double& __restrict dpsi, Rand& __restrict rand) {
     double b = glm::abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
@@ -86,7 +86,7 @@ void bessel_diff(double radius, double wl, double& __restrict__ dphi, double& __
  * @return result stored in dAngle
  */
 RAYX_FN_ACC
-void fraun_diff(double dim, double wl, double& __restrict__ dAngle, Rand& __restrict__ rand) {
+void fraun_diff(double dim, double wl, double& __restrict dAngle, Rand& __restrict rand) {
     if (dim == 0) return;        // no diffraction in this direction
     double b = dim * 1e06;       // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum

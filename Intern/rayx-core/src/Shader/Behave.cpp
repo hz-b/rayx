@@ -16,7 +16,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict__ rand) {
+Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
     SlitBehaviour b = deserializeSlit(behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -61,7 +61,7 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict__ rand) {
 }
 
 RAYX_FN_ACC
-Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __restrict__ rand) {
+Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __restrict rand) {
     RZPBehaviour b = deserializeRZP(behaviour);
 
     double WL = hvlam(r.m_energy);
@@ -108,7 +108,7 @@ Ray behaveGrating(Ray r, const Behaviour behaviour, const Collision col) {
 }
 
 RAYX_FN_ACC
-Ray behaveMirror(Ray r, const Collision col, const int material, const int* __restrict__ materialIndices, const double* __restrict__ materialTable) {
+Ray behaveMirror(Ray r, const Collision col, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     // calculate the new direction after the reflection
     const auto incident_vec = r.m_direction;
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);

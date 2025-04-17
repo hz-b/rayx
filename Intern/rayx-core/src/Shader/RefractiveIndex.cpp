@@ -45,7 +45,7 @@ int RAYX_API getNffEntryCount(const int material, const int* materialIndices) {
 
 // Indexes into the palik table of a particular material at a given index.
 RAYX_FN_ACC
-PalikEntry RAYX_API getPalikEntry(int index, int material, const int* __restrict__ materialIndices, const double* __restrict__ materialTable) {
+PalikEntry RAYX_API getPalikEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     int m = material - 1;  // in [0, 91]
     // materialIndices[m] is the start of the Palik table of material m.
     // 3*index skips 'index'-many entries, because an entry consists of 3 doubles.
@@ -60,7 +60,7 @@ PalikEntry RAYX_API getPalikEntry(int index, int material, const int* __restrict
 }
 
 RAYX_FN_ACC
-NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict__ materialIndices, const double* __restrict__ materialTable) {
+NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     int m = material - 1;  // in [0, 91]
     // materialIndices[92+m] is the start of the Nff table of material m.
     // 3*index skips 'index'-many entries.
@@ -76,8 +76,8 @@ NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict__ m
 
 // returns dvec2 to represent a complex number
 RAYX_FN_ACC
-complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict__ materialIndices,
-                                             const double* __restrict__ materialTable) {
+complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict materialIndices,
+                                             const double* __restrict materialTable) {
     if (material == -1) {  // vacuum
         return complex::Complex(1., 0.);
     }
