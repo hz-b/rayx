@@ -66,7 +66,7 @@ adds slope error to the normal
 slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FN_ACC
-glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand& __restrict__ rand) {
+glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand& __restrict rand) {
     double slopeX = error.m_sag;
     double slopeZ = error.m_mer;
 
