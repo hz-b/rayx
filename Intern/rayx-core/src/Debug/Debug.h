@@ -137,12 +137,14 @@ extern void RAYX_API (*error_fn)();
 #define RAYX_D_LOG RAYX_LOG
 #define RAYX_D_WARN RAYX_WARN
 #define RAYX_D_ERR RAYX_EXIT
+#define RAYX_D_VERB RAYX_VERB
 
 #else
 // In release mode, RAYX_D_LOG instead calls the IgnoreLog, hence discarding the print.
 #define RAYX_D_LOG RAYX::IgnoreLog()
 #define RAYX_D_WARN RAYX::IgnoreLog()
 #define RAYX_D_ERR RAYX::IgnoreLog()
+#define RAYX_D_VERB RAYX::IgnoreLog()
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

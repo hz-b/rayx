@@ -1,8 +1,3 @@
-// TODO(Sven):
-// can there be multiple cpu devices? like on a multi cpu system
-// allow multiple devices in DeviceConfig
-// one cpu + multiple gpu ??
-
 #include "DeviceConfig.h"
 
 #include <algorithm>
