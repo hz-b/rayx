@@ -71,9 +71,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // TODO: print warning message when EventType::TooManyEvents occours
 
-        if (rays.empty()) {
-            RAYX_LOG << "Not enough events (" << maxEvents << ")! Consider increasing maxEvents.";
-        }
+        if (rays.empty()) std::cout << "No events were recorded!";
 
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());
