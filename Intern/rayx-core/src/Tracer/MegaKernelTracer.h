@@ -28,6 +28,7 @@ inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
     using Elem = alpaka::Elem<Buf>;
 
     const auto shouldAlloc = !buf || alpaka::getExtents(*buf)[0] < size;
+    if (shouldAlloc) RAYX_D_VERB << (!buf ? "new alloc on device: " : "realloc on device: ") << nextPowerOfTwo(size * sizeof(Elem)) << " bytes";
     if (shouldAlloc) buf = alpaka::allocAsyncBufIfSupported<Elem, Idx>(q, nextPowerOfTwo(size));
 }
 
@@ -93,6 +94,8 @@ struct Resources {
     /// update resources
     template <typename Queue>
     Config update(Queue q, const Group& group, int maxEvents, int maxBatchSize) {
+        RAYX_PROFILE_FUNCTION_STDOUT();
+
         const auto platformHost = alpaka::PlatformCpu{};
         const auto devHost = alpaka::getDevByIdx(platformHost, 0);
 
@@ -179,6 +182,7 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_D_LOG << "\tnum batches: " << conf.numBatches;
 
         auto bundleHistory = BundleHistory{};
+        auto numEventsTotal = 0;
 
         for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {
             const auto batchStartRayIndex = batchIndex * conf.preferredBatchSize;
@@ -203,20 +207,22 @@ class MegaKernelTracer : public DeviceTracer {
             alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchSize), *m_resources.d_compactEventCounts, batchSize);
             std::exclusive_scan(compactEventCounts.begin(), compactEventCounts.end(), compactEventOffsets.begin(), 0);
             alpaka::memcpy(q, *m_resources.d_compactEventOffsets, alpaka::createView(devHost, compactEventOffsets, batchSize), batchSize);
-            const auto numEventsTotal = compactEventOffsets.back() + compactEventCounts.back();
+            const auto numEventsBatch = compactEventOffsets.back() + compactEventCounts.back();
 
             // make events compact by gathering events into compactEvents using compactEventCounts and compactEventOffsets
             gatherCompactEvents(devAcc, q, batchSize, maxEvents);
 
             // transfer events from device to host for curent batch
-            auto compactEvents = std::vector<Ray>(numEventsTotal);
-            alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsTotal), *m_resources.d_compactEvents, numEventsTotal);
+            auto compactEvents = std::vector<Ray>(numEventsBatch);
+            alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
             collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets);
 
-            RAYX_D_LOG << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << "traced "
-                       << numEventsTotal << " events";
+            RAYX_D_LOG << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
+                       << numEventsBatch << " events";
+            numEventsTotal += numEventsBatch;
         }
 
+        RAYX_D_LOG << "number of recorded events: " << numEventsTotal;
         return bundleHistory;
     }
 
