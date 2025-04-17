@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
 
 namespace {
 
@@ -69,6 +70,8 @@ std::vector<Device> getAvailableDevicesProps() {
 }
 
 std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All) {
+    RAYX_PROFILE_SCOPE_STDOUT("initDevices");
+
     auto devices = std::vector<Device>();
 
     auto append = [&devices]<typename AccTag>(const AccTag&) mutable {
