@@ -6,8 +6,6 @@
 
 namespace RAYX {
 
-// TODO: EventType::TooManyEvents is currently not used, but should be used to indicate that the trace job missed information in recorded output
-
 RAYX_FN_ACC
 void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEvents) {
     auto ray = inv.rays[gid];
@@ -15,6 +13,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
     // Iterate through all bounces
     int numEvents = 0;
+    bool colNotFound = false;
     for (int i = 0; i < inv.maxEvents; numEvents = ++i) {
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
         if (!isRayActive(ray.m_eventType)) break;
@@ -23,6 +22,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
+            colNotFound = true;
             break;
         }
 
@@ -61,6 +61,15 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
         // transform back to WORLD coordinates
         ray = rayMatrixMult(ray, element.m_outTrans);
+    }
+
+    // check if the number of events exceeds capacity
+    if (!colNotFound && inv.sequential == Sequential::No && isRayActive(ray.m_eventType)) {
+        Collision col = findCollisionNonSequential(ray, inv.elements, inv.numElements, rand);
+        if (col.found) {
+            ray = terminateRay(ray, EventType::TooManyEvents);
+            outputEvents.events[gid * inv.maxEvents + inv.maxEvents - 1] = ray;
+        }
     }
 
     // store recorded events count
