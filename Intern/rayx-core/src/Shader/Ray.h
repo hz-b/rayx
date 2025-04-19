@@ -3,7 +3,8 @@
 #include <glm.hpp>
 
 #include "Core.h"
-#include "Efficiency.h"
+#include "ElectricField.h"
+#include "EventType.h"
 
 namespace RAYX {
 
@@ -18,11 +19,11 @@ struct RAYX_API Ray {
     /// NOTE: The coordinate system in which the position is to be interpreted, depends on m_eventType!
     glm::dvec3 m_position;
 
-    /// The m_eventType expresses what is currently happening to the ray.
-    /// During tracing the eventType will be uninitialized (ETYPE_UNINIT).
-    /// Only when an event will be recorded, the m_eventType will be set accordingly.
+    /// The m_eventType expresses the kind of event of the previous event
+    /// Rays created may be initialized with EventType::Emitted
+    /// When an intercept occours, the variable will be set accordingly, either to EventType::HitElement or to an error type.
     /// See the potential values of `m_eventType` in `EventType.h`.
-    double m_eventType;
+    EventType m_eventType;
 
     /// The direction of the ray.
     /// The direction is normalized, so its L2 norm (aka length) is one.

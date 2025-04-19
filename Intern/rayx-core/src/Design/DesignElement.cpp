@@ -158,15 +158,15 @@ SlopeError DesignElement::getSlopeError() const {
 
 void DesignElement::setCutout(Cutout c) {
     m_elementParameters["geometricalShape"] = c.m_type;
-    if (c.m_type == CTYPE_RECT) {
+    if (c.m_type == CutoutType::Rect) {
         RectCutout rect = deserializeRect(c);
         m_elementParameters["CutoutWidth"] = rect.m_width;
         m_elementParameters["CutoutLength"] = rect.m_length;
-    } else if (c.m_type == CTYPE_ELLIPTICAL) {
+    } else if (c.m_type == CutoutType::Elliptical) {
         EllipticalCutout elli = deserializeElliptical(c);
         m_elementParameters["CutoutDiameterX"] = elli.m_diameter_x;
         m_elementParameters["CutoutDiameterZ"] = elli.m_diameter_z;
-    } else if (c.m_type == CTYPE_TRAPEZOID) {
+    } else if (c.m_type == CutoutType::Trapezoid) {
         TrapezoidCutout trapi = deserializeTrapezoid(c);
         m_elementParameters["CutoutWidthA"] = trapi.m_widthA;
         m_elementParameters["CutoutWidthB"] = trapi.m_widthB;
@@ -176,19 +176,19 @@ void DesignElement::setCutout(Cutout c) {
 Cutout DesignElement::getCutout() const {
     Cutout c;
 
-    c.m_type = m_elementParameters["geometricalShape"].as_double();
+    c.m_type = m_elementParameters["geometricalShape"].as_openingShape();
 
-    if (c.m_type == CTYPE_RECT) {  // Rectangle
+    if (c.m_type == CutoutType::Rect) {  // Rectangle
         RectCutout rect;
         rect.m_width = m_elementParameters["CutoutWidth"].as_double();
         rect.m_length = m_elementParameters["CutoutLength"].as_double();
         c = serializeRect(rect);
-    } else if (c.m_type == CTYPE_ELLIPTICAL) {  // Ellipsoid
+    } else if (c.m_type == CutoutType::Elliptical) {  // Ellipsoid
         EllipticalCutout elli;
         elli.m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double();
         elli.m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double();
         c = serializeElliptical(elli);
-    } else if (c.m_type == CTYPE_TRAPEZOID) {  // Trapezoid
+    } else if (c.m_type == CutoutType::Trapezoid) {  // Trapezoid
         TrapezoidCutout trapi;
         trapi.m_widthA = m_elementParameters["CutoutWidthA"].as_double();
         trapi.m_widthB = m_elementParameters["CutoutWidthB"].as_double();
@@ -331,8 +331,8 @@ void DesignElement::setTotalHeight(double height) { m_elementParameters["totalHe
 double DesignElement::getTotalHeight() const { return m_elementParameters["totalHeight"].as_double(); }
 
 // Opening Shape
-void DesignElement::setOpeningShape(double shape) { m_elementParameters["openingShape"] = shape; }
-double DesignElement::getOpeningShape() const { return m_elementParameters["openingShape"].as_double(); }
+void DesignElement::setOpeningShape(CutoutType shape) { m_elementParameters["openingShape"] = shape; }
+CutoutType DesignElement::getOpeningShape() const { return m_elementParameters["openingShape"].as_openingShape(); }
 
 // Opening Width
 void DesignElement::setOpeningWidth(double width) { m_elementParameters["openingWidth"] = width; }

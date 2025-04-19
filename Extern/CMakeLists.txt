@@ -60,5 +60,6 @@ else()
     set(alpaka_RELOCATABLE_DEVICE_CODE OFF CACHE BOOL "" FORCE)
 endif()
 
+set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
 add_subdirectory(alpaka)
 add_subdirectory(SDL EXCLUDE_FROM_ALL)

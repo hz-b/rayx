@@ -1,10 +1,10 @@
 #include "MatrixSource.h"
 
-#include "Rml/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignSource.h"
 #include "Random.h"
+#include "Rml/xml.h"
 #include "Shader/Constants.h"
 
 namespace RAYX {
@@ -62,7 +62,7 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
             const auto rotation = glm::dmat3(m_orientation);
             const auto field = rotation * stokesToElectricField(m_pol);
 
-            Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
+            Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
             returnList.push_back(r);
         }

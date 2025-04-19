@@ -1,12 +1,12 @@
 #include "Beamline.h"
 
+#include <sstream>
 #include <stack>
 #include <stdexcept>
-#include <sstream>
 
+#include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
-#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 

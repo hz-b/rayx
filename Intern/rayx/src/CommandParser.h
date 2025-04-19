@@ -40,7 +40,6 @@ class CommandParser {
         bool m_sequential = false;                     // -S (sequential tracing)
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
-        int m_setThreads = 1;                          // -T (dipolesource)
         int m_maxEvents = -1;                          // -m (max events)
     } m_args;
 
@@ -73,7 +72,7 @@ class CommandParser {
     std::unordered_map<char, Options> m_ParserCommands = {
         {'c', {OptionType::BOOL, "ocsv", "Output stored as .csv file.", &(m_args.m_csvFlag)}},
         {'B', {OptionType::BOOL, "benchmark", "Benchmark application: (RML → Trace → Output)", &(m_args.m_benchmark)}},
-        {'b', {OptionType::INT, "batch", "Batch size for Vulkan tracing", &(m_args.m_BatchSize)}},
+        {'b', {OptionType::INT, "batch", "Batch size for tracing", &(m_args.m_BatchSize)}},
         {'p', {OptionType::BOOL, "plot", "Plot output footprints and histograms.", &(m_args.m_plotFlag)}},
         {'x', {OptionType::BOOL, "cpu", "Tracine on CPU", &(m_args.m_cpuFlag)}},
         {'X', {OptionType::BOOL, "gpu", "Tracine on GPU", &(m_args.m_gpuFlag)}},
@@ -86,9 +85,6 @@ class CommandParser {
         {'S', {OptionType::BOOL, "sequential", "trace sequentially", &(m_args.m_sequential)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
         {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
-        {'T',
-         {OptionType::INT, "setThreads", "Number of Threads for Lightsource-Parallelization'",
-          &(m_args.m_setThreads)}},  // TODO: understandable description
         {'m', {OptionType::INT, "maxEvents", "Maximum number of events per ray", &(m_args.m_maxEvents)}},
     };
 };

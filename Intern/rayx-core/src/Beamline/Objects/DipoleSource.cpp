@@ -2,11 +2,11 @@
 
 #include <fstream>
 
-#include "Rml/xml.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignSource.h"
 #include "Random.h"
+#include "Rml/xml.h"
 #include "Shader/Constants.h"
 #include "Shader/EventType.h"
 
@@ -134,10 +134,12 @@ std::vector<Ray> DipoleSource::getRays(int thread_count) const {
         const auto rotation = glm::dmat3(m_orientation);
         const auto field = rotation * stokesToElectricField(psiandstokes.stokes);
 
-        Ray r = {position, ETYPE_UNINIT, direction, en, field, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 #if defined(DIPOLE_OMP)
 #pragma omp critical  // thread-safety for writing rayList
-        { rayList.push_back(r); }
+        {
+            rayList.push_back(r);
+        }
 #else
         rayList.push_back(r);
 #endif

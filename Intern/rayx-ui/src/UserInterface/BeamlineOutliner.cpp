@@ -1,11 +1,12 @@
 #include "BeamlineOutliner.h"
 
 #include <imgui.h>
+
+#include <filesystem>
+#include <memory>
 #include <sstream>
 #include <string>
-#include <memory>
 #include <vector>
-#include <filesystem>
 
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"

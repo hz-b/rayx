@@ -1,7 +1,8 @@
 #include "Window.h"
 
-#include <stdexcept>
 #include <SDL3/SDL_vulkan.h>
+
+#include <stdexcept>
 
 #include "Debug/Debug.h"
 

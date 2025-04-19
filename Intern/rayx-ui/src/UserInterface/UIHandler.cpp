@@ -9,10 +9,10 @@
 #include <fstream>
 #include <rapidxml.hpp>
 
-#include "Rml/Locate.h"
 #include "Colors.h"
 #include "Debug/Instrumentor.h"
 #include "RayProcessing.h"
+#include "Rml/Locate.h"
 
 void checkVkResult(VkResult result, const char* message) {
     if (result != VK_SUCCESS) {

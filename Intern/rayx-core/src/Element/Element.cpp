@@ -49,7 +49,7 @@ inline glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plan
     return calcTransformationMatrices(dele.getPosition(), dele.getOrientation(), false, plane);
 }
 
-inline double defaultMaterial(const DesignElement& dele) { return (double)static_cast<int>(dele.getMaterial()); }
+inline int defaultMaterial(const DesignElement& dele) { return static_cast<int>(dele.getMaterial()); }
 
 OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
     if (!cutout) {

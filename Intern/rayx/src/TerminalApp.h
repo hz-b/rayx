@@ -5,7 +5,7 @@
 
 #include "Beamline/Beamline.h"
 #include "CommandParser.h"
-#include "RAY-Core.h"
+#include "Debug/Instrumentor.h"
 #include "TerminalAppConfig.h"
 #include "Tracer/Tracer.h"
 

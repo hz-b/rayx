@@ -7,13 +7,6 @@
 namespace RAYX {
 
 template <typename Acc>
-inline auto getDevice(int deviceIndex) {
-    const auto platform = alpaka::Platform<Acc>();
-    const auto acc = alpaka::getDevByIdx(platform, deviceIndex);
-    return acc;
-};
-
-template <typename Acc>
 constexpr inline auto getBlockSize() {
     using Idx = alpaka::Idx<Acc>;
     using Dim = alpaka::Dim<Acc>;

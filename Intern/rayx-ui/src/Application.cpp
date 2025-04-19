@@ -1,13 +1,12 @@
 #include "Application.h"
 
+#include <SDL3/SDL.h>
+
 #include <chrono>
 #include <future>
 
-#include <SDL3/SDL.h>
-
 #include "CanonicalizePath.h"
 #include "Colors.h"
-#include "Rml/Importer.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "FrameInfo.h"
@@ -18,6 +17,7 @@
 #include "RenderSystem/GridRenderSystem.h"
 #include "RenderSystem/ObjectRenderSystem.h"
 #include "RenderSystem/RayRenderSystem.h"
+#include "Rml/Importer.h"
 #include "Triangulation/GeometryUtils.h"
 #include "UserInput.h"
 #include "Writer/CSVWriter.h"

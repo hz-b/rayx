@@ -90,6 +90,7 @@ if(MSVC)
     set(MSVC_CXX_FLAGS /W3) # enable warning level 3
     list(APPEND MSVC_CXX_FLAGS /wd4251) # disable warnings related to missing DLL export annotation on members of exported classes
     list(APPEND MSVC_CXX_FLAGS /wd4267) # disable warnings related to narrowing conversion
+    list(APPEND MSVC_CXX_FLAGS /Zc:preprocessor) # enable __VA_OPT__
     if(WERROR STREQUAL "YES")
         list(APPEND MSVC_CXX_FLAGS /WX) # handle warnings as errors
         message(STATUS "Werror mode")
@@ -105,6 +106,7 @@ else()
 
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
     target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>)
+    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas="-v">) # print cuda device function properties
 
     # Enable werror if requested (mostly used for CI)
     if(WERROR STREQUAL "YES")
@@ -168,6 +170,10 @@ if(alpaka_ACC_GPU_CUDA_ENABLE OR alpaka_ACC_GPU_HIP_ENABLE)
     endif()
 else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_NO_GPU_TRACER)
+endif()
+# Same for OpenMP
+if(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_OPENMP_ENABLED)
 endif()
 
 # -----------------

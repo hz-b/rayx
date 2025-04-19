@@ -1,11 +1,10 @@
 #pragma once
 
 #include <functional>
+#include <glm.hpp>
 #include <memory>
 #include <variant>
 #include <vector>
-
-#include <glm.hpp>
 
 #include "Core.h"
 #include "Design/DesignElement.h"

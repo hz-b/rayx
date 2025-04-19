@@ -8,12 +8,12 @@
 #include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
-#include "Rml/Importer.h"
 #include "Debug/Debug.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
 #include "Material/Material.h"
 #include "Random.h"
+#include "Rml/Importer.h"
 #include "Shader/Constants.h"
 #include "Shader/Diffraction.h"
 #include "Shader/Efficiency.h"
@@ -36,10 +36,6 @@ extern char** GLOBAL_ARGV;
 */
 
 const int PREC = 17;
-
-// declare invocation state globally
-// TODO(Sven): do we really need invocation state here, or just material tables individually?
-extern InvState inv;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
 /// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.
@@ -185,7 +181,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename);
 /// Returns all traced rays
 RAYX::BundleHistory traceRML(std::string filename);
 
-// extracts the last ETYPE_JUST_HIT_ELEM for each ray.
+// extracts the last EventType::HitElement for each ray.
 std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory&);
 
 /// will look at Tests/input/<filename>.csv
@@ -210,4 +206,4 @@ void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);
 
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.
-void updateCpuTracerMaterialTables(std::vector<Material>);
+MaterialTables createMaterialTables(std::vector<Material>);

@@ -9,8 +9,7 @@
 
 namespace RAYX {
 bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
-    try
-    {   
+    try {
         std::ifstream s(filename);
         RAYX_VERB << filename;
         std::string line;
@@ -20,11 +19,11 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
 
         // line 2
         std::getline(s, line);
-    #if defined(WIN32)
+#if defined(WIN32)
         if (sscanf_s(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
-    #else
+#else
         if (sscanf(line.c_str(), "%u %le %le %le", &out->m_lineCount, &out->m_start, &out->m_end, &out->m_step) != 4) {
-    #endif
+#endif
             RAYX_D_ERR << "Failed to parse DatFile \"" << filename << "\", at line 2: \"" << line << "\"";
             return false;
         }
@@ -38,11 +37,11 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
             }
 
             DatEntry e{};
-    #if defined(WIN32)
+#if defined(WIN32)
             if (sscanf_s(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
-    #else
+#else
             if (sscanf(line.c_str(), "%le %le", &e.m_energy, &e.m_weight) != 2) {
-    #endif
+#endif
                 RAYX_D_ERR << "Failed to parse DatFile \"" << filename << "\", at line " << lineidx << ": \"" << line << "\"";
                 return false;
             }

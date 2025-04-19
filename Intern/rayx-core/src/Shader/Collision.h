@@ -5,9 +5,8 @@
 #include "Core.h"
 #include "Element/Cutout.h"
 #include "InvocationState.h"
+#include "Rand.h"
 #include "Ray.h"
-
-#define COLLISION_EPSILON 1e-6
 
 namespace RAYX {
 
@@ -26,10 +25,17 @@ struct RAYX_API Collision {
     bool found;
 };
 
+static_assert(std::is_trivially_copyable_v<Collision>);
+
 RAYX_FN_ACC Collision getQuadricCollision(Ray r, QuadricSurface q);
 RAYX_FN_ACC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
 RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
-RAYX_FN_ACC Collision findCollisionWith(Ray r, uint32_t id, InvState& inv);
-RAYX_FN_ACC Collision findCollision(const Ray& ray, InvState& inv);
+RAYX_FN_ACC Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict element, Rand& __restrict rand);
+RAYX_FN_ACC Collision findCollisionSequential(const int elementIndex, const Ray& __restrict ray, const OpticalElement* __restrict elements,
+                                              Rand& __restrict rand);
+RAYX_FN_ACC Collision findCollisionNonSequential(const Ray& __restrict ray, const OpticalElement* __restrict elements, const int numElements,
+                                                 Rand& __restrict rand);
+RAYX_FN_ACC Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict ray,
+                                    const OpticalElement* __restrict elements, const int numElements, Rand& __restrict rand);
 
 }  // namespace RAYX

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Element/Element.h"
 #include "Beamline/Node.h"
+#include "Element/Element.h"
 #include "Value.h"
 
 namespace RAYX {
@@ -65,8 +65,8 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setTotalHeight(double d);
     double getTotalHeight() const;
 
-    void setOpeningShape(double shape);
-    double getOpeningShape() const;
+    void setOpeningShape(CutoutType shape);
+    CutoutType getOpeningShape() const;
 
     void setOpeningWidth(double d);
     double getOpeningWidth() const;

@@ -5,9 +5,9 @@
 #include <stdexcept>
 
 #include "Debug/Debug.h"
+#include "Random.h"
 #include "Rml/Importer.h"
 #include "Rml/Locate.h"
-#include "Random.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
 
@@ -67,34 +67,11 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         int maxEvents =
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, m_CommandParser->m_args.m_setThreads, maxEvents);
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
 
-        // check max EventID
-        uint32_t maxEventID = 0;
-        bool notEnoughEvents = false;
-        {
-            RAYX_PROFILE_SCOPE_STDOUT("maxEventID");
-            for (auto& ray : rays) {
-                if (ray.size() > (maxEventID)) {
-                    maxEventID = ray.size();
-                }
+        // TODO: print warning message when EventType::TooManyEvents occours
 
-                for (auto& event : ray) {
-                    if (event.m_eventType == RAYX::ETYPE_TOO_MANY_EVENTS) {
-                        notEnoughEvents = true;
-                    }
-                }
-            }
-        }
-        if (notEnoughEvents) {
-            RAYX_LOG << "Not enough events (" << maxEvents << ")! Consider increasing maxEvents.";
-        }
-        if (maxEventID == 0) {
-            RAYX_LOG << "No events were recorded!";
-        } else if (maxEventID < maxEvents) {
-            RAYX_LOG << "maxEvents is set to " << maxEvents << " but the maximum event ID is " << maxEventID << ". Consider setting maxEvents to "
-                     << maxEventID << " to increase performance.";
-        }
+        if (rays.empty()) std::cout << "No events were recorded!";
 
         // Export Rays to external data.
         auto file = exportRays(rays, path.string());
