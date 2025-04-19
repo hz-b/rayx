@@ -240,7 +240,7 @@ class MegaKernelTracer : public DeviceTracer {
             collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets, batchSize);
 
             RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
-                       << numEventsBatch << " events";
+                      << numEventsBatch << " events";
             numEventsTotal += numEventsBatch;
         }
 
@@ -327,9 +327,9 @@ class MegaKernelTracer : public DeviceTracer {
         const auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
 
         RAYX_VERB << "executing kernel with launch config: "
-                   << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
-                   << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
-                   << "elements = " << workDiv.m_threadElemExtent[0];  // TODO: why does m_blockThreadExtent not divide by warpSize?
+                  << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
+                  << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
+                  << "elements = " << workDiv.m_threadElemExtent[0];  // TODO: why does m_blockThreadExtent not divide by warpSize?
 
         alpaka::exec<Acc>(q, workDiv, kernel, std::forward<Args>(args)...);
     }
