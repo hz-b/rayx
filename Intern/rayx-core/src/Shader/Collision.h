@@ -31,6 +31,10 @@ RAYX_FN_ACC Collision getQuadricCollision(Ray r, QuadricSurface q);
 RAYX_FN_ACC Collision getToroidCollision(Ray r, ToroidSurface toroid, bool isTriangul);
 RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout cutout, bool isTriangul);
 RAYX_FN_ACC Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement& __restrict element, Rand& __restrict rand);
+RAYX_FN_ACC Collision findCollisionSequential(const int elementIndex, const Ray& __restrict ray, const OpticalElement* __restrict elements,
+                                              Rand& __restrict rand);
+RAYX_FN_ACC Collision findCollisionNonSequential(const Ray& __restrict ray, const OpticalElement* __restrict elements, const int numElements,
+                                                 Rand& __restrict rand);
 RAYX_FN_ACC Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict ray,
                                     const OpticalElement* __restrict elements, const int numElements, Rand& __restrict rand);
 

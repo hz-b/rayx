@@ -22,6 +22,8 @@ int count(const RAYX::BundleHistory& hist) {
 
 // Re-formats `hist` into a bunch of doubles using the format.
 std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     std::vector<double> output;
     output.reserve(count(hist) * format.size());
 

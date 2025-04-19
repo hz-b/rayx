@@ -32,11 +32,28 @@ inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
     if (shouldAlloc) buf = alpaka::allocAsyncBufIfSupported<Elem, Idx>(q, nextPowerOfTwo(size));
 }
 
-inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, const std::vector<Ray>& compactEvents,
-                                                  const std::vector<int>& compactEventCounts, const std::vector<int>& compactEventOffsets) {
+inline bool checkTooManyEvents(const std::vector<Ray>& compactEvents, const std::vector<int>& compactEventCounts,
+                               const std::vector<int>& compactEventOffsets, const int batchSize) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    for (int i = 0; i < static_cast<int>(compactEventCounts.size()); i++) {
+    for (int i = 0; i < batchSize; ++i) {
+        if (0 < compactEventCounts[i]) {
+            const auto offset = compactEventOffsets[i];
+            const auto count = compactEventCounts[i];
+            const auto lastEventIndex = offset + count - 1;
+            if (compactEvents[lastEventIndex].m_eventType == EventType::TooManyEvents) return true;
+        }
+    }
+
+    return false;
+}
+
+inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, const std::vector<Ray>& compactEvents,
+                                                  const std::vector<int>& compactEventCounts, const std::vector<int>& compactEventOffsets,
+                                                  const int batchSize) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    for (int i = 0; i < batchSize; i++) {
         const auto begin = compactEvents.data() + compactEventOffsets[i];
         const auto end = begin + compactEventCounts[i];
 
@@ -187,6 +204,10 @@ class MegaKernelTracer : public DeviceTracer {
 
         auto bundleHistory = BundleHistory{};
         auto numEventsTotal = 0;
+        auto isTooManyEvents = false;
+        auto compactEventCounts = std::vector<int>(conf.preferredBatchSize);
+        auto compactEventOffsets = std::vector<int>(conf.preferredBatchSize);
+        auto compactEvents = std::vector<Ray>(conf.preferredBatchSize * maxEvents);
 
         for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {
             const auto batchStartRayIndex = batchIndex * conf.preferredBatchSize;
@@ -206,26 +227,25 @@ class MegaKernelTracer : public DeviceTracer {
             traceBatch(devAcc, q, conf.numElements, conf.numRaysTotal, batchSize, batchStartRayIndex, maxEvents, randomSeed, sequential);
 
             // prefix sum on compactEventCounts to get compactEventOffsets
-            auto compactEventCounts = std::vector<int>(batchSize);
-            auto compactEventOffsets = std::vector<int>(batchSize);
             alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchSize), *m_resources.d_compactEventCounts, batchSize);
-            std::exclusive_scan(compactEventCounts.begin(), compactEventCounts.end(), compactEventOffsets.begin(), 0);
+            std::exclusive_scan(compactEventCounts.begin(), compactEventCounts.begin() + batchSize, compactEventOffsets.begin(), 0);
             alpaka::memcpy(q, *m_resources.d_compactEventOffsets, alpaka::createView(devHost, compactEventOffsets, batchSize), batchSize);
-            const auto numEventsBatch = compactEventOffsets.back() + compactEventCounts.back();
+            const auto numEventsBatch = compactEventOffsets.back() + compactEventCounts[batchSize - 1];
 
             // make events compact by gathering events into compactEvents using compactEventCounts and compactEventOffsets
             gatherCompactEvents(devAcc, q, batchSize, maxEvents);
 
             // transfer events from device to host for curent batch
-            auto compactEvents = std::vector<Ray>(numEventsBatch);
             alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
-            collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets);
+            isTooManyEvents = isTooManyEvents || checkTooManyEvents(compactEvents, compactEventCounts, compactEventOffsets, batchSize);
+            collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets, batchSize);
 
             RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
                        << numEventsBatch << " events";
             numEventsTotal += numEventsBatch;
         }
 
+        if (isTooManyEvents) RAYX_WARN << "capacity of events exceeded. could not record all events! consider increasing max events.";
         RAYX_VERB << "number of recorded events: " << numEventsTotal;
         return bundleHistory;
     }
@@ -304,6 +324,7 @@ class MegaKernelTracer : public DeviceTracer {
     template <typename Queue, typename DevAcc, typename Kernel, typename... Args>
     void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, const Kernel& kernel, Args&&... args) {
         const auto conf = alpaka::KernelCfg<Acc>{numElements, 1};
+        // TODO: make sure blockSize is divisible by 128
         const auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
 
         RAYX_VERB << "executing kernel with launch config: "
