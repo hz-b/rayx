@@ -28,7 +28,7 @@ inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
     using Elem = alpaka::Elem<Buf>;
 
     const auto shouldAlloc = !buf || alpaka::getExtents(*buf)[0] < size;
-    if (shouldAlloc) RAYX_D_VERB << (!buf ? "new alloc on device: " : "realloc on device: ") << nextPowerOfTwo(size * sizeof(Elem)) << " bytes";
+    if (shouldAlloc) RAYX_VERB << (!buf ? "new alloc on device: " : "realloc on device: ") << nextPowerOfTwo(size * sizeof(Elem)) << " bytes";
     if (shouldAlloc) buf = alpaka::allocAsyncBufIfSupported<Elem, Idx>(q, nextPowerOfTwo(size));
 }
 
@@ -171,19 +171,19 @@ class MegaKernelTracer : public DeviceTracer {
         const auto conf = m_resources.update(q, beamline, maxEvents, maxBatchSize);
         const auto randomSeed = randomDouble();
 
-        RAYX_D_LOG << "tracing beamline:";
-        RAYX_D_LOG << "\tnum elements: " << conf.numElements;
-        RAYX_D_LOG << "\tnum light sources: " << beamline.numSources();
-        RAYX_D_LOG << "\tsequential: " << (sequential == Sequential::Yes ? "yes" : "no");
-        RAYX_D_LOG << "\tmax events: " << maxEvents;
-        RAYX_D_LOG << "\tnum rays: " << conf.numRaysTotal;
-        RAYX_D_LOG << "\tmax batch size: " << maxBatchSize;
-        RAYX_D_LOG << "\tpreferred batch size: " << conf.preferredBatchSize;
-        RAYX_D_LOG << "\tnum batches: " << conf.numBatches;
-        RAYX_D_LOG << "\ttracing backend: " << AccTag{}.get_name();
-        RAYX_D_LOG << "\ttracing device index: " << m_deviceIndex;
-        RAYX_D_LOG << "\ttracing device name: " << alpaka::getName(devAcc);
-        RAYX_D_LOG << "\thost device name: " << alpaka::getName(devHost);
+        RAYX_VERB << "tracing beamline:";
+        RAYX_VERB << "\tnum elements: " << conf.numElements;
+        RAYX_VERB << "\tnum light sources: " << beamline.numSources();
+        RAYX_VERB << "\tsequential: " << (sequential == Sequential::Yes ? "yes" : "no");
+        RAYX_VERB << "\tmax events: " << maxEvents;
+        RAYX_VERB << "\tnum rays: " << conf.numRaysTotal;
+        RAYX_VERB << "\tmax batch size: " << maxBatchSize;
+        RAYX_VERB << "\tpreferred batch size: " << conf.preferredBatchSize;
+        RAYX_VERB << "\tnum batches: " << conf.numBatches;
+        RAYX_VERB << "\ttracing backend tag: " << AccTag{}.get_name();
+        RAYX_VERB << "\ttracing device index: " << m_deviceIndex;
+        RAYX_VERB << "\ttracing device name: " << alpaka::getName(devAcc);
+        RAYX_VERB << "\thost device name: " << alpaka::getName(devHost);
 
         auto bundleHistory = BundleHistory{};
         auto numEventsTotal = 0;
@@ -221,12 +221,12 @@ class MegaKernelTracer : public DeviceTracer {
             alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
             collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets);
 
-            RAYX_D_LOG << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
+            RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
                        << numEventsBatch << " events";
             numEventsTotal += numEventsBatch;
         }
 
-        RAYX_D_LOG << "number of recorded events: " << numEventsTotal;
+        RAYX_VERB << "number of recorded events: " << numEventsTotal;
         return bundleHistory;
     }
 
@@ -306,7 +306,7 @@ class MegaKernelTracer : public DeviceTracer {
         const auto conf = alpaka::KernelCfg<Acc>{numElements, 1};
         const auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
 
-        RAYX_D_LOG << "executing kernel with launch config: "
+        RAYX_VERB << "executing kernel with launch config: "
                    << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
                    << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
                    << "elements = " << workDiv.m_threadElemExtent[0];  // TODO: why does m_blockThreadExtent not divide by warpSize?
