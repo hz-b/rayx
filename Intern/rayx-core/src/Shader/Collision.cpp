@@ -518,17 +518,16 @@ Collision findCollisionWith(Ray r, const int elementIndex, const OpticalElement&
     return col;
 }
 
-// Returns the next collision for the ray
 RAYX_FN_ACC
-Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict ray, const OpticalElement* __restrict elements,
-                        const int numElements, Rand& __restrict rand) {
+Collision findCollisionSequential(const int elementIndex, const Ray& __restrict ray, const OpticalElement* __restrict elements,
+                                  Rand& __restrict rand) {
     // Find intersection point in next element
-    if (sequential == Sequential::Yes) {
-        const auto elementIndex = eventIndex;
-        _debug_assert(elementIndex < numElements, "(sequential tracing) element index (%d) out of range!", elementIndex);
-        return findCollisionWith(ray, elementIndex, elements[elementIndex], rand);
-    }
+    return findCollisionWith(ray, elementIndex, elements[elementIndex], rand);
+}
 
+RAYX_FN_ACC
+Collision findCollisionNonSequential(const Ray& __restrict ray, const OpticalElement* __restrict elements, const int numElements,
+                                     Rand& __restrict rand) {
     // global coordinates of first intersection point of ray among all elements in beamline
     Collision best_col;
     best_col.found = false;
@@ -562,6 +561,19 @@ Collision findCollision(const int eventIndex, const Sequential sequential, const
     _debug_assert(!best_col.found || best_col.elementIndex >= 0 && best_col.elementIndex < numElements,
                   "found collision, but element index is out of range!");
     return best_col;
+}
+
+// Returns the next collision for the ray
+RAYX_FN_ACC
+Collision findCollision(const int eventIndex, const Sequential sequential, const Ray& __restrict ray, const OpticalElement* __restrict elements,
+                        const int numElements, Rand& __restrict rand) {
+    if (sequential == Sequential::Yes) {
+        const auto elementIndex = eventIndex;
+        _debug_assert(elementIndex < numElements, "(sequential tracing) element index (%d) out of range!", elementIndex);
+        return findCollisionSequential(elementIndex, ray, elements, rand);
+    }
+
+    return findCollisionNonSequential(ray, elements, numElements, rand);
 }
 
 }  // namespace RAYX
