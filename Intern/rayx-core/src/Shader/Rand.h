@@ -27,7 +27,9 @@ RAYX_FN_ACC double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double si
 struct Rand {
     Rand() noexcept {}
 
+    Rand(const Rand&) = delete;
     Rand(Rand&&) = default;
+    Rand& operator=(const Rand&) = delete;
     Rand& operator=(Rand&&) = default;
 
     RAYX_FN_ACC
