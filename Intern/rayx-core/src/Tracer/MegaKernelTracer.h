@@ -216,7 +216,6 @@ class MegaKernelTracer : public DeviceTracer {
 
             // clear buffers
             alpaka::memset(q, *m_resources.d_compactEventCounts, 0);
-            alpaka::memset(q, *m_resources.d_compactEventOffsets, 0);
 
             // transfer rays from host to device for current batch
             auto raysView = alpaka::createView(devHost, m_resources.h_rays, conf.numRaysTotal);
