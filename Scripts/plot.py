@@ -10,15 +10,17 @@ import sys
 
 W_JUST_HIT_ELEM = 1
 
+
 def importOutput(filename: str):
     """
     Import output h5 format and clean data
     """
     # file will be closed when we exit from WITH scope
-    with h5py.File(filename, 'r') as h5f:
+    with h5py.File(filename, "r") as h5f:
         keys = []
         for x in h5f.keys():
-            if x == "rays": continue
+            if x == "rays":
+                continue
             keys.append(int(x))
         keys = sorted(keys)
 
@@ -28,14 +30,38 @@ def importOutput(filename: str):
             names.append(x)
 
         dataset = h5f["rays"]
-        df = pd.DataFrame(dataset, columns=['Ray-ID', 'Event-ID', 'X-position', 'Y-position', 'Z-position', 'Event-type', 'X-direction', 'Y-direction', 'Z-direction', 'Energy',
-                                             'Stokes0', 'Stokes1', 'Stokes2', 'Stokes3', 'pathLength', 'order',
-                                             'lastElement', 'lightSourceIndex'])
+        df = pd.DataFrame(
+            dataset,
+            columns=[
+                "Ray-ID",
+                "Event-ID",
+                "X-position",
+                "Y-position",
+                "Z-position",
+                "Event-type",
+                "X-direction",
+                "Y-direction",
+                "Z-direction",
+                "Energy",
+                "ElectricField-x-real",
+                "ElectricField-x-imag",
+                "ElectricField-y-real",
+                "ElectricField-y-imag",
+                "ElectricField-z-real",
+                "ElectricField-z-imag",
+                "pathLength",
+                "order",
+                "lastElement",
+                "lightSourceIndex",
+            ],
+        )
     df = df[df["Event-type"] == W_JUST_HIT_ELEM]
     df = df[["X-position", "Y-position", "Z-position", "lastElement"]]
     return df, names
 
+
 BAR = None
+
 
 def plot(filename: str):
     df, names = importOutput(filename)
@@ -55,7 +81,9 @@ def plot(filename: str):
         # this `relevance` tests which axis is more important.
         relevance = lambda v: v.max() - v.min()
         Y = relevance(d["Y-position"]) > relevance(d["Z-position"])
-        h = ax.hist2d(d["X-position"], d["Y-position"] if Y else d["Z-position"], bins=200)
+        h = ax.hist2d(
+            d["X-position"], d["Y-position"] if Y else d["Z-position"], bins=200
+        )
         if BAR:
             # this overwrites the old colorbar axes, instead of taking new space away from `ax`
             BAR = plt.colorbar(h[3], cax=BAR.ax)
@@ -71,6 +99,7 @@ def plot(filename: str):
     react(names[0])
 
     plt.show()
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
