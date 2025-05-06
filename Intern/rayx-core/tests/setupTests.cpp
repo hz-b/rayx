@@ -50,13 +50,12 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_pathLength = vec[10];
 
     const auto stokes = glm::dvec4(vec[11], vec[12], vec[13], vec[14]);
-    const auto rotation = RAYX::rotationMatrix(ray.m_direction);
-    const auto field = rotation * RAYX::stokesToElectricField(stokes);
+    const auto field = RAYX::stokesToElectricField(stokes, ray.m_direction);
     ray.m_field = field;
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
-    ray.m_eventType = -1;
+    ray.m_eventType = EventType::Uninit;
     ray.m_lastElement = -1;
     ray.m_order = -1;
 
@@ -85,13 +84,13 @@ std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
     std::vector<RAYX::Ray> outs;
     for (auto rr : hist) {
         Ray out;
-        out.m_eventType = ETYPE_UNINIT;
+        out.m_eventType = EventType::Uninit;
         for (auto r : rr) {
-            if (r.m_eventType == ETYPE_JUST_HIT_ELEM) {
+            if (r.m_eventType == EventType::HitElement) {
                 out = r;
             }
         }
-        if (out.m_eventType != ETYPE_UNINIT) {
+        if (out.m_eventType != EventType::Uninit) {
             outs.push_back(out);
         }
     }
@@ -169,7 +168,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
         if (ray_hist[i].m_lastElement != i) {
             return {};
         }
-        if (ray_hist[i].m_eventType != ETYPE_JUST_HIT_ELEM) {
+        if (ray_hist[i].m_eventType != EventType::HitElement) {
             return {};
         }
     }
