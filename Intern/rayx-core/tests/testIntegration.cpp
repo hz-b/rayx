@@ -80,3 +80,12 @@ TEST_F(TestSuite, RZP_misalignment) { compareLastAgainstRayUI("RZP_misalignment"
 
 TEST_F(TestSuite, RZP_plane) { compareLastAgainstRayUI("test-rzp-1-plane", 1e-10); }
 TEST_F(TestSuite, RZP_spherical) { compareLastAgainstRayUI("test-rzp-1-spherical", 1e-10); }
+
+TEST_F(TestSuite, Crystal) {
+    std::string filename = "crystal";
+    auto rayx_list = rayUiCompat("crystal");
+    auto rayui_list = loadCSVRayUI("crystalRayUI");
+
+    CHECK_EQ(rayx_list[3].m_direction.x, rayui_list[0].m_direction.x);
+    CHECK_EQ(rayx_list[4].m_direction.x, rayui_list[1].m_direction.x);
+}

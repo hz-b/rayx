@@ -48,7 +48,7 @@ constexpr double ELECTRIC_PERMITTIVITY = 8.8541878128e-12;  // Checked 2019-7-25
 /// \f$G\f$ [?]. RAY's factor appearing in Schwinger equation context
 constexpr double FACTOR_SCHWINGER_RAY = 1.2556937e15;
 
-//constexpr double ELECTRON_RADIUS = 2.8179403227e-15;     // Classical electron radius (m) // TODO check with nist
+constexpr double ELECTRON_RADIUS = 2.8179403227e-15;     // Classical electron radius (m) // TODO check with nist
 
-constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
+//constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
 }  // namespace RAYX

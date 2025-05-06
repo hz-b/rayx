@@ -109,7 +109,7 @@ struct RAYX_API Parser {
     double parseImageType() const;
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
-    std::filesystem::path parseEnergyDistributionFile() const;a
+    std::filesystem::path parseEnergyDistributionFile() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.
@@ -204,6 +204,7 @@ struct RAYX_API Parser {
     inline double parseLatticeConstant() const { return parseDouble("latticeConstant"); }
     inline double parseLatticeConstantSecond() const { return parseDouble("latticeConstantSecond"); }
     inline OffsetAngleType parseOffsetAngleType() const { return static_cast<OffsetAngleType>(parseInt("offsetAngleType")); }
+    inline Rad parseOffsetAngle() const { return parseInt("offsetAngle"); }
     inline int parseFirstMillerIndex() const { return parseInt("firstMillerIndex"); }
     inline int parseSecondMillerIndex() const { return parseInt("secondMillerIndex"); }
     inline int parseThirdMillerIndex() const { return parseInt("thirdMillerIndex"); }

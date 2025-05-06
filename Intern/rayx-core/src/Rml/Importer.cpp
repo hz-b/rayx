@@ -26,8 +26,8 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
         case ElementType::ConeMirror:
             getCone(parser, de);
             break;
-        case ElementType::PlaneCrystal:
-            g(parser, de);
+        case ElementType::Crystal:
+            getCrystal(parser, de);
             break;
         case ElementType::CylinderMirror:
             getCylinder(parser, de);

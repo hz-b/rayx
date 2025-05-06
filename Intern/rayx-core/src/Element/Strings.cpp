@@ -7,6 +7,7 @@
 namespace RAYX {
 
 std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSource, "Circle Source"},
+                                                       {ElementType::Crystal, "Crystal"},
                                                        {ElementType::CylinderMirror, "Cylinder"},
                                                        {ElementType::ImagePlane, "ImagePlane"},
                                                        {ElementType::MatrixSource, "Matrix Source"},

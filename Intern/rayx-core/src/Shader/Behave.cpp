@@ -16,33 +16,53 @@
 
 namespace RAYX {
 
-
 RAYX_FN_ACC
 Ray behaveCrystal(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
     CrystalBehaviour b = deserializeCrystal(inv.elements[id].m_behaviour);
 
-    double theta = getTheta(r, col.normal);
-    double bragg = getBraggAngle(r.m_energy, b.m_dSpacing, b.m_orderOfDiffraction);
-    double asymmetryFactor = getAsymmetryFactor(r.m_energy, bragg, b.m_offsetAngle);
+    double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
+    double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
+    double asymmetry = getAsymmetryFactor(bragg, b.m_offsetAngle);
     
-    double polFactorNormal = 1.0;                                   // polarization factor for normal polarization
-    double polFactorParallel = std::abs(cos(2 * bragg));            // polarization factor for parallel polarization
+    double polFactorS = 1.0;
+    double polFactorP = std::fabs(cos(2 * bragg));
 
+    double wavelength = inm2eV / r.m_energy;
+    double gamma = getDiffractionPrefactor(wavelength, b.m_unitCellVolume);
+    
+    std::complex<double> F0(b.m_structureFactorReF0, b.m_structureFactorImF0);
+    std::complex<double> FH(b.m_structureFactorReFH, b.m_structureFactorImFH);
+    std::complex<double> FHC(b.m_structureFactorReFHC, b.m_structureFactorImFHC);
 
-    double unitCellVolume = std::pow(b.m_latticeConstant, 3);  // e.g. 5.4309e-10 m for silicon
-    double wavelength = getWavelengthFromEnergy(r.m_energy);  // you need this helper (see below)
-    double preFactor = getDiffractionPrefactor(wavelength, unitCellVolume);
+    auto etaS = computeEta(theta0, bragg, asymmetry, 
+                         b.m_structureFactorReFH, b.m_structureFactorImFH, 
+                         b.m_structureFactorReFHC, b.m_structureFactorImFHC,
+                         b.m_structureFactorReF0, b.m_structureFactorImF0, 
+                         polFactorS, gamma);
 
-    double angularDeviation = computeW(theta, bragg, asymmetryFactor, b.m_structureFactorReFH, b.m_structureFactorReF0, polFactorNormal, preFactor);
+    auto etaP = computeEta(theta0, bragg, asymmetry, 
+                         b.m_structureFactorReFH, b.m_structureFactorImFH, 
+                         b.m_structureFactorReFHC, b.m_structureFactorImFHC,
+                         b.m_structureFactorReF0, b.m_structureFactorImF0, 
+                         polFactorP, gamma);
 
-    double absorption = getAbsorptionParameterAsymmetric(b.m_structureFactorImF0, preFactor, polFactorNormal, asymmetryFactor);
+    auto RS = computeR(etaS, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
+    auto RP = computeR(etaP, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
 
-    double dispersion = getPhaseShiftParameter(b.m_structureFactorReFH, b.m_structureFactorImFH, preFactor);
+    const auto incident_vec = r.m_direction;
+    const auto reflect_vec = glm::reflect(incident_vec, col.normal);
+    r.m_direction = reflect_vec;
 
-    double reflectionProfile = computeReflectionProfile(angularDeviation, absorption, dispersion);
+    ComplexFresnelCoeffs fresnelCoeff = { RS, RP };
 
+    const auto reflect_field  = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
+    r.m_field = reflect_field;
     return r;
 }
+
+// Implementation based on dynamical diffraction theory from:
+// Batterman, B. W., & Cole, H. (1964). "Dynamical Diffraction of X Rays by Perfect Crystals".
+// Reviews of Modern Physics, 36(3), 681-717. https://doi.org/10.1103/RevModPhys.36.681
 
 RAYX_FN_ACC
 Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {

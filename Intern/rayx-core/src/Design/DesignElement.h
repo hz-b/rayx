@@ -217,6 +217,9 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setOffsetAngleType(OffsetAngleType value);
     OffsetAngleType getOffsetAngleType() const;
 
+    void setOffsetAngle(Rad value);
+    Rad getOffsetAngle() const;
+
     void setFirstMillerIndex(int value);
     int getFirstMillerIndex() const;
 
@@ -253,8 +256,6 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setDSpacing2(double value);
     double getDSpacing2() const;
 
-    void setProfileKind(int value);
-    int getProfileKind() const;
 
 };
 }  // namespace RAYX
