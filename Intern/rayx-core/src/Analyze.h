@@ -42,7 +42,7 @@ struct Analysis {
     Parameter energy;
     Parameter positionX;
     Parameter positionY;
-    Histogram2D position;
+    Histogram2D positionHistogram;
 };
 
 std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundleHistory);

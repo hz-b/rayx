@@ -19,7 +19,7 @@ double average(R&& r) {
 
 template <std::ranges::range R>
 auto rootMeanSquare(R&& r) {
-    const auto squared = r | std::views::transform([](auto&& v) { return v * v; });
+    auto squared = r | std::views::transform([](auto&& v) { return v * v; });
     return std::sqrt(average(squared));
 }
 
@@ -45,10 +45,6 @@ double histogramBinIndexToValue(const int index, const double min, const double 
     return (first + second) / 2.0;
 }
 
-/*
- * histogram
- */
-
 auto sanitizeHistogramMinMax(const double min, const double max) -> std::pair<double, double> {
     // edge case: if min and max is equal, the histogram has zero width. To be able to have bins, we adjust the histogram boundaries to give it some
     // width
@@ -69,11 +65,11 @@ auto sanitizeHistogramMinMax(const glm::dvec2 min, const glm::dvec2 max) -> std:
 }
 
 template <std::ranges::range R, typename F>
-void debugPromptIndexOutOfHistogramBounds(R&& histogramIndices, F&& inHistogramBounds) {
+void debugPromptIndexOutOfHistogramBounds([[maybe_unused]] R&& histogramIndices, [[maybe_unused]] F&& inHistogramBounds) {
 #if defined(RAYX_DEBUG_MODE)
     // depending on how histogram min and max are chosen, values may be outside of the histogram bounds
     const auto negate = [](const bool b) { return !b; };
-    const auto numOutOfBounds = std::ranges::distance(histogramIndices | std::views::transform(inHistogramBounds) | std::views::filter(negate));
+    auto numOutOfBounds = std::ranges::distance(histogramIndices | std::views::transform(inHistogramBounds) | std::views::filter(negate));
     if (numOutOfBounds)
         RAYX_VERB << "events discarded while creating histogram. number of discarded events, that are out of bounds of histogram: " << numOutOfBounds;
 #endif
@@ -82,7 +78,7 @@ void debugPromptIndexOutOfHistogramBounds(R&& histogramIndices, F&& inHistogramB
 template <std::ranges::range R>
 Analysis::Parameter::Histogram::Bins createHistogramBins(R&& r, const double min, const double max, const int numBins) {
     const auto valueToHistogramBinIndexBaked = [=](double v) { return valueToHistogramBinIndex(v, min, max, numBins); };
-    const auto histogramIndices = r | std::views::transform(valueToHistogramBinIndexBaked);
+    auto histogramIndices = r | std::views::transform(valueToHistogramBinIndexBaked);
     const auto inHistogramBounds = [=](int i) { return 0 <= i && i < numBins; };
 
     debugPromptIndexOutOfHistogramBounds(histogramIndices, inHistogramBounds);
@@ -107,9 +103,7 @@ Analysis::Parameter::Histogram createHistogram(R&& r, const double min, const do
 }
 
 template <std::ranges::range R>
-Analysis::Histogram2D::Bins createPositionsHistogramBins(R&& events, const glm::vec2 min, const glm::dvec2 max, const glm::ivec2 numBins) {
-    const auto getPosition = [](const Ray& ray) { return ray.m_position; };
-    const auto toVec2 = [](const glm::dvec3 v) { return glm::dvec2{v.x, v.y}; };
+Analysis::Histogram2D::Bins createHistogram2DBins(R&& r, const glm::vec2 min, const glm::dvec2 max, const glm::ivec2 numBins) {
     const auto valueToHistogramBinCoord = [=](const glm::dvec2 v) {
         return glm::ivec2{
             valueToHistogramBinIndex(v.x, min.x, max.x, numBins.x),
@@ -117,8 +111,7 @@ Analysis::Histogram2D::Bins createPositionsHistogramBins(R&& events, const glm::
         };
     };
 
-    const auto histogramCoords =
-        events | std::views::transform(getPosition) | std::views::transform(toVec2) | std::views::transform(valueToHistogramBinCoord);
+    auto histogramCoords = r | std::views::transform(valueToHistogramBinCoord);
     const auto inHistogramBounds = [=](const glm::ivec2 v) { return 0 <= v.x && v.x < numBins.x && 0 <= v.y && v.y < numBins.y; };
 
     debugPromptIndexOutOfHistogramBounds(histogramCoords, inHistogramBounds);
@@ -131,10 +124,10 @@ Analysis::Histogram2D::Bins createPositionsHistogramBins(R&& events, const glm::
 }
 
 template <std::ranges::range R>
-Analysis::Histogram2D createPositionsHistogram(R&& events, const glm::dvec2 min, const glm::dvec2 max, const glm::ivec2 numBins) {
+Analysis::Histogram2D createHistogram2D(R&& r, const glm::dvec2 min, const glm::dvec2 max, const glm::ivec2 numBins) {
     const auto [sanitizedMin, sanitizedMax] = sanitizeHistogramMinMax(min, max);
     const auto interval = (sanitizedMax - sanitizedMin) / glm::dvec2(numBins);
-    const auto bins = createPositionsHistogramBins(events, sanitizedMin, sanitizedMax, numBins);
+    const auto bins = createHistogram2DBins(r, sanitizedMin, sanitizedMax, numBins);
     return {
         .bins = bins,
         .interval = interval,
@@ -146,7 +139,7 @@ Analysis::Histogram2D createPositionsHistogram(R&& events, const glm::dvec2 min,
 
 Analysis::Parameter::FullWidthHalfMax fullWidthHalfMax(const Analysis::Parameter::Histogram& histogram) {
     const auto numBins = std::ranges::distance(histogram.bins);
-    const auto binsReverse = histogram.bins | std::views::reverse;
+    auto binsReverse = histogram.bins | std::views::reverse;
 
     const auto max = *std::ranges::max_element(histogram.bins);
     const auto isLessThanHalfMax = [=](const double a) { return a < max / 2.0; };
@@ -180,30 +173,71 @@ Analysis::Parameter analyzeParameter(R&& r, const int numBins) {
     };
 }
 
-void dump(const std::string name, const Analysis::Parameter& param) {
-    RAYX_D_VERB << "analyzing events for parameter: " << name;
-    if (getDebugVerbose()) RAYX_D_DBG(param.histogram.bins);
-    RAYX_D_VERB << "\thistogram bin interval: " << param.histogram.interval;
-    RAYX_D_VERB << "\thistogram min: " << param.histogram.min;
-    RAYX_D_VERB << "\thistogram max: " << param.histogram.max;
-    RAYX_D_VERB << "\tavg: " << param.avg;
-    RAYX_D_VERB << "\trms: " << param.rms;
-    RAYX_D_VERB << "\tmin: " << param.min;
-    RAYX_D_VERB << "\tmax: " << param.max;
-    RAYX_D_VERB << "\tfwhm value (left): " << param.fwhm.left;
-    RAYX_D_VERB << "\tfwhm value (right): " << param.fwhm.right;
+char minimalisticHistogramValueToChar(const int value, const int maxValue) {
+    const auto MinimalisticHistogramChars = std::string("0123456789");
+    const auto numChars = static_cast<int>(MinimalisticHistogramChars.size());
+    return MinimalisticHistogramChars[std::min(numChars - 1, (value * numChars) / maxValue)];
 }
 
-void dump(const std::string name, const Analysis::Histogram2D& histogram) {
-    RAYX_D_VERB << "analyzing events for 2D histogram: " << name;
-    if (getDebugVerbose()) RAYX_D_DBG(histogram.bins);
-    RAYX_D_VERB << "\thistogram bin interval x: " << histogram.interval.x;
-    RAYX_D_VERB << "\thistogram bin interval y: " << histogram.interval.y;
-    RAYX_D_VERB << "\thistogram min x: " << histogram.min.x;
-    RAYX_D_VERB << "\thistogram min y: " << histogram.min.y;
-    RAYX_D_VERB << "\thistogram max x: " << histogram.max.x;
-    RAYX_D_VERB << "\thistogram max y: " << histogram.max.y;
-    RAYX_D_VERB << "\thistogram width: " << histogram.width;
+void densityPlot(const Analysis::Parameter::Histogram& histogram) {
+    auto bins = std::views::all(histogram.bins);
+    const auto max = *std::ranges::max_element(bins);
+    const auto toChar = [=](const int v) { return minimalisticHistogramValueToChar(v, max); };
+    const auto plot = [](const char c) mutable { std::cout << c; };
+    std::ranges::for_each(bins | std::views::transform(toChar), plot);
+    std::cout << std::endl;
+}
+
+void densityPlot(const Analysis::Histogram2D& histogram) {
+    auto bins = std::views::all(histogram.bins);
+    const auto max = *std::ranges::max_element(bins);
+    const auto toChar = [=](const int v) { return minimalisticHistogramValueToChar(v, max); };
+    const auto plot = [i = 0, width = histogram.width](const char c) mutable {
+        std::cout << c;
+        if (++i % width == 0) std::cout << std::endl;
+    };
+    std::ranges::for_each(bins | std::views::transform(toChar), plot);
+}
+
+template <std::ranges::range R>
+void dump(const std::string name, const Analysis::Parameter& param, R&& r) {
+    RAYX_VERB << "analyzing events for parameter: " << name;
+    RAYX_VERB << "\tavg: " << param.avg;
+    RAYX_VERB << "\trms: " << param.rms;
+    RAYX_VERB << "\tmin: " << param.min;
+    RAYX_VERB << "\tmax: " << param.max;
+    RAYX_VERB << "\tfwhm value (left): " << param.fwhm.left;
+    RAYX_VERB << "\tfwhm value (right): " << param.fwhm.right;
+    RAYX_VERB << "\thistogram bin interval: " << param.histogram.interval;
+    RAYX_VERB << "\thistogram min: " << param.histogram.min;
+    RAYX_VERB << "\thistogram max: " << param.histogram.max;
+    RAYX_VERB << "\tminimalistic histogram (values from '0' to 'highest value in histogram' map to values from '0' to '9' here): ";
+    if (getDebugVerbose()) {
+        const auto minimalisticHistogram = createHistogram(r, param.histogram.min, param.histogram.max, 80);
+        assert(minimalisticHistogram.min == param.histogram.min);
+        assert(minimalisticHistogram.max == param.histogram.max);
+        densityPlot(minimalisticHistogram);
+    }
+}
+
+template <std::ranges::range R>
+void dump(const std::string name, const Analysis::Histogram2D& histogram, R&& r) {
+    RAYX_VERB << "analyzing events for 2D histogram: " << name;
+    RAYX_VERB << "\thistogram bin interval x: " << histogram.interval.x;
+    RAYX_VERB << "\thistogram bin interval y: " << histogram.interval.y;
+    RAYX_VERB << "\thistogram min x: " << histogram.min.x;
+    RAYX_VERB << "\thistogram min y: " << histogram.min.y;
+    RAYX_VERB << "\thistogram max x: " << histogram.max.x;
+    RAYX_VERB << "\thistogram max y: " << histogram.max.y;
+    RAYX_VERB << "\thistogram width: " << histogram.width;
+    RAYX_D_VERB << "\tminimalistic histogram (values from '0' to 'highest value in histogram' map to values from '0' to '9' here): ";
+    if (getDebugVerbose()) {
+        const auto numBins2D = glm::ivec2(10);
+        const auto minimalisticHistogram = createHistogram2D(r, histogram.min, histogram.max, numBins2D);
+        assert(minimalisticHistogram.min == histogram.min);
+        assert(minimalisticHistogram.max == histogram.max);
+        densityPlot(minimalisticHistogram);
+    }
 }
 
 }  // unnamed namespace
@@ -214,16 +248,31 @@ Analysis analyzeElement(R&& r) {
 
     constexpr int numBins = 100;
 
-    analysis.energy = analyzeParameter(r | std::views::transform([](const Ray& r) { return r.m_energy; }), numBins);
-    analysis.positionX = analyzeParameter(r | std::views::transform([](const Ray& r) { return r.m_position.x; }), numBins);
-    analysis.positionY = analyzeParameter(r | std::views::transform([](const Ray& r) { return r.m_position.y; }), numBins);
-    analysis.position = createPositionsHistogram(r, {analysis.positionX.min, analysis.positionY.min},
-                                                 {analysis.positionX.max, analysis.positionY.max}, {10, 10});
-
-    dump("energy", analysis.energy);
-    dump("position.x", analysis.positionX);
-    dump("position.y", analysis.positionY);
-    dump("position", analysis.position);
+    {
+        auto attrEnergy = r | std::views::transform([](const Ray& r) { return r.m_energy; });
+        analysis.energy = analyzeParameter(attrEnergy, numBins);
+        dump("energy", analysis.energy, attrEnergy);
+    }
+    {
+        auto attrPositionX = r | std::views::transform([](const Ray& r) { return r.m_position.x; });
+        analysis.positionX = analyzeParameter(attrPositionX, numBins);
+        dump("position.x", analysis.positionX, attrPositionX);
+    }
+    {
+        auto attrPositionY = r | std::views::transform([](const Ray& r) { return r.m_position.y; });
+        analysis.positionY = analyzeParameter(attrPositionY, numBins);
+        dump("position.y", analysis.positionY, attrPositionY);
+    }
+    {
+        const auto getAttrPosition = [](const Ray& r) { return r.m_position; };
+        const auto toVec2 = [](const glm::dvec3 v) { return glm::dvec2{v.x, v.y}; };
+        auto attrPosition = r | std::views::transform(getAttrPosition) | std::views::transform(toVec2);
+        const auto min2D = glm::dvec2(analysis.positionX.min, analysis.positionY.min);
+        const auto max2D = glm::dvec2(analysis.positionX.max, analysis.positionY.max);
+        const auto numBins2D = glm::ivec2(numBins);
+        analysis.positionHistogram = createHistogram2D(attrPosition, min2D, max2D, numBins2D);
+        dump("position", analysis.positionHistogram, attrPosition);
+    }
 
     // TODO: compare performance using std::execution::par
 
@@ -236,17 +285,23 @@ std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundle
     std::vector<Analysis> analysis;
 
     const auto sourceRays = beamline.compileSources(1);
-    RAYX_D_VERB << "analyzing sources";
+    RAYX_VERB << "analyzing sources";
     analysis.push_back(analyzeElement(std::views::all(sourceRays)));
 
-    // const auto element0 = std::views::all(bundleHistory) | std::views::filter([] (const RayHistory& events) { return true; }) | std::views::transform([] (const RayHistory& events) { return events[0]; });
-    // analyzeElement(element0);
+    auto elementNames = std::vector<std::string>(beamline.numElements());
+    beamline.ctraverse([i = 0, &elementNames](const BeamlineNode& node) mutable {
+        if (node.isElement()) elementNames[i++] = static_cast<const DesignElement*>(&node)->getName();
+        return false;
+    });
 
-    // const auto events = std::views::all(bundleHistory);
-    // for (int i = 0; i < beamline.numElements(); ++i) {
-    //     RAYX_D_VERB << "analyzing element: " << i;
-    //     analysis.push_back(analyzeElement(events | std::views::filter([=] (const RayHistory& events) { return i < events.size(); }) | std::views::transform([=] (const RayHistory& events) { return events[i]; })));
-    // }
+    for (int i = 0; i < static_cast<int>(beamline.numElements()); ++i) {
+        RAYX_VERB << "analyzing element(" << i << "): " << elementNames[i];
+        const auto events = std::views::all(bundleHistory);
+        const auto hasEventForElement = [=](const RayHistory& events) { return i < static_cast<int>(events.size()); };
+        const auto getEventForElement = [=](const RayHistory& events) { return events[i]; };
+        const auto analysisForElement = analyzeElement(events | std::views::filter(hasEventForElement) | std::views::transform(getEventForElement));
+        analysis.push_back(analysisForElement);
+    }
 
     return analysis;
 }
