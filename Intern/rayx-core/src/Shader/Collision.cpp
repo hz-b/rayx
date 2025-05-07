@@ -558,8 +558,9 @@ Collision findCollisionNonSequential(const Ray& __restrict ray, const OpticalEle
         }
     }
 
-    _debug_assert(!best_col.found || best_col.elementIndex >= 0 && best_col.elementIndex < numElements,
+    _debug_assert(!best_col.found || (best_col.elementIndex >= 0 && best_col.elementIndex < numElements),
                   "found collision, but element index is out of range!");
+
     return best_col;
 }
 
