@@ -249,7 +249,7 @@ class MegaKernelTracer : public DeviceTracer {
         return bundleHistory;
     }
 
-    // private:
+    // private: TODO: why do we get a compile error when we make this private?
     struct DynamicElementsKernel {
         template <typename Acc>
         RAYX_FN_ACC void operator()(const Acc& acc, const InvState inv, OutputEvents outputEvents) const {
