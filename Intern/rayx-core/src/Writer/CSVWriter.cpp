@@ -121,8 +121,7 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
         const auto direction = glm::dvec3(d[4], d[5], d[6]);
 
         const auto stokes = glm::dvec4(d[8], d[9], d[10], d[11]);
-        // const auto rotation = glm::transpose(RAYX::rotationMatrix(direction));
-        const auto field = /* rotation *  */ RAYX::stokesToElectricField(stokes);
+        const auto field = RAYX::stokesToElectricField(stokes, direction);
 
         // create the Ray from the loaded doubles from this line.
         RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
