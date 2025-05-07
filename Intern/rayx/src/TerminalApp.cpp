@@ -69,8 +69,6 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
 
-        // TODO: print warning message when EventType::TooManyEvents occours
-
         if (rays.empty()) std::cout << "No events were recorded!";
 
         // Export Rays to external data.
