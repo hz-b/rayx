@@ -19,7 +19,7 @@
 #define _debug_assert(condition, string, ...) _assert(condition, string __VA_OPT__(, ) __VA_ARGS__)
 #define _debug_warn(condition, string, ...) _warn(condition, string __VA_OPT__(, ) __VA_ARGS__)
 #else
-#define _debug_throw(string, ...)
-#define _debug_assert(condition, string, ...)
-#define _debug_warn(condition, string, ...)
+#define _debug_throw(string, ...) do {} while(0)
+#define _debug_assert(condition, string, ...) do {} while(0)
+#define _debug_warn(condition, string, ...) do {} while(0)
 #endif
