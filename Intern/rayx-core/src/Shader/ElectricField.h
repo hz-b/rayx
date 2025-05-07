@@ -28,7 +28,7 @@ RAYX_FN_ACC
 inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
 
 RAYX_FN_ACC
-inline Stokes fieldToStokes(const LocalElectricField field) {
+inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
     const auto mag = complex::abs(field);
     const auto theta = complex::arg(field);
 
@@ -37,37 +37,53 @@ inline Stokes fieldToStokes(const LocalElectricField field) {
 }
 
 RAYX_FN_ACC
-inline Stokes fieldToStokes(const ElectricField field) { return fieldToStokes(LocalElectricField(field)); }
-
-RAYX_FN_ACC
 inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
     const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
-
     const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
     const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
     const auto y = complex::polar(y_mag, y_theta);
-
     return LocalElectricField({x_real, 0}, y);
 }
 
-RAYX_FN_ACC
-inline ElectricField stokesToElectricField(const Stokes stokes) { return ElectricField(stokesToLocalElectricField(stokes), complex::Complex(0, 0)); }
+struct RotationBase {
+    glm::dvec3 right;
+    glm::dvec3 up;
+    glm::dvec3 forward;
+};
 
+// Computes a base given a forward vector
+// A convention for the up and right vectors is implemented, making this function well defined and for all forward directions
+// TODO(Sven): this convention should be exchanged with one that does not branch
 RAYX_FN_ACC
-inline glm::dmat3 rotationMatrix(const glm::dvec3 forward) {
+inline RotationBase forwardVectorToBaseConvention(const glm::dvec3 forward) {
     auto up = glm::dvec3(0, 1, 0);
     glm::dvec3 right;
 
+    // If the forward vector is not nearly vertical, we use the up vector (0, 1, 0), othwewise use the right vector (1, 0, 0)
     if (glm::abs(glm::dot(forward, up)) < .5) {
         right = glm::normalize(glm::cross(forward, up));
         up = glm::normalize(glm::cross(right, forward));
+        right = glm::normalize(glm::cross(up, forward));
+        up = glm::cross(forward, right);
     } else {
         right = glm::dvec3(1, 0, 0);
         up = glm::normalize(glm::cross(forward, right));
         right = glm::normalize(glm::cross(forward, up));
+        right = glm::cross(up, forward);
     }
 
-    return glm::dmat3(right, up, forward);
+    return RotationBase{
+        .right = right,
+        .up = up,
+        .forward = forward,
+    };
+}
+
+// Computes a rotation matrix given a forward vector. This matrix can be used to align an object with a direction
+RAYX_FN_ACC
+inline glm::dmat3 rotationMatrix(const glm::dvec3 forward) {
+    const auto base = forwardVectorToBaseConvention(forward);
+    return glm::dmat3(base.right, base.up, base.forward);
 }
 
 RAYX_FN_ACC
@@ -75,4 +91,50 @@ inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) 
     const auto right = glm::cross(forward, up);
     return glm::dmat3(right, up, forward);
 }
+
+RAYX_FN_ACC
+inline ElectricField localToGlobalElectricField(const LocalElectricField localField, const glm::dvec3 forward) {
+    return rotationMatrix(forward) * ElectricField(localField, complex::Complex{0, 0});
+}
+
+RAYX_FN_ACC
+inline ElectricField localToGlobalElectricField(const LocalElectricField localField, const glm::dvec3 forward, const glm::dvec3 up) {
+    return rotationMatrix(forward, up) * ElectricField(localField, complex::Complex{0, 0});
+}
+
+RAYX_FN_ACC
+inline LocalElectricField globalToLocalElectricField(const ElectricField field, const glm::dvec3 forward) {
+    return glm::transpose(rotationMatrix(forward)) * field;
+}
+
+RAYX_FN_ACC
+inline LocalElectricField globalToLocalElectricField(const ElectricField field, const glm::dvec3 forward, const glm::vec3 up) {
+    return glm::transpose(rotationMatrix(forward, up)) * field;
+}
+
+RAYX_FN_ACC
+inline ElectricField stokesToElectricField(const Stokes stokes, const glm::dvec3 forward) {
+    return localToGlobalElectricField(stokesToLocalElectricField(stokes), forward);
+}
+
+RAYX_FN_ACC
+inline ElectricField stokesToElectricField(const Stokes stokes, const glm::dvec3 forward, const glm::dvec3 up) {
+    return localToGlobalElectricField(stokesToLocalElectricField(stokes), forward, up);
+}
+
+RAYX_FN_ACC
+inline ElectricField stokesToElectricField(const Stokes stokes, const glm::dmat3 rotation) {
+    return rotation * ElectricField(stokesToLocalElectricField(stokes), complex::Complex{0, 0});
+}
+
+RAYX_FN_ACC
+inline ElectricField electricFieldToStokes(const ElectricField field, const glm::dvec3 forward) {
+    return localElectricFieldToStokes(globalToLocalElectricField(field, forward));
+}
+
+RAYX_FN_ACC
+inline ElectricField electricFieldToStokes(const ElectricField field, const glm::dvec3 forward, const glm::dvec3 up) {
+    return localElectricFieldToStokes(globalToLocalElectricField(field, forward, up));
+}
+
 }  // namespace RAYX

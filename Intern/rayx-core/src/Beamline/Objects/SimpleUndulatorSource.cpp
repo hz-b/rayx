@@ -72,8 +72,7 @@ std::vector<Ray> SimpleUndulatorSource::getRays([[maybe_unused]] int thread_coun
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-        const auto rotation = glm::dmat3(m_orientation);
-        const auto field = rotation * stokesToElectricField(m_pol);
+        const auto field = stokesToElectricField(m_pol, direction);
 
         Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0.0, -1.0, -1.0};
 
