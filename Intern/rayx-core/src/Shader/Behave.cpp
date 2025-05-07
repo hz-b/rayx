@@ -128,8 +128,6 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
     return r;
 }
 
-RAYX_FN_ACC Ray behaveImagePlane(Ray r) {
-    return r;
-}
+RAYX_FN_ACC Ray behaveImagePlane(Ray r) { return r; }
 
 }  // namespace RAYX
