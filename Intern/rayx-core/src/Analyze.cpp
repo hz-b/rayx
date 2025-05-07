@@ -242,6 +242,8 @@ void dump(const std::string name, const Analysis::Histogram2D& histogram, R&& r)
 
 }  // unnamed namespace
 
+#if 0
+
 template <std::ranges::range R>
 Analysis analyzeElement(R&& r) {
     Analysis analysis;
@@ -305,5 +307,98 @@ std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundle
 
     return analysis;
 }
+
+#else
+
+struct RaySoA {
+    std::vector<double> positionX;
+    std::vector<double> positionY;
+    std::vector<double> energy;
+};
+
+Analysis analyzeElement(const RaySoA& events) {
+    Analysis analysis;
+
+    constexpr int numBins = 100;
+
+    {
+        auto attrEnergy = std::views::all(events.energy);
+        analysis.energy = analyzeParameter(attrEnergy, numBins);
+        dump("energy", analysis.energy, attrEnergy);
+    }
+    {
+        auto attrPositionX = std::views::all(events.positionX);
+        analysis.positionX = analyzeParameter(attrPositionX, numBins);
+        dump("position.x", analysis.positionX, attrPositionX);
+    }
+    {
+        auto attrPositionY = std::views::all(events.positionY);
+        analysis.positionY = analyzeParameter(attrPositionY, numBins);
+        dump("position.y", analysis.positionY, attrPositionY);
+    }
+    // {
+    //     const auto getAttrPosition = [](const Ray& r) { return r.m_position; };
+    //     const auto toVec2 = [](const glm::dvec3 v) { return glm::dvec2{v.x, v.y}; };
+    //     auto attrPosition = r | std::views::transform(getAttrPosition) | std::views::transform(toVec2);
+    //     const auto min2D = glm::dvec2(analysis.positionX.min, analysis.positionY.min);
+    //     const auto max2D = glm::dvec2(analysis.positionX.max, analysis.positionY.max);
+    //     const auto numBins2D = glm::ivec2(numBins);
+    //     analysis.positionHistogram = createHistogram2D(attrPosition, min2D, max2D, numBins2D);
+    //     dump("position", analysis.positionHistogram, attrPosition);
+    // }
+
+    // TODO: compare performance using std::execution::par
+
+    return analysis;
+}
+
+std::vector<RaySoA> transpose(const Group& beamline, const BundleHistory& bundleHistory) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    auto result = std::vector<RaySoA>(beamline.numElements());
+
+    for (int b = 0; b < static_cast<int>(bundleHistory.size()); ++b) {
+        const RayHistory& path = bundleHistory[b];
+        for (int h = 0; h < static_cast<int>(path.size()); ++h) {
+            const Ray& ray = path[h];
+            result[h].positionX.push_back(ray.m_position.x);
+            result[h].positionY.push_back(ray.m_position.y);
+            result[h].energy.push_back(ray.m_energy);
+        }
+    }
+
+    return result;
+}
+
+std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundleHistory) {
+    const auto data = transpose(beamline, bundleHistory);
+
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    std::vector<Analysis> analysis;
+
+    // const auto sourceRays = beamline.compileSources(1);
+    // RAYX_VERB << "analyzing sources";
+    // analysis.push_back(analyzeElement(std::views::all(sourceRays)));
+
+    const auto numElements = static_cast<int>(beamline.numElements());
+    auto elementNames = std::vector<std::string>(numElements);
+    // beamline.ctraverse([i = 0, &elementNames](const BeamlineNode& node) mutable {
+    //     if (node.isElement()) elementNames[i++] = static_cast<const DesignElement*>(&node)->getName();
+    //     return false;
+    // });
+
+    for (int i = 0; i < static_cast<int>(numElements); ++i) {
+        RAYX_VERB << "analyzing element(" << i << "): " << elementNames[i];
+        // const auto hasEventForElement = [=](const RayHistory& events) { return i < static_cast<int>(events.size()); };
+        // const auto getEventForElement = [=](const RayHistory& events) { return events[i]; };
+        const auto analysisForElement = analyzeElement(data[i]);
+        analysis.push_back(analysisForElement);
+    }
+
+    return analysis;
+}
+
+#endif
 
 }  // namespace RAYX

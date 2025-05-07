@@ -235,7 +235,10 @@ class MegaKernelTracer : public DeviceTracer {
             gatherCompactEvents(devAcc, q, batchSize, maxEvents);
 
             // transfer events from device to host for curent batch
-            alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
+            {
+                RAYX_PROFILE_SCOPE_STDOUT("transfer events from device to host");
+                alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
+            }
             isTooManyEvents = isTooManyEvents || checkTooManyEvents(compactEvents, compactEventCounts, compactEventOffsets, batchSize);
             collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets, batchSize);
 
