@@ -129,8 +129,6 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
 }
 
 RAYX_FN_ACC Ray behaveImagePlane(Ray r) {
-    // TODO: should we add an option for image planes to absorb?
-    // return terminateRay(r, EventType::Absorbed);
     return r;
 }
 
