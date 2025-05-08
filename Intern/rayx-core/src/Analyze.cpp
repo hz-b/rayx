@@ -18,8 +18,16 @@ double average(R&& r) {
 }
 
 template <std::ranges::range R>
-auto rootMeanSquare(R&& r) {
-    auto squared = r | std::views::transform([](auto&& v) { return v * v; });
+double variance(R&& r, const double avg) {
+    const auto distanceToAverage = [=] (const auto v) { return v - avg; };
+    const auto square = [] (const auto v) { return v * v; };
+    auto distanceToAverageSquared = r | std::views::transform(distanceToAverage) | std::views::transform(square);
+    return average(distanceToAverageSquared);
+}
+
+template <std::ranges::range R>
+double rootMeanSquare(R&& r) {
+    auto squared = r | std::views::transform([](const auto v) { return v * v; });
     return std::sqrt(average(squared));
 }
 
@@ -145,7 +153,7 @@ Analysis::Parameter::FullWidthHalfMax fullWidthHalfMax(const Analysis::Parameter
     const auto isLessThanHalfMax = [=](const double a) { return a < max / 2.0; };
     const auto leftBinIt = std::ranges::find_if_not(histogram.bins, isLessThanHalfMax);
     const auto rightBinIt = std::ranges::find_if_not(binsReverse, isLessThanHalfMax);
-    const auto leftBinIndex = static_cast<int>(std::ranges::distance(std::ranges::begin(histogram.bins), leftBinIt));
+    const auto leftBinIndex = static_cast<int>(std::distance(std::ranges::begin(histogram.bins), leftBinIt));
     const auto rightBinIndex = static_cast<int>(numBins - 1 - std::distance(std::ranges::begin(binsReverse), rightBinIt));
     const auto left = histogramBinIndexToValue(leftBinIndex, histogram.min, histogram.max, histogram.bins.size());
     const auto right = histogramBinIndexToValue(rightBinIndex, histogram.min, histogram.max, histogram.bins.size());
@@ -159,12 +167,14 @@ Analysis::Parameter::FullWidthHalfMax fullWidthHalfMax(const Analysis::Parameter
 template <std::ranges::range R>
 Analysis::Parameter analyzeParameter(R&& r, const int numBins) {
     const auto avg = average(r);
+    const auto var = variance(r, avg);
     const auto rms = rootMeanSquare(r);
     const auto [min, max] = minMax(r);
     const auto histogram = createHistogram(r, min, max, numBins);
 
     return {
         .avg = avg,
+        .var = var,
         .rms = rms,
         .min = min,
         .max = max,
@@ -203,11 +213,13 @@ template <std::ranges::range R>
 void dump(const std::string name, const Analysis::Parameter& param, R&& r) {
     RAYX_VERB << "analyzing events for parameter: " << name;
     RAYX_VERB << "\tavg: " << param.avg;
+    RAYX_VERB << "\tvar: " << param.var;
     RAYX_VERB << "\trms: " << param.rms;
     RAYX_VERB << "\tmin: " << param.min;
     RAYX_VERB << "\tmax: " << param.max;
     RAYX_VERB << "\tfwhm value (left): " << param.fwhm.left;
     RAYX_VERB << "\tfwhm value (right): " << param.fwhm.right;
+    RAYX_VERB << "\tbandwidth: " << (param.fwhm.right - param.fwhm.left);
     RAYX_VERB << "\thistogram bin interval: " << param.histogram.interval;
     RAYX_VERB << "\thistogram min: " << param.histogram.min;
     RAYX_VERB << "\thistogram max: " << param.histogram.max;
@@ -310,13 +322,13 @@ std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundle
 
 #else
 
-struct RaySoA {
+struct RayData {
+    std::vector<double> energy;
     std::vector<double> positionX;
     std::vector<double> positionY;
-    std::vector<double> energy;
 };
 
-Analysis analyzeElement(const RaySoA& events) {
+Analysis analyzeElement(const RayData& events) {
     Analysis analysis;
 
     constexpr int numBins = 100;
@@ -336,34 +348,35 @@ Analysis analyzeElement(const RaySoA& events) {
         analysis.positionY = analyzeParameter(attrPositionY, numBins);
         dump("position.y", analysis.positionY, attrPositionY);
     }
-    // {
-    //     const auto getAttrPosition = [](const Ray& r) { return r.m_position; };
-    //     const auto toVec2 = [](const glm::dvec3 v) { return glm::dvec2{v.x, v.y}; };
-    //     auto attrPosition = r | std::views::transform(getAttrPosition) | std::views::transform(toVec2);
-    //     const auto min2D = glm::dvec2(analysis.positionX.min, analysis.positionY.min);
-    //     const auto max2D = glm::dvec2(analysis.positionX.max, analysis.positionY.max);
-    //     const auto numBins2D = glm::ivec2(numBins);
-    //     analysis.positionHistogram = createHistogram2D(attrPosition, min2D, max2D, numBins2D);
-    //     dump("position", analysis.positionHistogram, attrPosition);
-    // }
+    {
+        // until we use c++23, we use a custom little zip view adaptor
+        const auto getAttrPosition = [&](const int i) { return glm::dvec2(events.positionX[i], events.positionY[i]); };
+        auto indices = std::views::iota(0, static_cast<int>(events.positionX.size()));
+        auto attrPosition = indices | std::views::transform(getAttrPosition);
+        const auto min2D = glm::dvec2(analysis.positionX.min, analysis.positionY.min);
+        const auto max2D = glm::dvec2(analysis.positionX.max, analysis.positionY.max);
+        const auto numBins2D = glm::ivec2(numBins);
+        analysis.positionHistogram = createHistogram2D(attrPosition, min2D, max2D, numBins2D);
+        dump("position", analysis.positionHistogram, attrPosition);
+    }
 
     // TODO: compare performance using std::execution::par
 
     return analysis;
 }
 
-std::vector<RaySoA> transpose(const Group& beamline, const BundleHistory& bundleHistory) {
+std::vector<RayData> transpose(const int numElements, const BundleHistory& bundleHistory) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto result = std::vector<RaySoA>(beamline.numElements());
+    auto result = std::vector<RayData>(beamline.numElements());
 
     for (int b = 0; b < static_cast<int>(bundleHistory.size()); ++b) {
         const RayHistory& path = bundleHistory[b];
         for (int h = 0; h < static_cast<int>(path.size()); ++h) {
             const Ray& ray = path[h];
+            result[h].energy.push_back(ray.m_energy);
             result[h].positionX.push_back(ray.m_position.x);
             result[h].positionY.push_back(ray.m_position.y);
-            result[h].energy.push_back(ray.m_energy);
         }
     }
 
@@ -371,7 +384,8 @@ std::vector<RaySoA> transpose(const Group& beamline, const BundleHistory& bundle
 }
 
 std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundleHistory) {
-    const auto data = transpose(beamline, bundleHistory);
+    const auto numElements = static_cast<int>(beamline.numElements());
+    const auto data = transpose(numElements, bundleHistory);
 
     RAYX_PROFILE_FUNCTION_STDOUT();
 
@@ -381,7 +395,6 @@ std::vector<Analysis> analyze(const Group& beamline, const BundleHistory& bundle
     // RAYX_VERB << "analyzing sources";
     // analysis.push_back(analyzeElement(std::views::all(sourceRays)));
 
-    const auto numElements = static_cast<int>(beamline.numElements());
     auto elementNames = std::vector<std::string>(numElements);
     // beamline.ctraverse([i = 0, &elementNames](const BeamlineNode& node) mutable {
     //     if (node.isElement()) elementNames[i++] = static_cast<const DesignElement*>(&node)->getName();

@@ -22,6 +22,7 @@ struct Analysis {
         };
 
         double avg;
+        double var;
         double rms;
         double min;
         double max;
