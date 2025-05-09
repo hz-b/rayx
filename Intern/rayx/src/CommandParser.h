@@ -42,6 +42,7 @@ class CommandParser {
         bool m_verbose = false;                        // --verbose (Verbose)
         std::string m_format = defaultFormatString();  // --format
         int m_maxEvents = -1;                          // -m (max events)
+        int m_recordElementIndex = -1;                 // -R --record-element (element index)
     } m_args;
 
     static inline void getVersion() {
@@ -88,5 +89,6 @@ class CommandParser {
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
         {'F', {OptionType::STRING, "format", "Format output CSV / H5 data", &(m_args.m_format)}},
         {'m', {OptionType::INT, "maxEvents", "Maximum number of events per ray", &(m_args.m_maxEvents)}},
+        {'R', {OptionType::INT, "record-element", "Record events only for a specifc element", &(m_args.m_recordElementIndex)}},
     };
 };

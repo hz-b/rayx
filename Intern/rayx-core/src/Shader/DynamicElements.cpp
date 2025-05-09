@@ -12,13 +12,13 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
     auto rand = Rand(gid + inv.batchStartRayIndex, inv.numRaysTotal, inv.randomSeed);
 
     // Iterate through all bounces
-    int numEvents = 0;
+    int numRecorded = 0;
     bool colNotFound = false;
-    for (int i = 0; i < inv.maxEvents; numEvents = ++i) {
+    for (int bounce = 0; bounce < inv.maxEvents; ++bounce) {
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
         if (!isRayActive(ray.m_eventType)) break;
 
-        Collision col = findCollision(i, inv.sequential, ray, inv.elements, inv.numElements, rand);
+        Collision col = findCollision(bounce, inv.sequential, ray, inv.elements, inv.numElements, rand);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
@@ -57,7 +57,10 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         }
 
         // write ray in local element coordinates to global memory
-        outputEvents.events[gid * inv.maxEvents + i] = ray;
+        if (inv.recordElementIndex < 0 || col.elementIndex == inv.recordElementIndex) {
+            outputEvents.events[gid * inv.maxEvents + numRecorded] = ray;
+            ++numRecorded;
+        }
 
         // transform back to WORLD coordinates
         ray = rayMatrixMult(ray, element.m_outTrans);
@@ -73,7 +76,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
     }
 
     // store recorded events count
-    outputEvents.eventCounts[gid] = numEvents;
+    outputEvents.eventCounts[gid] = numRecorded;
 }
 
 }  // namespace RAYX

@@ -66,8 +66,9 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
         int maxEvents =
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
+        int recordElementIndex = m_CommandParser->m_args.m_recordElementIndex;
 
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, recordElementIndex);
 
         if (rays.empty())
             RAYX_WARN << "No events were recorded!";

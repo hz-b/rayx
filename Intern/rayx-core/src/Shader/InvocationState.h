@@ -17,8 +17,9 @@ struct RAYX_API InvState {
     int batchSize;
     int batchStartRayIndex;
     int maxEvents;
+    int recordElementIndex;  //< Index of element, for which to record events. Others are discarded. -1 to record events of all elements.
     double randomSeed;
-    Sequential sequential;
+    Sequential sequential = Sequential::No;
 
     OpticalElement* elements;
     int numElements;
