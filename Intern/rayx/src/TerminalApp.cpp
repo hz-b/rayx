@@ -69,22 +69,42 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
 
-        if (rays.empty()) std::cout << "No events were recorded!";
+        if (rays.empty())
+            RAYX_WARN << "No events were recorded!";
+        else {
+            bool isCSV = m_CommandParser->m_args.m_csvFlag;
+            Format fmt = formatFromString(m_CommandParser->m_args.m_format);
 
-        // Export Rays to external data.
-        auto file = exportRays(rays, path.string());
+            std::filesystem::path outputPath;
+            if (!m_CommandParser->m_args.m_outPath.empty()) {
+                outputPath = m_CommandParser->m_args.m_outPath;
+            } else {
+                outputPath = path;
+                outputPath.replace_extension("");  // strip .rml
+            }
+            outputPath.replace_extension(isCSV ? ".csv" : ".h5");
 
-        // Plot
-        if (m_CommandParser->m_args.m_plotFlag) {
-            if (!file.ends_with(".h5")) {
-                RAYX_WARN << "You can only plot .h5 files!";
-                RAYX_EXIT << "Have you selected .csv exporting?";
+            // Error handling in case provided path does not exist
+            auto parent = outputPath.parent_path();
+            if (!parent.empty() && !std::filesystem::exists(parent)) {
+                RAYX_EXIT << "Output directory '" << parent.string() << "' does not exist. Create it first or use a different -o path.";
             }
 
-            auto cmd = std::string("python ") + RAYX::ResourceHandler::getInstance().getResourcePath("Scripts/plot.py").string() + " " + file;
-            auto ret = system(cmd.c_str());
-            if (ret != 0) {
-                RAYX_WARN << "received error code while printing";
+            auto file = exportRays(rays, isCSV, outputPath, fmt);
+
+            // Plot
+            if (m_CommandParser->m_args.m_plotFlag) {
+                if (isCSV) {
+                    RAYX_WARN << "You can only plot .h5 files!";
+                    RAYX_EXIT << "Have you selected .csv exporting?";
+                }
+
+                auto cmd =
+                    std::string("python ") + RAYX::ResourceHandler::getInstance().getResourcePath("Scripts/plot.py").string() + " " + file.string();
+                auto ret = system(cmd.c_str());
+                if (ret != 0) {
+                    RAYX_WARN << "received error code while printing";
+                }
             }
         }
     } else {
@@ -150,30 +170,19 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path) {
+std::filesystem::path TerminalApp::exportRays(const RAYX::BundleHistory& hist, bool isCSV, const std::filesystem::path& path, const Format& fmt) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    bool csv = m_CommandParser->m_args.m_csvFlag;
 
-    // strip .rml
-    if (path.ends_with(".rml")) {
-        path = path.substr(0, path.length() - 4);
-    } else {
-        RAYX_EXIT << "Input file is not an *.rml file!";
-    }
-
-    Format fmt = formatFromString(m_CommandParser->m_args.m_format);
-
-    if (csv) {
-        path += ".csv";
-        writeCSV(hist, path, fmt);
+    if (isCSV) {
+        writeCSV(hist, path.string(), fmt);
     } else {
 #ifdef NO_H5
-        RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build))";
+        RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
-        path += ".h5";
-        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames());
+        writeH5(hist, path.string(), fmt, getBeamlineOpticalElementsNames());
 #endif
     }
+
     return path;
 }
 

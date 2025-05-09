@@ -34,6 +34,7 @@ class CommandParser {
         bool m_benchmark = false;                      // -b (Benchmark)
         bool m_version = false;                        // -v (Version)
         std::string m_providedFile = "";               // -i (Input)
+        std::string m_outPath = "";                    // -o (Output)
         bool m_isFixSeed = false;                      // -f (Fixed Seed)
         int m_seed = -1;                               // -s (Provided Seed)
         int m_BatchSize = 0;                           // -b (Vk batch size )
@@ -79,6 +80,7 @@ class CommandParser {
         {'d', {OptionType::INT, "device", "Pick device via Device ID", &(m_args.m_deviceID)}},
         {'l', {OptionType::BOOL, "list", "List available devices", &(m_args.m_listDevices)}},
         {'i', {OptionType::STRING, "input", "Input RML File or Directory.", &(m_args.m_providedFile)}},
+        {'o', {OptionType::STRING, "output", "Output path or filename", &(m_args.m_outPath)}},
         {'v', {OptionType::BOOL, "version", "", &(m_args.m_version)}},
         {'f', {OptionType::BOOL, "", "Fix the seed to RAYX::FIXED_SEED (Uses default)", &(m_args.m_isFixSeed)}},
         {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
