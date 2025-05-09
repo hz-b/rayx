@@ -175,7 +175,8 @@ class MegaKernelTracer : public DeviceTracer {
     Resources<Acc> m_resources;
 
   public:
-    virtual BundleHistory trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents) override {
+    virtual BundleHistory trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents,
+                                const int recordElementIndex) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -223,7 +224,8 @@ class MegaKernelTracer : public DeviceTracer {
             alpaka::memcpy(q, *m_resources.d_rays, raysViewBatch);
 
             // trace current batch
-            traceBatch(devAcc, q, conf.numElements, conf.numRaysTotal, batchSize, batchStartRayIndex, maxEvents, randomSeed, sequential);
+            traceBatch(devAcc, q, conf.numElements, conf.numRaysTotal, batchSize, batchStartRayIndex, maxEvents, recordElementIndex, randomSeed,
+                       sequential);
 
             // prefix sum on compactEventCounts to get compactEventOffsets
             alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchSize), *m_resources.d_compactEventCounts, batchSize);
@@ -261,7 +263,7 @@ class MegaKernelTracer : public DeviceTracer {
 
     template <typename DevAcc, typename Queue>
     void traceBatch(DevAcc devAcc, Queue q, int numElements, int numRaysTotal, int batchSize, int batchStartRayIndex, int maxEvents,
-                    double randomSeed, Sequential sequential) {
+                    int recordElementIndex, double randomSeed, Sequential sequential) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         // inputs
@@ -271,6 +273,7 @@ class MegaKernelTracer : public DeviceTracer {
             .batchSize = batchSize,
             .batchStartRayIndex = batchStartRayIndex,
             .maxEvents = maxEvents,
+            .recordElementIndex = recordElementIndex,
             .randomSeed = randomSeed,
             .sequential = sequential,
 

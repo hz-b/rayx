@@ -17,8 +17,9 @@ struct RAYX_API InvState {
     int batchSize;
     int batchStartRayIndex;
     int maxEvents;
+    int recordElementIndex;
     double randomSeed;
-    Sequential sequential;
+    Sequential sequential = Sequential::No;
 
     OpticalElement* elements;
     int numElements;

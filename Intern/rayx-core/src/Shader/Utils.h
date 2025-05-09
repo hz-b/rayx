@@ -27,8 +27,8 @@ inline constexpr bool isRayActive(const EventType eventType) { return eventType 
 
 RAYX_FN_ACC
 [[nodiscard]] inline constexpr Ray terminateRay(Ray r, const EventType eventType) {
-    _debug_warn(isRayActive(r.m_eventType), "ray about to be terminated, but ray is already terminated!");
-    _debug_assert(!isRayActive(eventType), "ray about to be terminated, but provided event type is not a valid termination event type!");
+    //_debug_warn(isRayActive(r.m_eventType), "ray about to be terminated, but ray is already terminated!");
+    //_debug_assert(!isRayActive(eventType), "ray about to be terminated, but provided event type is not a valid termination event type!");
     r.m_eventType = eventType;
     return r;
 }
