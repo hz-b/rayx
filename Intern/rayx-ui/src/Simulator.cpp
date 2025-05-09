@@ -18,7 +18,7 @@ void Simulator::runSimulation() {
         m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
     }
 
-    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents);
+    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents, -1);  // TODO: implement recordElementIndex for GUI?
 
     bool notEnoughEvents = false;
 
