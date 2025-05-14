@@ -13,7 +13,7 @@
 namespace RAYX {
 
 // if no `--batch` option is given, this it the batch size.
-const uint64_t DEFAULT_BATCH_SIZE = 100000;
+const int DEFAULT_BATCH_SIZE = 100000; // TODO: this value is picked in a 'good' way if it can divide number of rays without rest. for number of rays picked by humans, this number is probably good. though, if it could be power of two, the shader would benefit
 
 class RAYX_API Tracer {
   public:
