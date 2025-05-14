@@ -99,6 +99,8 @@ struct Resources {
     Buf<int> d_compactEventCounts;
     /// offset into compact events buffer for earch input ray
     Buf<int> d_compactEventOffsets;
+    /// maps compact events buffer indices to events buffer indices
+    Buf<int> d_compactEventGatherSrcIndices;
 
     /// holds configuration state of allocated resources. required to trace correctly
     struct Config {
@@ -144,6 +146,7 @@ struct Resources {
         allocBuf(q, d_compactEvents, preferredBatchSize * maxEvents);
         allocBuf(q, d_compactEventCounts, preferredBatchSize);
         allocBuf(q, d_compactEventOffsets, preferredBatchSize);
+        allocBuf(q, d_compactEventGatherSrcIndices, preferredBatchSize * maxEvents);
 
         const auto numBatches = ceilIntDivision(h_rays.size(), preferredBatchSize);
         return {
@@ -231,10 +234,10 @@ class MegaKernelTracer : public DeviceTracer {
             alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchSize), *m_resources.d_compactEventCounts, batchSize);
             std::exclusive_scan(compactEventCounts.begin(), compactEventCounts.begin() + batchSize, compactEventOffsets.begin(), 0);
             alpaka::memcpy(q, *m_resources.d_compactEventOffsets, alpaka::createView(devHost, compactEventOffsets, batchSize), batchSize);
-            const auto numEventsBatch = compactEventOffsets.back() + compactEventCounts[batchSize - 1];
+            const auto numEventsBatch = compactEventOffsets[batchSize - 1] + compactEventCounts[batchSize - 1];
 
             // make events compact by gathering events into compactEvents using compactEventCounts and compactEventOffsets
-            gatherCompactEvents(devAcc, q, batchSize, maxEvents);
+            gatherCompactEvents(devAcc, q, batchSize, maxEvents, numEventsBatch);
 
             // transfer events from device to host for curent batch
             alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
@@ -295,32 +298,53 @@ class MegaKernelTracer : public DeviceTracer {
         execWithValidWorkDiv(devAcc, q, batchSize, 128, DynamicElementsKernel{}, inv, outputEvents);
     }
 
-    struct GatherKernel {
-        template <typename Acc, typename T>
-        RAYX_FN_ACC void operator()(const Acc& acc, T* dst, const T* src, const int* srcSizes, const int* srcOffsets, const int srcMaxSize,
-                                    const int n) const {
+    struct GatherIndicesKernel {
+        template <typename Acc>
+        RAYX_FN_ACC void operator()(const Acc& __restrict acc, int* __restrict srcIndices, const int* __restrict srcSizes,
+                                    const int* __restrict srcOffsets, const int maxEvents, const int n) const {
             const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
             if (gid < n) {
-                auto offset = srcOffsets[gid];
-                auto size = srcSizes[gid];
+                const auto offset = srcOffsets[gid];
+                const auto size = srcSizes[gid];
 
                 for (int i = 0; i < size; ++i) {
                     const auto idst = offset + i;
-                    const auto isrc = gid * srcMaxSize + i;
-                    dst[idst] = src[isrc];
+                    const auto isrc = gid * maxEvents + i;
+                    srcIndices[idst] = isrc;
                 }
             }
         }
     };
 
+    struct GatherKernel {
+        template <typename Acc, typename T>
+        RAYX_FN_ACC void operator()(const Acc& __restrict acc, T* __restrict dst, const T* __restrict src, const int* __restrict srcIndices,
+                                    const int n) const {
+            const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+
+            if (gid < n) {
+                const auto isrc = srcIndices[gid];
+                dst[gid] = src[isrc];
+            }
+        }
+    };
+
     template <typename DevAcc, typename Queue>
-    void gatherCompactEvents(DevAcc devAcc, Queue q, int batchSize, int maxEvents) {
+    void gatherCompactEvents(DevAcc devAcc, Queue q, const int batchSize, const int maxEvents, const int numEventsBatch) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
-        execWithValidWorkDiv(devAcc, q, batchSize, 128, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
-                             alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventCounts),
-                             alpaka::getPtrNative(*m_resources.d_compactEventOffsets), maxEvents, batchSize);
+        printf("%d\n", numEventsBatch);
+        // we dont want to compact events if there are none
+        if (numEventsBatch == 0) return;
+
+        execWithValidWorkDiv(devAcc, q, batchSize, 128, GatherIndicesKernel{}, alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
+                             alpaka::getPtrNative(*m_resources.d_compactEventCounts), alpaka::getPtrNative(*m_resources.d_compactEventOffsets),
+                             maxEvents, batchSize);
+
+        execWithValidWorkDiv(devAcc, q, numEventsBatch, 128, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
+                             alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
+                             numEventsBatch);
     }
 
     template <typename Queue, typename DevAcc, typename Kernel, typename... Args>
