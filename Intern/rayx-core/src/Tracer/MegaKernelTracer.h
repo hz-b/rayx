@@ -13,7 +13,7 @@
 namespace RAYX {
 namespace {
 
-inline int calcNumBatches(const int batchSize, const int numRaysTotal) { return (batchSize + numRaysTotal - 1) / batchSize; }
+inline int ceilIntDivision(const int dividend, const int divisor) { return (divisor + dividend - 1) / divisor; }
 
 inline int nextPowerOfTwo(const int value) { return static_cast<int>(glm::pow(2, glm::ceil(glm::log(value) / glm::log(2)))); }
 
@@ -145,7 +145,7 @@ struct Resources {
         allocBuf(q, d_compactEventCounts, preferredBatchSize);
         allocBuf(q, d_compactEventOffsets, preferredBatchSize);
 
-        const auto numBatches = calcNumBatches(preferredBatchSize, h_rays.size());
+        const auto numBatches = ceilIntDivision(h_rays.size(), preferredBatchSize);
         return {
             .numElements = numElements,
             .numRaysTotal = numRaysTotal,
@@ -292,7 +292,7 @@ class MegaKernelTracer : public DeviceTracer {
             .eventCounts = alpaka::getPtrNative(*m_resources.d_compactEventCounts),
         };
 
-        execWithValidWorkDiv(devAcc, q, batchSize, DynamicElementsKernel{}, inv, outputEvents);
+        execWithValidWorkDiv(devAcc, q, batchSize, 128, DynamicElementsKernel{}, inv, outputEvents);
     }
 
     struct GatherKernel {
@@ -318,21 +318,29 @@ class MegaKernelTracer : public DeviceTracer {
     void gatherCompactEvents(DevAcc devAcc, Queue q, int batchSize, int maxEvents) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
-        execWithValidWorkDiv(devAcc, q, batchSize, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
+        execWithValidWorkDiv(devAcc, q, batchSize, 128, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
                              alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventCounts),
                              alpaka::getPtrNative(*m_resources.d_compactEventOffsets), maxEvents, batchSize);
     }
 
     template <typename Queue, typename DevAcc, typename Kernel, typename... Args>
-    void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, const Kernel& kernel, Args&&... args) {
-        const auto conf = alpaka::KernelCfg<Acc>{numElements, 1};
-        // TODO: make sure blockSize is divisible by 128
-        const auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
+    void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, const int maxBlockSize, const Kernel& kernel, Args&&... args) {
+        const auto conf = alpaka::KernelCfg<Acc>{
+            .gridElemExtent = numElements,
+            .threadElemExtent = 1,
+            .blockThreadMustDivideGridThreadExtent = false,
+        };
+
+        auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
+        if (maxBlockSize < workDiv.m_blockThreadExtent[0]) {
+            workDiv.m_blockThreadExtent = maxBlockSize;
+            workDiv.m_gridBlockExtent = ceilIntDivision(numElements, maxBlockSize);
+        }
 
         RAYX_VERB << "executing kernel with launch config: "
                   << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
                   << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
-                  << "elements = " << workDiv.m_threadElemExtent[0];  // TODO: why does m_blockThreadExtent not divide by warpSize?
+                  << "elements = " << workDiv.m_threadElemExtent[0];
 
         alpaka::exec<Acc>(q, workDiv, kernel, std::forward<Args>(args)...);
     }
