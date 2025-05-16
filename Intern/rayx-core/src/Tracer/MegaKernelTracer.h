@@ -213,7 +213,7 @@ class MegaKernelTracer : public DeviceTracer {
         return bundleHistory;
     }
 
-private:
+  private:
     template <typename DevAcc, typename Queue>
     void traceBatch(DevAcc devAcc, Queue q, int numElements, int numRaysTotal, int batchSize, int batchStartRayIndex, int maxEvents,
                     int recordElementIndex, double randomSeed, Sequential sequential) {
@@ -256,12 +256,12 @@ private:
         if (numEventsBatch == 0) return;
 
         execWithValidWorkDiv<Acc>(devAcc, q, batchSize, 128, GatherIndicesKernel{}, alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
-                             alpaka::getPtrNative(*m_resources.d_compactEventCounts), alpaka::getPtrNative(*m_resources.d_compactEventOffsets),
-                             maxEvents, batchSize);
+                                  alpaka::getPtrNative(*m_resources.d_compactEventCounts), alpaka::getPtrNative(*m_resources.d_compactEventOffsets),
+                                  maxEvents, batchSize);
 
         execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatch, 128, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
-                             alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
-                             numEventsBatch);
+                                  alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
+                                  numEventsBatch);
     }
 };
 

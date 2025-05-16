@@ -1,9 +1,10 @@
 #pragma once
 
 #include <alpaka/alpaka.hpp>
-#include "Debug/Instrumentor.h"
-#include <vector>
 #include <optional>
+#include <vector>
+
+#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 

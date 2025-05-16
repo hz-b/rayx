@@ -84,13 +84,13 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         }
         auto& rayHist = rayCache[i];
 
-        if (beamline.numSources() <= rayHist[0].m_sourceID) {
+        if (static_cast<int>(beamline.numSources()) <= rayHist[0].m_sourceID) {
             RAYX_EXIT << "Trying to access out-of-bounds index with source ID: " << rayHist[0].m_sourceID;
         }
         glm::vec4 rayLastPos = sourceWorldPositions[static_cast<size_t>(rayHist[0].m_sourceID)];
 
         for (const RAYX::Ray& event : rayHist) {
-            if (event.m_lastElement >= beamline.numElements()) {
+            if (event.m_lastElement >= static_cast<int>(beamline.numElements())) {
                 RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);
@@ -116,7 +116,7 @@ void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<
     // Iterate over all rays in the bundle history
     for (const auto& rayBundle : rays) {
         for (const auto& ray : rayBundle) {
-            if (ray.m_lastElement >= numElements) {
+            if (ray.m_lastElement >= static_cast<int>(numElements)) {
                 continue;
             }
             sortedRays[static_cast<size_t>(ray.m_lastElement)].push_back(ray);
