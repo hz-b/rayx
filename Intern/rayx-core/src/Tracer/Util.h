@@ -58,9 +58,17 @@ inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, 
     }
 }
 
-// TODO: maybe make a PR to alpaka for alpaka::Acc<Dev> to extract Acc from Dev<Platform<Acc>>
+struct FixedBlockSizeConstraint {
+    int value;
+};
+struct MaxBlockSizeConstraint {
+    int value;
+};
+using BlockSizeConstraintVariant = std::variant<std::monostate, FixedBlockSizeConstraint, MaxBlockSizeConstraint>;
+
+// TODO: maybe make a PR to alpaka for alpaka::Acc<Dev> to extract Acc from DevAcc (= Dev<Platform<Acc>>)
 template <typename Acc, typename DevAcc, typename Queue, typename Kernel, typename... Args>
-inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, const int maxBlockSize, const Kernel& kernel, Args&&... args) {
+inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraintVariant blockSizeConstraint, const Kernel& kernel, Args&&... args) {
     const auto conf = alpaka::KernelCfg<Acc>{
         .gridElemExtent = numElements,
         .threadElemExtent = 1,
@@ -68,10 +76,19 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
     };
 
     auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
-    if (maxBlockSize < workDiv.m_blockThreadExtent[0]) {
-        workDiv.m_blockThreadExtent = maxBlockSize;
-        workDiv.m_gridBlockExtent = ceilIntDivision(numElements, maxBlockSize);
-    }
+    std::visit([&] <typename ConstraintType> (ConstraintType constraint) {
+        if constexpr (std::is_same_v<ConstraintType, FixedBlockSizeConstraint>) {
+            assert(workDiv.m_blockThreadExtent[0] < constraint.value);
+            workDiv.m_blockThreadExtent = constraint.value;
+            workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+        }
+        else if constexpr (std::is_same_v<ConstraintType, MaxBlockSizeConstraint>) {
+            if (constraint.value < workDiv.m_blockThreadExtent[0]) {
+                workDiv.m_blockThreadExtent = constraint.value;
+                workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+            }
+        }
+    }, blockSizeConstraint);
 
     RAYX_VERB << "executing kernel with launch config: "
               << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
