@@ -97,15 +97,15 @@ static Format FULL_FORMAT = {
     },
     FormatComponent{
         .name = "order",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_order; },
+        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_order); },
     },
     FormatComponent{
         .name = "lastElement",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_lastElement; },
+        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_lastElement); },
     },
     FormatComponent{
         .name = "lightSourceIndex",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_sourceID; },
+        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_sourceID); },
     },
 };
 

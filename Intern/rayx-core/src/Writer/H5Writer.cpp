@@ -110,10 +110,10 @@ RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format
                     {rayData[12], rayData[13]},
                     {rayData[14], rayData[15]},
                 },
-            .m_pathLength = rayData[16],   // pathLength
-            .m_order = rayData[17],        // order
-            .m_lastElement = rayData[18],  // lastElement
-            .m_sourceID = rayData[19]      // sourceID
+            .m_pathLength = rayData[16],                             // pathLength
+            .m_order = static_cast<signed char>(rayData[17]),        // order
+            .m_lastElement = static_cast<signed char>(rayData[18]),  // lastElement
+            .m_sourceID = static_cast<signed char>(rayData[19])      // sourceID
         };
 
         rayHist.push_back(ray);

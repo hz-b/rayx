@@ -39,18 +39,21 @@ struct RAYX_API Ray {
     /// The distance that this ray has already traveled (in mm).
     double m_pathLength;
 
+    // The following attributes are of small type size, to keep Ray compact on one cache line of 128 bytes. Since theese attributes are not widely
+    // accessed and are not heavily involved in arithmetic operations, performance penalities should be negligible
+
     /// The order of diffraction.
     /// Is currently only set to a non-zero value by the RZP.
-    double m_order;
+    signed char m_order;
 
     /// the index of the last OpticalElement that this ray collided/interacted with.
     /// is initially set to -1 upon construction by the LightSources.
-    double m_lastElement;
+    signed char m_lastElement;
 
     /// The index of the LightSource that emitted this ray.
     /// It is initially set to -1 upon construction by the LightSources and later set by the beamline.
     /// NOTE: This can be moved outside of the Ray struct. It is here for convenience.
-    double m_sourceID;
+    signed char m_sourceID;
 
     // NOTE: if you intend to mutate the Ray struct, you have to
     // 1. check that `formatAsVec` from Debug.h correctly uses your Ray struct.
