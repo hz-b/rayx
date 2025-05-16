@@ -18,7 +18,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
         if (!isRayActive(ray.m_eventType)) break;
 
-        Collision col = findCollision(bounce, inv.sequential, ray, inv.elements, inv.numElements, rand);
+        Collision col = findCollision(bounce, inv.sequential, ray.m_position, ray.m_direction, inv.elements, inv.numElements, rand);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
@@ -68,7 +68,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
     // check if the number of events exceeds capacity
     if (!colNotFound && inv.sequential == Sequential::No && isRayActive(ray.m_eventType)) {
-        Collision col = findCollisionNonSequential(ray, inv.elements, inv.numElements, rand);
+        Collision col = findCollisionNonSequential(ray.m_position, ray.m_direction, inv.elements, inv.numElements, rand);
         if (col.found) {
             ray = terminateRay(ray, EventType::TooManyEvents);
             outputEvents.events[gid * inv.maxEvents + inv.maxEvents - 1] = ray;
