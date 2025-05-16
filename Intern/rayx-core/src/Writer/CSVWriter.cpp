@@ -131,9 +131,9 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
                          .m_energy = d[7],
                          .m_field = field,
                          .m_pathLength = d[12],
-                         .m_order = d[13],
-                         .m_lastElement = d[14],
-                         .m_sourceID = d[15]};
+                         .m_order = static_cast<signed char>(d[13]),
+                         .m_lastElement = static_cast<signed char>(d[14]),
+                         .m_sourceID = static_cast<signed char>(d[15])};
         // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
         // If so, we need to make place for it.
         if (out.size() <= ray_id) {

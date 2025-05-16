@@ -62,7 +62,7 @@ std::vector<Ray> MatrixSource::getRays([[maybe_unused]] int thread_count) const 
             const auto rotation = glm::dmat3(m_orientation);
             const auto field = rotation * stokesToElectricField(m_pol);
 
-            Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0.0, -1.0, -1.0};
+            Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0, -1, -1};
 
             returnList.push_back(r);
         }
