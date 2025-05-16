@@ -19,6 +19,12 @@ inline Ray RAYX_API rayMatrixMult(Ray r, const glm::dmat4 m) {
     return r;
 }
 
+RAYX_FN_ACC
+inline void RAYX_API rayMatrixMult(glm::dvec3& __restrict rayPosition, glm::dvec3& __restrict rayDirection, const glm::dmat4& __restrict m) {
+    rayPosition = glm::dvec3(m * glm::dvec4(rayPosition, 1));
+    rayDirection = glm::dvec3(m * glm::dvec4(rayDirection, 0));
+}
+
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FN_ACC double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal);
 
