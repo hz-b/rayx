@@ -245,7 +245,7 @@ class MegaKernelTracer : public DeviceTracer {
             .eventCounts = alpaka::getPtrNative(*m_resources.d_compactEventCounts),
         };
 
-        execWithValidWorkDiv<Acc>(devAcc, q, batchSize, 128, DynamicElementsKernel{}, inv, outputEvents);
+        execWithValidWorkDiv<Acc>(devAcc, q, batchSize, MaxBlockSizeConstraint{128}, DynamicElementsKernel{}, inv, outputEvents);
     }
 
     template <typename DevAcc, typename Queue>
@@ -255,11 +255,11 @@ class MegaKernelTracer : public DeviceTracer {
         // we dont want to compact events if there are none
         if (numEventsBatch == 0) return;
 
-        execWithValidWorkDiv<Acc>(devAcc, q, batchSize, 128, GatherIndicesKernel{}, alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
+        execWithValidWorkDiv<Acc>(devAcc, q, batchSize, MaxBlockSizeConstraint{128}, GatherIndicesKernel{}, alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
                                   alpaka::getPtrNative(*m_resources.d_compactEventCounts), alpaka::getPtrNative(*m_resources.d_compactEventOffsets),
                                   maxEvents, batchSize);
 
-        execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatch, 128, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
+        execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatch, MaxBlockSizeConstraint{128}, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
                                   alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
                                   numEventsBatch);
     }
