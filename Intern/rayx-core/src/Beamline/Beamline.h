@@ -114,6 +114,8 @@ class RAYX_API Group : public BeamlineNode {
 
     std::vector<const DesignElement*> getElements() const;
     std::vector<const DesignSource*> getSources() const;
+    std::vector<std::string> getElementNames() const;
+    std::vector<std::string> getSourceNames() const;
     const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
     glm::dvec4 getPosition() const override { return m_position; }
     glm::dmat4 getOrientation() const override { return m_orientation; }

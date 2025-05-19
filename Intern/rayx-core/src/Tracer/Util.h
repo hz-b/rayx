@@ -58,17 +58,18 @@ inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, 
     }
 }
 
-struct FixedBlockSizeConstraint {
+struct ExactBlockSizeConstraint {
     int value;
 };
 struct MaxBlockSizeConstraint {
     int value;
 };
-using BlockSizeConstraintVariant = std::variant<std::monostate, FixedBlockSizeConstraint, MaxBlockSizeConstraint>;
+using BlockSizeConstraintVariant = std::variant<std::monostate, ExactBlockSizeConstraint, MaxBlockSizeConstraint>;
 
 // TODO: maybe make a PR to alpaka for alpaka::Acc<Dev> to extract Acc from DevAcc (= Dev<Platform<Acc>>)
 template <typename Acc, typename DevAcc, typename Queue, typename Kernel, typename... Args>
-inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraintVariant blockSizeConstraint, const Kernel& kernel, Args&&... args) {
+inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraintVariant blockSizeConstraint, const Kernel& kernel,
+                                 Args&&... args) {
     const auto conf = alpaka::KernelCfg<Acc>{
         .gridElemExtent = numElements,
         .threadElemExtent = 1,
@@ -76,19 +77,21 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
     };
 
     auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
-    std::visit([&] <typename ConstraintType> (ConstraintType constraint) {
-        if constexpr (std::is_same_v<ConstraintType, FixedBlockSizeConstraint>) {
-            assert(workDiv.m_blockThreadExtent[0] < constraint.value);
-            workDiv.m_blockThreadExtent = constraint.value;
-            workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
-        }
-        else if constexpr (std::is_same_v<ConstraintType, MaxBlockSizeConstraint>) {
-            if (constraint.value < workDiv.m_blockThreadExtent[0]) {
+    std::visit(
+        [&]<typename ConstraintType>(ConstraintType constraint) {
+            if constexpr (std::is_same_v<ConstraintType, ExactBlockSizeConstraint>) {
+                assert(workDiv.m_blockThreadExtent[0] <= constraint.value);
                 workDiv.m_blockThreadExtent = constraint.value;
                 workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
             }
-        }
-    }, blockSizeConstraint);
+            if constexpr (std::is_same_v<ConstraintType, MaxBlockSizeConstraint>) {
+                if (constraint.value < workDiv.m_blockThreadExtent[0]) {
+                    workDiv.m_blockThreadExtent = constraint.value;
+                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+                }
+            }
+        },
+        blockSizeConstraint);
 
     RAYX_VERB << "executing kernel with launch config: "
               << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
@@ -101,7 +104,8 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
 struct GatherIndicesKernel {
     template <typename Acc>
     RAYX_FN_ACC void operator()(const Acc& __restrict acc, int* __restrict srcIndices, const int* __restrict srcSizes,
-                                const int* __restrict srcOffsets, const int maxEvents, const int n) const {
+                                const int* __restrict srcOffsets, int* __restrict attr_path_id, const int batchStartRayIndex, const int maxEvents,
+                                const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
         if (gid < n) {
@@ -112,6 +116,7 @@ struct GatherIndicesKernel {
                 const auto idst = offset + i;
                 const auto isrc = gid * maxEvents + i;
                 srcIndices[idst] = isrc;
+                attr_path_id[idst] = gid + batchStartRayIndex;
             }
         }
     }
@@ -126,6 +131,48 @@ struct GatherKernel {
         if (gid < n) {
             const auto isrc = srcIndices[gid];
             dst[gid] = src[isrc];
+        }
+    }
+};
+
+template <typename Acc>
+struct RaySoaBuf {
+    using Dim = alpaka::DimInt<1>;
+    using Idx = int32_t;
+    template <typename T>
+    using Buf = std::optional<alpaka::Buf<Acc, T, Dim, Idx>>;
+
+#define RAYX_X(type, name, flag, map) Buf<type> name;
+    RAYX_X_MACRO_RAY_ATTR_PATH_ID
+    RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+};
+
+struct RaySoaRef {
+#define RAYX_X(type, name, flag, map) type* __restrict name;
+    RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+};
+
+template <typename Acc>
+inline RaySoaRef raySoaBufToRaySoaRef(RaySoaBuf<Acc>& buf) {
+    return RaySoaRef{
+#define RAYX_X(type, name, flag, map) .name = alpaka::getPtrNative(*buf.name),
+        RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+    };
+}
+
+struct CompactRaysToRaySoAKernel {
+    template <typename Acc>
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaySoaRef raysoa, const Ray* __restrict rays, const int n) const {
+        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+
+        // TODO: this kernel copies all attributes, but depending on flags some can be ignored
+        if (gid < n) {
+#define RAYX_X(type, name, flag, map) raysoa.name[gid] = rays[gid].map;
+            RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
         }
     }
 };

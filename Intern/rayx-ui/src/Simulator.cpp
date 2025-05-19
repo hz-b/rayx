@@ -56,7 +56,7 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    writeH5(rays, path, fmt, names);
+    writeH5BundleHistory(path, rays, fmt, names);
 #else
     writeCSV(rays, path, fmt);
 #endif

@@ -6,6 +6,7 @@
 #include "Beamline/Beamline.h"
 #include "CommandParser.h"
 #include "Debug/Instrumentor.h"
+#include "RaySoA.h"
 #include "TerminalAppConfig.h"
 #include "Tracer/Tracer.h"
 
@@ -31,9 +32,7 @@ class TerminalApp {
     /// children of that directory.
     void tracePath(const std::filesystem::path& path);
     // returns the output filename (either .csv or .h5)
-    std::filesystem::path exportRays(const RAYX::BundleHistory&, bool isCSV, const std::filesystem::path&, const Format& fmt);
-    std::vector<std::string> getBeamlineOpticalElementsNames();
-    std::vector<std::string> getBeamlineLightSourcesNames();
+    std::filesystem::path exportRays(const RAYX::RaySoA& rays, bool isCSV, const std::filesystem::path&, const RAYX::RayAttrFlag attr);
 
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;
