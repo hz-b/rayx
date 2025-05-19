@@ -15,7 +15,7 @@
     if (!(condition)) printf("Warning occurred while executing kernel: " string "\n" __VA_OPT__(, ) __VA_ARGS__)
 
 #ifdef RAYX_DEBUG_MODE
-#define _debug_throw_debug(string, ...) _throw(string __VA_OPT__(, ) __VA_ARGS__)
+#define _debug_throw(string, ...) _throw(string __VA_OPT__(, ) __VA_ARGS__)
 #define _debug_assert(condition, string, ...) _assert(condition, string __VA_OPT__(, ) __VA_ARGS__)
 #define _debug_warn(condition, string, ...) _warn(condition, string __VA_OPT__(, ) __VA_ARGS__)
 #else

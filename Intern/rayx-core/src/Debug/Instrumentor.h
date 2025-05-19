@@ -35,7 +35,7 @@ class RAYX_API InstrumentationTimer {
             if (m_canPrint) {
                 long long duration = end - start;
                 double seconds = duration * 0.000001;
-                std::cout << "BENCH: " << m_Name << ": " << std::endl << seconds << "s" << std::endl;
+                std::cout << "BENCH: " << m_Name << ":" << std::endl << seconds << "s" << std::endl;
             }
 
             m_isStopped = true;

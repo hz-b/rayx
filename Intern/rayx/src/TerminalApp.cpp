@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
 
 #include "Debug/Debug.h"
 #include "Random.h"
@@ -10,6 +12,75 @@
 #include "Rml/Locate.h"
 #include "Tracer/Tracer.h"
 #include "Writer/Writer.h"
+
+namespace {
+
+void dumpBeamline(const std::filesystem::path& filepath) {
+    std::cout << "reading beamline meta data from: " << filepath << std::endl;
+
+    const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
+
+    const auto sources = beamline->getSources();
+    std::cout << "beamline:" << std::endl;
+    std::cout << "\tsources (" << sources.size() << ");" << std::endl;
+
+    for (const auto* source : sources) {
+        std::cout << "\t- '" << source->getName() << "' \t(type: " << RAYX::elementTypeToString(source->getType())
+                  << ", number of rays: " << source->getNumberOfRays() << ")" << std::endl;
+    }
+
+    const auto elements = beamline->getElements();
+    std::cout << "\telements (" << elements.size() << "):" << std::endl;
+
+    for (const auto& element : elements) {
+        const auto curvature = RAYX::curvatureTypeToString(element->getCurvatureType());
+        const auto behaviour = RAYX::behaviourTypeToString(element->getBehaviourType());
+        std::cout << "\t- '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")" << std::endl;
+    }
+}
+
+void scanGroup(const HighFive::Group& group, const int depth = 0, const std::string& path = "/") {
+    size_t num_objs = group.getNumberObjects();
+    for (size_t i = 0; i < num_objs; ++i) {
+        std::string obj_name = group.getObjectName(i);
+        std::string full_path = path == "/" ? "/" + obj_name : path + "/" + obj_name;
+        auto obj_type = group.getObjectType(obj_name);
+
+        auto indent = [depth] () { for (int i = 0; i < depth; ++i) std::cout << "\t"; };
+
+        // Print object type and full path
+        switch (obj_type) {
+            case HighFive::ObjectType::Group:
+                indent();
+                std::cout << full_path << " (group)" << std::endl;
+                // Recursively scan sub-group
+                scanGroup(group.getGroup(obj_name), depth+1, full_path);
+                break;
+            case HighFive::ObjectType::Dataset:
+                indent();
+                std::cout << full_path << " (dataset)" << std::endl;
+                break;
+            default:
+                indent();
+                std::cout << full_path << " (unknown)" << std::endl;
+        }
+    }
+}
+
+void dumpH5File(const std::filesystem::path& filepath) {
+    try {
+        std::cout << "reading h5 meta data from: " << filepath << std::endl;
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
+        std::cout << "\tfilesize: " << file.getFileSize() << std::endl;
+        scanGroup(file.getGroup("/"), 1);
+    } catch (const std::exception& e) {
+        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
+    }
+}
+
+}  // unnamed namespace
+
+// TODO: add option for dumping the meta information of h5 file
 
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_VERB << "TerminalApp created!";
@@ -64,15 +135,18 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        int maxEvents =
+        const int maxEvents =
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
-        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents);
+        const auto attr =
+            m_CommandParser->m_args.m_format.empty() ? RAYX::AllRayAttr : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
 
-        if (rays.empty()) std::cout << "No events were recorded!";
+        auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, attr);
+
+        if (!rays.num_events) std::cout << "No events were recorded!" << std::endl;
 
         // Export Rays to external data.
-        auto file = exportRays(rays, path.string());
+        auto file = exportRays(rays, path.string(), attr);
 
         // Plot
         if (m_CommandParser->m_args.m_plotFlag) {
@@ -99,6 +173,22 @@ void TerminalApp::run() {
     m_CommandParser = std::make_unique<CommandParser>(m_argc, m_argv);
     // Check correct use (This will exit if error)
     m_CommandParser->analyzeCommands();
+
+    if (!m_CommandParser->m_args.m_dump.empty()) {
+        const auto filename = m_CommandParser->m_args.m_dump;
+        const auto filepath = std::filesystem::path(filename);
+        const auto filetype = filepath.extension();
+
+        if (filetype == ".rml")
+            dumpBeamline(filepath);
+        else if (filetype == ".h5")
+            dumpH5File(filepath);
+        else
+            RAYX_EXIT << "error: unable to dump file '" << filename << "', unknown filetype. supported filetypes are h5 and rml";
+
+        return;
+    }
+
     if (m_CommandParser->m_args.m_verbose) {
         RAYX::setDebugVerbose(true);
     }
@@ -150,7 +240,7 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string path) {
+std::string TerminalApp::exportRays(const RAYX::RaySoA& rays, std::string path, RAYX::RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     bool csv = m_CommandParser->m_args.m_csvFlag;
 
@@ -161,51 +251,17 @@ std::string TerminalApp::exportRays(const RAYX::BundleHistory& hist, std::string
         RAYX_EXIT << "Input file is not an *.rml file!";
     }
 
-    Format fmt = formatFromString(m_CommandParser->m_args.m_format);
-
     if (csv) {
         path += ".csv";
-        writeCSV(hist, path, fmt);
+        Format fmt = formatFromString(m_CommandParser->m_args.m_format);
+        writeCSV(raySoAToBundleHistory(rays), path, fmt);
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build))";
 #else
         path += ".h5";
-        writeH5(hist, path, fmt, getBeamlineOpticalElementsNames());
+        RAYX::writeH5RaySoA(path, rays, attr);
 #endif
     }
     return path;
-}
-
-/**
- * @brief Get all beamline optical element names
- *
- * @return std::vector<std::string> list of names
- */
-std::vector<std::string> TerminalApp::getBeamlineOpticalElementsNames() {
-    std::vector<std::string> names;
-    // getElements() returns a vector of pointers to DesignElement, traversing the entire tree.
-    auto elements = m_Beamline->getElements();
-    names.reserve(elements.size());
-    for (const auto elem : elements) {
-        // Assuming DesignElement provides a getName() method.
-        names.push_back(elem->getName());
-    }
-    return names;
-}
-
-/**
- * @brief Get all beamline light sources names
- *
- * @return std::vector<std::string> list of names
- */
-std::vector<std::string> TerminalApp::getBeamlineLightSourcesNames() {
-    std::vector<std::string> names;
-    // getSources() returns a vector of pointers to DesignSource.
-    auto sources = m_Beamline->getSources();
-    names.reserve(sources.size());
-    for (const auto src : sources) {
-        names.push_back(src->getName());
-    }
-    return names;
 }

@@ -1,156 +1,136 @@
-#ifndef NO_H5
-
 #include "H5Writer.h"
 
-#include <highfive/H5DataSpace.hpp>
+#include <bitset>
+#include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <limits>
-#include <string>
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
-#include "Shader/Ray.h"
 
-// count the number of events from `hist`.
-int count(const RAYX::BundleHistory& hist) {
-    int c = 0;
-    for (auto& ray_hist : hist) {
-        c += ray_hist.size();
+// declare user types for HighFive
+namespace {
+inline HighFive::DataType highfive_create_type_EventType() {
+    return HighFive::EnumType<RAYX::EventType>({
+        {"HitElement", RAYX::EventType::HitElement},
+        {"TooManyEvents", RAYX::EventType::TooManyEvents},
+        {"Absorbed", RAYX::EventType::Absorbed},
+        {"Uninitialized", RAYX::EventType::Uninitialized},
+        {"BeyondHorizon", RAYX::EventType::BeyondHorizon},
+        {"FatalError", RAYX::EventType::FatalError},
+        {"Emitted", RAYX::EventType::Emitted},
+    });
+}
+}  // unnamed namespace
+HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
+
+namespace RAYX {
+
+RayAttrFlag formatStringToRayAttrFlag(const std::string& format) {
+    auto stringToAttr = [](const std::string& str) -> RayAttrFlagType {
+#define RAYX_X(type, name, flag, map) \
+    if (str == #name) return flag;
+        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+        RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+        RAYX_EXIT << "error: failed to parse format string: unknown token: '" << str << "'";
+        return static_cast<RayAttrFlagType>(0);
+    };
+
+    auto attr = static_cast<RayAttrFlagType>(0);
+    auto ss = std::stringstream(format);
+    std::string token;
+    while (ss >> token) {
+        attr |= stringToAttr(token);
     }
-    return c;
+
+    return static_cast<RayAttrFlag>(attr);
 }
 
-// Re-formats `hist` into a bunch of doubles using the format.
-std::vector<double> toDoubles(const RAYX::BundleHistory& hist, const Format& format) {
+/// get number of events, which is the number of entries in an active attribute
+/// also check wether every active attribute has the same number of entries
+int getNumEvents(const RaySoA& rays) {
+    auto size = 0;
+    auto resize = [&size](const auto& v) {
+        const auto v_size = static_cast<int>(v.size());
+        _assert(v_size == 0 || v_size == size || size == 0,
+                "error: file corrupted: at least two non-empty Ray attributes have different number of elements!");
+        size = std::max(size, v_size);
+    };
+
+#define RAYX_X(type, name, flag, map) resize(rays.name);
+
+    RAYX_X_MACRO_RAY_ATTR_PATH_ID
+    RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+
+    return size;
+}
+
+RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlagType attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
+    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: " << std::bitset<EndOfRayAttrBits>(attr);
 
-    std::vector<double> output;
-    output.reserve(count(hist) * format.size());
-
-    for (uint32_t ray_id = 0; ray_id < hist.size(); ray_id++) {
-        const RAYX::RayHistory& ray_hist = hist[ray_id];
-        for (uint32_t event_id = 0; event_id < ray_hist.size(); event_id++) {
-            const RAYX::Ray& event = ray_hist[event_id];
-            for (uint32_t i = 0; i < format.size(); i++) {
-                double next = format[i].get_double(ray_id, event_id, event);
-                output.push_back(next);
-            }
-        }
-    }
-    return output;
-}
-
-void writeH5(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format, std::vector<std::string> elementNames) {
-    HighFive::File file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
-
-    auto doubles = toDoubles(hist, format);
+    RaySoA rays;
 
     try {
-        // write data
-        auto dataspace = HighFive::DataSpace({doubles.size() / format.size(), format.size()});
-        auto dataset = file.createDataSet<double>("rays", dataspace);
-        auto ptr = (double*)doubles.data();
-        dataset.write_raw(ptr);
+        auto file = HighFive::File(filepath, HighFive::File::ReadOnly);
 
-        // write element names
-        for (size_t i = 0; i < elementNames.size(); i++) {
-            std::string& name = elementNames[i];
-            dataspace = HighFive::DataSpace({name.size()});
-            dataset = file.createDataSet<char>(std::to_string(i), dataspace);
-            auto ptr = name.c_str();
-            dataset.write_raw(ptr);
-        }
-    } catch (HighFive::Exception& err) {
-        RAYX_EXIT << err.what();
-    }
-}
-
-RAYX::BundleHistory fromDoubles(const std::vector<double>& doubles, const Format& format) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-    const size_t formatSize = format.size();
-    const size_t numEntries = doubles.size() / formatSize;
-
-    if (doubles.size() % formatSize != 0) {
-        throw std::invalid_argument("Size of doubles does not match expected size based on format");
-    }
-
-    RAYX::BundleHistory bundleHist;
-    bundleHist.reserve(numEntries / 2);  // Estimate: assume at least 2 events per ray on average
-
-    RAYX::RayHistory rayHist;
-    rayHist.reserve(8);  // Estimate: assume 8 events per ray on average
-
-    const double* data = doubles.data();
-
-    size_t currentRayID = std::numeric_limits<size_t>::max();  // Initialize with an invalid Ray-ID
-
-    for (size_t i = 0; i < numEntries; ++i) {
-        const double* rayData = data + i * formatSize;
-
-        size_t rayID = static_cast<size_t>(rayData[0]);  // Extract the Ray-ID
-
-        if (rayID != currentRayID) {
-            if (!rayHist.empty()) {
-                bundleHist.push_back(std::move(rayHist));
-                size_t lastRayHistSize = rayHist.size();
-                rayHist.clear();
-                rayHist.reserve(lastRayHistSize);
-            }
-            currentRayID = rayID;
-        }
-
-        const auto ray = RAYX::Ray{
-            .m_position = {rayData[2], rayData[3], rayData[4]},       // origin
-            .m_eventType = static_cast<RAYX::EventType>(rayData[5]),  // eventType
-            .m_direction = {rayData[6], rayData[7], rayData[8]},      // direction
-            .m_energy = rayData[9],                                   // energy
-            .m_field =
-                {
-                    {rayData[10], rayData[11]},
-                    {rayData[12], rayData[13]},
-                    {rayData[14], rayData[15]},
-                },
-            .m_pathLength = rayData[16],                             // pathLength
-            .m_order = static_cast<signed char>(rayData[17]),        // order
-            .m_lastElement = static_cast<signed char>(rayData[18]),  // lastElement
-            .m_sourceID = static_cast<signed char>(rayData[19])      // sourceID
+        auto loadData = [&file](const auto& address, auto& dst) {
+            file.getDataSet(address).read(dst);
+            _assert(0 < dst.size(),
+                    "attempting to load ray data (%s), but it is empty. Are you sure the file contains the requested data? Possible error is "
+                    "insuficcient ray attribute flags when the data was written.",
+                    address);
         };
 
-        rayHist.push_back(ray);
+#define RAYX_X(type, name, flag, map)                                                      \
+    RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+    if (attr & flag) loadData("rayx/events/" #name, rays.name);
+
+        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+        RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+
+        rays.num_paths = file.getDataSet("rayx/num_paths").read<int32_t>();
+        rays.num_events = getNumEvents(rays);
+    } catch (const std::exception& e) {
+        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
     }
 
-    if (!rayHist.empty()) {
-        bundleHist.push_back(std::move(rayHist));
-    }
-
-    return bundleHist;
-}
-
-RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX::BundleHistory rays;
-
-    try {
-        HighFive::File file(filename, HighFive::File::ReadOnly);
-
-        std::vector<double> doubles;
-
-        // read data
-        auto dataset = file.getDataSet("rays");
-        auto dims = dataset.getSpace().getDimensions();
-        doubles.resize(dims[0] * dims[1]);
-        dataset.read(doubles.data());
-        if (doubles.size() == 0) {
-            RAYX_WARN << "No rays found in " << filename;
-            return rays;
-        }
-        rays = fromDoubles(doubles, format);
-        RAYX_VERB << "Loaded " << rays.size() << " rays from " << filename;
-
-    } catch (HighFive::Exception& err) {
-        RAYX_EXIT << err.what();
-    }
     return rays;
 }
 
-#endif
+BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
+    const auto rays = readH5RaySoA(filepath);
+    return raySoAToBundleHistory(rays);
+}
+
+void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, const RayAttrFlagType attr) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: " << std::bitset<EndOfRayAttrBits>(attr);
+
+    try {
+        auto file = HighFive::File(filepath, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
+
+#define RAYX_X(type, name, flag, map)                                                      \
+    RAYX_VERB << "writing ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+    if (attr & flag) file.createDataSet("rayx/events/" #name, rays.name);
+
+        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+        RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+
+        file.createDataSet("rayx/num_paths", rays.num_paths);
+
+        // TODO: add write of other tracing data like seed used
+    } catch (const std::exception& e) {
+        RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
+    }
+}
+
+void writeH5BundleHistory(const std::filesystem::path& filepath, const BundleHistory& bundle, const RayAttrFlagType attr) {
+    const auto rays = bundleHistoryToRaySoA(bundle);
+    writeH5RaySoA(filepath, rays, attr);
+}
+
+}  // namespace RAYX

@@ -51,11 +51,11 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-BundleHistory Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents) {
+RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, RayAttrFlag attr) {
     // in sequential tracing, maxEvents should be equal to the number of elements
     if (sequential == Sequential::Yes) maxEvents = group.numElements();
 
-    return m_deviceTracer->trace(group, sequential, static_cast<int>(maxBatchSize), static_cast<int>(maxEvents));
+    return m_deviceTracer->trace(group, sequential, static_cast<int>(maxBatchSize), static_cast<int>(maxEvents), attr);
 }
 
 /// Get the last event for each ray of the bundle.

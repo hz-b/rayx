@@ -7,7 +7,7 @@
 #include "Core.h"
 #include "DeviceConfig.h"
 #include "DeviceTracer.h"
-#include "Shader/Ray.h"
+#include "RaySoA.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
@@ -29,7 +29,7 @@ class RAYX_API Tracer {
     // This will call the trace implementation of a subclass
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
-    BundleHistory trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents);
+    RaySoA trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, RayAttrFlag attr = AllRayAttr);
 
     static int defaultMaxEvents(const Group* group);
 

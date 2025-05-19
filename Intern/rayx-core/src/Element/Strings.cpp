@@ -40,4 +40,7 @@ ElementType findElementString(const std::string& name) {
         return ElementType::ImagePlane;  // or some other default/fallback value
     }
 }
+
+std::string elementTypeToString(const ElementType type) { return ElementStringMap[type]; }
+
 }  // namespace RAYX

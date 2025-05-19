@@ -188,6 +188,30 @@ std::vector<const DesignSource*> Group::getSources() const {
     return sources;
 }
 
+std::vector<std::string> Group::getElementNames() const {
+    std::vector<std::string> names;
+    ctraverse([&names](const BeamlineNode& node) -> bool {
+        if (node.isElement()) {
+            const auto* element = static_cast<const DesignElement*>(&node);
+            names.push_back(element->getName());
+        }
+        return false;
+    });
+    return names;
+}
+
+std::vector<std::string> Group::getSourceNames() const {
+    std::vector<std::string> names;
+    ctraverse([&names](const BeamlineNode& node) -> bool {
+        if (node.isSource()) {
+            const auto* source = static_cast<const DesignSource*>(&node);
+            names.push_back(source->getName());
+        }
+        return false;
+    });
+    return names;
+}
+
 size_t Group::numElements() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {

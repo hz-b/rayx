@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "Throw.h"
 
 namespace RAYX {
 
@@ -40,5 +41,29 @@ enum class EventType {
     Emitted = 7,
 
 };
+
+inline std::string findEventTypeString(const EventType eventType) {
+    switch (eventType) {
+        case EventType::HitElement:
+            return "HitElement";
+        case EventType::TooManyEvents:
+            return "HitElement";
+        case EventType::Absorbed:
+            return "Absorbed";
+        case EventType::Uninitialized:
+            return "Uninitialized";
+        case EventType::BeyondHorizon:
+            return "BeyondHoizon";
+        case EventType::FatalError:
+            return "FatalError";
+        case EventType::Emitted:
+            return "Emitted";
+        default:
+            _debug_throw("unable to convert EventType (%d) to string!", static_cast<int>(eventType));
+            return "<unknown-event-type>";
+    }
+}
+
+inline std::ostream& operator<<(std::ostream& os, const EventType eventType) { return os << findEventTypeString(eventType); }
 
 }  // namespace RAYX
