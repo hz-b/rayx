@@ -208,3 +208,41 @@ TEST_F(TestSuite, testLightsourceGetters) {
         CHECK_EQ(widthResult, values.sourceWidth);
     }
 }
+
+TEST_F(TestSuite, testH5Writer) {
+    const auto rayOriginal = traceRML("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
+    const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
+
+    // test conversion between BundleHistory and RaySoA
+    {
+        const auto bundle = raySoAToBundleHistory(rayOriginalSoA);
+        CHECK_EQ(rayOriginal, bundle);
+    }
+
+    const auto filename = "testH5Writer.h5";
+
+    // test if write and read of BundleHistory work without altering the contents
+    {
+        writeH5BundleHistory(filename, rayOriginal);
+        const auto bundle = readH5BundleHistory(filename);
+        CHECK_EQ(rayOriginal, bundle);
+    }
+
+    // test if write and read of partial BundleHistory work without altering the contents
+    {
+        // ground thruth
+        RaySoA partialRayOriginalSoA;
+        partialRayOriginalSoA.energy = rayOriginalSoA.energy;
+        partialRayOriginalSoA.position_x = rayOriginalSoA.position_x;
+        partialRayOriginalSoA.position_y = rayOriginalSoA.position_y;
+        partialRayOriginalSoA.position_z = rayOriginalSoA.position_z;
+
+        // write only some attributes
+        const auto attr = RayEnergy | RayPosition;
+        writeH5BundleHistory(filename, rayOriginal, attr);
+        // read only some attributes
+        const auto raySoA = readH5RaySoA(filename, attr);
+
+        CHECK_EQ(partialRayOriginalSoA, raySoA);
+    }
+}

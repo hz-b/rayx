@@ -34,5 +34,7 @@ enum class ElementType {
 extern std::map<ElementType, std::string> ElementStringMap;
 
 ElementType findElementString(const std::string& name);
+std::string elementTypeToString(const ElementType type);
+
 }  // namespace RAYX
 #endif

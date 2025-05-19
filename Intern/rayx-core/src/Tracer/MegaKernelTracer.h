@@ -1,6 +1,7 @@
 #pragma once
 
 #include <numeric>
+#include <set>
 
 #include "Beamline/Beamline.h"
 #include "Debug/Instrumentor.h"
@@ -61,6 +62,9 @@ struct Resources {
     /// maps compact events buffer indices to events buffer indices
     Buf<int> d_compactEventGatherSrcIndices;
 
+    /// ray attributes layed out as structure of arrays (SoA)
+    RaySoaBuf<Acc> soaEvents;
+
     /// holds configuration state of allocated resources. required to trace correctly
     struct Config {
         int numElements;
@@ -102,10 +106,18 @@ struct Resources {
 
         // output events
         allocBuf(q, d_events, preferredBatchSize * maxEvents);
+
+        // compact events
         allocBuf(q, d_compactEvents, preferredBatchSize * maxEvents);
         allocBuf(q, d_compactEventCounts, preferredBatchSize);
         allocBuf(q, d_compactEventOffsets, preferredBatchSize);
         allocBuf(q, d_compactEventGatherSrcIndices, preferredBatchSize * maxEvents);
+
+        // SoA events
+#define RAYX_X(type, name, flag, map) allocBuf(q, soaEvents.name, preferredBatchSize* maxEvents);
+        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+        RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
 
         const auto numBatches = ceilIntDivision(h_rays.size(), preferredBatchSize);
         return {
@@ -137,8 +149,8 @@ class MegaKernelTracer : public DeviceTracer {
     Resources<Acc> m_resources;
 
   public:
-    virtual BundleHistory trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents,
-                                const int recordElementIndex) override {
+    virtual RaySoA trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents,
+                         const int recordElementIndex, const RayAttrFlag attr) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -165,12 +177,14 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_VERB << "\ttracing device name: " << alpaka::getName(devAcc);
         RAYX_VERB << "\thost device name: " << alpaka::getName(devHost);
 
-        auto bundleHistory = BundleHistory{};
         auto numEventsTotal = 0;
         auto isTooManyEvents = false;
         auto compactEventCounts = std::vector<int>(conf.preferredBatchSize);
         auto compactEventOffsets = std::vector<int>(conf.preferredBatchSize);
         auto compactEvents = std::vector<Ray>(conf.preferredBatchSize * maxEvents);
+
+        RaySoA raysoa;
+        RaySoA raysoaBatch[conf.numBatches];
 
         for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {
             const auto batchStartRayIndex = batchIndex * conf.preferredBatchSize;
@@ -196,21 +210,59 @@ class MegaKernelTracer : public DeviceTracer {
             const auto numEventsBatch = compactEventOffsets[batchSize - 1] + compactEventCounts[batchSize - 1];
 
             // make events compact by gathering events into compactEvents using compactEventCounts and compactEventOffsets
-            gatherCompactEvents(devAcc, q, batchSize, maxEvents, numEventsBatch);
+            gatherCompactEvents(devAcc, q, batchSize, batchStartRayIndex, maxEvents, numEventsBatch);
 
+            // transpose events from AoS to SoA data layout
+            compactEventsToRaySoA(devAcc, q, numEventsBatch);
+
+#define RAYX_X(type, name, flag, map)                                                                 \
+    if (attr & flag) {                                                                                \
+        raysoaBatch[batchIndex].name.resize(numEventsBatch);                                          \
+        auto name##_view = alpaka::createView(devHost, raysoaBatch[batchIndex].name, numEventsBatch); \
+        alpaka::memcpy(q, name##_view, *m_resources.soaEvents.name, numEventsBatch);                  \
+    }
+
+            RAYX_X_MACRO_RAY_ATTR_PATH_ID
+            RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+
+            // TODO(sven): profile gpu/cpu (maybe depending on ML workflow, one or the other should be written to h5)
+            //
+            // TODO(sven): re-enable these functions
             // transfer events from device to host for curent batch
-            alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
+            // alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
             isTooManyEvents = isTooManyEvents || checkTooManyEvents(compactEvents, compactEventCounts, compactEventOffsets, batchSize);
-            collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets, batchSize);
+            // collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets, batchSize);
 
-            RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
-                      << numEventsBatch << " events";
+            // RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
+            //           << numEventsBatch << " events";
             numEventsTotal += numEventsBatch;
         }
 
+#define RAYX_X(type, name, flag, map)                                                                                               \
+    if (attr & flag) {                                                                                                              \
+        int batchOffset = 0;                                                                                                        \
+        raysoa.name.resize(numEventsTotal);                                                                                         \
+        for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {                                                      \
+            std::copy(raysoaBatch[batchIndex].name.begin(), raysoaBatch[batchIndex].name.end(), raysoa.name.begin() + batchOffset); \
+            batchOffset += raysoaBatch[batchIndex].name.size();                                                                     \
+        }                                                                                                                           \
+    }
+
+        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+        RAYX_X_MACRO_RAY_ATTR
+#undef RAYX_X
+
+        // find the number of ray paths, that have at least 1 event, which is equal to the unique values in compactEventOffsets.
+        // std::unique requries a sorted array, which is the case for compactEventOffsets
+        // TODO(sven): rework this. it sucks...
+        raysoa.num_paths = std::distance(compactEventOffsets.begin(), std::unique(compactEventOffsets.begin(), compactEventOffsets.end())) -
+                           (numEventsTotal ? 0 : 1);
+        raysoa.num_events = numEventsTotal;
+
         if (isTooManyEvents) RAYX_WARN << "capacity of events exceeded. could not record all events! consider increasing max events.";
         RAYX_VERB << "number of recorded events: " << numEventsTotal;
-        return bundleHistory;
+        return raysoa;
     }
 
   private:
@@ -249,20 +301,33 @@ class MegaKernelTracer : public DeviceTracer {
     }
 
     template <typename DevAcc, typename Queue>
-    void gatherCompactEvents(DevAcc devAcc, Queue q, const int batchSize, const int maxEvents, const int numEventsBatch) {
+    void gatherCompactEvents(DevAcc devAcc, Queue q, const int batchSize, const int batchStartRayIndex, const int maxEvents,
+                             const int numEventsBatch) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         // we dont want to compact events if there are none
         if (numEventsBatch == 0) return;
 
-        execWithValidWorkDiv<Acc>(devAcc, q, batchSize, MaxBlockSizeConstraint{128}, GatherIndicesKernel{}, alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
+        execWithValidWorkDiv<Acc>(devAcc, q, batchSize, MaxBlockSizeConstraint{128}, GatherIndicesKernel{},
+                                  alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
                                   alpaka::getPtrNative(*m_resources.d_compactEventCounts), alpaka::getPtrNative(*m_resources.d_compactEventOffsets),
-                                  maxEvents, batchSize);
+                                  alpaka::getPtrNative(*m_resources.soaEvents.path_id), batchStartRayIndex, maxEvents, batchSize);
 
-        execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatch, MaxBlockSizeConstraint{128}, GatherKernel{}, alpaka::getPtrNative(*m_resources.d_compactEvents),
-                                  alpaka::getPtrNative(*m_resources.d_events), alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices),
-                                  numEventsBatch);
+        execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatch, MaxBlockSizeConstraint{128}, GatherKernel{},
+                                  alpaka::getPtrNative(*m_resources.d_compactEvents), alpaka::getPtrNative(*m_resources.d_events),
+                                  alpaka::getPtrNative(*m_resources.d_compactEventGatherSrcIndices), numEventsBatch);
     }
-};
+
+    template <typename DevAcc, typename Queue>
+    void compactEventsToRaySoA(DevAcc devAcc, Queue q, const int numEventsBatch) {
+        RAYX_PROFILE_FUNCTION_STDOUT();
+
+        // we dont want to transpose events if there are none
+        if (numEventsBatch == 0) return;
+
+        execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatch, MaxBlockSizeConstraint{128}, CompactRaysToRaySoAKernel{},
+                                  raySoaBufToRaySoaRef(m_resources.soaEvents), alpaka::getPtrNative(*m_resources.d_compactEvents), numEventsBatch);
+    }
+};  // namespace RAYX
 
 }  // namespace RAYX

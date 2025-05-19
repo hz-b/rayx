@@ -1,0 +1,609 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<lab>
+ <version>1.14</version>
+ <beamline>
+<!-- 0 -->
+  <object name="U41_318eV" type="Point Source">
+   <param id="numberRays" enabled="T">10</param>
+   <param id="sourceWidthDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+   <param id="sourceWidth" enabled="T">0.076</param>
+   <param id="sourceHeightDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+   <param id="sourceHeight" enabled="T">0.027</param>
+   <param id="sourceDepth" enabled="T">1</param>
+   <param id="horDivDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+   <param id="horDiv" enabled="T">0.078</param>
+   <param id="verDivDistribution" comment="gaussian (sigma)" enabled="T">1</param>
+   <param id="verDiv" enabled="T">0.04</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>1.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>1.0000000000000000</z>
+   </param>
+   <param id="energyDistributionType" comment="Values" enabled="T">1</param>
+   <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
+   <param id="photonEnergy" enabled="T">318</param>
+   <param id="energySpreadType" comment="white band" enabled="T">0</param>
+   <param id="energySpreadUnit" comment="eV" enabled="T">0</param>
+   <param id="energySpread" enabled="T">0</param>
+   <param id="linearPol_0" enabled="T">1</param>
+   <param id="linearPol_45" enabled="T">0</param>
+   <param id="circularPol" enabled="T">0</param>
+   <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
+   <param id="sourcePulseLength" enabled="F">0</param>
+  </object>
+<!-- 1 -->
+  <object name="ASBL" type="Slit">
+   <param id="openingShape" comment="rectangle" enabled="T">0</param>
+   <param id="openingWidth" enabled="T">2</param>
+   <param id="openingHeight" enabled="T">2</param>
+   <param id="centralBeamstop" comment="none" enabled="T">0</param>
+   <param id="stopWidth" enabled="F">20</param>
+   <param id="stopHeight" enabled="F">1</param>
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">100</param>
+   <param id="totalHeight" enabled="T">100</param>
+   <param id="distancePreceding" enabled="T">10000</param>
+   <param id="azimuthalAngle" enabled="T">0</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="translationZerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="rotationZerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>10000.0000000000000000</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>1.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>1.0000000000000000</z>
+   </param>
+  </object>
+<!-- 2 -->
+  <object name="M1-Cylinder" type="Cylinder">
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">20</param>
+   <param id="totalLength" enabled="T">320</param>
+   <param id="grazingIncAngle" enabled="T">1.75</param>
+   <param id="entranceArmLength" enabled="T">12000</param>
+   <param id="exitArmLength" enabled="T">3750</param>
+   <param id="bendingRadius" comment="Short Radius rho" enabled="T">1</param>
+   <param id="radius" auto="F" enabled="T">174.21</param>
+   <param id="distancePreceding" enabled="T">2000</param>
+   <param id="azimuthalAngle" enabled="T">90</param>
+   <param id="reflectivityType" comment="100%" enabled="T">0</param>
+   <param id="materialSubstrate" enabled="F">Au</param>
+   <param id="roughnessSubstrate" enabled="F">0.3</param>
+   <param id="densitySubstrate" auto="T" enabled="F">19.3</param>
+   <param id="surfaceCoating" comment="Substrate only" enabled="F">0</param>
+   <param id="coatingFile" absolute="" enabled="F"></param>
+   <param id="numberLayer" enabled="F">2</param>
+   <param id="materialCoating1" enabled="F"></param>
+   <param id="thicknessCoating1" enabled="F">0</param>
+   <param id="roughnessCoating1" enabled="F">0</param>
+   <param id="densityCoating1" auto="T" enabled="F">0</param>
+   <param id="materialCoating2" enabled="F"></param>
+   <param id="thicknessCoating2" enabled="F">0</param>
+   <param id="roughnessCoating2" enabled="F">0</param>
+   <param id="densityCoating2" auto="T" enabled="F">0</param>
+   <param id="materialTopLayer" enabled="F"></param>
+   <param id="thicknessTopLayer" enabled="F">0</param>
+   <param id="roughnessTopLayer" enabled="F">0</param>
+   <param id="densityTopLayer" auto="T" enabled="F">0</param>
+   <param id="lateralThicknessGradientCoating" comment="No" enabled="F">0</param>
+   <param id="gradientC1B1" enabled="F">0</param>
+   <param id="gradientC1B2" enabled="F">0</param>
+   <param id="gradientC1B3" enabled="F">0</param>
+   <param id="gradientC1B4" enabled="F">0</param>
+   <param id="gradientC1B5" enabled="F">0</param>
+   <param id="gradientC1B6" enabled="F">0</param>
+   <param id="gradientC1B7" enabled="F">0</param>
+   <param id="gradientC1B8" enabled="F">0</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="translationZerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="rotationZerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>12000.0000000000000000</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>1.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>-0.9995335908367129</x>
+    <y>0.0000000000000000</y>
+    <z>-0.0305385132098227</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.0305385132098227</x>
+    <y>0.0000000000000000</y>
+    <z>0.9995335908367129</z>
+   </param>
+   <param id="slopeError" comment="Yes" enabled="T">0</param>
+   <param id="profileKind" comment="no Profile" enabled="T">2</param>
+   <param id="profileFile" absolute="" enabled="F"></param>
+   <param id="slopeErrorSag" enabled="T">1.01</param>
+   <param id="slopeErrorMer" enabled="T">0.16</param>
+   <param id="thermalDistortionAmp" enabled="T">0</param>
+   <param id="thermalDistortionSigmaX" enabled="T">0</param>
+   <param id="thermalDistortionSigmaZ" enabled="T">0</param>
+   <param id="cylindricalBowingAmp" enabled="F">0</param>
+   <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+<!-- 3 -->
+  <object name="Entrance-Slit" type="Slit">
+   <param id="openingShape" comment="rectangle" enabled="T">0</param>
+   <param id="openingWidth" enabled="T">10</param>
+   <param id="openingHeight" enabled="T">10</param>
+   <param id="centralBeamstop" comment="none" enabled="T">0</param>
+   <param id="stopWidth" enabled="F">20</param>
+   <param id="stopHeight" enabled="F">1</param>
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">100</param>
+   <param id="totalHeight" enabled="T">100</param>
+   <param id="distancePreceding" enabled="T">3750</param>
+   <param id="azimuthalAngle" enabled="T">0</param>
+   <param id="alignmentError" comment="No" enabled="T">1</param>
+   <param id="translationXerror" enabled="F">0</param>
+   <param id="translationYerror" enabled="F">0</param>
+   <param id="translationZerror" enabled="F">0</param>
+   <param id="rotationXerror" enabled="F">0</param>
+   <param id="rotationYerror" enabled="F">0</param>
+   <param id="rotationZerror" enabled="F">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>-228.9320232557132613</x>
+    <y>0.0000000000000000</y>
+    <z>15743.0054940820009506</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.9981347984218669</x>
+    <y>0.0000000000000000</y>
+    <z>0.0610485395348569</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>1.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.0610485395348569</x>
+    <y>0.0000000000000000</y>
+    <z>0.9981347984218669</z>
+   </param>
+  </object>
+<!-- 4 -->
+  <object name="Plane Mirror" type="Plane Mirror">
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">20</param>
+   <param id="totalLength" enabled="T">310</param>
+   <param id="grazingIncAngle" enabled="T">4.3901672</param>
+   <param id="distancePreceding" enabled="T">5800</param>
+   <param id="azimuthalAngle" enabled="T">0</param>
+   <param id="systemMount" comment="standalone" enabled="T">0</param>
+   <param id="premirrorShiftZ" enabled="F">0</param>
+   <param id="pimpaleAlpha1" enabled="F">1</param>
+   <param id="pimpaleAlpha2" enabled="F">2</param>
+   <param id="pimpaleAlpha3" enabled="F">3</param>
+   <param id="distancePremirrorGrating" enabled="T">0</param>
+   <param id="reflectivityType" comment="100%" enabled="T">0</param>
+   <param id="reflectivitySenkrecht" enabled="T">1</param>
+   <param id="reflectivityParallel" enabled="T">1</param>
+   <param id="reflectivityPhase" enabled="T">0</param>
+   <param id="elementSubstrate" enabled="F">Au</param>
+   <param id="roughnessSubstrate" enabled="F">0.3</param>
+   <param id="densitySubstrate" auto="T" enabled="F">19.3</param>
+   <param id="surfaceCoating" comment="Substrate only" enabled="F">0</param>
+   <param id="coatingFile" absolute="" enabled="F"></param>
+   <param id="numberLayer" enabled="F">2</param>
+   <param id="materialCoating1" enabled="F"></param>
+   <param id="thicknessCoating1" enabled="F">0</param>
+   <param id="roughnessCoating1" enabled="F">0</param>
+   <param id="densityCoating1" auto="T" enabled="F">0</param>
+   <param id="materialCoating2" enabled="F"></param>
+   <param id="thicknessCoating2" enabled="F">0</param>
+   <param id="roughnessCoating2" enabled="F">0</param>
+   <param id="densityCoating2" auto="T" enabled="F">0</param>
+   <param id="materialTopLayer" enabled="F"></param>
+   <param id="thicknessTopLayer" enabled="F">0</param>
+   <param id="roughnessTopLayer" enabled="F">0</param>
+   <param id="densityTopLayer" auto="T" enabled="F">0</param>
+   <param id="lateralThicknessGradientCoating" comment="No" enabled="F">0</param>
+   <param id="gradientC1B1" enabled="F">0</param>
+   <param id="gradientC1B2" enabled="F">0</param>
+   <param id="gradientC1B3" enabled="F">0</param>
+   <param id="gradientC1B4" enabled="F">0</param>
+   <param id="gradientC1B5" enabled="F">0</param>
+   <param id="gradientC1B6" enabled="F">0</param>
+   <param id="gradientC1B7" enabled="F">0</param>
+   <param id="gradientC1B8" enabled="F">0</param>
+   <param id="alignmentError" comment="No" enabled="T">1</param>
+   <param id="translationXerror" enabled="F">0</param>
+   <param id="translationYerror" enabled="F">0</param>
+   <param id="translationZerror" enabled="F">0</param>
+   <param id="rotationXerror" enabled="F">0</param>
+   <param id="rotationYerror" enabled="F">0</param>
+   <param id="rotationZerror" enabled="F">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>-583.0135525578830311</x>
+    <y>0.0000000000000000</y>
+    <z>21532.1873249288291845</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.9981347984218669</x>
+    <y>0.0000000000000000</y>
+    <z>0.0610485395348569</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0046731386016528</x>
+    <y>0.9970659036601054</y>
+    <z>-0.0764051407568056</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.0608694172384517</x>
+    <y>0.0765479180543634</y>
+    <z>0.9952061747630959</z>
+   </param>
+   <param id="slopeError" comment="Yes" enabled="T">0</param>
+   <param id="profileKind" comment="no Profile" enabled="T">2</param>
+   <param id="profileFile" absolute="" enabled="F"></param>
+   <param id="slopeErrorSag" enabled="T">0.08400000000000001</param>
+   <param id="slopeErrorMer" enabled="T">0.023</param>
+   <param id="thermalDistortionAmp" enabled="T">0</param>
+   <param id="thermalDistortionSigmaX" enabled="T">0</param>
+   <param id="thermalDistortionSigmaZ" enabled="T">0</param>
+   <param id="cylindricalBowingAmp" enabled="F">0</param>
+   <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+<!-- 5 -->
+  <object name="Spherical Grating" type="Spherical Grating">
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">20</param>
+   <param id="totalLength" enabled="T">100</param>
+   <param id="gratingMount" comment="constant incidence angle" enabled="T">1</param>
+   <param id="deviationAngle" enabled="F">10</param>
+   <param id="entranceArmLength" enabled="T">6000</param>
+   <param id="exitArmLength" auto="F" enabled="T">11000</param>
+   <param id="radius" auto="F" enabled="T">109791</param>
+   <param id="designEnergy" auto="T" enabled="T">318</param>
+   <param id="lineDensity" enabled="T">1199.918</param>
+   <param id="orderDiffraction" enabled="T">1</param>
+   <param id="alpha" auto="F" enabled="T">87.36100673679999</param>
+   <param id="beta" auto="F" enabled="T">-83.85870570260001</param>
+   <param id="lineSpacing" comment="constant" enabled="T">0</param>
+   <param id="vlsParameter1" enabled="F">0</param>
+   <param id="vlsParameter2" enabled="F">0</param>
+   <param id="vlsParameter3" enabled="F">0</param>
+   <param id="vlsParameter4" enabled="F">0</param>
+   <param id="vlsParameter5" enabled="F">0</param>
+   <param id="vlsParameter6" enabled="F">0</param>
+   <param id="distancePreceding" enabled="T">200</param>
+   <param id="azimuthalAngle" enabled="T">180</param>
+   <param id="lineProfile" comment="unknown" enabled="T">3</param>
+   <param id="gratingEfficiency" enabled="T">1</param>
+   <param id="blazeAngle" enabled="F">4</param>
+   <param id="aspectAngle" enabled="F">90</param>
+   <param id="grooveDepth" enabled="F">10</param>
+   <param id="grooveRatio" enabled="F">0.65</param>
+   <param id="multilayerFourierCoefficients" auto="T" enabled="F">11</param>
+   <param id="multilayerIntegrationSteps" auto="T" enabled="F">50</param>
+   <param id="reflectivityType" comment="100%" enabled="T">0</param>
+   <param id="materialSubstrate" enabled="F">Au</param>
+   <param id="roughnessSubstrate" enabled="F">0.2</param>
+   <param id="densitySubstrate" auto="T" enabled="F">19.3</param>
+   <param id="surfaceCoating" comment="Substrate only" enabled="F">0</param>
+   <param id="numberLayer" enabled="F">2</param>
+   <param id="materialCoating1" enabled="F"></param>
+   <param id="thicknessCoating1" enabled="F">0</param>
+   <param id="densityCoating1" auto="T" enabled="F">0</param>
+   <param id="materialCoating2" enabled="F"></param>
+   <param id="thicknessCoating2" enabled="F">0</param>
+   <param id="densityCoating2" auto="T" enabled="F">0</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="translationZerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="rotationZerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>-595.0801728525600538</x>
+    <y>30.5293276352694036</y>
+    <z>21729.4748228317694156</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>-0.9981347984218669</x>
+    <y>0.0000000000000000</y>
+    <z>-0.0610485395348569</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>-0.0065310641596197</x>
+    <y>-0.9942610116376781</y>
+    <z>0.1067819551149172</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.0606981826769296</x>
+    <y>0.1069814971722740</y>
+    <z>0.9924065144296953</z>
+   </param>
+   <param id="slopeError" comment="Yes" enabled="T">0</param>
+   <param id="profileKind" comment="no Profile" enabled="T">2</param>
+   <param id="profileFile" absolute="" enabled="F"></param>
+   <param id="slopeErrorSag" enabled="T">0.124</param>
+   <param id="slopeErrorMer" enabled="T">0.102</param>
+   <param id="thermalDistortionAmp" enabled="T">0</param>
+   <param id="thermalDistortionSigmaX" enabled="T">0</param>
+   <param id="thermalDistortionSigmaZ" enabled="T">0</param>
+   <param id="cylindricalBowingAmp" enabled="F">0</param>
+   <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+<!-- 6 -->
+  <object name="Exit Slit" type="Slit">
+   <param id="openingShape" comment="rectangle" enabled="T">0</param>
+   <param id="openingWidth" enabled="T">20</param>
+   <param id="openingHeight" enabled="T">0.1</param>
+   <param id="centralBeamstop" comment="none" enabled="T">0</param>
+   <param id="stopWidth" enabled="F">20</param>
+   <param id="stopHeight" enabled="F">1</param>
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">100</param>
+   <param id="totalHeight" enabled="T">100</param>
+   <param id="distancePreceding" enabled="T">11000</param>
+   <param id="azimuthalAngle" enabled="T">0</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="translationZerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="rotationZerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>-1266.6141077357613085</x>
+    <y>30.5383201545151231</y>
+    <z>32708.9576054686403950</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.9981347984218669</x>
+    <y>0.0000000000000000</y>
+    <z>0.0610485395348569</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000499072879</x>
+    <y>0.9999999999996659</y>
+    <z>-0.0000008159769440</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.0610485395348365</x>
+    <y>0.0000008175017496</y>
+    <z>0.9981347984215335</z>
+   </param>
+  </object>
+<!-- 7 -->
+  <object name="E1" type="Ellipsoid">
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">20</param>
+   <param id="totalLength" enabled="T">390</param>
+   <param id="grazingIncAngle" enabled="T">2</param>
+   <param id="entranceArmLength" enabled="T">39600</param>
+   <param id="exitArmLength" enabled="T">1900</param>
+   <param id="designGrazingIncAngle" auto="F" enabled="T">1.978</param>
+   <param id="longHalfAxisA" auto="F" enabled="T">20750</param>
+   <param id="shortHalfAxisB" auto="F" enabled="T">302.721702601</param>
+   <param id="figureRotation" comment="plane" enabled="T">1</param>
+   <param id="parameter_a11" enabled="F">1</param>
+   <param id="distancePreceding" enabled="T">6850</param>
+   <param id="azimuthalAngle" enabled="T">90</param>
+   <param id="reflectivityType" comment="100%" enabled="T">0</param>
+   <param id="materialSubstrate" enabled="F">Au</param>
+   <param id="roughnessSubstrate" enabled="F">0.3</param>
+   <param id="densitySubstrate" auto="T" enabled="F">19.3</param>
+   <param id="surfaceCoating" comment="Substrate only" enabled="F">0</param>
+   <param id="coatingFile" absolute="" enabled="F"></param>
+   <param id="numberLayer" enabled="F">2</param>
+   <param id="materialCoating1" enabled="F"></param>
+   <param id="thicknessCoating1" enabled="F">0</param>
+   <param id="roughnessCoating1" enabled="F">0</param>
+   <param id="densityCoating1" auto="T" enabled="F">0</param>
+   <param id="materialCoating2" enabled="F"></param>
+   <param id="thicknessCoating2" enabled="F">0</param>
+   <param id="roughnessCoating2" enabled="F">0</param>
+   <param id="densityCoating2" auto="T" enabled="F">0</param>
+   <param id="materialTopLayer" enabled="F"></param>
+   <param id="thicknessTopLayer" enabled="F">0</param>
+   <param id="roughnessTopLayer" enabled="F">0</param>
+   <param id="densityTopLayer" auto="T" enabled="F">0</param>
+   <param id="lateralThicknessGradientCoating" comment="No" enabled="F">0</param>
+   <param id="gradientC1B1" enabled="F">0</param>
+   <param id="gradientC1B2" enabled="F">0</param>
+   <param id="gradientC1B3" enabled="F">0</param>
+   <param id="gradientC1B4" enabled="F">0</param>
+   <param id="gradientC1B5" enabled="F">0</param>
+   <param id="gradientC1B6" enabled="F">0</param>
+   <param id="gradientC1B7" enabled="F">0</param>
+   <param id="gradientC1B8" enabled="F">0</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="misalignmentCoordinateSystem" comment="Ellipsoid" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="translationZerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="rotationZerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>-1684.7966035493911932</x>
+    <y>30.5439200414999590</y>
+    <z>39546.1809746561484644</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.0000000499072879</x>
+    <y>0.9999999999996659</y>
+    <z>-0.0000008159769440</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>-0.9953961983671795</x>
+    <y>-0.0000000285303996</y>
+    <z>-0.0958457525202124</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.0958457525202036</x>
+    <y>0.0000008170037496</y>
+    <z>0.9953961983668456</z>
+   </param>
+   <param id="slopeError" comment="Yes" enabled="T">0</param>
+   <param id="profileKind" comment="no Profile" enabled="T">2</param>
+   <param id="profileFile" absolute="" enabled="F"></param>
+   <param id="slopeErrorSag" enabled="T">0.037</param>
+   <param id="slopeErrorMer" enabled="T">0.023</param>
+   <param id="thermalDistortionAmp" enabled="T">0</param>
+   <param id="thermalDistortionSigmaX" enabled="T">0</param>
+   <param id="thermalDistortionSigmaZ" enabled="T">0</param>
+   <param id="cylindricalBowingAmp" enabled="F">0</param>
+   <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+<!-- 8 -->
+  <object name="E2" type="Ellipsoid">
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">20</param>
+   <param id="totalLength" enabled="T">390</param>
+   <param id="grazingIncAngle" enabled="T">2</param>
+   <param id="entranceArmLength" enabled="T">7750</param>
+   <param id="exitArmLength" enabled="T">1000</param>
+   <param id="designGrazingIncAngle" auto="F" enabled="T">2.00735</param>
+   <param id="longHalfAxisA" auto="F" enabled="T">4375</param>
+   <param id="shortHalfAxisB" auto="F" enabled="T">97.1560870104</param>
+   <param id="figureRotation" comment="plane" enabled="T">1</param>
+   <param id="parameter_a11" enabled="F">1</param>
+   <param id="distancePreceding" enabled="T">900</param>
+   <param id="azimuthalAngle" enabled="T">0</param>
+   <param id="reflectivityType" comment="100%" enabled="T">0</param>
+   <param id="materialSubstrate" enabled="F">Au</param>
+   <param id="roughnessSubstrate" enabled="F">0.03</param>
+   <param id="densitySubstrate" auto="T" enabled="F">19.3</param>
+   <param id="surfaceCoating" comment="Substrate only" enabled="F">0</param>
+   <param id="coatingFile" absolute="" enabled="F"></param>
+   <param id="numberLayer" enabled="F">2</param>
+   <param id="materialCoating1" enabled="F"></param>
+   <param id="thicknessCoating1" enabled="F">0</param>
+   <param id="roughnessCoating1" enabled="F">0</param>
+   <param id="densityCoating1" auto="T" enabled="F">0</param>
+   <param id="materialCoating2" enabled="F"></param>
+   <param id="thicknessCoating2" enabled="F">0</param>
+   <param id="roughnessCoating2" enabled="F">0</param>
+   <param id="densityCoating2" auto="T" enabled="F">0</param>
+   <param id="materialTopLayer" enabled="F"></param>
+   <param id="thicknessTopLayer" enabled="F">0</param>
+   <param id="roughnessTopLayer" enabled="F">0</param>
+   <param id="densityTopLayer" auto="T" enabled="F">0</param>
+   <param id="lateralThicknessGradientCoating" comment="No" enabled="F">0</param>
+   <param id="gradientC1B1" enabled="F">0</param>
+   <param id="gradientC1B2" enabled="F">0</param>
+   <param id="gradientC1B3" enabled="F">0</param>
+   <param id="gradientC1B4" enabled="F">0</param>
+   <param id="gradientC1B5" enabled="F">0</param>
+   <param id="gradientC1B6" enabled="F">0</param>
+   <param id="gradientC1B7" enabled="F">0</param>
+   <param id="gradientC1B8" enabled="F">0</param>
+   <param id="alignmentError" comment="Yes" enabled="T">0</param>
+   <param id="misalignmentCoordinateSystem" comment="Ellipsoid" enabled="T">0</param>
+   <param id="translationXerror" enabled="T">0</param>
+   <param id="translationYerror" enabled="T">0</param>
+   <param id="translationZerror" enabled="T">0</param>
+   <param id="rotationXerror" enabled="T">0</param>
+   <param id="rotationYerror" enabled="T">0</param>
+   <param id="rotationZerror" enabled="T">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>-1802.2701765474193962</x>
+    <y>30.5446540008207528</y>
+    <z>40438.4813498922812869</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.9914448613738118</x>
+    <y>0.0000000570260393</y>
+    <z>0.1305261922200283</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0045553482918587</x>
+    <y>0.9993907985578609</y>
+    <z>-0.0346017421500882</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.1304466774486913</x>
+    <y>0.0349003117160589</y>
+    <z>0.9908408714746880</z>
+   </param>
+   <param id="slopeError" comment="Yes" enabled="T">0</param>
+   <param id="profileKind" comment="no Profile" enabled="T">2</param>
+   <param id="profileFile" absolute="" enabled="F"></param>
+   <param id="slopeErrorSag" enabled="T">0.045</param>
+   <param id="slopeErrorMer" enabled="T">0.024</param>
+   <param id="thermalDistortionAmp" enabled="T">0</param>
+   <param id="thermalDistortionSigmaX" enabled="T">0</param>
+   <param id="thermalDistortionSigmaZ" enabled="T">0</param>
+   <param id="cylindricalBowingAmp" enabled="F">0</param>
+   <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+<!-- 9 -->
+  <object name="ImagePlane" type="ImagePlane">
+   <param id="distanceImagePlane" enabled="T">1000</param>
+   <param id="worldPosition" enabled="F">
+    <x>-1932.4784100420697541</x>
+    <y>100.3019412687369396</y>
+    <z>41427.5110444936217391</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>0.9914448613738118</x>
+    <y>0.0000000570260393</y>
+    <z>0.1305261922200283</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0091050966862335</x>
+    <y>0.9975639933723643</y>
+    <z>-0.0691605114304122</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>-0.1302082334946503</x>
+    <y>0.0697572872679162</y>
+    <z>0.9890296946013423</z>
+   </param>
+  </object>
+ </beamline>
+</lab>
