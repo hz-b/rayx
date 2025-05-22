@@ -128,12 +128,12 @@ inline ElectricField stokesToElectricField(const Stokes stokes, const glm::dmat3
 }
 
 RAYX_FN_ACC
-inline ElectricField electricFieldToStokes(const ElectricField field, const glm::dvec3 forward) {
+inline Stokes electricFieldToStokes(const ElectricField field, const glm::dvec3 forward) {
     return localElectricFieldToStokes(globalToLocalElectricField(field, forward));
 }
 
 RAYX_FN_ACC
-inline ElectricField electricFieldToStokes(const ElectricField field, const glm::dvec3 forward, const glm::dvec3 up) {
+inline Stokes electricFieldToStokes(const ElectricField field, const glm::dvec3 forward, const glm::dvec3 up) {
     return localElectricFieldToStokes(globalToLocalElectricField(field, forward, up));
 }
 

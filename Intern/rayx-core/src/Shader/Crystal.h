@@ -83,8 +83,8 @@ RAYX_FN_ACC double getAsymmetryFactor(double braggAngle, double alpha) {
 ///        parameters in dynamical X-ray diffraction theory. The prefactor is derived from
 ///        the Fourier component of the crystal polarizability.
 ///
-/// @param wavelength X-ray wavelength in meters
-/// @param unitCellVolume Unit cell volume in cubic meters
+/// @param wavelength X-ray wavelength
+/// @param unitCellVolume Unit cell volume
 /// @return Prefactor value (dimensionless)
 RAYX_FN_ACC double getDiffractionPrefactor(double wavelength, double unitCellVolume) {
 
@@ -100,34 +100,34 @@ RAYX_FN_ACC double getDiffractionPrefactor(double wavelength, double unitCellVol
 
 /// @brief Computes the normalized angular deviation parameter eta (W) for dynamical X-ray diffraction.
 ///        This implements the calculation from the original FORTRAN DARWIN subroutine.
-///
+///         
 /// @param theta       Angle of incidence relative to surface (radians)
-/// @param thetaB      Bragg angle (radians)
+/// @param bragg      Bragg angle (radians)
 /// @param asymmetry   Asymmetry factor (b)
-/// @param FH_real     Real part of the complex structure factor F_h
-/// @param FH_imag     Imaginary part of the complex structure factor F_h
-/// @param FHC_real    Real part of the complex structure factor F_h_bar
-/// @param FHC_imag    Imaginary part of the complex structure factor F_h_bar
-/// @param F0_real     Real part of the structure factor F_0
-/// @param F0_imag     Imaginary part of the structure factor F_0
+/// @param structureFactorReFH     Real part of the complex structure factor F_h
+/// @param structureFactorImFH     Imaginary part of the complex structure factor F_h
+/// @param structureFactorReFHC    Real part of the complex structure factor F_h_bar
+/// @param structureFactorImFHC FHC_imag    Imaginary part of the complex structure factor F_h_bar
+/// @param structureFactorReF0     Real part of the structure factor F_0
+/// @param structureFactorImF0     Imaginary part of the structure factor F_0
 /// @param polFactor   Polarization factor (1 for s-pol, |cos(2θ_B)| for p-pol)
 /// @param gamma       Scaling factor (2.818e-6 * wavelength^2 / (π * unit cell volume))
 /// @return            Complex value of eta
-RAYX_FN_ACC std::complex<double> computeEta(double theta, double thetaB, double asymmetry, 
-                                           double FH_real, double FH_imag, 
-                                           double FHC_real, double FHC_imag,
-                                           double F0_real, double F0_imag,
+RAYX_FN_ACC std::complex<double> computeEta(double theta, double bragg, double asymmetry, 
+                                           double structureFactorReFH, double structureFactorImFH, 
+                                           double structureFactorReFHC, double structureFactorImFHC,
+                                           double structureFactorReF0, double structureFactorImF0,
                                            double polFactor, double gamma) {
     // Calculate numerator terms
-    std::complex<double> top_term1 = asymmetry * (theta - thetaB) * sin(2.0 * theta);
-    std::complex<double> top_term2 = 0.5 * gamma * std::complex<double>(F0_real, F0_imag) * (1.0 - asymmetry);
+    std::complex<double> top_term1 = asymmetry * (theta - bragg) * sin(2.0 * theta);
+    std::complex<double> top_term2 = 0.5 * gamma * std::complex<double>(structureFactorReF0, structureFactorImF0) * (1.0 - asymmetry);
     std::complex<double> top = top_term1 + top_term2;
 
     // Calculate denominator terms
     double bottom_term1 = gamma * polFactor;
     double bottom_term2 = sqrt(fabs(asymmetry));
-    std::complex<double> FH(FH_real, FH_imag);
-    std::complex<double> FHC(FHC_real, FHC_imag);
+    std::complex<double> FH(structureFactorReFH, structureFactorImFH);
+    std::complex<double> FHC(structureFactorReFHC, structureFactorImFHC);
     std::complex<double> bottom_term3 = sqrt(FH * FHC);
     
     std::complex<double> bottom = bottom_term1 * bottom_term2 * bottom_term3;

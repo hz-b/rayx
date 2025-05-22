@@ -234,7 +234,7 @@ struct CrystalBehaviour {
 RAYX_FN_ACC
 inline Behaviour serializeCrystal(const CrystalBehaviour& c) {
     Behaviour b;
-    b.m_type = BTYPE_CRYSTAL;
+    b.m_type = BehaveType::Crystal;
 
     b.m_private_serialization_params[0] = c.m_dSpacing2;
     b.m_private_serialization_params[1] = c.m_unitCellVolume;

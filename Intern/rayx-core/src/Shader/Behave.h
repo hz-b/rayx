@@ -17,7 +17,7 @@ namespace RAYX {
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, EventType::Absorbed)`)
 
-RAYX_FN_ACC Ray behaveCrystal(Ray r, int id, Collision col, InvState& inv);
+RAYX_FN_ACC Ray behaveCrystal(Ray r, const Behaviour behaviour, Collision col);
 RAYX_FN_ACC Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& rand);
 RAYX_FN_ACC Ray behaveRZP(Ray r, const Behaviour behaviour, Collision col, Rand& rand);
 RAYX_FN_ACC Ray behaveGrating(Ray r, const Behaviour behaviour, Collision col);

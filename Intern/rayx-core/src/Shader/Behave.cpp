@@ -17,8 +17,8 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveCrystal(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) {
-    CrystalBehaviour b = deserializeCrystal(inv.elements[id].m_behaviour);
+Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision col) {
+    CrystalBehaviour b = deserializeCrystal(behaviour);
 
     double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
     double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
@@ -57,6 +57,12 @@ Ray behaveCrystal(Ray r, int id, [[maybe_unused]] Collision col, InvState& inv) 
 
     const auto reflect_field  = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
     r.m_field = reflect_field;
+    Stokes crystalstokes = electricFieldToStokes(reflect_field, reflect_vec, col.normal);
+    std::cout << "Crystal Stokes: " << crystalstokes.x << std::endl;
+    std::cout << "Crystal Stokes: " << crystalstokes.y << std::endl;
+    std::cout << "Crystal Stokes: " << crystalstokes.z << std::endl;
+    std::cout << "Crystal Stokes: " << crystalstokes.w << std::endl;
+    
     return r;
 }
 
