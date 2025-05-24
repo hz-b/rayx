@@ -9,6 +9,8 @@
 #include <windows.h>
 #elif defined(__APPLE__)
 #include <cassert>
+#include <libproc.h>
+#include <unistd.h>
 #else
 #include <limits.h>
 #include <unistd.h>
@@ -63,6 +65,17 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
         // If the buffer was too small, increase size and retry
         buffer.resize(buffer.size() * 2);
     }
+#elif defined(__APPLE__)
+    std::vector<char> buffer(PROC_PIDPATHINFO_MAXSIZE);
+    pid_t pid = getpid();
+    int ret = proc_pidpath(pid, buffer.data(), buffer.size());
+    if (ret <= 0) {
+        // Fehler beim Auslesen des Pfads
+        return std::filesystem::path();
+    }
+    buffer[ret] = '\0'; // Null-terminieren, falls nicht bereits geschehen
+    // Optional: buffer kann länger als der Pfad sein, daher String kürzen
+    return std::filesystem::path(buffer.data());
 
 #else
     static_assert(false, "macOS support is not implemented yet");
@@ -80,7 +93,7 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
         }
     }
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__APPLE__)
     // Check in /usr (package install)
     std::filesystem::path path = std::filesystem::path("/usr") / baseDir / relativePath;
     if (fileExists(path)) return path;

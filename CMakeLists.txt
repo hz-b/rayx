@@ -20,6 +20,49 @@ option(RAYX_REQUIRE_OPENMP "If option 'RAYX_ENABLE_OPENMP' is ON, this option wi
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
 # ------------------
 
+# ---- Specific macos compiler options and flags concerning OpenMP ----
+if(APPLE)
+    # Detect architecture and package manager
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+        set(HOMEBREW_PREFIX "/opt/homebrew")
+    else()
+        set(HOMEBREW_PREFIX "/usr/local")
+    endif()
+    
+    # MacPorts detection
+    if(EXISTS "/opt/local/include/libomp")
+        set(OpenMP_INCLUDE_DIR "/opt/local/include/libomp")
+        set(OpenMP_LIBRARY "/opt/local/lib/libomp.dylib")
+        message(STATUS "Using MacPorts OpenMP installation")
+    else()
+        # Homebrew fallback
+        set(OpenMP_INCLUDE_DIR "${HOMEBREW_PREFIX}/opt/libomp/include")
+        set(OpenMP_LIBRARY "${HOMEBREW_PREFIX}/opt/libomp/lib/libomp.dylib")
+        message(STATUS "Using Homebrew OpenMP installation")
+    endif()
+
+    # Common OpenMP settings
+    set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I${OpenMP_INCLUDE_DIR}")
+    set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${OpenMP_INCLUDE_DIR}")
+    set(OpenMP_C_LIB_NAMES "omp")
+    set(OpenMP_CXX_LIB_NAMES "omp")
+    set(OpenMP_omp_LIBRARY "${OpenMP_LIBRARY}")
+    set(OpenMP_omp_INCLUDE_DIRS "${OpenMP_INCLUDE_DIR}")
+    
+    if(RAYX_ENABLE_OPENMP)
+        find_package(OpenMP REQUIRED)
+        if(OpenMP_CXX_FOUND)
+            message(STATUS "OpenMP found:")
+            message(STATUS "  Include dirs: ${OpenMP_CXX_INCLUDE_DIRS}")
+            message(STATUS "  Libraries: ${OpenMP_CXX_LIBRARIES}")
+        
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+            include_directories(${OpenMP_omp_INCLUDE_DIRS})
+            link_libraries(${OpenMP_omp_LIBRARY})
+        endif()
+    endif()
+endif()
+
 
 # ---- Build options ----
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/release)
