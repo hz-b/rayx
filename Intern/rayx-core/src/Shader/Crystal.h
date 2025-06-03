@@ -44,12 +44,11 @@ RAYX_FN_ACC double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
     return theta;                             //TODO Fanny check how to correct this
 }
 
-/// @brief this function calculates the energy dependent bragg angle 
-/// Bragg's law: n * λ = 2 * d * sin(θ)
+/// @brief Computes the bragg angle 
 /// @param energy photonenergy of the ray
-/// @param d Interplanar spacing2
+/// @param d lattice spacing*2
 /// @param order Diffraction order 
-/// @return the bragg angle theta
+/// @return the bragg angle theta (rad)
 RAYX_FN_ACC double getBraggAngle(double energy, double dSpacing2) {
     
     int order = 1;
@@ -79,40 +78,39 @@ RAYX_FN_ACC double getAsymmetryFactor(double braggAngle, double alpha) {
 }
 
 
-/// @brief Computes the prefactor formerly GAMA used in calculating the absorption and dispersion
-///        parameters in dynamical X-ray diffraction theory. The prefactor is derived from
-///        the Fourier component of the crystal polarizability.
-///
-/// @param wavelength X-ray wavelength
-/// @param unitCellVolume Unit cell volume
-/// @return Prefactor value (dimensionless)
+/// @brief Computes the diffraction prefactor Γ used in dynamical X-ray diffraction theory.
+/// Defined in Batterman & Cole (1964), p. 685.
+/// @param wavelength X-ray wavelength (in nm)
+/// @param unitCellVolume Unit cell volume (in nm³)
+/// @return Diffraction prefactor Γ 
 RAYX_FN_ACC double getDiffractionPrefactor(double wavelength, double unitCellVolume) {
 
     // Avoid division by zero
     if (wavelength <= 0.0 || unitCellVolume <= 0.0) {
         return 0.0;
     }
-    double eleradius = ELECTRON_RADIUS * 1.e9 ;
-    double result = (eleradius * wavelength * wavelength) / PI / unitCellVolume; 
+    double result = (ELECTRON_RADIUS * wavelength * wavelength) / PI / unitCellVolume; 
     return result;
 }
 
 
-/// @brief Computes the normalized angular deviation parameter eta (W) for dynamical X-ray diffraction.
-///        This implements the calculation from the original FORTRAN DARWIN subroutine.
-///         
-/// @param theta       Angle of incidence relative to surface (radians)
-/// @param bragg      Bragg angle (radians)
-/// @param asymmetry   Asymmetry factor (b)
-/// @param structureFactorReFH     Real part of the complex structure factor F_h
-/// @param structureFactorImFH     Imaginary part of the complex structure factor F_h
-/// @param structureFactorReFHC    Real part of the complex structure factor F_h_bar
-/// @param structureFactorImFHC FHC_imag    Imaginary part of the complex structure factor F_h_bar
-/// @param structureFactorReF0     Real part of the structure factor F_0
-/// @param structureFactorImF0     Imaginary part of the structure factor F_0
-/// @param polFactor   Polarization factor (1 for s-pol, |cos(2θ_B)| for p-pol)
-/// @param gamma       Scaling factor (2.818e-6 * wavelength^2 / (π * unit cell volume))
-/// @return            Complex value of eta
+/// @brief Computes the normalized angular deviation parameter η (Eta) for dynamical X-ray diffraction.
+///
+///        This implementation follows Equation (32) from
+///        Batterman & Cole (1964), p. 690
+///        
+/// @param theta                Angle of incidence relative to the crystal surface (radians)
+/// @param bragg                Bragg angle (radians)
+/// @param asymmetry            Asymmetry factor 
+/// @param structureFactorReFH Real part of structure factor 
+/// @param structureFactorImFH Imaginary part of structure factor 
+/// @param structureFactorReFHC Real part of structure factor 
+/// @param structureFactorImFHC Imaginary part of structure factor 
+/// @param structureFactorReF0 Real part of structure factor 
+/// @param structureFactorImF0 Imaginary part of structure factor 
+/// @param polFactor            Polarization factor 
+/// @param gamma                Diffraction prefactor 
+/// @return                     Complex η parameter
 RAYX_FN_ACC std::complex<double> computeEta(double theta, double bragg, double asymmetry, 
                                            double structureFactorReFH, double structureFactorImFH, 
                                            double structureFactorReFHC, double structureFactorImFHC,
@@ -138,25 +136,26 @@ RAYX_FN_ACC std::complex<double> computeEta(double theta, double bragg, double a
 }
 
 /// @brief Computes the reflection coefficient R based on eta
-/// @param eta         Complex eta value
-/// @param FH_real     Real part of F_h
-/// @param FH_imag     Imaginary part of F_h
-/// @param FHC_real    Real part of F_h_bar
-/// @param FHC_imag    Imaginary part of F_h_bar
-/// @return            Complex reflection coefficient R
+/// This function is based on Equation (103) from  
+/// Batterman & Cole (1964), p. 706, 
+///
+/// @param eta                          Complex deviation parameter 
+/// @param structureFactorReFH          Real part of structure factor 
+/// @param structureFactorImFH          Imaginary part of structure factor 
+/// @param structureFactorReFHC         Real part of structure factor 
+/// @param structureFactorImFHC         Imaginary part of structure factor 
+/// @return                             Complex reflection coefficient R
 RAYX_FN_ACC std::complex<double> computeR(std::complex<double> eta, 
-                                         double FH_real, double FH_imag,
-                                         double FHC_real, double FHC_imag) {
+                                          double structureFactorReFH, double structureFactorImFH,
+                                          double structureFactorReFHC, double structureFactorImFHC) {
     std::complex<double> one(1.0, 0.0);
-    std::complex<double> FH(FH_real, FH_imag);
-    std::complex<double> FHC(FHC_real, FHC_imag);
-    
+    std::complex<double> FH(structureFactorReFH, structureFactorImFH);
+    std::complex<double> FHC(structureFactorReFHC, structureFactorImFHC);
+
     if (std::real(eta) > 0.0) {
-        auto R = (eta - sqrt(eta * eta - one)) * sqrt(FH / FHC);
-        return R;
+        return (eta - sqrt(eta * eta - one)) * sqrt(FH / FHC);
     } else {
-        auto R = (eta + sqrt(eta * eta - one)) * sqrt(FH / FHC);
-        return R;
+        return (eta + sqrt(eta * eta - one)) * sqrt(FH / FHC);
     }
 }
 

@@ -14,6 +14,7 @@
     - [Beamline Objects](./Model/BeamlineObjects/BeamlineObjects.md)
         - [Optical Elements](./Model/BeamlineObjects/OpticalElements/OpticalElements.md)
             - [Cone Mirror](./Model/BeamlineObjects/OpticalElements/Cone-Mirror.md)
+            - [Crystal](./Model/BeamlineObjects/OpticalElements/Crystal.md)
             - [Cylinder Mirror](./Model/BeamlineObjects/OpticalElements/Cylinder-Mirror.md)
             - [Ellipsoid Mirror](./Model/BeamlineObjects/OpticalElements/Ellipsoid-Mirror.md)
             - [Image Plane](./Model/BeamlineObjects/OpticalElements/Image-Plane.md)
