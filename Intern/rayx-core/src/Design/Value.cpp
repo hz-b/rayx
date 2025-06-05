@@ -34,6 +34,8 @@ ValueType DesignMap::type() const {
         ValueType::Misalignment,
         ValueType::CentralBeamstop,
         ValueType::Cutout,
+        ValueType::CutoutType,  // Added
+        ValueType::EventType,   // Added
         ValueType::CylinderDirection,
         ValueType::FigureRotation,
         ValueType::Map,
