@@ -22,7 +22,7 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
 
     double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
     double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
-    double asymmetry = getAsymmetryFactor(bragg, b.m_offsetAngle);
+    double asymmetry = -getAsymmetryFactor(bragg, b.m_offsetAngle);
     
     double polFactorS = 1.0;
     double polFactorP = std::fabs(cos(2 * bragg));
@@ -57,12 +57,11 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
 
     const auto reflect_field  = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
     r.m_field = reflect_field;
-    Stokes crystalstokes = electricFieldToStokes(reflect_field, reflect_vec, col.normal);
-    std::cout << "Crystal Stokes: " << crystalstokes.x << std::endl;
-    std::cout << "Crystal Stokes: " << crystalstokes.y << std::endl;
-    std::cout << "Crystal Stokes: " << crystalstokes.z << std::endl;
-    std::cout << "Crystal Stokes: " << crystalstokes.w << std::endl;
-    
+
+    double reflectivity = intensity(reflect_field);
+    if (!sampleReflectivity(reflectivity)) {
+        return terminateRay(r, EventType::Absorbed);
+    }
     return r;
 }
 
