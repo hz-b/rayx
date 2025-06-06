@@ -3,7 +3,7 @@
  <version>1.15</version>
  <beamline>
   <object name="Matrix Source" type="Matrix Source">
-   <param id="numberRays" enabled="T">20000</param>
+   <param id="numberRays" enabled="T">9</param>
    <param id="sourceWidth" enabled="T">0.065</param>
    <param id="sourceHeight" enabled="T">0.04</param>
    <param id="sourceDepth" enabled="T">0</param>
@@ -49,7 +49,7 @@
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">50</param>
    <param id="totalLength" enabled="T">200</param>
-   <param id="grazingIncAngle" auto="T" enabled="T">11.40433086350113</param>
+   <param id="grazingIncAngle" auto="T" enabled="T">11.40421885885746</param>
    <param id="distancePreceding" enabled="T">10000</param>
    <param id="azimuthalAngle" enabled="T">0</param>
    <param id="crystalType" comment="Si" enabled="T">1</param>
@@ -64,10 +64,10 @@
    <param id="thirdMillerIndex" enabled="T">1</param>
    <param id="structureFactorReF0" enabled="F">113.6807956531886</param>
    <param id="structureFactorImF0" enabled="F">1.730370664482074</param>
-   <param id="structureFactorReFH" enabled="F">-216.1503646347029</param>
-   <param id="structureFactorImFH" enabled="F">-42.11928177205367</param>
-   <param id="structureFactorReFHC" enabled="F">-217.8807350722742</param>
-   <param id="structureFactorImFHC" enabled="F">43.84965289035717</param>
+   <param id="structureFactorReFH" enabled="F">-216.1503646347028</param>
+   <param id="structureFactorImFH" enabled="F">-42.1192817720538</param>
+   <param id="structureFactorReFHC" enabled="F">-217.880735072274</param>
+   <param id="structureFactorImFHC" enabled="F">43.84965289035731</param>
    <param id="unitCellVolume" enabled="F">0.160191477991</param>
    <param id="dSpacingGradientSwitch" comment="No" enabled="T">0</param>
    <param id="dSpacingGradient" enabled="F">0</param>
@@ -91,13 +91,13 @@
    </param>
    <param id="worldYdirection" enabled="F">
     <x>0.0000000000000000</x>
-    <y>0.9802562313323784</y>
-    <z>-0.1977314363828948</z>
+    <y>0.9802566178657661</y>
+    <z>-0.1977295201288098</z>
    </param>
    <param id="worldZdirection" enabled="F">
     <x>0.0000000000000000</x>
-    <y>0.1977314363828948</y>
-    <z>0.9802562313323784</z>
+    <y>0.1977295201288098</y>
+    <z>0.9802566178657661</z>
    </param>
    <param id="slopeError" comment="No" enabled="T">1</param>
    <param id="profileKind" comment="no Profile" enabled="F">2</param>
@@ -109,6 +109,29 @@
    <param id="thermalDistortionSigmaZ" enabled="F">0</param>
    <param id="cylindricalBowingAmp" enabled="F">0</param>
    <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+  <object name="ImagePlane" type="ImagePlane">
+   <param id="distanceImagePlane" enabled="T">1000</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>387.6513413073760717</y>
+    <z>10921.8060737392606825</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.9218060737392613</y>
+    <z>-0.3876513413073761</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.3876513413073761</y>
+    <z>0.9218060737392613</z>
+   </param>
   </object>
  </beamline>
  <drawing>
