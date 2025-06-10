@@ -246,3 +246,13 @@ TEST_F(TestSuite, testH5Writer) {
         CHECK_EQ(partialRayOriginalSoA, raySoA);
     }
 }
+
+TEST_F(TestSuite, testSelectElementForRecordEvent) {
+    // const auto filename = std::filesystem::path("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
+    // const auto beamline = loadBeamline(filename);
+    // TODO: add test for recording events for selected element
+    // - use fixed seed
+    // - trace: record all events
+    // - trace: record events from only one element
+    // - compare
+}
