@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Core.h"
+#include "Complex.h"
 #include "Constants.h"
 #include <cmath>
-#include <algorithm>
 
 /// @brief a
 namespace RAYX {
@@ -29,7 +29,7 @@ RAYX_FN_ACC double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
     double fz = r.m_direction[2];
     
     // Normalize incoming ray vector
-    double fn = std::sqrt(fx * fx + fy * fy + fz * fz);
+    double fn = complex::sqrt(fx * fx + fy * fy + fz * fz);
     if (fn == 0.0) fn = 1.0;
     fx /= fn;
     fy /= fn;
@@ -37,9 +37,9 @@ RAYX_FN_ACC double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
 
     // Dot product of normalized ray and surface normal
     double ar = fx * al + fy * am + fz * an;
-    ar = std::clamp(ar, -1.0, 1.0);
+    ar = complex::clamp(ar, -1.0, 1.0);
 
-    double theta = std::acos(ar) - PI/2;
+    double theta = complex::acos(ar) - PI/2;
     theta = theta + offsetAngle;
     return theta;                             //TODO Fanny check how to correct this
 }
@@ -69,9 +69,9 @@ RAYX_FN_ACC double getBraggAngle(double energy, double dSpacing2) {
 /// @param alpha Tilt between surface and diffraction planes α (in radians) (offset Angle)
 /// @return Asymmetry factor b (dimensionless)
 RAYX_FN_ACC double getAsymmetryFactor(double braggAngle, double alpha) {
-    double numerator = std::sin(braggAngle - alpha);
-    double denominator = std::sin(braggAngle + alpha);
-    
+    double numerator = complex::sin(braggAngle - alpha);
+    double denominator = complex::sin(braggAngle + alpha);
+
     if (denominator == 0.0) return 0.0; // avoid division by zero
     
     return numerator / denominator;
@@ -111,27 +111,27 @@ RAYX_FN_ACC double getDiffractionPrefactor(double wavelength, double unitCellVol
 /// @param polFactor            Polarization factor 
 /// @param gamma                Diffraction prefactor 
 /// @return                     Complex η parameter
-RAYX_FN_ACC std::complex<double> computeEta(double theta, double bragg, double asymmetry, 
+RAYX_FN_ACC complex::Complex computeEta(double theta, double bragg, double asymmetry, 
                                            double structureFactorReFH, double structureFactorImFH, 
                                            double structureFactorReFHC, double structureFactorImFHC,
                                            double structureFactorReF0, double structureFactorImF0,
                                            double polFactor, double gamma) {
     // Calculate numerator terms
-    std::complex<double> top_term1 = asymmetry * (theta - bragg) * sin(2.0 * theta);
-    std::complex<double> top_term2 = 0.5 * gamma * std::complex<double>(structureFactorReF0, structureFactorImF0) * (1.0 - asymmetry);
-    std::complex<double> top = top_term1 + top_term2;
+    complex::Complex top_term1 = asymmetry * (theta - bragg) * sin(2.0 * theta);
+    complex::Complex top_term2 = 0.5 * gamma * complex::Complex(structureFactorReF0, structureFactorImF0) * (1.0 - asymmetry);
+    complex::Complex top = top_term1 + top_term2;
 
     // Calculate denominator terms
     double bottom_term1 = gamma * polFactor;
     double bottom_term2 = sqrt(fabs(asymmetry));
-    std::complex<double> FH(structureFactorReFH, structureFactorImFH);
-    std::complex<double> FHC(structureFactorReFHC, structureFactorImFHC);
-    std::complex<double> bottom_term3 = sqrt(FH * FHC);
+    complex::Complex FH(structureFactorReFH, structureFactorImFH);
+    complex::Complex FHC(structureFactorReFHC, structureFactorImFHC);
+    complex::Complex bottom_term3 = sqrt(FH * FHC);
     
-    std::complex<double> bottom = bottom_term1 * bottom_term2 * bottom_term3;
+    complex::Complex bottom = bottom_term1 * bottom_term2 * bottom_term3;
 
     // Final eta calculation
-    std::complex<double> eta = top / bottom;
+    complex::Complex eta = top / bottom;
     return eta;
 }
 
@@ -145,14 +145,14 @@ RAYX_FN_ACC std::complex<double> computeEta(double theta, double bragg, double a
 /// @param structureFactorReFHC         Real part of structure factor 
 /// @param structureFactorImFHC         Imaginary part of structure factor 
 /// @return                             Complex reflection coefficient R
-RAYX_FN_ACC std::complex<double> computeR(std::complex<double> eta, 
+RAYX_FN_ACC complex::Complex computeR(complex::Complex eta, 
                                           double structureFactorReFH, double structureFactorImFH,
                                           double structureFactorReFHC, double structureFactorImFHC) {
-    std::complex<double> one(1.0, 0.0);
-    std::complex<double> FH(structureFactorReFH, structureFactorImFH);
-    std::complex<double> FHC(structureFactorReFHC, structureFactorImFHC);
+    complex::Complex one(1.0, 0.0);
+    complex::Complex FH(structureFactorReFH, structureFactorImFH);
+    complex::Complex FHC(structureFactorReFHC, structureFactorImFHC);
 
-    if (std::real(eta) > 0.0) {
+    if (complex::real(eta) > 0.0) {
         return (eta - sqrt(eta * eta - one)) * sqrt(FH / FHC);
     } else {
         return (eta + sqrt(eta * eta - one)) * sqrt(FH / FHC);
