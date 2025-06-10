@@ -32,7 +32,6 @@ namespace complex {
 #if defined(RAYX_CUDA_ENABLED)
 using cuda::std::abs;
 using cuda::std::arg;
-using cuda::std::clamp;
 using cuda::std::conj;
 using cuda::std::exp;
 using cuda::std::log;
@@ -60,7 +59,6 @@ using cuda::std::tanh;
 #else
 using std::abs;
 using std::arg;
-using std::clamp;
 using std::conj;
 using std::exp;
 using std::log;
