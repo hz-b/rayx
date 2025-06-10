@@ -37,7 +37,13 @@ RAYX_FN_ACC double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
 
     // Dot product of normalized ray and surface normal
     double ar = fx * al + fy * am + fz * an;
-    ar = complex::clamp(ar, -1.0, 1.0);
+    
+    // Clamp ar to the range [-1.0, 1.0] since std::clamp is not supported in CUDA
+    if (ar < -1.0) {
+        ar = -1.0;
+    } else if (ar > 1.0) {
+        ar = 1.0;
+    }
 
     double theta = complex::acos(ar) - PI/2;
     theta = theta + offsetAngle;
