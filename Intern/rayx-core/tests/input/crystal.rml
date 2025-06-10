@@ -64,10 +64,10 @@
    <param id="thirdMillerIndex" enabled="T">1</param>
    <param id="structureFactorReF0" enabled="F">113.6807956531886</param>
    <param id="structureFactorImF0" enabled="F">1.730370664482074</param>
-   <param id="structureFactorReFH" enabled="F">-216.1503646347028</param>
-   <param id="structureFactorImFH" enabled="F">-42.1192817720538</param>
-   <param id="structureFactorReFHC" enabled="F">-217.880735072274</param>
-   <param id="structureFactorImFHC" enabled="F">43.84965289035731</param>
+   <param id="structureFactorReFH" enabled="F">43.84963536529425</param>
+   <param id="structureFactorImFH" enabled="F">-42.1192476771696</param>
+   <param id="structureFactorReFHC" enabled="F">42.11926492772296</param>
+   <param id="structureFactorImFHC" enabled="F">43.8496187954731</param>
    <param id="unitCellVolume" enabled="F">0.160191477991</param>
    <param id="dSpacingGradientSwitch" comment="No" enabled="T">0</param>
    <param id="dSpacingGradient" enabled="F">0</param>
