@@ -10,19 +10,26 @@ RAYX_FN_ACC double RAYX_API hvlam(double x);
 
 RAYX_FN_ACC double infinity();
 
-// multiplies position and direction of ray r with transformation matrix m
-// r = dot(m, r)
 RAYX_FN_ACC
-inline Ray RAYX_API rayMatrixMult(Ray r, const glm::dmat4 m) {
-    r.m_position = glm::dvec3(m * glm::dvec4(r.m_position, 1));
-    r.m_direction = glm::dvec3(m * glm::dvec4(r.m_direction, 0));
-    return r;
+inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& __restrict rayPosition, glm::dvec3& __restrict rayDirection) {
+    rayPosition = glm::dvec3(m * glm::dvec4(rayPosition, 1));
+    rayDirection = glm::dvec3(m * glm::dvec4(rayDirection, 0));
 }
 
 RAYX_FN_ACC
-inline void RAYX_API rayMatrixMult(glm::dvec3& __restrict rayPosition, glm::dvec3& __restrict rayDirection, const glm::dmat4& __restrict m) {
+inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& __restrict rayPosition, glm::dvec3& __restrict rayDirection,
+                                   ElectricField& __restrict rayElectricField) {
     rayPosition = glm::dvec3(m * glm::dvec4(rayPosition, 1));
     rayDirection = glm::dvec3(m * glm::dvec4(rayDirection, 0));
+    rayElectricField = glm::dmat3(m) * rayElectricField;
+}
+
+// multiplies position and direction of ray r with transformation matrix m
+// r = dot(m, r)
+RAYX_FN_ACC
+inline Ray RAYX_API rayMatrixMult(const glm::dmat4 m, Ray r) {
+    rayMatrixMult(m, r.m_position, r.m_direction, r.m_field);
+    return r;
 }
 
 // returns angle between ray direction and surface normal at intersection point
