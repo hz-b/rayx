@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ElectricField.h"
-#include "Random.h"
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -152,7 +152,7 @@ inline ElectricField interceptReflectCrystal(const ElectricField incidentElectri
 
 RAYX_FN_ACC
 // sample the reflectivity of a ray
-inline bool sampleReflectivity(double reflectivity) {
+inline bool sampleReflectivity(double reflectivity, Rand& __restrict rand) {
     // if reflectivity is 0, the ray is absorbed
     if (reflectivity <= 0.0) {  
         return false;
@@ -162,7 +162,7 @@ inline bool sampleReflectivity(double reflectivity) {
         return true;
     }
     // otherwise, sample the reflectivity
-    const auto sample = randomDouble();
+    const auto sample = rand.randomDouble();
     return sample < reflectivity;   
 }
 
