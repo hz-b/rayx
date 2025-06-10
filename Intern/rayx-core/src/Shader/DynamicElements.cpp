@@ -28,7 +28,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
         // transform ray and intersection point in ELEMENT coordiantes
         const auto element = inv.elements[col.elementIndex];
-        ray = rayMatrixMult(ray, element.m_inTrans);
+        ray = rayMatrixMult(element.m_inTrans, ray);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         const auto behaviour = element.m_behaviour;
@@ -63,7 +63,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         }
 
         // transform back to WORLD coordinates
-        ray = rayMatrixMult(ray, element.m_outTrans);
+        ray = rayMatrixMult(element.m_outTrans, ray);
     }
 
     // check if the number of events exceeds capacity

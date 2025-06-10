@@ -509,7 +509,7 @@ RAYX_FN_ACC
 Collision findCollisionWith(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const int elementIndex, const OpticalElement& __restrict element,
                             Rand& __restrict rand) {
     // misalignment
-    rayMatrixMult(rayPosition, rayDirection, element.m_inTrans);  // image plane is the x-y plane of the coordinate system
+    rayMatrixMult(element.m_inTrans, rayPosition, rayDirection);  // image plane is the x-y plane of the coordinate system
     Collision col = findCollisionInElementCoords(rayPosition, rayDirection, element.m_surface, element.m_cutout, false);
     if (col.found) {
         col.elementIndex = elementIndex;
