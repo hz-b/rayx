@@ -183,8 +183,7 @@ class MegaKernelTracer : public DeviceTracer {
         auto compactEventOffsets = std::vector<int>(conf.preferredBatchSize);
         auto compactEvents = std::vector<Ray>(conf.preferredBatchSize * maxEvents);
 
-        RaySoA raysoa;
-        RaySoA raysoaBatch[conf.numBatches];
+        auto raysoaBatch = std::vector<RaySoA>(conf.numBatches);
 
         for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {
             const auto batchStartRayIndex = batchIndex * conf.preferredBatchSize;
@@ -239,6 +238,7 @@ class MegaKernelTracer : public DeviceTracer {
             numEventsTotal += numEventsBatch;
         }
 
+        RaySoA raysoa;
 #define RAYX_X(type, name, flag, map)                                                                                               \
     if (attr & flag) {                                                                                                              \
         int batchOffset = 0;                                                                                                        \
@@ -255,7 +255,6 @@ class MegaKernelTracer : public DeviceTracer {
 
         // find the number of ray paths, that have at least 1 event, which is equal to the unique values in compactEventOffsets.
         // std::unique requries a sorted array, which is the case for compactEventOffsets
-        // TODO(sven): rework this. it sucks...
         raysoa.num_paths = std::distance(compactEventOffsets.begin(), std::unique(compactEventOffsets.begin(), compactEventOffsets.end())) -
                            (numEventsTotal ? 0 : 1);
         raysoa.num_events = numEventsTotal;
