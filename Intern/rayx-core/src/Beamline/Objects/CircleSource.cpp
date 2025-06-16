@@ -57,7 +57,7 @@ std::vector<Ray> CircleSource::getRays([[maybe_unused]] int thread_count) const 
         // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
         glm::dvec3 direction = getDirection();
 
-        const auto field = stokesToElectricField(m_stokes, direction);
+        const auto field = stokesToElectricField(m_stokes, m_orientation);
 
         Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0, -1, -1};
 

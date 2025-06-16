@@ -743,7 +743,46 @@ TEST_F(TestSuite, testVlsGrating) {
     }
 }
 
-TEST_F(TestSuite, testRotationBaseConvention) {
+TEST_F(TestSuite, testElectricField) {
+    CHECK_EQ(1.0, intensity(LocalElectricField({1, 0}, {0, 0})));
+    CHECK_EQ(1.0, intensity(ElectricField({1, 0}, {0, 0}, {0, 0})));
+    CHECK_EQ(LocalElectricField({1, 0}, {0, 0}), LocalElectricField(ElectricField({1, 0}, {0, 0}, {0, 0})));
+    CHECK_EQ(ElectricField({1, 0}, {0, 0}, {0, 0}), ElectricField(LocalElectricField({1, 0}, {0, 0}), complex::Complex{0, 0}));
+}
+
+TEST_F(TestSuite, testStokes) {
+    CHECK_EQ(0.1, intensity(Stokes{0.1, 0.2, 0.3, 0.4}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 1, 0, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, -1, 0, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 1, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, -1, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 0, 1}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 0, -1}));
+    CHECK_EQ(0.0, degreeOfPolarization(Stokes{1, 0, 0, 0}));
+}
+
+TEST_F(TestSuite, testElectricFieldRotation) {
+    const auto incidentField0 = ElectricField{{1, 0}, {0, 0}, {0, 0}};
+    const auto incidentField1 = ElectricField{{0, 0}, {0, 0}, {1, 0}};
+    const auto incidentField2 = ElectricField{{0, 0}, {0, 0}, {0, 1}};
+
+    const auto doNothing = [](ElectricField f) { return rotationMatrix(glm::dvec3{0, 0, 1}, glm::dvec3{0, 1, 0}) * f; };
+    CHECK_EQ(incidentField0, doNothing(incidentField0));
+    CHECK_EQ(incidentField1, doNothing(incidentField1));
+    CHECK_EQ(incidentField2, doNothing(incidentField2));
+
+    const auto rotateUp = [](ElectricField f) { return rotationMatrix(glm::dvec3{0, 1, 0}, glm::dvec3{0, 0, -1}) * f; };
+    CHECK_EQ(incidentField0, rotateUp(incidentField0));
+    CHECK_EQ(ElectricField({0, 0}, {1, 0}, {0, 0}), rotateUp(incidentField1));
+    CHECK_EQ(ElectricField({0, 0}, {0, 1}, {0, 0}), rotateUp(incidentField2));
+
+    const auto rotateRight = [](ElectricField f) { return rotationMatrix(glm::dvec3{1, 0, 0}, glm::dvec3{0, 1, 0}) * f; };
+    CHECK_EQ(ElectricField({0, 0}, {0, 0}, {-1, 0}), rotateRight(incidentField0));
+    CHECK_EQ(ElectricField({1, 0}, {0, 0}, {0, 0}), rotateRight(incidentField1));
+    CHECK_EQ(ElectricField({0, 1}, {0, 0}, {0, 0}), rotateRight(incidentField2));
+}
+
+TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention) {
     const auto forward = glm::dvec3(0, 0, 1);
     const auto right = glm::dvec3(1, 0, 0);
     const auto up = glm::dvec3(0, 1, 0);
@@ -752,19 +791,18 @@ TEST_F(TestSuite, testRotationBaseConvention) {
         // test if the convention uses the correct forward, up and right
 
         // rotation into forward yields identity matrix
-        CHECK_EQ(rotationMatrix(forward), glm::dmat3(1.0));
+        CHECK_EQ(rotationMatrixWithBaseConvention(forward), glm::dmat3(1.0));
 
         // rotate forward into right yields right
-        CHECK_EQ(rotationMatrix(right) * forward, right);
+        CHECK_EQ(rotationMatrixWithBaseConvention(right) * forward, right);
 
         // rotate forward into up yields up
-        CHECK_EQ(rotationMatrix(up) * forward, up);
+        CHECK_EQ(rotationMatrixWithBaseConvention(up) * forward, up);
     }
 
     {
         // in order to test if the rotation function is steadily,
         // we gradually increase the rotation angle and compare the resulting angle to the previous.
-        // TODO(Sven): this test does not give a lot of guarantees
 
         const auto steps = 100;
         const auto stepAngle = 1.0 / steps * PI * 2.0;
@@ -776,12 +814,66 @@ TEST_F(TestSuite, testRotationBaseConvention) {
         for (int i = 1; i < steps + 1; ++i) {
             auto angle = i / static_cast<double>(steps) * PI * 2.0;
             auto dir = get_dir(angle);
-            auto new_vec = rotationMatrix(dir) * forward;
+            auto new_vec = rotationMatrixWithBaseConvention(dir) * forward;
             auto angle_between_vecs = angleBetweenUnitVectors(prev_vec, new_vec);
             CHECK_EQ(angle_between_vecs, stepAngle);
             prev_vec = new_vec;
         }
     }
+}
+
+TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention2) {
+    using namespace complex;
+
+    // convention for incident field
+    // forward = (0, 0, -1)
+    // up      = (0, 1, 0)
+    // right   = (1, 0, 0)
+    const auto incidentElectricField = ElectricField({1, 0}, {0, 0}, {0, 0});
+
+    struct InOutPair {
+        ElectricField in_field;
+        glm::dvec3 in_forward;
+        glm::dvec3 in_up;
+        ElectricField out_field;
+        ElectricField out_field_rotationWithoutUp;
+    };
+
+    const auto inouts = std::vector<InOutPair>{
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {0, 0, -1},
+            .in_up = {0, 1, 0},
+            .out_field = {{-1, 0}, {0, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{-1, 0}, {0, 0}, {0, 0}},
+        },
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {1, 0, 0},
+            .in_up = {0, 0, 1},
+            .out_field = {{0, 0}, {1, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {-1, 0}},
+        },
+    };
+
+    for (const auto& p : inouts) {
+        const auto rotation = rotationMatrix(p.in_forward, p.in_up);
+        const auto field = rotation * incidentElectricField;
+        CHECK_EQ(field, p.out_field);
+
+        const auto rotationWithoutUp = rotationMatrixWithBaseConvention(p.in_forward);
+        const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
+        CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
+    }
+}
+
+TEST_F(TestSuite, testElectricFieldToStokesConversion) {
+    const auto h = std::sqrt(2.0) / 2.0;
+
+    CHECK_EQ(Stokes(1, 1, 0, 0), localElectricFieldToStokes(LocalElectricField({1, 0}, {0, 0})));
+    CHECK_EQ(Stokes(1, -1, 0, 0), localElectricFieldToStokes(LocalElectricField({0, 0}, {1, 0})));
+    CHECK_EQ(Stokes(1, 0, 1, 0), localElectricFieldToStokes(LocalElectricField({h, 0}, {h, 0})));
+    CHECK_EQ(Stokes(1, 0, -1, 0), localElectricFieldToStokes(LocalElectricField({-h, 0}, {h, 0})));
 }
 
 TEST_F(TestSuite, testGetIncidenceAngle) {
@@ -1199,51 +1291,6 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
 //         }
 //     }
 // }
-
-TEST_F(TestSuite, testRotateElectricField) {
-    using namespace complex;
-
-    // convention for incident field
-    // forward = (0, 0, -1)
-    // up      = (0, 1, 0)
-    // right   = (1, 0, 0)
-    const auto incidentElectricField = ElectricField({1, 0}, {0, 0}, {0, 0});
-
-    struct InOutPair {
-        ElectricField in_field;
-        glm::dvec3 in_forward;
-        glm::dvec3 in_up;
-        ElectricField out_field;
-        ElectricField out_field_rotationWithoutUp;
-    };
-
-    const auto inouts = std::vector<InOutPair>{
-        {
-            .in_field = {{1, 0}, {0, 0}, {0, 0}},
-            .in_forward = {0, 0, -1},
-            .in_up = {0, 1, 0},
-            .out_field = {{1, 0}, {0, 0}, {0, 0}},
-            .out_field_rotationWithoutUp = {{1, 0}, {0, 0}, {0, 0}},
-        },
-        {
-            .in_field = {{1, 0}, {0, 0}, {0, 0}},
-            .in_forward = {1, 0, 0},
-            .in_up = {0, 0, 1},
-            .out_field = {{0, 0}, {-1, 0}, {0, 0}},
-            .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {1, 0}},
-        },
-    };
-
-    for (const auto& p : inouts) {
-        const auto rotation = rotationMatrix(p.in_forward, p.in_up);
-        const auto field = rotation * incidentElectricField;
-        CHECK_EQ(field, p.out_field);
-
-        const auto rotationWithoutUp = rotationMatrix(p.in_forward);
-        const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
-        CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
-    }
-}
 
 // both the Cpp code as well as the shader define hvlam.
 TEST_F(TestSuite, testHvlam) {

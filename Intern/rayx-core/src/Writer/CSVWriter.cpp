@@ -6,6 +6,8 @@
 
 #include "Debug/Debug.h"
 
+namespace {
+
 // writer:
 
 const int CELL_SIZE = 23;
@@ -17,8 +19,6 @@ struct Cell {
     char buf[CELL_SIZE + 1];  // + 1 for null-termination.
 };
 
-using std::min;
-
 // Tries to write a string into a cell.
 // Will only write an incomplete string, if it doesn't fit.
 Cell strToCell(const char* x) {
@@ -29,7 +29,7 @@ Cell strToCell(const char* x) {
         RAYX_WARN << "strToCell: string \"" << x << "\" needs to be shortened!";
     }
 
-    for (int i = 0; i < min(n, CELL_SIZE); i++) {
+    for (int i = 0; i < std::min(n, CELL_SIZE); i++) {
         out.buf[i] = x[i];
     }
     for (int i = n; i < CELL_SIZE; i++) {
@@ -55,6 +55,10 @@ Cell doubleToCell(double x) {
     }
     return strToCell(s.c_str());
 }
+
+}  // unnamed namespace
+
+namespace RAYX {
 
 void writeCSV(const RAYX::BundleHistory& hist, const std::string& filename, const Format& format) {
     std::ofstream file(filename);
@@ -114,25 +118,63 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
             d.push_back(std::stod(num));
         }
 
-        if (d.size() != 16) {
+        if (d.size() != 16 && d.size() != 18) {
             RAYX_EXIT << "CSV line has incorrect length: " << d.size();
         }
 
-        const auto direction = glm::dvec3(d[4], d[5], d[6]);
+        int o = 0;
 
-        const auto stokes = glm::dvec4(d[8], d[9], d[10], d[11]);
-        const auto field = RAYX::stokesToElectricField(stokes, direction);
+        const auto rayPosition = glm::dvec3(d[o], d[o + 1], d[o + 2]);
+        o += 3;
+
+        const auto rayEventType = static_cast<EventType>(d[o]);
+        o += 1;
+
+        const auto rayDirection = glm::dvec3(d[o], d[o + 1], d[o + 2]);
+        o += 3;
+
+        const auto rayEnergy = d[o];
+        o += 1;
+
+        ElectricField rayElectricField;
+        if (d.size() == 16) {
+            // old csv files used to have stokes parameters
+            const auto stokes = glm::dvec4(d[o], d[o + 1], d[o + 2], d[o + 3]);
+            rayElectricField = stokesToElectricFieldWithBaseConvention(stokes, rayDirection);
+            o += 4;
+        } else if (d.size() == 18) {
+            // new csv files have electric field parameters
+            rayElectricField = ElectricField{{d[o], d[o + 1]}, {d[o + 2], d[o + 3]}, {d[o + 4], d[o + 5]}};
+            o += 6;
+        }
+
+        const auto rayPathLength = d[o];
+        o += 1;
+
+        const auto rayOrder = static_cast<Order>(d[o]);
+        o += 1;
+
+        const auto rayElementId = static_cast<ElementId>(d[o]);
+        o += 1;
+
+        const auto raySourceId = static_cast<SourceId>(d[o]);
+        o += 1;
+
+        assert(o == 16 || o == 18);
 
         // create the Ray from the loaded doubles from this line.
-        RAYX::Ray ray = {.m_position = {d[0], d[1], d[2]},
-                         .m_eventType = static_cast<RAYX::EventType>(d[3]),
-                         .m_direction = direction,
-                         .m_energy = d[7],
-                         .m_field = field,
-                         .m_pathLength = d[12],
-                         .m_order = static_cast<signed char>(d[13]),
-                         .m_lastElement = static_cast<signed char>(d[14]),
-                         .m_sourceID = static_cast<signed char>(d[15])};
+        RAYX::Ray ray = {
+            .m_position = rayPosition,
+            .m_eventType = rayEventType,
+            .m_direction = rayDirection,
+            .m_energy = rayEnergy,
+            .m_field = rayElectricField,
+            .m_pathLength = rayPathLength,
+            .m_order = rayOrder,
+            .m_lastElement = rayElementId,
+            .m_sourceID = raySourceId,
+        };
+
         // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
         // If so, we need to make place for it.
         if (out.size() <= ray_id) {
@@ -156,3 +198,5 @@ RAYX::BundleHistory loadCSV(const std::string& filename) {
 
     return out;
 }
+
+}  // namespace RAYX
