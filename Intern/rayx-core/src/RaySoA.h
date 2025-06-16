@@ -121,6 +121,8 @@ struct RaySoA {
     }
 };
 
+static_assert(std::is_nothrow_default_constructible_v<RaySoA>);
+
 /// Contains all the events of a single Ray in chronological order.
 using RayHistory = std::vector<Ray>;
 
