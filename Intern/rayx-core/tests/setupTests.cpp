@@ -71,7 +71,7 @@ RAYX::Beamline loadBeamline(std::string filename) {
 /// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCSV(hist, f, FULL_FORMAT);
+    writeCsv(hist, f, FULL_FORMAT);
 }
 
 RAYX::BundleHistory traceRML(std::string filename) {
@@ -238,7 +238,7 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     auto a = traceRML(filename);
 
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".correct.csv").string();
-    auto b = loadCSV(f);
+    auto b = loadCsv(f, true);
 
     writeToOutputCSV(a, filename + ".rayx");
     compareBundleHistories(a, b, tolerance);

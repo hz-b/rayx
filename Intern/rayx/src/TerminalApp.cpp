@@ -267,7 +267,7 @@ std::filesystem::path TerminalApp::exportRays(const RAYX::RaySoA& rays, bool isC
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (isCSV) {
-        writeCSV(RAYX::raySoAToBundleHistory(rays), path.string(), FULL_FORMAT);
+        writeCsv(RAYX::raySoAToBundleHistory(rays), path.string(), FULL_FORMAT);
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
