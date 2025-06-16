@@ -45,8 +45,18 @@ namespace RAYX {
 inline std::ostream& operator<<(std::ostream& os, const complex::Complex& c) { return os << "{" << c.real() << ", " << c.imag() << "}"; }
 
 template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const glm::tvec2<T>& v) {
+    return os << "{" << v.x << ", " << v.y << "}";
+}
+
+template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const glm::tvec3<T>& v) {
     return os << "{" << v.x << ", " << v.y << ", " << v.z << "}";
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const glm::tvec4<T>& v) {
+    return os << "{" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << "}";
 }
 
 ///////////////////////////////////////////////
