@@ -50,7 +50,7 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_pathLength = vec[10];
 
     const auto stokes = glm::dvec4(vec[11], vec[12], vec[13], vec[14]);
-    ray.m_field = RAYX::stokesToElectricField(stokes, ray.m_direction);
+    ray.m_field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, ray.m_direction);
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
