@@ -7,6 +7,7 @@
 #include "ImageType.h"
 
 namespace RAYX {
+
 // inverse nanometer-electron volt relationship / reziprocal factor
 constexpr double INV_NM_TO_EVOLT = 1239.841984332002622;
 
@@ -47,5 +48,8 @@ constexpr double ELECTRIC_PERMITTIVITY = 8.8541878128e-12;  // Checked 2019-7-25
 
 /// \f$G\f$ [?]. RAY's factor appearing in Schwinger equation context
 constexpr double FACTOR_SCHWINGER_RAY = 1.2556937e15;
+
+/// electric permitivity multiplied by speed of light
+constexpr double ELECTRIC_PERMITIVITY_MULTIPLIES_SPEED_OF_LIGHT = 2.6544187279929558624e-3;
 
 }  // namespace RAYX
