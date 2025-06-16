@@ -103,17 +103,17 @@ const std::map<Material, std::string> MaterialToString = {
     {Material::VACUUM, "VACUUM"},
 
 // Add other materials here as needed
-#define RAYX_X(e, z, a, rho) {Material::e, #e},
+#define X(e, z, a, rho) {Material::e, #e},
 #include "Material/materials.xmacro"
-#undef RAYX_X
+#undef X
 };
 const std::map<std::string, Material> StringToMaterial = {
     {"REFLECTIVE", Material::REFLECTIVE},
     {"VACUUM", Material::VACUUM},
 // Add other materials here as needed
-#define RAYX_X(e, z, a, rho) {#e, Material::e},
+#define X(e, z, a, rho) {#e, Material::e},
 #include "Material/materials.xmacro"
-#undef RAYX_X
+#undef X
 };
 
 }  // namespace RAYX
