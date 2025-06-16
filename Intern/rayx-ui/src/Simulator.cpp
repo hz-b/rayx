@@ -19,12 +19,13 @@ void Simulator::runSimulation() {
     }
 
     constexpr int RECORD_ALL_ELEMENTS = -1;
-    auto rays =
+    const auto rays =
         m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents, RECORD_ALL_ELEMENTS);  // TODO: implement recordElementIndex for GUI?
+    const auto bundleHist = RAYX::raySoAToBundleHistory(rays);
 
     bool notEnoughEvents = false;
 
-    for (auto& ray : rays) {
+    for (auto& ray : bundleHist) {
         for (auto& event : ray) {
             if (event.m_eventType == RAYX::EventType::TooManyEvents) {
                 notEnoughEvents = true;
@@ -56,9 +57,9 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    writeH5BundleHistory(path, rays, fmt, names);
+    RAYX::writeH5RaySoA(path, rays);
 #else
-    writeCSV(rays, path, fmt);
+    RAYX::writeCSV(bundleHist, path, fmt);
 #endif
 }
 

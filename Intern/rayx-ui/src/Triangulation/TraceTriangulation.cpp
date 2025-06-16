@@ -25,7 +25,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
             pos = glm::dvec3(x, distanceToObj, z);
             dir = glm::dvec3(0.0f, -1.0f, 0.0f);
             const auto stokes = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
-            const auto field = RAYX::stokesToElectricField(stokes, dir);
+            const auto field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, dir);
 
             RAYX::Ray ray = {
                 .m_position = pos,
