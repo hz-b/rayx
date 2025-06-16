@@ -10,9 +10,8 @@
 
 namespace RAYX {
 
-void RAYX_API writeCSV(const RAYX::BundleHistory&, const std::string& filename, const Format& format);
+void RAYX_API writeCsv(const RAYX::BundleHistory&, const std::string& filename, const Format& format);
 
-// loadCSV only works for csv files created using FULL_FORMAT.
-RAYX::BundleHistory RAYX_API loadCSV(const std::string& filename);
+RAYX::BundleHistory RAYX_API loadCsv(const std::string& filename, const bool rayUiCompatible = false);
 
 }  // namespace RAYX
