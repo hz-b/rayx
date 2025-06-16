@@ -28,9 +28,9 @@
 #define RAYX_X_MACRO_RAY_ATTR_FIELD_Z_REAL RAYX_X(double,    field_z_real, RayFieldZReal, m_field.z.real())
 #define RAYX_X_MACRO_RAY_ATTR_FIELD_Z_IMAG RAYX_X(double,    field_z_imag, RayFieldZImag, m_field.z.imag())
 #define RAYX_X_MACRO_RAY_ATTR_PATH_LENGTH  RAYX_X(double,    path_length,  RayPathLength, m_pathLength    )
-#define RAYX_X_MACRO_RAY_ATTR_ORDER        RAYX_X(int8_t,    order,        RayOrder,      m_order         )
-#define RAYX_X_MACRO_RAY_ATTR_ELEMENT_ID   RAYX_X(int8_t,    element_id,   RayElementId,  m_lastElement   )
-#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID    RAYX_X(int8_t,    source_id,    RaySourceId,   m_sourceID      )
+#define RAYX_X_MACRO_RAY_ATTR_ORDER        RAYX_X(Order,     order,        RayOrder,      m_order         )
+#define RAYX_X_MACRO_RAY_ATTR_ELEMENT_ID   RAYX_X(ElementId, element_id,   RayElementId,  m_lastElement   )
+#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID    RAYX_X(SourceId,  source_id,    RaySourceId,   m_sourceID      )
 // clang-format on
 
 #define RAYX_X_MACRO_RAY_ATTR          \
