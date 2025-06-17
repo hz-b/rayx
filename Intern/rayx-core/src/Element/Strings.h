@@ -12,6 +12,7 @@ enum class ElementType {
     CylinderMirror,
     EllipsoidMirror,
     ExpertsMirror,
+    Foil,
     ParaboloidMirror,
     PlaneGrating,
     PlaneMirror,
@@ -28,7 +29,7 @@ enum class ElementType {
     DipoleSrc,
     PixelSource,
     CircleSource,
-    SimpleUndulatorSource
+    SimpleUndulatorSource,
 };
 
 extern std::map<ElementType, std::string> ElementStringMap;

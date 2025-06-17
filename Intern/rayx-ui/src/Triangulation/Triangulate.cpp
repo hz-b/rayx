@@ -448,6 +448,10 @@ void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureV
             planarTriangulation(compiled, vertices, indices);
             break;
         }
+        case RAYX::SurfaceType::PlaneXY: {
+            planarTriangulation(compiled, vertices, indices);
+            break;
+        }
         case RAYX::SurfaceType::Quadric: {
             RAYX::QuadricSurface q = deserializeQuadric(compiled.m_surface);
             if (isPlanar(q)) {

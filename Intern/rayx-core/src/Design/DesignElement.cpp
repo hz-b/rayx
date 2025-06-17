@@ -476,4 +476,16 @@ CurvatureType DesignElement::getCurvatureType() const { return m_elementParamete
 void DesignElement::setBehaviourType(BehaviourType value) { m_elementParameters["behaviourType"] = value; }
 BehaviourType DesignElement::getBehaviourType() const { return m_elementParameters["behaviourType"].as_behaviourType(); }
 
+void DesignElement::setThicknessSubstrate(double value) { m_elementParameters["thicknessSubstrate"] = value; }
+double DesignElement::getThicknessSubstrate() const { return m_elementParameters["thicknessSubstrate"].as_double(); }
+
+void DesignElement::setRoughnessSubstrate(double value) { m_elementParameters["roughnessSubstrate"] = value; }
+double DesignElement::getRoughnessSubstrate() const { return m_elementParameters["roughnessSubstrate"].as_double(); }
+
+void DesignElement::setDensitySubstrate(double value) { m_elementParameters["densitySubstrate"] = value; }
+double DesignElement::getDensitySubstrate() const { return m_elementParameters["densitySubstrate"].as_double(); }
+
+void DesignElement::setDesignPlane(DesignPlane value) { m_elementParameters["designPlane"] = value; }
+DesignPlane DesignElement::getDesignPlane() const { return m_elementParameters["designPlane"].as_designPlane(); }
+
 }  // namespace RAYX

@@ -13,7 +13,9 @@ enum class SurfaceType {
     Quadric,
     Toroid,
     PlaneXZ,
+    PlaneXY,
     Cubic,
+
 };
 
 struct Surface {
@@ -33,7 +35,8 @@ Surface makeEllipsoid(const DesignElement& dele);   //< creates a Ellipsoid from
 Surface makeCone(const DesignElement& dele);        //< creates a Cone from the parameters given in ` dele`.
 Surface makeCylinder(const DesignElement& dele);    //< creates a Cylinder from the parameters given in ` dele`.
 Surface makeSphere(double radius);                  //< creates a sphere from the radius .
-Surface makePlane();                                //< creates a plane surface.
+Surface makePlaneXZ();                              //< creates a plane surface in the XZ plane.
+Surface makePlaneXY();                              //< creates a plane surface in the XY plane.
 Surface makeParaboloid(const DesignElement& dele);  //< creates a Paraboloid from the parameters given in ` dele`.
 
 ///////////////////
@@ -132,6 +135,13 @@ RAYX_FN_ACC
 inline Surface serializePlaneXZ() {
     Surface ser;
     ser.m_type = SurfaceType::PlaneXZ;
+    return ser;
+}
+
+RAYX_FN_ACC
+inline Surface serializePlaneXY() {
+    Surface ser;
+    ser.m_type = SurfaceType::PlaneXY;
     return ser;
 }
 

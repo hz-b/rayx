@@ -30,6 +30,7 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
 
+    de->setDesignPlane(dp);
     if (de->getType() != ElementType::ImagePlane) {
         de->setCutout(parser.parseCutout(dp, ElementStringMap[parser.type()]));
     } else {
@@ -212,6 +213,16 @@ void getExpertsOptics(xml::Parser parser, DesignElement* de) {
     de->setBehaviourType(BehaviourType::Mirror);
 
     de->setExpertsOptics(serializeQuadric(parser.parseQuadricParameters()));
+}
+
+void getFoil(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XY);
+    de->setCurvatureType(CurvatureType::Plane);
+    de->setBehaviourType(BehaviourType::Foil);
+
+    de->setThicknessSubstrate(parser.parseThicknessSubstrate());
+    de->setRoughnessSubstrate(parser.parseRoughnessSubstrate());
+    de->setDensitySubstrate(parser.parseDensitySubstrate());
 }
 
 }  // namespace RAYX

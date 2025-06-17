@@ -97,7 +97,12 @@ inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::d
     // we dont need the lenght of the vector resulting from the cross product, but only the direciton.
     // this may could be done by calculation angles instead of a vector.
     // fixing this removes the check in interceptReflect, that specializes for normal incidence
-    const auto s0 = glm::normalize(glm::cross(incidentVec, -normalVec));
+    glm::dvec3 s0;
+    if (incidentVec == glm::dvec3(0.0, 0.0, 1.0)) {
+        s0 = glm::dvec3(1.0, 0.0, 0.0);  // beliebig orthogonal zu (0,0,-1)
+    } else {
+        s0 = glm::normalize(glm::cross(incidentVec, -normalVec));
+    }
     const auto s1 = s0;
     const auto p0 = glm::cross(incidentVec, s0);
     const auto p1 = glm::cross(reflectOrRefractVec, s0);

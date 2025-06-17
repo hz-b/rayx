@@ -45,4 +45,60 @@ Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x) {
     return r;
 }
 
+/**
+ * Simple refraction for double precision vectors
+ * @params:  I: incident vector
+ *           N: normal vector at the point of intersection
+ *           eta: ratio of refractive indices (n1/n2)
+ * @returns: refracted vector, or zero vector if total internal reflection occurs
+ */
+RAYX_FN_ACC
+glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta) {
+    double cosi = glm::dot(-I, N);
+    double cost2 = 1.0 - eta * eta * (1.0 - cosi * cosi);
+    if (cost2 < 0.0) return glm::dvec3(0.0); // Total internal reflection
+    return eta * I + (eta * cosi - sqrt(cost2)) * N;
+}
+
+
+
+RAYX_FN_ACC
+complex::Complex computeTransmittance(
+    double wl,          // Wellenlänge in nm
+    double alpha_deg,   // Einfallswinkel in Grad
+    const complex::Complex& n1,  // Brechungsindex Eintrittsmedium (komplex)
+    const complex::Complex& n2,  // Brechungsindex Folie (komplex)
+    double d            // Schichtdicke Folie in nm
+) {
+    constexpr double PI = 3.14159265358979323846;
+    const complex::Complex I(0.0, 1.0);  // imaginäre Einheit
+
+    // Umrechnung Winkel in Bogenmaß
+    double theta1 = alpha_deg * PI / 180.0;
+
+    // Snellius-Gesetz: n1*sin(theta1) = n2*sin(theta2) => Berechne theta2
+    complex::Complex sin_theta2 = (n1 / n2) * std::sin(theta1);
+    complex::Complex theta2 = asin(sin_theta2); // Complex asin wird in deinem Typ vorausgesetzt
+
+    // Wellenzahl im Medium 2
+    complex::Complex k0 = complex::Complex(2.0 * PI / wl, 0.0); // k0 = 2π/λ
+
+    // Phasenverschiebung durch die Schicht
+    complex::Complex delta = k0 * n2 * d * std::cos(theta2);
+
+    // Fresnel Koeffizienten (für s-Polarisation als Beispiel)
+    complex::Complex rs = (n1 * std::cos(theta1) - n2 * std::cos(theta2)) /
+                 (n1 * std::cos(theta1) + n2 * std::cos(theta2));
+    complex::Complex ts = complex::Complex(1.0, 0.0) + rs; // Transmissionsamplitude an erster Grenzfläche
+
+    // Transmission durch die Schicht mit Interferenz
+    complex::Complex numerator = ts * std::exp(-I * delta);
+    complex::Complex denominator = complex::Complex(1.0, 0.0) + rs * std::exp(-complex::Complex(2.0, 0.0) * I * delta);
+
+    complex::Complex T = numerator / denominator; // Komplexe Transmissionsamplitude
+
+    return T;
+}
+
+
 }  // namespace RAYX

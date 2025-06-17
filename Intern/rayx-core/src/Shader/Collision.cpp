@@ -469,6 +469,21 @@ Collision RAYX_API findCollisionInElementCoords(Ray r, Surface surface, Cutout c
             col.found = time >= 0;
             break;
         }
+        case SurfaceType::PlaneXY: {
+            col.normal = glm::dvec3(0, 0, -glm::sign(r.m_direction.z));
+
+            // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
+            double time = -r.m_position.z / r.m_direction.z;
+
+            col.hitpoint.x = r.m_position.x + r.m_direction.x * time;
+            col.hitpoint.y = r.m_position.y + r.m_direction.y * time;
+            col.hitpoint.z = 0;
+
+            // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set
+            // `found = false`.
+            col.found = time >= 0;
+            break;
+        }
         case SurfaceType::Toroid:
             col = getToroidCollision(r, deserializeToroid(surface), isTriangul);
             break;

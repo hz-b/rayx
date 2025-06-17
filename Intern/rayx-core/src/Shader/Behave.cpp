@@ -128,6 +128,61 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
     return r;
 }
 
+RAYX_FN_ACC
+Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
+    //FoilBehaviour f = deserializeFoil(behaviour);
+    const auto incidentVec = r.m_direction;
+    const auto normal = col.normal;
+
+    constexpr int vacuum_material = -1;
+
+    const auto ior_i = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable); // vacuum
+    const auto ior_t = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);        // foil
+
+    // Eintritt: Vakuum -> Folie
+    const auto refractIn = refract_dvec3(incidentVec, normal, ior_i.real() / ior_t.real());
+    if (glm::length(refractIn) == 0.0) return r; // Totalreflexion
+
+    auto incAngle = angleBetweenUnitVectors(incidentVec, normal);
+    // when angleBetweenUnitVectors is nan, the value shall be 10⁻8
+    if (std::isnan(incAngle) || incAngle == 0) {incAngle = 1e-8;}
+
+    const auto incidentAngle = complex::Complex(incAngle, 0);
+    const auto refractAngleIn = calcRefractAngle(incidentAngle, ior_i, ior_t);
+    const auto ampIn = calcRefractAmplitude(incidentAngle, refractAngleIn, ior_i, ior_t);
+
+    const auto entryMatrix = calcPolaririzationMatrix(incidentVec, refractIn, normal, ampIn);
+    ElectricField ef1 = entryMatrix * r.m_field;
+
+    // Durchlauf durch die Folie
+    //const double cos_theta = glm::dot(-refractIn, normal);
+    //const double travelDist = f.m_thicknessSubstrate / std::abs(cos_theta);
+    // const glm::dvec3 insidePos = col.hitpoint + refractIn * travelDist;
+
+    // Austritt: Folie -> Vakuum
+    const auto exitNormal = -normal;
+    const auto refractOut = refract_dvec3(refractIn, exitNormal, ior_t.real() / ior_i.real());
+    if (glm::length(refractOut) == 0.0) return r; // Totalreflexion
+
+    incAngle = angleBetweenUnitVectors(refractIn, exitNormal);
+    // when angleBetweenUnitVectors is nan, the value shall be 10⁻8
+    if (std::isnan(incAngle) || incAngle == 0) {incAngle = 1e-8;}
+
+    const auto exitAngle = complex::Complex(incAngle, 0);
+    const auto refractAngleOut = calcRefractAngle(exitAngle, ior_t, ior_i);
+    const auto ampOut = calcRefractAmplitude(exitAngle, refractAngleOut, ior_t, ior_i);
+
+    const auto exitMatrix = calcPolaririzationMatrix(refractIn, refractOut, exitNormal, ampOut);
+    ElectricField ef2 = exitMatrix * ef1;
+
+    r.m_direction = refractOut;
+    r.m_field = ef2;
+    //r.m_position = insidePos; // optional, je nach Modell
+    return r;
+}
+
+
+
 RAYX_FN_ACC Ray behaveImagePlane(Ray r) { return r; }
 
 }  // namespace RAYX

@@ -15,6 +15,7 @@ enum class BehaveType {
     Slit,
     RZP,
     ImagePlane,
+    Foil
 };
 
 struct Behaviour {
@@ -30,9 +31,10 @@ struct DesignElement;
 enum class RZPType { Elliptical, Meriodional };
 enum class CentralBeamstop { None, Rectangle, Elliptical };
 Behaviour makeBehaviour(const DesignElement& dele);
-Behaviour makeGrating(const DesignElement& dele);  //< creates a Grating Behaviour from the parameters given in `dele`.
+Behaviour makeGrating(const DesignElement& dele); 
 Behaviour makeSlit(const DesignElement& dele);
 Behaviour makeRZPBehaviour(const DesignElement& dele);
+Behaviour makeFoil(const DesignElement& dele);
 
 ////////////////////
 // Mirror
@@ -207,6 +209,36 @@ inline Behaviour serializeImagePlane() {
     Behaviour b;
     b.m_type = BehaveType::ImagePlane;
     return b;
+}
+
+/////////////////
+// FOIL
+////////////////
+
+struct FoilBehaviour {
+    //Substrates
+    double m_thicknessSubstrate;  // Thickness of the substrate in mm
+    double m_roughnessSubstrate;  // Roughness of the substrate in mm
+    double m_densitySubstrate;    // Density of the substrate in g/cm^3
+};
+
+RAYX_FN_ACC
+inline Behaviour serializeFoil(FoilBehaviour f) {
+    Behaviour b;
+    b.m_type = BehaveType::Foil;
+    b.m_private_serialization_params[0] = f.m_thicknessSubstrate;
+    b.m_private_serialization_params[1] = f.m_roughnessSubstrate;
+    b.m_private_serialization_params[2] = f.m_densitySubstrate;
+    return b;
+}
+
+RAYX_FN_ACC
+inline FoilBehaviour deserializeFoil(Behaviour b) {
+    FoilBehaviour f;
+    f.m_thicknessSubstrate = b.m_private_serialization_params[0];
+    f.m_roughnessSubstrate = b.m_private_serialization_params[1];
+    f.m_densitySubstrate = b.m_private_serialization_params[2];
+    return f;
 }
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.

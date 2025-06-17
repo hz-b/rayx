@@ -8,6 +8,7 @@ namespace RAYX {
 
 std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSource, "Circle Source"},
                                                        {ElementType::CylinderMirror, "Cylinder"},
+                                                       {ElementType::Foil, "Foil"},
                                                        {ElementType::ImagePlane, "ImagePlane"},
                                                        {ElementType::MatrixSource, "Matrix Source"},
                                                        {ElementType::ParaboloidMirror, "Paraboloid"},

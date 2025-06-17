@@ -23,11 +23,16 @@ Surface makeSurface(const DesignElement& dele) {
             return makeParaboloid(dele);
         case CurvatureType::Plane:
         default:
-            return makePlane();
+            if (dele.getDesignPlane() == DesignPlane::XY) {
+                return makePlaneXY();
+            }
+            return makePlaneXZ();
     }
 }
 
-Surface makePlane() { return serializePlaneXZ(); }
+Surface makePlaneXZ() { return serializePlaneXZ(); }
+
+Surface makePlaneXY() { return serializePlaneXY(); }
 
 Surface makeCylinder(const DesignElement& dele) {
     auto cyl_direction = dele.getRadiusDirection();
