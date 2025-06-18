@@ -14,7 +14,9 @@
 #include "Rml/Importer.h"
 #include "Rml/Locate.h"
 #include "Tracer/Tracer.h"
-#include "Writer/Writer.h"
+#include "Writer/CsvWriter.h"
+#include "Writer/H5Writer.h"
+#include "Writer/Format.h"
 
 namespace {
 
@@ -155,7 +157,6 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             std::cout << "No events were recorded!" << std::endl;
         else {
             bool isCSV = m_CommandParser->m_args.m_csvFlag;
-            Format fmt = formatFromString(m_CommandParser->m_args.m_format);
 
             std::filesystem::path outputPath;
             if (!m_CommandParser->m_args.m_outPath.empty()) {
@@ -276,7 +277,7 @@ std::filesystem::path TerminalApp::exportRays(const RAYX::RaySoA& rays, bool isC
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (isCSV) {
-        writeCsv(RAYX::raySoAToBundleHistory(rays), path.string(), FULL_FORMAT);
+        writeCsv(RAYX::raySoAToBundleHistory(rays), path.string());
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";

@@ -1,9 +1,8 @@
 #include "Simulator.h"
 
 #include "Random.h"
-#include "Writer/CSVWriter.h"
+#include "Writer/CsvWriter.h"
 #include "Writer/H5Writer.h"
-#include "Writer/Writer.h"
 
 // constructor
 Simulator::Simulator() { m_seq = RAYX::Sequential::No; }
@@ -45,8 +44,6 @@ void Simulator::runSimulation() {
         RAYX_EXIT << "Input file is not an *.rml file!";
     }
 
-    Format fmt = formatFromString(defaultFormatString());
-
     std::vector<std::string> names;
     auto elements = m_Beamline.getElements();
     names.reserve(elements.size());
@@ -59,7 +56,7 @@ void Simulator::runSimulation() {
 #ifndef NO_H5
     RAYX::writeH5RaySoA(path, rays);
 #else
-    RAYX::writeCsv(bundleHist, path, fmt);
+    RAYX::writeCsv(bundleHist, path);
 #endif
 }
 

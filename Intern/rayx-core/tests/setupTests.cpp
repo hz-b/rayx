@@ -71,7 +71,7 @@ RAYX::Beamline loadBeamline(std::string filename) {
 /// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCsv(hist, f, FULL_FORMAT);
+    writeCsv(hist, f);
 }
 
 RAYX::BundleHistory traceRML(std::string filename) {

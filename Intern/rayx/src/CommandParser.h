@@ -4,7 +4,6 @@
 
 #include "Debug/Debug.h"
 #include "TerminalAppConfig.h"
-#include "Writer/Writer.h"
 
 class CommandParser {
   public:
