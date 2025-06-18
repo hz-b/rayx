@@ -1,3 +1,5 @@
+#ifndef NO_H5
+
 #include "H5Writer.h"
 
 #include <bitset>
@@ -24,27 +26,6 @@ inline HighFive::DataType highfive_create_type_EventType() {
 HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
 
 namespace RAYX {
-
-RayAttrFlag formatStringToRayAttrFlag(const std::string& format) {
-    auto stringToAttr = [](const std::string& str) -> RayAttrFlagType {
-#define RAYX_X(type, name, flag, map) \
-    if (str == #name) return flag;
-        RAYX_X_MACRO_RAY_ATTR_PATH_ID
-        RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
-        RAYX_EXIT << "error: failed to parse format string: unknown token: '" << str << "'";
-        return static_cast<RayAttrFlagType>(0);
-    };
-
-    auto attr = static_cast<RayAttrFlagType>(0);
-    auto ss = std::stringstream(format);
-    std::string token;
-    while (ss >> token) {
-        attr |= stringToAttr(token);
-    }
-
-    return static_cast<RayAttrFlag>(attr);
-}
 
 /// get number of events, which is the number of entries in an active attribute
 /// also check wether every active attribute has the same number of entries
@@ -134,3 +115,5 @@ void writeH5BundleHistory(const std::filesystem::path& filepath, const BundleHis
 }
 
 }  // namespace RAYX
+
+#endif

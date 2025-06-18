@@ -113,3 +113,4 @@ static Format FULL_FORMAT = {
 // both CSVWriter and H5Writer.
 #include "CSVWriter.h"
 #include "H5Writer.h"
+#include "Format.h"

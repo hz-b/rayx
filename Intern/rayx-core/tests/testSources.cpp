@@ -209,6 +209,7 @@ TEST_F(TestSuite, testLightsourceGetters) {
     }
 }
 
+#ifndef NO_H5
 TEST_F(TestSuite, testH5Writer) {
     const auto rayOriginal = traceRML("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
     const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
@@ -246,6 +247,7 @@ TEST_F(TestSuite, testH5Writer) {
         CHECK_EQ(partialRayOriginalSoA, raySoA);
     }
 }
+#endif
 
 TEST_F(TestSuite, testSelectElementForRecordEvent) {
     // const auto filename = std::filesystem::path("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");

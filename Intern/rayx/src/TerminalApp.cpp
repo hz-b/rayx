@@ -1,8 +1,11 @@
 #include "TerminalApp.h"
 
-#include <filesystem>
+#ifndef NO_H5
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#endif
+
+#include <filesystem>
 #include <memory>
 #include <stdexcept>
 
@@ -39,6 +42,7 @@ void dumpBeamline(const std::filesystem::path& filepath) {
     }
 }
 
+#ifndef NO_H5
 void scanGroup(const HighFive::Group& group, const int depth = 0, const std::string& path = "/") {
     size_t num_objs = group.getNumberObjects();
     for (size_t i = 0; i < num_objs; ++i) {
@@ -79,6 +83,7 @@ void dumpH5File(const std::filesystem::path& filepath) {
         RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
     }
 }
+#endif
 
 }  // unnamed namespace
 
@@ -205,7 +210,11 @@ void TerminalApp::run() {
         if (filetype == ".rml")
             dumpBeamline(filepath);
         else if (filetype == ".h5")
+#ifndef NO_H5
             dumpH5File(filepath);
+#else
+            RAYX_EXIT << "error: unable to dump h5 file due to hdf5 was disabled during build.";
+#endif
         else
             RAYX_EXIT << "error: unable to dump file '" << filename << "', unknown filetype. supported filetypes are h5 and rml";
 

@@ -59,7 +59,7 @@ void Simulator::runSimulation() {
 #ifndef NO_H5
     RAYX::writeH5RaySoA(path, rays);
 #else
-    RAYX::writeCSV(bundleHist, path, fmt);
+    RAYX::writeCsv(bundleHist, path, fmt);
 #endif
 }
 
