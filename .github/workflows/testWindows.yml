@@ -23,6 +23,13 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Install hdf5
+        run: |
+          vcpkg install hdf5 --triplet x64-windows
+          vcpkg integrate install
+          echo "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\bin" >> $GITHUB_PATH
+        shell: powershell
+
       - name: Prepare Vulkan SDK
         uses: humbletim/install-vulkan-sdk@c2aa128094d42ba02959a660f03e0a4e012192f9
         with:
