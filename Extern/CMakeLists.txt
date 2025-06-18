@@ -63,3 +63,6 @@ endif()
 set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
 add_subdirectory(alpaka)
 add_subdirectory(SDL EXCLUDE_FROM_ALL)
+
+set(HIGHFIVE_FIND_HDF5 OFF CACHE BOOL "" FORCE)
+add_subdirectory(highfive)
