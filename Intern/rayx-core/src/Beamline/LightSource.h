@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Core.h"
-#include "Element/Strings.h"
+#include "Element/Element.h"
 #include "EnergyDistribution.h"
 #include "Rml/xml.h"
 #include "Shader/Ray.h"

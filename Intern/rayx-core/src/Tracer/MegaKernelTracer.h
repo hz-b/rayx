@@ -255,8 +255,9 @@ class MegaKernelTracer : public DeviceTracer {
 
         // find the number of ray paths, that have at least 1 event, which is equal to the unique values in compactEventOffsets.
         // std::unique requries a sorted array, which is the case for compactEventOffsets
-        raysoa.num_paths = std::distance(compactEventOffsets.begin(), std::unique(compactEventOffsets.begin(), compactEventOffsets.end())) -
-                           (numEventsTotal ? 0 : 1);
+        raysoa.num_paths =
+            static_cast<int>(std::distance(compactEventOffsets.begin(), std::unique(compactEventOffsets.begin(), compactEventOffsets.end()))) -
+            (numEventsTotal ? 0 : 1);
         raysoa.num_events = numEventsTotal;
 
         if (isTooManyEvents) RAYX_WARN << "capacity of events exceeded. could not record all events! consider increasing max events.";
