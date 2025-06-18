@@ -13,7 +13,7 @@
 #include "Design/DesignElement.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-#include "Element/Strings.h"
+#include "Element/Element.h"
 #include "Rml/xml.h"
 
 using RAYX::ElementType;

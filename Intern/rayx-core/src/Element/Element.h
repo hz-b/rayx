@@ -2,6 +2,8 @@
 
 #include <glm.hpp>
 #include <optional>
+#include <map>
+#include <string>
 
 #include "Behaviour.h"
 #include "Core.h"
@@ -13,6 +15,31 @@
 namespace RAYX {
 
 struct DesignElement;
+
+enum class ElementType {
+    ImagePlane,
+    ConeMirror,
+    CylinderMirror,
+    EllipsoidMirror,
+    ExpertsMirror,
+    ParaboloidMirror,
+    PlaneGrating,
+    PlaneMirror,
+    ReflectionZoneplate,
+    Slit,
+    SphereGrating,
+    Sphere,
+    SphereMirror,
+    ToroidMirror,
+    ToroidGrating,
+    PointSource,
+    MatrixSource,
+    DipoleSource,
+    DipoleSrc,
+    PixelSource,
+    CircleSource,
+    SimpleUndulatorSource
+};
 
 /**
  * @brief Structure to represent an element in the ray tracing simulation.
@@ -30,11 +57,16 @@ struct OpticalElement {
 
 // Ensure OpticalElement does not introduce cost on copy or default construction.
 static_assert(std::is_trivially_copyable_v<OpticalElement>);
+static_assert(std::is_trivially_default_constructible_v<OpticalElement>);
 
 RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
 
 // constructs an OpticalElement given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
 OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {},
                            DesignPlane plane = DesignPlane::XZ);
+
+extern std::map<ElementType, std::string> ElementStringMap;
+ElementType RAYX_API findElementString(const std::string& name);
+std::string RAYX_API elementTypeToString(const ElementType type);
 
 }  // namespace RAYX

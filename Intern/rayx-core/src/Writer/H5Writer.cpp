@@ -3,8 +3,7 @@
 #include "H5Writer.h"
 
 #include <bitset>
-#include <highfive/H5DataSet.hpp>
-#include <highfive/H5File.hpp>
+#include <highfive/highfive.hpp>
 
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
@@ -54,7 +53,7 @@ RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlagType
     RaySoA rays;
 
     try {
-        auto file = HighFive::File(filepath, HighFive::File::ReadOnly);
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
 
         auto loadData = [&file](const auto& address, auto& dst) {
             file.getDataSet(address).read(dst);
@@ -91,7 +90,7 @@ void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, co
     RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: " << std::bitset<EndOfRayAttrBits>(attr);
 
     try {
-        auto file = HighFive::File(filepath, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
 #define RAYX_X(type, name, flag, map)                                                      \
     RAYX_VERB << "writing ray attribute: " #name " (" << rays.name.size() << " elements)"; \

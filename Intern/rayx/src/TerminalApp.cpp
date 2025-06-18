@@ -15,8 +15,8 @@
 #include "Rml/Locate.h"
 #include "Tracer/Tracer.h"
 #include "Writer/CsvWriter.h"
-#include "Writer/H5Writer.h"
 #include "Writer/Format.h"
+#include "Writer/H5Writer.h"
 
 namespace {
 
