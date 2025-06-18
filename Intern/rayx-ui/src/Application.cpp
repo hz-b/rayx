@@ -20,7 +20,7 @@
 #include "Rml/Importer.h"
 #include "Triangulation/GeometryUtils.h"
 #include "UserInput.h"
-#include "Writer/CSVWriter.h"
+#include "Writer/CsvWriter.h"
 #include "Writer/H5Writer.h"
 
 // --------- Start of Application code --------- //
