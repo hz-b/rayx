@@ -83,7 +83,7 @@ Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __res
     double ax = WL * DX * Ord * 1e-6;
     r = refrac2D(r, col.normal, az, ax);
 
-    r.m_order = Ord;
+    r.m_order = static_cast<Order>(Ord);
     return r;
 }
 
@@ -98,7 +98,7 @@ Ray behaveGrating(Ray r, const Behaviour behaviour, const Collision col) {
 
     // adjusted linedensity = WL * default_linedensity * order * 1e-06
     double adjustedLinedensity = vlsGrating(lineDensity, col.normal, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
-    r.m_order = orderOfDiffraction;
+    r.m_order = static_cast<Order>(orderOfDiffraction);
     // no additional zero order here?
 
     // refraction
