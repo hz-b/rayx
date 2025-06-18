@@ -50,6 +50,7 @@ jobs:
         working-directory: ${{github.workspace}}
         run: |
           ./build/bin/release/rayx -x -c -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
+          ./build/bin/release/rayx -x    -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
           git checkout -- Intern/rayx-core/tests/input/BoringImagePlane.csv
 
       - name: Test
