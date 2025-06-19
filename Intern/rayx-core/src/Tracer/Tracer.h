@@ -30,7 +30,7 @@ class RAYX_API Tracer {
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
     RaySoA trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, int32_t recordElementIndex,
-                 RayAttrFlag attr = AllRayAttr);
+                 RayAttrFlag attr = RayAttrFlag::All);
 
     static int defaultMaxEvents(const Group* group);
 

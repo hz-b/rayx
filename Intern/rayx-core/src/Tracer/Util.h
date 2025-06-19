@@ -142,24 +142,26 @@ struct RaySoaBuf {
     template <typename T>
     using Buf = std::optional<alpaka::Buf<Acc, T, Dim, Idx>>;
 
-#define RAYX_X(type, name, flag, map) Buf<type> name;
-    RAYX_X_MACRO_RAY_ATTR_PATH_ID
+#define X(type, name, flag, map) Buf<type> name;
+
     RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 };
 
 struct RaySoaRef {
-#define RAYX_X(type, name, flag, map) type* __restrict name;
-    RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#define X(type, name, flag, map) type* __restrict name;
+
+    RAYX_X_MACRO_RAY_ATTR_MAPPED
+#undef X
 };
 
 template <typename Acc>
 inline RaySoaRef raySoaBufToRaySoaRef(RaySoaBuf<Acc>& buf) {
     return RaySoaRef{
-#define RAYX_X(type, name, flag, map) .name = alpaka::getPtrNative(*buf.name),
-        RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#define X(type, name, flag, map) .name = alpaka::getPtrNative(*buf.name),
+
+        RAYX_X_MACRO_RAY_ATTR_MAPPED
+#undef X
     };
 }
 
@@ -170,9 +172,10 @@ struct CompactRaysToRaySoAKernel {
 
         // TODO: this kernel copies all attributes, but depending on flags some can be ignored
         if (gid < n) {
-#define RAYX_X(type, name, flag, map) raysoa.name[gid] = rays[gid].map;
-            RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#define X(type, name, flag, map) raysoa.name[gid] = rays[gid].map;
+
+            RAYX_X_MACRO_RAY_ATTR_MAPPED
+#undef X
         }
     }
 };

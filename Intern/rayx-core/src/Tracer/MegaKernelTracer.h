@@ -114,10 +114,10 @@ struct Resources {
         allocBuf(q, d_compactEventGatherSrcIndices, preferredBatchSize * maxEvents);
 
         // SoA events
-#define RAYX_X(type, name, flag, map) allocBuf(q, soaEvents.name, preferredBatchSize* maxEvents);
-        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+#define X(type, name, flag, map) allocBuf(q, soaEvents.name, preferredBatchSize* maxEvents);
+
         RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
         const auto numBatches = ceilIntDivision(h_rays.size(), preferredBatchSize);
         return {
@@ -214,16 +214,15 @@ class MegaKernelTracer : public DeviceTracer {
             // transpose events from AoS to SoA data layout
             compactEventsToRaySoA(devAcc, q, numEventsBatch);
 
-#define RAYX_X(type, name, flag, map)                                                                 \
-    if (attr & flag) {                                                                                \
+#define X(type, name, flag, map)                                                                      \
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) {                                            \
         raysoaBatch[batchIndex].name.resize(numEventsBatch);                                          \
         auto name##_view = alpaka::createView(devHost, raysoaBatch[batchIndex].name, numEventsBatch); \
         alpaka::memcpy(q, name##_view, *m_resources.soaEvents.name, numEventsBatch);                  \
     }
 
-            RAYX_X_MACRO_RAY_ATTR_PATH_ID
             RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
             isTooManyEvents = isTooManyEvents || checkTooManyEvents(compactEvents, compactEventCounts, compactEventOffsets, batchSize);
 
@@ -233,8 +232,8 @@ class MegaKernelTracer : public DeviceTracer {
         }
 
         RaySoA raysoa;
-#define RAYX_X(type, name, flag, map)                                                                                               \
-    if (attr & flag) {                                                                                                              \
+#define X(type, name, flag, map)                                                                                                    \
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) {                                                                          \
         int batchOffset = 0;                                                                                                        \
         raysoa.name.resize(numEventsTotal);                                                                                         \
         for (int batchIndex = 0; batchIndex < conf.numBatches; ++batchIndex) {                                                      \
@@ -243,9 +242,8 @@ class MegaKernelTracer : public DeviceTracer {
         }                                                                                                                           \
     }
 
-        RAYX_X_MACRO_RAY_ATTR_PATH_ID
         RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
         // find the number of ray paths, that have at least 1 event, which is equal to the unique values in compactEventOffsets.
         // std::unique requries a sorted array, which is the case for compactEventOffsets

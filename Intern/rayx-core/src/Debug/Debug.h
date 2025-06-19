@@ -188,12 +188,15 @@ inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<doub
 inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
 
 inline std::vector<double> formatAsVec(const Ray arg) {
-    return {
-#define RAYX_X(type, name, flag, map) static_cast<double>(arg.map),
+    std::vector<double> out;
+    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
 
-        RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
-    };
+#define X(type, name, flag, map) insert(formatAsVec(arg.map));
+
+        RAYX_X_MACRO_RAY_ATTR_MAPPED
+#undef X
+
+    return out;
 }
 
 template <int N, int M, typename T>
@@ -245,11 +248,10 @@ inline std::vector<double> formatAsVec(const RaySoA& rays) {
     std::vector<double> out;
     auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
 
-#define RAYX_X(type, name, flag, map) insert(formatAsVec(rays.name));
+#define X(type, name, flag, map) insert(formatAsVec(rays.name));
 
-    RAYX_X_MACRO_RAY_ATTR_PATH_ID
     RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
     return out;
 }

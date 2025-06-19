@@ -15,10 +15,10 @@ RaySoA bundleHistoryToRaySoA(const BundleHistory& bundle) {
         for (const auto& event : hist) {
             rays.path_id.push_back(path_id);
 
-#define RAYX_X(type, name, flag, map) rays.name.push_back(event.map);
+#define X(type, name, flag, map) rays.name.push_back(event.map);
 
-            RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+            RAYX_X_MACRO_RAY_ATTR_MAPPED
+#undef X
 
             ++event_id;
         }

@@ -147,7 +147,7 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         int recordElementIndex = m_CommandParser->m_args.m_recordElementIndex;
 
         const auto attr =
-            m_CommandParser->m_args.m_format.empty() ? RAYX::AllRayAttr : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
+            m_CommandParser->m_args.m_format.empty() ? RAYX::RayAttrFlag::All : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
 
         const auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, recordElementIndex, attr);
 
