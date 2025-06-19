@@ -21,18 +21,21 @@
 namespace {
 
 void dumpBeamline(const std::filesystem::path& filepath) {
-    std::cout << "reading beamline meta data from: " << filepath << std::endl;
+    std::cout << "dumping beamline meta data from: " << filepath << std::endl;
 
     const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
 
     const auto sources = beamline->getSources();
-    std::cout << "beamline:" << std::endl;
-    std::cout << "\tsources (" << sources.size() << ");" << std::endl;
+    std::cout << "\tsources (" << sources.size() << "):" << std::endl;
 
+    int objectIndex = 0;
     for (const auto* source : sources) {
-        std::cout << "\t- '" << source->getName() << "' \t(type: " << RAYX::elementTypeToString(source->getType())
+        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << RAYX::elementTypeToString(source->getType())
                   << ", number of rays: " << source->getNumberOfRays() << ")" << std::endl;
+        ++objectIndex;
     }
+
+    objectIndex = 0; // TODO: this line can be removed as soon as we support recording of generated rays
 
     const auto elements = beamline->getElements();
     std::cout << "\telements (" << elements.size() << "):" << std::endl;
@@ -40,7 +43,8 @@ void dumpBeamline(const std::filesystem::path& filepath) {
     for (const auto& element : elements) {
         const auto curvature = RAYX::curvatureTypeToString(element->getCurvatureType());
         const auto behaviour = RAYX::behaviourTypeToString(element->getBehaviourType());
-        std::cout << "\t- '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")" << std::endl;
+        std::cout << "\t- [" << objectIndex << "] '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")" << std::endl;
+        ++objectIndex;
     }
 }
 
