@@ -38,8 +38,4 @@ class RAYX_API Tracer {
     std::shared_ptr<DeviceTracer> m_deviceTracer;
 };
 
-// TODO deprecate these functions and all of their uses.
-RAYX_API std::vector<Ray> extractLastEvents(const BundleHistory& hist);
-RAYX_API BundleHistory convertToBundleHistory(const std::vector<Ray>& rays);
-
 }  // namespace RAYX

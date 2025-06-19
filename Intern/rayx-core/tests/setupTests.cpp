@@ -205,6 +205,14 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
     return out;
 }
 
+BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
+    BundleHistory out;
+    for (auto r : rays) {
+        out.push_back({r});
+    }
+    return out;
+}
+
 void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential seq) {
     auto rayx_list = rayUiCompat(filename, seq);
     auto rayui_list = loadCSVRayUI(filename);

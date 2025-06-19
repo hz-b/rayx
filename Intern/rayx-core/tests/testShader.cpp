@@ -752,6 +752,7 @@ TEST_F(TestSuite, testElectricField) {
 
 TEST_F(TestSuite, testStokes) {
     CHECK_EQ(0.1, intensity(Stokes{0.1, 0.2, 0.3, 0.4}));
+    CHECK_EQ(1.0, intensity(Stokes{1.0, 0.1, 0.2, 0.3}));
     CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 1, 0, 0}));
     CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, -1, 0, 0}));
     CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 1, 0}));
@@ -759,6 +760,7 @@ TEST_F(TestSuite, testStokes) {
     CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 0, 1}));
     CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 0, -1}));
     CHECK_EQ(0.0, degreeOfPolarization(Stokes{1, 0, 0, 0}));
+    CHECK_EQ(0.5, degreeOfPolarization(Stokes{1, 0.5, 0, 0}));
 }
 
 TEST_F(TestSuite, testElectricFieldRotation) {
@@ -874,6 +876,11 @@ TEST_F(TestSuite, testElectricFieldToStokesConversion) {
     CHECK_EQ(Stokes(1, -1, 0, 0), localElectricFieldToStokes(LocalElectricField({0, 0}, {1, 0})));
     CHECK_EQ(Stokes(1, 0, 1, 0), localElectricFieldToStokes(LocalElectricField({h, 0}, {h, 0})));
     CHECK_EQ(Stokes(1, 0, -1, 0), localElectricFieldToStokes(LocalElectricField({-h, 0}, {h, 0})));
+
+    CHECK_EQ(LocalElectricField({1, 0}, {0, 0}), stokesToLocalElectricField(Stokes(1, 1, 0, 0)));
+    CHECK_EQ(LocalElectricField({0, 0}, {1, 0}), stokesToLocalElectricField(Stokes(1, -1, 0, 0)));
+    CHECK_EQ(LocalElectricField({h, 0}, {h, 0}), stokesToLocalElectricField(Stokes(1, 0, 1, 0)));
+    CHECK_EQ(LocalElectricField({h, 0}, {-h, 0}), stokesToLocalElectricField(Stokes(1, 0, -1, 0)));
 }
 
 TEST_F(TestSuite, testGetIncidenceAngle) {
@@ -1196,101 +1203,6 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
         CHECK_EQ(reflectElectricField, expected_reflect_field, eps);
     }
 }
-
-// TODO(Sven): rethink this test
-// TEST_F(TestSuite, testStokesToElectricFieldAndElectricFieldToStokes) {
-//     using namespace complex;
-//
-//     struct InOutPair {
-//         Stokes stokes;
-//         LocalElectricField field;
-//     };
-//
-//     const auto diag = 1.0 / glm::sqrt(2.0);
-//
-//     std::vector<InOutPair> inouts{
-//         {
-//             // linearly polarized (horizontal)
-//             .stokes = Stokes(1, 1, 0, 0),
-//             .field = LocalElectricField({1, 0}, {0, 0}),
-//         },
-//         {
-//             // linearly polarized (vertical)
-//             .stokes = Stokes(1, -1, 0, 0),
-//             .field = LocalElectricField({0, 0}, {1, 0}),
-//         },
-//         {
-//             // linearly polarized (diagonal +45 degrees)
-//             .stokes = Stokes(1, 0, 1, 0),
-//             .field = LocalElectricField({diag, 0}, {diag, 0}),
-//         },
-//         {
-//             // linearly polarized (diagonal -45 degrees)
-//             .stokes = Stokes(1, 0, -1, 0),
-//             .field = LocalElectricField({diag, 0}, {-diag, 0}),
-//         },
-//         {
-//             // circular polarized (right) (clockwise)
-//             .stokes = Stokes(1, 0, 0, 1),
-//             .field = LocalElectricField({diag, 0}, {0, -diag}),
-//         },
-//         {
-//             // circular polarized (left) (counter-clockwise)
-//             .stokes = Stokes(1, 0, 0, -1),
-//             .field = LocalElectricField({diag, 0}, {0, diag}),
-//         },
-//     };
-//
-//     for (auto p : inouts) {
-//         // stokes must be polarized in order to convert to an electric field
-//         CHECK_EQ(degreeOfPolarization(p.stokes), 1.0);
-//
-//         // convert stokes to field and back and check if stokes are equal to initial stokes
-//         {
-//             const auto field = stokesToLocalElectricField(p.stokes);
-//             CHECK_EQ(intensity(field), intensity(p.stokes));
-//
-//             const auto stokes = fieldToStokes(field);
-//             CHECK_EQ(intensity(stokes), intensity(p.stokes));
-//             CHECK_EQ(stokes, p.stokes);
-//
-//             // lets shift the phase of our field and check if the stokes are still preserved,
-//             // since stokes should not carry phase information
-//             const auto mag = abs(field);
-//             const auto theta = arg(field);
-//             for (double shift = 0.0; shift < PI * 2.0; shift += PI / 5.0) {
-//                 const auto field = polar(mag, theta + shift);
-//                 const auto stokes = fieldToStokes(field);
-//                 CHECK_EQ(stokes, p.stokes);
-//             }
-//         }
-//
-//         // convert field to stokes and back and check if magnitude and polarization is preserved
-//         // the phase is not being checked, because stokes parameters do not preserve phase
-//         {
-//             const auto stokes = fieldToStokes(p.field);
-//             CHECK_EQ(intensity(stokes), intensity(p.field));
-//             CHECK_EQ(stokes, p.stokes);
-//
-//             const auto field = stokesToLocalElectricField(stokes);
-//
-//             // check if the magnitude is preserved
-//             const auto mag = abs(field);
-//             const auto expected_mag = abs(p.field);
-//             CHECK_EQ(mag, expected_mag);
-//
-//             // check if polarization is preserved
-//             // by checking if the difference in phase between x and y component is preserved
-//             const auto theta = arg(field);
-//             const auto delta = theta.x - theta.y;
-//
-//             const auto expected_theta = arg(p.field);
-//             const auto expected_delta = expected_theta.x - expected_theta.y;
-//
-//             CHECK_EQ(delta, expected_delta);
-//         }
-//     }
-// }
 
 // both the Cpp code as well as the shader define hvlam.
 TEST_F(TestSuite, testHvlam) {

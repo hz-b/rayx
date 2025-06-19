@@ -101,8 +101,6 @@ void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, co
 #undef RAYX_X
 
         file.createDataSet("rayx/num_paths", rays.num_paths);
-
-        // TODO: add write of other tracing data like seed used
     } catch (const std::exception& e) {
         RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
     }

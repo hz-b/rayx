@@ -157,7 +157,7 @@ class MegaKernelTracer : public DeviceTracer {
         const auto devHost = alpaka::getDevByIdx(platformHost, 0);
         const auto platformAcc = alpaka::Platform<Acc>{};
         const auto devAcc = alpaka::getDevByIdx(platformAcc, m_deviceIndex);
-        using Queue = alpaka::Queue<Acc, alpaka::Blocking>;  // TODO
+        using Queue = alpaka::Queue<Acc, alpaka::Blocking>;
         auto q = Queue(devAcc);
 
         const auto conf = m_resources.update(q, beamline, maxEvents, maxBatchSize);
@@ -225,16 +225,10 @@ class MegaKernelTracer : public DeviceTracer {
             RAYX_X_MACRO_RAY_ATTR
 #undef RAYX_X
 
-            // TODO(sven): profile gpu/cpu (maybe depending on ML workflow, one or the other should be written to h5)
-            //
-            // TODO(sven): re-enable these functions
-            // transfer events from device to host for curent batch
-            // alpaka::memcpy(q, alpaka::createView(devHost, compactEvents, numEventsBatch), *m_resources.d_compactEvents, numEventsBatch);
             isTooManyEvents = isTooManyEvents || checkTooManyEvents(compactEvents, compactEventCounts, compactEventOffsets, batchSize);
-            // collectCompactEventsIntoBundleHistory(bundleHistory, compactEvents, compactEventCounts, compactEventOffsets, batchSize);
 
-            // RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
-            //           << numEventsBatch << " events";
+            RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << conf.numBatches << ") with batch size = " << batchSize << ", traced "
+                      << numEventsBatch << " events";
             numEventsTotal += numEventsBatch;
         }
 
