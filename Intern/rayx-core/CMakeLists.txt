@@ -91,9 +91,8 @@ if(MSVC)
     list(APPEND MSVC_CXX_FLAGS /wd4251) # disable warnings related to missing DLL export annotation on members of exported classes
     list(APPEND MSVC_CXX_FLAGS /wd4267) # disable warnings related to narrowing conversion
     list(APPEND MSVC_CXX_FLAGS /Zc:preprocessor) # enable __VA_OPT__
-    if(WERROR STREQUAL "YES")
+    if(RAYX_WERROR)
         list(APPEND MSVC_CXX_FLAGS /WX) # handle warnings as errors
-        message(STATUS "Werror mode")
     endif()
     prepend_xcompiler(MSVC_CXX_FLAGS MSVC_CUDA_FLAGS)
     list(APPEND MSVC_CUDA_FLAGS --diag-suppress 1394) # disable warnings related to missing DLL export annotation on members of exported classes
@@ -106,14 +105,21 @@ else()
 
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
     target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>)
-    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas="-v">) # print cuda device function properties
-    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>) # generate line number information for  device code. usefull when profiling with nvidia nsight compute
+
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler="-fvisibility=hidden">)
+
+    if(RAYX_KERNEL_DEBUG)
+        # print cuda device function properties
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas="-v">)
+        # generate line number information for  device code. usefull when profiling with nvidia nsight compute
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>)
+    endif()
 
     # Enable werror if requested (mostly used for CI)
-    if(WERROR STREQUAL "YES")
+    if(RAYX_WERROR)
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Werror>)
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Werror all-warnings>)
-        message(STATUS "Werror mode")
     endif()
 endif()
 

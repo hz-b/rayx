@@ -68,7 +68,7 @@ jobs:
 
       - name: Configure CMake (Windows)
         if: matrix.os == 'windows-latest'
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+        run: cmake -B ${{github.workspace}}/build -DRAYX_WERROR=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
 
       # Linux-specific build steps
       - name: Install dependencies (Ubuntu)
@@ -86,7 +86,7 @@ jobs:
 
       - name: Configure CMake (Ubuntu)
         if: matrix.os == 'ubuntu-24.04'
-        run: cmake -B ${{github.workspace}}/build -DWERROR=YES -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+        run: cmake -B ${{github.workspace}}/build -DRAYX_WERROR=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRAYX_REQUIRE_CUDA=ON -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
 
       # Build the project
       - name: Build
