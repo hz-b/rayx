@@ -6,17 +6,16 @@
 namespace RAYX {
 
 inline RayAttrFlag formatStringToRayAttrFlag(const std::string& format) {
-    auto stringToAttr = [](const std::string& str) -> RayAttrFlagType {
-#define RAYX_X(type, name, flag, map) \
-    if (str == #name) return flag;
-        RAYX_X_MACRO_RAY_ATTR_PATH_ID
+    auto stringToAttr = [](const std::string& str) -> RayAttrFlag {
+#define X(type, name, flag, map) \
+    if (str == #name) return RayAttrFlag::flag;
         RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
         RAYX_EXIT << "error: failed to parse format string: unknown token: '" << str << "'";
-        return static_cast<RayAttrFlagType>(0);
+        return RayAttrFlag::None;
     };
 
-    auto attr = static_cast<RayAttrFlagType>(0);
+    auto attr = RayAttrFlag::None;
     auto ss = std::stringstream(format);
     std::string token;
     while (ss >> token) {

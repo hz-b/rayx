@@ -21,8 +21,16 @@ inline HighFive::DataType highfive_create_type_EventType() {
         {"Emitted", RAYX::EventType::Emitted},
     });
 }
+
+inline HighFive::DataType highfive_create_type_ElectricField() {
+    return HighFive::CompoundType({
+        {"real", HighFive::AtomicType<double>(), 0},
+        {"imag", HighFive::AtomicType<double>(), sizeof(double)},
+    });
+}
 }  // unnamed namespace
 HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
+HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_ElectricField);
 
 namespace RAYX {
 
@@ -37,18 +45,18 @@ int getNumEvents(const RaySoA& rays) {
         size = std::max(size, v_size);
     };
 
-#define RAYX_X(type, name, flag, map) resize(rays.name);
+#define X(type, name, flag, map) resize(rays.name);
 
-    RAYX_X_MACRO_RAY_ATTR_PATH_ID
     RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
     return size;
 }
 
-RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlagType attr) {
+RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: " << std::bitset<EndOfRayAttrBits>(attr);
+    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: "
+              << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
 
     RaySoA rays;
 
@@ -63,13 +71,12 @@ RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlagType
                     address);
         };
 
-#define RAYX_X(type, name, flag, map)                                                      \
+#define X(type, name, flag, map)                                                           \
     RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if (attr & flag) loadData("rayx/events/" #name, rays.name);
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) loadData("rayx/events/" #name, rays.name);
 
-        RAYX_X_MACRO_RAY_ATTR_PATH_ID
         RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
         rays.num_paths = file.getDataSet("rayx/num_paths").read<int32_t>();
         rays.num_events = getNumEvents(rays);
@@ -85,20 +92,20 @@ BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
     return raySoAToBundleHistory(rays);
 }
 
-void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, const RayAttrFlagType attr) {
+void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, const RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: " << std::bitset<EndOfRayAttrBits>(attr);
+    RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: "
+              << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-#define RAYX_X(type, name, flag, map)                                                      \
+#define X(type, name, flag, map)                                                           \
     RAYX_VERB << "writing ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if (attr & flag) file.createDataSet("rayx/events/" #name, rays.name);
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) file.createDataSet("rayx/events/" #name, rays.name);
 
-        RAYX_X_MACRO_RAY_ATTR_PATH_ID
         RAYX_X_MACRO_RAY_ATTR
-#undef RAYX_X
+#undef X
 
         file.createDataSet("rayx/num_paths", rays.num_paths);
     } catch (const std::exception& e) {
@@ -106,7 +113,7 @@ void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, co
     }
 }
 
-void writeH5BundleHistory(const std::filesystem::path& filepath, const BundleHistory& bundle, const RayAttrFlagType attr) {
+void writeH5BundleHistory(const std::filesystem::path& filepath, const BundleHistory& bundle, const RayAttrFlag attr) {
     const auto rays = bundleHistoryToRaySoA(bundle);
     writeH5RaySoA(filepath, rays, attr);
 }
