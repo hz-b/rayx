@@ -9,8 +9,6 @@
 #error 'RAYX_X' must not be defined at this point
 #endif
 
-// TODO: think about doing X macro with just one param and enable other params by template specialization order fancy macors
-
 // clang-format off
 #define RAYX_X_MACRO_RAY_ATTR_PATH_ID      RAYX_X(int32_t,   path_id,      RayPathId,     _               )
 #define RAYX_X_MACRO_RAY_ATTR_POSITION_X   RAYX_X(double,    position_x,   RayPositionX,  m_position.x    )
@@ -88,8 +86,6 @@ enum RayAttrFlag : RayAttrFlagType {
     // clang-format on
 };
 
-// TODO(sven): think about splitting this struct into Event and Path. create releation between entries of both, like in databases
-// e.g. every event from the same path has the same source_id, which is redundant
 struct RaySoA {
     int num_events;
     int num_paths;

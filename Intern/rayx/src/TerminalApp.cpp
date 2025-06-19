@@ -89,8 +89,6 @@ void dumpH5File(const std::filesystem::path& filepath) {
 
 }  // unnamed namespace
 
-// TODO: add option for dumping the meta information of h5 file
-
 TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
     RAYX_VERB << "TerminalApp created!";
 

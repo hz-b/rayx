@@ -3,6 +3,16 @@
 // in this module tests mostly compare rayx's output with RAY-UI.
 // The output of Ray-UI is mostly generated using RawRaysOutgoing.
 
+/// Get the last event for each ray of the bundle.
+std::vector<Ray> extractLastEvents(const BundleHistory& hist) {
+    std::vector<Ray> out;
+    for (auto& ray_hist : hist) {
+        out.push_back(ray_hist.back());
+    }
+
+    return out;
+}
+
 TEST_F(TestSuite, ImagePlane) { compareLastAgainstRayUI("ImagePlane"); }
 TEST_F(TestSuite, ImagePlaneRectangle) { loadBeamline("ImagePlaneRectangle"); }  // no RAYUI equivalent
 TEST_F(TestSuite, PlaneMirror) { compareLastAgainstRayUI("PlaneMirror"); }
