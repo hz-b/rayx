@@ -238,7 +238,7 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     auto a = traceRML(filename);
 
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".correct.csv").string();
-    auto b = loadCsv(f, true);
+    auto b = loadCsv(f);
 
     writeToOutputCSV(a, filename + ".rayx");
     compareBundleHistories(a, b, tolerance);

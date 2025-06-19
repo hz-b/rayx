@@ -193,7 +193,7 @@ void writeCsv(const RAYX::BundleHistory& hist, const std::string& filename) {
     RAYX_VERB << "Writing done!";
 }
 
-RAYX::BundleHistory loadCsv(const std::string& filename, const bool rayUiCompatible) {
+RAYX::BundleHistory loadCsv(const std::string& filename) {
     std::ifstream file(filename);
 
     // ignore setup line
@@ -217,9 +217,7 @@ RAYX::BundleHistory loadCsv(const std::string& filename, const bool rayUiCompati
             d.push_back(std::stod(num));
         }
 
-        if (!((rayUiCompatible && d.size() == 16) || (!rayUiCompatible && d.size() == 18))) {
-            RAYX_EXIT << "CSV line has incorrect length: " << d.size();
-        }
+        if (d.size() != 18) RAYX_EXIT << "CSV line has incorrect length: " << d.size() << ". should be 18";
 
         int o = 0;
 
@@ -235,20 +233,8 @@ RAYX::BundleHistory loadCsv(const std::string& filename, const bool rayUiCompati
         const auto rayEnergy = d[o];
         o += 1;
 
-        ElectricField rayElectricField;
-        if (d.size() == 16) {
-            // old csv files used to have stokes parameters
-            const auto stokes = glm::dvec4(d[o], d[o + 1], d[o + 2], d[o + 3]);
-            if (rayUiCompatible)
-                rayElectricField = stokesToElectricFieldWithBaseConvention(stokes, glm::dvec3(0, 0, 1));
-            else
-                rayElectricField = stokesToElectricFieldWithBaseConvention(stokes, rayDirection);
-            o += 4;
-        } else if (d.size() == 18) {
-            // new csv files have electric field parameters
-            rayElectricField = ElectricField{{d[o], d[o + 1]}, {d[o + 2], d[o + 3]}, {d[o + 4], d[o + 5]}};
-            o += 6;
-        }
+        const auto rayElectricField = ElectricField{{d[o], d[o + 1]}, {d[o + 2], d[o + 3]}, {d[o + 4], d[o + 5]}};
+        o += 6;
 
         const auto rayPathLength = d[o];
         o += 1;
@@ -262,7 +248,7 @@ RAYX::BundleHistory loadCsv(const std::string& filename, const bool rayUiCompati
         const auto raySourceId = static_cast<SourceId>(d[o]);
         o += 1;
 
-        assert((rayUiCompatible && o == 16) || (!rayUiCompatible && o == 18));
+        assert(o == 18);
 
         // create the Ray from the loaded doubles from this line.
         RAYX::Ray ray = {
