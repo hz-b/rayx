@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     GLOBAL_ARGV = argv;
 
     // stop execution of tests as soon as the first fails
-    testing::FLAGS_gtest_break_on_failure = "true";
+    // testing::FLAGS_gtest_break_on_failure = "true";
 
     return RUN_ALL_TESTS();
 }
