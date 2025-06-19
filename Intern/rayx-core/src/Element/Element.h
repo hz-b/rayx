@@ -65,7 +65,7 @@ RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 o
 OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {},
                            DesignPlane plane = DesignPlane::XZ);
 
-extern std::map<ElementType, std::string> ElementStringMap;
+extern std::map<ElementType, std::string> RAYX_API ElementStringMap;
 ElementType RAYX_API findElementString(const std::string& name);
 std::string RAYX_API elementTypeToString(const ElementType type);
 
