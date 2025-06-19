@@ -44,14 +44,6 @@ void Simulator::runSimulation() {
         RAYX_EXIT << "Input file is not an *.rml file!";
     }
 
-    std::vector<std::string> names;
-    auto elements = m_Beamline.getElements();
-    names.reserve(elements.size());
-
-    for (const auto designElement : elements) {
-        names.push_back(designElement->getName());
-    }
-
     path += ".h5";
 #ifndef NO_H5
     RAYX::writeH5RaySoA(path, rays);
