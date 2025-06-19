@@ -18,6 +18,7 @@ enum class SourceDist { Uniform, Gaussian, Thirds, Circle };       // SourceDist
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
+enum class SourcePulseType { None };
 
 struct DesignSource;
 
