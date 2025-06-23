@@ -211,7 +211,8 @@ TEST_F(TestSuite, testLightsourceGetters) {
 
 #ifndef NO_H5
 TEST_F(TestSuite, testH5Writer) {
-    const auto rayOriginal = traceRML("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
+    const auto beamlineFilename = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
+    const auto rayOriginal = traceRML(beamlineFilename);
     const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
 
     // test conversion between BundleHistory and RaySoA
@@ -220,12 +221,12 @@ TEST_F(TestSuite, testH5Writer) {
         CHECK_EQ(rayOriginal, bundle);
     }
 
-    const auto filename = "testH5Writer.h5";
+    const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("h5");
 
     // test if write and read of BundleHistory work without altering the contents
     {
-        writeH5BundleHistory(filename, rayOriginal);
-        const auto bundle = readH5BundleHistory(filename);
+        writeH5BundleHistory(h5Filepath, rayOriginal);
+        const auto bundle = readH5BundleHistory(h5Filepath);
         CHECK_EQ(rayOriginal, bundle);
     }
 
@@ -240,9 +241,9 @@ TEST_F(TestSuite, testH5Writer) {
 
         // write only some attributes
         const auto attr = RayAttrFlag::Energy | RayAttrFlag::Position;
-        writeH5BundleHistory(filename, rayOriginal, attr);
+        writeH5BundleHistory(h5Filepath, rayOriginal, attr);
         // read only some attributes
-        const auto raySoA = readH5RaySoA(filename, attr);
+        const auto raySoA = readH5RaySoA(h5Filepath, attr);
 
         CHECK_EQ(partialRayOriginalSoA, raySoA);
     }

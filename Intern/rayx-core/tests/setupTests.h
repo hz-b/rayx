@@ -173,6 +173,9 @@ class TestSuite : public testing::Test {
 
 // helper functions for writing tests
 
+/// will return the absolute path to the beamline
+std::filesystem::path getBeamlineFilepath(std::string filename);
+
 /// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename);
 
