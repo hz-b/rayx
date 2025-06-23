@@ -61,11 +61,14 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
+/// will return the absolute path to the beamline
+std::filesystem::path getBeamlineFilepath(std::string filename) {
+    return canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".rml");
+}
+
 /// will look at Intern/rayx-core/tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename) {
-    std::string beamline_file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".rml").string();
-
-    return RAYX::importBeamline(beamline_file);
+    return RAYX::importBeamline(getBeamlineFilepath(filename));
 }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
