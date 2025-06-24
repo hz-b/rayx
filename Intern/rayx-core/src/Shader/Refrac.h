@@ -28,6 +28,4 @@ RAYX_FN_ACC Ray refrac2D(Ray r, glm::dvec3 normal, double az, double ax);
 RAYX_FN_ACC glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta);
 
 
-RAYX_FN_ACC complex::Complex computeTransmittance(double wl, double alpha_deg, const complex::Complex& n1, const complex::Complex& n2,  double d);
-
 }  // namespace RAYX
