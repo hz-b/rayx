@@ -1,6 +1,7 @@
 #include "Utils.h"
 
 #include "Constants.h"
+#include "Efficiency.h"
 
 namespace RAYX {
 
@@ -11,7 +12,7 @@ complex::Complex calcPhaseShift(const complex::Complex& ior, double thickness, d
 }
 
 RAYX_FN_ACC
-complex::Complex computeTransmittanceFoil(
+ComplexFresnelCoeffs computeTransmittanceFoil(
     double wavelength,         
     complex::Complex theta0,
     const complex::Complex& indexVacuum,
@@ -70,13 +71,7 @@ complex::Complex computeTransmittanceFoil(
     Complex denominatorP = 1.0 + r01p * r12p * phase * phase;
     Complex tp_total = numeratorP / denominatorP;
 
-    // Transmission intensities (inkl. Winkelkorrektur)
-    double Ts = std::norm(ts_total) * std::real(std::cos(theta2)) / std::real(std::cos(theta0));
-    double Tp = std::norm(tp_total) * std::real(std::cos(theta2)) / std::real(std::cos(theta0));
-
-    double T_avg = 0.5 * (Ts + Tp); // Unpolarisiertes Licht
-
-    return Complex(T_avg, 0.0);
+    return {.s = ts_total, .p = tp_total};
 }
 
 

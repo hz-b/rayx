@@ -153,7 +153,7 @@ Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int 
         f.m_thicknessSubstrate
     );
 
-    r.m_field = complex::sqrt(totalTransmission) * r.m_field;
+    r.m_field = interceptTransmittance(r.m_field, incidentVec, normal, totalTransmission);
 
     return r;
 }

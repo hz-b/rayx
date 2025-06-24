@@ -116,6 +116,29 @@ inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::d
     return out * jonesMatrix * in;
 }
 
+
+RAYX_FN_ACC
+inline cmat3 calcPolaririzationMatrixTransmission(const glm::dvec3 incidentVec, const glm::dvec3 normalVec,
+                                      const ComplexFresnelCoeffs amplitude) {
+    // TODO: cross product is not numerically stable here, if indicentVec == reflectOrRefractVec
+    // we dont need the lenght of the vector resulting from the cross product, but only the direciton.
+    // this may could be done by calculation angles instead of a vector.
+    // fixing this removes the check in interceptReflect, that specializes for normal incidence
+    glm::dvec3 s0;
+    if (incidentVec == glm::dvec3(0.0, 0.0, 1.0)) {
+        s0 = glm::dvec3(1.0, 0.0, 0.0);  // beliebig orthogonal zu (0,0,-1)
+    } else {
+        s0 = glm::normalize(glm::cross(incidentVec, normalVec));
+    }
+    const auto p0 = glm::cross(incidentVec, s0);
+
+    const auto in = glm::dmat3(s0.x, p0.x, incidentVec.x, s0.y, p0.y, incidentVec.y, s0.z, p0.z, incidentVec.z);
+
+    const auto jonesMatrix = calcJonesMatrix(amplitude);
+
+    return jonesMatrix * in;
+}
+
 RAYX_FN_ACC
 inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnelCoeffs amplitude) {
     // since no plane of incidence is defined at normal incidence,
@@ -142,5 +165,19 @@ inline ElectricField interceptReflect(const ElectricField incidentElectricField,
     const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
     return reflectElectricField;
 }
+
+
+RAYX_FN_ACC
+inline ElectricField interceptTransmittance(const ElectricField incidentElectricField, const glm::dvec3 incidentVec,
+                                      const glm::dvec3 normalVec, ComplexFresnelCoeffs transCoeffs) {
+
+    // TODO: make this more robust
+    const auto transmittPolarizationMatrix = calcPolaririzationMatrixTransmission(incidentVec, normalVec, transCoeffs);
+
+    const auto transmittElectricField = transmittPolarizationMatrix * incidentElectricField;
+    return transmittElectricField;
+}
+
+
 
 }  // namespace RAYX

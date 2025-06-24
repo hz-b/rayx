@@ -3,6 +3,8 @@
 #include "Ray.h"
 
 #include "Complex.h"
+#include "Efficiency.h"
+
 
 namespace RAYX {
 
@@ -23,7 +25,7 @@ RAYX_FN_ACC complex::Complex calcPhaseShift(const complex::Complex& ior, double 
  * @param incidentAngleRad  Angle of incidence in radians (from normal).
  * @return double           Intensity transmission coefficient (range 0 to 1).
  */
-RAYX_FN_ACC complex::Complex computeTransmittanceFoil(double wavelength, complex::Complex incidentAngleRad, const complex::Complex& n0, const complex::Complex& n1, double thickness);
+RAYX_FN_ACC ComplexFresnelCoeffs computeTransmittanceFoil(double wavelength, complex::Complex incidentAngleRad, const complex::Complex& n0, const complex::Complex& n1, double thickness);
 
 
 }
