@@ -208,3 +208,6 @@ void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.
 MaterialTables createMaterialTables(std::vector<Material>);
+
+// returns the rayx rays converted to be ray-UI compatible.
+std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No);

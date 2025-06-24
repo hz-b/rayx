@@ -70,6 +70,33 @@ void getCone(xml::Parser parser, DesignElement* de) {
     de->setTotalLength(parser.parseTotalLength());
 }
 
+void getCrystal(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Plane);
+    de->setBehaviourType(BehaviourType::Crystal);
+
+    de->setCrystalType(parser.parseCrystalType());
+    //de->setCrystalMaterial(parser.parseCrystalMaterial());
+    //de->setLatticeStructure(parser.parseLatticeStructure());
+    //de->setLatticeConstant(parser.parseLatticeConstant());
+    //de->setLatticeConstantSecond(parser.parseLatticeConstantSecond());
+    de->setOffsetAngle(parser.parseOffsetAngle());
+    //de->setFirstMillerIndex(parser.parseFirstMillerIndex());
+    //de->setSecondMillerIndex(parser.parseSecondMillerIndex());
+    //de->setThirdMillerIndex(parser.parseThirdMillerIndex());
+    de->setStructureFactorReF0(parser.parseStructureFactorReF0());
+    de->setStructureFactorImF0(parser.parseStructureFactorImF0());
+    de->setStructureFactorReFH(parser.parseStructureFactorReFH());
+    de->setStructureFactorImFH(parser.parseStructureFactorImFH());
+    de->setStructureFactorReFHC(parser.parseStructureFactorReFHC());
+    de->setStructureFactorImFHC(parser.parseStructureFactorImFHC());
+    de->setUnitCellVolume(parser.parseUnitCellVolume());
+    //de->setDSpacingGradient(parser.parseDSpacingGradient());
+    de->setDSpacing2(parser.parseDSpacing2());
+    //de->setProfileKind(parser.parseProfileKind());
+}
+
+
 void getCylinder(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
     de->setCurvatureType(CurvatureType::Cylinder);

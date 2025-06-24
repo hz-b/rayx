@@ -94,7 +94,8 @@ std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSourc
                                                        {ElementType::DipoleSource, "Dipole Source"},
                                                        {ElementType::DipoleSrc, "Dipole"},
                                                        {ElementType::PixelSource, "Pixel Source"},
-                                                       {ElementType::EllipsoidMirror, "Ellipsoid"}};
+                                                       {ElementType::EllipsoidMirror, "Ellipsoid"},
+                                                       {ElementType::Crystal, "Crystal"}};
 
 ElementType findElementString(const std::string& name) {
     auto it = std::find_if(ElementStringMap.begin(), ElementStringMap.end(),

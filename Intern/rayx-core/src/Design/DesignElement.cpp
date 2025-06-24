@@ -36,13 +36,13 @@ OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dm
         return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr));
     } else {
         Surface surface = makeSurface(*dePtr);
-        Behaviour behavior = makeBehaviour(*dePtr);
+        Behaviour behaviour = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
-            return makeElement(*dePtr, behavior, surface, {}, DesignPlane::XY);
+            return makeElement(*dePtr, behaviour, surface, {}, DesignPlane::XY);
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*dePtr, behavior, surface, serializeUnlimited(), DesignPlane::XY);
+            return makeElement(*dePtr, behaviour, surface, serializeUnlimited(), DesignPlane::XY);
         } else {
-            return makeElement(*dePtr, behavior, surface);
+            return makeElement(*dePtr, behaviour, surface);
         }
     }
 }
@@ -346,91 +346,72 @@ double DesignElement::getOpeningHeight() const { return m_elementParameters["ope
 void DesignElement::setCentralBeamstop(CentralBeamstop value) { m_elementParameters["centralBeamstop"] = value; }
 CentralBeamstop DesignElement::getCentralBeamstop() const { return m_elementParameters["centralBeamstop"].as_centralBeamStop(); }
 
-// Stop Width
 void DesignElement::setStopWidth(double width) { m_elementParameters["stopWidth"] = width; }
 double DesignElement::getStopWidth() const { return m_elementParameters["stopWidth"].as_double(); }
 
-// Stop Height
 void DesignElement::setStopHeight(double height) { m_elementParameters["stopHeight"] = height; }
 double DesignElement::getStopHeight() const { return m_elementParameters["stopHeight"].as_double(); }
 
-// Total Width
 void DesignElement::setTotalWidth(double width) { m_elementParameters["totalWidth"] = width; }
 double DesignElement::getTotalWidth() const { return m_elementParameters["totalWidth"].as_double(); }
 
-// Profile Kind
 void DesignElement::setProfileKind(int value) { m_elementParameters["profileKind"] = value; }
 int DesignElement::getProfileKind() const { return m_elementParameters["profileKind"].as_int(); }
 
-// Profile File
 void DesignElement::setProfileFile(double filePath) { m_elementParameters["profileFile"] = filePath; }
 double DesignElement::getProfileFile() const { return m_elementParameters["profileFile"].as_double(); }
 
-// Total Length
 void DesignElement::setTotalLength(double value) { m_elementParameters["totalLength"] = value; }
 double DesignElement::getTotalLength() const { return m_elementParameters["totalLength"].as_double(); }
 
-// Grazing Inc Angle
 void DesignElement::setGrazingIncAngle(Rad value) { m_elementParameters["grazingIncAngle"] = value; }
 Rad DesignElement::getGrazingIncAngle() const { return m_elementParameters["grazingIncAngle"].as_rad(); }
 
 void DesignElement::setDeviationAngle(Rad value) { m_elementParameters["deviationAngle"] = value; }
 Rad DesignElement::getDeviationAngle() const { return m_elementParameters["deviationAngle"].as_rad(); }
 
-// Entrance Arm Length
 void DesignElement::setEntranceArmLength(double value) { m_elementParameters["entranceArmLength"] = value; }
 double DesignElement::getEntranceArmLength() const { return m_elementParameters["entranceArmLength"].as_double(); }
 
-// Exit Arm Length
 void DesignElement::setExitArmLength(double value) { m_elementParameters["exitArmLength"] = value; }
 double DesignElement::getExitArmLength() const { return m_elementParameters["exitArmLength"].as_double(); }
 
-// bendingRadius
 void DesignElement::setRadiusDirection(CylinderDirection value) { m_elementParameters["bendingRadius"] = value; }
 CylinderDirection DesignElement::getRadiusDirection() const { return m_elementParameters["bendingRadius"].as_cylinderDirection(); }
 
-// radius
 void DesignElement::setRadius(double value) { m_elementParameters["radius"] = value; }
 double DesignElement::getRadius() const { return m_elementParameters["radius"].as_double(); }
 
 void DesignElement::setDesignGrazingIncAngle(Rad value) { m_elementParameters["designGrazingIncAngle"] = value; }
 Rad DesignElement::getDesignGrazingIncAngle() const { return m_elementParameters["designGrazingIncAngle"].as_rad(); }
 
-// longHalfAxisA
 void DesignElement::setLongHalfAxisA(double value) { m_elementParameters["longHalfAxisA"] = value; }
 double DesignElement::getLongHalfAxisA() const { return m_elementParameters["longHalfAxisA"].as_double(); }
 
-// shortHalfAxisB
 void DesignElement::setShortHalfAxisB(double value) { m_elementParameters["shortHalfAxisB"] = value; }
 double DesignElement::getShortHalfAxisB() const { return m_elementParameters["shortHalfAxisB"].as_double(); }
 
 void DesignElement::setParameterA11(double value) { m_elementParameters["parameter_a11"] = value; }
 double DesignElement::getParameterA11() const { return m_elementParameters["parameter_a11"].as_double(); }
 
-// figureRotation
 void DesignElement::setFigureRotation(FigureRotation value) { m_elementParameters["figureRotation"] = value; }
 FigureRotation DesignElement::getFigureRotation() const { return m_elementParameters["figureRotation"].as_figureRotation(); }
 
-// armLength
 void DesignElement::setArmLength(double value) { m_elementParameters["armLength"] = value; }
 double DesignElement::getArmLength() const { return m_elementParameters["armLength"].as_double(); }
 
-// parameter_P
 void DesignElement::setParameterP(double value) { m_elementParameters["parameter_P"] = value; }
 double DesignElement::getParameterP() const { return m_elementParameters["parameter_P"].as_double(); }
 
-// parameter_P_type
 void DesignElement::setParameterPType(double value) { m_elementParameters["parameter_P_type"] = value; }
 double DesignElement::getParameterPType() const { return m_elementParameters["parameter_P_type"].as_double(); }
 
-// Setter and Getter for lineDensity
 void DesignElement::setLineDensity(double value) { m_elementParameters["lineDensity"] = value; }
 double DesignElement::getLineDensity() const { return m_elementParameters["lineDensity"].as_double(); }
 
 void DesignElement::setShortRadius(double value) { m_elementParameters["shortRadius"] = value; }
 double DesignElement::getShortRadius() const { return m_elementParameters["shortRadius"].as_double(); }
 
-// Setter and Getter for longRadius
 void DesignElement::setLongRadius(double value) { m_elementParameters["longRadius"] = value; }
 double DesignElement::getLongRadius() const { return m_elementParameters["longRadius"].as_double(); }
 
@@ -475,5 +456,62 @@ CurvatureType DesignElement::getCurvatureType() const { return m_elementParamete
 
 void DesignElement::setBehaviourType(BehaviourType value) { m_elementParameters["behaviourType"] = value; }
 BehaviourType DesignElement::getBehaviourType() const { return m_elementParameters["behaviourType"].as_behaviourType(); }
+
+void DesignElement::setCrystalType(CrystalType value) { m_elementParameters["crystalType"] = value; }
+CrystalType DesignElement::getCrystalType() const { return m_elementParameters["crystalType"].as_crystalType(); }
+
+void DesignElement::setCrystalMaterial(const std::string& value) { m_elementParameters["crystalMaterial"] = value; }
+std::string DesignElement::getCrystalMaterial() const { return m_elementParameters["crystalMaterial"].as_string(); }
+
+void DesignElement::setLatticeStructure(const std::string& value) { m_elementParameters["latticeStructure"] = value; }
+std::string DesignElement::getLatticeStructure() const { return m_elementParameters["latticeStructure"].as_string(); }
+
+void DesignElement::setLatticeConstant(double value) { m_elementParameters["latticeConstant"] = value; }
+double DesignElement::getLatticeConstant() const { return m_elementParameters["latticeConstant"].as_double(); }
+
+void DesignElement::setLatticeConstantSecond(double value) { m_elementParameters["latticeConstantSecond"] = value; }
+double DesignElement::getLatticeConstantSecond() const { return m_elementParameters["latticeConstantSecond"].as_double(); }
+
+//void DesignElement::setOffsetAngleType(OffsetAngleType value) { m_elementParameters["offsetAngleType"] = value; }
+//OffsetAngleType DesignElement::getOffsetAngleType() const { return m_elementParameters["offsetAngleType"].as_int(); }
+
+void DesignElement::setFirstMillerIndex(int value) { m_elementParameters["firstMillerIndex"] = value; }
+int DesignElement::getFirstMillerIndex() const { return m_elementParameters["firstMillerIndex"].as_int(); }
+
+void DesignElement::setSecondMillerIndex(int value) { m_elementParameters["secondMillerIndex"] = value; }
+int DesignElement::getSecondMillerIndex() const { return m_elementParameters["secondMillerIndex"].as_int(); }
+
+void DesignElement::setThirdMillerIndex(int value) { m_elementParameters["thirdMillerIndex"] = value; }
+int DesignElement::getThirdMillerIndex() const { return m_elementParameters["thirdMillerIndex"].as_int(); }
+
+void DesignElement::setStructureFactorReF0(double value) { m_elementParameters["structureFactorReF0"] = value; }
+double DesignElement::getStructureFactorReF0() const { return m_elementParameters["structureFactorReF0"].as_double(); }
+
+void DesignElement::setStructureFactorImF0(double value) { m_elementParameters["structureFactorImF0"] = value; }
+double DesignElement::getStructureFactorImF0() const { return m_elementParameters["structureFactorImF0"].as_double(); }
+
+void DesignElement::setStructureFactorReFH(double value) { m_elementParameters["structureFactorReFH"] = value; }
+double DesignElement::getStructureFactorReFH() const { return m_elementParameters["structureFactorReFH"].as_double(); }
+
+void DesignElement::setStructureFactorImFH(double value) { m_elementParameters["structureFactorImFH"] = value; }
+double DesignElement::getStructureFactorImFH() const { return m_elementParameters["structureFactorImFH"].as_double(); }
+
+void DesignElement::setStructureFactorReFHC(double value) { m_elementParameters["structureFactorReFHC"] = value; }
+double DesignElement::getStructureFactorReFHC() const { return m_elementParameters["structureFactorReFHC"].as_double(); }
+
+void DesignElement::setStructureFactorImFHC(double value) { m_elementParameters["structureFactorImFHC"] = value; }
+double DesignElement::getStructureFactorImFHC() const { return m_elementParameters["structureFactorImFHC"].as_double(); }
+
+void DesignElement::setUnitCellVolume(double value) { m_elementParameters["unitCellVolume"] = value; }
+double DesignElement::getUnitCellVolume() const { return m_elementParameters["unitCellVolume"].as_double(); }
+
+void DesignElement::setDSpacingGradient(double value) { m_elementParameters["dSpacingGradient"] = value; }
+double DesignElement::getDSpacingGradient() const { return m_elementParameters["dSpacingGradient"].as_double(); }
+
+void DesignElement::setDSpacing2(double value) { m_elementParameters["dSpacing2"] = value; }
+double DesignElement::getDSpacing2() const { return m_elementParameters["dSpacing2"].as_double(); }
+
+void DesignElement::setOffsetAngle(Rad value) { m_elementParameters["offsetAngle"] = value;}
+Rad DesignElement::getOffsetAngle() const { return m_elementParameters["offsetAngle"].as_rad();}
 
 }  // namespace RAYX

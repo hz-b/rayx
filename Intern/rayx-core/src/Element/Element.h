@@ -19,6 +19,7 @@ struct DesignElement;
 enum class ElementType {
     ImagePlane,
     ConeMirror,
+    Crystal,
     CylinderMirror,
     EllipsoidMirror,
     ExpertsMirror,

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ElectricField.h"
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -136,6 +137,33 @@ inline ElectricField interceptReflect(const ElectricField incidentElectricField,
 
     const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
     return reflectElectricField;
+}
+
+RAYX_FN_ACC
+inline ElectricField interceptReflectCrystal(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
+                                      const glm::dvec3 normalVec, ComplexFresnelCoeffs reflectAmplitude) {
+
+    // TODO: make this more robust
+    const auto reflectPolarizationMatrix = calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
+
+    const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
+    return reflectElectricField;
+}
+
+RAYX_FN_ACC
+// sample the reflectivity of a ray
+inline bool sampleReflectivity(double reflectivity, Rand& __restrict rand) {
+    // if reflectivity is 0, the ray is absorbed
+    if (reflectivity <= 0.0) {  
+        return false;
+    }
+    // if reflectivity is 1, the ray is reflected
+    if (reflectivity >= 1.0) {
+        return true;
+    }
+    // otherwise, sample the reflectivity
+    const auto sample = rand.randomDouble();
+    return sample < reflectivity;   
 }
 
 }  // namespace RAYX
