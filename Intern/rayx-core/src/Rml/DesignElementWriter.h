@@ -70,6 +70,24 @@ void getCone(xml::Parser parser, DesignElement* de) {
     de->setTotalLength(parser.parseTotalLength());
 }
 
+void getCrystal(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XZ);
+    de->setCurvatureType(CurvatureType::Plane);
+    de->setBehaviourType(BehaviourType::Crystal);
+
+    de->setCrystalType(parser.parseCrystalType());
+    de->setOffsetAngle(parser.parseOffsetAngle());
+    de->setStructureFactorReF0(parser.parseStructureFactorReF0());
+    de->setStructureFactorImF0(parser.parseStructureFactorImF0());
+    de->setStructureFactorReFH(parser.parseStructureFactorReFH());
+    de->setStructureFactorImFH(parser.parseStructureFactorImFH());
+    de->setStructureFactorReFHC(parser.parseStructureFactorReFHC());
+    de->setStructureFactorImFHC(parser.parseStructureFactorImFHC());
+    de->setUnitCellVolume(parser.parseUnitCellVolume());
+    de->setDSpacing2(parser.parseDSpacing2());
+}
+
+
 void getCylinder(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
     de->setCurvatureType(CurvatureType::Cylinder);

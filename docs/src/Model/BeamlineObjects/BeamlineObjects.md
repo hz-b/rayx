@@ -22,6 +22,7 @@ We divide the objects into two categories: Light Sources and Optical Elements. A
 - [Plane Grating](OpticalElements/Plane-Grating.md)
 - [Cone Mirror](OpticalElements/Cone-Mirror.md)
 - [Cone Grating](OpticalElements/Cone-Mirror.md)
+- [Crystal](OpticalElements/Crystal.md)
 - [Cylindrical Mirror](OpticalElements/Cylinder-Mirror.md)
 - [Ellipsoid Mirror](OpticalElements/Ellipsoid-Mirror.md)
 - [Spherical Mirror](OpticalElements/Sphere-Mirror.md)

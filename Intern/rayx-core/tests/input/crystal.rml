@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<lab>
+ <version>1.15</version>
+ <beamline>
+  <object name="Matrix Source" type="Matrix Source">
+   <param id="numberRays" enabled="T">9</param>
+   <param id="sourceWidth" enabled="T">0.065</param>
+   <param id="sourceHeight" enabled="T">0.04</param>
+   <param id="sourceDepth" enabled="T">0</param>
+   <param id="horDiv" enabled="T">1</param>
+   <param id="verDiv" enabled="T">1</param>
+   <param id="alignmentError" comment="No" enabled="T">1</param>
+   <param id="translationXerror" enabled="F">0</param>
+   <param id="translationYerror" enabled="F">0</param>
+   <param id="rotationXerror" enabled="F">0</param>
+   <param id="rotationYerror" enabled="F">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>1.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>1.0000000000000000</z>
+   </param>
+   <param id="energyDistributionType" comment="Values" enabled="T">1</param>
+   <param id="photonEnergyDistributionFile" absolute="" enabled="F"></param>
+   <param id="photonEnergy" enabled="T">10000</param>
+   <param id="energySpreadType" comment="white band" enabled="T">0</param>
+   <param id="energySpread" enabled="T">0</param>
+   <param id="linearPol_0" enabled="T">1</param>
+   <param id="linearPol_45" enabled="T">0</param>
+   <param id="circularPol" enabled="T">0</param>
+   <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
+   <param id="sourcePulseLength" enabled="F">0</param>
+  </object>
+  <object name="Crystal" type="Crystal">
+   <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+   <param id="totalWidth" enabled="T">50</param>
+   <param id="totalLength" enabled="T">200</param>
+   <param id="grazingIncAngle" auto="T" enabled="T">11.40421885885746</param>
+   <param id="distancePreceding" enabled="T">10000</param>
+   <param id="azimuthalAngle" enabled="T">0</param>
+   <param id="crystalType" comment="Si" enabled="T">1</param>
+   <param id="crystalMaterial" enabled="F">Si</param>
+   <param id="latticeStructure" comment="Zincblende" enabled="F">1</param>
+   <param id="latticeConstant" enabled="F">0.5431</param>
+   <param id="latticeConstantSecond" enabled="F">0.5431</param>
+   <param id="offsetAngleType" comment="Entrance Angle" enabled="T">0</param>
+   <param id="offsetAngle" enabled="T">0</param>
+   <param id="firstMillerIndex" enabled="T">1</param>
+   <param id="secondMillerIndex" enabled="T">1</param>
+   <param id="thirdMillerIndex" enabled="T">1</param>
+   <param id="structureFactorReF0" enabled="F">113.6807956531886</param>
+   <param id="structureFactorImF0" enabled="F">1.730370664482074</param>
+   <param id="structureFactorReFH" enabled="F">43.84963536529425</param>
+   <param id="structureFactorImFH" enabled="F">-42.1192476771696</param>
+   <param id="structureFactorReFHC" enabled="F">42.11926492772296</param>
+   <param id="structureFactorImFHC" enabled="F">43.8496187954731</param>
+   <param id="unitCellVolume" enabled="F">0.160191477991</param>
+   <param id="dSpacingGradientSwitch" comment="No" enabled="T">0</param>
+   <param id="dSpacingGradient" enabled="F">0</param>
+   <param id="dSpacing2" auto="T" enabled="F">0.6271178623937715</param>
+   <param id="alignmentError" comment="No" enabled="T">1</param>
+   <param id="translationXerror" enabled="F">0</param>
+   <param id="translationYerror" enabled="F">0</param>
+   <param id="translationZerror" enabled="F">0</param>
+   <param id="rotationXerror" enabled="F">0</param>
+   <param id="rotationYerror" enabled="F">0</param>
+   <param id="rotationZerror" enabled="F">0</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>10000.0000000000000000</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.9802566178657661</y>
+    <z>-0.1977295201288098</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.1977295201288098</y>
+    <z>0.9802566178657661</z>
+   </param>
+   <param id="slopeError" comment="No" enabled="T">1</param>
+   <param id="profileKind" comment="no Profile" enabled="F">2</param>
+   <param id="profileFile" absolute="" enabled="F"></param>
+   <param id="slopeErrorSag" enabled="F">0</param>
+   <param id="slopeErrorMer" enabled="F">0</param>
+   <param id="thermalDistortionAmp" enabled="F">0</param>
+   <param id="thermalDistortionSigmaX" enabled="F">0</param>
+   <param id="thermalDistortionSigmaZ" enabled="F">0</param>
+   <param id="cylindricalBowingAmp" enabled="F">0</param>
+   <param id="cylindricalBowingRadius" enabled="F">0</param>
+  </object>
+  <object name="ImagePlane" type="ImagePlane">
+   <param id="distanceImagePlane" enabled="T">1000</param>
+   <param id="worldPosition" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>387.6513413073760717</y>
+    <z>10921.8060737392606825</z>
+   </param>
+   <param id="worldXdirection" enabled="F">
+    <x>1.0000000000000000</x>
+    <y>0.0000000000000000</y>
+    <z>0.0000000000000000</z>
+   </param>
+   <param id="worldYdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.9218060737392613</y>
+    <z>-0.3876513413073761</z>
+   </param>
+   <param id="worldZdirection" enabled="F">
+    <x>0.0000000000000000</x>
+    <y>0.3876513413073761</y>
+    <z>0.9218060737392613</z>
+   </param>
+  </object>
+ </beamline>
+ <drawing>
+  <mainBeamThickness>0</mainBeamThickness>
+  <header>true</header>
+  <axes>true</axes>
+  <names>false</names>
+  <angles>true</angles>
+  <scaling>0</scaling>
+  <scaleLinear>1</scaleLinear>
+  <scaleExponent>1</scaleExponent>
+  <scaleLinearOffset>600</scaleLinearOffset>
+  <scaleExponentiallyOffset>600</scaleExponentiallyOffset>
+ </drawing>
+</lab>

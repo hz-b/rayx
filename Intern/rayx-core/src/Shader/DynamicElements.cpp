@@ -51,6 +51,9 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
             case BehaveType::RZP:
                 ray = behaveRZP(ray, behaviour, col, rand);
                 break;
+            case BehaveType::Crystal:
+                ray = behaveCrystal(ray, behaviour, col);
+                break;
             case BehaveType::ImagePlane:
                 ray = behaveImagePlane(ray);
                 break;

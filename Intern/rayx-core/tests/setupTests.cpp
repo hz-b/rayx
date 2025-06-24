@@ -177,7 +177,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
 }
 
 // returns the rayx rays converted to be ray-UI compatible.
-std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No) {
+std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
     const auto beamline = loadBeamline(filename);
     const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, -1);
     const auto hist = raySoAToBundleHistory(rays);

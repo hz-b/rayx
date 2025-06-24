@@ -130,11 +130,9 @@ inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
 RAYX_FN_ACC
 inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
     const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
-
     const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
     const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
     const auto y = complex::polar(y_mag, y_theta);
-
     return LocalElectricField({x_real, 0}, y);
 }
 

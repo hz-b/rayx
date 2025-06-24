@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm.hpp>
+#include <algorithm>
 
 #include "Core.h"
 
@@ -39,6 +40,7 @@ using cuda::std::norm;
 using cuda::std::polar;
 using cuda::std::pow;
 using cuda::std::proj;
+using cuda::std::real;
 using cuda::std::sqrt;
 
 using cuda::std::acos;
@@ -65,6 +67,7 @@ using std::norm;
 using std::polar;
 using std::pow;
 using std::proj;
+using std::real;
 using std::sqrt;
 
 using std::acos;
