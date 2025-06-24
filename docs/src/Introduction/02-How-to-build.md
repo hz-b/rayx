@@ -4,8 +4,15 @@ For building and running the project, we recommend using [Visual Studio Code](ht
 
 ## CMake Options:
 
-- `RAYX_ENABLE_CUDA:BOOL` `default = ON` `enable search for Cuda on your system. If found, build with Cuda`
-- `RAYX_REQUIRES_CUDA:BOOL` `default = OFF` `require Cuda to be found on your system. Otherwise throw an error`
+| CMake Option                | Default value | Description                                                                                 |
+| -                           | -             | -                                                                                           |
+| `RAYX_ENABLE_OPENMP:BOOL`   | `ON`          | enable search for OpenMP on your system. If found, build with OpenMP for tracing on CPU     |
+| `RAYX_REQUIRES_OPENMP:BOOL` | `OFF`         | require OpenMP to be found on your system. Otherwise throw an error                         |
+| `RAYX_ENABLE_CUDA:BOOL`     | `ON`          | enable search for Cuda on your system. If found, build with Cuda for tracing on GPU         |
+| `RAYX_REQUIRES_CUDA:BOOL`   | `OFF`         | require Cuda to be found on your system. Otherwise throw an error                           |
+| `RAYX_ENABLE_H5:BOOL`       | `ON`          | enable search for HDF5 on your system. If found, build with HDF5 for H5 file format support |
+| `RAYX_REQUIRES_H5:BOOL`     | `OFF`         | require HDF5 to be found on your system. Otherwise throw an error                           |
+| `RAYX_STATIC_LIB:BOOL`      | `OFF`         | This option builds 'rayx-core' as a static library                                          |
 
 ## Cloning the Repository
 

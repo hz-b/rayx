@@ -21,6 +21,8 @@ option(RAYX_ENABLE_CUDA "This option enables the search for CUDA. Project will b
 option(RAYX_REQUIRE_CUDA "If option 'RAYX_ENABLE_CUDA' is ON, this option will add the requirement that cuda must be found." OFF)
 option(RAYX_ENABLE_OPENMP "This option enables the search for OPENMP. Project will be compiled without openmp if not found." ON)
 option(RAYX_REQUIRE_OPENMP "If option 'RAYX_ENABLE_OPENMP' is ON, this option will add the requirement that openmp must be found." OFF)
+option(RAYX_ENABLE_H5 "This option enables the search for HDF5. Project will be compiled without HDF5 if not found." ON)
+option(RAYX_REQUIRE_H5 "If option 'RAYX_ENABLE_H5' is ON, this option will add the requirement that HDF5 must be found." OFF)
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
 # ------------------
 
