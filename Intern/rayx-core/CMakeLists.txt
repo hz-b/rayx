@@ -127,13 +127,11 @@ endif()
 
 # ---- Disable H5 ----
 
-find_package(HDF5)
-
-if(HDF5_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${HDF5_LIBRARIES})
-    target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${HDF5_INCLUDE_DIRS})
+if(RAYX_H5_ENABLED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${RAYX_HDF5_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${RAYX_HDF5_INCLUDE_DIRS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ${RAYX_HDF5_DEFINITIONS})
 else()
-    message(STATUS "HDF5 not found")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
 endif()
 
@@ -194,7 +192,10 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/alpaka/include/
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka HighFive::HighFive)
+target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka)
+if(RAYX_H5_ENABLED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC HighFive::HighFive)
+endif()
 
 # ------------------------
 
