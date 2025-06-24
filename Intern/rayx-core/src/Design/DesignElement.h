@@ -205,29 +205,11 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setCrystalMaterial(const std::string& value);
     std::string getCrystalMaterial() const;
 
-    void setLatticeStructure(const std::string& value);
-    std::string getLatticeStructure() const;
-
-    void setLatticeConstant(double value);
-    double getLatticeConstant() const;
-
-    void setLatticeConstantSecond(double value);
-    double getLatticeConstantSecond() const;
-
     void setOffsetAngleType(OffsetAngleType value);
     OffsetAngleType getOffsetAngleType() const;
 
     void setOffsetAngle(Rad value);
     Rad getOffsetAngle() const;
-
-    void setFirstMillerIndex(int value);
-    int getFirstMillerIndex() const;
-
-    void setSecondMillerIndex(int value);
-    int getSecondMillerIndex() const;
-
-    void setThirdMillerIndex(int value);
-    int getThirdMillerIndex() const;
 
     void setStructureFactorReF0(double value);
     double getStructureFactorReF0() const;
@@ -249,9 +231,6 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setUnitCellVolume(double value);
     double getUnitCellVolume() const;
-
-    void setDSpacingGradient(double value);
-    double getDSpacingGradient() const;
 
     void setDSpacing2(double value);
     double getDSpacing2() const;

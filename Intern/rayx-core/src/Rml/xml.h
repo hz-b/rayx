@@ -200,14 +200,8 @@ struct RAYX_API Parser {
 
     inline CrystalType parseCrystalType() const { return static_cast<CrystalType>(parseInt("crystalType")); }
     inline std::string parseCrystalMaterial() const { return parseStr("crystalMaterial"); }
-    inline std::string parseLatticeStructure() const { return parseStr("latticeStructure"); }
-    inline double parseLatticeConstant() const { return parseDouble("latticeConstant"); }
-    inline double parseLatticeConstantSecond() const { return parseDouble("latticeConstantSecond"); }
     inline OffsetAngleType parseOffsetAngleType() const { return static_cast<OffsetAngleType>(parseInt("offsetAngleType")); }
     inline Rad parseOffsetAngle() const { return parseInt("offsetAngle"); }
-    inline int parseFirstMillerIndex() const { return parseInt("firstMillerIndex"); }
-    inline int parseSecondMillerIndex() const { return parseInt("secondMillerIndex"); }
-    inline int parseThirdMillerIndex() const { return parseInt("thirdMillerIndex"); }
     inline double parseStructureFactorReF0() const { return parseDouble("structureFactorReF0"); }
     inline double parseStructureFactorImF0() const { return parseDouble("structureFactorImF0"); }
     inline double parseStructureFactorReFH() const { return parseDouble("structureFactorReFH"); }
@@ -215,7 +209,6 @@ struct RAYX_API Parser {
     inline double parseStructureFactorReFHC() const { return parseDouble("structureFactorReFHC"); }
     inline double parseStructureFactorImFHC() const { return parseDouble("structureFactorImFHC"); }
     inline double parseUnitCellVolume() const { return parseDouble("unitCellVolume"); }
-    inline double parseDSpacingGradient() const { return parseDouble("dSpacingGradient"); }
     inline double parseDSpacing2() const { return parseDouble("dSpacing2"); }
     inline int parseProfileKind() const { return parseInt("profileKind"); }
 

@@ -17,7 +17,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision col, Rand& __restrict rand) {
+Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision col) {
     CrystalBehaviour b = deserializeCrystal(behaviour);
 
     double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
@@ -58,10 +58,6 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
     const auto reflect_field  = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
     r.m_field = reflect_field;
 
-    double reflectivity = intensity(reflect_field);
-    if (!sampleReflectivity(reflectivity, rand)) {
-        return terminateRay(r, EventType::Absorbed);
-    }
     return r;
 }
 

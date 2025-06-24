@@ -76,14 +76,7 @@ void getCrystal(xml::Parser parser, DesignElement* de) {
     de->setBehaviourType(BehaviourType::Crystal);
 
     de->setCrystalType(parser.parseCrystalType());
-    //de->setCrystalMaterial(parser.parseCrystalMaterial());
-    //de->setLatticeStructure(parser.parseLatticeStructure());
-    //de->setLatticeConstant(parser.parseLatticeConstant());
-    //de->setLatticeConstantSecond(parser.parseLatticeConstantSecond());
     de->setOffsetAngle(parser.parseOffsetAngle());
-    //de->setFirstMillerIndex(parser.parseFirstMillerIndex());
-    //de->setSecondMillerIndex(parser.parseSecondMillerIndex());
-    //de->setThirdMillerIndex(parser.parseThirdMillerIndex());
     de->setStructureFactorReF0(parser.parseStructureFactorReF0());
     de->setStructureFactorImF0(parser.parseStructureFactorImF0());
     de->setStructureFactorReFH(parser.parseStructureFactorReFH());
@@ -91,9 +84,7 @@ void getCrystal(xml::Parser parser, DesignElement* de) {
     de->setStructureFactorReFHC(parser.parseStructureFactorReFHC());
     de->setStructureFactorImFHC(parser.parseStructureFactorImFHC());
     de->setUnitCellVolume(parser.parseUnitCellVolume());
-    //de->setDSpacingGradient(parser.parseDSpacingGradient());
     de->setDSpacing2(parser.parseDSpacing2());
-    //de->setProfileKind(parser.parseProfileKind());
 }
 
 

@@ -150,20 +150,5 @@ inline ElectricField interceptReflectCrystal(const ElectricField incidentElectri
     return reflectElectricField;
 }
 
-RAYX_FN_ACC
-// sample the reflectivity of a ray
-inline bool sampleReflectivity(double reflectivity, Rand& __restrict rand) {
-    // if reflectivity is 0, the ray is absorbed
-    if (reflectivity <= 0.0) {  
-        return false;
-    }
-    // if reflectivity is 1, the ray is reflected
-    if (reflectivity >= 1.0) {
-        return true;
-    }
-    // otherwise, sample the reflectivity
-    const auto sample = rand.randomDouble();
-    return sample < reflectivity;   
-}
 
 }  // namespace RAYX
