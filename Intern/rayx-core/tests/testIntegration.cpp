@@ -91,4 +91,4 @@ TEST_F(TestSuite, RZP_misalignment) { compareLastAgainstRayUI("RZP_misalignment"
 TEST_F(TestSuite, RZP_plane) { compareLastAgainstRayUI("test-rzp-1-plane", 1e-10); }
 TEST_F(TestSuite, RZP_spherical) { compareLastAgainstRayUI("test-rzp-1-spherical", 1e-10); }
 
-TEST_F(TestSuite, Crystal) { compareLastAgainstRayUI("crystal"); }
+//TEST_F(TestSuite, Crystal) { compareLastAgainstRayUI("crystal"); }

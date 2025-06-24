@@ -3,9 +3,9 @@
 #include "Core.h"
 #include "Complex.h"
 #include "Constants.h"
+#include "Utils.h"
 #include <cmath>
 
-/// @brief a
 namespace RAYX {
 
 // **********************************************************
@@ -69,7 +69,7 @@ RAYX_FN_ACC double getBraggAngle(double energy, double dSpacing2) {
     double theta = asin(theta_factor); // In radians
     return theta;
 }
-
+  
 /// @brief Computes the asymmetry factor b from the Bragg angle and surface tilt angle
 /// @param braggAngle Bragg angle θ_B (in radians)
 /// @param alpha Tilt between surface and diffraction planes α (in radians) (offset Angle)
