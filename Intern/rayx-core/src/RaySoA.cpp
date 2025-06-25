@@ -33,7 +33,9 @@ RaySoA bundleHistoryToRaySoA(const BundleHistory& bundle) {
 BundleHistory raySoAToBundleHistory(const RaySoA& rays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto bundle = BundleHistory(rays.num_paths);
+    if (rays.num_events == 0) return BundleHistory();
+    int maxPathId = *std::max_element(rays.path_id.begin(), rays.path_id.end());
+    auto bundle = BundleHistory(maxPathId + 1);
 
     for (int i = 0; i < rays.num_events; ++i) {
         const auto path_id = rays.path_id[i];

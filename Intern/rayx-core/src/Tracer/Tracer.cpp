@@ -51,8 +51,7 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, std::shared_ptr<bool[]> recordMask,
-                     RayAttrFlag attr) {
+RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask, const RayAttrFlag attr) {
     // in sequential tracing, maxEvents should be equal to the number of elements
     if (sequential == Sequential::Yes) maxEvents = group.numElements();
 

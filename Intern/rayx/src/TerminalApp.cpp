@@ -155,15 +155,27 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
         const int maxEvents =
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
-        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
         size_t numElements = m_Beamline->numElements();
-        auto recordMask = std::make_shared<bool[]>(numElements);
-        std::fill_n(recordMask.get(), numElements, false);
-        for (auto idx : recordIndices) {
-            if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
-            if (idx > numElements - 1) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
-            recordMask[idx] = true;
+
+        // Record mask
+        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
+        std::vector<bool> recordMask(numElements, true);
+        if (!recordIndices.empty()) {
+            recordMask = std::vector<bool>(numElements, false);
+            for (auto idx : recordIndices) {
+                if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
+                if (idx > numElements - 1) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
+                recordMask[idx] = true;
+            }
         }
+
+        // Verbose log: print mask as a string of 0s and 1s
+        std::string maskStr;
+        maskStr.reserve(numElements);
+        for (auto b : recordMask) {
+            maskStr += b;
+        }
+        RAYX_VERB << "recordMask [size=" << numElements << "]: " << maskStr;
 
         const auto attr =
             m_CommandParser->m_args.m_format.empty() ? RAYX::RayAttrFlag::All : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
