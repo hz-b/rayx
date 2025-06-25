@@ -60,7 +60,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         }
 
         // write ray in local element coordinates to global memory
-        if (!inv.recordMask || inv.recordMask[col.elementIndex]) {
+        if (numRecorded < inv.maxEvents && (!inv.recordMask || inv.recordMask[col.elementIndex])) {
             outputEvents.events[gid * inv.maxEvents + numRecorded] = ray;
             ++numRecorded;
         }
