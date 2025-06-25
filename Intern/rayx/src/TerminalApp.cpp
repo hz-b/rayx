@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
 #include "Debug/Debug.h"
 #include "Random.h"
@@ -144,17 +145,30 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         if (m_CommandParser->m_args.m_BatchSize != 0) {
             max_batch_size = m_CommandParser->m_args.m_BatchSize;
         }
+        if (m_CommandParser->m_args.m_recordIndices.empty()) {
+            RAYX_VERB << "Passed no or empty array for which elements to record.";
+        } else {
+            RAYX_VERB << "First element of passed array: " << m_CommandParser->m_args.m_recordIndices[0];
+        }
 
         // Run rayx core
         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
         const int maxEvents =
             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
-        int recordElementIndex = m_CommandParser->m_args.m_recordElementIndex;
+        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
+        size_t numElements = m_Beamline->numElements();
+        auto recordMask = std::make_shared<bool[]>(numElements);
+        std::fill_n(recordMask.get(), numElements, false);
+        for (auto idx : recordIndices) {
+            if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
+            if (idx > numElements - 1) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
+            recordMask[idx] = true;
+        }
 
         const auto attr =
             m_CommandParser->m_args.m_format.empty() ? RAYX::RayAttrFlag::All : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
 
-        const auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, recordElementIndex, attr);
+        const auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, recordMask, attr);
 
         if (!rays.num_events)
             std::cout << "No events were recorded!" << std::endl;

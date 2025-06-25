@@ -41,8 +41,8 @@ class CommandParser {
         bool m_verbose = false;           // --verbose (Verbose)
         std::string m_format;             // --format
         int m_maxEvents = -1;             // -m (max events)
-        int m_recordElementIndex = -1;    // -R --record-element (element index)
-        std::string m_dump = "";          // -D (dump)
+        std::vector<int> m_recordIndices = {};
+        std::string m_dump = "";  // -D (dump)
     } m_args;
 
     static inline void getVersion() {
@@ -61,7 +61,7 @@ class CommandParser {
 
   private:
     int m_cli11_return;
-    enum OptionType { BOOL, INT, STRING, BOOL_STRING };
+    enum OptionType { BOOL, INT, STRING, INT_VEC };
     struct Options {
         // CLI::Option cli11_option;
         const OptionType type;
@@ -97,7 +97,7 @@ class CommandParser {
           "\"",
           &(m_args.m_format)}},
         {'m', {OptionType::INT, "maxEvents", "Maximum number of events per ray", &(m_args.m_maxEvents)}},
-        {'R', {OptionType::INT, "record-element", "Record events only for a specifc element", &(m_args.m_recordElementIndex)}},
+        {'R', {OptionType::INT_VEC, "record-indices", "Record events only for specifc elements", &(m_args.m_recordIndices)}},
         {'D', {OptionType::STRING, "dump", "Dump the meta data of a file (h5 or rml)", &(m_args.m_dump)}},
     };
 };
