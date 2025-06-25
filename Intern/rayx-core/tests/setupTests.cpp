@@ -67,9 +67,7 @@ std::filesystem::path getBeamlineFilepath(std::string filename) {
 }
 
 /// will look at Intern/rayx-core/tests/input/<filename>.rml
-RAYX::Beamline loadBeamline(std::string filename) {
-    return RAYX::importBeamline(getBeamlineFilepath(filename));
-}
+RAYX::Beamline loadBeamline(std::string filename) { return RAYX::importBeamline(getBeamlineFilepath(filename)); }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
@@ -79,7 +77,7 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     const auto beamline = loadBeamline(filename);
-    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, -1);
+    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, beamline.numElements() + 2);
     return raySoAToBundleHistory(rays);
 }
 
@@ -179,7 +177,7 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
     const auto beamline = loadBeamline(filename);
-    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, -1);
+    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2);
     const auto hist = raySoAToBundleHistory(rays);
 
     std::vector<RAYX::Ray> out;
