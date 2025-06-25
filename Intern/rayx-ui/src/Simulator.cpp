@@ -17,7 +17,7 @@ void Simulator::runSimulation() {
         m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
     }
 
-    const auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents);
+    const auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents, RAYX::fullRecordMask(m_Beamline.numElements()));
     const auto bundleHist = RAYX::raySoAToBundleHistory(rays);
 
     bool notEnoughEvents = false;
