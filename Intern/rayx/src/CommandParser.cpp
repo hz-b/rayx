@@ -21,10 +21,11 @@ CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_
             m_cli11->add_flag(_name, *static_cast<bool*>(option.second.option_flag), _description);
         } else if (_type == OptionType::STRING) {
             m_cli11->add_option(_name, *static_cast<std::string*>(option.second.option_flag), _description);
-        } else if (_type == OptionType::BOOL_STRING) {  // Discarded
-            m_cli11->add_flag(_name, *static_cast<bool*>(option.second.option_flag), _description);
         } else if (_type == OptionType::INT) {
             m_cli11->add_option(_name, *static_cast<int*>(option.second.option_flag), _description);
+        } else if (_type == OptionType::INT_VEC) {
+            m_cli11->add_option(_name, *static_cast<std::vector<int>*>(option.second.option_flag), _description)
+                ->expected(-1);  // allow any number of ints
         }
     }
 

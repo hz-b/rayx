@@ -17,7 +17,7 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual RaySoA trace(const Group&, Sequential sequential, const int maxBatchSize, const int maxEvents, const int recordElementIndex,
+    virtual RaySoA trace(const Group&, Sequential sequential, const int maxBatchSize, const int maxEvents, std::shared_ptr<bool[]> recordMask,
                          const RayAttrFlag attr) = 0;
 };
 
