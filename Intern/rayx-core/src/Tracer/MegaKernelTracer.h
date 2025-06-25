@@ -150,7 +150,7 @@ class MegaKernelTracer : public DeviceTracer {
 
   public:
     virtual RaySoA trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents,
-                         const int recordElementIndex, const RayAttrFlag attr) override {
+                         std::shared_ptr<bool[]> recordMask, const RayAttrFlag attr) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -199,8 +199,7 @@ class MegaKernelTracer : public DeviceTracer {
             alpaka::memcpy(q, *m_resources.d_rays, raysViewBatch);
 
             // trace current batch
-            traceBatch(devAcc, q, conf.numElements, conf.numRaysTotal, batchSize, batchStartRayIndex, maxEvents, recordElementIndex, randomSeed,
-                       sequential);
+            traceBatch(devAcc, q, conf.numElements, conf.numRaysTotal, batchSize, batchStartRayIndex, maxEvents, recordMask, randomSeed, sequential);
 
             // prefix sum on compactEventCounts to get compactEventOffsets
             alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchSize), *m_resources.d_compactEventCounts, batchSize);
@@ -260,7 +259,7 @@ class MegaKernelTracer : public DeviceTracer {
   private:
     template <typename DevAcc, typename Queue>
     void traceBatch(DevAcc devAcc, Queue q, int numElements, int numRaysTotal, int batchSize, int batchStartRayIndex, int maxEvents,
-                    int recordElementIndex, double randomSeed, Sequential sequential) {
+                    std::shared_ptr<bool[]> recordMask, double randomSeed, Sequential sequential) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         // inputs
@@ -270,7 +269,6 @@ class MegaKernelTracer : public DeviceTracer {
             .batchSize = batchSize,
             .batchStartRayIndex = batchStartRayIndex,
             .maxEvents = maxEvents,
-            .recordElementIndex = recordElementIndex,
             .randomSeed = randomSeed,
             .sequential = sequential,
 
@@ -279,6 +277,7 @@ class MegaKernelTracer : public DeviceTracer {
             .numElements = numElements,
             .materialIndices = alpaka::getPtrNative(*m_resources.d_materialIndices),
             .materialTables = alpaka::getPtrNative(*m_resources.d_materialTable),
+            .recordMask = recordMask.get(),
             .rays = alpaka::getPtrNative(*m_resources.d_rays),
         };
 
