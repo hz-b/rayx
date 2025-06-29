@@ -19,7 +19,9 @@ namespace RAYX {
 // Output:
 //   returns theta - the angle of incidence in radians
 // **********************************************************
-RAYX_FN_ACC double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
+RAYX_FN_ACC 
+inline double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
+
     double al = normal[0];
     double am = normal[1];
     double an = normal[2];
@@ -55,7 +57,9 @@ RAYX_FN_ACC double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
 /// @param d lattice spacing*2
 /// @param order Diffraction order
 /// @return the bragg angle theta (rad)
-RAYX_FN_ACC double getBraggAngle(double energy, double dSpacing2) {
+RAYX_FN_ACC 
+inline double getBraggAngle(double energy, double dSpacing2) {
+    
     int order = 1;
     double wavelength = hvlam(energy);
     double theta_factor = (order * wavelength) / dSpacing2;
@@ -73,7 +77,8 @@ RAYX_FN_ACC double getBraggAngle(double energy, double dSpacing2) {
 /// @param braggAngle Bragg angle θ_B (in radians)
 /// @param alpha Tilt between surface and diffraction planes α (in radians) (offset Angle)
 /// @return Asymmetry factor b (dimensionless)
-RAYX_FN_ACC double getAsymmetryFactor(double braggAngle, double alpha) {
+RAYX_FN_ACC 
+inline double getAsymmetryFactor(double braggAngle, double alpha) {
     double numerator = complex::sin(braggAngle - alpha);
     double denominator = complex::sin(braggAngle + alpha);
 
@@ -86,8 +91,10 @@ RAYX_FN_ACC double getAsymmetryFactor(double braggAngle, double alpha) {
 /// Defined in Batterman & Cole (1964), p. 685.
 /// @param wavelength X-ray wavelength (in nm)
 /// @param unitCellVolume Unit cell volume (in nm³)
-/// @return Diffraction prefactor Γ
-RAYX_FN_ACC double getDiffractionPrefactor(double wavelength, double unitCellVolume) {
+/// @return Diffraction prefactor Γ 
+RAYX_FN_ACC 
+inline double getDiffractionPrefactor(double wavelength, double unitCellVolume) {
+
     // Avoid division by zero
     if (wavelength <= 0.0 || unitCellVolume <= 0.0) {
         return 0.0;
@@ -113,9 +120,12 @@ RAYX_FN_ACC double getDiffractionPrefactor(double wavelength, double unitCellVol
 /// @param polFactor            Polarization factor
 /// @param gamma                Diffraction prefactor
 /// @return                     Complex η parameter
-RAYX_FN_ACC complex::Complex computeEta(double theta, double bragg, double asymmetry, double structureFactorReFH, double structureFactorImFH,
-                                        double structureFactorReFHC, double structureFactorImFHC, double structureFactorReF0,
-                                        double structureFactorImF0, double polFactor, double gamma) {
+RAYX_FN_ACC 
+inline complex::Complex computeEta(double theta, double bragg, double asymmetry, 
+                                           double structureFactorReFH, double structureFactorImFH, 
+                                           double structureFactorReFHC, double structureFactorImFHC,
+                                           double structureFactorReF0, double structureFactorImF0,
+                                           double polFactor, double gamma) {
     // Calculate numerator terms
     complex::Complex top_term1 = asymmetry * (theta - bragg) * sin(2.0 * theta);
     complex::Complex top_term2 = 0.5 * gamma * complex::Complex(structureFactorReF0, structureFactorImF0) * (1.0 - asymmetry);
@@ -145,8 +155,10 @@ RAYX_FN_ACC complex::Complex computeEta(double theta, double bragg, double asymm
 /// @param structureFactorReFHC         Real part of structure factor
 /// @param structureFactorImFHC         Imaginary part of structure factor
 /// @return                             Complex reflection coefficient R
-RAYX_FN_ACC complex::Complex computeR(complex::Complex eta, double structureFactorReFH, double structureFactorImFH, double structureFactorReFHC,
-                                      double structureFactorImFHC) {
+RAYX_FN_ACC 
+inline::Complex computeR(complex::Complex eta, 
+                                          double structureFactorReFH, double structureFactorImFH,
+                                          double structureFactorReFHC, double structureFactorImFHC) {
     complex::Complex one(1.0, 0.0);
     complex::Complex FH(structureFactorReFH, structureFactorImFH);
     complex::Complex FHC(structureFactorReFHC, structureFactorImFHC);
