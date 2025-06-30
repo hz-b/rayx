@@ -87,13 +87,15 @@ class CommandParser {
         {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
         {'S', {OptionType::BOOL, "sequential", "trace sequentially", &(m_args.m_sequential)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
-        {'F', {OptionType::STRING, "format", "Write specific Ray attributes to output H5 files. Provide a space-separated list of attributes. default value: \""
-#define X(type, name, flag, map) \
-    #name " "
+        {'F',
+         {OptionType::STRING, "format",
+          "Write specific Ray attributes to output H5 files. Provide a space-separated list of attributes. default value: \""
+#define X(type, name, flag, map) #name " "
 
-    RAYX_X_MACRO_RAY_ATTR
+          RAYX_X_MACRO_RAY_ATTR
 #undef X
-        "\"", &(m_args.m_format)}},
+          "\"",
+          &(m_args.m_format)}},
         {'m', {OptionType::INT, "maxEvents", "Maximum number of events per ray", &(m_args.m_maxEvents)}},
         {'R', {OptionType::INT, "record-element", "Record events only for a specifc element", &(m_args.m_recordElementIndex)}},
         {'D', {OptionType::STRING, "dump", "Dump the meta data of a file (h5 or rml)", &(m_args.m_dump)}},

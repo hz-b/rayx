@@ -35,7 +35,7 @@ void dumpBeamline(const std::filesystem::path& filepath) {
         ++objectIndex;
     }
 
-    objectIndex = 0; // TODO: this line can be removed as soon as we support recording of generated rays
+    objectIndex = 0;  // TODO: this line can be removed as soon as we support recording of generated rays
 
     const auto elements = beamline->getElements();
     std::cout << "\telements (" << elements.size() << "):" << std::endl;
@@ -43,7 +43,8 @@ void dumpBeamline(const std::filesystem::path& filepath) {
     for (const auto& element : elements) {
         const auto curvature = RAYX::curvatureTypeToString(element->getCurvatureType());
         const auto behaviour = RAYX::behaviourTypeToString(element->getBehaviourType());
-        std::cout << "\t- [" << objectIndex << "] '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")" << std::endl;
+        std::cout << "\t- [" << objectIndex << "] '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")"
+                  << std::endl;
         ++objectIndex;
     }
 }

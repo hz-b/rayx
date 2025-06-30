@@ -234,7 +234,5 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setDSpacing2(double value);
     double getDSpacing2() const;
-
-
 };
 }  // namespace RAYX

@@ -52,7 +52,7 @@ constexpr double FACTOR_SCHWINGER_RAY = 1.2556937e15;
 /// electric permitivity multiplied by speed of light
 constexpr double ELECTRIC_PERMITIVITY_MULTIPLIES_SPEED_OF_LIGHT = 2.6544187279929558624e-3;
 
-constexpr double ELECTRON_RADIUS = 2.8179403205e-6;     // Classical electron radius (nm) 
+constexpr double ELECTRON_RADIUS = 2.8179403205e-6;  // Classical electron radius (nm)
 
-//constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
+// constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
 }  // namespace RAYX
