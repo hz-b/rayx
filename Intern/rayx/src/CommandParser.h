@@ -87,7 +87,7 @@ class CommandParser {
         {'s', {OptionType::INT, "seed", "Provided user seed", &(m_args.m_seed)}},
         {'S', {OptionType::BOOL, "sequential", "trace sequentially", &(m_args.m_sequential)}},
         {'V', {OptionType::BOOL, "verbose", "Dump more information", &(m_args.m_verbose)}},
-        {'F', {OptionType::STRING, "format", "Write specific Ray attributes to output CSV / H5 files. Provide a space-separated list of attributes. default value: \""
+        {'F', {OptionType::STRING, "format", "Write specific Ray attributes to output H5 files. Provide a space-separated list of attributes. default value: \""
 #define X(type, name, flag, map) \
     #name " "
 
