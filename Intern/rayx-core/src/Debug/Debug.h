@@ -193,7 +193,7 @@ inline std::vector<double> formatAsVec(const Ray arg) {
 
 #define X(type, name, flag, map) insert(formatAsVec(arg.map));
 
-        RAYX_X_MACRO_RAY_ATTR_MAPPED
+    RAYX_X_MACRO_RAY_ATTR_MAPPED
 #undef X
 
     return out;

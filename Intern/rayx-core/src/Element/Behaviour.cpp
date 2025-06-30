@@ -25,7 +25,6 @@ Behaviour makeBehaviour(const DesignElement& dele) {
 }
 
 Behaviour makeCrystal(const DesignElement& dele) {
-
     auto dSpacing2 = dele.getDSpacing2();
     auto unitCellVoulume = dele.getUnitCellVolume();
     auto offsetAngle = dele.getOffsetAngle();
@@ -38,7 +37,7 @@ Behaviour makeCrystal(const DesignElement& dele) {
     auto structureFactorImFHC = dele.getStructureFactorImFHC();
 
     return serializeCrystal({
-    
+
         .m_dSpacing2 = dSpacing2,
         .m_unitCellVolume = unitCellVoulume,
         .m_offsetAngle = offsetAngle.rad,
@@ -51,7 +50,6 @@ Behaviour makeCrystal(const DesignElement& dele) {
         .m_structureFactorImFHC = structureFactorImFHC,
     });
 }
-
 
 Behaviour makeGrating(const DesignElement& dele) {
     auto vls = dele.getVLSParameters();

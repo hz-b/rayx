@@ -1,8 +1,8 @@
 #pragma once
 
 #include <glm.hpp>
-#include <optional>
 #include <map>
+#include <optional>
 #include <string>
 
 #include "Behaviour.h"

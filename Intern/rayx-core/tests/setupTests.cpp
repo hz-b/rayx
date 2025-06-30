@@ -67,9 +67,7 @@ std::filesystem::path getBeamlineFilepath(std::string filename) {
 }
 
 /// will look at Intern/rayx-core/tests/input/<filename>.rml
-RAYX::Beamline loadBeamline(std::string filename) {
-    return RAYX::importBeamline(getBeamlineFilepath(filename));
-}
+RAYX::Beamline loadBeamline(std::string filename) { return RAYX::importBeamline(getBeamlineFilepath(filename)); }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {

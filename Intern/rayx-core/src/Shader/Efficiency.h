@@ -141,14 +141,12 @@ inline ElectricField interceptReflect(const ElectricField incidentElectricField,
 
 RAYX_FN_ACC
 inline ElectricField interceptReflectCrystal(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
-                                      const glm::dvec3 normalVec, ComplexFresnelCoeffs reflectAmplitude) {
-
+                                             const glm::dvec3 normalVec, ComplexFresnelCoeffs reflectAmplitude) {
     // TODO: make this more robust
     const auto reflectPolarizationMatrix = calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
 
     const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
     return reflectElectricField;
 }
-
 
 }  // namespace RAYX

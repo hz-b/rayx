@@ -107,9 +107,7 @@ struct RaySoA {
 
     glm::dvec3 position(int i) const { return glm::dvec3(position_x[i], position_y[i], position_z[i]); }
     glm::dvec3 direction(int i) const { return glm::dvec3(direction_x[i], direction_y[i], direction_z[i]); }
-    ElectricField field(int i) const {
-        return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]);
-    }
+    ElectricField field(int i) const { return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]); }
     Ray ray(int i) const {
         return Ray{
             .m_position = position(i),

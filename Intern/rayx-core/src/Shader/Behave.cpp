@@ -1,5 +1,6 @@
 #include "Behave.h"
 
+#include "Crystal.h"
 #include "CutoutFns.h"
 #include "Diffraction.h"
 #include "Efficiency.h"
@@ -12,7 +13,6 @@
 #include "SphericalCoords.h"
 #include "Throw.h"
 #include "Utils.h"
-#include "Crystal.h"
 
 namespace RAYX {
 
@@ -23,28 +23,22 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
     double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
     double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
     double asymmetry = -getAsymmetryFactor(bragg, b.m_offsetAngle);
-    
+
     double polFactorS = 1.0;
     double polFactorP = std::fabs(cos(2 * bragg));
 
     double wavelength = inm2eV / r.m_energy;
     double gamma = getDiffractionPrefactor(wavelength, b.m_unitCellVolume);
-    
+
     std::complex<double> F0(b.m_structureFactorReF0, b.m_structureFactorImF0);
     std::complex<double> FH(b.m_structureFactorReFH, b.m_structureFactorImFH);
     std::complex<double> FHC(b.m_structureFactorReFHC, b.m_structureFactorImFHC);
 
-    auto etaS = computeEta(theta0, bragg, asymmetry, 
-                         b.m_structureFactorReFH, b.m_structureFactorImFH, 
-                         b.m_structureFactorReFHC, b.m_structureFactorImFHC,
-                         b.m_structureFactorReF0, b.m_structureFactorImF0, 
-                         polFactorS, gamma);
+    auto etaS = computeEta(theta0, bragg, asymmetry, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC,
+                           b.m_structureFactorImFHC, b.m_structureFactorReF0, b.m_structureFactorImF0, polFactorS, gamma);
 
-    auto etaP = computeEta(theta0, bragg, asymmetry, 
-                         b.m_structureFactorReFH, b.m_structureFactorImFH, 
-                         b.m_structureFactorReFHC, b.m_structureFactorImFHC,
-                         b.m_structureFactorReF0, b.m_structureFactorImF0, 
-                         polFactorP, gamma);
+    auto etaP = computeEta(theta0, bragg, asymmetry, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC,
+                           b.m_structureFactorImFHC, b.m_structureFactorReF0, b.m_structureFactorImF0, polFactorP, gamma);
 
     auto RS = computeR(etaS, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
     auto RP = computeR(etaP, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
@@ -53,9 +47,9 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);
     r.m_direction = reflect_vec;
 
-    ComplexFresnelCoeffs fresnelCoeff = { RS, RP };
+    ComplexFresnelCoeffs fresnelCoeff = {RS, RP};
 
-    const auto reflect_field  = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
+    const auto reflect_field = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
     r.m_field = reflect_field;
 
     return r;

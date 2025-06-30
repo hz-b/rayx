@@ -1410,8 +1410,6 @@ TEST_F(TestSuite, testSphericalCoords) {
     }
 }
 
-
-
 TEST_F(TestSuite, testBraggAngle) {
     struct InOutPair {
         double energy;
@@ -1420,16 +1418,14 @@ TEST_F(TestSuite, testBraggAngle) {
         double out;
     };
 
-std::vector<InOutPair> inouts = {
-    {.energy = 10000, .dSpacing2 = 3.135, .out = 0.039558705359119407},  // Graphit (002), ~30°
-    {.energy = 10000, .dSpacing2 = 2.0135, .out = 0.061615437503612994}, // NaCl (200), ~48.6°
-    {.energy = 10000, .dSpacing2 = 1.9216, .out = 0.06456618672669405}, // Si (111), ~51.3°
-    {.energy = 10000, .dSpacing2 = 1.5414, .out = 0.080523086008524924}, // LiF (200), ~71.8°
-    {.energy = 10000, .dSpacing2 = 2.0135, .out = 0.061615437503612994}, // NaCl (200), ~20.5°
-    {.energy = 10000, .dSpacing2 = 1.5414, .out = 0.080523086008524924},  // LiF (200), ~29.5°
-    {.energy = 5000, .dSpacing2 = 2.0, .out = 0.12430406526943308},
-    {.energy = 4000, .dSpacing2 = 2.0, .out = 0.1556074597838914}
-};
+    std::vector<InOutPair> inouts = {{.energy = 10000, .dSpacing2 = 3.135, .out = 0.039558705359119407},   // Graphit (002), ~30°
+                                     {.energy = 10000, .dSpacing2 = 2.0135, .out = 0.061615437503612994},  // NaCl (200), ~48.6°
+                                     {.energy = 10000, .dSpacing2 = 1.9216, .out = 0.06456618672669405},   // Si (111), ~51.3°
+                                     {.energy = 10000, .dSpacing2 = 1.5414, .out = 0.080523086008524924},  // LiF (200), ~71.8°
+                                     {.energy = 10000, .dSpacing2 = 2.0135, .out = 0.061615437503612994},  // NaCl (200), ~20.5°
+                                     {.energy = 10000, .dSpacing2 = 1.5414, .out = 0.080523086008524924},  // LiF (200), ~29.5°
+                                     {.energy = 5000, .dSpacing2 = 2.0, .out = 0.12430406526943308},
+                                     {.energy = 4000, .dSpacing2 = 2.0, .out = 0.1556074597838914}};
 
     for (const auto& p : inouts) {
         const auto braggAngle = getBraggAngle(p.energy, p.dSpacing2);
@@ -1439,26 +1435,23 @@ std::vector<InOutPair> inouts = {
 
 TEST_F(TestSuite, testDiffractionPrefactor) {
     struct InOutPair {
-        double wavelength; 
+        double wavelength;
         double unitCellVolume;
         double out;
     };
 
-    std::vector<InOutPair> inouts = {
-        {.wavelength = 0.15406, .unitCellVolume = 0.160, .out = 1.3305822415873555e-07},  
-        {.wavelength = 0.15406, .unitCellVolume = 0.180, .out = 1.1827397702998716e-07},
-        {.wavelength = 0.07107, .unitCellVolume = 0.045, .out = 1.0067972847445151e-07},
-        {.wavelength = 0.0, .unitCellVolume = 1.0, .out = 0.0},  
-        {.wavelength = 0.1, .unitCellVolume = 0.0, .out = 0.0},
-        {.wavelength = -1.0, .unitCellVolume = 1.0, .out = 0.0}
-    };
+    std::vector<InOutPair> inouts = {{.wavelength = 0.15406, .unitCellVolume = 0.160, .out = 1.3305822415873555e-07},
+                                     {.wavelength = 0.15406, .unitCellVolume = 0.180, .out = 1.1827397702998716e-07},
+                                     {.wavelength = 0.07107, .unitCellVolume = 0.045, .out = 1.0067972847445151e-07},
+                                     {.wavelength = 0.0, .unitCellVolume = 1.0, .out = 0.0},
+                                     {.wavelength = 0.1, .unitCellVolume = 0.0, .out = 0.0},
+                                     {.wavelength = -1.0, .unitCellVolume = 1.0, .out = 0.0}};
 
     for (const auto& p : inouts) {
         const auto prefactor = getDiffractionPrefactor(p.wavelength, p.unitCellVolume);
         CHECK_EQ(prefactor, p.out);
     }
 }
-
 
 TEST_F(TestSuite, testComputeEta) {
     struct TestCase {
@@ -1476,71 +1469,59 @@ TEST_F(TestSuite, testComputeEta) {
         complex::Complex expected;
     };
 
-    std::vector<TestCase> testCases = {
-        {
-            .theta = 0.1990,
-            .bragg = 0.1990,
-            .asymmetry = -1.0,
-            .structureFactorReFH = 43.8496,
-            .structureFactorImFH = -42.1192,
-            .structureFactorReFHC = 42.1193,
-            .structureFactorImFHC = 43.8496,
-            .structureFactorReF0 = 113.6808,
-            .structureFactorImF0 = 1.7304,
-            .polFactor = 1.0,
-            .gamma = 8.6076025188876205e-08,
-            .expected = complex::Complex(1.8698989229058245, -0.0091710480362834079)
-        },{
-            .theta = 0.1995,
-            .bragg = 0.1990,
-            .asymmetry = -1.0,
-            .structureFactorReFH = 43.8496,
-            .structureFactorImFH = -42.1192,
-            .structureFactorReFHC = 42.1193,
-            .structureFactorImFHC = 43.8496,
-            .structureFactorReF0 = 113.6808,
-            .structureFactorImF0 = 1.7304,
-            .polFactor = 1.0,
-            .gamma = 8.6076025188876205e-08,
-            .expected = complex::Complex(-35.238613144067784, 0.73773569616427415)
-        },{
-            .theta = 0.1990,
-            .bragg = 0.1990,
-            .asymmetry = 0.8,
-            .structureFactorReFH = 43.8496,
-            .structureFactorImFH = -42.1192,
-            .structureFactorReFHC = 42.1193,
-            .structureFactorImFHC = 43.8496,
-            .structureFactorReF0 = 113.6808,
-            .structureFactorImF0 = 1.7304,
-            .polFactor = 1.0,
-            .gamma = 8.6076025188876205e-08,
-            .expected = complex::Complex(0.20906105513355305, -0.0010253543417022822)
-        },{
-            .theta = 0.1990,
-            .bragg = 0.1990,
-            .asymmetry = -1.0,
-            .structureFactorReFH = 43.8496,
-            .structureFactorImFH = -42.1192,
-            .structureFactorReFHC = 42.1193,
-            .structureFactorImFHC = 43.8496,
-            .structureFactorReF0 = 113.6808,
-            .structureFactorImF0 = 1.7304,
-            .polFactor = cos(2*0.1990), 
-            .gamma = 8.6076025188876205e-08,
-            .expected = complex::Complex(2.0284463725210271, -0.0099486549211473489)
-        }
-    };
+    std::vector<TestCase> testCases = {{.theta = 0.1990,
+                                        .bragg = 0.1990,
+                                        .asymmetry = -1.0,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = 1.0,
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(1.8698989229058245, -0.0091710480362834079)},
+                                       {.theta = 0.1995,
+                                        .bragg = 0.1990,
+                                        .asymmetry = -1.0,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = 1.0,
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(-35.238613144067784, 0.73773569616427415)},
+                                       {.theta = 0.1990,
+                                        .bragg = 0.1990,
+                                        .asymmetry = 0.8,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = 1.0,
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(0.20906105513355305, -0.0010253543417022822)},
+                                       {.theta = 0.1990,
+                                        .bragg = 0.1990,
+                                        .asymmetry = -1.0,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = cos(2 * 0.1990),
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(2.0284463725210271, -0.0099486549211473489)}};
 
     for (const auto& tc : testCases) {
-        complex::Complex eta = computeEta(
-            tc.theta, tc.bragg, tc.asymmetry,
-            tc.structureFactorReFH, tc.structureFactorImFH,
-            tc.structureFactorReFHC, tc.structureFactorImFHC,
-            tc.structureFactorReF0, tc.structureFactorImF0,
-            tc.polFactor, tc.gamma
-        );
-        
+        complex::Complex eta = computeEta(tc.theta, tc.bragg, tc.asymmetry, tc.structureFactorReFH, tc.structureFactorImFH, tc.structureFactorReFHC,
+                                          tc.structureFactorImFHC, tc.structureFactorReF0, tc.structureFactorImF0, tc.polFactor, tc.gamma);
+
         CHECK_EQ(eta.real(), tc.expected.real());
         CHECK_EQ(eta.imag(), tc.expected.imag());
     }
