@@ -35,8 +35,7 @@ enum class SigmaType;
 enum class SpreadType;
 enum class ElementType;
 enum class CrystalType;
-enum class OffsetAngleType; //TODO:see if this is needed
-
+enum class OffsetAngleType;  // TODO:see if this is needed
 
 // An error in position and orientation that an object might have.
 struct Misalignment {
@@ -196,7 +195,6 @@ struct RAYX_API Parser {
     inline double parseElectronSigmaXs() const { return parseDouble("electronSigmaXs"); }
     inline double parseElectronSigmaY() const { return parseDouble("electronSigmaY"); }
     inline double parseElectronSigmaYs() const { return parseDouble("electronSigmaYs"); }
-
 
     inline CrystalType parseCrystalType() const { return static_cast<CrystalType>(parseInt("crystalType")); }
     inline std::string parseCrystalMaterial() const { return parseStr("crystalMaterial"); }

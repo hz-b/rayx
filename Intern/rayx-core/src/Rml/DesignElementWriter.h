@@ -87,7 +87,6 @@ void getCrystal(xml::Parser parser, DesignElement* de) {
     de->setDSpacing2(parser.parseDSpacing2());
 }
 
-
 void getCylinder(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XZ);
     de->setCurvatureType(CurvatureType::Cylinder);

@@ -212,8 +212,6 @@ inline Behaviour serializeImagePlane() {
     return b;
 }
 
-
-
 //////////////
 // Crystal
 //////////////
@@ -267,9 +265,6 @@ inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
 
     return c;
 }
-
-
-
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

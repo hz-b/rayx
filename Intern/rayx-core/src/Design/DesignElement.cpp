@@ -487,7 +487,7 @@ double DesignElement::getUnitCellVolume() const { return m_elementParameters["un
 void DesignElement::setDSpacing2(double value) { m_elementParameters["dSpacing2"] = value; }
 double DesignElement::getDSpacing2() const { return m_elementParameters["dSpacing2"].as_double(); }
 
-void DesignElement::setOffsetAngle(Rad value) { m_elementParameters["offsetAngle"] = value;}
-Rad DesignElement::getOffsetAngle() const { return m_elementParameters["offsetAngle"].as_rad();}
+void DesignElement::setOffsetAngle(Rad value) { m_elementParameters["offsetAngle"] = value; }
+Rad DesignElement::getOffsetAngle() const { return m_elementParameters["offsetAngle"].as_rad(); }
 
 }  // namespace RAYX

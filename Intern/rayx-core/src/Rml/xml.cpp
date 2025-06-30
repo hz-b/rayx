@@ -639,7 +639,7 @@ CubicSurface Parser::parseCubicParameters() const {
 }
 
 ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
-    auto orientation = ElectronEnergyOrientation::Clockwise; // default initialize, even tho we dont know at this point
+    auto orientation = ElectronEnergyOrientation::Clockwise;  // default initialize, even tho we dont know at this point
     if (!paramElectronEnergyOrientation(node, &orientation)) {
         return orientation;
     }
@@ -648,7 +648,7 @@ ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
 }
 
 SourcePulseType Parser::parseSourcePulseType() const {
-    auto spreadType = SourcePulseType::None; // default initialize, even tho we dont know at this point
+    auto spreadType = SourcePulseType::None;  // default initialize, even tho we dont know at this point
     if (!paramSourcePulseType(node, &spreadType)) {
         return spreadType;
     }
