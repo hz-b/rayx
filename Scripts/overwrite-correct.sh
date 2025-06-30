@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ever changed anything in Ray-X? maybe changed the event ID of something? or maybe the order in the CSV Writer format?
 # Many changes like this will cause the __whole__ set-seeded part of the test suite to fail.
