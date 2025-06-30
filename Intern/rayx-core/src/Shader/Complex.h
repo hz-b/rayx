@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm.hpp>
 #include <algorithm>
+#include <glm.hpp>
 
 #include "Core.h"
 
