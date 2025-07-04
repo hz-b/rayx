@@ -453,7 +453,7 @@ Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict ray
                                                 Cutout cutout, bool isTriangul) {
     Collision col;
     switch (surface.m_type) {
-        case SurfaceType::PlaneXZ: {
+        case SurfaceType::Plane: {
             col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
 
             // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).

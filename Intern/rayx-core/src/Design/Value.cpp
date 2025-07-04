@@ -52,6 +52,7 @@ ValueType DesignMap::type() const {
         ValueType::ElementType,
         ValueType::GratingMount,
         ValueType::CrystalType,
+        ValueType::DesignPlane,
     };
     return types[m_variant.index()];
 }
@@ -189,6 +190,11 @@ GratingMount DesignMap::as_gratingMount() const {
 CrystalType DesignMap::as_crystalType() const {
     if (auto* x = std::get_if<CrystalType>(&m_variant)) return *x;
     throw std::runtime_error("as_crystalType() called on non-crystalType!");
+}
+
+DesignPlane DesignMap::as_designPlane() const {
+    if (auto* x = std::get_if<DesignPlane>(&m_variant)) return *x;
+    throw std::runtime_error("as_designPlane() called on non-designPlane!");
 }
 
 const DesignMap& DesignMap::operator[](const std::string& s) const {

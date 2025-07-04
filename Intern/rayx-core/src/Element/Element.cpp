@@ -53,7 +53,7 @@ inline glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plan
 
 inline int defaultMaterial(const DesignElement& dele) { return static_cast<int>(dele.getMaterial()); }
 
-OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout, DesignPlane plane) {
+OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane, std::optional<Cutout> cutout ) {
     if (!cutout) {
         cutout = dele.getCutout();
     }
@@ -95,7 +95,8 @@ std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSourc
                                                        {ElementType::DipoleSrc, "Dipole"},
                                                        {ElementType::PixelSource, "Pixel Source"},
                                                        {ElementType::EllipsoidMirror, "Ellipsoid"},
-                                                       {ElementType::Crystal, "Crystal"}};
+                                                       {ElementType::Crystal, "Crystal"},
+                                                       {ElementType::Foil, "Foil"}};
 
 ElementType findElementString(const std::string& name) {
     auto it = std::find_if(ElementStringMap.begin(), ElementStringMap.end(),

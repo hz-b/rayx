@@ -12,7 +12,7 @@ namespace RAYX {
 enum class SurfaceType {
     Quadric,
     Toroid,
-    PlaneXZ,
+    Plane,
     Cubic,
 };
 
@@ -33,7 +33,7 @@ Surface makeEllipsoid(const DesignElement& dele);   //< creates a Ellipsoid from
 Surface makeCone(const DesignElement& dele);        //< creates a Cone from the parameters given in ` dele`.
 Surface makeCylinder(const DesignElement& dele);    //< creates a Cylinder from the parameters given in ` dele`.
 Surface makeSphere(double radius);                  //< creates a sphere from the radius .
-Surface makePlane();                                //< creates a plane surface.
+Surface makePlane();                              //< creates a plane surface
 Surface makeParaboloid(const DesignElement& dele);  //< creates a Paraboloid from the parameters given in ` dele`.
 
 ///////////////////
@@ -123,15 +123,15 @@ inline ToroidSurface deserializeToroid(Surface ser) {
 }
 
 /////////////
-// Plane XZ
+// Plane
 /////////////
 
-// `PlaneXZ` doesn't have any data so it doesn't need a struct.
+// `Plane` doesn't have any data so it doesn't need a struct.
 
 RAYX_FN_ACC
-inline Surface serializePlaneXZ() {
+inline Surface serializePlane() {
     Surface ser;
-    ser.m_type = SurfaceType::PlaneXZ;
+    ser.m_type = SurfaceType::Plane;
     return ser;
 }
 

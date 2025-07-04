@@ -234,5 +234,14 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setDSpacing2(double value);
     double getDSpacing2() const;
+
+    void setThicknessSubstrate(double value);
+    double getThicknessSubstrate() const;
+
+    void setRoughnessSubstrate(double value);
+    double getRoughnessSubstrate() const;
+    
+    void setDesignPlane(DesignPlane value);
+    DesignPlane getDesignPlane() const;
 };
 }  // namespace RAYX

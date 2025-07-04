@@ -19,6 +19,8 @@ Behaviour makeBehaviour(const DesignElement& dele) {
             return makeRZPBehaviour(dele);
         case BehaviourType::Slit:
             return makeSlit(dele);
+        case BehaviourType::Foil:
+            return makeFoil(dele);
         default:
             return serializeImagePlane();
     }
@@ -146,5 +148,14 @@ Behaviour makeRZPBehaviour(const DesignElement& dele) {
                          .m_designBetaAngle = designBetaAngle.rad,
                          .m_additionalOrder = (double)additionalOrder});
 }
+
+// Foil Behaviour
+Behaviour makeFoil(const DesignElement& dele) {
+    auto thicknessSubstrate = dele.getThicknessSubstrate();
+    auto roughnessSubstrate = dele.getRoughnessSubstrate();
+
+    return serializeFoil({.m_thicknessSubstrate = thicknessSubstrate, 
+                        .m_roughnessSubstrate = roughnessSubstrate,});
+    }
 
 }  // namespace RAYX

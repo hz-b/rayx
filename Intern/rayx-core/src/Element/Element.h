@@ -23,6 +23,7 @@ enum class ElementType {
     CylinderMirror,
     EllipsoidMirror,
     ExpertsMirror,
+    Foil,
     ParaboloidMirror,
     PlaneGrating,
     PlaneMirror,
@@ -63,8 +64,8 @@ static_assert(std::is_trivially_default_constructible_v<OpticalElement>);
 RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
 
 // constructs an OpticalElement given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
-OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, std::optional<Cutout> cutout = {},
-                           DesignPlane plane = DesignPlane::XZ);
+OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane = DesignPlane::XZ,
+                            std::optional<Cutout> cutout = {});
 
 extern std::map<ElementType, std::string> RAYX_API ElementStringMap;
 ElementType RAYX_API findElementString(const std::string& name);

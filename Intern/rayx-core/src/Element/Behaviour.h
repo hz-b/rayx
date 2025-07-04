@@ -16,6 +16,7 @@ enum class BehaveType {
     RZP,
     ImagePlane,
     Crystal,
+    Foil
 };
 
 struct Behaviour {
@@ -35,7 +36,7 @@ Behaviour makeCrystal(const DesignElement& dele);
 Behaviour makeGrating(const DesignElement& dele);  //< creates a Grating Behaviour from the parameters given in `dele`.
 Behaviour makeSlit(const DesignElement& dele);
 Behaviour makeRZPBehaviour(const DesignElement& dele);
-Behaviour makeCrystalBehaviour(const DesignElement& dele);
+Behaviour makeFoil(const DesignElement& dele);
 
 ////////////////////
 // Mirror
@@ -264,6 +265,33 @@ inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
     c.m_structureFactorImFHC = b.m_private_serialization_params[8];
 
     return c;
+}
+
+/////////////////
+// FOIL
+////////////////
+
+struct FoilBehaviour {
+    //Substrates
+    double m_thicknessSubstrate;
+    double m_roughnessSubstrate;
+};
+
+RAYX_FN_ACC
+inline Behaviour serializeFoil(FoilBehaviour f) {
+    Behaviour b;
+    b.m_type = BehaveType::Foil;
+    b.m_private_serialization_params[0] = f.m_thicknessSubstrate;
+    b.m_private_serialization_params[1] = f.m_roughnessSubstrate;
+    return b;
+}
+
+RAYX_FN_ACC
+inline FoilBehaviour deserializeFoil(Behaviour b) {
+    FoilBehaviour f;
+    f.m_thicknessSubstrate = b.m_private_serialization_params[0];
+    f.m_roughnessSubstrate = b.m_private_serialization_params[1];
+    return f;
 }
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.

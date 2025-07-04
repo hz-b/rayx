@@ -38,6 +38,9 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
         case ElementType::ExpertsMirror:
             getExpertsOptics(parser, de);
             break;
+        case ElementType::Foil:
+            getFoil(parser, de);
+            break;
         case ElementType::ParaboloidMirror:
             getParaboloid(parser, de);
             break;

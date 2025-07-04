@@ -57,6 +57,9 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
             case BehaveType::ImagePlane:
                 ray = behaveImagePlane(ray);
                 break;
+            case BehaveType::Foil:
+                ray = behaveFoil(ray, behaviour, col, element.m_material, inv.materialIndices, inv.materialTables);
+                break;
         }
 
         // write ray in local element coordinates to global memory
