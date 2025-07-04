@@ -59,7 +59,7 @@ inline std::string findEventTypeString(const EventType eventType) {
         case EventType::Emitted:
             return "Emitted";
         default:
-            _debug_throw("unable to convert EventType (%d) to string!", static_cast<int>(eventType));
+            //_debug_throw("unable to convert EventType (%d) to string!", static_cast<int>(eventType));
             return "<unknown-event-type>";
     }
 }

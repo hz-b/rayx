@@ -1,0 +1,187 @@
+diff --git a/Intern/rayx-core/src/Tracer/DeviceTracer.h b/Intern/rayx-core/src/Tracer/DeviceTracer.h
+index 4e09e5ac..ea6e11ed 100644
+--- a/Intern/rayx-core/src/Tracer/DeviceTracer.h
++++ b/Intern/rayx-core/src/Tracer/DeviceTracer.h
+@@ -9,6 +9,11 @@
+ 
+ namespace RAYX {
+ 
++// Small helper to make passing the full record mask easier. 
++inline std::vector<bool> fullRecordMask(size_t numElements) {
++    return std::vector<bool>(numElements, true);
++}
++
+ /**
+  * @brief DeviceTracer is an interface to a tracer implementation
+  * we use this interface to remove the actual implementation from the rayx api
+@@ -17,8 +22,13 @@ class RAYX_API DeviceTracer {
+   public:
+     virtual ~DeviceTracer() = default;
+ 
+-    virtual RaySoA trace(const Group&, Sequential sequential, const int maxBatchSize, const int maxEvents, std::shared_ptr<bool[]> recordMask,
+-                         const RayAttrFlag attr) = 0;
++    virtual RaySoA trace(
++        const Group& beamline, 
++        Sequential sequential, 
++        const int maxBatchSize, 
++        const int maxEvents, 
++        const std::vector<bool>& recordMask, 
++        const RayAttrFlag attr) = 0;
+ };
+ 
+ }  // namespace RAYX
+diff --git a/Intern/rayx-core/src/Tracer/MegaKernelTracer.h b/Intern/rayx-core/src/Tracer/MegaKernelTracer.h
+index c83c201e..da1bdc23 100644
+--- a/Intern/rayx-core/src/Tracer/MegaKernelTracer.h
++++ b/Intern/rayx-core/src/Tracer/MegaKernelTracer.h
+@@ -77,7 +77,7 @@ struct Resources {
+ 
+     /// update resources
+     template <typename Queue>
+-    Config update(Queue q, const Group& group, int maxEvents, int maxBatchSize, std::shared_ptr<bool[]> recordMask) {
++    Config update(Queue q, const Group& group, int maxEvents, int maxBatchSize, const std::vector<bool>& recordMask) {
+         RAYX_PROFILE_FUNCTION_STDOUT();
+ 
+         const auto platformHost = alpaka::PlatformCpu{};
+@@ -101,10 +101,14 @@ struct Resources {
+         alpaka::memcpy(q, *d_elements, alpaka::createView(devHost, elements, numElements));
+ 
+         // record mask
+-        if (recordMask) {
+-            allocBuf(q, d_recordMask, numElements);
+-            alpaka::memcpy(q, *d_recordMask, alpaka::createView(devHost, recordMask.get(), numElements));
++        assert(recordMask.size() == static_cast<size_t>(numElements));
++        allocBuf(q, d_recordMask, numElements);
++        std::unique_ptr<bool[]> tmpHostMask(new bool[numElements]);
++        for(int i = 0; i < numElements; ++i) {
++            tmpHostMask[i] = recordMask[i];
+         }
++        auto hostView = alpaka::createView(devHost, tmpHostMask.get(), numElements);
++        alpaka::memcpy(q, d_recordMask, hostView);
+ 
+         // input rays
+         h_rays = group.compileSources(1);  // TODO: generate rays on device
+@@ -157,8 +161,13 @@ class MegaKernelTracer : public DeviceTracer {
+     Resources<Acc> m_resources;
+ 
+   public:
+-    virtual RaySoA trace(const Group& beamline, const Sequential sequential, const int maxBatchSize, const int maxEvents,
+-                         std::shared_ptr<bool[]> recordMask, const RayAttrFlag attr) override {
++    virtual RaySoA trace(
++        const Group& beamline, 
++        Sequential sequential, 
++        const int maxBatchSize, 
++        const int maxEvents, 
++        const std::vector<bool>& recordMask, 
++        const RayAttrFlag attr) override {
+         RAYX_PROFILE_FUNCTION_STDOUT();
+ 
+         const auto platformHost = alpaka::PlatformCpu{};
+@@ -284,7 +293,7 @@ class MegaKernelTracer : public DeviceTracer {
+             .numElements = numElements,
+             .materialIndices = alpaka::getPtrNative(*m_resources.d_materialIndices),
+             .materialTables = alpaka::getPtrNative(*m_resources.d_materialTable),
+-            .recordMask = (m_resources.d_recordMask.has_value()) ? alpaka::getPtrNative(*m_resources.d_recordMask) : nullptr,
++            .recordMask = alpaka::getPtrNative(*m_resources.d_recordMask),
+             .rays = alpaka::getPtrNative(*m_resources.d_rays),
+         };
+ 
+diff --git a/Intern/rayx-core/src/Tracer/Tracer.cpp b/Intern/rayx-core/src/Tracer/Tracer.cpp
+index b3e0fd3e..af48327a 100644
+--- a/Intern/rayx-core/src/Tracer/Tracer.cpp
++++ b/Intern/rayx-core/src/Tracer/Tracer.cpp
+@@ -51,8 +51,7 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
+     }
+ }
+ 
+-RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, std::shared_ptr<bool[]> recordMask,
+-                     RayAttrFlag attr) {
++RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask, const RayAttrFlag attr) {
+     // in sequential tracing, maxEvents should be equal to the number of elements
+     if (sequential == Sequential::Yes) maxEvents = group.numElements();
+ 
+diff --git a/Intern/rayx-core/src/Tracer/Tracer.h b/Intern/rayx-core/src/Tracer/Tracer.h
+index f6a7e7bc..68e1180f 100644
+--- a/Intern/rayx-core/src/Tracer/Tracer.h
++++ b/Intern/rayx-core/src/Tracer/Tracer.h
+@@ -29,8 +29,14 @@ class RAYX_API Tracer {
+     // This will call the trace implementation of a subclass
+     // See `BundleHistory` for information about the return value.
+     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
+-    RaySoA trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, std::shared_ptr<bool[]> recordMask = nullptr,
+-                 RayAttrFlag attr = RayAttrFlag::All);
++
++    RaySoA trace(
++        const Group& group, 
++        const Sequential sequential, 
++        uint64_t maxBatchSize, 
++        uint32_t maxEvents, 
++        const std::vector<bool>& recordMask,
++        const RayAttrFlag attr = RayAttrFlag::All);
+ 
+     static int defaultMaxEvents(const Group* group);
+ 
+diff --git a/Intern/rayx-core/tests/setupTests.cpp b/Intern/rayx-core/tests/setupTests.cpp
+index 43459fb4..5388733b 100644
+--- a/Intern/rayx-core/tests/setupTests.cpp
++++ b/Intern/rayx-core/tests/setupTests.cpp
+@@ -77,7 +77,8 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
+ 
+ RAYX::BundleHistory traceRML(std::string filename) {
+     const auto beamline = loadBeamline(filename);
+-    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, beamline.numElements() + 2);
++    const auto numElements = beamline.numElements();
++    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, numElements + 2, fullRecordMask(numElements));
+     return raySoAToBundleHistory(rays);
+ }
+ 
+@@ -177,7 +178,9 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
+ // returns the rayx rays converted to be ray-UI compatible.
+ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
+     const auto beamline = loadBeamline(filename);
+-    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2);
++    const auto numElements = beamline.numElements();
++    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, fullRecordMask(numElements));
++
+     const auto hist = raySoAToBundleHistory(rays);
+ 
+     std::vector<RAYX::Ray> out;
+diff --git a/Intern/rayx/src/TerminalApp.cpp b/Intern/rayx/src/TerminalApp.cpp
+index 03837ee6..7dc2e7f0 100644
+--- a/Intern/rayx/src/TerminalApp.cpp
++++ b/Intern/rayx/src/TerminalApp.cpp
+@@ -155,15 +155,27 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
+         RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+         const int maxEvents =
+             (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
+-        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
+         size_t numElements = m_Beamline->numElements();
+-        auto recordMask = std::make_shared<bool[]>(numElements);
+-        std::fill_n(recordMask.get(), numElements, false);
+-        for (auto idx : recordIndices) {
+-            if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
+-            if (idx > numElements - 1) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
+-            recordMask[idx] = true;
++
++        // Record mask
++        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
++        std::vector<bool> recordMask(numElements, true);
++        if (!recordIndices.empty()) {
++            recordMask = std::vector<bool>(numElements, false);
++            for (auto idx : recordIndices) {
++                if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
++                if (idx > numElements - 1) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
++                recordMask[idx] = true;
++            }
++        }
++
++        // Verbose log: print mask as a string of 0s and 1s
++        std::string maskStr;
++        maskStr.reserve(numElements);
++        for (auto b : recordMask) {
++            maskStr += b;
+         }
++        RAYX_VERB << "recordMask [size=" << numElements << "]: " << maskStr;
+ 
+         const auto attr =
+             m_CommandParser->m_args.m_format.empty() ? RAYX::RayAttrFlag::All : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
