@@ -11,6 +11,7 @@
 #include "Refrac.h"
 #include "RefractiveIndex.h"
 #include "SphericalCoords.h"
+#include "Transmission.h"
 #include "Throw.h"
 #include "Transmission.h"
 #include "Utils.h"

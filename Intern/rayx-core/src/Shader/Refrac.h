@@ -4,6 +4,8 @@
 
 #include "Complex.h"
 #include "Ray.h"
+#include <cmath>
+#include "Complex.h" 
 #include "Utils.h"
 
 namespace RAYX {
