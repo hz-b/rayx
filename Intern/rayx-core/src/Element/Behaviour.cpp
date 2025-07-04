@@ -160,4 +160,10 @@ Behaviour makeFoil(const DesignElement& dele) {
     });
 }
 
+Behaviour makeLens(const DesignElement& dele) {
+    auto lensThickness = dele.getLensThickness();
+
+    return serializeLens({.m_lensThickness = lensThickness,});
+
+    }
 }  // namespace RAYX

@@ -198,6 +198,17 @@ Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int 
     return r;
 }
 
+// behave Lens
+RAYX_FN_ACC Ray behaveLens(Ray r, const Behaviour behaviour, const Collision col, int material, const int* __restrict materialIndices, const double* __restrict materialTable, Surface surface, const Cutout cutout) {
+    LensBehaviour b = deserializeLens(behaviour);
+
+    // Lens specific behavior implementation goes here
+    Collision exitcollision = findCollisionInElementCoords(col.hitpoint, r.m_direction, surface, cutout, true);
+
+    r.m_position = exitcollision.hitpoint;
+    return r;
+}
+
 RAYX_FN_ACC Ray behaveImagePlane(Ray r) { return r; }
 
 }  // namespace RAYX

@@ -24,6 +24,7 @@ enum class ElementType {
     EllipsoidMirror,
     ExpertsMirror,
     Foil,
+    SphereLens,
     ParaboloidMirror,
     PlaneGrating,
     PlaneMirror,
