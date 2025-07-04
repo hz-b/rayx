@@ -40,7 +40,7 @@ class BeamlineDesignHandler {
                      "Material",         "totalLength",      "lineDensity",       "deviationAngle", "radius",
                      "OrderDiffraction", "lognRadius",       "shortRadius",       "armLength",      "parameter_a11",
                      "parameter_P",      "parameter_P_type", "entranceArmLength", "exitArmLength",  "designGrazingIncAngle",
-                     "figureRotation",   "longHalfAxisA",    "shortHalfAxisB",    "longRadius"}}};
+                     "figureRotation",   "longHalfAxisA",    "shortHalfAxisB",    "longRadius"}},};
 
     const std::vector<std::string> customOrder = {"type",
                                                   "name",
@@ -77,5 +77,8 @@ class BeamlineDesignHandler {
                                                   "totalWidth",
                                                   "openingShape",
                                                   "openingHeight",
-                                                  "openingWidth"};
+                                                  "openingWidth", 
+                                                  "transmissionType", 
+                                                  "thicknessSubstrate",
+                                                  "roughnessSubstrate"};
 };

@@ -45,4 +45,20 @@ Ray refrac2D(Ray r, glm::dvec3 normal, double density_z, double density_x) {
     return r;
 }
 
+/**
+ * Simple refraction for double precision vectors
+ * @params:  I: incident vector
+ *           N: normal vector at the point of intersection
+ *           eta: ratio of refractive indices (n1/n2)
+ * @returns: refracted vector, or zero vector if total internal reflection occurs
+ */
+RAYX_FN_ACC
+glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta) {
+    double cosi = glm::dot(-I, N);
+    double cost2 = 1.0 - eta * eta * (1.0 - cosi * cosi);
+    if (cost2 < 0.0) return glm::dvec3(0.0); // Total internal reflection
+    return eta * I + (eta * cosi - sqrt(cost2)) * N;
+}
+
+
 }  // namespace RAYX

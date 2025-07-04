@@ -47,7 +47,8 @@ enum class ValueType {
     BehaviourType,
     ElementType,
     GratingMount,
-    CrystalType
+    CrystalType,
+    DesignPlane
 };
 
 class Undefined {};
@@ -96,6 +97,7 @@ class RAYX_API DesignMap {
     DesignMap(ElementType x) : m_variant(x) {}
     DesignMap(GratingMount x) : m_variant(x) {}
     DesignMap(CrystalType x) : m_variant(x) {}
+    DesignMap(DesignPlane x) : m_variant(x) {}
 
     // Assignment operators
     void operator=(double x) { m_variant = x; }
@@ -126,6 +128,7 @@ class RAYX_API DesignMap {
     void operator=(GratingMount x) { m_variant = x; }
     void operator=(ElementType x) { m_variant = x; }
     void operator=(CrystalType x) { m_variant = x; }
+    void operator=(DesignPlane x) { m_variant = x; }
 
     // Deep copy (clone) method.
     DesignMap clone() const;
@@ -160,6 +163,7 @@ class RAYX_API DesignMap {
     ElementType as_elementType() const;
     GratingMount as_gratingMount() const;
     CrystalType as_crystalType() const;
+    DesignPlane as_designPlane() const;
 
     // Subscript operators.
     const DesignMap& operator[](const std::string& s) const;
@@ -236,7 +240,7 @@ class RAYX_API DesignMap {
   private:
     std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
                  CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist,
-                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType>
+                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType, DesignPlane>
         m_variant;
 };
 

@@ -27,7 +27,7 @@ Surface makeSurface(const DesignElement& dele) {
     }
 }
 
-Surface makePlane() { return serializePlaneXZ(); }
+Surface makePlane() { return serializePlane(); }
 
 Surface makeCylinder(const DesignElement& dele) {
     auto cyl_direction = dele.getRadiusDirection();

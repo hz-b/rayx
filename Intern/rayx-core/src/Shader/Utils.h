@@ -36,7 +36,7 @@ inline Ray RAYX_API rayMatrixMult(const glm::dmat4 m, Ray r) {
 RAYX_FN_ACC double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal);
 
 RAYX_FN_ACC
-inline constexpr bool isRayActive(const EventType eventType) { return eventType == EventType::Emitted || eventType == EventType::HitElement; }
+inline constexpr bool isRayActive(const EventType eventType) { return eventType == EventType::Emitted || eventType == EventType::HitElement || eventType == EventType::Transmitted; }
 
 RAYX_FN_ACC
 [[nodiscard]] inline constexpr Ray terminateRay(Ray r, const EventType eventType) {

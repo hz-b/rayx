@@ -444,7 +444,7 @@ bool isPlanar(const RAYX::QuadricSurface& q) {
 void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     switch (compiled.m_surface.m_type) {
-        case RAYX::SurfaceType::PlaneXZ: {
+        case RAYX::SurfaceType::Plane: {
             planarTriangulation(compiled, vertices, indices);
             break;
         }

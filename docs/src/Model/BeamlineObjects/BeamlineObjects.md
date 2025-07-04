@@ -25,6 +25,7 @@ We divide the objects into two categories: Light Sources and Optical Elements. A
 - [Crystal](OpticalElements/Crystal.md)
 - [Cylindrical Mirror](OpticalElements/Cylinder-Mirror.md)
 - [Ellipsoid Mirror](OpticalElements/Ellipsoid-Mirror.md)
+- [Foil](OpticalElements/Foil.md)
 - [Spherical Mirror](OpticalElements/Sphere-Mirror.md)
 - [Spherical Grating](OpticalElements/Sphere-Grating.md)
 - [Toroidal Mirror](OpticalElements/Toroid-Mirror.md)
