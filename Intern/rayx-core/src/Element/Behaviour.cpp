@@ -158,4 +158,10 @@ Behaviour makeFoil(const DesignElement& dele) {
                         .m_roughnessSubstrate = roughnessSubstrate,});
     }
 
+Behaviour makeLens(const DesignElement& dele) {
+    auto lensThickness = dele.getLensThickness();
+
+    return serializeLens({.m_lensThickness = lensThickness,});
+
+    }
 }  // namespace RAYX

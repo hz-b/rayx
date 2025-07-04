@@ -16,7 +16,8 @@ enum class BehaveType {
     RZP,
     ImagePlane,
     Crystal,
-    Foil
+    Foil,
+    Lens 
 };
 
 struct Behaviour {
@@ -33,11 +34,11 @@ enum class RZPType { Elliptical, Meriodional };
 enum class CentralBeamstop { None, Rectangle, Elliptical };
 Behaviour makeBehaviour(const DesignElement& dele);
 Behaviour makeCrystal(const DesignElement& dele);
-Behaviour makeGrating(const DesignElement& dele);  //< creates a Grating Behaviour from the parameters given in `dele`.
+Behaviour makeGrating(const DesignElement& dele);
 Behaviour makeSlit(const DesignElement& dele);
 Behaviour makeRZPBehaviour(const DesignElement& dele);
 Behaviour makeFoil(const DesignElement& dele);
-
+Behaviour makeLens(const DesignElement& dele);
 ////////////////////
 // Mirror
 ////////////////////
@@ -293,6 +294,32 @@ inline FoilBehaviour deserializeFoil(Behaviour b) {
     f.m_roughnessSubstrate = b.m_private_serialization_params[1];
     return f;
 }
+
+/////////////////
+// LENS
+////////////////
+
+struct LensBehaviour {
+    double m_lensThickness;  // Thickness of the lens
+
+};
+
+inline Behaviour serializeLens(LensBehaviour l) {
+    Behaviour b;
+    b.m_type = BehaveType::Lens;
+
+    b.m_private_serialization_params[0] = l.m_lensThickness;
+
+    return b;
+}
+
+inline LensBehaviour deserializeLens(Behaviour b) {
+    LensBehaviour l;
+    l.m_lensThickness = b.m_private_serialization_params[0];
+
+    return l;
+}
+
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

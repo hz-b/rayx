@@ -241,4 +241,13 @@ void getFoil(xml::Parser parser, DesignElement* de) {
     de->setRoughnessSubstrate(parser.parseRoughnessSubstrate());
 }
 
+void getSphericalLens(xml::Parser parser, DesignElement* de) {
+    setAllMandatory(parser, de, DesignPlane::XY);
+    de->setCurvatureType(CurvatureType::Spherical);
+    de->setBehaviourType(BehaviourType::Lens);
+
+    de->setRadius(parser.parseRadius());
+    de->setLensThickness(10.0);
+}
+
 }  // namespace RAYX

@@ -27,13 +27,13 @@ struct RAYX_API Collision {
 
 static_assert(std::is_trivially_copyable_v<Collision>);
 
-RAYX_FN_ACC Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, QuadricSurface q);
+RAYX_FN_ACC Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, QuadricSurface q, bool isLens);
 
 RAYX_FN_ACC Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, ToroidSurface toroid,
                                          bool isTriangul);
 
 RAYX_FN_ACC Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
-                                                            Surface surface, Cutout cutout, bool isTriangul);
+                                                            Surface surface, Cutout cutout, bool isTriangul, bool lens = false);
 
 RAYX_FN_ACC Collision findCollisionWith(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const int elementIndex,
                                         const OpticalElement& __restrict element, Rand& __restrict rand);

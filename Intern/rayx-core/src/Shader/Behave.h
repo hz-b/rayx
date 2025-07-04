@@ -24,5 +24,6 @@ RAYX_FN_ACC Ray behaveGrating(Ray r, const Behaviour behaviour, Collision col);
 RAYX_FN_ACC Ray behaveMirror(Ray r, const Collision col, int material, const int* materialIndices, const double* materialTable);
 RAYX_FN_ACC Ray behaveImagePlane(Ray r);
 RAYX_FN_ACC Ray behaveFoil(Ray r, const Behaviour behaviour, Collision col, int material, const int* materialIndices, const double* materialTable);
-
+RAYX_FN_ACC Ray behaveLens(Ray r, const Behaviour behaviour, Collision col, int material, const int* materialIndices, const double* materialTable, 
+                           Surface surface, const Cutout cutout);
 }  // namespace RAYX

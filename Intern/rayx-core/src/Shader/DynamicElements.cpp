@@ -60,6 +60,11 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
             case BehaveType::Foil:
                 ray = behaveFoil(ray, behaviour, col, element.m_material, inv.materialIndices, inv.materialTables);
                 break;
+            case BehaveType::Lens:
+                auto surface = element.m_surface;
+                const auto cutout = element.m_cutout;
+                ray = behaveLens(ray, behaviour, col, element.m_material, inv.materialIndices, inv.materialTables, surface, cutout);
+                break;
         }
 
         // write ray in local element coordinates to global memory
