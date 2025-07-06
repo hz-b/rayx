@@ -97,7 +97,8 @@ std::map<ElementType, std::string> ElementStringMap = {{ElementType::CircleSourc
                                                        {ElementType::EllipsoidMirror, "Ellipsoid"},
                                                        {ElementType::Crystal, "Crystal"},
                                                        {ElementType::Foil, "Foil"},
-                                                       {ElementType::SphereLens, "Spherical Lens"}};
+                                                       {ElementType::SphereLensEntrance, "Spherical Lens Entrance"},
+                                                       {ElementType::SphereLensExit, "Spherical Lens Exit"}};
 
 ElementType findElementString(const std::string& name) {
     auto it = std::find_if(ElementStringMap.begin(), ElementStringMap.end(),

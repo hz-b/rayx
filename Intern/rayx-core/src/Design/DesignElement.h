@@ -244,7 +244,7 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setDesignPlane(DesignPlane value);
     DesignPlane getDesignPlane() const;
 
-    void setLensThickness(double value);
-    double getLensThickness() const;
+    void setLensCurvatureType(bool value);
+    bool getLensCurvatureType() const;
 };
 }  // namespace RAYX

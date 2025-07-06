@@ -21,6 +21,8 @@ Behaviour makeBehaviour(const DesignElement& dele) {
             return makeSlit(dele);
         case BehaviourType::Foil:
             return makeFoil(dele);
+        case BehaviourType::Lens:
+            return makeLens(dele);
         default:
             return serializeImagePlane();
     }
@@ -160,10 +162,10 @@ Behaviour makeFoil(const DesignElement& dele) {
     });
 }
 
-Behaviour makeLens(const DesignElement& dele) {
-    auto lensThickness = dele.getLensThickness();
+Behaviour makeLens(const DesignElement& dele) { 
+    auto entrance = dele.getLensCurvatureType();
+    return serializeLens({.m_entrance = entrance}); 
+}
 
-    return serializeLens({.m_lensThickness = lensThickness,});
 
-    }
 }  // namespace RAYX

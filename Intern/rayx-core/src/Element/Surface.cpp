@@ -10,9 +10,11 @@ Surface makeSurface(const DesignElement& dele) {
         case CurvatureType::Toroidal:
             return makeToroid(dele);
         case CurvatureType::Spherical:
-            return makeSphere(dele.getRadius());
+            return makeSphere(dele.getRadius(), false);
         case CurvatureType::RzpSphere:
-            return makeSphere(dele.getLongRadius());
+            return makeSphere(dele.getLongRadius(), false);
+        case CurvatureType::SphericalVolume:
+            return makeSphere(dele.getRadius(), dele.getLensCurvatureType());
         case CurvatureType::Cone:
             return makeCone(dele);
         case CurvatureType::Cylinder:
@@ -204,9 +206,11 @@ Surface makeEllipsoid(const DesignElement& dele) {
     });
 }
 
-Surface makeSphere(double radius) {
+Surface makeSphere(double radius, bool volumeEntrance) { // volume Entrance needs to be convex
+    int icurve;
+    volumeEntrance ? icurve = -1 : icurve = 1;
     return serializeQuadric({
-        .m_icurv = 1,
+        .m_icurv = icurve,
         .m_a11 = 1,
         .m_a12 = 0,
         .m_a13 = 0,
@@ -219,6 +223,7 @@ Surface makeSphere(double radius) {
         .m_a44 = 0,
     });
 }
+
 
 Surface makeToroid(const DesignElement& dele) {
     return serializeToroid({

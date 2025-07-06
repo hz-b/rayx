@@ -202,10 +202,32 @@ Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int 
 RAYX_FN_ACC Ray behaveLens(Ray r, const Behaviour behaviour, const Collision col, int material, const int* __restrict materialIndices, const double* __restrict materialTable, Surface surface, const Cutout cutout) {
     LensBehaviour b = deserializeLens(behaviour);
 
-    // Lens specific behavior implementation goes here
-    Collision exitcollision = findCollisionInElementCoords(col.hitpoint, r.m_direction, surface, cutout, true);
+    // calc refract angle 
+    double angle = angleBetweenUnitVectors(-r.m_direction, col.normal); // in rad
+    if (std::isnan(angle) || angle == 0) angle = 1e-8;
+    const auto incidentAngle = complex::Complex(angle, 0);  
 
-    r.m_position = exitcollision.hitpoint;
+    complex::Complex firstSubstrat;
+    complex::Complex secondSubstrat;
+
+    if (b.m_entrance) {    
+        firstSubstrat = getRefractiveIndex(r.m_energy, -1, materialIndices, materialTable); 
+        secondSubstrat = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+    } else {
+        firstSubstrat = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+        secondSubstrat = getRefractiveIndex(r.m_energy, -1, materialIndices, materialTable);
+    }
+
+    const auto refractAngle = calcRefractAngle(incidentAngle, firstSubstrat, secondSubstrat);
+    const auto refracvec = refract_dvec3(r.m_direction, col.normal, firstSubstrat.real() / secondSubstrat.real());
+    // calc refract amplitude
+    ComplexFresnelCoeffs refractAmplitude = calcRefractAmplitude(incidentAngle, refractAngle, firstSubstrat, secondSubstrat);
+    // Lens specific behavior implementation goes here
+    //r.m_field = interceptRefract(r.m_field, r.m_direction, col.normal, refractAmplitude);
+    const auto transmittPolarizationMatrix = calcPolaririzationMatrixFoil(r.m_direction, col.normal, refractAmplitude);
+    r.m_field = transmittPolarizationMatrix * r.m_field;
+
+    r.m_direction = refracvec;
     return r;
 }
 

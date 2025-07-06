@@ -8,8 +8,8 @@
     <param id="sourceWidth" enabled="T">0.065</param>
     <param id="sourceHeight" enabled="T">0.04</param>
     <param id="sourceDepth" enabled="T">0</param>
-    <param id="horDiv" enabled="T">1</param>
-    <param id="verDiv" enabled="T">1</param>
+    <param id="horDiv" enabled="T">100</param>
+    <param id="verDiv" enabled="T">100</param>
     <param id="energyDistributionType" comment="Values" enabled="T">1</param>
     <param id="photonEnergyDistributionFile" relative="" enabled="F"></param>
     <param id="photonEnergy" enabled="T">100</param>
@@ -42,15 +42,14 @@
     </param>
   </object>
 
-  <object name="SphereLensDefault" type="Spherical Lens">
+  <object name="SphereLensDefault" type="Spherical Lens Entrance">
     <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-    <param id="totalWidth" enabled="T">50</param>
+    <param id="totalWidth" enabled="T">200</param>
     <param id="totalHeight" enabled="T">200</param>
-    <param id="radius" auto="T" enabled="T">10470.4917875</param>
+    <param id="radius" auto="T" enabled="T">1047</param>
     <param id="azimuthalAngle" enabled="T">0</param>
     <param id="transmissionType" comment="Derived by Material" enabled="T">1</param>
-    <param id="materialSubstrate" enabled="T">Au</param>
-    <param id="LensThickness" enabled="T">50</param>    
+    <param id="materialSubstrate" enabled="T">Si</param>
     <param id="alignmentError" comment="No" enabled="T">1</param>
     <param id="translationXerror" enabled="F">0</param>
     <param id="translationYerror" enabled="F">0</param>
@@ -61,7 +60,44 @@
     <param id="worldPosition" enabled="F">
       <x>0</x>
       <y>0</y>
-      <z>10000</z>
+      <z>1000</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>1</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>0</x>
+      <y>1</y>
+      <z>0</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>1</z>
+    </param>
+  </object>
+
+    <object name="SphereLensDefault" type="Spherical Lens Exit">
+    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+    <param id="totalWidth" enabled="T">200</param>
+    <param id="totalHeight" enabled="T">200</param>
+    <param id="radius" auto="T" enabled="T">1047</param>
+    <param id="azimuthalAngle" enabled="T">0</param>
+    <param id="transmissionType" comment="Derived by Material" enabled="T">1</param>
+    <param id="materialSubstrate" enabled="T">Si</param>
+    <param id="alignmentError" comment="No" enabled="T">1</param>
+    <param id="translationXerror" enabled="F">0</param>
+    <param id="translationYerror" enabled="F">0</param>
+    <param id="translationZerror" enabled="F">0</param>
+    <param id="rotationXerror" enabled="F">0</param>
+    <param id="rotationYerror" enabled="F">0</param>
+    <param id="rotationZerror" enabled="F">0</param>
+    <param id="worldPosition" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>1010</z>
     </param>
     <param id="worldXdirection" enabled="F">
       <x>1</x>
@@ -85,7 +121,7 @@
     <param id="worldPosition" enabled="F">
       <x>0</x>
       <y>0</y>
-      <z>11000</z>
+      <z>1020</z>
     </param>
     <param id="worldXdirection" enabled="F">
       <x>1</x>

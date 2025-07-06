@@ -41,8 +41,11 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
         case ElementType::Foil:
             getFoil(parser, de);
             break;
-        case ElementType::SphereLens:
-            getSphericalLens(parser, de);
+        case ElementType::SphereLensEntrance:
+            getSphericalLens(parser, de, true);
+            break;
+        case ElementType::SphereLensExit:
+            getSphericalLens(parser, de, false);
             break;
         case ElementType::ParaboloidMirror:
             getParaboloid(parser, de);
