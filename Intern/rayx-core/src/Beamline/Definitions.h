@@ -9,6 +9,7 @@ enum class CurvatureType {
     Plane,
     Toroidal,
     Spherical,
+    SphericalVolume,
     Cubic,
     Cone,
     Cylinder,

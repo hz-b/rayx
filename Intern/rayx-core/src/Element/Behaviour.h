@@ -17,7 +17,8 @@ enum class BehaveType {
     ImagePlane,
     Crystal,
     Foil,
-    Lens 
+    Lens
+
 };
 
 struct Behaviour {
@@ -300,26 +301,23 @@ inline FoilBehaviour deserializeFoil(Behaviour b) {
 ////////////////
 
 struct LensBehaviour {
-    double m_lensThickness;  // Thickness of the lens
+    bool m_entrance;  // Whether the lens is an entrance lens or not
 
 };
 
 inline Behaviour serializeLens(LensBehaviour l) {
     Behaviour b;
     b.m_type = BehaveType::Lens;
-
-    b.m_private_serialization_params[0] = l.m_lensThickness;
-
+    b.m_private_serialization_params[0] = l.m_entrance;
     return b;
 }
 
-inline LensBehaviour deserializeLens(Behaviour b) {
-    LensBehaviour l;
-    l.m_lensThickness = b.m_private_serialization_params[0];
-
-    return l;
+RAYX_FN_ACC
+inline LensBehaviour deserializeLens(const Behaviour& b) {
+    LensBehaviour lens;
+    lens.m_entrance = b.m_private_serialization_params[0];
+    return lens;
 }
-
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

@@ -501,7 +501,7 @@ double DesignElement::getRoughnessSubstrate() const { return m_elementParameters
 void DesignElement::setDesignPlane(DesignPlane value) { m_elementParameters["designPlane"] = value; }
 DesignPlane DesignElement::getDesignPlane() const { return m_elementParameters["designPlane"].as_designPlane(); }
 
-void DesignElement::setLensThickness(double value) { m_elementParameters["lensThickness"] = value; }
-double DesignElement::getLensThickness() const { return m_elementParameters["lensThickness"].as_double(); }
+void DesignElement::setLensCurvatureType(bool value) { m_elementParameters["lensCurvatureType"] = value; }
+bool DesignElement::getLensCurvatureType() const { return m_elementParameters["lensCurvatureType"].as_bool(); }
 
 }  // namespace RAYX
