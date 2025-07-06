@@ -42,7 +42,7 @@
     </param>
   </object>
 
-  <object name="SphereLensDefault" type="Spherical Lens Entrance">
+  <object name="SphereLensEntrance" type="Spherical Lens Entrance">
     <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
     <param id="totalWidth" enabled="T">200</param>
     <param id="totalHeight" enabled="T">200</param>
@@ -79,7 +79,7 @@
     </param>
   </object>
 
-    <object name="SphereLensDefault" type="Spherical Lens Exit">
+    <object name="SphereLensExit" type="Spherical Lens Exit">
     <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
     <param id="totalWidth" enabled="T">200</param>
     <param id="totalHeight" enabled="T">200</param>
