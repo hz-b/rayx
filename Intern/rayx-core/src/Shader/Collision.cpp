@@ -15,16 +15,14 @@ namespace RAYX {
  *                    Quadric collision
  **************************************************************/
 RAYX_FN_ACC
-Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, QuadricSurface q, bool isLens) {
+Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, QuadricSurface q) {
     Collision col;
     col.found = true;
     col.hitpoint = glm::dvec3(0, 0, 0);
     col.normal = glm::dvec3(0, 0, 0);
 
     int cs = 1;
-    int d_sign;
-    // if lens is true d_sign = icurve, not -icurve
-    isLens? d_sign = q.m_icurv : d_sign = -q.m_icurv;
+    int d_sign = q.m_icurv;
     if (glm::abs(rayDirection[1]) >= glm::abs(rayDirection[0]) && glm::abs(rayDirection[1]) >= glm::abs(rayDirection[2])) {
         cs = 2;
     } else if (glm::abs(rayDirection[2]) >= glm::abs(rayDirection[0]) && glm::abs(rayDirection[2]) >= glm::abs(rayDirection[1])) {
@@ -452,7 +450,7 @@ Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm
 
 RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
-                                                Cutout cutout, bool isTriangul, bool isLens) {
+                                                Cutout cutout, bool isTriangul) {
     Collision col;
     switch (surface.m_type) {
         case SurfaceType::Plane: {
@@ -477,7 +475,7 @@ Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict ray
             col = getToroidCollision(rayPosition, rayDirection, deserializeToroid(surface), isTriangul);
             break;
         case SurfaceType::Quadric:
-            col = getQuadricCollision(rayPosition, rayDirection, deserializeQuadric(surface), isLens);
+            col = getQuadricCollision(rayPosition, rayDirection, deserializeQuadric(surface));
             break;
         case SurfaceType::Cubic:
             col = getCubicCollision(rayPosition, rayDirection, deserializeCubic(surface));

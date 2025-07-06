@@ -219,15 +219,14 @@ RAYX_FN_ACC Ray behaveLens(Ray r, const Behaviour behaviour, const Collision col
     }
 
     const auto refractAngle = calcRefractAngle(incidentAngle, firstSubstrat, secondSubstrat);
-    const auto refracvec = refract_dvec3(r.m_direction, col.normal, firstSubstrat.real() / secondSubstrat.real());
+    const auto refracvec = refract_dvec3(r.m_direction, -col.normal, firstSubstrat.real() / secondSubstrat.real());
     // calc refract amplitude
     ComplexFresnelCoeffs refractAmplitude = calcRefractAmplitude(incidentAngle, refractAngle, firstSubstrat, secondSubstrat);
     // Lens specific behavior implementation goes here
     //r.m_field = interceptRefract(r.m_field, r.m_direction, col.normal, refractAmplitude);
-    const auto transmittPolarizationMatrix = calcPolaririzationMatrixFoil(r.m_direction, col.normal, refractAmplitude);
+    const auto transmittPolarizationMatrix = calcPolaririzationMatrixFoil(r.m_direction, -col.normal, refractAmplitude);
     r.m_field = transmittPolarizationMatrix * r.m_field;
 
-    r.m_direction = refracvec;
     return r;
 }
 

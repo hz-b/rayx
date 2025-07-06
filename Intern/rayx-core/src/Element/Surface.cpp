@@ -206,18 +206,17 @@ Surface makeEllipsoid(const DesignElement& dele) {
     });
 }
 
-Surface makeSphere(double radius, bool volumeEntrance) { // volume Entrance needs to be convex
-    int icurve;
-    volumeEntrance ? icurve = -1 : icurve = 1;
+Surface makeSphere(double radius, bool convex) { // volume Entrance needs to be convex
+    radius = convex ? radius : radius * -1; // negative radius means concave
     return serializeQuadric({
-        .m_icurv = icurve,
+        .m_icurv = -1,
         .m_a11 = 1,
         .m_a12 = 0,
         .m_a13 = 0,
         .m_a14 = 0,
         .m_a22 = 1,
         .m_a23 = 0,
-        .m_a24 = -radius,
+        .m_a24 = radius, // negative radius means concave
         .m_a33 = 1,
         .m_a34 = 0,
         .m_a44 = 0,
