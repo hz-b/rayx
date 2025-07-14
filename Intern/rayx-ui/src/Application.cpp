@@ -320,10 +320,8 @@ void Application::loadRays(const std::filesystem::path& rmlPath, const size_t nu
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
     m_rays = RAYX::readH5BundleHistory(rayFilePath);
-
 #else
-    std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
-    m_rays = RAYX::loadCsv(rayFilePath);
+    RAYX_EXIT << "error: unable to load rays without support for h5. compile with h5 enabled!";
 #endif
     sortRaysByElement(m_rays, m_sortedRays, numElements);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "Core.h"
 #include "Throw.h"
 
@@ -46,28 +48,44 @@ enum class EventType {
 
 };
 
-inline std::string findEventTypeString(const EventType eventType) {
+inline std::string eventTypeToString(const EventType eventType) {
     switch (eventType) {
         case EventType::HitElement:
             return "HitElement";
         case EventType::TooManyEvents:
-            return "HitElement";
+            return "TooManyEvents";
         case EventType::Absorbed:
             return "Absorbed";
         case EventType::Uninitialized:
             return "Uninitialized";
         case EventType::BeyondHorizon:
-            return "BeyondHoizon";
+            return "BeyondHorizon";
         case EventType::FatalError:
             return "FatalError";
         case EventType::Emitted:
             return "Emitted";
         default:
-            //_debug_throw("unable to convert EventType (%d) to string!", static_cast<int>(eventType));
+            _throw("error: unable to convert EventType to string: '%d'", static_cast<int>(eventType));
             return "<unknown-event-type>";
     }
 }
 
-inline std::ostream& operator<<(std::ostream& os, const EventType eventType) { return os << findEventTypeString(eventType); }
+inline EventType stringToEventType(const std::string eventTypeString) {
+    const auto map = std::map<std::string, EventType>{
+        {"HitElement", EventType::HitElement},
+        {"TooManyEvents", EventType::TooManyEvents},
+        {"Absorbed", EventType::Absorbed},
+        {"Uninitialized", EventType::Uninitialized},
+        {"BeyondHorizon", EventType::BeyondHorizon},
+        {"FatalError", EventType::FatalError},
+        {"Emitted", EventType::Emitted},
+    };
+
+    auto it = map.find(eventTypeString);
+    _assert(it != map.end(), "error: unable to convert string to EventType: '%s'", eventTypeString.c_str());
+    return it->second;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const EventType eventType) { return os << eventTypeToString(eventType); }
 
 }  // namespace RAYX

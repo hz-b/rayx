@@ -1,290 +1,153 @@
 #include "CsvWriter.h"
 
-#include <cstring>
-#include <fstream>
+#include <bitset>
+#include <set>
 #include <sstream>
 
 #include "Debug/Debug.h"
-
-namespace {
-
-// writer:
-
-const int CELL_SIZE = 23;
-const char DELIMITER = ',';
-
-// The resulting CSV file consists of rows and columns. At each column-row pair, you will find a __Cell__.
-// In order to make it readable, cells have a fixed size; thus the CSV file looks like a grid.
-struct Cell {
-    char buf[CELL_SIZE + 1];  // + 1 for null-termination.
-};
-
-// Tries to write a string into a cell.
-// Will only write an incomplete string, if it doesn't fit.
-Cell strToCell(const char* x) {
-    Cell out{};
-    int n = strlen(x);
-
-    if (n > CELL_SIZE) {
-        RAYX_WARN << "strToCell: string \"" << x << "\" needs to be shortened!";
-    }
-
-    for (int i = 0; i < std::min(n, CELL_SIZE); i++) {
-        out.buf[i] = x[i];
-    }
-    for (int i = n; i < CELL_SIZE; i++) {
-        out.buf[i] = ' ';
-    }
-    out.buf[CELL_SIZE - 1] = '\0';
-    return out;
-}
-
-// Formats a double into a cell.
-Cell doubleToCell(double x) {
-    std::stringstream ss;
-    ss.setf(std::ios::fixed);
-
-    ss.precision(CELL_SIZE);
-    std::string s;
-    ss << x;
-    ss >> s;
-
-    // remove digits which do not fit.
-    while (s.size() > CELL_SIZE) {
-        s.pop_back();
-    }
-    return strToCell(s.c_str());
-}
-
-// When writing a Ray to CSV / H5, one needs to specify a way in which to format the ray.
-// A format consists of multiple components - each component corresponds to a single double of data.
-// Example: "Ray-ID|Event-ID". This simple format has two components.
-// A ray formatted with this format only stores its ray-id and its event-id.
-struct FormatComponent {
-    // The name of the component, example: "X-position".
-    const char* name;
-    // A function pointer expressing how to access this component given an actual RAYX::Ray.
-    double (*get_double)(uint32_t ray_id, uint32_t event_id, RAYX::Ray ray);
-};
-
-// Again, a format is simply a list of components!
-using Format = std::vector<FormatComponent>;
-
-// The "full" format, consisting of all components that rays support.
-// All other formats are derived by picking a subset of these components, and potentially reordering them.
-static Format FULL_FORMAT = {
-    FormatComponent{
-        .name = "Ray-ID",
-        .get_double = [](uint32_t ray_id, uint32_t, RAYX::Ray) { return (double)ray_id; },
-    },
-    FormatComponent{
-        .name = "Event-ID",
-        .get_double = [](uint32_t, uint32_t event_id, RAYX::Ray) { return (double)event_id; },
-    },
-    FormatComponent{
-        .name = "X-position",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_position.x; },
-    },
-    FormatComponent{
-        .name = "Y-position",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_position.y; },
-    },
-    FormatComponent{
-        .name = "Z-position",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_position.z; },
-    },
-    FormatComponent{
-        .name = "Event-type",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_eventType); },
-    },
-    FormatComponent{
-        .name = "X-direction",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_direction.x; },
-    },
-    FormatComponent{
-        .name = "Y-direction",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_direction.y; },
-    },
-    FormatComponent{
-        .name = "Z-direction",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_direction.z; },
-    },
-    FormatComponent{
-        .name = "Energy",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_energy; },
-    },
-    FormatComponent{
-        .name = "ElectricField-x-real",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_field.x.real(); },
-    },
-    FormatComponent{
-        .name = "ElectricField-x-imag",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_field.x.imag(); },
-    },
-    FormatComponent{
-        .name = "ElectricField-y-real",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_field.y.real(); },
-    },
-    FormatComponent{
-        .name = "ElectricField-y-imag",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_field.y.imag(); },
-    },
-    FormatComponent{
-        .name = "ElectricField-z-real",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_field.z.real(); },
-    },
-    FormatComponent{
-        .name = "ElectricField-z-imag",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_field.z.imag(); },
-    },
-    FormatComponent{
-        .name = "pathLength",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return ray.m_pathLength; },
-    },
-    FormatComponent{
-        .name = "order",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_order); },
-    },
-    FormatComponent{
-        .name = "lastElement",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_lastElement); },
-    },
-    FormatComponent{
-        .name = "lightSourceIndex",
-        .get_double = [](uint32_t, uint32_t, RAYX::Ray ray) { return static_cast<double>(ray.m_sourceID); },
-    },
-};
-
-}  // unnamed namespace
+#include "Debug/Instrumentor.h"
 
 namespace RAYX {
 
-void writeCsv(const RAYX::BundleHistory& hist, const std::string& filename) {
-    std::ofstream file(filename);
+RaySoA readCsvRaySoA(const std::filesystem::path& filename) {
+    auto file = std::ifstream(filename);
 
-    const auto format = FULL_FORMAT;
+    std::string line;
 
-    // write the header of the CSV file:
-    for (uint32_t i = 0; i < format.size(); i++) {
-        if (i > 0) {
-            file << DELIMITER;
-        }
-        file << strToCell(format[i].name).buf;
-    }
-    file << '\n';
+    // skip header line
+    std::getline(file, line);
 
-    RAYX_VERB << "Writing " << hist.size() << " rays to file...";
+    RaySoA rays;
+    rays.attr = RayAttrFlag::All;
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
 
-    // write the body of the CSV file:
-    for (uint64_t ray_id = 0; ray_id < hist.size(); ray_id++) {
-        const RAYX::RayHistory& ray_hist = hist[ray_id];
-        for (size_t event_id = 0; event_id < ray_hist.size(); event_id++) {
-            const RAYX::Ray& event = ray_hist[event_id];
-            for (uint32_t i = 0; i < format.size(); i++) {
-                if (i > 0) {
-                    file << DELIMITER;
-                }
-                double d = format[i].get_double(static_cast<uint32_t>(ray_id), static_cast<int>(event_id), event);
-                file << doubleToCell(d).buf;
+        auto put = [&ss]<typename type>(type& var) {
+            // get next token
+            std::string cell_str;
+            std::getline(ss, cell_str, ',');
+
+            // create strinstream for the cell only
+            std::stringstream ss_cell(cell_str);
+
+            if constexpr (std::is_same_v<type, EventType>) {
+                // trim leading and trailing whitespaces
+                std::string value_str;
+                ss_cell >> value_str;
+                var = stringToEventType(value_str);
+            } else if constexpr (std::is_floating_point_v<type>) {
+                ss_cell >> var;
+            } else if constexpr (std::is_integral_v<type>) {
+                int64_t i;  // when var is of type int8_t, chars are treated as ascii, thus a temporary int is required
+                ss_cell >> i;
+                var = i;  // set var = i without explicit cast, to make the compiler detect potential narrowing conversions
+            } else {
+                RAYX_EXIT << "error: implemeneted!";
             }
-            file << '\n';
-        }
-    }
-    RAYX_VERB << "Writing done!";
-}
-
-RAYX::BundleHistory loadCsv(const std::string& filename) {
-    std::ifstream file(filename);
-
-    // ignore setup line
-    std::string s;
-    std::getline(file, s);
-
-    RAYX::BundleHistory out;
-
-    while (std::getline(file, s)) {
-        std::vector<double> d;
-        std::stringstream ss(s);
-        std::string num;
-
-        std::getline(ss, num, DELIMITER);
-        uint64_t ray_id = std::stoi(num);
-
-        std::getline(ss, num, DELIMITER);
-        uint64_t event_id = std::stoi(num);
-
-        while (std::getline(ss, num, DELIMITER)) {
-            d.push_back(std::stod(num));
-        }
-
-        if (d.size() != 18) RAYX_EXIT << "CSV line has incorrect length: " << d.size() << ". should be 18";
-
-        int o = 0;
-
-        const auto rayPosition = glm::dvec3(d[o], d[o + 1], d[o + 2]);
-        o += 3;
-
-        const auto rayEventType = static_cast<EventType>(d[o]);
-        o += 1;
-
-        const auto rayDirection = glm::dvec3(d[o], d[o + 1], d[o + 2]);
-        o += 3;
-
-        const auto rayEnergy = d[o];
-        o += 1;
-
-        const auto rayElectricField = ElectricField{{d[o], d[o + 1]}, {d[o + 2], d[o + 3]}, {d[o + 4], d[o + 5]}};
-        o += 6;
-
-        const auto rayPathLength = d[o];
-        o += 1;
-
-        const auto rayOrder = static_cast<Order>(d[o]);
-        o += 1;
-
-        const auto rayElementId = static_cast<ElementId>(d[o]);
-        o += 1;
-
-        const auto raySourceId = static_cast<SourceId>(d[o]);
-        o += 1;
-
-        assert(o == 18);
-
-        // create the Ray from the loaded doubles from this line.
-        RAYX::Ray ray = {
-            .m_position = rayPosition,
-            .m_eventType = rayEventType,
-            .m_direction = rayDirection,
-            .m_energy = rayEnergy,
-            .m_field = rayElectricField,
-            .m_pathLength = rayPathLength,
-            .m_order = rayOrder,
-            .m_lastElement = rayElementId,
-            .m_sourceID = raySourceId,
         };
 
-        // This checks whether `ray_id` is from a "new ray" that didn't yet come up in the BundleHistory.
-        // If so, we need to make place for it.
-        if (out.size() <= ray_id) {
-            out.emplace_back();
-        }
+#define X(type, name, flag, map) rays.name.emplace_back();
 
-        // If the rays are out of order, we crash.
-        // This happens for example if we load rays with ray-ids 0, 1, 2, 4, 3.
-        // Then when the parser reads the 4, it will consider it out-of-order as it expected a 3.
-        if (ray_id + 1 != out.size()) {
-            RAYX_EXIT << "loadCSV failed: rays out of order";
-        }
-        // The event-id of the new event should match the number of previous events found for this ray.
-        if (event_id != out[ray_id].size()) {
-            RAYX_EXIT << "loadCSV failed: events out of order";
-        }
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
 
-        // put the new event into the BundleHistory.
-        out[ray_id].push_back(ray);
+#define X(type, name, flag, map) put(rays.name.back());
+
+        RAYX_X_MACRO_RAY_ATTR_BUT_ELECTRIC_FIELD
+#undef X
+
+        auto put_efield = [&](complex::Complex& efield) {
+            double val;
+            put(val);
+            efield.real(val);
+            put(val);
+            efield.imag(val);
+        };
+
+        put_efield(rays.electric_field_x.back());
+        put_efield(rays.electric_field_y.back());
+        put_efield(rays.electric_field_z.back());
+
+        ++rays.num_events;
     }
 
-    return out;
+    rays.num_paths = std::set(rays.path_id.begin(), rays.path_id.end()).size();
+    return rays;
+}
+
+BundleHistory readCsvBundleHistory(const std::filesystem::path& filename) {
+    const auto rays = readCsvRaySoA(filename);
+    return raySoAToBundleHistory(rays);
+}
+
+void writeCsvRaySoA(const std::filesystem::path& filename, const RaySoA& rays, const RayAttrFlag attr) {
+    constexpr int PRECISION = 18;
+    constexpr int CELL_WIDTH = 24;  // make space for extra characters e.g. minus sign or extra characters of scientific notation. also the names of
+                                    // the attribute should fit
+
+    auto file = std::ofstream(filename, std::ios::trunc);
+
+    std::stringstream ss;
+    ss << std::setprecision(PRECISION);
+    ss << std::boolalpha;
+
+#define X(type, name, flag, map) \
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) ss << std::setw(CELL_WIDTH) << #flag << ",";
+
+    RAYX_X_MACRO_RAY_ATTR_BUT_ELECTRIC_FIELD
+#undef X
+
+#define X(type, name, flag, map)                               \
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) {     \
+        ss << std::setw(CELL_WIDTH) << #flag " (real)" << ","; \
+        ss << std::setw(CELL_WIDTH) << #flag " (imag)" << ","; \
+    }
+
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD
+#undef X
+
+    auto s = ss.str();
+    ss.str(std::string());
+
+    if (!s.empty()) s.pop_back();
+
+    file << s << std::endl;
+
+    auto put = [&ss]<typename type>(const type value) {
+        if constexpr (std::is_same_v<type, int8_t>)
+            ss << std::setw(CELL_WIDTH) << static_cast<int>(value) << ",";
+        else
+            ss << std::setw(CELL_WIDTH) << value << ",";
+    };
+
+    for (int i = 0; i < rays.num_events; ++i) {
+#define X(type, name, flag, map) \
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) put(rays.name[i]);
+
+        RAYX_X_MACRO_RAY_ATTR_BUT_ELECTRIC_FIELD
+#undef X
+
+#define X(type, name, flag, map)                           \
+    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) { \
+        put(rays.name[i].real());                          \
+        put(rays.name[i].imag());                          \
+    };
+
+        RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD
+#undef X
+
+        s = ss.str();
+        ss.str(std::string());
+
+        if (!s.empty()) s.pop_back();
+
+        file << s << std::endl;
+    }
+}
+
+void writeCsvBundleHistory(const std::filesystem::path& filename, const BundleHistory& bundle, const RayAttrFlag attr) {
+    const auto rays = bundleHistoryToRaySoA(bundle);
+    writeCsvRaySoA(filename, rays, attr);
 }
 
 }  // namespace RAYX

@@ -1,16 +1,15 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include <filesystem>
 
-#include "Core.h"
-#include "Shader/Ray.h"
-#include "Tracer/Tracer.h"
+#include "RaySoA.h"
 
 namespace RAYX {
 
-void RAYX_API writeCsv(const RAYX::BundleHistory&, const std::string& filename);
+RAYX_API RaySoA readCsvRaySoA(const std::filesystem::path& filename);
+RAYX_API BundleHistory readCsvBundleHistory(const std::filesystem::path& filename);
 
-RAYX::BundleHistory RAYX_API loadCsv(const std::string& filename);
+RAYX_API void writeCsvRaySoA(const std::filesystem::path& filename, const RaySoA& rays, const RayAttrFlag attr = RayAttrFlag::All);
+RAYX_API void writeCsvBundleHistory(const std::filesystem::path& filename, const BundleHistory& bundle, const RayAttrFlag attr = RayAttrFlag::All);
 
 }  // namespace RAYX
