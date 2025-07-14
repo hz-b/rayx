@@ -22,11 +22,8 @@ set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
-# -------------------
-
-# ---- Check for CUDA and OPENMP support and configure Alpaka ----
-set(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
-
+# alpaka
+# alpaka openmp backend (optional
 if(RAYX_ENABLE_OPENMP)
     find_package(OpenMP COMPONENTS CXX)
     if(OpenMP_CXX_FOUND)
@@ -42,6 +39,7 @@ else() # setting could be cached so force it off
     set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE OFF CACHE BOOL "" FORCE)
 endif()
 
+# alpaka cuda backend (optional
 if(RAYX_ENABLE_CUDA)
     check_language(CUDA)
     if(CMAKE_CUDA_COMPILER)
@@ -60,12 +58,16 @@ else()
     set(alpaka_RELOCATABLE_DEVICE_CODE OFF CACHE BOOL "" FORCE)
 endif()
 
+if(NOT alpaka_ACC_GPU_CUDA_ENABLE AND NOT alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE)
+    message(FATAL_ERROR "Neither OpenMP or Cuda backend have been enabled. At least one is required. Aborting.")
+endif()
+
 set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
 add_subdirectory(alpaka)
-add_subdirectory(SDL EXCLUDE_FROM_ALL)
 
+# HDF5 (optional)
 if(RAYX_ENABLE_H5)
-    find_package(HDF5 GLOBAL)
+    find_package(HDF5 GLOBAL REQUIRED COMPONENTS C)
     if(HDF5_FOUND)
         set(RAYX_H5_ENABLED ON PARENT_SCOPE)
         set(RAYX_HDF5_LIBRARIES ${HDF5_LIBRARIES} PARENT_SCOPE)
@@ -82,3 +84,6 @@ if(RAYX_ENABLE_H5)
         endif()
     endif()
 endif()
+
+# SDL
+add_subdirectory(SDL EXCLUDE_FROM_ALL)
