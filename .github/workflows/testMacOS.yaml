@@ -1,0 +1,52 @@
+name: testMacOS
+
+on:
+  push:
+    branches:
+      - '**'     # Run on all branches
+    tags-ignore:
+      - 'v*'     # Ignore tag pushes matching 'v*'
+  pull_request:
+    branches:
+      - '**'     # Run for all pull requests
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Install dependencies (Homebrew)
+        run: |
+          brew update
+          brew install cmake boost gtk+3 hdf5
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DRAYX_WERROR=ON -DRAYX_REQUIRE_CUDA=OFF
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Run
+        working-directory: ${{github.workspace}}
+        run: |
+          ./build/bin/release/rayx -x -c -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
+          ./build/bin/release/rayx -x    -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
+          git checkout -- Intern/rayx-core/tests/input/BoringImagePlane.csv
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build/bin/release
+        run: ./rayx-core-tst -x
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RAYX-macOS-${{env.BUILD_TYPE}}
+          path: ${{github.workspace}}/build/bin/release
