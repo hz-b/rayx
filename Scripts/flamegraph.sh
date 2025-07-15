@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Takes a command and creates an SVG of a flame graph using perf and utilities
 set -e
 set -x

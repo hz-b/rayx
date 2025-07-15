@@ -12,7 +12,7 @@
 #include "Beamline/Beamline.h"
 #include "Beamline/StringConversion.h"
 #include "Debug/Instrumentor.h"
-#include "Element/Strings.cpp"
+#include "Element/Element.h"
 
 void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiInfo) {
     if (!uiInfo.selectedNode) {

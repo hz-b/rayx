@@ -50,9 +50,7 @@ RAYX::Ray parseCSVline(std::string line) {
     ray.m_pathLength = vec[10];
 
     const auto stokes = glm::dvec4(vec[11], vec[12], vec[13], vec[14]);
-    const auto rotation = RAYX::rotationMatrix(ray.m_direction);
-    const auto field = rotation * RAYX::stokesToElectricField(stokes);
-    ray.m_field = field;
+    ray.m_field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, ray.m_direction);
 
     // otherwise uninitialized:
     ray.m_sourceID = -1;
@@ -63,22 +61,24 @@ RAYX::Ray parseCSVline(std::string line) {
     return ray;
 }
 
-/// will look at Intern/rayx-core/tests/input/<filename>.rml
-RAYX::Beamline loadBeamline(std::string filename) {
-    std::string beamline_file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".rml").string();
-
-    return RAYX::importBeamline(beamline_file);
+/// will return the absolute path to the beamline
+std::filesystem::path getBeamlineFilepath(std::string filename) {
+    return canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".rml");
 }
+
+/// will look at Intern/rayx-core/tests/input/<filename>.rml
+RAYX::Beamline loadBeamline(std::string filename) { return RAYX::importBeamline(getBeamlineFilepath(filename)); }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
 void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCSV(hist, f, FULL_FORMAT);
+    writeCsv(hist, f);
 }
 
 RAYX::BundleHistory traceRML(std::string filename) {
-    auto beamline = loadBeamline(filename);
-    return tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, beamline.numElements() + 2);
+    const auto beamline = loadBeamline(filename);
+    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, -1);
+    return raySoAToBundleHistory(rays);
 }
 
 std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
@@ -175,9 +175,10 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
 }
 
 // returns the rayx rays converted to be ray-UI compatible.
-std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No) {
-    auto beamline = loadBeamline(filename);
-    BundleHistory hist = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2);
+std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
+    const auto beamline = loadBeamline(filename);
+    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, -1);
+    const auto hist = raySoAToBundleHistory(rays);
 
     std::vector<RAYX::Ray> out;
 
@@ -201,6 +202,14 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequen
             }
             out.push_back(r);
         }
+    }
+    return out;
+}
+
+BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
+    BundleHistory out;
+    for (auto r : rays) {
+        out.push_back({r});
     }
     return out;
 }
@@ -238,7 +247,7 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
     auto a = traceRML(filename);
 
     std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".correct.csv").string();
-    auto b = loadCSV(f);
+    auto b = loadCsv(f);
 
     writeToOutputCSV(a, filename + ".rayx");
     compareBundleHistories(a, b, tolerance);

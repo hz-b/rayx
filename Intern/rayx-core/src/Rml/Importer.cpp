@@ -13,7 +13,7 @@
 #include "Design/DesignElement.h"
 #include "DesignElementWriter.h"
 #include "DesignSourceWriter.h"
-#include "Element/Strings.h"
+#include "Element/Element.h"
 #include "Rml/xml.h"
 
 using RAYX::ElementType;
@@ -25,6 +25,9 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
             break;
         case ElementType::ConeMirror:
             getCone(parser, de);
+            break;
+        case ElementType::Crystal:
+            getCrystal(parser, de);
             break;
         case ElementType::CylinderMirror:
             getCylinder(parser, de);

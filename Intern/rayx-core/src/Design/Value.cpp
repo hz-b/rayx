@@ -34,6 +34,8 @@ ValueType DesignMap::type() const {
         ValueType::Misalignment,
         ValueType::CentralBeamstop,
         ValueType::Cutout,
+        ValueType::CutoutType,  // Added
+        ValueType::EventType,   // Added
         ValueType::CylinderDirection,
         ValueType::FigureRotation,
         ValueType::Map,
@@ -49,6 +51,7 @@ ValueType DesignMap::type() const {
         ValueType::BehaviourType,
         ValueType::ElementType,
         ValueType::GratingMount,
+        ValueType::CrystalType,
     };
     return types[m_variant.index()];
 }
@@ -181,6 +184,11 @@ ElementType DesignMap::as_elementType() const {
 GratingMount DesignMap::as_gratingMount() const {
     if (auto* x = std::get_if<GratingMount>(&m_variant)) return *x;
     throw std::runtime_error("as_gratingMount() called on non-gratingMount!");
+}
+
+CrystalType DesignMap::as_crystalType() const {
+    if (auto* x = std::get_if<CrystalType>(&m_variant)) return *x;
+    throw std::runtime_error("as_crystalType() called on non-crystalType!");
 }
 
 const DesignMap& DesignMap::operator[](const std::string& s) const {

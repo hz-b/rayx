@@ -20,7 +20,7 @@
 #include "Rml/Importer.h"
 #include "Triangulation/GeometryUtils.h"
 #include "UserInput.h"
-#include "Writer/CSVWriter.h"
+#include "Writer/CsvWriter.h"
 #include "Writer/H5Writer.h"
 
 // --------- Start of Application code --------- //
@@ -319,11 +319,11 @@ void Application::loadRays(const std::filesystem::path& rmlPath, const size_t nu
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays = raysFromH5(rayFilePath, FULL_FORMAT);
+    m_rays = RAYX::readH5BundleHistory(rayFilePath);
 
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
-    m_rays = loadCSV(rayFilePath);
+    m_rays = RAYX::loadCsv(rayFilePath);
 #endif
     sortRaysByElement(m_rays, m_sortedRays, numElements);
 }

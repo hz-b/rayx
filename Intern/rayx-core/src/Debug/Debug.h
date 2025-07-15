@@ -22,7 +22,7 @@
 #include <vector>
 
 // This include is necessary, as Debug implements a special formatting for Ray.
-#include "Shader/Complex.h"
+#include "RaySoA.h"
 #include "Shader/Ray.h"
 
 // Debug only code; use it as: DEBUG(<statement>);
@@ -37,6 +37,27 @@
 #define STRING(s) #s
 
 namespace RAYX {
+
+/////////////////////////////////////////////////////////////////////////////
+// OSTREAM CONVERSION
+/////////////////////////////////////////////////////////////////////////////
+
+inline std::ostream& operator<<(std::ostream& os, const complex::Complex& c) { return os << "{" << c.real() << ", " << c.imag() << "}"; }
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const glm::tvec2<T>& v) {
+    return os << "{" << v.x << ", " << v.y << "}";
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const glm::tvec3<T>& v) {
+    return os << "{" << v.x << ", " << v.y << ", " << v.z << "}";
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const glm::tvec4<T>& v) {
+    return os << "{" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << "}";
+}
 
 ///////////////////////////////////////////////
 // LOGGING SYSTEM
@@ -162,17 +183,20 @@ extern void RAYX_API (*error_fn)();
  * */
 
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
+inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<double>(arg)}; }
 
 inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
 
 inline std::vector<double> formatAsVec(const Ray arg) {
-    return {
-        arg.m_position.x,     arg.m_position.y,     arg.m_position.z,     static_cast<double>(arg.m_eventType),
-        arg.m_direction.x,    arg.m_direction.y,    arg.m_direction.z,    arg.m_energy,
-        arg.m_field.x.real(), arg.m_field.x.imag(), arg.m_field.y.real(), arg.m_field.y.imag(),
-        arg.m_field.z.real(), arg.m_field.z.imag(), arg.m_pathLength,     arg.m_order,
-        arg.m_lastElement,    arg.m_sourceID,
-    };
+    std::vector<double> out;
+    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
+
+#define X(type, name, flag, map) insert(formatAsVec(arg.map));
+
+    RAYX_X_MACRO_RAY_ATTR_MAPPED
+#undef X
+
+    return out;
 }
 
 template <int N, int M, typename T>
@@ -218,6 +242,18 @@ inline std::vector<double> formatAsVec(const std::vector<T> arg) {
 template <>
 inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
     return arg;
+}
+
+inline std::vector<double> formatAsVec(const RaySoA& rays) {
+    std::vector<double> out;
+    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
+
+#define X(type, name, flag, map) insert(formatAsVec(rays.name));
+
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+
+    return out;
 }
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);

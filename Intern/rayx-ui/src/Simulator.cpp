@@ -1,9 +1,8 @@
 #include "Simulator.h"
 
 #include "Random.h"
-#include "Writer/CSVWriter.h"
+#include "Writer/CsvWriter.h"
 #include "Writer/H5Writer.h"
-#include "Writer/Writer.h"
 
 // constructor
 Simulator::Simulator() { m_seq = RAYX::Sequential::No; }
@@ -18,11 +17,14 @@ void Simulator::runSimulation() {
         m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
     }
 
-    auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents);
+    constexpr int RECORD_ALL_ELEMENTS = -1;
+    const auto rays =
+        m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents, RECORD_ALL_ELEMENTS);  // TODO: implement recordElementIndex for GUI?
+    const auto bundleHist = RAYX::raySoAToBundleHistory(rays);
 
     bool notEnoughEvents = false;
 
-    for (auto& ray : rays) {
+    for (auto& ray : bundleHist) {
         for (auto& event : ray) {
             if (event.m_eventType == RAYX::EventType::TooManyEvents) {
                 notEnoughEvents = true;
@@ -42,21 +44,11 @@ void Simulator::runSimulation() {
         RAYX_EXIT << "Input file is not an *.rml file!";
     }
 
-    Format fmt = formatFromString(defaultFormatString());
-
-    std::vector<std::string> names;
-    auto elements = m_Beamline.getElements();
-    names.reserve(elements.size());
-
-    for (const auto designElement : elements) {
-        names.push_back(designElement->getName());
-    }
-
     path += ".h5";
 #ifndef NO_H5
-    writeH5(rays, path, fmt, names);
+    RAYX::writeH5RaySoA(path, rays);
 #else
-    writeCSV(rays, path, fmt);
+    RAYX::writeCsv(bundleHist, path);
 #endif
 }
 

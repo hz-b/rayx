@@ -3,6 +3,7 @@
 #include "Beamline/Objects/DipoleSource.h"
 #include "Shader/ApplySlopeError.h"
 #include "Shader/Approx.h"
+#include "Shader/Crystal.h"
 #include "Shader/LineDensity.h"
 #include "Shader/Rand.h"
 #include "Shader/Refrac.h"
@@ -467,7 +468,7 @@ TEST_F(TestSuite, testRayMatrixMult) {
     };
 
     for (auto p : inouts) {
-        auto out_ray = rayMatrixMult(p.in_ray, p.in_matrix);
+        auto out_ray = rayMatrixMult(p.in_matrix, p.in_ray);
         CHECK_EQ(out_ray, p.out_ray);
     }
 }
@@ -741,6 +742,146 @@ TEST_F(TestSuite, testVlsGrating) {
         auto out = vlsGrating(p.in_lineDensity, glm::dvec3(0, 1, 0), p.in_z, p.in_vls);
         CHECK_EQ(out, p.out);
     }
+}
+
+TEST_F(TestSuite, testElectricField) {
+    CHECK_EQ(1.0, intensity(LocalElectricField({1, 0}, {0, 0})));
+    CHECK_EQ(1.0, intensity(ElectricField({1, 0}, {0, 0}, {0, 0})));
+    CHECK_EQ(LocalElectricField({1, 0}, {0, 0}), LocalElectricField(ElectricField({1, 0}, {0, 0}, {0, 0})));
+    CHECK_EQ(ElectricField({1, 0}, {0, 0}, {0, 0}), ElectricField(LocalElectricField({1, 0}, {0, 0}), complex::Complex{0, 0}));
+}
+
+TEST_F(TestSuite, testStokes) {
+    CHECK_EQ(0.1, intensity(Stokes{0.1, 0.2, 0.3, 0.4}));
+    CHECK_EQ(1.0, intensity(Stokes{1.0, 0.1, 0.2, 0.3}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 1, 0, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, -1, 0, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 1, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, -1, 0}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 0, 1}));
+    CHECK_EQ(1.0, degreeOfPolarization(Stokes{1, 0, 0, -1}));
+    CHECK_EQ(0.0, degreeOfPolarization(Stokes{1, 0, 0, 0}));
+    CHECK_EQ(0.5, degreeOfPolarization(Stokes{1, 0.5, 0, 0}));
+}
+
+TEST_F(TestSuite, testElectricFieldRotation) {
+    const auto incidentField0 = ElectricField{{1, 0}, {0, 0}, {0, 0}};
+    const auto incidentField1 = ElectricField{{0, 0}, {0, 0}, {1, 0}};
+    const auto incidentField2 = ElectricField{{0, 0}, {0, 0}, {0, 1}};
+
+    const auto doNothing = [](ElectricField f) { return rotationMatrix(glm::dvec3{0, 0, 1}, glm::dvec3{0, 1, 0}) * f; };
+    CHECK_EQ(incidentField0, doNothing(incidentField0));
+    CHECK_EQ(incidentField1, doNothing(incidentField1));
+    CHECK_EQ(incidentField2, doNothing(incidentField2));
+
+    const auto rotateUp = [](ElectricField f) { return rotationMatrix(glm::dvec3{0, 1, 0}, glm::dvec3{0, 0, -1}) * f; };
+    CHECK_EQ(incidentField0, rotateUp(incidentField0));
+    CHECK_EQ(ElectricField({0, 0}, {1, 0}, {0, 0}), rotateUp(incidentField1));
+    CHECK_EQ(ElectricField({0, 0}, {0, 1}, {0, 0}), rotateUp(incidentField2));
+
+    const auto rotateRight = [](ElectricField f) { return rotationMatrix(glm::dvec3{1, 0, 0}, glm::dvec3{0, 1, 0}) * f; };
+    CHECK_EQ(ElectricField({0, 0}, {0, 0}, {-1, 0}), rotateRight(incidentField0));
+    CHECK_EQ(ElectricField({1, 0}, {0, 0}, {0, 0}), rotateRight(incidentField1));
+    CHECK_EQ(ElectricField({0, 1}, {0, 0}, {0, 0}), rotateRight(incidentField2));
+}
+
+TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention) {
+    const auto forward = glm::dvec3(0, 0, 1);
+    const auto right = glm::dvec3(1, 0, 0);
+    const auto up = glm::dvec3(0, 1, 0);
+
+    {
+        // test if the convention uses the correct forward, up and right
+
+        // rotation into forward yields identity matrix
+        CHECK_EQ(rotationMatrixWithBaseConvention(forward), glm::dmat3(1.0));
+
+        // rotate forward into right yields right
+        CHECK_EQ(rotationMatrixWithBaseConvention(right) * forward, right);
+
+        // rotate forward into up yields up
+        CHECK_EQ(rotationMatrixWithBaseConvention(up) * forward, up);
+    }
+
+    {
+        // in order to test if the rotation function is steadily,
+        // we gradually increase the rotation angle and compare the resulting angle to the previous.
+
+        const auto steps = 100;
+        const auto stepAngle = 1.0 / steps * PI * 2.0;
+
+        auto get_dir = [](double angle) { return glm::dvec3(glm::cos(angle), glm::sin(angle), 0); };
+
+        auto prev_vec = get_dir(0.0f);
+
+        for (int i = 1; i < steps + 1; ++i) {
+            auto angle = i / static_cast<double>(steps) * PI * 2.0;
+            auto dir = get_dir(angle);
+            auto new_vec = rotationMatrixWithBaseConvention(dir) * forward;
+            auto angle_between_vecs = angleBetweenUnitVectors(prev_vec, new_vec);
+            CHECK_EQ(angle_between_vecs, stepAngle);
+            prev_vec = new_vec;
+        }
+    }
+}
+
+TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention2) {
+    using namespace complex;
+
+    // convention for incident field
+    // forward = (0, 0, -1)
+    // up      = (0, 1, 0)
+    // right   = (1, 0, 0)
+    const auto incidentElectricField = ElectricField({1, 0}, {0, 0}, {0, 0});
+
+    struct InOutPair {
+        ElectricField in_field;
+        glm::dvec3 in_forward;
+        glm::dvec3 in_up;
+        ElectricField out_field;
+        ElectricField out_field_rotationWithoutUp;
+    };
+
+    const auto inouts = std::vector<InOutPair>{
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {0, 0, -1},
+            .in_up = {0, 1, 0},
+            .out_field = {{-1, 0}, {0, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{-1, 0}, {0, 0}, {0, 0}},
+        },
+        {
+            .in_field = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward = {1, 0, 0},
+            .in_up = {0, 0, 1},
+            .out_field = {{0, 0}, {1, 0}, {0, 0}},
+            .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {-1, 0}},
+        },
+    };
+
+    for (const auto& p : inouts) {
+        const auto rotation = rotationMatrix(p.in_forward, p.in_up);
+        const auto field = rotation * incidentElectricField;
+        CHECK_EQ(field, p.out_field);
+
+        const auto rotationWithoutUp = rotationMatrixWithBaseConvention(p.in_forward);
+        const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
+        CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
+    }
+}
+
+TEST_F(TestSuite, testElectricFieldToStokesConversion) {
+    const auto h = std::sqrt(2.0) / 2.0;
+
+    CHECK_EQ(Stokes(1, 1, 0, 0), localElectricFieldToStokes(LocalElectricField({1, 0}, {0, 0})));
+    CHECK_EQ(Stokes(1, -1, 0, 0), localElectricFieldToStokes(LocalElectricField({0, 0}, {1, 0})));
+    CHECK_EQ(Stokes(1, 0, 1, 0), localElectricFieldToStokes(LocalElectricField({h, 0}, {h, 0})));
+    CHECK_EQ(Stokes(1, 0, -1, 0), localElectricFieldToStokes(LocalElectricField({-h, 0}, {h, 0})));
+
+    CHECK_EQ(LocalElectricField({1, 0}, {0, 0}), stokesToLocalElectricField(Stokes(1, 1, 0, 0)));
+    CHECK_EQ(LocalElectricField({0, 0}, {1, 0}), stokesToLocalElectricField(Stokes(1, -1, 0, 0)));
+    CHECK_EQ(LocalElectricField({h, 0}, {h, 0}), stokesToLocalElectricField(Stokes(1, 0, 1, 0)));
+    CHECK_EQ(LocalElectricField({h, 0}, {-h, 0}), stokesToLocalElectricField(Stokes(1, 0, -1, 0)));
 }
 
 TEST_F(TestSuite, testGetIncidenceAngle) {
@@ -1064,145 +1205,6 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     }
 }
 
-TEST_F(TestSuite, testStokesToElectricFieldAndElectricFieldToStokes) {
-    using namespace complex;
-
-    struct InOutPair {
-        Stokes stokes;
-        LocalElectricField field;
-    };
-
-    const auto diag = 1.0 / glm::sqrt(2.0);
-
-    std::vector<InOutPair> inouts{
-        {
-            // linearly polarized (horizontal)
-            .stokes = Stokes(1, 1, 0, 0),
-            .field = LocalElectricField({1, 0}, {0, 0}),
-        },
-        {
-            // linearly polarized (vertical)
-            .stokes = Stokes(1, -1, 0, 0),
-            .field = LocalElectricField({0, 0}, {1, 0}),
-        },
-        {
-            // linearly polarized (diagonal +45 degrees)
-            .stokes = Stokes(1, 0, 1, 0),
-            .field = LocalElectricField({diag, 0}, {diag, 0}),
-        },
-        {
-            // linearly polarized (diagonal -45 degrees)
-            .stokes = Stokes(1, 0, -1, 0),
-            .field = LocalElectricField({diag, 0}, {-diag, 0}),
-        },
-        {
-            // circular polarized (right) (clockwise)
-            .stokes = Stokes(1, 0, 0, 1),
-            .field = LocalElectricField({diag, 0}, {0, -diag}),
-        },
-        {
-            // circular polarized (left) (counter-clockwise)
-            .stokes = Stokes(1, 0, 0, -1),
-            .field = LocalElectricField({diag, 0}, {0, diag}),
-        },
-    };
-
-    for (auto p : inouts) {
-        // stokes must be polarized in order to convert to an electric field
-        CHECK_EQ(degreeOfPolarization(p.stokes), 1.0);
-
-        // convert stokes to field and back and check if stokes are equal to initial stokes
-        {
-            const auto field = stokesToLocalElectricField(p.stokes);
-            CHECK_EQ(intensity(field), intensity(p.stokes));
-
-            const auto stokes = fieldToStokes(field);
-            CHECK_EQ(intensity(stokes), intensity(p.stokes));
-            CHECK_EQ(stokes, p.stokes);
-
-            // lets shift the phase of our field and check if the stokes are still preserved,
-            // since stokes should not carry phase information
-            const auto mag = abs(field);
-            const auto theta = arg(field);
-            for (double shift = 0.0; shift < PI * 2.0; shift += PI / 5.0) {
-                const auto field = polar(mag, theta + shift);
-                const auto stokes = fieldToStokes(field);
-                CHECK_EQ(stokes, p.stokes);
-            }
-        }
-
-        // convert field to stokes and back and check if magnitude and polarization is preserved
-        // the phase is not being checked, because stokes parameters do not preserve phase
-        {
-            const auto stokes = fieldToStokes(p.field);
-            CHECK_EQ(intensity(stokes), intensity(p.field));
-            CHECK_EQ(stokes, p.stokes);
-
-            const auto field = stokesToLocalElectricField(stokes);
-
-            // check if the magnitude is preserved
-            const auto mag = abs(field);
-            const auto expected_mag = abs(p.field);
-            CHECK_EQ(mag, expected_mag);
-
-            // check if polarization is preserved
-            // by checking if the difference in phase between x and y component is preserved
-            const auto theta = arg(field);
-            const auto delta = theta.x - theta.y;
-
-            const auto expected_theta = arg(p.field);
-            const auto expected_delta = expected_theta.x - expected_theta.y;
-
-            CHECK_EQ(delta, expected_delta);
-        }
-    }
-}
-
-TEST_F(TestSuite, testRotateElectricField) {
-    using namespace complex;
-
-    // convention for incident field
-    // forward = (0, 0, -1)
-    // up      = (0, 1, 0)
-    // right   = (1, 0, 0)
-    const auto incidentElectricField = ElectricField({1, 0}, {0, 0}, {0, 0});
-
-    struct InOutPair {
-        ElectricField in_field;
-        glm::dvec3 in_forward;
-        glm::dvec3 in_up;
-        ElectricField out_field;
-        ElectricField out_field_rotationWithoutUp;
-    };
-
-    const auto inouts = std::vector<InOutPair>{
-        {
-            .in_field = {{1, 0}, {0, 0}, {0, 0}},
-            .in_forward = {0, 0, -1},
-            .in_up = {0, 1, 0},
-            .out_field = {{1, 0}, {0, 0}, {0, 0}},
-            .out_field_rotationWithoutUp = {{1, 0}, {0, 0}, {0, 0}},
-        },
-        {
-            .in_field = {{1, 0}, {0, 0}, {0, 0}},
-            .in_forward = {1, 0, 0},
-            .in_up = {0, 0, 1},
-            .out_field = {{0, 0}, {-1, 0}, {0, 0}},
-            .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {1, 0}},
-        },
-    };
-
-    for (const auto& p : inouts) {
-        const auto rotation = rotationMatrix(p.in_forward, p.in_up);
-        const auto field = rotation * incidentElectricField;
-        CHECK_EQ(field, p.out_field);
-
-        const auto rotationWithoutUp = rotationMatrix(p.in_forward);
-        const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
-        CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
-    }
-}
-
 // both the Cpp code as well as the shader define hvlam.
 TEST_F(TestSuite, testHvlam) {
     double hv = 100;
@@ -1405,5 +1407,122 @@ TEST_F(TestSuite, testSphericalCoords) {
         sphericalCoordsToDirection(phi, psi, dir2);
 
         CHECK_EQ(dir, dir2, 1e-11);
+    }
+}
+
+TEST_F(TestSuite, testBraggAngle) {
+    struct InOutPair {
+        double energy;
+        double dSpacing2;
+
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {{.energy = 10000, .dSpacing2 = 3.135, .out = 0.039558705359119407},   // Graphit (002), ~30°
+                                     {.energy = 10000, .dSpacing2 = 2.0135, .out = 0.061615437503612994},  // NaCl (200), ~48.6°
+                                     {.energy = 10000, .dSpacing2 = 1.9216, .out = 0.06456618672669405},   // Si (111), ~51.3°
+                                     {.energy = 10000, .dSpacing2 = 1.5414, .out = 0.080523086008524924},  // LiF (200), ~71.8°
+                                     {.energy = 10000, .dSpacing2 = 2.0135, .out = 0.061615437503612994},  // NaCl (200), ~20.5°
+                                     {.energy = 10000, .dSpacing2 = 1.5414, .out = 0.080523086008524924},  // LiF (200), ~29.5°
+                                     {.energy = 5000, .dSpacing2 = 2.0, .out = 0.12430406526943308},
+                                     {.energy = 4000, .dSpacing2 = 2.0, .out = 0.1556074597838914}};
+
+    for (const auto& p : inouts) {
+        const auto braggAngle = getBraggAngle(p.energy, p.dSpacing2);
+        CHECK_EQ(braggAngle, p.out);
+    }
+}
+
+TEST_F(TestSuite, testDiffractionPrefactor) {
+    struct InOutPair {
+        double wavelength;
+        double unitCellVolume;
+        double out;
+    };
+
+    std::vector<InOutPair> inouts = {{.wavelength = 0.15406, .unitCellVolume = 0.160, .out = 1.3305822415873555e-07},
+                                     {.wavelength = 0.15406, .unitCellVolume = 0.180, .out = 1.1827397702998716e-07},
+                                     {.wavelength = 0.07107, .unitCellVolume = 0.045, .out = 1.0067972847445151e-07},
+                                     {.wavelength = 0.0, .unitCellVolume = 1.0, .out = 0.0},
+                                     {.wavelength = 0.1, .unitCellVolume = 0.0, .out = 0.0},
+                                     {.wavelength = -1.0, .unitCellVolume = 1.0, .out = 0.0}};
+
+    for (const auto& p : inouts) {
+        const auto prefactor = getDiffractionPrefactor(p.wavelength, p.unitCellVolume);
+        CHECK_EQ(prefactor, p.out);
+    }
+}
+
+TEST_F(TestSuite, testComputeEta) {
+    struct TestCase {
+        double theta;
+        double bragg;
+        double asymmetry;
+        double structureFactorReFH;
+        double structureFactorImFH;
+        double structureFactorReFHC;
+        double structureFactorImFHC;
+        double structureFactorReF0;
+        double structureFactorImF0;
+        double polFactor;
+        double gamma;
+        complex::Complex expected;
+    };
+
+    std::vector<TestCase> testCases = {{.theta = 0.1990,
+                                        .bragg = 0.1990,
+                                        .asymmetry = -1.0,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = 1.0,
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(1.8698989229058245, -0.0091710480362834079)},
+                                       {.theta = 0.1995,
+                                        .bragg = 0.1990,
+                                        .asymmetry = -1.0,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = 1.0,
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(-35.238613144067784, 0.73773569616427415)},
+                                       {.theta = 0.1990,
+                                        .bragg = 0.1990,
+                                        .asymmetry = 0.8,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = 1.0,
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(0.20906105513355305, -0.0010253543417022822)},
+                                       {.theta = 0.1990,
+                                        .bragg = 0.1990,
+                                        .asymmetry = -1.0,
+                                        .structureFactorReFH = 43.8496,
+                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReFHC = 42.1193,
+                                        .structureFactorImFHC = 43.8496,
+                                        .structureFactorReF0 = 113.6808,
+                                        .structureFactorImF0 = 1.7304,
+                                        .polFactor = cos(2 * 0.1990),
+                                        .gamma = 8.6076025188876205e-08,
+                                        .expected = complex::Complex(2.0284463725210271, -0.0099486549211473489)}};
+
+    for (const auto& tc : testCases) {
+        complex::Complex eta = computeEta(tc.theta, tc.bragg, tc.asymmetry, tc.structureFactorReFH, tc.structureFactorImFH, tc.structureFactorReFHC,
+                                          tc.structureFactorImFHC, tc.structureFactorReF0, tc.structureFactorImF0, tc.polFactor, tc.gamma);
+
+        CHECK_EQ(eta.real(), tc.expected.real());
+        CHECK_EQ(eta.imag(), tc.expected.imag());
     }
 }

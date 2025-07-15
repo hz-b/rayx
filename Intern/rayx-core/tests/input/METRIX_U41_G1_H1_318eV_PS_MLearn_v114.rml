@@ -1,9 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <lab>
- <version>1.15</version>
+ <version>1.14</version>
  <beamline>
-  <object name="Point Source" type="Point Source">
-   <param id="numberRays" enabled="T">225</param>
+<!-- 0 -->
+  <object name="U41_318eV" type="Point Source">
+   <param id="numberRays" enabled="T">10</param>
    <param id="sourceWidthDistribution" comment="gaussian (sigma)" enabled="T">1</param>
    <param id="sourceWidth" enabled="T">0.076</param>
    <param id="sourceHeightDistribution" comment="gaussian (sigma)" enabled="T">1</param>
@@ -50,6 +51,7 @@
    <param id="sourcePulseType" comment="all rays start simultaneously" enabled="T">0</param>
    <param id="sourcePulseLength" enabled="F">0</param>
   </object>
+<!-- 1 -->
   <object name="ASBL" type="Slit">
    <param id="openingShape" comment="rectangle" enabled="T">0</param>
    <param id="openingWidth" enabled="T">2</param>
@@ -58,8 +60,8 @@
    <param id="stopWidth" enabled="F">20</param>
    <param id="stopHeight" enabled="F">1</param>
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-   <param id="totalWidth" enabled="T">50</param>
-   <param id="totalHeight" enabled="T">50</param>
+   <param id="totalWidth" enabled="T">100</param>
+   <param id="totalHeight" enabled="T">100</param>
    <param id="distancePreceding" enabled="T">10000</param>
    <param id="azimuthalAngle" enabled="T">0</param>
    <param id="alignmentError" comment="Yes" enabled="T">0</param>
@@ -90,6 +92,7 @@
     <z>1.0000000000000000</z>
    </param>
   </object>
+<!-- 2 -->
   <object name="M1-Cylinder" type="Cylinder">
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">20</param>
@@ -167,6 +170,7 @@
    <param id="cylindricalBowingAmp" enabled="F">0</param>
    <param id="cylindricalBowingRadius" enabled="F">0</param>
   </object>
+<!-- 3 -->
   <object name="Entrance-Slit" type="Slit">
    <param id="openingShape" comment="rectangle" enabled="T">0</param>
    <param id="openingWidth" enabled="T">10</param>
@@ -175,8 +179,8 @@
    <param id="stopWidth" enabled="F">20</param>
    <param id="stopHeight" enabled="F">1</param>
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-   <param id="totalWidth" enabled="T">50</param>
-   <param id="totalHeight" enabled="T">50</param>
+   <param id="totalWidth" enabled="T">100</param>
+   <param id="totalHeight" enabled="T">100</param>
    <param id="distancePreceding" enabled="T">3750</param>
    <param id="azimuthalAngle" enabled="T">0</param>
    <param id="alignmentError" comment="No" enabled="T">1</param>
@@ -192,7 +196,7 @@
     <z>15743.0054940820009506</z>
    </param>
    <param id="worldXdirection" enabled="F">
-    <x>0.9981347984218668</x>
+    <x>0.9981347984218669</x>
     <y>0.0000000000000000</y>
     <z>0.0610485395348569</z>
    </param>
@@ -204,9 +208,10 @@
    <param id="worldZdirection" enabled="F">
     <x>-0.0610485395348569</x>
     <y>0.0000000000000000</y>
-    <z>0.9981347984218668</z>
+    <z>0.9981347984218669</z>
    </param>
   </object>
+<!-- 4 -->
   <object name="Plane Mirror" type="Plane Mirror">
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">20</param>
@@ -264,7 +269,7 @@
     <z>21532.1873249288291845</z>
    </param>
    <param id="worldXdirection" enabled="F">
-    <x>0.9981347984218668</x>
+    <x>0.9981347984218669</x>
     <y>0.0000000000000000</y>
     <z>0.0610485395348569</z>
    </param>
@@ -276,7 +281,7 @@
    <param id="worldZdirection" enabled="F">
     <x>-0.0608694172384517</x>
     <y>0.0765479180543634</y>
-    <z>0.9952061747630958</z>
+    <z>0.9952061747630959</z>
    </param>
    <param id="slopeError" comment="Yes" enabled="T">0</param>
    <param id="profileKind" comment="no Profile" enabled="T">2</param>
@@ -289,6 +294,7 @@
    <param id="cylindricalBowingAmp" enabled="F">0</param>
    <param id="cylindricalBowingRadius" enabled="F">0</param>
   </object>
+<!-- 5 -->
   <object name="Spherical Grating" type="Spherical Grating">
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">20</param>
@@ -345,7 +351,7 @@
     <z>21729.4748228317694156</z>
    </param>
    <param id="worldXdirection" enabled="F">
-    <x>-0.9981347984218668</x>
+    <x>-0.9981347984218669</x>
     <y>0.0000000000000000</y>
     <z>-0.0610485395348569</z>
    </param>
@@ -357,7 +363,7 @@
    <param id="worldZdirection" enabled="F">
     <x>-0.0606981826769296</x>
     <y>0.1069814971722740</y>
-    <z>0.9924065144296952</z>
+    <z>0.9924065144296953</z>
    </param>
    <param id="slopeError" comment="Yes" enabled="T">0</param>
    <param id="profileKind" comment="no Profile" enabled="T">2</param>
@@ -370,6 +376,7 @@
    <param id="cylindricalBowingAmp" enabled="F">0</param>
    <param id="cylindricalBowingRadius" enabled="F">0</param>
   </object>
+<!-- 6 -->
   <object name="Exit Slit" type="Slit">
    <param id="openingShape" comment="rectangle" enabled="T">0</param>
    <param id="openingWidth" enabled="T">20</param>
@@ -378,8 +385,8 @@
    <param id="stopWidth" enabled="F">20</param>
    <param id="stopHeight" enabled="F">1</param>
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
-   <param id="totalWidth" enabled="T">50</param>
-   <param id="totalHeight" enabled="T">50</param>
+   <param id="totalWidth" enabled="T">100</param>
+   <param id="totalHeight" enabled="T">100</param>
    <param id="distancePreceding" enabled="T">11000</param>
    <param id="azimuthalAngle" enabled="T">0</param>
    <param id="alignmentError" comment="Yes" enabled="T">0</param>
@@ -391,25 +398,26 @@
    <param id="rotationZerror" enabled="T">0</param>
    <param id="worldPosition" enabled="F">
     <x>-1266.6141077357613085</x>
-    <y>30.5383201545151621</y>
-    <z>32708.9576054686367570</z>
+    <y>30.5383201545151231</y>
+    <z>32708.9576054686403950</z>
    </param>
    <param id="worldXdirection" enabled="F">
-    <x>0.9981347984218668</x>
+    <x>0.9981347984218669</x>
     <y>0.0000000000000000</y>
     <z>0.0610485395348569</z>
    </param>
    <param id="worldYdirection" enabled="F">
     <x>0.0000000499072879</x>
-    <y>0.9999999999996660</y>
-    <z>-0.0000008159769441</z>
+    <y>0.9999999999996659</y>
+    <z>-0.0000008159769440</z>
    </param>
    <param id="worldZdirection" enabled="F">
     <x>-0.0610485395348365</x>
     <y>0.0000008175017496</y>
-    <z>0.9981347984215334</z>
+    <z>0.9981347984215335</z>
    </param>
   </object>
+<!-- 7 -->
   <object name="E1" type="Ellipsoid">
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">20</param>
@@ -462,23 +470,23 @@
    <param id="rotationZerror" enabled="T">0</param>
    <param id="worldPosition" enabled="F">
     <x>-1684.7966035493911932</x>
-    <y>30.5439200415000194</y>
-    <z>39546.1809746561411885</z>
+    <y>30.5439200414999590</y>
+    <z>39546.1809746561484644</z>
    </param>
    <param id="worldXdirection" enabled="F">
     <x>0.0000000499072879</x>
-    <y>0.9999999999996660</y>
-    <z>-0.0000008159769441</z>
+    <y>0.9999999999996659</y>
+    <z>-0.0000008159769440</z>
    </param>
    <param id="worldYdirection" enabled="F">
-    <x>-0.9953961983671794</x>
+    <x>-0.9953961983671795</x>
     <y>-0.0000000285303996</y>
-    <z>-0.0958457525202123</z>
+    <z>-0.0958457525202124</z>
    </param>
    <param id="worldZdirection" enabled="F">
     <x>-0.0958457525202036</x>
     <y>0.0000008170037496</y>
-    <z>0.9953961983668455</z>
+    <z>0.9953961983668456</z>
    </param>
    <param id="slopeError" comment="Yes" enabled="T">0</param>
    <param id="profileKind" comment="no Profile" enabled="T">2</param>
@@ -491,6 +499,7 @@
    <param id="cylindricalBowingAmp" enabled="F">0</param>
    <param id="cylindricalBowingRadius" enabled="F">0</param>
   </object>
+<!-- 8 -->
   <object name="E2" type="Ellipsoid">
    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
    <param id="totalWidth" enabled="T">20</param>
@@ -543,8 +552,8 @@
    <param id="rotationZerror" enabled="T">0</param>
    <param id="worldPosition" enabled="F">
     <x>-1802.2701765474193962</x>
-    <y>30.5446540008208167</y>
-    <z>40438.4813498922740109</z>
+    <y>30.5446540008207528</y>
+    <z>40438.4813498922812869</z>
    </param>
    <param id="worldXdirection" enabled="F">
     <x>0.9914448613738118</x>
@@ -553,13 +562,13 @@
    </param>
    <param id="worldYdirection" enabled="F">
     <x>0.0045553482918587</x>
-    <y>0.9993907985578611</y>
+    <y>0.9993907985578609</y>
     <z>-0.0346017421500882</z>
    </param>
    <param id="worldZdirection" enabled="F">
     <x>-0.1304466774486913</x>
     <y>0.0349003117160589</y>
-    <z>0.9908408714746879</z>
+    <z>0.9908408714746880</z>
    </param>
    <param id="slopeError" comment="Yes" enabled="T">0</param>
    <param id="profileKind" comment="no Profile" enabled="T">2</param>
@@ -572,12 +581,13 @@
    <param id="cylindricalBowingAmp" enabled="F">0</param>
    <param id="cylindricalBowingRadius" enabled="F">0</param>
   </object>
+<!-- 9 -->
   <object name="ImagePlane" type="ImagePlane">
    <param id="distanceImagePlane" enabled="T">1000</param>
    <param id="worldPosition" enabled="F">
     <x>-1932.4784100420697541</x>
-    <y>100.3019412687369964</y>
-    <z>41427.5110444936144631</z>
+    <y>100.3019412687369396</y>
+    <z>41427.5110444936217391</z>
    </param>
    <param id="worldXdirection" enabled="F">
     <x>0.9914448613738118</x>
@@ -586,26 +596,14 @@
    </param>
    <param id="worldYdirection" enabled="F">
     <x>0.0091050966862335</x>
-    <y>0.9975639933723645</y>
+    <y>0.9975639933723643</y>
     <z>-0.0691605114304122</z>
    </param>
    <param id="worldZdirection" enabled="F">
     <x>-0.1302082334946503</x>
     <y>0.0697572872679162</y>
-    <z>0.9890296946013422</z>
+    <z>0.9890296946013423</z>
    </param>
   </object>
  </beamline>
- <drawing>
-  <mainBeamThickness>0</mainBeamThickness>
-  <header>true</header>
-  <axes>true</axes>
-  <names>true</names>
-  <angles>true</angles>
-  <scaling>0</scaling>
-  <scaleLinear>1</scaleLinear>
-  <scaleExponent>1</scaleExponent>
-  <scaleLinearOffset>600</scaleLinearOffset>
-  <scaleExponentiallyOffset>600</scaleExponentiallyOffset>
- </drawing>
 </lab>

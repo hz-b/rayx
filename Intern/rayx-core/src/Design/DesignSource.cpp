@@ -38,6 +38,8 @@ std::vector<Ray> DesignSource::compile(int numThreads, const glm::dvec4& groupPo
             return MatrixSource(*dsPtr).getRays(numThreads);
         case ElementType::DipoleSource:
             return DipoleSource(*dsPtr).getRays(numThreads);
+        case ElementType::DipoleSrc:
+            return DipoleSource(*dsPtr).getRays(numThreads);
         case ElementType::PixelSource:
             return PixelSource(*dsPtr).getRays(numThreads);
         case ElementType::CircleSource:

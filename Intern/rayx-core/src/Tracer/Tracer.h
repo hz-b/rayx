@@ -7,13 +7,15 @@
 #include "Core.h"
 #include "DeviceConfig.h"
 #include "DeviceTracer.h"
-#include "Shader/Ray.h"
+#include "RaySoA.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
 
 // if no `--batch` option is given, this it the batch size.
-const uint64_t DEFAULT_BATCH_SIZE = 100000;
+const int DEFAULT_BATCH_SIZE =
+    100000;  // TODO: this value is picked in a 'good' way if it can divide number of rays without rest. for number of rays picked by humans, this
+             // number is probably good. though, if it could be power of two, the shader would benefit
 
 class RAYX_API Tracer {
   public:
@@ -27,16 +29,13 @@ class RAYX_API Tracer {
     // This will call the trace implementation of a subclass
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
-    BundleHistory trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents);
+    RaySoA trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, int32_t recordElementIndex,
+                 RayAttrFlag attr = RayAttrFlag::All);
 
     static int defaultMaxEvents(const Group* group);
 
   private:
     std::shared_ptr<DeviceTracer> m_deviceTracer;
 };
-
-// TODO deprecate these functions and all of their uses.
-RAYX_API std::vector<Ray> extractLastEvents(const BundleHistory& hist);
-RAYX_API BundleHistory convertToBundleHistory(const std::vector<Ray>& rays);
 
 }  // namespace RAYX

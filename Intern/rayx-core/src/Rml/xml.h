@@ -34,6 +34,8 @@ enum class EnergySpreadUnit;
 enum class SigmaType;
 enum class SpreadType;
 enum class ElementType;
+enum class CrystalType;
+enum class OffsetAngleType;  // TODO:see if this is needed
 
 // An error in position and orientation that an object might have.
 struct Misalignment {
@@ -193,6 +195,20 @@ struct RAYX_API Parser {
     inline double parseElectronSigmaXs() const { return parseDouble("electronSigmaXs"); }
     inline double parseElectronSigmaY() const { return parseDouble("electronSigmaY"); }
     inline double parseElectronSigmaYs() const { return parseDouble("electronSigmaYs"); }
+
+    inline CrystalType parseCrystalType() const { return static_cast<CrystalType>(parseInt("crystalType")); }
+    inline std::string parseCrystalMaterial() const { return parseStr("crystalMaterial"); }
+    inline OffsetAngleType parseOffsetAngleType() const { return static_cast<OffsetAngleType>(parseInt("offsetAngleType")); }
+    inline Rad parseOffsetAngle() const { return parseInt("offsetAngle"); }
+    inline double parseStructureFactorReF0() const { return parseDouble("structureFactorReF0"); }
+    inline double parseStructureFactorImF0() const { return parseDouble("structureFactorImF0"); }
+    inline double parseStructureFactorReFH() const { return parseDouble("structureFactorReFH"); }
+    inline double parseStructureFactorImFH() const { return parseDouble("structureFactorImFH"); }
+    inline double parseStructureFactorReFHC() const { return parseDouble("structureFactorReFHC"); }
+    inline double parseStructureFactorImFHC() const { return parseDouble("structureFactorImFHC"); }
+    inline double parseUnitCellVolume() const { return parseDouble("unitCellVolume"); }
+    inline double parseDSpacing2() const { return parseDouble("dSpacing2"); }
+    inline int parseProfileKind() const { return parseInt("profileKind"); }
 
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;

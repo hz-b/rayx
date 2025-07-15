@@ -91,9 +91,8 @@ if(MSVC)
     list(APPEND MSVC_CXX_FLAGS /wd4251) # disable warnings related to missing DLL export annotation on members of exported classes
     list(APPEND MSVC_CXX_FLAGS /wd4267) # disable warnings related to narrowing conversion
     list(APPEND MSVC_CXX_FLAGS /Zc:preprocessor) # enable __VA_OPT__
-    if(WERROR STREQUAL "YES")
+    if(RAYX_WERROR)
         list(APPEND MSVC_CXX_FLAGS /WX) # handle warnings as errors
-        message(STATUS "Werror mode")
     endif()
     prepend_xcompiler(MSVC_CXX_FLAGS MSVC_CUDA_FLAGS)
     list(APPEND MSVC_CUDA_FLAGS --diag-suppress 1394) # disable warnings related to missing DLL export annotation on members of exported classes
@@ -106,13 +105,21 @@ else()
 
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
     target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>)
-    # target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas="-v">) # print cuda device function properties
+
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler="-fvisibility=hidden">)
+
+    if(RAYX_KERNEL_DEBUG)
+        # print cuda device function properties
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xptxas="-v">)
+        # generate line number information for  device code. usefull when profiling with nvidia nsight compute
+        target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>)
+    endif()
 
     # Enable werror if requested (mostly used for CI)
-    if(WERROR STREQUAL "YES")
+    if(RAYX_WERROR)
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Werror>)
         target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Werror all-warnings>)
-        message(STATUS "Werror mode")
     endif()
 endif()
 
@@ -120,13 +127,11 @@ endif()
 
 # ---- Disable H5 ----
 
-find_package(HDF5)
-
-if(HDF5_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${HDF5_LIBRARIES})
-    target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${HDF5_INCLUDE_DIRS})
+if(RAYX_H5_ENABLED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${RAYX_HDF5_LIBRARIES})
+    target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${RAYX_HDF5_INCLUDE_DIRS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC ${RAYX_HDF5_DEFINITIONS})
 else()
-    message(STATUS "HDF5 not found")
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
 endif()
 
@@ -184,11 +189,13 @@ target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${PROJECT_SOURCE_DIR
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/glm/glm/
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
-    ${PROJECT_SOURCE_DIR}/../../Extern/HighFive/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/VMA/include/
     ${PROJECT_SOURCE_DIR}/../../Extern/alpaka/include/
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC alpaka::alpaka)
+if(RAYX_H5_ENABLED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC HighFive::HighFive)
+endif()
 
 # ------------------------
 

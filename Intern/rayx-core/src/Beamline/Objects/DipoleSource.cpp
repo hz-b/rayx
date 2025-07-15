@@ -131,10 +131,9 @@ std::vector<Ray> DipoleSource::getRays(int thread_count) const {
         glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
         direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-        const auto rotation = glm::dmat3(m_orientation);
-        const auto field = rotation * stokesToElectricField(psiandstokes.stokes);
+        const auto field = stokesToElectricField(psiandstokes.stokes, m_orientation);
 
-        Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0.0, -1.0, -1.0};
+        Ray r = {position, EventType::Emitted, direction, en, field, 0.0, 0, -1, -1};
 #if defined(DIPOLE_OMP)
 #pragma omp critical  // thread-safety for writing rayList
         {

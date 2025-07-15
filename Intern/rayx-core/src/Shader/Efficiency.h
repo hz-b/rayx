@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ElectricField.h"
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -133,6 +134,16 @@ inline ElectricField interceptReflect(const ElectricField incidentElectricField,
     const auto isNormalIncidence = incidentVec == -normalVec;
     const auto reflectPolarizationMatrix = isNormalIncidence ? calcReflectPolarizationMatrixAtNormalIncidence(reflectAmplitude)
                                                              : calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
+
+    const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
+    return reflectElectricField;
+}
+
+RAYX_FN_ACC
+inline ElectricField interceptReflectCrystal(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
+                                             const glm::dvec3 normalVec, ComplexFresnelCoeffs reflectAmplitude) {
+    // TODO: make this more robust
+    const auto reflectPolarizationMatrix = calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
 
     const auto reflectElectricField = reflectPolarizationMatrix * incidentElectricField;
     return reflectElectricField;

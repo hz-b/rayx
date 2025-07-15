@@ -1,13 +1,17 @@
 #pragma once
 
-#include <optional>
-#include <string>
-#include <vector>
+#include <filesystem>
 
-#include "Shader/Ray.h"
-#include "Tracer/Tracer.h"
-#include "Writer/Writer.h"
+#include "RaySoA.h"
 
-RAYX_API void writeH5(const RAYX::BundleHistory&, const std::string& filename, const Format& format, std::vector<std::string> elementNames);
+namespace RAYX {
 
-RAYX_API RAYX::BundleHistory raysFromH5(const std::string& filename, const Format& format);
+#ifndef NO_H5
+RAYX_API RaySoA readH5RaySoA(const std::filesystem::path& filename, const RayAttrFlag attr = RayAttrFlag::All);
+RAYX_API BundleHistory readH5BundleHistory(const std::filesystem::path& filename);
+
+RAYX_API void writeH5RaySoA(const std::filesystem::path& filename, const RaySoA& rays, const RayAttrFlag attr = RayAttrFlag::All);
+RAYX_API void writeH5BundleHistory(const std::filesystem::path& filename, const BundleHistory& bundle, const RayAttrFlag attr = RayAttrFlag::All);
+#endif
+
+}  // namespace RAYX

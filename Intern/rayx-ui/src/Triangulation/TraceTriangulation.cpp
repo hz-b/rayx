@@ -24,9 +24,8 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
             constexpr double distanceToObj = 2000.0f;
             pos = glm::dvec3(x, distanceToObj, z);
             dir = glm::dvec3(0.0f, -1.0f, 0.0f);
-            const auto rotation = RAYX::rotationMatrix(dir);
             const auto stokes = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
-            const auto field = rotation * RAYX::stokesToElectricField(stokes);
+            const auto field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, dir);
 
             RAYX::Ray ray = {
                 .m_position = pos,
@@ -35,9 +34,9 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
                 .m_energy = 1.0f,
                 .m_field = field,
                 .m_pathLength = 0.0f,
-                .m_order = 0.0f,
-                .m_lastElement = -1.0f,
-                .m_sourceID = 0.0f,
+                .m_order = 0,
+                .m_lastElement = -1,
+                .m_sourceID = 0,
             };
             grid[i][j] = ray;
         }
@@ -65,7 +64,9 @@ void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<Texture
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
-            RAYX::Collision collision = RAYX::findCollisionInElementCoords(rayGrid[i][j], compiled.m_surface, compiled.m_cutout, true);
+            const auto& ray = rayGrid[i][j];
+            RAYX::Collision collision =
+                RAYX::findCollisionInElementCoords(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }

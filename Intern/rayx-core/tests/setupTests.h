@@ -19,7 +19,8 @@
 #include "Shader/Efficiency.h"
 #include "Shader/Ray.h"
 #include "Shader/RefractiveIndex.h"
-#include "Writer/CSVWriter.h"
+#include "Writer/CsvWriter.h"
+#include "Writer/H5Writer.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -172,6 +173,9 @@ class TestSuite : public testing::Test {
 
 // helper functions for writing tests
 
+/// will return the absolute path to the beamline
+std::filesystem::path getBeamlineFilepath(std::string filename);
+
 /// will look at Tests/input/<filename>.rml
 RAYX::Beamline loadBeamline(std::string filename);
 
@@ -207,3 +211,6 @@ void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);
 /// updates the material tables of the Cpu Tracer to contain exactly the
 /// materials given in the std::vector.
 MaterialTables createMaterialTables(std::vector<Material>);
+
+// returns the rayx rays converted to be ray-UI compatible.
+std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No);

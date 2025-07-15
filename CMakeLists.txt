@@ -12,11 +12,17 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 # ------------------
 
 # ---- Options ----
-option(WERROR "add -Werror option" "NO") # inactive per default
+option(RAYX_WERROR "add -Werror option. Warning will be treated as errors." OFF) # inactive per default
+if (RAYX_WERROR)
+    message(STATUS "Werror mode is active. Warnings will be treated as errors.")
+endif()
+
 option(RAYX_ENABLE_CUDA "This option enables the search for CUDA. Project will be compiled without cuda if not found." ON)
 option(RAYX_REQUIRE_CUDA "If option 'RAYX_ENABLE_CUDA' is ON, this option will add the requirement that cuda must be found." OFF)
 option(RAYX_ENABLE_OPENMP "This option enables the search for OPENMP. Project will be compiled without openmp if not found." ON)
 option(RAYX_REQUIRE_OPENMP "If option 'RAYX_ENABLE_OPENMP' is ON, this option will add the requirement that openmp must be found." OFF)
+option(RAYX_ENABLE_H5 "This option enables the search for HDF5. Project will be compiled without HDF5 if not found." ON)
+option(RAYX_REQUIRE_H5 "If option 'RAYX_ENABLE_H5' is ON, this option will add the requirement that HDF5 must be found." OFF)
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
 # ------------------
 

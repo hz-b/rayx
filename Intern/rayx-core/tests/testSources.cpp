@@ -208,3 +208,54 @@ TEST_F(TestSuite, testLightsourceGetters) {
         CHECK_EQ(widthResult, values.sourceWidth);
     }
 }
+
+#ifndef NO_H5
+TEST_F(TestSuite, testH5Writer) {
+    const auto beamlineFilename = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
+    const auto rayOriginal = traceRML(beamlineFilename);
+    const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
+
+    // test conversion between BundleHistory and RaySoA
+    {
+        const auto bundle = raySoAToBundleHistory(rayOriginalSoA);
+        CHECK_EQ(rayOriginal, bundle);
+    }
+
+    const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("h5");
+
+    // test if write and read of BundleHistory work without altering the contents
+    {
+        writeH5BundleHistory(h5Filepath, rayOriginal);
+        const auto bundle = readH5BundleHistory(h5Filepath);
+        CHECK_EQ(rayOriginal, bundle);
+    }
+
+    // test if write and read of partial BundleHistory work without altering the contents
+    {
+        // ground thruth
+        RaySoA partialRayOriginalSoA;
+        partialRayOriginalSoA.energy = rayOriginalSoA.energy;
+        partialRayOriginalSoA.position_x = rayOriginalSoA.position_x;
+        partialRayOriginalSoA.position_y = rayOriginalSoA.position_y;
+        partialRayOriginalSoA.position_z = rayOriginalSoA.position_z;
+
+        // write only some attributes
+        const auto attr = RayAttrFlag::Energy | RayAttrFlag::Position;
+        writeH5BundleHistory(h5Filepath, rayOriginal, attr);
+        // read only some attributes
+        const auto raySoA = readH5RaySoA(h5Filepath, attr);
+
+        CHECK_EQ(partialRayOriginalSoA, raySoA);
+    }
+}
+#endif
+
+TEST_F(TestSuite, testSelectElementForRecordEvent) {
+    // const auto filename = std::filesystem::path("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
+    // const auto beamline = loadBeamline(filename);
+    // TODO: add test for recording events for selected element
+    // - use fixed seed
+    // - trace: record all events
+    // - trace: record events from only one element
+    // - compare
+}

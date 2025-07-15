@@ -10,7 +10,7 @@
 #include "Beamline/EnergyDistribution.h"
 #include "Beamline/LightSource.h"
 #include "Debug/Debug.h"
-#include "Element/Strings.h"
+#include "Element/Element.h"
 #include "Shader/Constants.h"
 
 namespace RAYX::xml {
@@ -418,7 +418,7 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
 
     const char* str;
 
-    if (!paramStr(node, "materialSubstrate", &str)) {
+    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "crystalMaterial", &str)) {
         return false;
     }
 
@@ -476,7 +476,7 @@ int Parser::parseInt(const char* paramname) const {
 }
 
 const char* Parser::parseStr(const char* paramname) const {
-    const char* s;
+    const char* s = nullptr;
     if (!paramStr(node, paramname, &s)) {
         RAYX_EXIT << "parseStr failed for \"" << paramname << "\"";
     }
@@ -639,7 +639,7 @@ CubicSurface Parser::parseCubicParameters() const {
 }
 
 ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
-    ElectronEnergyOrientation orientation;
+    auto orientation = ElectronEnergyOrientation::Clockwise;  // default initialize, even tho we dont know at this point
     if (!paramElectronEnergyOrientation(node, &orientation)) {
         return orientation;
     }
@@ -648,7 +648,7 @@ ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
 }
 
 SourcePulseType Parser::parseSourcePulseType() const {
-    SourcePulseType spreadType;
+    auto spreadType = SourcePulseType::None;  // default initialize, even tho we dont know at this point
     if (!paramSourcePulseType(node, &spreadType)) {
         return spreadType;
     }

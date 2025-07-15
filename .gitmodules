@@ -1,9 +1,6 @@
 [submodule "Extern/glm"]
 	path = Extern/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "Extern/HighFive"]
-	path = Extern/HighFive
-	url = https://github.com/BlueBrain/HighFive.git
 [submodule "Extern/CLI11"]
 	path = Extern/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
@@ -28,3 +25,6 @@
 [submodule "Extern/SDL"]
 	path = Extern/SDL
 	url = https://github.com/libsdl-org/SDL
+[submodule "Extern/highfive"]
+	path = Extern/highfive
+	url = https://github.com/highfive-devs/highfive.git

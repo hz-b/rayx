@@ -1,4 +1,4 @@
-# Baamline Parameter
+# Beamline Parameter
 
 This table explains all the parameters that can be used in a RAYX beamline.
 They are ordered for Elements and Sources and roughly in their order of importance.
@@ -126,3 +126,9 @@ They are ordered for Elements and Sources and roughly in their order of importan
 | Thickness Top Layer            | Thickness of the top layer coating                            |
 | Roughness Top Layer            | Roughness of the top layer coating                            |
 | Density Top Layer              | Density of the top layer coating                              |
+| Lattice Spacing × 2            | Twice the lattice spacing \(2d\) of the crystal (in nm)       |
+| Unit Cell Volume               | Volume of the crystal's unit cell (in nm³)                    |
+| Structure Factor F₀            | Real and imaginary parts of the forward scattering factor     |
+| Structure Factor F_H           | Real and imaginary parts of the Bragg-reflected structure factor |
+| Structure Factor F_H̄           | Real and imaginary parts of the conjugate reflected factor    |
+| Offset Angle α                 | Crystal surface tilt relative to atomic planes (in radians)   |

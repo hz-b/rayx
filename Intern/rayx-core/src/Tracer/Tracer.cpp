@@ -51,29 +51,12 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-BundleHistory Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents) {
+RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, int32_t recordElementIndex,
+                     RayAttrFlag attr) {
     // in sequential tracing, maxEvents should be equal to the number of elements
     if (sequential == Sequential::Yes) maxEvents = group.numElements();
 
-    return m_deviceTracer->trace(group, sequential, static_cast<int>(maxBatchSize), static_cast<int>(maxEvents));
-}
-
-/// Get the last event for each ray of the bundle.
-std::vector<Ray> extractLastEvents(const BundleHistory& hist) {
-    std::vector<Ray> out;
-    for (auto& ray_hist : hist) {
-        out.push_back(ray_hist.back());
-    }
-
-    return out;
-}
-
-BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
-    BundleHistory out;
-    for (auto r : rays) {
-        out.push_back({r});
-    }
-    return out;
+    return m_deviceTracer->trace(group, sequential, static_cast<int>(maxBatchSize), static_cast<int>(maxEvents), recordElementIndex, attr);
 }
 
 int Tracer::defaultMaxEvents(const Group* group) {

@@ -9,6 +9,8 @@ namespace RAYX {
 
 Behaviour makeBehaviour(const DesignElement& dele) {
     switch (dele.getBehaviourType()) {
+        case BehaviourType::Crystal:
+            return makeCrystal(dele);
         case BehaviourType::Grating:
             return makeGrating(dele);
         case BehaviourType::Mirror:
@@ -20,6 +22,33 @@ Behaviour makeBehaviour(const DesignElement& dele) {
         default:
             return serializeImagePlane();
     }
+}
+
+Behaviour makeCrystal(const DesignElement& dele) {
+    auto dSpacing2 = dele.getDSpacing2();
+    auto unitCellVoulume = dele.getUnitCellVolume();
+    auto offsetAngle = dele.getOffsetAngle();
+
+    auto structureFactorReF0 = dele.getStructureFactorReF0();
+    auto structureFactorImF0 = dele.getStructureFactorImF0();
+    auto structureFactorReFH = dele.getStructureFactorReFH();
+    auto structureFactorImFH = dele.getStructureFactorImFH();
+    auto structureFactorReFHC = dele.getStructureFactorReFHC();
+    auto structureFactorImFHC = dele.getStructureFactorImFHC();
+
+    return serializeCrystal({
+
+        .m_dSpacing2 = dSpacing2,
+        .m_unitCellVolume = unitCellVoulume,
+        .m_offsetAngle = offsetAngle.rad,
+
+        .m_structureFactorReF0 = structureFactorReF0,
+        .m_structureFactorImF0 = structureFactorImF0,
+        .m_structureFactorReFH = structureFactorReFH,
+        .m_structureFactorImFH = structureFactorImFH,
+        .m_structureFactorReFHC = structureFactorReFHC,
+        .m_structureFactorImFHC = structureFactorImFHC,
+    });
 }
 
 Behaviour makeGrating(const DesignElement& dele) {
