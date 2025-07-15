@@ -24,9 +24,6 @@ option(RAYX_REQUIRE_OPENMP "If option 'RAYX_ENABLE_OPENMP' is ON, this option wi
 option(RAYX_ENABLE_H5 "This option enables the search for HDF5. Project will be compiled without HDF5 if not found." ON)
 option(RAYX_REQUIRE_H5 "If option 'RAYX_ENABLE_H5' is ON, this option will add the requirement that HDF5 must be found." OFF)
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
-option(RAYX_CMD "This option builds 'rayx'" YES)
-set(RAYX_CUSTOM_DATA_DIR "" CACHE STRING "This option allows to set a custom data directory for rayx-core.")
-
 # ------------------
 
 
@@ -67,11 +64,7 @@ if(APPLE)
     set(INSTALL_DATA_DIR "Library/Application Support/${PROJECT_NAME}")
     set(INSTALL_FONTS_DIR "Library/Fonts/${PROJECT_NAME}")
 elseif(UNIX AND NOT APPLE)
-    if(RAYX_CUSTOM_DATA_DIR STREQUAL "")
-        set(INSTALL_DATA_DIR "share/${PROJECT_NAME}")
-    else()
-        set(INSTALL_DATA_DIR "${RAYX_CUSTOM_DATA_DIR}/${PROJECT_NAME}")
-    endif()
+    set(INSTALL_DATA_DIR "share/${PROJECT_NAME}")
     set(INSTALL_FONTS_DIR "share/fonts/${PROJECT_NAME}")
 elseif(WIN32)
     set(INSTALL_DATA_DIR ".")

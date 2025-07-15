@@ -19,6 +19,9 @@
 [submodule "Extern/alpaka"]
 	path = Extern/alpaka
 	url = https://github.com/alpaka-group/alpaka.git
+[submodule "Extern/portable-file-dialogs"]
+	path = Extern/portable-file-dialogs
+	url = https://github.com/samhocevar/portable-file-dialogs.git
 [submodule "Extern/SDL"]
 	path = Extern/SDL
 	url = https://github.com/libsdl-org/SDL

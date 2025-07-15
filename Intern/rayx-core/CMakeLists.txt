@@ -237,17 +237,13 @@ add_custom_command(
 )
 # -----------------
 
-
-
 # ---- CPack ----
 if(APPLE OR UNIX)
-    if(NOT RAYX_STATIC_LIB STREQUAL "ON")
-        install(TARGETS ${PROJECT_NAME} 
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib
-        )
-    endif()
+    install(TARGETS ${PROJECT_NAME} 
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
 elseif(WIN32)
     install(TARGETS ${PROJECT_NAME} 
         RUNTIME DESTINATION .
@@ -255,11 +251,11 @@ elseif(WIN32)
         ARCHIVE DESTINATION .
     )
 endif()
-install(DIRECTORY ${RAYX_SOURCE_DIR}/Data/nff
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data/nff
         DESTINATION ${INSTALL_DATA_DIR}/Data)
-install(DIRECTORY ${RAYX_SOURCE_DIR}/Data/PALIK
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data/PALIK
         DESTINATION ${INSTALL_DATA_DIR}/Data)
-install(DIRECTORY ${RAYX_SOURCE_DIR}/Scripts
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Scripts
         DESTINATION ${INSTALL_DATA_DIR})
 include(InstallRequiredSystemLibraries)
 include(CPack)
