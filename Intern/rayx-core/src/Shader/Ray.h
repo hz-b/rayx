@@ -40,6 +40,8 @@ struct RAYX_API Ray {
     /// The complex electric field
     ElectricField m_field;
 
+    // TODO: until we support transmission in media with refractive index != 1.0, path length equivalent to optical path length. in future, we should
+    // consider renaming this attribute to optical path length
     /// The distance that this ray has already traveled (in mm).
     double m_pathLength;
 

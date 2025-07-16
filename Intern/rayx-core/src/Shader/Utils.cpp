@@ -4,14 +4,13 @@
 
 namespace RAYX {
 
-// converts energy in eV to wavelength in nm
 RAYX_FN_ACC
-double RAYX_API hvlam(double x) {
-    if (x == 0) {
-        return 0.0;
-    }
+double RAYX_API energyToWaveLength(double x) {
     return INV_NM_TO_EVOLT / x;
 }
+
+RAYX_FN_ACC
+double waveLengthToEnergy(const double waveLength) { return INV_NM_TO_EVOLT / waveLength; }
 
 // originally we calculcated 1/0, which might be UB (https://stackoverflow.com/questions/5802351/what-happens-when-you-divide-by-0-in-a-shader).
 // `return 1e+308 * 2.0;` correctly returns positive infinity on my machine (Rudi), but we have no guarantee that it always does.
