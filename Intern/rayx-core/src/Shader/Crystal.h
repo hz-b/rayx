@@ -156,7 +156,7 @@ inline complex::Complex computeEta(double theta, double bragg, double asymmetry,
 /// @param structureFactorImFHC         Imaginary part of structure factor
 /// @return                             Complex reflection coefficient R
 RAYX_FN_ACC 
-inline::Complex computeR(complex::Complex eta, 
+inline complex::Complex computeR(complex::Complex eta, 
                                           double structureFactorReFH, double structureFactorImFH,
                                           double structureFactorReFHC, double structureFactorImFHC) {
     complex::Complex one(1.0, 0.0);
