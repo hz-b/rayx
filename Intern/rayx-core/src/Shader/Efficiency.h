@@ -151,6 +151,40 @@ inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnel
     };
 }
 
+// intercept reflection with one coating layer
+RAYX_FN_ACC
+inline ElectricField interceptReflectOneLayer(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
+                                      const glm::dvec3 normalVec, const complex::Complex vacuum_ior, const complex::Complex coating_iorT, const complex::Complex substrate_ior) {
+    const auto incidentAngle = complex::Complex(angleBetweenUnitVectors(incidentVec, -normalVec), 0);
+    const auto refractAngle = calcRefractAngle(incidentAngle, vacuum_ior, coating_iorT);
+
+    // calculate the transmittance from vacuum to coating
+    const auto transmittance = calcRefractAmplitude(incidentAngle, refractAngle,
+                                                    vacuum_ior, coating_iorT);
+
+    const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, vacuum_ior, coating_iorT);
+
+    const auto reflectElectricField = reflectAmplitude * incidentElectricField;
+
+    return reflectElectricField;
+
+}
+
+RAYX_FN_ACC
+inline ElectricField interceptTransmit(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 normalVec,
+                                       const complex::Complex iorI, const complex::Complex iorT) {
+    const auto incidentAngle = complex::Complex(angleBetweenUnitVectors(incidentVec, -normalVec), 0);
+    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, iorT);
+
+    const auto transmitAmplitude = calcTransmitAmplitude(incidentAngle, refractAngle, iorI, iorT);
+
+    const auto isNormalIncidence = incidentVec == -normalVec;
+    const auto transmitPolarizationMatrix = isNormalIncidence ? calcReflectPolarizationMatrixAtNormalIncidence(transmitAmplitude)
+                                                               : calcPolaririzationMatrix(incidentVec, incidentVec, normalVec, transmitAmplitude);
+
+    return transmitPolarizationMatrix * incidentElectricField;
+}
+
 RAYX_FN_ACC
 inline ElectricField interceptReflect(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
                                       const glm::dvec3 normalVec, const complex::Complex iorI, const complex::Complex iorT) {

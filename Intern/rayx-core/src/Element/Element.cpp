@@ -61,12 +61,15 @@ OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surfa
     auto inMat = defaultInMatrix(dele, plane);
     auto outMat = defaultOutMatrix(dele, plane);
 
+    auto coating = dele.getCoating();
+
     return OpticalElement{
         .m_inTrans = inMat,
         .m_outTrans = outMat,
         .m_behaviour = behaviour,
         .m_surface = surface,
         .m_cutout = *cutout,
+        .m_coating = coating,
         .m_slopeError = dele.getSlopeError(),
         .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
         .m_material = defaultMaterial(dele),

@@ -33,6 +33,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
         const auto behaviour = element.m_behaviour;
+        const auto coating = element.m_coating;
 
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
@@ -41,7 +42,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
         switch (behaviour.m_type) {
             case BehaveType::Mirror:
-                ray = behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
+                ray = behaveMirror(ray, col, coating, element.m_material, inv.materialIndices, inv.materialTables);
                 break;
             case BehaveType::Grating:
                 ray = behaveGrating(ray, behaviour, col);

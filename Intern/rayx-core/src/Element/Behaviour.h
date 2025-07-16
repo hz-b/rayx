@@ -19,6 +19,8 @@ enum class BehaveType {
     Foil
 };
 
+
+
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
     // the type describes how the m_private_serialization_params need to be interpreted.
