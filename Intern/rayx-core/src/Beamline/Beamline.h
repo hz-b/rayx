@@ -19,8 +19,8 @@ namespace RAYX {
  */
 class RAYX_API Group : public BeamlineNode {
   public:
-    Group();
-    ~Group();
+    Group() = default;
+    ~Group() = default;
     Group(Group&& other) noexcept;
     Group& operator=(Group&& other) noexcept;
     Group(const Group&) = delete;

@@ -9,8 +9,6 @@
 #include "Design/DesignSource.h"
 
 namespace RAYX {
-    Group::Group() = default;
-    Group::~Group() = default;
 
 // Move constructor
 Group::Group(Group&& other) noexcept
