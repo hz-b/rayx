@@ -27,6 +27,35 @@ inline double intensity(const Stokes stokes) { return stokes.x; }
 RAYX_FN_ACC
 inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
 
+/**
+ * Advances an electric field propagating in a certain media by a certain distance
+ * @param field electric field of incident photon
+ * @param waveLength wavelength of incident photon
+ * @param distance distance traveled in media
+ * @param ior_real real component of complex index of refraction of media
+ * @return advanced electric field
+ * @TODO: check if waveLength and distance use the same
+ */
+RAYX_FN_ACC
+inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double distance, const float ior_real) {
+    // bring wavelength from nanometers into millimeters
+    waveLength /= 1e6;
+
+    // compute wave number (2π * n / λ)
+    const double waveNumber = 2.0 * PI * ior_real / waveLength;
+
+    // reduce the distance modulo wavelength to avoid large angle errors
+    const double reducedDistance = std::fmod(distance, waveLength);
+
+    // compute the phase shift using the reduced distance
+    const double deltaPhi = waveNumber * reducedDistance;
+
+    // apply the complex exponential of the phase shift
+    const auto phaseShift = complex::exp(complex::Complex(0.0, deltaPhi));
+
+    return field * phaseShift;
+}
+
 /*
  *  rotation of electric field
  */

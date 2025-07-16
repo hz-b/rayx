@@ -5,8 +5,19 @@
 
 namespace RAYX {
 
-// converts energy in eV to wavelength in nm
-RAYX_FN_ACC double RAYX_API hvlam(double x);
+/**
+ * converts energy (eV) to wavelength (nm)
+ * @param energy energy of a photon in eV. must not be 0
+ * @return wavelength of photon in nm
+ */
+RAYX_FN_ACC double RAYX_API energyToWaveLength(double energy);
+
+/**
+ * Convert photon wavelength (nm) to energy (eV)
+ * @param wavelength of photon in nm. must not be 0
+ * @return energy energy of a photon in eV
+ */
+RAYX_FN_ACC double RAYX_API waveLengthToEnergy(const double waveLength);
 
 RAYX_FN_ACC double infinity();
 

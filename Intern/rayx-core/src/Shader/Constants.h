@@ -8,11 +8,8 @@
 
 namespace RAYX {
 
-// inverse nanometer-electron volt relationship / reziprocal factor
+/// inverse nanometer-electron volt relationship / reziprocal factor
 constexpr double INV_NM_TO_EVOLT = 1239.841984332002622;
-
-// inverse nanometer-electron volt relationship / reziprocal factor
-constexpr double inm2eV = 1.239852e3;  // TODO: Check, find better name maybe
 
 constexpr double PI = 3.14159265358979323846264338327950;
 // 141592653589793238462643383279502884197169399
@@ -39,7 +36,6 @@ constexpr double ELECTRON_MASS = 9.1093837015e-31;  // Checked 2019-7-25, PB, NI
 /// RAY-UI shortcut for getFactorElectronEnergy
 constexpr double FACTOR_ELECTRON_ENERGY_SC = 1957;
 
-//
 constexpr double FINE_STRUCTURE_CONSTANT = 7.2973525693e-3;  // Checked 2020-2-18, PB, NIST: fine-structure constant, no units
 
 /// \f$\epsilon_0\f$ [As/Vm]. vacuum electric permittivity.
@@ -53,6 +49,6 @@ constexpr double FACTOR_SCHWINGER_RAY = 1.2556937e15;
 constexpr double ELECTRIC_PERMITIVITY_MULTIPLIES_SPEED_OF_LIGHT = 2.6544187279929558624e-3;
 
 constexpr double ELECTRON_RADIUS = 2.8179403205e-6;  // Classical electron radius (nm)
-
 // constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
+
 }  // namespace RAYX
