@@ -149,21 +149,37 @@ Ray behaveGrating(Ray r, const Behaviour::Grating grating, const Collision col) 
 }
 
 RAYX_FN_ACC
-Ray behaveMirror(Ray r, const Collision col, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
+Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     // calculate the new direction after the reflection
     const auto incident_vec = r.m_direction;
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);
     r.m_direction = reflect_vec;
 
-    if (material != -2) {
+    if (coating.m_type == SurfaceCoatingType::SubstrateOnly) {
+        if (material != -2) {
         constexpr int vacuum_material = -1;
-        const auto ior_i = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
-        const auto ior_t = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+        const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
-        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, ior_i, ior_t);
+        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, vacuum_ior, substrate_ior);
 
         r.m_field = reflect_field;
         r.m_order = 0;
+        }
+    } else if (coating.m_type == SurfaceCoatingType::SingleCoating) {
+        // calculate the reflectance of the coating
+        OneCoating oneCoating = deserializeOneCoating(coating);
+        const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+        const auto coating_ior = getRefractiveIndex(r.m_energy, oneCoating.material, materialIndices, materialTable);
+
+        const auto firstLayerReflectance = computeReflectance(vacuum_ior, coating_ior, r.m_energy);
+        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, coating_ior, substrate_ior);
+
+        r.m_field = reflect_field;
+        r.m_order = 0;
+    } else {
+        _throw("Unsupported surface coating type: %d", static_cast<int>(coating.m_type));
     }
 
     return r;

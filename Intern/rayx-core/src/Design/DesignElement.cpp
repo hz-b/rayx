@@ -506,4 +506,35 @@ double DesignElement::getRoughnessSubstrate() const { return m_elementParameters
 void DesignElement::setDesignPlane(DesignPlane value) { m_elementParameters["designPlane"] = value; }
 DesignPlane DesignElement::getDesignPlane() const { return m_elementParameters["designPlane"].as_designPlane(); }
 
+void DesignElement::setSurfaceCoatingType(SurfaceCoatingType value) { m_elementParameters["surfaceCoatingType"] = value; }
+SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_elementParameters["surfaceCoatingType"].as_surfaceCoatingType(); }
+
+Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+    SurfaceCoatingType type = getSurfaceCoatingType();
+    if (type == SurfaceCoatingType::SubstrateOnly) {
+        return serializeSubstrateOnly();
+    } else if (type == SurfaceCoatingType::OneCoating) {
+        OneCoating oneCoating;
+        oneCoating.material = static_cast<int>(getMaterialCoating());
+        oneCoating.thickness = getThicknessCoating();
+        oneCoating.roughness = getRoughnessCoating();
+        return serializeOneCoating(oneCoating);
+    } else if (type == SurfaceCoatingType::MultipleCoatings) {
+        return serializeSubstrateOnly(); // Placeholder for multiple coatings, needs implementation
+    } else {
+        std::cerr << "Unknown SurfaceCoatingType: " << static_cast<int>(type) << std::endl;
+        return serializeSubstrateOnly(); // Default case
+    }
+}
+
+// material coating
+void DesignElement::setMaterialCoating(Material value) { m_elementParameters["materialCoating"] = value; }
+Material DesignElement::getMaterialCoating() const { return m_elementParameters["materialCoating"].as_material(); }
+
+void DesignElement::setThicknessCoating(double value) { m_elementParameters["thicknessCoating"] = value; }
+double DesignElement::getThicknessCoating() const { return m_elementParameters["thicknessCoating"].as_double(); }
+
+void DesignElement::setRoughnessCoating(double value) { m_elementParameters["roughnessCoating"] = value; }
+double DesignElement::getRoughnessCoating() const { return m_elementParameters["roughnessCoating"].as_double(); }
+
 }  // namespace RAYX

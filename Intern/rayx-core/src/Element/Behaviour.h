@@ -11,6 +11,8 @@ namespace RAYX {
 // Each behaviour type has its own `behave` function in `Behave.h`.
 enum class BehaveType { Mirror, Grating, Slit, RZP, ImagePlane, Crystal, Foil };
 
+
+
 struct Behaviour {
     struct Mirror {
         // no parameters
