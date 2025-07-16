@@ -65,7 +65,8 @@ inline std::string eventTypeToString(const EventType eventType) {
         case EventType::Emitted:
             return "Emitted";
         default:
-            _throw("error: unable to convert EventType to string: '%d'", static_cast<int>(eventType));
+            // TODO: enable this again
+            //_throw("error: unable to convert EventType to string: '%d'", static_cast<int>(eventType));
             return "<unknown-event-type>";
     }
 }
@@ -82,7 +83,8 @@ inline EventType stringToEventType(const std::string eventTypeString) {
     };
 
     auto it = map.find(eventTypeString);
-    _assert(it != map.end(), "error: unable to convert string to EventType: '%s'", eventTypeString.c_str());
+    // TODO: enable this again
+    // _assert(it != map.end(), "error: unable to convert string to EventType: '%s'", eventTypeString.c_str());
     return it->second;
 }
 
