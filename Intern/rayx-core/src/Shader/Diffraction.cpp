@@ -1,5 +1,6 @@
 #include "Diffraction.h"
 
+#include <boost/math/special_functions/bessel.hpp>
 #include "Approx.h"
 #include "Constants.h"
 #include "Rand.h"
@@ -20,24 +21,38 @@ double RAYX_API fact(int a) {
 
 /**returns first bessel function of parameter v*/
 RAYX_FN_ACC
-double RAYX_API bessel1(double v) {
-    if (v < 0.0 || v > 20.0) {
-        return 0.0;
+double RAYX_API bessel1(double x) {
+    // if (v < 0.0 || v > 20.0) {
+    //     return 0.0;
+    // }
+
+    // double sum = 0;
+    // int large = 80;
+
+    // double PO1;
+    // double PO2;
+    // double FA1;
+    // for (int small = 0; small <= large; small++) {
+    //     PO1 = dpow(-1.0, small);
+    //     PO2 = dpow(v / 2.0, 2 * small + 1);
+    //     FA1 = fact(small);
+    //     sum += (PO1 / (FA1 * FA1 * (small + 1))) * PO2;
+    // }
+    // return sum;
+
+    if (x < 0) {
+    //    x = std::abs(x);  // Nur anwendbar, wenn Jᵥ(-x) = (-1)ᵛ Jᵥ(x)
+    }
+    if (std::isnan(x) || std::isinf(x)) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    try {
+        return boost::math::cyl_bessel_j(1.0, x);
+    }
+    catch (...) {
+        return std::numeric_limits<double>::signaling_NaN();
     }
 
-    double sum = 0;
-    int large = 30;
-
-    double PO1;
-    double PO2;
-    double FA1;
-    for (int small = 0; small <= large; small++) {
-        PO1 = dpow(-1.0, small);
-        PO2 = dpow(v / 2.0, 2 * small + 1);
-        FA1 = fact(small);
-        sum += (PO1 / (FA1 * FA1 * (small + 1))) * PO2;
-    }
-    return sum;
 }
 
 /**
@@ -67,6 +82,7 @@ void bessel_diff(double radius, double wl, double& __restrict dphi, double& __re
         double u = 2.0 * PI * b * xi / wl;
         double wd = 1;
         if (u != 0) {
+            std::cout << "u: " << u << std::endl;
             wd = 2.0 * bessel1(u) / u;
             wd = wd * wd;
         }
