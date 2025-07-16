@@ -117,13 +117,8 @@ inline cmat3 calcPolaririzationMatrix(const glm::dvec3 incidentVec, const glm::d
     return out * jonesMatrix * in;
 }
 
-
 RAYX_FN_ACC
-inline cmat3 calcPolaririzationMatrixFoil(
-    const glm::dvec3 incidentVec, 
-    const glm::dvec3 normalVec,
-    const ComplexFresnelCoeffs amplitude
-) {
+inline cmat3 calcPolaririzationMatrixFoil(const glm::dvec3 incidentVec, const glm::dvec3 normalVec, const ComplexFresnelCoeffs amplitude) {
     glm::dvec3 s0;
     if (glm::length(glm::cross(incidentVec, normalVec)) < 1e-10) {
         if (std::abs(incidentVec.x) > 1e-6) {
@@ -137,11 +132,7 @@ inline cmat3 calcPolaririzationMatrixFoil(
 
     const glm::dvec3 p0 = glm::normalize(glm::cross(incidentVec, s0));
 
-    const glm::dmat3 in = glm::dmat3(
-        s0.x, p0.x, incidentVec.x,
-        s0.y, p0.y, incidentVec.y,
-        s0.z, p0.z, incidentVec.z
-    );
+    const glm::dmat3 in = glm::dmat3(s0.x, p0.x, incidentVec.x, s0.y, p0.y, incidentVec.y, s0.z, p0.z, incidentVec.z);
 
     const cmat3 jonesMatrix = calcJonesMatrix(amplitude);
 
@@ -187,18 +178,14 @@ inline ElectricField interceptReflectCrystal(const ElectricField incidentElectri
     return reflectElectricField;
 }
 
-
 RAYX_FN_ACC
-inline ElectricField interceptFoil(const ElectricField incidentElectricField, const glm::dvec3 incidentVec,
-                                      const glm::dvec3 normalVec, ComplexFresnelCoeffs transCoeffs) {
-
+inline ElectricField interceptFoil(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 normalVec,
+                                   ComplexFresnelCoeffs transCoeffs) {
     // TODO: make this more robust
     const auto transmittPolarizationMatrix = calcPolaririzationMatrixFoil(incidentVec, normalVec, transCoeffs);
 
     const auto transmittElectricField = transmittPolarizationMatrix * incidentElectricField;
     return transmittElectricField;
 }
-
-
 
 }  // namespace RAYX

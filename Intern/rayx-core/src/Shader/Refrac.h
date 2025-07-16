@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Ray.h"
 #include <cmath>
-#include "Complex.h" 
+
+#include "Complex.h"
+#include "Ray.h"
 #include "Utils.h"
 
 namespace RAYX {
@@ -17,7 +18,6 @@ anyways. az: linedensity in z direction ax: linedensity in x direction
 */
 RAYX_FN_ACC Ray refrac2D(Ray r, glm::dvec3 normal, double az, double ax);
 
-
 /**
  * Simple refraction for double precision vectors
  * @params:  I: incident vector
@@ -26,6 +26,5 @@ RAYX_FN_ACC Ray refrac2D(Ray r, glm::dvec3 normal, double az, double ax);
  * @returns: refracted vector, or zero vector if total internal reflection occurs
  */
 RAYX_FN_ACC glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta);
-
 
 }  // namespace RAYX

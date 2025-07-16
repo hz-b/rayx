@@ -56,9 +56,8 @@ RAYX_FN_ACC
 glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta) {
     double cosi = glm::dot(-I, N);
     double cost2 = 1.0 - eta * eta * (1.0 - cosi * cosi);
-    if (cost2 < 0.0) return glm::dvec3(0.0); // Total internal reflection
+    if (cost2 < 0.0) return glm::dvec3(0.0);  // Total internal reflection
     return eta * I + (eta * cosi - sqrt(cost2)) * N;
 }
-
 
 }  // namespace RAYX

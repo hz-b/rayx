@@ -154,8 +154,10 @@ Behaviour makeFoil(const DesignElement& dele) {
     auto thicknessSubstrate = dele.getThicknessSubstrate();
     auto roughnessSubstrate = dele.getRoughnessSubstrate();
 
-    return serializeFoil({.m_thicknessSubstrate = thicknessSubstrate, 
-                        .m_roughnessSubstrate = roughnessSubstrate,});
-    }
+    return serializeFoil({
+        .m_thicknessSubstrate = thicknessSubstrate,
+        .m_roughnessSubstrate = roughnessSubstrate,
+    });
+}
 
 }  // namespace RAYX

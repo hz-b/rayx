@@ -1,14 +1,13 @@
-#include "Utils.h"
-
 #include "Constants.h"
 #include "Efficiency.h"
+#include "Utils.h"
 
 namespace RAYX {
 
 /**
  * @brief Calculates the transmission through a single thin film layer using Fresnel equations.
  *
- * This function computes the intensity transmission coefficient (T) for a plane wave incident on 
+ * This function computes the intensity transmission coefficient (T) for a plane wave incident on
  * a single dielectric or absorbing film, including interference effects.
  *
  * @param wavelength        Wavelength of light in nanometers.
@@ -19,36 +18,27 @@ namespace RAYX {
  * @return double           Intensity transmission coefficient (range 0 to 1).
  */
 RAYX_FN_ACC
-inline ComplexFresnelCoeffs computeTransmittance(
-    double wavelength,         
-    complex::Complex theta0,
-    const complex::Complex& indexVacuum,
-    const complex::Complex& indexMaterial,
-    double thickness           
-) {
+inline ComplexFresnelCoeffs computeTransmittance(double wavelength, complex::Complex theta0, const complex::Complex& indexVacuum,
+                                                 const complex::Complex& indexMaterial, double thickness) {
     using complex::Complex;
 
-    complex::Complex sinTheta1 = (indexVacuum / indexMaterial) * std::sin(theta0);
-    complex::Complex theta1 = std::asin(sinTheta1);
-    
-    complex::Complex theta2 = theta0; // Austritt in Vakuum, Winkel gleich theta0
+    complex::Complex sinTheta1 = (indexVacuum / indexMaterial) * complex::sin(theta0);
+    complex::Complex theta1 = complex::asin(sinTheta1);
+
+    complex::Complex theta2 = theta0;  // Austritt in Vakuum, Winkel gleich theta0
 
     // Fresnel-Koeffizienten (s- und p-Polarisation)
     auto rs = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (ni * std::cos(thetai) - nt * std::cos(thetat)) /
-               (ni * std::cos(thetai) + nt * std::cos(thetat));
+        return (ni * complex::cos(thetai) - nt * complex::cos(thetat)) / (ni * complex::cos(thetai) + nt * complex::cos(thetat));
     };
     auto ts = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (2.0 * ni * std::cos(thetai)) /
-               (ni * std::cos(thetai) + nt * std::cos(thetat));
+        return (2.0 * ni * complex::cos(thetai)) / (ni * complex::cos(thetai) + nt * complex::cos(thetat));
     };
     auto rp = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (nt * std::cos(thetai) - ni * std::cos(thetat)) /
-               (nt * std::cos(thetai) + ni * std::cos(thetat));
+        return (nt * complex::cos(thetai) - ni * complex::cos(thetat)) / (nt * complex::cos(thetai) + ni * complex::cos(thetat));
     };
     auto tp = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (2.0 * ni * std::cos(thetai)) /
-               (nt * std::cos(thetai) + ni * std::cos(thetat));
+        return (2.0 * ni * complex::cos(thetai)) / (nt * complex::cos(thetai) + ni * complex::cos(thetat));
     };
 
     // s-Polarisation
@@ -64,8 +54,8 @@ inline ComplexFresnelCoeffs computeTransmittance(
     complex::Complex t12p = tp(indexMaterial, indexVacuum, theta1, theta2);
 
     // Phasenverschiebung
-    complex::Complex delta = (2.0 * PI / wavelength) * indexMaterial * thickness * std::cos(theta1);
-    complex::Complex phase = std::exp(complex::Complex(0, 1) * delta);
+    complex::Complex delta = (2.0 * PI / wavelength) * indexMaterial * thickness * complex::cos(theta1);
+    complex::Complex phase = complex::exp(complex::Complex(0, 1) * delta);
 
     // Gesamte Transmission s
     complex::Complex numeratorS = t01s * t12s * phase;
@@ -80,4 +70,4 @@ inline ComplexFresnelCoeffs computeTransmittance(
     return {.s = ts_total, .p = tp_total};
 }
 
-}
+}  // namespace RAYX
