@@ -19,7 +19,6 @@ pkgs.mkShell {
     ninja
 
     # rayx-core dependencies
-    boost
     hdf5
 
     # rayx-ui dependencies

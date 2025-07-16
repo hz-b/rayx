@@ -46,20 +46,6 @@ jobs:
       - name: Add glslangValidator to PATH
         run: echo "${{github.workspace}}/glslang/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Install boost
-        uses: MarkusJx/install-boost@v2.4.5
-        id: install-boost
-        with:
-          boost_version: 1.84.0
-          boost_install_dir: ${{github.workspace}}/boost
-          platform_version: 2019
-          toolset: msvc
-
-      - name: Add Boost to PATH
-        run: |
-          echo "${{github.workspace}}/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{github.workspace}}/boost/boost" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
       - name: Setup CUDA Toolkit
         id: cuda-toolkit
         shell: pwsh
