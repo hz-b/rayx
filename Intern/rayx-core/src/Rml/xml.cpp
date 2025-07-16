@@ -244,7 +244,10 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
 
     const char* str;
 
-    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "crystalMaterial", &str)) { return false; }
+    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "crystalMaterial", &str) &&
+        !paramStr(node, "materialCoating", &str)) {
+        return false;
+    }
 
     return materialFromString(str, out);
 }
@@ -330,6 +333,15 @@ glm::dmat4x4 Parser::parseOrientation() const {
 }
 
 Material Parser::parseMaterial() const {
+    Material m;
+    if (!paramMaterial(node, &m)) {
+        RAYX_VERB << "No material specified in RML file: defaulting to copper!";
+        return Material::Cu;
+    }
+    return m;
+}
+
+Material Parser::parseMaterialCoating() const {
     Material m;
     if (!paramMaterial(node, &m)) {
         RAYX_VERB << "No material specified in RML file: defaulting to copper!";

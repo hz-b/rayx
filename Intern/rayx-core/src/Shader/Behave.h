@@ -17,15 +17,12 @@ namespace RAYX {
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, EventType::Absorbed)`)
 
-RAYX_FN_ACC void behaveCrystal(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col);
-RAYX_FN_ACC void behaveSlit(Ray& __restrict ray, const Behaviour& __restrict behaviour);
-RAYX_FN_ACC void behaveRZP(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col);
-RAYX_FN_ACC void behaveGrating(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col);
-RAYX_FN_ACC void behaveMirror(Ray& __restrict rar, const CollisionPoint& __restrict col, int material, const Material materials);
-RAYX_FN_ACC void behaveFoil(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col, int material,
-                            const Materials materials);
-RAYX_FN_ACC void behaveImagePlane(Ray& __restrict ray);
-RAYX_FN_ACC void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const OpticalElement& __restrict element,
-                        const Materials materials);
+RAYX_FN_ACC Ray behaveCrystal(Ray r, const Behaviour behaviour, Collision col);
+RAYX_FN_ACC Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& rand);
+RAYX_FN_ACC Ray behaveRZP(Ray r, const Behaviour behaviour, Collision col, Rand& rand);
+RAYX_FN_ACC Ray behaveGrating(Ray r, const Behaviour behaviour, Collision col);
+RAYX_FN_ACC Ray behaveMirror(Ray r, const Collision col, const Coating coating, int material, const int* materialIndices, const double* materialTable);
+RAYX_FN_ACC Ray behaveImagePlane(Ray r);
+RAYX_FN_ACC Ray behaveFoil(Ray r, const Behaviour behaviour, Collision col, int material, const int* materialIndices, const double* materialTable);
 
 }  // namespace RAYX

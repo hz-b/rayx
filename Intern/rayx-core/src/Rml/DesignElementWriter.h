@@ -19,6 +19,20 @@ namespace RAYX {
  * This only works in combi with the xml parser.
  */
 
+void getSurfaceCoating(xml::Parser parser, DesignElement* de) {
+    de->setSurfaceCoatingType(parser.parseSurfaceCoatingType());
+    if (de->getSurfaceCoatingType() == SurfaceCoatingType::SubstrateOnly) {
+        return;
+    } else if (de->getSurfaceCoatingType() == SurfaceCoatingType::OneCoating) {
+        de->setMaterialCoating(parser.parseMaterialCoating());
+        de->setThicknessCoating(parser.parseThicknessCoating());
+        de->setRoughnessCoating(parser.parseRoughnessCoating());
+    } else if (de->getSurfaceCoatingType() == SurfaceCoatingType::MultipleCoatings) {
+        // Multiple coatings are not supported yet, so we set nothing
+        return;
+    }
+}
+
 void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setName(parser.name());
     de->setType(parser.type());
@@ -30,6 +44,8 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
     de->setMaterial(parser.parseMaterial());
 
+    getSurfaceCoating(parser, de);
+
     de->setDesignPlane(dp);
     if (de->getType() != ElementType::ImagePlane) {
         de->setCutout(parser.parseCutout(dp, ElementTypeToString.at(parser.type())));
@@ -37,6 +53,8 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
         de->setCutout(parser.parseCutout(dp, ElementTypeToString.at(parser.type())));
     }
 }
+
+
 
 void getImageplane(xml::Parser parser, DesignElement* de) {
     setAllMandatory(parser, de, DesignPlane::XY);

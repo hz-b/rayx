@@ -38,6 +38,7 @@ enum class SpreadType;
 enum class ElementType;
 enum class CrystalType;
 enum class OffsetAngleType;  // TODO:see if this is needed
+enum class SurfaceCoatingType;  
 
 namespace xml {
 
@@ -89,6 +90,7 @@ struct RAYX_API Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
+    Material parseMaterialCoating() const;
     Cutout parseCutout(DesignPlane, std::string) const;
     Surface::Quadric parseQuadricParameters() const;
     Surface::Cubic parseCubicParameters() const;
@@ -202,6 +204,10 @@ struct RAYX_API Parser {
     inline double parseThicknessSubstrate() const { return parseDouble("thicknessSubstrate"); }
     inline double parseRoughnessSubstrate() const { return parseDouble("roughnessSubstrate"); }
     inline double parseDensitySubstrate() const { return parseDouble("densitySubstrate"); }
+
+    inline SurfaceCoatingType parseSurfaceCoatingType() const { return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));}  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+    inline double parseThicknessCoating() const { return parseDouble("thicknessCoating"); }
+    inline double parseRoughnessCoating() const { return parseDouble("roughnessCoating"); }
 
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;
