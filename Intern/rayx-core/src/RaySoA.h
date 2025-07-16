@@ -19,35 +19,55 @@
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y X(double,           direction_y,      DirectionY,     m_direction.y )
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z X(double,           direction_z,      DirectionZ,     m_direction.z )
 #define RAYX_X_MACRO_RAY_ATTR_ENERGY      X(double,           energy,           Energy,         m_energy      )
-#define RAYX_X_MACRO_RAY_ATTR_FIELD_X     X(complex::Complex, electric_field_x, ElectricFieldX, m_field.x     )
-#define RAYX_X_MACRO_RAY_ATTR_FIELD_Y     X(complex::Complex, electric_field_y, ElectricFieldY, m_field.y     )
-#define RAYX_X_MACRO_RAY_ATTR_FIELD_Z     X(complex::Complex, electric_field_z, ElectricFieldZ, m_field.z     )
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X     X(complex::Complex, electric_field_x, ElectricFieldX, m_field.x     )
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y     X(complex::Complex, electric_field_y, ElectricFieldY, m_field.y     )
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z     X(complex::Complex, electric_field_z, ElectricFieldZ, m_field.z     )
 #define RAYX_X_MACRO_RAY_ATTR_PATH_LENGTH X(double,           path_length,      PathLength,     m_pathLength  )
 #define RAYX_X_MACRO_RAY_ATTR_ORDER       X(Order,            order,            Order,          m_order       )
 #define RAYX_X_MACRO_RAY_ATTR_ELEMENT_ID  X(ElementId,        element_id,       ElementId,      m_lastElement )
 #define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID   X(SourceId,         source_id,        SourceId,       m_sourceID    )
 // clang-format on
 
-#define RAYX_X_MACRO_RAY_ATTR_MAPPED  \
-    RAYX_X_MACRO_RAY_ATTR_POSITION_X  \
-    RAYX_X_MACRO_RAY_ATTR_POSITION_Y  \
-    RAYX_X_MACRO_RAY_ATTR_POSITION_Z  \
-    RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE  \
-    RAYX_X_MACRO_RAY_ATTR_DIRECTION_X \
-    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y \
-    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z \
-    RAYX_X_MACRO_RAY_ATTR_ENERGY      \
-    RAYX_X_MACRO_RAY_ATTR_FIELD_X     \
-    RAYX_X_MACRO_RAY_ATTR_FIELD_Y     \
-    RAYX_X_MACRO_RAY_ATTR_FIELD_Z     \
-    RAYX_X_MACRO_RAY_ATTR_PATH_LENGTH \
-    RAYX_X_MACRO_RAY_ATTR_ORDER       \
-    RAYX_X_MACRO_RAY_ATTR_ELEMENT_ID  \
+#define RAYX_X_MACRO_RAY_ATTR_MAPPED       \
+    RAYX_X_MACRO_RAY_ATTR_POSITION_X       \
+    RAYX_X_MACRO_RAY_ATTR_POSITION_Y       \
+    RAYX_X_MACRO_RAY_ATTR_POSITION_Z       \
+    RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE       \
+    RAYX_X_MACRO_RAY_ATTR_DIRECTION_X      \
+    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y      \
+    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z      \
+    RAYX_X_MACRO_RAY_ATTR_ENERGY           \
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X \
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y \
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z \
+    RAYX_X_MACRO_RAY_ATTR_PATH_LENGTH      \
+    RAYX_X_MACRO_RAY_ATTR_ORDER            \
+    RAYX_X_MACRO_RAY_ATTR_ELEMENT_ID       \
     RAYX_X_MACRO_RAY_ATTR_SOURCE_ID
 
 #define RAYX_X_MACRO_RAY_ATTR     \
     RAYX_X_MACRO_RAY_ATTR_PATH_ID \
     RAYX_X_MACRO_RAY_ATTR_MAPPED
+
+#define RAYX_X_MACRO_RAY_ATTR_BUT_ELECTRIC_FIELD \
+    RAYX_X_MACRO_RAY_ATTR_PATH_ID                \
+    RAYX_X_MACRO_RAY_ATTR_POSITION_X             \
+    RAYX_X_MACRO_RAY_ATTR_POSITION_Y             \
+    RAYX_X_MACRO_RAY_ATTR_POSITION_Z             \
+    RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE             \
+    RAYX_X_MACRO_RAY_ATTR_DIRECTION_X            \
+    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y            \
+    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z            \
+    RAYX_X_MACRO_RAY_ATTR_ENERGY                 \
+    RAYX_X_MACRO_RAY_ATTR_PATH_LENGTH            \
+    RAYX_X_MACRO_RAY_ATTR_ORDER                  \
+    RAYX_X_MACRO_RAY_ATTR_ELEMENT_ID             \
+    RAYX_X_MACRO_RAY_ATTR_SOURCE_ID
+
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD \
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X   \
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y   \
+    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z
 
 namespace RAYX {
 

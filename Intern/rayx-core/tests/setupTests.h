@@ -19,6 +19,7 @@
 #include "Shader/Efficiency.h"
 #include "Shader/Ray.h"
 #include "Shader/RefractiveIndex.h"
+#include "Tracer/Tracer.h"
 #include "Writer/CsvWriter.h"
 #include "Writer/H5Writer.h"
 #include "gmock/gmock.h"
