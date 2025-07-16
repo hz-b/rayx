@@ -32,17 +32,19 @@ OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dm
     dePtr->setPosition(worldPos);
     dePtr->setOrientation(worldOri);
 
+    DesignPlane plane = getDesignPlane();
+
     if (getType() == ElementType::ExpertsMirror) {
-        return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr));
+        return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr), plane);
     } else {
         Surface surface = makeSurface(*dePtr);
         Behaviour behaviour = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
-            return makeElement(*dePtr, behaviour, surface, {}, DesignPlane::XY);
+            return makeElement(*dePtr, behaviour, surface, plane, {});
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*dePtr, behaviour, surface, serializeUnlimited(), DesignPlane::XY);
+            return makeElement(*dePtr, behaviour, surface, plane, serializeUnlimited());
         } else {
-            return makeElement(*dePtr, behaviour, surface);
+            return makeElement(*dePtr, behaviour, surface, plane);
         }
     }
 }
@@ -489,5 +491,14 @@ double DesignElement::getDSpacing2() const { return m_elementParameters["dSpacin
 
 void DesignElement::setOffsetAngle(Rad value) { m_elementParameters["offsetAngle"] = value; }
 Rad DesignElement::getOffsetAngle() const { return m_elementParameters["offsetAngle"].as_rad(); }
+
+void DesignElement::setThicknessSubstrate(double value) { m_elementParameters["thicknessSubstrate"] = value; }
+double DesignElement::getThicknessSubstrate() const { return m_elementParameters["thicknessSubstrate"].as_double(); }
+
+void DesignElement::setRoughnessSubstrate(double value) { m_elementParameters["roughnessSubstrate"] = value; }
+double DesignElement::getRoughnessSubstrate() const { return m_elementParameters["roughnessSubstrate"].as_double(); }
+
+void DesignElement::setDesignPlane(DesignPlane value) { m_elementParameters["designPlane"] = value; }
+DesignPlane DesignElement::getDesignPlane() const { return m_elementParameters["designPlane"].as_designPlane(); }
 
 }  // namespace RAYX

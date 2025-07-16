@@ -40,6 +40,10 @@ enum class EventType {
     // If there are no other elements the ray has this eventtype
     Emitted = 7,
 
+    // This ray transmits through an element
+    // and is not terminated.
+    Transmitted = 8,
+
 };
 
 inline std::string findEventTypeString(const EventType eventType) {

@@ -12,6 +12,7 @@
 #include "RefractiveIndex.h"
 #include "SphericalCoords.h"
 #include "Throw.h"
+#include "Transmission.h"
 #include "Utils.h"
 
 namespace RAYX {
@@ -168,6 +169,30 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
         r.m_field = reflect_field;
         r.m_order = 0;
     }
+
+    return r;
+}
+
+RAYX_FN_ACC
+Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int material, const int* __restrict materialIndices,
+               const double* __restrict materialTable) {
+    FoilBehaviour f = deserializeFoil(behaviour);
+    const double wavelength = hvlam(r.m_energy);
+
+    const auto indexVacuum = complex::Complex(1., 0.);
+    const auto indexMaterial = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+
+    double angle = angleBetweenUnitVectors(-r.m_direction, col.normal);  // in rad
+
+    if (std::isnan(angle) || angle == 0) angle = 1e-8;
+    const auto incidentAngle = complex::Complex(angle, 0);
+
+    const auto totalTransmission = computeTransmittance(wavelength, incidentAngle, indexVacuum, indexMaterial, f.m_thicknessSubstrate);
+
+    // calc efficiency
+    r.m_field = interceptFoil(r.m_field, r.m_direction, col.normal, totalTransmission);
+
+    r.m_eventType = EventType::Transmitted;
 
     return r;
 }
