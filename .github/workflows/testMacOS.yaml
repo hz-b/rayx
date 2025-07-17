@@ -53,6 +53,7 @@ jobs:
           CC: "/opt/homebrew/opt/llvm/bin/clang"
           CXX: "/opt/homebrew/opt/llvm/bin/clang++"
           PATH: "/opt/homebrew/opt/llvm/bin:/opt/homebrew/bin:$PATH"
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
