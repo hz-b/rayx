@@ -40,6 +40,11 @@ jobs:
       - name: Configure Homebrew clang (symlink for easier access)
         run: |
           brew unlink llvm && brew link llvm --force --overwrite
+      
+      - name: Symlink system ld for Homebrew clang
+        run: |
+          ln -sf /usr/bin/ld /opt/homebrew/bin/ld
+          ln -sf /usr/bin/ld /opt/homebrew/opt/llvm/bin/ld
 
       - name: Configure CMake with Homebrew clang and OpenMP support
         env:
@@ -47,8 +52,7 @@ jobs:
           CPPFLAGS: "-I/opt/homebrew/opt/libomp/include"
           CC: "/opt/homebrew/opt/llvm/bin/clang"
           CXX: "/opt/homebrew/opt/llvm/bin/clang++"
-          PATH: "/opt/homebrew/opt/llvm/bin:$PATH"
-          LD: "/usr/bin/ld"
+          PATH: "/opt/homebrew/opt/llvm/bin:/opt/homebrew/bin:$PATH"
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
@@ -57,7 +61,6 @@ jobs:
             -DCMAKE_C_COMPILER="$CC" \
             -DCMAKE_CXX_COMPILER="$CXX" \
             -DCMAKE_CXX_FLAGS="-stdlib=libc++ -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include" \
-            -DCMAKE_LINKER=$LD \
             -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -lomp"
 
       - name: Build
