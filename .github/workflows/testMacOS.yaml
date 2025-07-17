@@ -57,6 +57,8 @@ jobs:
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DCMAKE_MACOSX_RPATH=ON \
+            -DCMAKE_INSTALL_RPATH="@loader_path;@rpath" \
             -DRAYX_WERROR=ON \
             -DRAYX_REQUIRE_CUDA=OFF \
             -DCMAKE_C_COMPILER="$CC" \
