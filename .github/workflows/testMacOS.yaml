@@ -3,9 +3,9 @@ name: testMacOS
 on:
   push:
     branches:
-      - '**' # Run on all branches
+      - '**'
     tags-ignore:
-      - 'v*' # Ignore tag pushes like v1.2.3
+      - 'v*'
   pull_request:
     branches:
       - '**'
@@ -26,19 +26,27 @@ jobs:
       - name: Install dependencies (Homebrew)
         run: |
           brew update
-          brew install cmake boost gtk+3 hdf5 libomp
+          brew install cmake boost gtk+3 hdf5 libomp llvm
 
-      - name: Configure CMake with OpenMP support
+      - name: Configure Homebrew clang (symlink for easier access)
+        run: |
+          brew unlink llvm && brew link llvm --force --overwrite
+
+      - name: Configure CMake with Homebrew clang and OpenMP support
         env:
           LDFLAGS: "-L/opt/homebrew/opt/libomp/lib"
           CPPFLAGS: "-I/opt/homebrew/opt/libomp/include"
+          CC: "/opt/homebrew/opt/llvm/bin/clang"
+          CXX: "/opt/homebrew/opt/llvm/bin/clang++"
+          PATH: "/opt/homebrew/opt/llvm/bin:$PATH"
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
             -DRAYX_WERROR=ON \
             -DRAYX_REQUIRE_CUDA=OFF \
-            -DCMAKE_CXX_COMPILER="$(which clang++)" \
-            -DCMAKE_CXX_FLAGS="-Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include" \
+            -DCMAKE_C_COMPILER="$CC" \
+            -DCMAKE_CXX_COMPILER="$CXX" \
+            -DCMAKE_CXX_FLAGS="-stdlib=libc++ -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include" \
             -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -lomp"
 
       - name: Build
