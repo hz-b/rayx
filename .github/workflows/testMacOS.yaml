@@ -31,6 +31,13 @@ jobs:
       - name: Add Homebrew to PATH
         run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
 
+      - name: Install Xcode Command Line Tools
+        run: |
+          sudo xcode-select --install || true
+          sudo xcode-select -s /Library/Developer/CommandLineTools
+          export LD=$(xcrun --find ld)
+          export PATH="/Library/Developer/CommandLineTools/usr/bin:$PATH"
+
       - name: Configure Homebrew clang (symlink for easier access)
         run: |
           brew unlink llvm && brew link llvm --force --overwrite
@@ -50,6 +57,7 @@ jobs:
             -DCMAKE_C_COMPILER="$CC" \
             -DCMAKE_CXX_COMPILER="$CXX" \
             -DCMAKE_CXX_FLAGS="-stdlib=libc++ -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include" \
+            -DCMAKE_LINKER=$LD \
             -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -lomp"
 
       - name: Build
