@@ -27,6 +27,9 @@ jobs:
         run: |
           brew update
           brew install cmake boost gtk+3 hdf5 libomp llvm
+      
+      - name: Add Homebrew to PATH
+        run: echo 'export PATH="/opt/homebrew/bin:$PATH"' >> $GITHUB_ENV
 
       - name: Configure Homebrew clang (symlink for easier access)
         run: |
