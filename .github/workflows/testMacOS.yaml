@@ -31,12 +31,11 @@ jobs:
       - name: Add Homebrew to PATH
         run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
 
-      - name: Install Xcode Command Line Tools
-        run: |
-          sudo xcode-select --install || true
-          sudo xcode-select -s /Library/Developer/CommandLineTools
-          export LD=$(xcrun --find ld)
-          export PATH="/Library/Developer/CommandLineTools/usr/bin:$PATH"
+      - name: Set Xcode toolchain as default
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Ensure system linker is used
+        run: echo "LD=/usr/bin/ld" >> $GITHUB_ENV
 
       - name: Configure Homebrew clang (symlink for easier access)
         run: |
@@ -49,6 +48,7 @@ jobs:
           CC: "/opt/homebrew/opt/llvm/bin/clang"
           CXX: "/opt/homebrew/opt/llvm/bin/clang++"
           PATH: "/opt/homebrew/opt/llvm/bin:$PATH"
+          LD: "/usr/bin/ld"
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
