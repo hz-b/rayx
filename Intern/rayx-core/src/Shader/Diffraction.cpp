@@ -46,12 +46,12 @@ double RAYX_API bessel1(double x) {
     if (std::isnan(x) || std::isinf(x)) {
         return std::numeric_limits<double>::quiet_NaN();
     }
-    try {
+    //try {
         return boost::math::cyl_bessel_j(1.0, x);
-    }
-    catch (...) {
-        return std::numeric_limits<double>::signaling_NaN();
-    }
+    //}
+    //catch (...) {
+    //    return std::numeric_limits<double>::signaling_NaN();
+    //}
 
 }
 
