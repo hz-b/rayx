@@ -658,18 +658,18 @@ TEST_F(TestSuite, testBessel1) {
         },
         {
             .in = 20.100000000000001,
-            .out = 0,
-            //.out = 0.0828010057602099,  // Mathematica
+            //.out = 0,
+            .out = 0.0828010057602099,  // Mathematica
         },
         {
             .in = -12.122999999999999,
-            .out = 0,
-            //.out = 0.2136819845126457,  // Mathematica
+            //.out = 0,
+            .out = 0.2136819845126457,  // Mathematica
         },
         {
             .in = 23.100000000000001,
-            .out = 0,
-            //.out = -0.0553305078841861,  // Mathematica
+            //.out = 0,
+            .out = -0.0553305078841861,  // Mathematica
         },
         {
             .in = 0,
@@ -683,8 +683,8 @@ TEST_F(TestSuite, testBessel1) {
         },
         {
             .in = -0.10000000000000001,
-            .out = 0,
-            //.out = -0.049937526036242, // Mathematica
+            //.out = 0,
+            .out = -0.049937526036242, // Mathematica
         },
         {
             .in = 1e-08,
