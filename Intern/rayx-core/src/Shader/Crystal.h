@@ -59,7 +59,7 @@ inline double getTheta(Ray r, glm::dvec3 normal, double offsetAngle) {
 RAYX_FN_ACC
 inline double getBraggAngle(double energy, double dSpacing2) {
     int order = 1;
-    double wavelength = hvlam(energy);
+    double wavelength = energyToWaveLength(energy);
     double theta_factor = (order * wavelength) / dSpacing2;
 
     // Check for physical validity

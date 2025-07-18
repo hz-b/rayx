@@ -2,6 +2,7 @@
 
 #include "Behave.h"
 #include "Collision.h"
+#include "RecordEvent.h"
 #include "Utils.h"
 
 namespace RAYX {
@@ -64,7 +65,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
         // write ray in local element coordinates to global memory
         if (numRecorded < inv.maxEvents && (!inv.recordMask || inv.recordMask[col.elementIndex])) {
-            outputEvents.events[gid * inv.maxEvents + numRecorded] = ray;
+            recordEvent(outputEvents.events, ray, getRecordIndex(gid, numRecorded, inv.maxEvents));
             ++numRecorded;
         }
 
@@ -75,9 +76,9 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
     // check if the number of events exceeds capacity
     if (!colNotFound && inv.sequential == Sequential::No && isRayActive(ray.m_eventType)) {
         Collision col = findCollisionNonSequential(ray.m_position, ray.m_direction, inv.elements, inv.numElements, rand);
-        if (col.found) {
+        if (col.found && (!inv.recordMask || inv.recordMask[col.elementIndex])) {
             ray = terminateRay(ray, EventType::TooManyEvents);
-            outputEvents.events[gid * inv.maxEvents + inv.maxEvents - 1] = ray;
+            recordEvent(outputEvents.events, ray, getRecordIndex(gid, inv.maxEvents, inv.maxEvents - 1));
         }
     }
 

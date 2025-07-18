@@ -1205,15 +1205,15 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     }
 }
 
-// both the Cpp code as well as the shader define hvlam.
+// both the Cpp code as well as the shader define energyToWaveLength.
 TEST_F(TestSuite, testHvlam) {
     double hv = 100;
     double linedensity = 1000;
     double orderOfDiff = 1;
-    double a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
+    double a = abs(energyToWaveLength(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.012398419843320024);
 
-    a = abs(hvlam(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
+    a = abs(energyToWaveLength(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.012398419843320024);
 }
 

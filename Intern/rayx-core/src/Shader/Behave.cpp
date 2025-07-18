@@ -28,7 +28,7 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
     double polFactorS = 1.0;
     double polFactorP = std::fabs(cos(2 * bragg));
 
-    double wavelength = inm2eV / r.m_energy;
+    double wavelength = energyToWaveLength(r.m_energy);
     double gamma = getDiffractionPrefactor(wavelength, b.m_unitCellVolume);
 
     std::complex<double> F0(b.m_structureFactorReF0, b.m_structureFactorImF0);
@@ -80,7 +80,7 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
 
     double dPhi = 0;
     double dPsi = 0;
-    double wavelength = hvlam(r.m_energy);
+    double wavelength = energyToWaveLength(r.m_energy);
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
@@ -109,7 +109,7 @@ RAYX_FN_ACC
 Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __restrict rand) {
     RZPBehaviour b = deserializeRZP(behaviour);
 
-    double WL = hvlam(r.m_energy);
+    double WL = energyToWaveLength(r.m_energy);
     double Ord = b.m_orderOfDiffraction;
     int additional_order = int(b.m_additionalOrder);
 
@@ -137,7 +137,7 @@ Ray behaveGrating(Ray r, const Behaviour behaviour, const Collision col) {
     GratingBehaviour b = deserializeGrating(behaviour);
 
     // vls parameters passed in q.elementParams
-    double WL = hvlam(r.m_energy);
+    double WL = energyToWaveLength(r.m_energy);
     double lineDensity = b.m_lineDensity;
     double orderOfDiffraction = b.m_orderOfDiffraction;
 
@@ -177,7 +177,7 @@ RAYX_FN_ACC
 Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int material, const int* __restrict materialIndices,
                const double* __restrict materialTable) {
     FoilBehaviour f = deserializeFoil(behaviour);
-    const double wavelength = hvlam(r.m_energy);
+    const double wavelength = energyToWaveLength(r.m_energy);
 
     const auto indexVacuum = complex::Complex(1., 0.);
     const auto indexMaterial = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
