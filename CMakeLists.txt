@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@loader_path;@rpath;/opt/homebrew/lib")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
+endif()
+
 # ---- Project ----
 project(RAYX VERSION 0.21.7)
 if(MSVC)
@@ -67,6 +73,10 @@ if(APPLE)
             link_libraries(${OpenMP_omp_LIBRARY})
         endif()
     endif()
+    
+    set(HDF5_ROOT "/opt/homebrew/opt/hdf5")
+    find_package(HDF5 REQUIRED COMPONENTS C HL)
+
 endif()
 
 
