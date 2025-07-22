@@ -1,0 +1,43 @@
+# flatten_single_child_sections: true
+# preserve_directory_names: false
+# ignore: "*.*.md"
+# sort:
+#   direction: asc
+#   type: natural
+#   by: filename
+#   sections: last
+#   ignore_case: true
+
+nav:
+  - "Home": "index.md"
+  - "Getting Started": Introduction
+  - "User Guide": Model
+  - "Development":
+      - "Writing Documentation": "how-to-use-mkdocs.md"
+      - "Tools": Tools # awesome-nav allows globs and folders
+      - "Rayx-UI": RAYX-UI
+      - Vulkan
+      - "API-Reference":
+          - "Rayx Core":
+              # - "rayx-core/index.md" # TODO: Setup API landing page
+              - "Links": "rayx-core/links.md"
+              - "Classes":
+                  - "Class List": "rayx-core/annotated.md"
+                  - "Class Index": "rayx-core/classes.md"
+                  - "Class Hierarchy": "rayx-core/hierarchy.md"
+                  - "Class Members": "rayx-core/class_members.md"
+                  - "Class Member Functions": "rayx-core/class_member_functions.md"
+                  - "Class Member Variables": "rayx-core/class_member_variables.md"
+                  - "Class Member Typedefs": "rayx-core/class_member_typedefs.md"
+                  - "Class Member Enumerations": "rayx-core/class_member_enums.md"
+              - "Namespaces":
+                  - "Namespace List": "rayx-core/namespaces.md"
+                  - "Namespace Members": "rayx-core/namespace_members.md"
+                  - "Namespace Member Functions": "rayx-core/namespace_member_functions.md"
+                  - "Namespace Member Variables": "rayx-core/namespace_member_variables.md"
+                  - "Namespace Member Typedefs": "rayx-core/namespace_member_typedefs.md"
+                  - "Namespace Member Enumerations": "rayx-core/namespace_member_enums.md"
+              - "Functions": "rayx-core/functions.md"
+              - "Variables": "rayx-core/variables.md"
+              - "Macros": "rayx-core/macros.md"
+              - "Files": "rayx-core/files.md"

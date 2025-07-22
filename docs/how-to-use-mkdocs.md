@@ -1,6 +1,6 @@
-# Welcome to MkDocs
+# Writing Documentation with MkDocs
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+For full documentation have a look at [mkdocs.org](https://www.mkdocs.org) the [Material for MkDocs documentation](http://squidfunk.github.io/mkdocs-material/) and [MkDoxy](https://mkdoxy.kubaandrysek.cz/).
 
 ## Commands
 
@@ -16,7 +16,63 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
 
-## Test Stuff
+## API documentation with MkDoxy
+
+This plugin uses `Doxygen` to generate markdown files from the code comments.
+You can include parts of the API documentation as Snippets into the written guides using a [tag syntax](https://mkdoxy.kubaandrysek.cz/snippets/).
+
+=== "Tag Syntax"
+    ```yaml
+    ::: doxy.rayx-core.class.method
+    name: RAYX::BeamlineNode
+    method: glm::mat4 getOrientation()
+    ``` 
+=== "Resulting Snippet"
+::: doxy.rayx-core.Class.Method
+name: RAYX::BeamlineNode
+method: glm::dmat4 getOrientation()
+indent_level: 4 
+
+
+### Intellisense and errors
+
+If there is an error inside the MkDoxy Tag it generates a helpful block with the error, available tags and the corresponding snippet.
+For example using the tag without any config shows the available projects.
+
+=== "Invalid Tag"
+    ```yaml
+    ::: doxy
+    ```
+=== "Error message"
+::: doxy
+indent_level: 4
+
+This is especially helpful in the above example of a class method. Here the method signature is wrong, so a list of all class methods is displayed.
+
+=== "Invalid Method Tag"
+    ```yaml
+    ::: doxy.rayx-core.class.method
+    name: RAYX::BeamlineNode
+    method: glm::mat4 getOrientation()
+    ``` 
+=== "Resulting Snippet"
+::: doxy.rayx-core.Class.Method
+name: RAYX::BeamlineNode
+method: mat4 getOrientation()
+indent_level: 4 
+
+### Temporarily disabling MkDoxy
+
+When working on documentation the local server takes some time to check and link the API documentation, even though the `Doxygen` output is cached to a `.mkdoxy` dir and only regenerated when necessary.
+`MkDoxy` can be temporarily disabled with the environment variable `ENABLE_MKDOXY`
+
+```sh
+ENABLE_MKDOXY=false mkdocs serve
+```
+
+This is useful when writing documentation pages that don't use the API docs and you want to check the resulting page regularly, e.g. when using a lot of math.
+
+## Markup
 
 ### Lists
 
@@ -129,3 +185,23 @@ graph LR
   D --> B;
   B ---->|No| E[Success!];
 ```
+
+
+### Linking to other pages
+
+Using markdown links **relative** to the current file (not the current page) this syntax is simply:
+
+```md
+[Home](index.md)
+```
+
+[Home](index.md)
+
+### Images
+
+There are some additional settings available for images that are not part of core markdown, like sizing and captions, see [Image Options](https://squidfunk.github.io/mkdocs-material/reference/images/).
+
+![RAYX Logo](res/rayx-logo.png){ width="300" }
+/// caption
+RAYX Logo with a width of 300px
+///

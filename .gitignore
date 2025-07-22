@@ -61,6 +61,8 @@ venv.bak/
 
 # mkdocs documentation
 /site
+# mkdoxy cache for local dev
+/.mkdoxy/
 
 # Sphinx documentation
 docs/_build/
