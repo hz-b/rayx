@@ -34,8 +34,6 @@ Clone the git repository by running one of the following commands:
 - Install the [HDF5](https://www.hdfgroup.org/downloads/hdf5/) library.
 - Install Python3, python3-dev, and python3-matplotlib.
 - We recommend using the MSVC compiler for Windows, available through [Visual Studio](https://visualstudio.microsoft.com/downloads/) (2019 or newer).
-- Install the [Boost](https://www.boost.org/users/download/) library.
-- Add Boost to your PATH.
 - Optional (required for Tracing on the GPU):
     - Install [Cuda](https://developer.nvidia.com/Cuda-downloads?target_os=Windows).
     Tested with Cuda version 12.5.1
@@ -67,7 +65,6 @@ see: [Cmake Options](#cmake-options)
 - Install the Vulkan SDK from [here](https://vulkan.lunarg.com/sdk/home). Select a version under Linux -> Ubuntu Packages.
 - Install Python3, python3-dev, and python3-matplotlib.
 - The project leverages [libhdf5](https://github.com/BlueBrain/HighFive) for data management and incorporates various other libraries for graphical user interfaces, linear algebra computations, and handling different aspects of the X11 window system. Install the necessary libraries with the following command:
-- Install boost
 - Optional (required for Tracing on the GPU):
     - Install Cuda
     - see [Determining Cuda and compiler version](#determining-cuda-and-compiler-version)
