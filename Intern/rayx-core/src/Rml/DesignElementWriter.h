@@ -29,7 +29,8 @@ void getSurfaceCoating(xml::Parser parser, DesignElement* de) {
         de->setThicknessCoating(parser.parseThicknessCoating());
         de->setRoughnessCoating(parser.parseRoughnessCoating());
     } else if (parser.parseSurfaceCoatingType() == SurfaceCoatingType::MultipleCoatings) {
-        parser.parseMultilayer();
+        de->setSurfaceCoatingType(parser.parseSurfaceCoatingType());
+        de->setMultilayerCoating(parser.parseCoating());
         return;
     }
 }

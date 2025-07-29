@@ -201,8 +201,33 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
         r.m_field = polmat * r.m_field;
         r.m_order = 0;
-    } else {
-        _throw("Unsupported surface coating type: %d", static_cast<int>(coating.m_type));
+    } else if (coating.m_type == SurfaceCoatingType::MultipleCoatings) {
+        MultilayerCoating mlCoating = deserializeMultilayer(coating);
+                constexpr int vacuum_material = -1;
+        const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+
+        const int n = mlCoating.numLayers;
+        complex::Complex iors[17];
+        double thickness[15];
+
+        iors[0] = vacuum_ior;
+        for (int i = 0; i < n; ++i) {
+            iors[i + 1] = getRefractiveIndex(r.m_energy, mlCoating.layers[i].material, materialIndices, materialTable);
+            thickness[i] = mlCoating.layers[i].thickness;
+        }
+        iors[n + 1] = substrate_ior;
+
+        const auto angle = angleBetweenUnitVectors(-incident_vec, col.normal);
+        const auto incidentAngle = complex::Complex(angle == 0.0 ? 1e-8 : angle, 0.0);
+
+        const double wavelength = energyToWaveLength(r.m_energy);
+
+        const auto amplitude = computeMultilayerReflectance(incidentAngle, wavelength, n, thickness, iors);
+
+        const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
+        r.m_field = polmat * r.m_field;
+        r.m_order = 0;
     }
 
     return r;
