@@ -68,7 +68,7 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
-bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out);
+bool paramMultilayer(const rapidxml::xml_node<>* node, Coating* out);
 
 std::optional<glm::dvec4> paramPosition(const rapidxml::xml_node<>* node);
 std::optional<glm::dmat4x4> paramOrientation(const rapidxml::xml_node<>* node);
@@ -113,7 +113,7 @@ struct RAYX_API Parser {
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
     std::filesystem::path parseEnergyDistributionFile() const;
-    MultilayerCoating parseMultilayer() const;
+    MultilayerCoating parseCoating() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.

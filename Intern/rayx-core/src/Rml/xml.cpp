@@ -300,46 +300,39 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 //multilayer coating
-bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
+bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
     if (!node || !out) {
         return false;
     }
 
-    out->m_type = SurfaceCoatingType::MultipleCoatings;
-
-    rapidxml::xml_node<>* p;
-    if (!param(node, "numLayers", &p)) {
-        return false;
+    // Root für die Layer bestimmen: entweder 'node' selbst oder <param id="Coating">
+    rapidxml::xml_node<>* layersRoot = nullptr;
+    if (node->first_node("layer")) {
+        layersRoot = const_cast<rapidxml::xml_node<>*>(node);
+    } else {
+        if (!param(node, "Coating", &layersRoot)) {
+            RAYX_WARN << "Missing <param id='Coating'> for multilayer";
+            return false;
+        }
     }
 
-    int numLayers;
-    xml::paramInt(node, "numLayers", &numLayers);
-    out->numCoatings = numLayers;
+    int numLayers = 0;
+    for (auto* l = layersRoot->first_node("layer"); l; l = l->next_sibling("layer")) {
+        numLayers++;
+    }
+
+    out->numLayers = numLayers;
     if (numLayers <= 0) {
         RAYX_WARN << "Invalid number of layers: " << numLayers << ". Must be greater than 0.";
         return false;
     }
     out->layers.resize(numLayers);
-
-    for (int i = 0; i < numLayers; ++i) {
-        std::string layerName = "layer" + std::to_string(i + 1);
-
-        rapidxml::xml_node<>* layerNode = nullptr;
-        for (auto* param = node->first_node("param"); param; param = param->next_sibling("param")) {
-            if (auto* idAttr = param->first_attribute("id"); idAttr && layerName == idAttr->value()) {
-                layerNode = param;
-                break;
-            }
-        }
-
-        if (!layerNode) {
-            RAYX_WARN << "Missing param with id='" << layerName << "'";
-            return false;
-        }
-
+    int i = 0;
+    for (auto* layerNode = layersRoot->first_node("layer"); layerNode; layerNode = layerNode->next_sibling("layer"), ++i) {
         Layer& layer = out->layers[i];
+
         const char* materialStr = nullptr;
-        if (auto* m = layerNode->first_node("material")) {
+        if (auto* m = layerNode->first_attribute("material")) {
             materialStr = m->value();
         } else {
             RAYX_WARN << "Layer " << i + 1 << " is missing a <material> element.";
@@ -349,7 +342,7 @@ bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
         materialFromString(materialStr, &material);
         layer.material = static_cast<int>(material);
 
-        if (auto* t = layerNode->first_node("thickness")) {
+        if (auto* t = layerNode->first_attribute("thickness")) {
             layer.thickness = std::stod(t->value());
         } else {
             RAYX_WARN << "Missing thickness for layer " << (i + 1);
@@ -610,10 +603,12 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-MultilayerCoating Parser::parseMultilayer() const {
+MultilayerCoating Parser::parseCoating() const {
     MultilayerCoating m;
-    if (!paramMultilayer(node, &m)) {
-        RAYX_EXIT << "parseMultilayer failed";
+    // get children from param Cotaing 
+    
+    if (!paramCoating(node, &m)) {
+        RAYX_EXIT << "parseCoating failed";
     }
     return m;
 }
