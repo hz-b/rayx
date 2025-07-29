@@ -305,8 +305,6 @@ bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
         return false;
     }
 
-    out->m_type = SurfaceCoatingType::MultipleCoatings;
-
     rapidxml::xml_node<>* p;
     if (!param(node, "numLayers", &p)) {
         return false;
@@ -314,7 +312,7 @@ bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
 
     int numLayers;
     xml::paramInt(node, "numLayers", &numLayers);
-    out->numCoatings = numLayers;
+    out->numLayers = numLayers;
     if (numLayers <= 0) {
         RAYX_WARN << "Invalid number of layers: " << numLayers << ". Must be greater than 0.";
         return false;

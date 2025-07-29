@@ -14,26 +14,22 @@ enum class SurfaceCoatingType {
     MultipleCoatings // Multiple coating layers
 };
 
-struct Coating {
-    // the type of this behaviour, see the BTYPE constants.
-    // the type describes how the m_private_serialization_params need to be interpreted.
-    SurfaceCoatingType m_type;
-
-    // These params are private. use the serialize & deserialize functions below instead.
-    double m_private_serialization_params[16];
-};
-
 struct Layer {
     int material;
     double thickness;
 };
 
 struct MultilayerCoating {
-    SurfaceCoatingType m_type;
-    int numCoatings;
+    int numLayers;
     std::vector<Layer> layers;
 };
 
+struct Coating {
+    // the type of this behaviour, see the BTYPE constants.
+    // the type describes how the m_private_serialization_params need to be interpreted.
+    SurfaceCoatingType m_type;
+    double m_private_serialization_params[32];
+};
 
 // substrate only
 RAYX_FN_ACC
@@ -58,17 +54,45 @@ RAYX_FN_ACC
 inline Coating serializeOneCoating(const OneCoating oc) {
     Coating c;
     c.m_type = SurfaceCoatingType::OneCoating;
-    c.m_private_serialization_params[0] = oc.material;
+    c.m_private_serialization_params[0] = static_cast<double>(oc.material);
     c.m_private_serialization_params[1] = oc.thickness;
     c.m_private_serialization_params[2] = oc.roughness;
     return c;
 }
 inline OneCoating deserializeOneCoating(const Coating c) {
     OneCoating oc;
-    oc.material = c.m_private_serialization_params[0];
+    oc.material = static_cast<int>(c.m_private_serialization_params[0]);
     oc.thickness = c.m_private_serialization_params[1];
     oc.roughness = c.m_private_serialization_params[2];
     return oc;
+}
+
+///////////////
+// MultilayerCoating
+///////////////
+
+RAYX_FN_ACC
+inline Coating serializeMultilayer(MultilayerCoating layers) {
+    Coating c;
+    c.m_type = SurfaceCoatingType::MultipleCoatings;
+    c.m_private_serialization_params[0] = static_cast<double>(layers.numLayers);
+    for (size_t i = 0; i < layers.layers.size(); ++i) {
+        c.m_private_serialization_params[1 + i * 2] = static_cast<double>(layers.layers[i].material);
+        c.m_private_serialization_params[2 + i * 2] = layers.layers[i].thickness;
+    }
+    return c;
+}
+
+RAYX_FN_ACC
+inline MultilayerCoating deserializeMultilayer(const Coating c) {
+    MultilayerCoating layers;
+    layers.numLayers = static_cast<int>(c.m_private_serialization_params[0]);
+    layers.layers.resize(layers.numLayers);
+    for (int i = 0; i < layers.numLayers; ++i) {
+        layers.layers[i].material = static_cast<int>(c.m_private_serialization_params[1 + i * 2]);
+        layers.layers[i].thickness = c.m_private_serialization_params[2 + i * 2];
+    }
+    return layers;
 }
 
 } // namespace RAYX

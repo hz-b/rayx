@@ -201,7 +201,8 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
         r.m_field = polmat * r.m_field;
         r.m_order = 0;
-    } else {
+    } else if (coating.m_type == SurfaceCoatingType::MultipleCoatings) {
+        MultilayerCoating mlCoating = deserializeMultilayer(coating);
         _throw("Unsupported surface coating type: %d", static_cast<int>(coating.m_type));
     }
 
