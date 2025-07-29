@@ -299,6 +299,66 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
+//multilayer coating
+bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
+    if (!node || !out) {
+        return false;
+    }
+
+    out->m_type = SurfaceCoatingType::MultipleCoatings;
+
+    rapidxml::xml_node<>* p;
+    if (!param(node, "numLayers", &p)) {
+        return false;
+    }
+
+    int numLayers;
+    xml::paramInt(node, "numLayers", &numLayers);
+    out->numCoatings = numLayers;
+    if (numLayers <= 0) {
+        RAYX_WARN << "Invalid number of layers: " << numLayers << ". Must be greater than 0.";
+        return false;
+    }
+    out->layers.resize(numLayers);
+
+    for (int i = 0; i < numLayers; ++i) {
+        std::string layerName = "layer" + std::to_string(i + 1);
+
+        rapidxml::xml_node<>* layerNode = nullptr;
+        for (auto* param = node->first_node("param"); param; param = param->next_sibling("param")) {
+            if (auto* idAttr = param->first_attribute("id"); idAttr && layerName == idAttr->value()) {
+                layerNode = param;
+                break;
+            }
+        }
+
+        if (!layerNode) {
+            RAYX_WARN << "Missing param with id='" << layerName << "'";
+            return false;
+        }
+
+        Layer& layer = out->layers[i];
+        const char* materialStr = nullptr;
+        if (auto* m = layerNode->first_node("material")) {
+            materialStr = m->value();
+        } else {
+            RAYX_WARN << "Layer " << i + 1 << " is missing a <material> element.";
+            return false;
+        }
+        Material material;
+        materialFromString(materialStr, &material);
+        layer.material = static_cast<int>(material);
+
+        if (auto* t = layerNode->first_node("thickness")) {
+            layer.thickness = std::stod(t->value());
+        } else {
+            RAYX_WARN << "Missing thickness for layer " << (i + 1);
+            return false;
+        }
+    }
+    return true;
+}
+
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out) {
     if (!node || !out) {
         return false;
@@ -550,11 +610,10 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Material Parser::parseMaterialCoating() const {
-    Material m;
-    if (!paramMaterial(node, &m)) {
-        RAYX_VERB << "No material specified in RML file: defaulting to copper!";
-        return Material::Cu;
+MultilayerCoating Parser::parseMultilayer() const {
+    MultilayerCoating m;
+    if (!paramMultilayer(node, &m)) {
+        RAYX_EXIT << "parseMultilayer failed";
     }
     return m;
 }

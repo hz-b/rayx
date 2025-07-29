@@ -166,17 +166,36 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         r.m_field = reflect_field;
         r.m_order = 0;
         }
-    } else if (coating.m_type == SurfaceCoatingType::SingleCoating) {
-        // calculate the reflectance of the coating
+    } else if (coating.m_type == SurfaceCoatingType::OneCoating) {
+        // Extrahiere Coating-Informationen
         OneCoating oneCoating = deserializeOneCoating(coating);
+
+            // Refraktive Indizes
+        constexpr int vacuum_material = -1;
         const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
-        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
         const auto coating_ior = getRefractiveIndex(r.m_energy, oneCoating.material, materialIndices, materialTable);
+        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
-        const auto firstLayerReflectance = computeReflectance(vacuum_ior, coating_ior, r.m_energy);
-        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, coating_ior, substrate_ior);
+            // Einfallswinkel bestimmen
+        const auto angle = angleBetweenUnitVectors(-incident_vec, col.normal);
+        const auto incidentAngle = complex::Complex(angle == 0.0 ? 1e-8 : angle, 0.0);
 
-        r.m_field = reflect_field;
+            // Wellenlänge berechnen
+        const double wavelength = energyToWaveLength(r.m_energy);
+
+            // Reflexionsamplituden (ohne Rauigkeit)
+        const auto amplitude = computeSingleCoatingReflectance(
+            incidentAngle,
+            wavelength,
+            oneCoating.thickness,
+            vacuum_ior,
+            coating_ior,
+            substrate_ior
+        );
+
+            // Polarisationsmatrix anwenden
+        const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
+        r.m_field = polmat * r.m_field;
         r.m_order = 0;
     } else {
         _throw("Unsupported surface coating type: %d", static_cast<int>(coating.m_type));

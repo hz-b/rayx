@@ -509,6 +509,16 @@ DesignPlane DesignElement::getDesignPlane() const { return m_elementParameters["
 void DesignElement::setSurfaceCoatingType(SurfaceCoatingType value) { m_elementParameters["surfaceCoatingType"] = value; }
 SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_elementParameters["surfaceCoatingType"].as_surfaceCoatingType(); }
 
+//set multilayer coating
+void DesignElement::setMultilayerCoating(const MultilayerCoating& coating) {
+    m_elementParameters["numCoating"] = int(coating.layers.size());
+    for (size_t i = 0; i < coating.layers.size(); ++i) {
+        const auto& layer = coating.layers[i];
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = layer.material;
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = layer.thickness;
+    }
+}
+
 Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coating, 2 = multiple coatings
     SurfaceCoatingType type = getSurfaceCoatingType();
     if (type == SurfaceCoatingType::SubstrateOnly) {
