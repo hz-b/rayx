@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-
+#include <vector>
 
 namespace RAYX {
 
@@ -22,6 +22,18 @@ struct Coating {
     // These params are private. use the serialize & deserialize functions below instead.
     double m_private_serialization_params[16];
 };
+
+struct Layer {
+    int material;
+    double thickness;
+};
+
+struct MultilayerCoating {
+    SurfaceCoatingType m_type;
+    int numCoatings;
+    std::vector<Layer> layers;
+};
+
 
 // substrate only
 RAYX_FN_ACC
