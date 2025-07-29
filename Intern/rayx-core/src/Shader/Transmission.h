@@ -70,10 +70,4 @@ inline ComplexFresnelCoeffs computeTransmittance(double wavelength, complex::Com
     return {.s = ts_total, .p = tp_total};
 }
 
-
-// compute transmittance for entrance or exit of a coating on a substrate
-RAYX_FN_ACC ComplexFresnelCoeffs computeTransmittanceOnBarrier(double wavelength, complex::Complex theta0, const complex::Complex& indexEntry,
-                                                                const complex::Complex& indexExit, double thickness) {
-                                                                    
-}
 }  // namespace RAYX

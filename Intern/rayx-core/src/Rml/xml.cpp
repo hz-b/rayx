@@ -215,6 +215,146 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
+//multilayer coating
+bool paramMultilayer(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
+    if (!node || !out) {
+        return false;
+    }
+
+    out->m_type = SurfaceCoatingType::MultipleCoatings;
+
+    rapidxml::xml_node<>* p;
+    if (!param(node, "numLayers", &p)) {
+        return false;
+    }
+
+    int numLayers;
+    xml::paramInt(node, "numLayers", &numLayers);
+    out->numCoatings = numLayers;
+    if (numLayers <= 0) {
+        RAYX_WARN << "Invalid number of layers: " << numLayers << ". Must be greater than 0.";
+        return false;
+    }
+    out->layers.resize(numLayers);
+
+    for (int i = 0; i < numLayers; ++i) {
+        std::string layerName = "layer" + std::to_string(i + 1);
+
+        rapidxml::xml_node<>* layerNode = nullptr;
+        for (auto* param = node->first_node("param"); param; param = param->next_sibling("param")) {
+            if (auto* idAttr = param->first_attribute("id"); idAttr && layerName == idAttr->value()) {
+                layerNode = param;
+                break;
+            }
+        }
+
+        if (!layerNode) {
+            RAYX_WARN << "Missing param with id='" << layerName << "'";
+            return false;
+        }
+
+        Layer& layer = out->layers[i];
+        const char* materialStr = nullptr;
+        if (auto* m = layerNode->first_node("material")) {
+            materialStr = m->value();
+        } else {
+            RAYX_WARN << "Layer " << i + 1 << " is missing a <material> element.";
+            return false;
+        }
+        Material material;
+        materialFromString(materialStr, &material);
+        layer.material = static_cast<int>(material);
+
+        if (auto* t = layerNode->first_node("thickness")) {
+            layer.thickness = std::stod(t->value());
+        } else {
+            RAYX_WARN << "Missing thickness for layer " << (i + 1);
+            return false;
+        }
+    }
+    return true;
+}
+
+bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out) {
+    if (!node || !out) {
+        return false;
+    }
+
+    int energyDistributionType_int;
+    if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType_int)) {
+        return false;
+    }
+    auto energyDistributionType = static_cast<EnergyDistributionType>(energyDistributionType_int);
+
+    int spreadType_int;
+    if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
+        return false;
+    }
+
+    /**
+     * a different output is set for all Energy Distribution Types
+     *
+     * default: 0:HardEdge(WhiteBand)
+     *          1:SoftEdge(Energyspread = sigma)
+     *          2:SeparateEnergies(Spikes)
+     */
+    auto spreadType = static_cast<SpreadType>(spreadType_int);
+
+    if (energyDistributionType == EnergyDistributionType::File) {
+        const char* filename;
+        if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) {
+            return false;
+        }
+        std::filesystem::path path = std::filesystem::canonical(rmlFile);
+        path.replace_filename(filename);  // this makes the path `filename` be relative to the
+                                          // path of the rml file
+
+        DatFile df;
+        if (!DatFile::load(path, &df)) {
+            return false;
+        }
+        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
+        *out = EnergyDistribution(df);
+        return true;
+
+    } else if (energyDistributionType == EnergyDistributionType::Values) {
+        double photonEnergy;
+        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
+            return false;
+        }
+
+        double energySpread;
+        if (!xml::paramDouble(node, "energySpread", &energySpread)) {
+            return false;
+        }
+
+        if (spreadType == SpreadType::SoftEdge) {
+            if (energySpread == 0) {
+                energySpread = 1;
+            }
+            *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+
+        } else if (spreadType == SpreadType::SeparateEnergies) {
+            int numOfEnergies;
+            if (!xml::paramInt(node, "SeparateEnergies", &numOfEnergies)) {
+                std::cout << "No Number for Separate Energies in RML File" << std::endl;
+                numOfEnergies = 3;
+            }
+            numOfEnergies = abs(numOfEnergies);
+            *out = EnergyDistribution(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
+        } else {
+            *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+        }
+
+        return true;
+    } else {
+        RAYX_EXIT << "paramEnergyDistribution is not implemented for "
+                     "energyDistributionType"
+                  << static_cast<int>(energyDistributionType) << "!";
+        return false;
+    }
+}
+
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out) {
     if (!node || !out) { return false; }
     int energyOrientation_int;
@@ -341,11 +481,10 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-Material Parser::parseMaterialCoating() const {
-    Material m;
-    if (!paramMaterial(node, &m)) {
-        RAYX_VERB << "No material specified in RML file: defaulting to copper!";
-        return Material::Cu;
+MultilayerCoating Parser::parseMultilayer() const {
+    MultilayerCoating m;
+    if (!paramMultilayer(node, &m)) {
+        RAYX_EXIT << "parseMultilayer failed";
     }
     return m;
 }
