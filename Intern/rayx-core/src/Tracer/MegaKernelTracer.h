@@ -104,7 +104,7 @@ struct Resources {
         assert(recordMask.size() == static_cast<size_t>(numElements));
         allocBuf(q, d_recordMask, numElements);
         std::unique_ptr<bool[]> tmpHostMask(new bool[numElements]);
-        for(int i = 0; i < numElements; ++i) {
+        for (int i = 0; i < numElements; ++i) {
             tmpHostMask[i] = recordMask[i];
         }
         auto hostView = alpaka::createView(devHost, tmpHostMask.get(), numElements);
@@ -161,13 +161,8 @@ class MegaKernelTracer : public DeviceTracer {
     Resources<Acc> m_resources;
 
   public:
-    virtual RaySoA trace(
-        const Group& beamline, 
-        Sequential sequential, 
-        const int maxBatchSize, 
-        const int maxEvents, 
-        const std::vector<bool>& recordMask, 
-        const RayAttrFlag attr) override {
+    virtual RaySoA trace(const Group& beamline, Sequential sequential, const int maxBatchSize, const int maxEvents,
+                         const std::vector<bool>& recordMask, const RayAttrFlag attr) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};

@@ -240,7 +240,7 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setRoughnessSubstrate(double value);
     double getRoughnessSubstrate() const;
-    
+
     void setDesignPlane(DesignPlane value);
     DesignPlane getDesignPlane() const;
 };

@@ -240,7 +240,8 @@ class RAYX_API DesignMap {
   private:
     std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
                  CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist,
-                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType, DesignPlane>
+                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType,
+                 DesignPlane>
         m_variant;
 };
 
