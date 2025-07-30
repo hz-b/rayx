@@ -9,15 +9,7 @@ namespace RAYX {
 
 // A behaviour decides what happens whenever a ray hits the surface of this element.
 // Each behaviour type has its own `behave` function in `Behave.h`.
-enum class BehaveType {
-    Mirror,
-    Grating,
-    Slit,
-    RZP,
-    ImagePlane,
-    Crystal,
-    Foil
-};
+enum class BehaveType { Mirror, Grating, Slit, RZP, ImagePlane, Crystal, Foil };
 
 struct Behaviour {
     // the type of this behaviour, see the BTYPE constants.
@@ -272,7 +264,7 @@ inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
 ////////////////
 
 struct FoilBehaviour {
-    //Substrates
+    // Substrates
     double m_thicknessSubstrate;
     double m_roughnessSubstrate;
 };

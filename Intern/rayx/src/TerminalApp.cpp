@@ -164,7 +164,8 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             recordMask = std::vector<bool>(numElements, false);
             for (auto idx : recordIndices) {
                 if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
-                if (idx > numElements - 1) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
+                if (idx > numElements - 1)
+                    RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
                 recordMask[idx] = true;
             }
         }

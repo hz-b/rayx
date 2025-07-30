@@ -33,7 +33,7 @@ Surface makeEllipsoid(const DesignElement& dele);   //< creates a Ellipsoid from
 Surface makeCone(const DesignElement& dele);        //< creates a Cone from the parameters given in ` dele`.
 Surface makeCylinder(const DesignElement& dele);    //< creates a Cylinder from the parameters given in ` dele`.
 Surface makeSphere(double radius);                  //< creates a sphere from the radius .
-Surface makePlane();                              //< creates a plane surface
+Surface makePlane();                                //< creates a plane surface
 Surface makeParaboloid(const DesignElement& dele);  //< creates a Paraboloid from the parameters given in ` dele`.
 
 ///////////////////

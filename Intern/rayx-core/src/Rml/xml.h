@@ -213,8 +213,7 @@ struct RAYX_API Parser {
     inline double parseThicknessSubstrate() const { return parseDouble("thicknessSubstrate"); }
     inline double parseRoughnessSubstrate() const { return parseDouble("roughnessSubstrate"); }
     inline double parseDensitySubstrate() const { return parseDouble("densitySubstrate"); }
-    
-    
+
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;
 

@@ -66,7 +66,7 @@ RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlag att
         auto loadData = [&file](const auto& address, auto& dst) {
             file.getDataSet(address).read(dst);
             _assert(0 < dst.size(),
-                    "attempting to load ray data (%s), but it is empty. Are you sure the file contains the requested data? Possible error is "
+                    "attempting to load ray data (%s), but it is empty. Are you sure the file contains the requested data? Possible cause is "
                     "insuficcient ray attribute flags when the data was written.",
                     address);
         };
