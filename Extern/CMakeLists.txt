@@ -9,7 +9,7 @@ add_subdirectory(googletest)
 add_library(portable_file_dialogs INTERFACE)
 target_include_directories(portable_file_dialogs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/portable-file-dialogs)
 
-# CLI11
+# --- CLI11 ---
 set(CLI11_SANITIZERS OFF)
 set(CLI11_BUILD_DOCS OFF)
 set(CLI11_BUILD_TESTS OFF)
@@ -22,8 +22,9 @@ set(CLI11_CUDA_TESTS OFF)
 set(CLI11_CLANG_TIDY OFF)
 add_subdirectory(CLI11)
 
-# alpaka
-# alpaka openmp backend (optional
+# --- alpaka ---
+
+# alpaka openmp backend
 if(RAYX_ENABLE_OPENMP)
     find_package(OpenMP COMPONENTS CXX)
     if(OpenMP_CXX_FOUND)
@@ -39,10 +40,20 @@ else() # setting could be cached so force it off
     set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE OFF CACHE BOOL "" FORCE)
 endif()
 
-# alpaka cuda backend (optional
+# alpaka cuda backend
 if(RAYX_ENABLE_CUDA)
     check_language(CUDA)
     if(CMAKE_CUDA_COMPILER)
+        if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+            # This is a set of GPU architechtures, that we compile the device code for
+            # A list of relevant GPUs can be found at: https://developer.nvidia.com/cuda-gpus
+            set(RAYX_DEFAULT_CUDA_ARCHITECTURES "all-major")
+
+            message(STATUS "Configuration for cuda architectures was not provided. Defaulting to CMAKE_CUDA_ARCHITECTURES=\"${RAYX_DEFAULT_CUDA_ARCHITECTURES}\"")
+            set(CMAKE_CUDA_ARCHITECTURES "${RAYX_DEFAULT_CUDA_ARCHITECTURES}" CACHE STRING "Device code gets compiled for specific cuda architectures" FORCE)
+        endif()
+        message(STATUS "Compiling device code for cuda architectures: \"${CMAKE_CUDA_ARCHITECTURES}\"")
+
         set(alpaka_ACC_GPU_CUDA_ENABLE ON CACHE BOOL "" FORCE)
         set(alpaka_RELOCATABLE_DEVICE_CODE ON CACHE BOOL "" FORCE)
         set(alpaka_DISABLE_VENDOR_RNG ON CACHE BOOL "" FORCE)
@@ -53,11 +64,12 @@ if(RAYX_ENABLE_CUDA)
             message(WARNING "Cuda compiler was not found by CMake. GPU tracer will be disabled.")
         endif()
     endif()
-else()
+else() # setting could be cached so force it off
     set(alpaka_ACC_GPU_CUDA_ENABLE OFF CACHE BOOL "" FORCE)
     set(alpaka_RELOCATABLE_DEVICE_CODE OFF CACHE BOOL "" FORCE)
 endif()
 
+# at least one backend must be provided
 if(NOT alpaka_ACC_GPU_CUDA_ENABLE AND NOT alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE)
     message(FATAL_ERROR "Neither OpenMP or Cuda backend have been enabled. At least one is required. Aborting.")
 endif()
@@ -65,7 +77,7 @@ endif()
 set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")
 add_subdirectory(alpaka)
 
-# HDF5 (optional)
+# --- HDF5 --- (optional)
 if(RAYX_ENABLE_H5)
     find_package(HDF5 GLOBAL REQUIRED COMPONENTS C)
     if(HDF5_FOUND)
@@ -85,5 +97,5 @@ if(RAYX_ENABLE_H5)
     endif()
 endif()
 
-# SDL
+# --- SDL ---
 add_subdirectory(SDL EXCLUDE_FROM_ALL)
