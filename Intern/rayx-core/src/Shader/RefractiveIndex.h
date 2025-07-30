@@ -34,7 +34,7 @@ RAYX_FN_ACC PalikEntry RAYX_API getPalikEntry(int index, int material, const int
 RAYX_FN_ACC NffEntry RAYX_API getNffEntry(int index, int material, const int* materialIndices, const double* materialTable);
 
 // returns dvec2 to represent a complex number
-RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* materialIndices, const double* materialTable);
+RAYX_FN_ACC std::complex<double> RAYX_API getRefractiveIndex(double energy, int material, const int* materialIndices, const double* materialTable);
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 RAYX_FN_ACC glm::dvec2 RAYX_API getAtomicMassAndRho(int material);

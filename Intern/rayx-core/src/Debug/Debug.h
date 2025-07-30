@@ -42,7 +42,7 @@ namespace RAYX {
 // OSTREAM CONVERSION
 /////////////////////////////////////////////////////////////////////////////
 
-inline std::ostream& operator<<(std::ostream& os, const complex::Complex& c) { return os << "{" << c.real() << ", " << c.imag() << "}"; }
+inline std::ostream& operator<<(std::ostream& os, const std::complex<double>& c) { return os << "{" << c.real() << ", " << c.imag() << "}"; }
 
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const glm::tvec2<T>& v) {
@@ -185,7 +185,7 @@ extern void RAYX_API (*error_fn)();
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<double>(arg)}; }
 
-inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
+inline std::vector<double> formatAsVec(std::complex<double> comp) { return {comp.real(), comp.imag()}; }
 
 inline std::vector<double> formatAsVec(const Ray arg) {
     std::vector<double> out;

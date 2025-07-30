@@ -11,13 +11,13 @@ using LocalElectricField = cvec2;
 
 RAYX_FN_ACC
 inline double intensity(const LocalElectricField field) {
-    const auto mag = complex::abs(field);
+    const auto mag = std::abs(field);
     return glm::dot(mag, mag);
 }
 
 RAYX_FN_ACC
 inline double intensity(const ElectricField field) {
-    const auto mag = complex::abs(field);
+    const auto mag = std::abs(field);
     return glm::dot(mag, mag);
 }
 
@@ -51,7 +51,7 @@ inline ElectricField advanceElectricField(const ElectricField field, double wave
     const double deltaPhi = waveNumber * reducedDistance;
 
     // apply the complex exponential of the phase shift
-    const auto phaseShift = complex::exp(complex::Complex(0.0, deltaPhi));
+    const auto phaseShift = std::exp(std::complex<double>(0.0, deltaPhi));
 
     return field * phaseShift;
 }
@@ -117,17 +117,17 @@ inline glm::dmat3 rotationMatrix(const glm::dvec3 forward, const glm::dvec3 up) 
 
 RAYX_FN_ACC
 inline ElectricField localToGlobalElectricFieldWithBaseConvention(const LocalElectricField localField, const glm::dvec3 forward) {
-    return rotationMatrixWithBaseConvention(forward) * ElectricField(localField, complex::Complex{0, 0});
+    return rotationMatrixWithBaseConvention(forward) * ElectricField(localField, std::complex<double>{0, 0});
 }
 
 RAYX_FN_ACC
 inline ElectricField localToGlobalElectricField(const LocalElectricField localField, const glm::dvec3 forward, const glm::dvec3 up) {
-    return rotationMatrix(forward, up) * ElectricField(localField, complex::Complex{0, 0});
+    return rotationMatrix(forward, up) * ElectricField(localField, std::complex<double>{0, 0});
 }
 
 RAYX_FN_ACC
 inline ElectricField localToGlobalElectricField(const LocalElectricField localField, const glm::dmat3 rotation) {
-    return rotation * ElectricField(localField, complex::Complex{0, 0});
+    return rotation * ElectricField(localField, std::complex<double>{0, 0});
 }
 
 RAYX_FN_ACC
@@ -149,8 +149,8 @@ inline LocalElectricField globalToLocalElectricField(const ElectricField field, 
 
 RAYX_FN_ACC
 inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
-    const auto mag = complex::abs(field);
-    const auto theta = complex::arg(field);
+    const auto mag = std::abs(field);
+    const auto theta = std::arg(field);
 
     return Stokes(mag.x * mag.x + mag.y * mag.y, mag.x * mag.x - mag.y * mag.y, 2.0 * mag.x * mag.y * glm::cos(theta.x - theta.y),
                   2.0 * mag.x * mag.y * glm::sin(theta.x - theta.y));
@@ -161,7 +161,7 @@ inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
     const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
     const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
     const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
-    const auto y = complex::polar(y_mag, y_theta);
+    const auto y = std::polar(y_mag, y_theta);
     return LocalElectricField({x_real, 0}, y);
 }
 
@@ -177,7 +177,7 @@ inline ElectricField stokesToElectricField(const Stokes stokes, const glm::dvec3
 
 RAYX_FN_ACC
 inline ElectricField stokesToElectricField(const Stokes stokes, const glm::dmat3 rotation) {
-    return rotation * ElectricField(stokesToLocalElectricField(stokes), complex::Complex{0, 0});
+    return rotation * ElectricField(stokesToLocalElectricField(stokes), std::complex<double>{0, 0});
 }
 
 RAYX_FN_ACC
