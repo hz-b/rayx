@@ -79,9 +79,9 @@ jobs:
       - name: Run
         working-directory: ${{github.workspace}}
         run: |
-          ./build/bin/release/rayx -x -c -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
-          ./build/bin/release/rayx -x    -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
-          git checkout -- Intern/rayx-core/tests/input/BoringImagePlane.csv
+          $Env:RML="Intern/rayx-core/tests/input/METRIX_U41_G1_H1_318eV_PS_MLearn_v114.rml"
+          ./build/bin/release/rayx -x -c -V -i $Env:RML
+          ./build/bin/release/rayx -x    -V -i $Env:RML
 
       - name: Test
         working-directory: ${{github.workspace}}/build/bin/release
