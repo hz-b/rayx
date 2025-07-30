@@ -76,16 +76,16 @@ NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict mat
 
 // returns dvec2 to represent a complex number
 RAYX_FN_ACC
-complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict materialIndices,
+std::complex<double> RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict materialIndices,
                                              const double* __restrict materialTable) {
     if (material == -1) {  // vacuum
-        return complex::Complex(1., 0.);
+        return std::complex<double>(1., 0.);
     }
 
     // out of range check
     if (material < 1 || material > 92) {
         _throw("getRefractiveIndex material out of range!");
-        return complex::Complex(-1.0, -1.0);
+        return std::complex<double>(-1.0, -1.0);
     }
 
     // try to get refractive index using Palik table
@@ -109,7 +109,7 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
             }
 
             PalikEntry entry = getPalikEntry(low, material, materialIndices, materialTable);
-            return complex::Complex(entry.m_n, entry.m_k);
+            return std::complex<double>(entry.m_n, entry.m_k);
         }
     }
 
@@ -139,11 +139,11 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
         double n = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
         double k = (415.252 * rho * entry.m_f2) / (e * e * mass);
 
-        return complex::Complex(n, k);
+        return std::complex<double>(n, k);
     }
 
     _throw("getRefractiveIndex: no matching entry found!");
-    return complex::Complex(-1.0, -1.0);
+    return std::complex<double>(-1.0, -1.0);
 }
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro

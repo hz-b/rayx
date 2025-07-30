@@ -18,54 +18,52 @@ namespace RAYX {
  * @return double           Intensity transmission coefficient (range 0 to 1).
  */
 RAYX_FN_ACC
-inline ComplexFresnelCoeffs computeTransmittance(double wavelength, complex::Complex theta0, const complex::Complex& indexVacuum,
-                                                 const complex::Complex& indexMaterial, double thickness) {
-    using complex::Complex;
+inline ComplexFresnelCoeffs computeTransmittance(double wavelength, std::complex<double> theta0, const std::complex<double>& indexVacuum,
+                                                 const std::complex<double>& indexMaterial, double thickness) {
+    std::complex<double> sinTheta1 = (indexVacuum / indexMaterial) * std::sin(theta0);
+    std::complex<double> theta1 = std::asin(sinTheta1);
 
-    complex::Complex sinTheta1 = (indexVacuum / indexMaterial) * complex::sin(theta0);
-    complex::Complex theta1 = complex::asin(sinTheta1);
-
-    complex::Complex theta2 = theta0;  // Austritt in Vakuum, Winkel gleich theta0
+    std::complex<double> theta2 = theta0;  // Austritt in Vakuum, Winkel gleich theta0
 
     // Fresnel-Koeffizienten (s- und p-Polarisation)
-    auto rs = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (ni * complex::cos(thetai) - nt * complex::cos(thetat)) / (ni * complex::cos(thetai) + nt * complex::cos(thetat));
+    auto rs = [](std::complex<double> ni, std::complex<double> nt, std::complex<double> thetai, std::complex<double> thetat) {
+        return (ni * std::cos(thetai) - nt * std::cos(thetat)) / (ni * std::cos(thetai) + nt * std::cos(thetat));
     };
-    auto ts = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (2.0 * ni * complex::cos(thetai)) / (ni * complex::cos(thetai) + nt * complex::cos(thetat));
+    auto ts = [](std::complex<double> ni, std::complex<double> nt, std::complex<double> thetai, std::complex<double> thetat) {
+        return (2.0 * ni * std::cos(thetai)) / (ni * std::cos(thetai) + nt * std::cos(thetat));
     };
-    auto rp = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (nt * complex::cos(thetai) - ni * complex::cos(thetat)) / (nt * complex::cos(thetai) + ni * complex::cos(thetat));
+    auto rp = [](std::complex<double> ni, std::complex<double> nt, std::complex<double> thetai, std::complex<double> thetat) {
+        return (nt * std::cos(thetai) - ni * std::cos(thetat)) / (nt * std::cos(thetai) + ni * std::cos(thetat));
     };
-    auto tp = [](complex::Complex ni, complex::Complex nt, complex::Complex thetai, complex::Complex thetat) {
-        return (2.0 * ni * complex::cos(thetai)) / (nt * complex::cos(thetai) + ni * complex::cos(thetat));
+    auto tp = [](std::complex<double> ni, std::complex<double> nt, std::complex<double> thetai, std::complex<double> thetat) {
+        return (2.0 * ni * std::cos(thetai)) / (nt * std::cos(thetai) + ni * std::cos(thetat));
     };
 
     // s-Polarisation
-    complex::Complex r01s = rs(indexVacuum, indexMaterial, theta0, theta1);
-    complex::Complex t01s = ts(indexVacuum, indexMaterial, theta0, theta1);
-    complex::Complex r12s = rs(indexMaterial, indexVacuum, theta1, theta2);
-    complex::Complex t12s = ts(indexMaterial, indexVacuum, theta1, theta2);
+    std::complex<double> r01s = rs(indexVacuum, indexMaterial, theta0, theta1);
+    std::complex<double> t01s = ts(indexVacuum, indexMaterial, theta0, theta1);
+    std::complex<double> r12s = rs(indexMaterial, indexVacuum, theta1, theta2);
+    std::complex<double> t12s = ts(indexMaterial, indexVacuum, theta1, theta2);
 
     // p-Polarisation
-    complex::Complex r01p = rp(indexVacuum, indexMaterial, theta0, theta1);
-    complex::Complex t01p = tp(indexVacuum, indexMaterial, theta0, theta1);
-    complex::Complex r12p = rp(indexMaterial, indexVacuum, theta1, theta2);
-    complex::Complex t12p = tp(indexMaterial, indexVacuum, theta1, theta2);
+    std::complex<double> r01p = rp(indexVacuum, indexMaterial, theta0, theta1);
+    std::complex<double> t01p = tp(indexVacuum, indexMaterial, theta0, theta1);
+    std::complex<double> r12p = rp(indexMaterial, indexVacuum, theta1, theta2);
+    std::complex<double> t12p = tp(indexMaterial, indexVacuum, theta1, theta2);
 
     // Phasenverschiebung
-    complex::Complex delta = (2.0 * PI / wavelength) * indexMaterial * thickness * complex::cos(theta1);
-    complex::Complex phase = complex::exp(complex::Complex(0, 1) * delta);
+    std::complex<double> delta = (2.0 * PI / wavelength) * indexMaterial * thickness * std::cos(theta1);
+    std::complex<double> phase = std::exp(std::complex<double>(0, 1) * delta);
 
     // Gesamte Transmission s
-    complex::Complex numeratorS = t01s * t12s * phase;
-    complex::Complex denominatorS = 1.0 + r01s * r12s * phase * phase;
-    complex::Complex ts_total = numeratorS / denominatorS;
+    std::complex<double> numeratorS = t01s * t12s * phase;
+    std::complex<double> denominatorS = 1.0 + r01s * r12s * phase * phase;
+    std::complex<double> ts_total = numeratorS / denominatorS;
 
     // Gesamte Transmission p
-    complex::Complex numeratorP = t01p * t12p * phase;
-    complex::Complex denominatorP = 1.0 + r01p * r12p * phase * phase;
-    complex::Complex tp_total = numeratorP / denominatorP;
+    std::complex<double> numeratorP = t01p * t12p * phase;
+    std::complex<double> denominatorP = 1.0 + r01p * r12p * phase * phase;
+    std::complex<double> tp_total = numeratorP / denominatorP;
 
     return {.s = ts_total, .p = tp_total};
 }

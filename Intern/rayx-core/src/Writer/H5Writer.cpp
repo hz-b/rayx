@@ -30,7 +30,7 @@ inline HighFive::DataType highfive_create_type_ElectricField() {
 }
 }  // unnamed namespace
 HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
-HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_ElectricField);
+HIGHFIVE_REGISTER_TYPE(std::complex<double>, highfive_create_type_ElectricField);
 
 namespace RAYX {
 

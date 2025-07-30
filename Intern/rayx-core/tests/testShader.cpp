@@ -748,7 +748,7 @@ TEST_F(TestSuite, testElectricField) {
     CHECK_EQ(1.0, intensity(LocalElectricField({1, 0}, {0, 0})));
     CHECK_EQ(1.0, intensity(ElectricField({1, 0}, {0, 0}, {0, 0})));
     CHECK_EQ(LocalElectricField({1, 0}, {0, 0}), LocalElectricField(ElectricField({1, 0}, {0, 0}, {0, 0})));
-    CHECK_EQ(ElectricField({1, 0}, {0, 0}, {0, 0}), ElectricField(LocalElectricField({1, 0}, {0, 0}), complex::Complex{0, 0}));
+    CHECK_EQ(ElectricField({1, 0}, {0, 0}, {0, 0}), ElectricField(LocalElectricField({1, 0}, {0, 0}), std::complex<double>{0, 0}));
 }
 
 TEST_F(TestSuite, testStokes) {
@@ -826,8 +826,6 @@ TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention) {
 }
 
 TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention2) {
-    using namespace complex;
-
     // convention for incident field
     // forward = (0, 0, -1)
     // up      = (0, 1, 0)
@@ -907,52 +905,50 @@ TEST_F(TestSuite, testGetIncidenceAngle) {
 }
 
 TEST_F(TestSuite, testSnell) {
-    using namespace complex;
-
     struct InOutPair {
-        Complex in_ior_i;
-        Complex in_ior_t;
-        Complex in_incident_angle;
+        std::complex<double> in_ior_i;
+        std::complex<double> in_ior_t;
+        std::complex<double> in_incident_angle;
 
-        Complex out_refract_angle;
+        std::complex<double> out_refract_angle;
     };
 
     const auto inouts = std::vector<InOutPair>{
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.0, 0),
-            .in_incident_angle = Complex(0.5, 0.5),
-            .out_refract_angle = Complex(0.5, 0.5),
+            .in_ior_i = std::complex<double>(1.0, 0),
+            .in_ior_t = std::complex<double>(1.0, 0),
+            .in_incident_angle = std::complex<double>(0.5, 0.5),
+            .out_refract_angle = std::complex<double>(0.5, 0.5),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.2, 0),
-            .in_incident_angle = Complex(PI * 0.5, 0),
-            .out_refract_angle = Complex(0.98511078333774571, 0),
+            .in_ior_i = std::complex<double>(1.0, 0),
+            .in_ior_t = std::complex<double>(1.2, 0),
+            .in_incident_angle = std::complex<double>(PI * 0.5, 0),
+            .out_refract_angle = std::complex<double>(0.98511078333774571, 0),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.2, 0),
-            .in_incident_angle = Complex(PI * 0.25, 0),
-            .out_refract_angle = Complex(0.63013724606456445, 0),
+            .in_ior_i = std::complex<double>(1.0, 0),
+            .in_ior_t = std::complex<double>(1.2, 0),
+            .in_incident_angle = std::complex<double>(PI * 0.25, 0),
+            .out_refract_angle = std::complex<double>(0.63013724606456445, 0),
         },
         {
-            .in_ior_i = Complex(1.2, 0),
-            .in_ior_t = Complex(1.0, 0),
-            .in_incident_angle = Complex(0.63013724606456445, 0),
-            .out_refract_angle = Complex(PI * 0.25, 0),
+            .in_ior_i = std::complex<double>(1.2, 0),
+            .in_ior_t = std::complex<double>(1.0, 0),
+            .in_incident_angle = std::complex<double>(0.63013724606456445, 0),
+            .out_refract_angle = std::complex<double>(PI * 0.25, 0),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(0.05, 5.0),
-            .in_incident_angle = Complex(PI * 0.25, 0),
-            .out_refract_angle = Complex(0.0014001432455587293, -0.14094028035483516),
+            .in_ior_i = std::complex<double>(1.0, 0),
+            .in_ior_t = std::complex<double>(0.05, 5.0),
+            .in_incident_angle = std::complex<double>(PI * 0.25, 0),
+            .out_refract_angle = std::complex<double>(0.0014001432455587293, -0.14094028035483516),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(2.0, 0),
-            .in_incident_angle = Complex(PI * 0.45, 0),
-            .out_refract_angle = Complex(0.51650510236395286, 0),
+            .in_ior_i = std::complex<double>(1.0, 0),
+            .in_ior_t = std::complex<double>(2.0, 0),
+            .in_incident_angle = std::complex<double>(PI * 0.45, 0),
+            .out_refract_angle = std::complex<double>(0.51650510236395286, 0),
         },
     };
 
@@ -963,38 +959,36 @@ TEST_F(TestSuite, testSnell) {
 }
 
 TEST_F(TestSuite, testFresnel) {
-    using namespace complex;
-
     struct InOutPair {
-        Complex in_ior_i;
-        Complex in_ior_t;
-        Complex in_incident_angle;
-        Complex in_refract_angle;
+        std::complex<double> in_ior_i;
+        std::complex<double> in_ior_t;
+        std::complex<double> in_incident_angle;
+        std::complex<double> in_refract_angle;
 
         ComplexFresnelCoeffs out_reflect_amplitude;
     };
 
     std::vector<InOutPair> inouts = {
         {
-            .in_ior_i = Complex(0.91453807092958361, 0.035170965000031584),
-            .in_ior_t = Complex(1, 0),
-            .in_incident_angle = acos(Complex(0.10897754475504851, 0.40807275584607544)),
-            .in_refract_angle = acos(Complex(0.17315572500228882, 0)),
+            .in_ior_i = std::complex<double>(0.91453807092958361, 0.035170965000031584),
+            .in_ior_t = std::complex<double>(1, 0),
+            .in_incident_angle = acos(std::complex<double>(0.10897754475504851, 0.40807275584607544)),
+            .in_refract_angle = acos(std::complex<double>(0.17315572500228882, 0)),
             .out_reflect_amplitude =
                 {
-                    .s = Complex(0.57163467986230054, 0.62486367906829521),
-                    .p = Complex(0.63080662811278632, 0.52640331936127849),
+                    .s = std::complex<double>(0.57163467986230054, 0.62486367906829521),
+                    .p = std::complex<double>(0.63080662811278632, 0.52640331936127849),
                 },
         },
         {
-            .in_ior_i = Complex(0.91452118089946777, 0.035187568837614078),
-            .in_ior_t = Complex(1, 0),
-            .in_incident_angle = acos(Complex(0.10906363669865969, 0.40789272144618016)),
-            .in_refract_angle = acos(Complex(0.1736481785774231, 0)),
+            .in_ior_i = std::complex<double>(0.91452118089946777, 0.035187568837614078),
+            .in_ior_t = std::complex<double>(1, 0),
+            .in_incident_angle = acos(std::complex<double>(0.10906363669865969, 0.40789272144618016)),
+            .in_refract_angle = acos(std::complex<double>(0.1736481785774231, 0)),
             .out_reflect_amplitude =
                 {
-                    .s = Complex(0.56981824812215454, 0.62585833416785819),
-                    .p = Complex(0.62929764490597007, 0.52731592442193231),
+                    .s = std::complex<double>(0.56981824812215454, 0.62585833416785819),
+                    .p = std::complex<double>(0.62929764490597007, 0.52731592442193231),
                 },
         },
     };
@@ -1007,10 +1001,8 @@ TEST_F(TestSuite, testFresnel) {
 }
 
 TEST_F(TestSuite, testPolarizationIntensity) {
-    using namespace complex;
-
-    const auto iorI = Complex(1.0, 0);
-    const auto refractIor = Complex(1.5, 0);
+    const auto iorI = std::complex<double>(1.0, 0);
+    const auto refractIor = std::complex<double>(1.5, 0);
     const auto incidentVec = glm::dvec3(1, 0, 0);
     const auto normalVec = glm::normalize(glm::dvec3(-1, 1, 0));
 
@@ -1028,8 +1020,6 @@ TEST_F(TestSuite, testPolarizationIntensity) {
 }
 
 TEST_F(TestSuite, testPolarizingReflectionScenario) {
-    using namespace complex;
-
     const auto incidentVec = glm::normalize(glm::dvec3(-0.195, -0.195, 0.961));
     const auto normal_vec_0 = glm::normalize(glm::dvec3(0, -1, -1));
 
@@ -1040,8 +1030,8 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
     CHECK_EQ(Rad(incident_angle_0).toDeg().deg, 57.19646879265609);
 
     const auto reflect_amplitude_0 = ComplexFresnelCoeffs{
-        .s = polar(0.992, 2.918),
-        .p = polar(0.975, -0.751),
+        .s = std::polar(0.992, 2.918),
+        .p = std::polar(0.975, -0.751),
     };
 
     const auto reflect_polarization_matrix_0 = calcPolaririzationMatrix(incidentVec, reflect_vec_0, normal_vec_0, reflect_amplitude_0);
@@ -1068,8 +1058,8 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
     CHECK_EQ(Rad(incident_angle_1).toDeg().deg, 35.155651179977404);
 
     const auto reflect_amplitude_1 = ComplexFresnelCoeffs{
-        .s = polar(0.988, 2.80),
-        .p = polar(0.982, -0.507),
+        .s = std::polar(0.988, 2.80),
+        .p = std::polar(0.982, -0.507),
     };
 
     const auto reflect_polarization_matrix_1 = calcPolaririzationMatrix(reflect_vec_0, reflect_vec_1, normal_vec_1, reflect_amplitude_1);
@@ -1091,11 +1081,9 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
 }
 
 TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
-    using namespace complex;
-
     struct IorPair {
-        Complex iorI;
-        Complex refractIor;
+        std::complex<double> iorI;
+        std::complex<double> refractIor;
     };
 
     const auto ior_pairs = std::vector<IorPair>{
@@ -1146,10 +1134,8 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
 
 // fully polarizing reflection (reflection at brewsters angle)
 TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
-    using namespace complex;
-
-    const auto iorI = Complex(1.0, 0);
-    const auto refractIor = Complex(2.0, 0);
+    const auto iorI = std::complex<double>(1.0, 0);
+    const auto refractIor = std::complex<double>(2.0, 0);
     const auto incidentVec = glm::dvec3(1, 0, 0);
     const auto normalVec = glm::normalize(glm::dvec3(-1, refractIor.real(), 0));
 
@@ -1178,10 +1164,8 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
 
 // non-polarizing reflection (reflection at normal incidence)
 TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
-    using namespace complex;
-
-    const auto iorI = Complex(1.0, 0);
-    const auto refractIor = Complex(1.5, 0);
+    const auto iorI = std::complex<double>(1.0, 0);
+    const auto refractIor = std::complex<double>(1.5, 0);
     const auto incidentVec = glm::normalize(glm::dvec3(1, 1, 0));
     const auto normalVec = -incidentVec;
     const auto reflectVec = glm::reflect(incidentVec, normalVec);
@@ -1466,7 +1450,7 @@ TEST_F(TestSuite, testComputeEta) {
         double structureFactorImF0;
         double polFactor;
         double gamma;
-        complex::Complex expected;
+        std::complex<double> expected;
     };
 
     std::vector<TestCase> testCases = {{.theta = 0.1990,
@@ -1480,7 +1464,7 @@ TEST_F(TestSuite, testComputeEta) {
                                         .structureFactorImF0 = 1.7304,
                                         .polFactor = 1.0,
                                         .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(1.8698989229058245, -0.0091710480362834079)},
+                                        .expected = std::complex<double>(1.8698989229058245, -0.0091710480362834079)},
                                        {.theta = 0.1995,
                                         .bragg = 0.1990,
                                         .asymmetry = -1.0,
@@ -1492,7 +1476,7 @@ TEST_F(TestSuite, testComputeEta) {
                                         .structureFactorImF0 = 1.7304,
                                         .polFactor = 1.0,
                                         .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(-35.238613144067784, 0.73773569616427415)},
+                                        .expected = std::complex<double>(-35.238613144067784, 0.73773569616427415)},
                                        {.theta = 0.1990,
                                         .bragg = 0.1990,
                                         .asymmetry = 0.8,
@@ -1504,7 +1488,7 @@ TEST_F(TestSuite, testComputeEta) {
                                         .structureFactorImF0 = 1.7304,
                                         .polFactor = 1.0,
                                         .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(0.20906105513355305, -0.0010253543417022822)},
+                                        .expected = std::complex<double>(0.20906105513355305, -0.0010253543417022822)},
                                        {.theta = 0.1990,
                                         .bragg = 0.1990,
                                         .asymmetry = -1.0,
@@ -1516,10 +1500,10 @@ TEST_F(TestSuite, testComputeEta) {
                                         .structureFactorImF0 = 1.7304,
                                         .polFactor = cos(2 * 0.1990),
                                         .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(2.0284463725210271, -0.0099486549211473489)}};
+                                        .expected = std::complex<double>(2.0284463725210271, -0.0099486549211473489)}};
 
     for (const auto& tc : testCases) {
-        complex::Complex eta = computeEta(tc.theta, tc.bragg, tc.asymmetry, tc.structureFactorReFH, tc.structureFactorImFH, tc.structureFactorReFHC,
+        std::complex<double> eta = computeEta(tc.theta, tc.bragg, tc.asymmetry, tc.structureFactorReFH, tc.structureFactorImFH, tc.structureFactorReFHC,
                                           tc.structureFactorImFHC, tc.structureFactorReF0, tc.structureFactorImF0, tc.polFactor, tc.gamma);
 
         CHECK_EQ(eta.real(), tc.expected.real());
