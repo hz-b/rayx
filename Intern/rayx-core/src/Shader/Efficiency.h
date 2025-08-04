@@ -15,8 +15,8 @@ struct ComplexFresnelCoeffs {
     complex::Complex p;
 };
 
-RAYX_FN_ACC
-inline double angleBetweenUnitVectors(glm::dvec3 a, glm::dvec3 b) { return glm::acos(glm::dot(a, b)); }
+/// calculates the angle in rad, between two unit vectors
+RAYX_FN_ACC inline double angleBetweenUnitVectors(glm::dvec3 a, glm::dvec3 b) { return glm::acos(glm::dot(a, b)); }
 
 RAYX_FN_ACC
 inline complex::Complex calcRefractAngle(const complex::Complex incidentAngle, const complex::Complex iorI, const complex::Complex iorT) {
