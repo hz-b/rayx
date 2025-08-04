@@ -184,7 +184,11 @@ Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int 
 
     double angle = angleBetweenUnitVectors(-r.m_direction, col.normal);  // in rad
 
-    if (std::isnan(angle) || angle == 0) angle = 1e-8;
+    // std::isnan is not tagged as device function, when compiling with nvcc
+#if !defined(RAYX_CUDA_ENABLED)
+    using std::isnan;
+#endif
+    if (isnan(angle) || angle == 0) angle = 1e-8;
     const auto incidentAngle = complex::Complex(angle, 0);
 
     const auto totalTransmission = computeTransmittance(wavelength, incidentAngle, indexVacuum, indexMaterial, f.m_thicknessSubstrate);
