@@ -51,7 +51,8 @@ jobs:
         shell: pwsh
         run: .\Scripts\setup-cuda.ps1
         env:
-          INPUT_CUDA_VERSION: 12.5.1
+          # if you want to change the cuda version, go to Scripts/setup-cuda-ps1 and add a download link for the new version there.
+          INPUT_CUDA_VERSION: 12.9.1
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DRAYX_WERROR=ON -DRAYX_REQUIRE_CUDA=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
