@@ -131,5 +131,6 @@ if(Vulkan_FOUND)
 
     # Call the function to compile all shaders in the specified directory
     compile_shaders(RAYX_UI_COMPILE_SHADER "${PROJECT_SOURCE_DIR}/src/Shaders")
+    add_dependencies(${PROJECT_NAME} RAYX_UI_COMPILE_SHADER)
     # ------------------------
 endif() # Vulkan_FOUND
