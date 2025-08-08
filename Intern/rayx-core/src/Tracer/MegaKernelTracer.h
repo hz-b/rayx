@@ -43,8 +43,10 @@ struct Resources {
     // resources per beamline. constant per beamline
     /// beamline elements
     Buf<OpticalElement> d_elements;
+
     /// mask for which elements to record events
     Buf<bool> d_recordMask;
+
     /// all rays generated from all light sources
     std::vector<Ray> h_rays;
 
