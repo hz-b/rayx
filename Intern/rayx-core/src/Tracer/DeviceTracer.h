@@ -9,9 +9,6 @@
 
 namespace RAYX {
 
-// Small helper to make passing the full record mask easier.
-inline std::vector<bool> fullRecordMask(size_t numElements) { return std::vector<bool>(numElements, true); }
-
 /**
  * @brief DeviceTracer is an interface to a tracer implementation
  * we use this interface to remove the actual implementation from the rayx api

@@ -1,6 +1,5 @@
 #include <numeric>
 
-#include "Beamline/Objects/DipoleSource.h"
 #include "Shader/ApplySlopeError.h"
 #include "Shader/Approx.h"
 #include "Shader/Crystal.h"
@@ -1307,91 +1306,6 @@ TEST_F(TestSuite, testRefractiveIndex) {
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
     CHECK_EQ(getRefractiveIndex(25146.2, 29, mat.indices.data(), mat.materials.data()), glm::dvec2(1.0, 1.0328e-7), 1e-5);
-}
-
-TEST_F(TestSuite, testBesselDipole) {
-    struct InOutPair {
-        double proportion;
-        double zeta;
-        double out;
-    };
-    std::vector<InOutPair> inouts = {{
-                                         .proportion = 1 / 3,
-                                         .zeta = 78.126966373103443,
-                                         .out = 1.664046593883771e-35,
-                                     },
-                                     {
-                                         .proportion = 1 / 3,
-                                         .zeta = 73.550785975500432,
-                                         .out = 1.6659366793149262e-33,
-                                     },
-                                     {
-                                         .proportion = 1 / 3,
-                                         .zeta = 46.422887861754496,
-                                         .out = 1.2672053903555623e-21,
-                                     },
-                                     {
-                                         .proportion = 2 / 3,
-                                         .zeta = 78.126966373103443,
-                                         .out = 1.6675777760881476e-35,
-                                     },
-                                     {
-                                         .proportion = 2 / 3,
-                                         .zeta = 73.550785975500432,
-                                         .out = 1.6696906039215801e-33,
-                                     },
-                                     {
-                                         .proportion = 2 / 3,
-                                         .zeta = 49.798819164687949,
-                                         .out = 4.1969864622545434e-23,
-                                     }};
-
-    auto beamline = loadBeamline("dipole_plain");
-    const auto src = beamline.getSources()[0];
-    DipoleSource dipolesource(*src);
-
-    for (auto values : inouts) {
-        auto result = dipolesource.bessel(values.proportion, values.zeta);
-        CHECK_EQ(result, values.out, 0.1);
-    }
-}
-
-TEST_F(TestSuite, testSchwingerDipole) {
-    struct InOutPair {
-        double energy;
-        double flux;
-    };
-    std::vector<InOutPair> inouts = {{
-                                         .energy = 6520.0878532052693,
-                                         .flux = 566462407647095.5,
-                                     },
-                                     {.energy = 100, .flux = 2855336264551178},
-                                     {
-                                         .energy = 900,
-                                         .flux = 3762078406399219,
-                                     },
-                                     {
-                                         .energy = 2000,
-                                         .flux = 2907004029317153.5,
-                                     },
-                                     {
-                                         .energy = 0.667,
-                                         .flux = 596812742357665.25,
-                                     },
-                                     {
-                                         .energy = 2456,
-                                         .flux = 2526853293939861,
-                                     }};
-
-    auto beamline = loadBeamline("dipole_plain");
-    const auto src = beamline.getSources()[0];
-
-    DipoleSource dipolesource(*src);
-
-    for (auto values : inouts) {
-        auto result = dipolesource.schwinger(values.energy);
-        CHECK_EQ(result, values.flux, 0.000000001);
-    }
 }
 
 TEST_F(TestSuite, testSphericalCoords) {

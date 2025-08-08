@@ -1,7 +1,7 @@
 #include "setupTests.h"
 
 // define globally decralred invocation state
-InvState inv;
+ConstState inv;
 
 std::unique_ptr<RAYX::Tracer> tracer;
 
@@ -77,8 +77,9 @@ void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
 
 RAYX::BundleHistory traceRML(std::string filename) {
     const auto beamline = loadBeamline(filename);
+    const auto numSources = beamline.numSources();
     const auto numElements = beamline.numElements();
-    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, numElements + 2, fullRecordMask(numElements));
+    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, numElements + 2, recordMaskAllElements(numSources, numElements));
     return raySoAToBundleHistory(rays);
 }
 
@@ -178,8 +179,9 @@ std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamlin
 // returns the rayx rays converted to be ray-UI compatible.
 std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
     const auto beamline = loadBeamline(filename);
+    const auto numSources = beamline.numSources();
     const auto numElements = beamline.numElements();
-    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, fullRecordMask(numElements));
+    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, recordMaskAllElements(numSources, numElements));
 
     const auto hist = raySoAToBundleHistory(rays);
 

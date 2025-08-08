@@ -136,36 +136,6 @@ std::vector<OpticalElement> Group::compileElements() const {
     return elements;
 }
 
-std::vector<Ray> Group::compileSources(int thread_count) const {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-    std::vector<Ray> rays;
-
-    auto traverseWithTransforms = [&rays, thread_count](const Group& group, const glm::dvec4& parentPosition, const glm::dmat4& parentOrientation,
-                                                        const auto& self) -> void {
-        // Compute the transform for this group
-        glm::dvec4 currentPosition = parentOrientation * group.getPosition() + parentPosition;
-        glm::dmat4 currentOrientation = parentOrientation * group.getOrientation();
-
-        for (const auto& child : group.m_children) {  // For each child...
-            assert(child && "m_children contains a nullptr!");
-            if (child->isSource()) {
-                const auto* srcPtr = static_cast<DesignSource*>(child.get());
-                auto sourceRays = srcPtr->compile(thread_count, currentPosition, currentOrientation);
-                for (auto& ray : sourceRays) {
-                    ray.m_sourceID = static_cast<uint32_t>(rays.size());
-                }
-                rays.insert(rays.end(), sourceRays.begin(), sourceRays.end());
-            } else if (child->isGroup()) {
-                const auto* childGroupPtr = static_cast<Group*>(child.get());
-                self(*childGroupPtr, currentPosition, currentOrientation, self);
-            }
-        }
-    };
-
-    traverseWithTransforms(*this, glm::dvec4(0, 0, 0, 1), glm::dmat4(1), traverseWithTransforms);
-    return rays;
-}
-
 std::vector<const DesignElement*> Group::getElements() const {
     std::vector<const DesignElement*> elements;
     ctraverse([&elements](const BeamlineNode& node) -> bool {
@@ -212,6 +182,21 @@ std::vector<std::string> Group::getSourceNames() const {
     return names;
 }
 
+std::vector<std::string> Group::getObjectNames() const {
+    std::vector<std::string> names;
+    ctraverse([&names](const BeamlineNode& node) -> bool {
+        if (node.isSource()) {
+            const auto* source = static_cast<const DesignSource*>(&node);
+            names.push_back(source->getName());
+        } else if (node.isElement()) {
+            const auto* element = static_cast<const DesignElement*>(&node);
+            names.push_back(element->getName());
+        }
+        return false;
+    });
+    return names;
+}
+
 size_t Group::numElements() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
@@ -227,6 +212,17 @@ size_t Group::numSources() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
         if (node.isSource()) {
+            ++count;
+        }
+        return false;
+    });
+    return count;
+}
+
+size_t Group::numObjects() const {
+    size_t count = 0;
+    ctraverse([&count](const BeamlineNode& node) -> bool {
+        if (node.isSource() || node.isElement()) {
             ++count;
         }
         return false;

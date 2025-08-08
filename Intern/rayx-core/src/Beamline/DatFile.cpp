@@ -68,39 +68,4 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     return s.str();
 }
 
-double DatFile::selectEnergy() const {
-    // runs either continuous Energydistribution from DataFile or just the specific energies
-    if (m_continuous) {
-        // find the index `idx`, s.t.
-        // we will return an energy between lines[idx].energy and
-        // lines[idx+1].energy
-        double continuousWeightSum = m_weightSum - m_Lines.front().m_weight / 2 - m_Lines.back().m_weight / 2;
-        double w = randomDoubleInRange(0, continuousWeightSum);
-
-        double counter = 0;
-        uint32_t idx = 0;
-
-        for (; idx <= m_Lines.size() - 1; idx++) {
-            counter += (m_Lines[idx].m_weight + m_Lines[idx + 1].m_weight) / 2;
-            if (counter >= w) {
-                break;
-            }
-        }
-
-        // interpolate between lines[idx].energy and lines[idx+1].energy
-        return randomDoubleInRange(m_Lines[idx].m_energy, m_Lines[idx + 1].m_energy);
-    } else {
-        double w = randomDoubleInRange(0, m_weightSum);
-
-        double counter = 0;
-        for (auto e : m_Lines) {
-            counter += e.m_weight;
-            if (counter >= w) {
-                return e.m_energy;
-            }
-        }
-        return m_Lines.back().m_energy;
-    }
-}
-
 }  // namespace RAYX

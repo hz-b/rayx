@@ -17,7 +17,8 @@ void Simulator::runSimulation() {
         m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
     }
 
-    const auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents, RAYX::fullRecordMask(m_Beamline.numElements()));
+    const auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents,
+                                      RAYX::recordMaskAllElements(m_Beamline.numSources(), m_Beamline.numElements()));
     const auto bundleHist = RAYX::raySoAToBundleHistory(rays);
 
     bool notEnoughEvents = false;
@@ -44,7 +45,7 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    RAYX::writeH5RaySoA(path, m_Beamline.getElementNames(), rays);
+    RAYX::writeH5RaySoA(path, m_Beamline.getSourceNames(), m_Beamline.getElementNames(), rays);
 #else
     RAYX::writeCsv(bundleHist, path);
 #endif

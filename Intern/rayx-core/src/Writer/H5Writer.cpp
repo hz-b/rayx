@@ -92,6 +92,22 @@ BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
     return raySoAToBundleHistory(rays);
 }
 
+std::vector<std::string> readH5SourceNames(const std::filesystem::path& filepath) {
+    RAYX_VERB << "reading source names from '" << filepath;
+
+    auto source_names = std::vector<std::string>();
+
+    try {
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
+
+        file.getDataSet("/rayx/source_names").read(source_names);
+    } catch (const std::exception& e) {
+        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
+    }
+
+    return source_names;
+}
+
 std::vector<std::string> readH5ElementNames(const std::filesystem::path& filepath) {
     RAYX_VERB << "reading element names from '" << filepath;
 
@@ -108,32 +124,33 @@ std::vector<std::string> readH5ElementNames(const std::filesystem::path& filepat
     return element_names;
 }
 
-void writeH5RaySoA(const std::filesystem::path& filepath, const std::vector<std::string>& element_names, const RaySoA& rays, const RayAttrFlag attr) {
+void writeH5RaySoA(const std::filesystem::path& filepath, const std::vector<std::string>& source_names, const std::vector<std::string>& element_names, const RaySoA& rays, const RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: "
+    RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: "
               << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-#define X(type, name, flag, map)                                                           \
-    RAYX_VERB << "writing ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+#define X(type, name, flag, map)                                                         \
+    RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) file.createDataSet("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
 
         file.createDataSet("rayx/num_paths", rays.num_paths);
+        file.createDataSet("rayx/source_names", source_names);
         file.createDataSet("rayx/element_names", element_names);
     } catch (const std::exception& e) {
         RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
     }
 }
 
-void writeH5BundleHistory(const std::filesystem::path& filepath, const std::vector<std::string>& element_names, const BundleHistory& bundle,
+void writeH5BundleHistory(const std::filesystem::path& filepath, const std::vector<std::string>& source_names, const std::vector<std::string>& element_names, const BundleHistory& bundle,
                           const RayAttrFlag attr) {
     const auto rays = bundleHistoryToRaySoA(bundle);
-    writeH5RaySoA(filepath, element_names, rays, attr);
+    writeH5RaySoA(filepath, source_names, element_names, rays, attr);
 }
 
 }  // namespace RAYX

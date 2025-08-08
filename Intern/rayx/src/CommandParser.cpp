@@ -1,54 +1,111 @@
 #include "CommandParser.h"
 
-#include <cstring>
+#include <CLI/CLI.hpp>
 
-// CommandParser::CommandParser()  {}
+#include "Debug/Debug.h"
+#include "Debug/Instrumentor.h"
+#include "Random.h"
+#include "TerminalAppConfig.h"
+#include "Tracer/Tracer.h"
 
-CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_shared<CLI::App>("Terminal Application for rayx")} {
-    for (const std::pair<char, Options> option : m_ParserCommands) {
-        // Full name string
-        std::string _name;
-        _name += "-";
-        _name += option.first;  // Short argument
-        if (strcmp(option.second.full_name, "") != 0) {
-            _name += ",--";
-            _name.append(option.second.full_name);  // Full argument
-        }
+namespace {
 
-        const OptionType _type = option.second.type;
-        const std::string _description(option.second.description);
-        if (_type == OptionType::BOOL) {
-            m_cli11->add_flag(_name, *static_cast<bool*>(option.second.option_flag), _description);
-        } else if (_type == OptionType::STRING) {
-            m_cli11->add_option(_name, *static_cast<std::string*>(option.second.option_flag), _description);
-        } else if (_type == OptionType::INT) {
-            m_cli11->add_option(_name, *static_cast<int*>(option.second.option_flag), _description);
-        } else if (_type == OptionType::INT_VEC) {
-            m_cli11->add_option(_name, *static_cast<std::vector<int>*>(option.second.option_flag), _description)
-                ->expected(-1);  // allow any number of ints
-        }
-    }
+void getVersion() {
+    RAYX_LOG << R"(
 
-    ///// Parse
+  ╔═══╗╔═══╗╔╗  ╔╗╔═╗╔═╗
+  ║╔═╗║║╔═╗║║╚╗╔╝║╚╗╚╝╔╝
+  ║╚═╝║║║ ║║╚╗╚╝╔╝ ╚╗╔╝
+  ║╔╗╔╝║╚═╝║ ╚╗╔╝  ╔╝╚╗
+  ║║║╚╗║╔═╗║  ║║  ╔╝╔╗╚╗
+  ╚╝╚═╝╚╝ ╚╝  ╚╝  ╚═╝╚═╝ HZB 2023.
+  )";
+    RAYX_LOG << "\n\t rayx terminal application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "." << TERMINALAPP_VERSION_PATCH
+             << "\n \t GIT: " << GIT_REVISION << "\n \t BUILD: " << BUILD_TIMESTAMP;
+};
+
+}  // unnamed namespace
+
+CliArgs parseCliArgs(const int argc, char const* const* const argv) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    CliArgs args;
+    CLI::App app{"Terminal Application for RAYX"};
+
+    // add positional argument to input paths
+    std::vector<std::string> inputPaths;
+    app.add_option("inputs", inputPaths, "Same as --input");
+
+    const auto groupPrograms = "Alternative programs, no tracing";
+
+    // the order here, determines the order in the --help print
+
+    // tracing related options
+    app.add_option("-i,--input", args.inputPaths, "Input RML files or directories (traversed recursively, looking for RML files)");
+    app.add_option("-o,--output", args.outputPath,
+                   "Output filepath. Can only be used if a single input is provided, that directs to an RML file. Default: put the output file "
+                   "next to the RML");
+    app.add_flag("-S,--sequential", args.sequential, "Trace sequentially");
+    app.add_option("-s,--seed", args.seed, "Specify a seed to be used for tracing");
+    app.add_flag("-f,--default-seed", args.defaultSeed, std::format("Use default seed for tracing: {}", RAYX::FIXED_SEED));
+    app.add_flag("-x,--cpu", args.cpu,
+                 "Enable CPU devices. Can be combined with --gpu. Affects --list-devices and --device-index. Default behaviour if neither --cpu and "
+                 "--gpu are provided: Both will be enabled");
+    app.add_flag("-X,--gpu", args.gpu, "Same as --cpu, but for GPU instead of CPU");
+    app.add_option("-d,--device-index", args.deviceId,
+                   "Pick device via device index. Available devices are determined by --cpu and --gpu. Default: the best device will be picked "
+                   "automatically. Use --list-devices to see the available devices");
+    app.add_flag("-c,--csv", args.csv, "Output stored as csv instead of hdf5 file");
+    app.add_flag("-V,--verbose", args.verbose, "Dump more information");
+    app.add_option("-m,--maxevents", args.maxEvents, "Maximum number of events per ray. Default: number_of_elements_in_beamline * 2 + 8");
+    app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", RAYX::DEFAULT_BATCH_SIZE));
+    app.add_option("-n,--number-of-rays", args.numberOfRays, "Override the number of rays for all sources");
+    app.add_flag("-B,--benchmark", args.benchmark, "Dump benchmark durations");
+    app.add_option("-R,--record-indices", args.recordIndices,
+                   "Record events only for specific sources / elements. Use --dump to list the objects of a beamline");
+
+    auto formatAttrNames = RAYX::getRayAttrNames();
+    auto formatAttrNamesStr = std::string();
+    for (const auto attrName : formatAttrNames) formatAttrNamesStr += "\n\t" + attrName;
+    app.add_option(
+        "-F,--format", args.format,
+        std::format("Record only specific Ray attributes to the output H5 file. Default: record all attributes. Attributes: {}", formatAttrNamesStr));
+
+    // other programs than tracing
+    app.add_flag("-v,--version", args.version, "Show version information")->group(groupPrograms);
+    app.add_flag("-l,--list-devices", args.listDevices, "List devices available for tracing. Affected by --cpu and --gpu")->group(groupPrograms);
+    app.add_option("-D,--dump", args.dump, "Dump the meta data of a file (h5 or rml)")->group(groupPrograms);
+
     try {
-        m_cli11->parse(_argc, _argv);
+        app.parse(argc, argv);
     } catch (const CLI::ParseError& e) {
-        m_cli11_return = m_cli11->exit(e);
-        if ((e.get_name() == "CallForHelp") || (e.get_name() == "CallForAllHelp"))
-            exit(1);
-        else
-            RAYX_D_ERR << "CLI ERROR" << m_cli11_return << " " << e.get_name();
+        auto exit_code = app.exit(e);
+        std::exit(exit_code);
+        return {};
     }
+
+    args.inputPaths.insert(args.inputPaths.end(), inputPaths.begin(), inputPaths.end());
+
+    if (args.format.empty()) args.format = formatAttrNames;
+
+    if (args.version) {
+        getVersion();
+        std::exit(0);
+    }
+
+    if (args.defaultSeed && args.seed) RAYX_EXIT << "Please do not provide '--default-seed' and '--seed' simultaneously'";
+
+    const bool isMoreThanOnePath = args.inputPaths.size() > 1;
+    const bool isFirstPathDirectory = args.inputPaths.size() == 1 && std::filesystem::is_directory(args.inputPaths[0]);
+    if (args.outputPath && (isMoreThanOnePath || isFirstPathDirectory)) {
+        if (std::filesystem::is_directory(*args.outputPath)) {
+            std::cout << "warning: you specified an output directory and potentially multiple input files. input files with the same name can lead "
+                         "to name collisions when exporting to the output directory"
+                      << std::endl;
+        } else {
+            RAYX_EXIT << "error: the output path must be a directory, when multiple input files or an input directory is specified";
+        }
+    }
+
+    return args;
 }
-
-void CommandParser::analyzeCommands() const {
-    if (!m_args.m_isFixSeed && m_args.m_seed != -1) {
-        RAYX_EXIT << "Cannot use user-defined seed without -f, try -f-seed <seed>";
-    }
-
-    if (m_args.m_isFixSeed && m_args.m_seed < -1) {
-        RAYX_EXIT << "Unsupported seed <= 0";
-    }
-}
-
-CommandParser::~CommandParser() = default;

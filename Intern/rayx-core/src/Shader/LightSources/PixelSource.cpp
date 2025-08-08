@@ -1,0 +1,80 @@
+#include "PixelSource.h"
+
+#include "Design/DesignElement.h"
+#include "Design/DesignSource.h"
+#include "Shader/Constants.h"
+
+namespace RAYX {
+
+PixelSource::PixelSource(const DesignSource& deso)
+    : ModelLightSource(deso),
+      m_pol(deso.getStokes()),
+      m_horDivergence(deso.getHorDivergence()),
+      m_verDivergence(deso.getVerDivergence()),
+      m_sourceDepth(deso.getSourceDepth()),
+      m_sourceHeight(deso.getSourceHeight()),
+      m_sourceWidth(deso.getSourceWidth()) {}
+
+/**
+ * get deviation from main ray according to specified distribution
+ * (uniform or Thrids for the x, y position))
+ * and extent (eg specified width/height of source)
+ */
+RAYX_FN_ACC
+double getPosInDistribution(SourceDist l, double extent, Rand& __restrict rand) {
+    if (l == SourceDist::Uniform) {
+        return (rand.randomDouble() - 0.5) * extent;
+    } else if (l == SourceDist::Thirds) {
+        double temp = (rand.randomDouble() - 0.5) * 2 / 3 * extent;
+        return temp + copysign(1.0, temp) * 1 / 6 * extent;
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * Creates random rays from pixel source with specified distributed width
+ * & height in 4 distinct pixels
+ * position and directions are distributed uniform
+ *
+ * @returns list of rays
+ */
+RAYX_FN_ACC
+Ray PixelSource::genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
+    // create ray with random position and divergence within the given span
+    // for width, height, depth, horizontal and vertical divergence
+    auto x = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);
+    x += m_position.x;
+    auto y = getPosInDistribution(SourceDist::Thirds, m_sourceHeight, rand);
+    y += m_position.y;
+    auto z = getPosInDistribution(SourceDist::Uniform, m_sourceDepth, rand);
+    z += m_position.z;
+    const auto en = selectEnergy(energyDistribution, rand);
+    // double z = (rn[2] - 0.5) * m_sourceDepth;
+    glm::dvec3 position = glm::dvec3(x, y, z);
+
+    // get random deviation from main ray based on divergence
+    const auto psi = getPosInDistribution(SourceDist::Uniform, m_verDivergence, rand);
+    const auto phi = getPosInDistribution(SourceDist::Uniform, m_horDivergence, rand);
+    // get corresponding angles based on distribution and deviation from
+    // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
+    glm::dvec3 direction = getDirectionFromAngles(phi, psi);
+    glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
+    direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+
+    const auto field = stokesToElectricField(m_pol, m_orientation);
+
+    return Ray{
+        .m_position = position,
+        .m_eventType = EventType::Emitted,
+        .m_direction = direction,
+        .m_energy = en,
+        .m_field = field,
+        .m_pathLength = 0.0,
+        .m_order = 0,
+        .m_lastElement = -1,
+        .m_sourceID = sourceId,
+    };
+}
+
+}  // namespace RAYX

@@ -10,44 +10,46 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Beamline/StringConversion.h"
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Rml/Importer.h"
 #include "Rml/Locate.h"
 #include "Tracer/Tracer.h"
 #include "Writer/CsvWriter.h"
-#include "Writer/Format.h"
 #include "Writer/H5Writer.h"
+
+namespace fs = std::filesystem;
 
 namespace {
 
-void dumpBeamline(const std::filesystem::path& filepath) {
-    std::cout << "dumping beamline meta data from: " << filepath << std::endl;
-
-    const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
-
+void dumpBeamlineObjects(const RAYX::Beamline* beamline) {
     const auto sources = beamline->getSources();
     std::cout << "\tsources (" << sources.size() << "):" << std::endl;
 
     int objectIndex = 0;
     for (const auto* source : sources) {
-        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << RAYX::elementTypeToString(source->getType())
+        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << RAYX::ElementTypeToString.at(source->getType())
                   << ", number of rays: " << source->getNumberOfRays() << ")" << std::endl;
         ++objectIndex;
     }
-
-    objectIndex = 0;  // TODO: this line can be removed as soon as we support recording of generated rays
 
     const auto elements = beamline->getElements();
     std::cout << "\telements (" << elements.size() << "):" << std::endl;
 
     for (const auto& element : elements) {
-        const auto curvature = RAYX::curvatureTypeToString(element->getCurvatureType());
-        const auto behaviour = RAYX::behaviourTypeToString(element->getBehaviourType());
+        const auto curvature = RAYX::CurvatureTypeToString.at(element->getCurvatureType());
+        const auto behaviour = RAYX::BehaviourTypeToString.at(element->getBehaviourType());
         std::cout << "\t- [" << objectIndex << "] '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")"
                   << std::endl;
         ++objectIndex;
     }
+}
+
+void dumpBeamline(const fs::path& filepath) {
+    std::cout << "dumping beamline meta data from: " << filepath << std::endl;
+    const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
+    dumpBeamlineObjects(beamline.get());
 }
 
 #ifndef NO_H5
@@ -72,6 +74,7 @@ void scanGroup(const HighFive::Group& group, const int depth = 0, const std::str
                 break;
             case HighFive::ObjectType::Dataset:
                 indent();
+                // TODO: dump dataset datatype and number of elements
                 std::cout << full_path << " (dataset)" << std::endl;
                 break;
             default:
@@ -81,7 +84,7 @@ void scanGroup(const HighFive::Group& group, const int depth = 0, const std::str
     }
 }
 
-void dumpH5File(const std::filesystem::path& filepath) {
+void dumpH5File(const fs::path& filepath) {
     try {
         std::cout << "reading h5 meta data from: " << filepath << std::endl;
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
@@ -95,7 +98,7 @@ void dumpH5File(const std::filesystem::path& filepath) {
 
 }  // unnamed namespace
 
-TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
+TerminalApp::TerminalApp(int argc, char** argv) {
     RAYX_VERB << "TerminalApp created!";
 
 // This should not be a RAYX_VERB, as it helps a lot to see the git hash
@@ -117,18 +120,15 @@ TerminalApp::TerminalApp(int argc, char** argv) : m_argv(argv), m_argc(argc) {
                      "will make this program run out of memory for larger ray "
                      "numbers!";
     }
+
+    m_cliArgs = parseCliArgs(argc, argv);
 }
 
 TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
-void TerminalApp::tracePath(const std::filesystem::path& path) {
-    namespace fs = std::filesystem;
+void TerminalApp::tracePath(const fs::path& path) {
     if (!fs::exists(path)) {
-        if (path.empty()) {
-            RAYX_EXIT << "No input file provided!";
-        } else {
-            RAYX_EXIT << "File '" << path << "' not found!";
-        }
+        RAYX_EXIT << "Trying to access file or directory " << path << " but it was not found!";
     }
 
     if (fs::is_directory(path)) {
@@ -136,107 +136,103 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             tracePath(p.path());
         }
     } else if (path.extension() == ".rml") {
-        std::cout << "Tracing File: " << path << std::endl;
-        // Load RML file
-        m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
-
-        // calculate max batch size
-        uint64_t max_batch_size = RAYX::DEFAULT_BATCH_SIZE;
-        if (m_CommandParser->m_args.m_BatchSize != 0) {
-            max_batch_size = m_CommandParser->m_args.m_BatchSize;
-        }
-        if (m_CommandParser->m_args.m_recordIndices.empty()) {
-            RAYX_VERB << "Passed no or empty array for which elements to record.";
-        } else {
-            RAYX_VERB << "First element of passed array: " << m_CommandParser->m_args.m_recordIndices[0];
-        }
-
-        // Run rayx core
-        RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        const int maxEvents =
-            (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
-        size_t numElements = m_Beamline->numElements();
-
-        // Record mask
-        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
-        std::vector<bool> recordMask(numElements, true);
-        if (!recordIndices.empty()) {
-            recordMask = std::vector<bool>(numElements, false);
-            for (auto idx : recordIndices) {
-                if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
-                if (idx > numElements - 1)
-                    RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
-                recordMask[idx] = true;
-            }
-        }
-
-        // Verbose log: print mask as a string of 0s and 1s
-        std::string maskStr;
-        maskStr.reserve(numElements);
-        for (auto b : recordMask) {
-            maskStr += b;
-        }
-        RAYX_VERB << "recordMask [size=" << numElements << "]: " << maskStr;
-
-        const auto attr =
-            m_CommandParser->m_args.m_format.empty() ? RAYX::RayAttrFlag::All : RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
-
-        const auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, recordMask, attr);
-
-        if (!rays.num_events)
-            std::cout << "No events were recorded!" << std::endl;
-        else {
-            bool isCSV = m_CommandParser->m_args.m_csvFlag;
-
-            std::filesystem::path outputPath;
-            if (!m_CommandParser->m_args.m_outPath.empty()) {
-                outputPath = m_CommandParser->m_args.m_outPath;
-            } else {
-                outputPath = path;
-                outputPath.replace_extension("");  // strip .rml
-            }
-            outputPath.replace_extension(isCSV ? ".csv" : ".h5");
-
-            // Error handling in case provided path does not exist
-            auto parent = outputPath.parent_path();
-            if (!parent.empty() && !std::filesystem::exists(parent)) {
-                RAYX_EXIT << "Output directory '" << parent.string() << "' does not exist. Create it first or use a different -o path.";
-            }
-
-            auto element_names = m_Beamline->getElementNames();
-            auto file = exportRays(rays, element_names, isCSV, outputPath, attr);
-
-            // Plot
-            if (m_CommandParser->m_args.m_plotFlag) {
-                if (isCSV) {
-                    RAYX_WARN << "You can only plot .h5 files!";
-                    RAYX_EXIT << "Have you selected .csv exporting?";
-                }
-
-                auto cmd =
-                    std::string("python ") + RAYX::ResourceHandler::getInstance().getResourcePath("Scripts/plot.py").string() + " " + file.string();
-                auto ret = system(cmd.c_str());
-                if (ret != 0) {
-                    RAYX_WARN << "received error code while printing";
-                }
-            }
-        }
+        traceRmlAndExportRays(path);
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
 }
 
+void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
+    using namespace std::chrono;
+    const auto start_time = steady_clock::now();
+
+    std::cout << "Processing: " << inputFilepath << std::endl;
+
+    // record mask for attributes. determine which ray attributes should be recorded
+    const auto attr = RAYX::rayAttrStringsToRayAttrMask(m_cliArgs.format);
+
+    const auto beamline = loadBeamline(inputFilepath);
+
+    const auto rays = traceBeamline(beamline, attr);
+
+    if (!rays.num_events)
+        std::cout << "No events were recorded!" << std::endl;
+    else {
+        // TODO: write object names instead of element names (include sources)
+        const auto sourceNames = beamline.getSourceNames();
+        const auto elementNames = beamline.getElementNames();
+        auto outputFilepath = exportRays(inputFilepath, sourceNames, elementNames, rays, attr);
+
+        const auto end_time = steady_clock::now();
+        const auto elapsed_time = duration_cast<milliseconds>(end_time - start_time).count();
+        std::cout << "Finished in " << elapsed_time << "ms. Exported rays to: " << fs::absolute(outputFilepath) << std::endl;
+    }
+}
+
+RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
+    auto beamline = RAYX::importBeamline(filepath);
+
+    // override number of rays for all sources
+    if (m_cliArgs.numberOfRays) {
+        beamline.traverse([n = *m_cliArgs.numberOfRays](RAYX::BeamlineNode& node) -> bool {
+            if (node.isSource()) {
+                auto* source = static_cast<RAYX::DesignSource*>(&node);
+                source->setNumberOfRays(n);
+            }
+            return false;
+        });
+    }
+
+    return beamline;
+}
+
+RAYX::RaySoA TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrFlag attr) {
+    // dump beamline objects
+    if (RAYX::getDebugVerbose()) {
+        dumpBeamlineObjects(&beamline);
+    }
+
+    const size_t numObjects = beamline.numObjects();
+
+    // record mask for elements. determine which elements should be recorded
+    auto recordMask =
+        m_cliArgs.recordIndices.empty() ? RAYX::recordMaskAll(numObjects) : RAYX::recordMaskByIndices(numObjects, m_cliArgs.recordIndices);
+
+    if (m_cliArgs.recordIndices.empty()) {
+        RAYX_VERB << "Record indices is empty. Defaulting to recording all elements";
+    }
+
+    if (RAYX::getDebugVerbose()) {
+        const auto objectNames = beamline.getObjectNames();
+        RAYX_VERB << "Recording objects:";
+        for (int i = 0; i < static_cast<int>(recordMask.size()); ++i) {
+            if (recordMask[i]) {
+                RAYX_VERB << "\t- [" << i << "] '" << objectNames[i] << "'";
+            };
+        }
+    }
+
+    // sequential / non-sequential tracing
+    RAYX::Sequential seq = m_cliArgs.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+
+    // max events to record per ray path
+    const int maxEvents = m_cliArgs.maxEvents ? *m_cliArgs.maxEvents : RAYX::Tracer::defaultMaxEvents(&beamline);
+
+    // max batch size
+    uint64_t batchSize = m_cliArgs.batchSize ? *m_cliArgs.batchSize : RAYX::DEFAULT_BATCH_SIZE;
+
+    // do the trace
+    const auto rays = m_tracer->trace(beamline, seq, batchSize, maxEvents, recordMask, attr);
+
+    return rays;
+}
+
 void TerminalApp::run() {
     RAYX_VERB << "TerminalApp running...";
 
-    /////////////////// Argument Parser
-    m_CommandParser = std::make_unique<CommandParser>(m_argc, m_argv);
-    // Check correct use (This will exit if error)
-    m_CommandParser->analyzeCommands();
-
-    if (!m_CommandParser->m_args.m_dump.empty()) {
-        const auto filename = m_CommandParser->m_args.m_dump;
-        const auto filepath = std::filesystem::path(filename);
+    if (m_cliArgs.dump) {
+        const auto filename = *m_cliArgs.dump;
+        const auto filepath = fs::path(filename);
         const auto filetype = filepath.extension();
 
         if (filetype == ".rml")
@@ -253,70 +249,80 @@ void TerminalApp::run() {
         return;
     }
 
-    if (m_CommandParser->m_args.m_verbose) {
+    if (m_cliArgs.verbose) {
         RAYX::setDebugVerbose(true);
     }
 
-    if (m_CommandParser->m_args.m_isFixSeed) {
-        if (m_CommandParser->m_args.m_seed != -1) {
-            RAYX::fixSeed(m_CommandParser->m_args.m_seed);
-        } else
-            RAYX::fixSeed(RAYX::FIXED_SEED);
-
+    if (m_cliArgs.defaultSeed) {
+        RAYX::fixSeed(RAYX::FIXED_SEED);
+    } else if (m_cliArgs.seed) {
+        RAYX::fixSeed(*m_cliArgs.seed);
     } else {
         RAYX::randomSeed();
     }
 
-    if (m_CommandParser->m_args.m_benchmark) {
+    if (m_cliArgs.benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
         RAYX::BENCH_FLAG = true;
-    }
-    /////////////////// Argument treatement
-    if (m_CommandParser->m_args.m_version) {
-        m_CommandParser->getVersion();
-        exit(0);
     }
 
     auto argToDeviceType = [&] {
         using DeviceType = RAYX::DeviceConfig::DeviceType;
-        if (m_CommandParser->m_args.m_cpuFlag == m_CommandParser->m_args.m_gpuFlag) return DeviceType::All;
-        return m_CommandParser->m_args.m_cpuFlag ? DeviceType::Cpu : DeviceType::Gpu;
+        if (m_cliArgs.cpu == m_cliArgs.gpu) return DeviceType::All;
+        return m_cliArgs.cpu ? DeviceType::Cpu : DeviceType::Gpu;
     };
 
     auto deviceType = argToDeviceType();
 
-    if (m_CommandParser->m_args.m_listDevices) {
+    if (m_cliArgs.listDevices) {
         RAYX::DeviceConfig(deviceType).dumpDevices();
         exit(0);
     }
 
     // Choose Hardware
     auto getDevice = [&] {
-        if (m_CommandParser->m_args.m_deviceID != -1) {
-            return RAYX::DeviceConfig(deviceType).enableDeviceByIndex(m_CommandParser->m_args.m_deviceID);
+        if (m_cliArgs.deviceId) {
+            return RAYX::DeviceConfig(deviceType).enableDeviceByIndex(*m_cliArgs.deviceId);
         } else {
             return RAYX::DeviceConfig(deviceType).enableBestDevice();
         }
     };
-    m_Tracer = std::make_unique<RAYX::Tracer>(getDevice());
+    m_tracer = std::make_unique<RAYX::Tracer>(getDevice());
 
-    // Trace, export and plot
-    tracePath(m_CommandParser->m_args.m_providedFile);
+    if (!m_cliArgs.inputPaths.size()) RAYX_EXIT << "Please provide an input RML file or directory. Use --help for more information";
+
+    // trace and export
+    for (const auto path : m_cliArgs.inputPaths) tracePath(path);
 }
 
-std::filesystem::path TerminalApp::exportRays(const RAYX::RaySoA& rays, const std::vector<std::string>& element_names, bool isCSV,
-                                              const std::filesystem::path& path, const RAYX::RayAttrFlag attr) {
+fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vector<std::string>& sourceNames, const std::vector<std::string>& elementNames, const RAYX::RaySoA& rays,
+                                 const RAYX::RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    if (isCSV) {
-        writeCsv(RAYX::raySoAToBundleHistory(rays), path.string());
+    fs::path outputFilepath;
+    if (m_cliArgs.outputPath) {
+        outputFilepath = *m_cliArgs.outputPath;
+        if (fs::is_directory(outputFilepath)) outputFilepath /= inputFilepath.filename();
+    } else {
+        outputFilepath = inputFilepath;
+    }
+    outputFilepath.replace_extension(m_cliArgs.csv ? ".csv" : ".h5");
+
+    // Error handling in case provided path does not exist
+    auto parent = outputFilepath.parent_path();
+    if (!parent.empty() && !fs::exists(parent)) {
+        RAYX_EXIT << "Output directory '" << parent.string() << "' does not exist. Create it first or use a different output path.";
+    }
+
+    if (m_cliArgs.csv) {
+        writeCsv(RAYX::raySoAToBundleHistory(rays), outputFilepath.string());
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
-        writeH5RaySoA(path, element_names, rays, attr);
+        writeH5RaySoA(outputFilepath, sourceNames, elementNames, rays, attr);
 #endif
     }
 
-    return path;
+    return outputFilepath;
 }

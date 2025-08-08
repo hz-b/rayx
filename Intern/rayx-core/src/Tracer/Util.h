@@ -5,8 +5,12 @@
 #include <vector>
 
 #include "Debug/Instrumentor.h"
+#include "Shader/Rand.h"
 
 namespace RAYX {
+
+template <typename Acc, typename T>
+using OptBuf = std::optional<alpaka::Buf<Acc, T, alpaka::DimInt<1>, int32_t>>;
 
 inline int ceilIntDivision(const int dividend, const int divisor) { return (divisor + dividend - 1) / divisor; }
 
@@ -58,18 +62,35 @@ inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, 
     }
 }
 
-struct ExactBlockSizeConstraint {
+namespace BlockSizeConstraint {
+
+struct None {};
+
+struct Exact {
     int value;
 };
-struct MaxBlockSizeConstraint {
+
+struct AtLeast {
     int value;
 };
-using BlockSizeConstraintVariant = std::variant<std::monostate, ExactBlockSizeConstraint, MaxBlockSizeConstraint>;
+
+struct AtMost {
+    int value;
+};
+
+struct InRange {
+    int atLeast;
+    int atMost;
+};
+
+using Variant = std::variant<None, Exact, AtLeast, AtMost, InRange>;
+
+}  // namespace BlockSizeConstraint
 
 // TODO: maybe make a PR to alpaka for alpaka::Acc<Dev> to extract Acc from DevAcc (= Dev<Platform<Acc>>)
 template <typename Acc, typename DevAcc, typename Queue, typename Kernel, typename... Args>
-inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraintVariant blockSizeConstraint, const Kernel& kernel,
-                                 Args&&... args) {
+inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraint::Variant blockSizeConstraint,
+                                 const Kernel& kernel, Args&&... args) {
     const auto conf = alpaka::KernelCfg<Acc>{
         .gridElemExtent = numElements,
         .threadElemExtent = 1,
@@ -78,22 +99,35 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
 
     auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
     std::visit(
-        [&]<typename ConstraintType>(ConstraintType constraint) {
-            if constexpr (std::is_same_v<ConstraintType, ExactBlockSizeConstraint>) {
-                assert(workDiv.m_blockThreadExtent[0] <= constraint.value);
+        [&]<typename BlockSizeConstraintType>(BlockSizeConstraintType constraint) {
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::Exact>) {
+                assert(workDiv.m_blockThreadExtent[0] <= constraint.value && "BlockSizeConstraint::Exact exceeds the capabilities this device");
                 workDiv.m_blockThreadExtent = constraint.value;
                 workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
             }
-            if constexpr (std::is_same_v<ConstraintType, MaxBlockSizeConstraint>) {
+
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::AtMost>) {
                 if (constraint.value < workDiv.m_blockThreadExtent[0]) {
                     workDiv.m_blockThreadExtent = constraint.value;
                     workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
                 }
             }
+
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::AtLeast>) {
+                assert(constraint.value <= workDiv.m_blockThreadExtent[0] && "BlockSizeConstraint::AtLeast exceeds the capabilities this device");
+            }
+
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::InRange>) {
+                assert(constraint.atLeast <= workDiv.m_blockThreadExtent[0] && "BlockSizeConstraint::InRange exceeds capabilities of this device");
+                if (constraint.atMost < workDiv.m_blockThreadExtent[0]) {
+                    workDiv.m_blockThreadExtent = constraint.atMost;
+                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.atMost);
+                }
+            }
         },
         blockSizeConstraint);
 
-    RAYX_VERB << "executing kernel with launch config: "
+    RAYX_VERB << "execute kernel with launch config: "
               << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
               << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
               << "elements = " << workDiv.m_threadElemExtent[0];

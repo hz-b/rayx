@@ -3,8 +3,8 @@
 #include <filesystem>
 #include <memory>
 
-#include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
+
 namespace RAYX {
 
 DesignSource::DesignSource(DesignSource&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
@@ -18,37 +18,6 @@ std::unique_ptr<BeamlineNode> DesignSource::clone() const {
     DesignSource clone;
     clone.m_elementParameters = m_elementParameters.clone();
     return std::make_unique<DesignSource>(std::move(clone));
-}
-
-std::vector<Ray> DesignSource::compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const {
-    // Apply group transformations
-    glm::dvec4 position = groupOrientation * getPosition() + groupPosition;
-    glm::dmat4 orientation = groupOrientation * getOrientation();
-
-    // Create a temporary copy with world instead of local pos/ori
-    std::unique_ptr<BeamlineNode> ds = this->clone();
-    DesignSource* dsPtr = static_cast<DesignSource*>(ds.get());
-    dsPtr->setPosition(position);
-    dsPtr->setOrientation(orientation);
-
-    switch (dsPtr->getType()) {
-        case ElementType::PointSource:
-            return PointSource(*dsPtr).getRays(numThreads);
-        case ElementType::MatrixSource:
-            return MatrixSource(*dsPtr).getRays(numThreads);
-        case ElementType::DipoleSource:
-            return DipoleSource(*dsPtr).getRays(numThreads);
-        case ElementType::DipoleSrc:
-            return DipoleSource(*dsPtr).getRays(numThreads);
-        case ElementType::PixelSource:
-            return PixelSource(*dsPtr).getRays(numThreads);
-        case ElementType::CircleSource:
-            return CircleSource(*dsPtr).getRays(numThreads);
-        case ElementType::SimpleUndulatorSource:
-            return SimpleUndulatorSource(*dsPtr).getRays(numThreads);
-        default:
-            throw std::runtime_error("Unknown source type");
-    }
 }
 
 void DesignSource::setName(std::string s) { m_elementParameters["name"] = s; }
@@ -227,8 +196,8 @@ void DesignSource::setSeparateEnergies(int value) { m_elementParameters["Separat
 void DesignSource::setPhotonFlux(double value) { m_elementParameters["photonFlux"] = value; }
 double DesignSource::getPhotonFlux() const { return m_elementParameters["photonFlux"].as_double(); }
 
-EnergyDistribution DesignSource::getEnergyDistribution() const {
-    EnergyDistribution en;
+EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
+    EnergyDistributionVariant en;
     SpreadType spreadType = m_elementParameters["energyDistribution"].as_energySpreadType();
     EnergyDistributionType energyDistributionType = m_elementParameters["energyDistributionType"].as_energyDistributionType();
 
@@ -239,7 +208,7 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
         DatFile::load(filename, &df);
 
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
-        en = EnergyDistribution(df);
+        en = EnergyDistributionVariant(df);
 
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy = m_elementParameters["energy"].as_double();
@@ -249,7 +218,7 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
             if (energySpread == 0) {
                 energySpread = 1;
             }
-            en = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+            en = EnergyDistributionVariant(SoftEdge(photonEnergy, energySpread));
 
         } else if (spreadType == SpreadType::SeparateEnergies) {
             int numOfEnergies;
@@ -259,9 +228,9 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
                 numOfEnergies = m_elementParameters["SeparateEnergies"].as_int();
             }
             numOfEnergies = abs(numOfEnergies);
-            en = EnergyDistribution(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
+            en = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else {
-            en = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+            en = EnergyDistributionVariant(HardEdge(photonEnergy, energySpread));
         }
 
     } else {
@@ -272,8 +241,8 @@ EnergyDistribution DesignSource::getEnergyDistribution() const {
     return en;
 }
 
-void DesignSource::setNumberOfRays(double value) { m_elementParameters["numberOfRays"] = value; }
-double DesignSource::getNumberOfRays() const { return m_elementParameters["numberOfRays"].as_double(); }
+void DesignSource::setNumberOfRays(int value) { m_elementParameters["numberOfRays"] = value; }
+int DesignSource::getNumberOfRays() const { return m_elementParameters["numberOfRays"].as_int(); }
 
 void DesignSource::setNumOfCircles(int value) { m_elementParameters["numOfCircles"] = value; }
 

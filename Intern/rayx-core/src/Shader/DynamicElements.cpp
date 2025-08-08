@@ -8,18 +8,25 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEvents) {
-    auto ray = inv.rays[gid];
-    auto rand = Rand(gid + inv.batchStartRayIndex, inv.numRaysTotal, inv.randomSeed);
+void dynamicElements(const int gid, const ConstState& constState, MutableState& mutableState) {
+    auto ray = constState.rays[gid];
+
+    int numRecorded = 0;
+    if (constState.recordMask.shouldRecordSource(ray.m_sourceID)) {
+        recordEvent(mutableState.events, ray, getRecordIndex(gid, numRecorded, constState.maxEvents));
+        ++numRecorded;
+    }
+
+    auto rand = std::move(mutableState.rands[gid]);
 
     // Iterate through all bounces
-    int numRecorded = 0;
     bool colNotFound = false;
-    for (int bounce = 0; bounce < inv.maxEvents; ++bounce) {
+    for (int bounce = 0; bounce < constState.maxEvents; ++bounce) {
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
         if (!isRayActive(ray.m_eventType)) break;
 
-        Collision col = findCollision(bounce, inv.sequential, ray.m_position, ray.m_direction, inv.elements, inv.numElements, rand);
+        Collision col =
+            findCollision(bounce, constState.sequential, ray.m_position, ray.m_direction, constState.elements, constState.numElements, rand);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!
@@ -28,7 +35,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         }
 
         // transform ray and intersection point in ELEMENT coordiantes
-        const auto element = inv.elements[col.elementIndex];
+        const auto element = constState.elements[col.elementIndex];
         ray = rayMatrixMult(element.m_inTrans, ray);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
@@ -41,7 +48,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
 
         switch (behaviour.m_type) {
             case BehaveType::Mirror:
-                ray = behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
+                ray = behaveMirror(ray, col, element.m_material, constState.materialIndices, constState.materialTables);
                 break;
             case BehaveType::Grating:
                 ray = behaveGrating(ray, behaviour, col);
@@ -59,13 +66,13 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
                 ray = behaveImagePlane(ray);
                 break;
             case BehaveType::Foil:
-                ray = behaveFoil(ray, behaviour, col, element.m_material, inv.materialIndices, inv.materialTables);
+                ray = behaveFoil(ray, behaviour, col, element.m_material, constState.materialIndices, constState.materialTables);
                 break;
         }
 
         // write ray in local element coordinates to global memory
-        if (numRecorded < inv.maxEvents && (!inv.recordMask || inv.recordMask[col.elementIndex])) {
-            recordEvent(outputEvents.events, ray, getRecordIndex(gid, numRecorded, inv.maxEvents));
+        if (numRecorded < constState.maxEvents && (constState.recordMask.shouldRecordElement(col.elementIndex))) {
+            recordEvent(mutableState.events, ray, getRecordIndex(gid, numRecorded, constState.maxEvents));
             ++numRecorded;
         }
 
@@ -74,16 +81,16 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
     }
 
     // check if the number of events exceeds capacity
-    if (!colNotFound && inv.sequential == Sequential::No && isRayActive(ray.m_eventType)) {
-        Collision col = findCollisionNonSequential(ray.m_position, ray.m_direction, inv.elements, inv.numElements, rand);
-        if (col.found && (!inv.recordMask || inv.recordMask[col.elementIndex])) {
+    if (!colNotFound && constState.sequential == Sequential::No && isRayActive(ray.m_eventType)) {
+        Collision col = findCollisionNonSequential(ray.m_position, ray.m_direction, constState.elements, constState.numElements, rand);
+        if (col.found && (constState.recordMask.shouldRecordElement(col.elementIndex))) {
             ray = terminateRay(ray, EventType::TooManyEvents);
-            recordEvent(outputEvents.events, ray, getRecordIndex(gid, inv.maxEvents, inv.maxEvents - 1));
+            recordEvent(mutableState.events, ray, getRecordIndex(gid, numRecorded, constState.maxEvents));
         }
     }
 
     // store recorded events count
-    outputEvents.eventCounts[gid] = numRecorded;
+    mutableState.eventCounts[gid] = numRecorded;
 }
 
 }  // namespace RAYX

@@ -8,7 +8,7 @@
 #include "Angle.h"
 #include "Beamline/Beamline.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Beamline/LightSource.h"
+#include "Beamline/StringConversion.h"
 #include "Debug/Debug.h"
 #include "Element/Element.h"
 #include "Shader/Constants.h"
@@ -299,7 +299,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
-bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out) {
+bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistributionVariant* out) {
     if (!node || !out) {
         return false;
     }
@@ -338,7 +338,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             return false;
         }
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
-        *out = EnergyDistribution(df);
+        *out = EnergyDistributionVariant(df);
         return true;
 
     } else if (energyDistributionType == EnergyDistributionType::Values) {
@@ -356,7 +356,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
             if (energySpread == 0) {
                 energySpread = 1;
             }
-            *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
+            *out = EnergyDistributionVariant(SoftEdge(photonEnergy, energySpread));
 
         } else if (spreadType == SpreadType::SeparateEnergies) {
             int numOfEnergies;
@@ -365,9 +365,9 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
                 numOfEnergies = 3;
             }
             numOfEnergies = abs(numOfEnergies);
-            *out = EnergyDistribution(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
+            *out = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else {
-            *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
+            *out = EnergyDistributionVariant(HardEdge(photonEnergy, energySpread));
         }
 
         return true;
@@ -455,7 +455,7 @@ const char* Parser::name() const { return node->first_attribute("name")->value()
 
 ElementType Parser::type() const {
     const char* val = node->first_attribute("type")->value();
-    return findElementString(std::string(val));
+    return StringToElementType.at(std::string(val));
 }
 
 // parsers for fundamental types
@@ -516,8 +516,8 @@ std::array<double, 6> Parser::parseVls() const {
     return x;
 }
 
-EnergyDistribution Parser::parseEnergyDistribution() const {
-    EnergyDistribution x;
+EnergyDistributionVariant Parser::parseEnergyDistribution() const {
+    EnergyDistributionVariant x;
     if (!paramEnergyDistribution(node, rmlFile, &x)) {
         RAYX_EXIT << "parseEnergyDistribution failed";
     }

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 
-#include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "Beamline/Objects/MatrixSource.h"
 #include "Element/Element.h"
 #include "RenderObject.h"
 

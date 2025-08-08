@@ -44,6 +44,7 @@ class RAYX_API Group : public BeamlineNode {
     void addChild(std::unique_ptr<BeamlineNode> child);
     size_t numElements() const;
     size_t numSources() const;
+    size_t numObjects() const;
 
     /**
      * @brief Creates a deep copy of this group and its children.
@@ -91,17 +92,6 @@ class RAYX_API Group : public BeamlineNode {
     std::vector<OpticalElement> compileElements() const;
 
     /**
-     * @brief Recursively gathers Rays from all DesignSource nodes in the Group.
-     *
-     * Applies position/orientation transforms at each level. This method can be multithreaded
-     * if the design source compilation supports concurrency.
-     *
-     * @param thread_count Number of threads to use for sources' compilation.
-     * @return A vector of Rays from all sources.
-     */
-    std::vector<Ray> compileSources(int thread_count = 1) const;
-
-    /**
      * @brief Gathers the world positions of all light sources within a Group hierarchy.
      *
      * @param group       A reference to the current Group to process.
@@ -116,6 +106,7 @@ class RAYX_API Group : public BeamlineNode {
     std::vector<const DesignSource*> getSources() const;
     std::vector<std::string> getElementNames() const;
     std::vector<std::string> getSourceNames() const;
+    std::vector<std::string> getObjectNames() const;
     const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
     glm::dvec4 getPosition() const override { return m_position; }
     glm::dmat4 getOrientation() const override { return m_orientation; }

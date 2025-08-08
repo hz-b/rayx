@@ -5,7 +5,6 @@
 #include <sstream>
 #include <type_traits>
 
-#include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Debug/Debug.h"
