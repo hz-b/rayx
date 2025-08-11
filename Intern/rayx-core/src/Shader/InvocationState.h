@@ -3,6 +3,7 @@
 
 #include "Element/Element.h"
 #include "Ray.h"
+#include "Rand.h"
 
 namespace RAYX {
 
@@ -11,13 +12,9 @@ namespace RAYX {
 /// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
 enum class Sequential { No, Yes };
 
-// The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
-struct RAYX_API InvState {
-    int numRaysTotal;
-    int batchSize;
-    int batchStartRayIndex;
+/// stores all constant buffers
+struct RAYX_API ConstState {
     int maxEvents;
-    double randomSeed;
     Sequential sequential = Sequential::No;
 
     OpticalElement* elements;
@@ -28,9 +25,11 @@ struct RAYX_API InvState {
     Ray* rays;
 };
 
-struct RAYX_API OutputEvents {
+/// stores all mutable buffers
+struct RAYX_API MutableState {
     Ray* events;
     int* eventCounts;
+    Rand* rands;
 };
 
 }  // namespace RAYX

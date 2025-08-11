@@ -23,7 +23,6 @@ RAYX_FN_ACC double RAYX_API squaresDoubleRNG(uint64_t& ctr);
 // mu and standard deviation sigma
 RAYX_FN_ACC double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma);
 
-// TODO: RAII: write to gmem on destruction
 struct Rand {
     Rand() noexcept {}
 
@@ -46,6 +45,11 @@ struct Rand {
 
     RAYX_FN_ACC
     uint64_t randomInt() { return squares64(m_ctr); }
+
+    RAYX_FN_ACC
+    int randomIntInRange(int min_inclusive, int max_exclusive) {
+        return min_inclusive + squares64(m_ctr) % (max_exclusive + 1 - min_inclusive);
+    }
 
     RAYX_FN_ACC
     double randomDouble() { return squaresDoubleRNG(m_ctr); }

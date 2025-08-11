@@ -3,6 +3,7 @@
 #include "Beamline/Node.h"
 #include "Element/Element.h"
 #include "Value.h"
+#include "Beamline/Misalignment.h"
 
 namespace RAYX {
 

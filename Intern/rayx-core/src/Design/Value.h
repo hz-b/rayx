@@ -9,12 +9,12 @@
 // Include your other dependencies.
 #include "Angle.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Beamline/LightSource.h"
 #include "Core.h"
 #include "Debug/Debug.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
+#include "Rml/xml.h"
 
 namespace RAYX {
 

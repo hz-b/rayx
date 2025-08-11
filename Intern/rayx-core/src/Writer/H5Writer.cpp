@@ -94,14 +94,14 @@ BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
 
 void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, const RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: "
+    RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: "
               << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
 #define X(type, name, flag, map)                                                           \
-    RAYX_VERB << "writing ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+    RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) file.createDataSet("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR

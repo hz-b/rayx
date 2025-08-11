@@ -5,8 +5,12 @@
 #include <vector>
 
 #include "Debug/Instrumentor.h"
+#include "Shader/Rand.h"
 
 namespace RAYX {
+
+template <typename Acc, typename T>
+using OptBuf = std::optional<alpaka::Buf<Acc, T, alpaka::DimInt<1>, int32_t>>;
 
 inline int ceilIntDivision(const int dividend, const int divisor) { return (divisor + dividend - 1) / divisor; }
 
@@ -58,18 +62,35 @@ inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, 
     }
 }
 
-struct ExactBlockSizeConstraint {
+namespace BlockSizeConstraint {
+
+struct None {};
+
+struct Exact {
     int value;
 };
-struct MaxBlockSizeConstraint {
+
+struct AtLeast {
     int value;
 };
-using BlockSizeConstraintVariant = std::variant<std::monostate, ExactBlockSizeConstraint, MaxBlockSizeConstraint>;
+
+struct AtMost {
+    int value;
+};
+
+struct InRange {
+    int atLeast;
+    int atMost;
+};
+
+using Variant = std::variant<None, Exact, AtLeast, AtMost, InRange>;
+
+}  // namespace BlockSizeConstraint
 
 // TODO: maybe make a PR to alpaka for alpaka::Acc<Dev> to extract Acc from DevAcc (= Dev<Platform<Acc>>)
 template <typename Acc, typename DevAcc, typename Queue, typename Kernel, typename... Args>
-inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraintVariant blockSizeConstraint, const Kernel& kernel,
-                                 Args&&... args) {
+inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraint::Variant blockSizeConstraint,
+                                 const Kernel& kernel, Args&&... args) {
     const auto conf = alpaka::KernelCfg<Acc>{
         .gridElemExtent = numElements,
         .threadElemExtent = 1,
@@ -78,22 +99,35 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
 
     auto workDiv = alpaka::getValidWorkDiv(conf, devAcc, kernel, std::forward<Args>(args)...);
     std::visit(
-        [&]<typename ConstraintType>(ConstraintType constraint) {
-            if constexpr (std::is_same_v<ConstraintType, ExactBlockSizeConstraint>) {
-                assert(workDiv.m_blockThreadExtent[0] <= constraint.value);
+        [&]<typename BlockSizeConstraintType>(BlockSizeConstraintType constraint) {
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::Exact>) {
+                assert(workDiv.m_blockThreadExtent[0] <= constraint.value && "BlockSizeConstraint::Exact exceeds the capabilities this device");
                 workDiv.m_blockThreadExtent = constraint.value;
                 workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
             }
-            if constexpr (std::is_same_v<ConstraintType, MaxBlockSizeConstraint>) {
+
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::AtMost>) {
                 if (constraint.value < workDiv.m_blockThreadExtent[0]) {
                     workDiv.m_blockThreadExtent = constraint.value;
                     workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
                 }
             }
+
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::AtLeast>) {
+                assert(constraint.value <= workDiv.m_blockThreadExtent[0] && "BlockSizeConstraint::AtLeast exceeds the capabilities this device");
+            }
+
+            if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::InRange>) {
+                assert(constraint.atLeast <= workDiv.m_blockThreadExtent[0] && "BlockSizeConstraint::InRange exceeds capabilities of this device");
+                if (constraint.atMost < workDiv.m_blockThreadExtent[0]) {
+                    workDiv.m_blockThreadExtent = constraint.atMost;
+                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.atMost);
+                }
+            }
         },
         blockSizeConstraint);
 
-    RAYX_VERB << "executing kernel with launch config: "
+    RAYX_VERB << "execute kernel with launch config: "
               << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
               << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
               << "elements = " << workDiv.m_threadElemExtent[0];
@@ -176,6 +210,38 @@ struct CompactRaysToRaySoAKernel {
 
             RAYX_X_MACRO_RAY_ATTR_MAPPED
 #undef X
+        }
+    }
+};
+
+RAYX_FN_ACC
+inline int binarySearchPrefix(const double* prefix, int n, double r) {
+    int left = 0;
+    int right = n - 1;
+    while (left < right) {
+        const int mid = (left + right) >> 1;  // divide by 2
+        if (prefix[mid] > r)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left;
+}
+
+struct WeightedPickKernel {
+    template <typename Acc, typename T>
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, T* __restrict outputValues, const double* __restrict prefixWeights, const int numWeights,
+                                const double sumWeights, const T* __restrict inputValues, Rand* __restrict rands, const int n) const {
+        const int gid = blockIdx.x * blockDim.x + threadIdx.x;
+
+        if (gid < n) {
+            const double r = rands[gid].randomDouble() * sumWeights;
+
+            // Binary search in prefix sums
+            const int index = binarySearchPrefix(prefixWeights, numWeights, r);
+
+            // Store corresponding value
+            outputValues[gid] = inputValues[index];
         }
     }
 };

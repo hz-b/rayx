@@ -18,6 +18,7 @@
 #include "Writer/CsvWriter.h"
 #include "Writer/Format.h"
 #include "Writer/H5Writer.h"
+#include "Beamline/StringConversion.h"
 
 namespace {
 
@@ -31,7 +32,7 @@ void dumpBeamline(const std::filesystem::path& filepath) {
 
     int objectIndex = 0;
     for (const auto* source : sources) {
-        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << RAYX::elementTypeToString(source->getType())
+        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << RAYX::ElementTypeToString.at(source->getType())
                   << ", number of rays: " << source->getNumberOfRays() << ")" << std::endl;
         ++objectIndex;
     }
@@ -42,8 +43,8 @@ void dumpBeamline(const std::filesystem::path& filepath) {
     std::cout << "\telements (" << elements.size() << "):" << std::endl;
 
     for (const auto& element : elements) {
-        const auto curvature = RAYX::curvatureTypeToString(element->getCurvatureType());
-        const auto behaviour = RAYX::behaviourTypeToString(element->getBehaviourType());
+        const auto curvature = RAYX::CurvatureTypeToString.at(element->getCurvatureType());
+        const auto behaviour = RAYX::BehaviourTypeToString.at(element->getBehaviourType());
         std::cout << "\t- [" << objectIndex << "] '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")"
                   << std::endl;
         ++objectIndex;

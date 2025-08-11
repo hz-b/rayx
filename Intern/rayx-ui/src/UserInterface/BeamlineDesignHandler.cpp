@@ -143,16 +143,16 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     // type,geometricalShape and openingShape need to be a drowdown instead of a string/int input
     if (key == "type") {
         auto currentEl = element.as_elementType();
-        int currentItem = int(std::distance(RAYX::ElementStringMap.begin(), RAYX::ElementStringMap.find(currentEl)));
+        int currentItem = int(std::distance(RAYX::ElementTypeToString.begin(), RAYX::ElementTypeToString.find(currentEl)));
 
         static bool isDisabled = true;  // TODO: Enable after SRI release has been built
         if (true) {
             ImGui::BeginDisabled();
         }
 
-        if (ImGui::BeginCombo("##combo", currentItem >= 0 ? RAYX::ElementStringMap[currentEl].c_str() : "")) {
+        if (ImGui::BeginCombo("##combo", currentItem >= 0 ? RAYX::ElementTypeToString.at(currentEl).c_str() : "")) {
             [[maybe_unused]] int n = 0;
-            for (const auto& pair : RAYX::ElementStringMap) {
+            for (const auto& pair : RAYX::ElementTypeToString) {
                 bool isSelected = (currentEl == pair.first);
                 if (ImGui::Selectable(pair.second.c_str(), isSelected)) {
                     element = pair.first;

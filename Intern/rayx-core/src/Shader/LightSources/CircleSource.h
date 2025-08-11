@@ -1,22 +1,21 @@
 #pragma once
 
-#include "Beamline/LightSource.h"
+#include "LightSource.h"
+#include "Shader/Rand.h"
 
 namespace RAYX {
 
-class RAYX_API CircleSource : public LightSource {
+class RAYX_API ModelCircleSource : public ModelLightSource {
   public:
-    CircleSource(const DesignSource&);
-    virtual ~CircleSource() = default;
+    ModelCircleSource(const DesignSource&);
 
-    std::vector<Ray> getRays(int thread_count = 1) const override;
+    RAYX_FN_ACC Ray genRay(const SourceId sourceId, Rand& __restrict rand) const;
 
-    glm::dvec3 getDirection() const;
+    RAYX_FN_ACC glm::dvec3 getDirection(Rand& __restrict rand) const;
 
   private:
     // Geometric Params
     // SourcePulseType m_sourceDistributionType;  // TODO unused.
-    Misalignment m_misalignment;
 
     glm::dvec4 m_stokes;
 

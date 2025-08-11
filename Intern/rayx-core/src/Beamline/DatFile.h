@@ -33,8 +33,5 @@ struct DatFile {
 
     /** creates a valid .DAT file from this struct (may be used for testing) */
     [[maybe_unused]] std::string dump();
-
-    /** samples from the distribution given by the .DAT file */
-    double selectEnergy() const;
 };
 }  // namespace RAYX

@@ -91,17 +91,6 @@ class RAYX_API Group : public BeamlineNode {
     std::vector<OpticalElement> compileElements() const;
 
     /**
-     * @brief Recursively gathers Rays from all DesignSource nodes in the Group.
-     *
-     * Applies position/orientation transforms at each level. This method can be multithreaded
-     * if the design source compilation supports concurrency.
-     *
-     * @param thread_count Number of threads to use for sources' compilation.
-     * @return A vector of Rays from all sources.
-     */
-    std::vector<Ray> compileSources(int thread_count = 1) const;
-
-    /**
      * @brief Gathers the world positions of all light sources within a Group hierarchy.
      *
      * @param group       A reference to the current Group to process.
