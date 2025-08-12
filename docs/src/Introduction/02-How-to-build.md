@@ -1,18 +1,19 @@
-# How to Build
+#How to Build
 
 For building and running the project, we recommend using [Visual Studio Code](https://code.visualstudio.com/) (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the `compile.sh` script can be used for compilation (see [using compile.sh](#using-compile.sh)).
 
 ## CMake Options:
 
-| CMake Option                | Default value | Description                                                                                 |
-| -                           | -             | -                                                                                           |
-| `RAYX_ENABLE_OPENMP:BOOL`   | `ON`          | enable search for OpenMP on your system. If found, build with OpenMP for tracing on CPU     |
-| `RAYX_REQUIRES_OPENMP:BOOL` | `OFF`         | require OpenMP to be found on your system. Otherwise throw an error                         |
-| `RAYX_ENABLE_CUDA:BOOL`     | `ON`          | enable search for Cuda on your system. If found, build with Cuda for tracing on GPU         |
-| `RAYX_REQUIRES_CUDA:BOOL`   | `OFF`         | require Cuda to be found on your system. Otherwise throw an error                           |
-| `RAYX_ENABLE_H5:BOOL`       | `ON`          | enable search for HDF5 on your system. If found, build with HDF5 for H5 file format support |
-| `RAYX_REQUIRES_H5:BOOL`     | `OFF`         | require HDF5 to be found on your system. Otherwise throw an error                           |
-| `RAYX_STATIC_LIB:BOOL`      | `OFF`         | This option builds 'rayx-core' as a static library                                          |
+| CMake Option                      | Default value | Description                                                                                   |
+| -                                 | -             | -                                                                                             |
+| `RAYX_ENABLE_OPENMP:BOOL`         | `ON`          | enable search for OpenMP on your system. If found, build with OpenMP for tracing on CPU       |
+| `RAYX_REQUIRES_OPENMP:BOOL`       | `OFF`         | require OpenMP to be found on your system. Otherwise throw an error                           |
+| `RAYX_ENABLE_CUDA:BOOL`           | `ON`          | enable search for Cuda on your system. If found, build with Cuda for tracing on GPU           |
+| `RAYX_REQUIRES_CUDA:BOOL`         | `OFF`         | require Cuda to be found on your system. Otherwise throw an error                             |
+| `RAYX_ENABLE_H5:BOOL`             | `ON`          | enable search for HDF5 on your system. If found, build with HDF5 for H5 file format support   |
+| `RAYX_REQUIRES_H5:BOOL`           | `OFF`         | require HDF5 to be found on your system. Otherwise throw an error                             |
+| `RAYX_STATIC_LIB:BOOL`            | `OFF`         | this option builds 'rayx-core' as a static library                                            |
+| `CMAKE_CUDA_ARCHITECTURES:STRING` | `all-major`   | set the cuda device architectures to build for. by default, build for all major architectures |
 
 ## Cloning the Repository
 
