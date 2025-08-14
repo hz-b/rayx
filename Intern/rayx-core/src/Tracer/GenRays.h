@@ -8,6 +8,7 @@
 #include "Random.h"
 #include "Shader/LightSources/CircleSource.h"
 #include "Shader/LightSources/DipoleSource.h"
+#include "Shader/LightSources/EnergyDistributions/EnergyDistribution.h"
 #include "Shader/LightSources/MatrixSource.h"
 #include "Shader/LightSources/PixelSource.h"
 #include "Shader/LightSources/PointSource.h"
@@ -100,28 +101,30 @@ struct GenRays {
             }
         };
 
-        const auto compileEnergyDistribution = [](const DesignSource& designSource) {
-            // TODO:
-            if (designSource.getType() == ElementType::DipoleSource) return EnergyDistributionDataType::None;
+        const auto compileEnergyDistribution = [](const DesignSource& designSource) -> EnergyDistributionDataVariant {
+            // DipoleSource has no energy distribution
+            if (designSource.getType() == ElementType::DipoleSource) return std::monostate{};
 
-            const auto energyDistributionVariant = designSource.getEnergyDistribution();
-
-            std::visit(
-                []<typename T>(const T& energyDistribution) {
+            return std::visit(
+                []<typename T>(const T& value) -> EnergyDistributionDataVariant {
                     if constexpr (std::is_same_v<T, HardEdge>) {
-                        RAYX_LOG << "HardEdge";
+                        return value;
                     }
                     if constexpr (std::is_same_v<T, SoftEdge>) {
-                        RAYX_LOG << "SoftEdge";
+                        return value;
                     }
                     if constexpr (std::is_same_v<T, SeparateEnergies>) {
-                        RAYX_LOG << "SeparateEnergies";
+                        return value;
                     }
                     if constexpr (std::is_same_v<T, DatFile>) {
-                        RAYX_LOG << "DatFile";
+                        // TODO: implement
+                        return EnergyDistributionList{};
                     }
+
+                    RAYX_EXIT << "error: unimplemented energy distribution type";
+                    return std::monostate{};
                 },
-                energyDistributionVariant);
+                designSource.getEnergyDistribution());
         };
 
         m_numRaysTotal = 0;
@@ -131,7 +134,8 @@ struct GenRays {
         const auto designSources = beamline.getSources();
         for (const auto* designSource : designSources) {
             const auto source = *compileSource(*designSource);
-            // const auto energyDistribution = *compileEnergyDistribution(*designSource);
+            // TODO
+            [[maybe_unused]] const auto energyDistributionDataVariant = compileEnergyDistribution(*designSource);
             const auto numRaysSource = static_cast<int>(designSource->getNumberOfRays());
             m_numRaysTotal += numRaysSource;
 
