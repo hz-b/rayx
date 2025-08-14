@@ -8,10 +8,10 @@
 #include "Angle.h"
 #include "Beamline/Beamline.h"
 #include "Beamline/EnergyDistribution.h"
+#include "Beamline/StringConversion.h"
 #include "Debug/Debug.h"
 #include "Element/Element.h"
 #include "Shader/Constants.h"
-#include "Beamline/StringConversion.h"
 
 namespace RAYX::xml {
 

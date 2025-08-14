@@ -381,7 +381,7 @@ double calcMaxFlux(double photonEnergy, double energySpread, double criticalEner
 
 double calcGamma(double electronEnergy) { return std::fabs(electronEnergy) * get_factorElectronEnergy(); }
 
-ModelDipoleSource::ModelDipoleSource(const DesignSource& dSource)
+DipoleSource::DipoleSource(const DesignSource& dSource)
     : ModelLightSource(dSource),
       m_bendingRadius(dSource.getBendingRadius()),
       m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
@@ -398,7 +398,7 @@ ModelDipoleSource::ModelDipoleSource(const DesignSource& dSource)
     auto rand = Rand(randomUint());
     m_gamma = calcGamma(m_electronEnergy);
     m_verDivergence = calcVerDivergence(m_photonEnergy, m_verEbeamDivergence, m_electronEnergy, m_criticalEnergy);
-    // m_stokes = ModelDipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
+    // m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
     m_maxIntensity = calcMaxIntensity(m_photonEnergy, m_verDivergence, m_electronEnergy, m_criticalEnergy, m_electronEnergyOrientation, rand);
     m_maxFlux = calcMaxFlux(m_photonEnergy, m_energySpread, m_criticalEnergy, m_gamma);
     // m_flux = calcFluxOrg(m_photonEnergy, m_energySpread, dSource.getEnergySpreadUnit(), m_horDivergence, m_stokes);
@@ -414,7 +414,7 @@ ModelDipoleSource::ModelDipoleSource(const DesignSource& dSource)
  * @returns Ray
  */
 RAYX_FN_ACC
-Ray ModelDipoleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray DipoleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     double phi, en;  // phi=horizontal Angle, en=energy
 
     // create ray with random position and divergence within the given span
@@ -457,7 +457,7 @@ Ray ModelDipoleSource::genRay(const SourceId sourceId, Rand& __restrict rand) co
  * chooses y position in given source hight
  * */
 RAYX_FN_ACC
-glm::dvec3 ModelDipoleSource::getXYZPosition(double phi, Rand& __restrict rand) const {
+glm::dvec3 DipoleSource::getXYZPosition(double phi, Rand& __restrict rand) const {
     double x1 = getNormalFromRange(m_sourceWidth, rand);
 
     double sign = m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? -1.0 : 1.0;
@@ -475,7 +475,7 @@ glm::dvec3 ModelDipoleSource::getXYZPosition(double phi, Rand& __restrict rand) 
 
 /// monte-Carlo-method to get normal-distributed x and y Values for getXYZPosition()
 RAYX_FN_ACC
-double ModelDipoleSource::getNormalFromRange(double range, Rand& __restrict rand) const {
+double DipoleSource::getNormalFromRange(double range, Rand& __restrict rand) const {
     double value;
     double Distribution;
 
@@ -493,7 +493,7 @@ double ModelDipoleSource::getNormalFromRange(double range, Rand& __restrict rand
  * chooses photon energy according to the natural energy distribution spectrum by schwinger
  */
 RAYX_FN_ACC
-double ModelDipoleSource::getEnergy(Rand& __restrict rand) const {
+double DipoleSource::getEnergy(Rand& __restrict rand) const {
     double flux = 0.0;
     double energy = 0.0;
 
@@ -508,7 +508,7 @@ double ModelDipoleSource::getEnergy(Rand& __restrict rand) const {
  * chooses psi and stokes-vector according to the natural distribution spectrum
  */
 RAYX_FN_ACC
-PsiAndStokes ModelDipoleSource::getPsiandStokes(double en, Rand& __restrict rand) const {
+PsiAndStokes DipoleSource::getPsiandStokes(double en, Rand& __restrict rand) const {
     PsiAndStokes psiandstokes;
     do {
         psiandstokes.psi = (rand.randomDouble() - 0.5) * 6 * m_verDivergence;

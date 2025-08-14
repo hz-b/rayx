@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Beamline/StringConversion.h"
 #include "Debug/Debug.h"
 #include "Random.h"
 #include "Rml/Importer.h"
@@ -18,7 +19,6 @@
 #include "Writer/CsvWriter.h"
 #include "Writer/Format.h"
 #include "Writer/H5Writer.h"
-#include "Beamline/StringConversion.h"
 
 namespace {
 

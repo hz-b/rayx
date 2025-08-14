@@ -100,7 +100,7 @@ void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, co
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-#define X(type, name, flag, map)                                                           \
+#define X(type, name, flag, map)                                                         \
     RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) file.createDataSet("rayx/events/" #name, rays.name);
 

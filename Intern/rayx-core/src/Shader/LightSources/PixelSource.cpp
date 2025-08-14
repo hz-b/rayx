@@ -6,7 +6,7 @@
 
 namespace RAYX {
 
-ModelPixelSource::ModelPixelSource(const DesignSource& deso)
+PixelSource::PixelSource(const DesignSource& deso)
     : ModelLightSource(deso),
       m_pol(deso.getStokes()),
       m_verDivergence(deso.getVerDivergence()),
@@ -39,7 +39,7 @@ double getPosInDistribution(SourceDist l, double extent, Rand& __restrict rand) 
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray ModelPixelSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray PixelSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     auto x = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);

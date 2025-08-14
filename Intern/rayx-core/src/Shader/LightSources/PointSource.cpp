@@ -26,7 +26,7 @@ double getCoord(const SourceDist l, const double extent, Rand& __restrict rand) 
 
 }  // unnamed namespace
 
-ModelPointSource::ModelPointSource(const DesignSource& dSource)
+PointSource::PointSource(const DesignSource& dSource)
     : ModelLightSource(dSource),
       m_widthDist(dSource.getWidthDist()),
       m_heightDist(dSource.getHeightDist()),
@@ -48,7 +48,7 @@ ModelPointSource::ModelPointSource(const DesignSource& dSource)
  *
  * @returns list of rays
  */
-RAYX_FN_ACC Ray ModelPointSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+RAYX_FN_ACC Ray PointSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     auto x = getCoord(m_widthDist, m_sourceWidth, rand) + m_misalignmentParams.m_translationXerror;

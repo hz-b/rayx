@@ -17,11 +17,11 @@ RAYX_API double get_factorElectronEnergy();
 RAYX_API double get_factorOmega();
 RAYX_API RAYX_FN_ACC double dipoleBessel(double hnue, double zeta);
 RAYX_API RAYX_FN_ACC glm::dvec4 getStokesSyn(double energy, double psi1, double psi2, double electronEnergy, double criticalEnergy,
-                                    ElectronEnergyOrientation electronEnergyOrientation);
+                                             ElectronEnergyOrientation electronEnergyOrientation);
 RAYX_API RAYX_FN_ACC PsiAndStokes calcDipoleFold(double psi, double photonEnergy, double sigpsi, double electronEnergy, double criticalEnergy,
-                                        ElectronEnergyOrientation electronEnergyOrientation, Rand& __restrict rand);
+                                                 ElectronEnergyOrientation electronEnergyOrientation, Rand& __restrict rand);
 RAYX_API double calcMaxIntensity(double photonEnergy, double verDivergence, double electronEnergy, double criticalEnergy,
-                        ElectronEnergyOrientation electronEnergyOrientation, Rand& __restrict rand);
+                                 ElectronEnergyOrientation electronEnergyOrientation, Rand& __restrict rand);
 RAYX_API double calcVerDivergence(double energy, double sigv, double electronEnergy, double criticalEnergy);
 RAYX_API RAYX_FN_ACC double getDipoleInterpolation(double energy);
 /// calculate probability for chosen energy with edge-cases according to H.Wiedemann Synchrotron Radiation P. 259 (D.21)
@@ -29,9 +29,9 @@ RAYX_API RAYX_FN_ACC double schwinger(double energy, double gamma, double critic
 RAYX_API double calcMaxFlux(double photonEnergy, double energySpread, double criticalEnergy, double gamma);
 RAYX_API double calcGamma(double electronEnergy);
 
-class RAYX_API ModelDipoleSource : public ModelLightSource {
+class RAYX_API DipoleSource : public ModelLightSource {
   public:
-    ModelDipoleSource(const DesignSource&);
+    DipoleSource(const DesignSource&);
 
     RAYX_FN_ACC Ray genRay(const SourceId sourceId, Rand& __restrict rand) const;
 

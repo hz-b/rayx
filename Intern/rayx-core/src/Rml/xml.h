@@ -9,14 +9,14 @@
 
 #include "Angle.h"
 #include "Beamline/Definitions.h"
+#include "Beamline/EnergyDistribution.h"
+#include "Beamline/Misalignment.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
 #include "Shader/LightSources/LightSource.h"
-#include "Beamline/EnergyDistribution.h"
 #include "Shader/SlopeError.h"
-#include "Beamline/Misalignment.h"
 
 namespace RAYX {
 

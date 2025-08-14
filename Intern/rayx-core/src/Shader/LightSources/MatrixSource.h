@@ -6,9 +6,9 @@
 namespace RAYX {
 struct DesignSource;
 
-class RAYX_API ModelMatrixSource : public ModelLightSource {
+class RAYX_API MatrixSource : public ModelLightSource {
   public:
-    ModelMatrixSource(const DesignSource&);
+    MatrixSource(const DesignSource&);
 
     RAYX_FN_ACC Ray genRay(const int rayIndex, const SourceId sourceId, Rand& __restrict rand) const;
 

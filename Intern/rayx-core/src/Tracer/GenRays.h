@@ -30,11 +30,12 @@ struct InitRandomCountersKernel {
 
 struct GenRaysKernel {
     template <typename Source>
-    RAYX_FN_ACC Ray genRay(const Source& __restrict source, [[maybe_unused]] const int rayIndex, const SourceId sourceId, Rand& __restrict rand) const {
+    RAYX_FN_ACC Ray genRay(const Source& __restrict source, [[maybe_unused]] const int rayIndex, const SourceId sourceId,
+                           Rand& __restrict rand) const {
         return source.genRay(sourceId, rand);
     }
 
-    RAYX_FN_ACC Ray genRay(const ModelMatrixSource& source, const int rayIndex, const SourceId sourceId, Rand& rand) const {
+    RAYX_FN_ACC Ray genRay(const MatrixSource& source, const int rayIndex, const SourceId sourceId, Rand& rand) const {
         return source.genRay(rayIndex, sourceId, rand);
     }
 
@@ -81,17 +82,17 @@ struct GenRays {
         const auto compileSource = [](const DesignSource& designSource) -> std::optional<SourceVariant> {
             switch (designSource.getType()) {
                 case ElementType::PointSource:
-                    return ModelPointSource(designSource);
+                    return PointSource(designSource);
                 case ElementType::MatrixSource:
-                    return ModelMatrixSource(designSource);
+                    return MatrixSource(designSource);
                 case ElementType::DipoleSource:
-                    return ModelDipoleSource(designSource);
+                    return DipoleSource(designSource);
                 case ElementType::PixelSource:
-                    return ModelPixelSource(designSource);
+                    return PixelSource(designSource);
                 case ElementType::CircleSource:
-                    return ModelCircleSource(designSource);
+                    return CircleSource(designSource);
                 case ElementType::SimpleUndulatorSource:
-                    return ModelSimpleUndulatorSource(designSource);
+                    return SimpleUndulatorSource(designSource);
                 default:
                     throw std::runtime_error(std::format("Unimplemented source type ({}) with name: \"{}\"",
                                                          ElementTypeToString.at(designSource.getType()), designSource.getName()));
@@ -99,29 +100,29 @@ struct GenRays {
             }
         };
 
-        // const auto compileEnergyDistribution = [](const DesignSource& designSource) -> std::optional<EnergyDistributionVariant> {
-        //     // TODO:
-        //     if (designSource.getType() == ElementType::DipoleSource) return EnergyDistributionDataType::None;
-        //
-        //     const auto energyDistributionVariant = designSource.getEnergyDistribution();
-        //
-        //     std::visit(
-        //         []<typename T>(const T& energyDistribution) {
-        //             if constexpr (std::is_same_v<T, HardEdge>) {
-        //                 RAYX_LOG << "HardEdge";
-        //             }
-        //             if constexpr (std::is_same_v<T, SoftEdge>) {
-        //                 RAYX_LOG << "SoftEdge";
-        //             }
-        //             if constexpr (std::is_same_v<T, SeparateEnergies>) {
-        //                 RAYX_LOG << "SeparateEnergies";
-        //             }
-        //             if constexpr (std::is_same_v<T, DatFile>) {
-        //                 RAYX_LOG << "DatFile";
-        //             }
-        //         },
-        //         energyDistributionVariant);
-        // };
+        const auto compileEnergyDistribution = [](const DesignSource& designSource) {
+            // TODO:
+            if (designSource.getType() == ElementType::DipoleSource) return EnergyDistributionDataType::None;
+
+            const auto energyDistributionVariant = designSource.getEnergyDistribution();
+
+            std::visit(
+                []<typename T>(const T& energyDistribution) {
+                    if constexpr (std::is_same_v<T, HardEdge>) {
+                        RAYX_LOG << "HardEdge";
+                    }
+                    if constexpr (std::is_same_v<T, SoftEdge>) {
+                        RAYX_LOG << "SoftEdge";
+                    }
+                    if constexpr (std::is_same_v<T, SeparateEnergies>) {
+                        RAYX_LOG << "SeparateEnergies";
+                    }
+                    if constexpr (std::is_same_v<T, DatFile>) {
+                        RAYX_LOG << "DatFile";
+                    }
+                },
+                energyDistributionVariant);
+        };
 
         m_numRaysTotal = 0;
         auto numRaysSources = std::vector<int>();
@@ -223,8 +224,7 @@ struct GenRays {
 
     OptBuf<Acc, double> d_datFiles;
 
-    using SourceVariant =
-        std::variant<ModelCircleSource, ModelDipoleSource, ModelMatrixSource, ModelPixelSource, ModelPointSource, ModelSimpleUndulatorSource>;
+    using SourceVariant = std::variant<CircleSource, DipoleSource, MatrixSource, PixelSource, PointSource, SimpleUndulatorSource>;
 
     struct SourceState {
         const SourceVariant source;

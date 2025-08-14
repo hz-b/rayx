@@ -39,8 +39,10 @@ class CommandParser {
         int m_BatchSize = 0;              // -b (Vk batch size )
         bool m_sequential = false;        // -S (sequential tracing)
         bool m_verbose = false;           // --verbose (Verbose)
-        std::string m_format = "path_id position_x position_y position_z event_type direction_x direction_y direction_z energy electric_field_x electric_field_y electric_field_z path_length order element_id source_id";             // --format
-        int m_maxEvents = -1;             // -m (max events)
+        std::string m_format =
+            "path_id position_x position_y position_z event_type direction_x direction_y direction_z energy electric_field_x electric_field_y "
+            "electric_field_z path_length order element_id source_id";  // --format
+        int m_maxEvents = -1;                                           // -m (max events)
         std::vector<int> m_recordIndices = {};
         std::string m_dump = "";  // -D (dump)
     } m_args;

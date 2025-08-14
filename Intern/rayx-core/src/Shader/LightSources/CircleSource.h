@@ -5,9 +5,9 @@
 
 namespace RAYX {
 
-class RAYX_API ModelCircleSource : public ModelLightSource {
+class RAYX_API CircleSource : public ModelLightSource {
   public:
-    ModelCircleSource(const DesignSource&);
+    CircleSource(const DesignSource&);
 
     RAYX_FN_ACC Ray genRay(const SourceId sourceId, Rand& __restrict rand) const;
 

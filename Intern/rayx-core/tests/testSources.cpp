@@ -1,7 +1,7 @@
 #include <fstream>
 
-#include "setupTests.h"
 #include "Shader/LightSources/DipoleSource.h"
+#include "setupTests.h"
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
     for (auto r : rays) {

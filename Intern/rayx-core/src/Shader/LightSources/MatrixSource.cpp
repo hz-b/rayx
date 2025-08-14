@@ -9,7 +9,7 @@
 
 namespace RAYX {
 
-ModelMatrixSource::ModelMatrixSource(const DesignSource& dSource)
+MatrixSource::MatrixSource(const DesignSource& dSource)
     : ModelLightSource(dSource),
       m_pol(dSource.getStokes()),
       m_verDivergence(dSource.getVerDivergence()),
@@ -24,7 +24,7 @@ ModelMatrixSource::ModelMatrixSource(const DesignSource& dSource)
  * returns vector of rays
  */
 RAYX_FN_ACC
-Ray ModelMatrixSource::genRay(const int rayIndex, const SourceId sourceId, Rand& __restrict rand) const {
+Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, Rand& __restrict rand) const {
     const int rmat = int(std::sqrt(m_numberOfRays));
     const int row = rayIndex % rmat;
     const int col = (rayIndex / rmat) % rmat;

@@ -19,7 +19,8 @@ void dynamicElements(const int gid, const ConstState& constState, MutableState& 
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
         if (!isRayActive(ray.m_eventType)) break;
 
-        Collision col = findCollision(bounce, constState.sequential, ray.m_position, ray.m_direction, constState.elements, constState.numElements, rand);
+        Collision col =
+            findCollision(bounce, constState.sequential, ray.m_position, ray.m_direction, constState.elements, constState.numElements, rand);
         if (!col.found) {
             // no element was hit.
             // Tracing is done!

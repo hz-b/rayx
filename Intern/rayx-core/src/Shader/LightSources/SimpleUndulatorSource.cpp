@@ -52,7 +52,7 @@ double getSourceHeight(const double electronSigmaY, const double undulatorSigma)
 
 }  // unnamed namespace
 
-ModelSimpleUndulatorSource::ModelSimpleUndulatorSource(const DesignSource& dSource) : ModelLightSource(dSource) {
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : ModelLightSource(dSource) {
     const auto sigmaType = dSource.getSigmaType();
     const auto undulatorLength = dSource.getUndulatorLength();
     const auto photonEnergy = dSource.getEnergy();
@@ -78,9 +78,7 @@ ModelSimpleUndulatorSource::ModelSimpleUndulatorSource(const DesignSource& dSour
  * source)
  */
 RAYX_FN_ACC
-double ModelSimpleUndulatorSource::getCoord(const double extent, Rand& __restrict rand) const {
-    return rand.randomDoubleNormalDistributed(0, 1) * extent;
-}
+double SimpleUndulatorSource::getCoord(const double extent, Rand& __restrict rand) const { return rand.randomDoubleNormalDistributed(0, 1) * extent; }
 
 /**
  * Creates random rays from simple undulator Source
@@ -88,7 +86,7 @@ double ModelSimpleUndulatorSource::getCoord(const double extent, Rand& __restric
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray ModelSimpleUndulatorSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray SimpleUndulatorSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     auto x = getCoord(m_sourceWidth, rand);

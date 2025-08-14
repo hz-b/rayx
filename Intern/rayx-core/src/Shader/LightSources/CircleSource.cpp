@@ -6,7 +6,7 @@
 
 namespace RAYX {
 
-ModelCircleSource::ModelCircleSource(const DesignSource& dSource) : ModelLightSource(dSource) {
+CircleSource::CircleSource(const DesignSource& dSource) : ModelLightSource(dSource) {
     m_stokes = dSource.getStokes();
 
     m_sourceDepth = dSource.getSourceDepth();
@@ -27,7 +27,7 @@ ModelCircleSource::ModelCircleSource(const DesignSource& dSource) : ModelLightSo
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray ModelCircleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray CircleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth
     auto x = (rand.randomDouble() - 0.5) * m_sourceWidth;
@@ -66,7 +66,7 @@ Ray ModelCircleSource::genRay(const SourceId sourceId, Rand& __restrict rand) co
  * calculations taken from RAY-UI
  */
 RAYX_FN_ACC
-glm::dvec3 ModelCircleSource::getDirection(Rand& __restrict rand) const {
+glm::dvec3 CircleSource::getDirection(Rand& __restrict rand) const {
     double angle = rand.randomDouble() * 2.0 * PI;
     int circle;
 

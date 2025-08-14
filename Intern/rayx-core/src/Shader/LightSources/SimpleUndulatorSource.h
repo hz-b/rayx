@@ -5,9 +5,9 @@
 
 namespace RAYX {
 
-class RAYX_API ModelSimpleUndulatorSource : public ModelLightSource {
+class RAYX_API SimpleUndulatorSource : public ModelLightSource {
   public:
-    ModelSimpleUndulatorSource(const DesignSource&);
+    SimpleUndulatorSource(const DesignSource&);
 
     RAYX_FN_ACC Ray genRay(const SourceId sourceId, Rand& __restrict rand) const;
 

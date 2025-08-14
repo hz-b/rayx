@@ -5,9 +5,9 @@
 
 namespace RAYX {
 
-class RAYX_API ModelPixelSource : public ModelLightSource {
+class RAYX_API PixelSource : public ModelLightSource {
   public:
-    ModelPixelSource(const DesignSource&);
+    PixelSource(const DesignSource&);
 
     RAYX_FN_ACC Ray genRay(const SourceId sourceId, Rand& __restrict rand) const;
 

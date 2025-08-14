@@ -2,8 +2,8 @@
 #pragma once
 
 #include "Element/Element.h"
-#include "Ray.h"
 #include "Rand.h"
+#include "Ray.h"
 
 namespace RAYX {
 
