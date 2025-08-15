@@ -214,36 +214,4 @@ struct CompactRaysToRaySoAKernel {
     }
 };
 
-RAYX_FN_ACC
-inline int binarySearchPrefix(const double* prefix, int n, double r) {
-    int left = 0;
-    int right = n - 1;
-    while (left < right) {
-        const int mid = (left + right) >> 1;  // divide by 2
-        if (prefix[mid] > r)
-            right = mid;
-        else
-            left = mid + 1;
-    }
-    return left;
-}
-
-struct WeightedPickKernel {
-    template <typename Acc, typename T>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, T* __restrict outputValues, const double* __restrict prefixWeights, const int numWeights,
-                                const double sumWeights, const T* __restrict inputValues, Rand* __restrict rands, const int n) const {
-        const int gid = blockIdx.x * blockDim.x + threadIdx.x;
-
-        if (gid < n) {
-            const double r = rands[gid].randomDouble() * sumWeights;
-
-            // Binary search in prefix sums
-            const int index = binarySearchPrefix(prefixWeights, numWeights, r);
-
-            // Store corresponding value
-            outputValues[gid] = inputValues[index];
-        }
-    }
-};
-
 }  // namespace RAYX

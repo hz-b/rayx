@@ -48,7 +48,7 @@ PointSource::PointSource(const DesignSource& dSource)
  *
  * @returns list of rays
  */
-RAYX_FN_ACC Ray PointSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+RAYX_FN_ACC Ray PointSource::genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     auto x = getCoord(m_widthDist, m_sourceWidth, rand) + m_misalignmentParams.m_translationXerror;
@@ -57,8 +57,7 @@ RAYX_FN_ACC Ray PointSource::genRay(const SourceId sourceId, Rand& __restrict ra
     y += m_position.y;
     auto z = (rand.randomDouble() - 0.5) * m_sourceDepth;
     z += m_position.z;
-    const auto en = 300.0;  // LightSource.cpp
-    // const auto en = selectEnergy();  // TODO: enable
+    const auto en = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     // get random deviation from main ray based on distribution

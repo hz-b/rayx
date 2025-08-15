@@ -24,7 +24,8 @@ MatrixSource::MatrixSource(const DesignSource& dSource)
  * returns vector of rays
  */
 RAYX_FN_ACC
-Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, Rand& __restrict rand) const {
+Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+                         Rand& __restrict rand) const {
     const int rmat = int(std::sqrt(m_numberOfRays));
     const int row = rayIndex % rmat;
     const int col = (rayIndex / rmat) % rmat;
@@ -37,7 +38,7 @@ Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, Rand& __re
 
     auto z = (rn - 0.5) * m_sourceDepth;
     z += m_position.z;
-    const auto en = 300.0;  // TODO: select energy from EnergyDistribution
+    const auto en = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     const auto phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + m_misalignmentParams.m_rotationXerror.rad;

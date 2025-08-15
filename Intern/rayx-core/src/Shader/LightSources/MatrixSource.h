@@ -10,7 +10,8 @@ class RAYX_API MatrixSource : public ModelLightSource {
   public:
     MatrixSource(const DesignSource&);
 
-    RAYX_FN_ACC Ray genRay(const int rayIndex, const SourceId sourceId, Rand& __restrict rand) const;
+    RAYX_FN_ACC Ray genRay(const int rayIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+                           Rand& __restrict rand) const;
 
   private:
     glm::dvec4 m_pol;

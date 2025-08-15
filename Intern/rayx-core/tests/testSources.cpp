@@ -342,7 +342,7 @@ TEST_F(TestSuite, testH5Writer) {
 TEST_F(TestSuite, testSelectElementForRecordEvent) {
     // const auto filename = std::filesystem::path("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
     // const auto beamline = loadBeamline(filename);
-    // TODO: add test for recording events for selected element
+    // TODO: add test for recording events for selected element. also multiple beamlines. small -> bigger. big -> smaller buffers
     // - use fixed seed
     // - trace: record all events
     // - trace: record events from only one element

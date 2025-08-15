@@ -86,15 +86,14 @@ double SimpleUndulatorSource::getCoord(const double extent, Rand& __restrict ran
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray SimpleUndulatorSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray SimpleUndulatorSource::genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     auto x = getCoord(m_sourceWidth, rand);
     auto y = getCoord(m_sourceHeight, rand);
     auto z = (rand.randomDouble() - 0.5) * m_sourceDepth;
     z += m_position.z;
-    // const auto en = selectEnergy();  // LightSource.cpp
-    const auto en = 300.0;  // TODO: enable
+    const auto en = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     const auto phi = getCoord(m_horDivergence, rand);

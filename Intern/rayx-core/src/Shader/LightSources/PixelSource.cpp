@@ -39,7 +39,7 @@ double getPosInDistribution(SourceDist l, double extent, Rand& __restrict rand) 
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray PixelSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray PixelSource::genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
     auto x = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);
@@ -48,8 +48,7 @@ Ray PixelSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     y += m_position.y;
     auto z = getPosInDistribution(SourceDist::Uniform, m_sourceDepth, rand);
     z += m_position.z;
-    // const auto en = selectEnergy();  // LightSource.cpp
-    const auto en = 300.0;  // TODO: enable
+    const auto en = selectEnergy(energyDistribution, rand);
     // double z = (rn[2] - 0.5) * m_sourceDepth;
     glm::dvec3 position = glm::dvec3(x, y, z);
 

@@ -17,19 +17,19 @@ struct RAYX_API ConstState {
     int maxEvents;
     Sequential sequential = Sequential::No;
 
-    OpticalElement* elements;
+    OpticalElement* __restrict elements;
     int numElements;
-    int* materialIndices;
-    double* materialTables;
-    bool* recordMask;  //< Mask that decides which elements to record events for (array length is numElements)
-    Ray* rays;
+    int* __restrict materialIndices;
+    double* __restrict materialTables;
+    bool* __restrict recordMask;  //< Mask that decides which elements to record events for (array length is numElements)
+    Ray* __restrict rays;
 };
 
 /// stores all mutable buffers
 struct RAYX_API MutableState {
-    Ray* events;
-    int* eventCounts;
-    Rand* rands;
+    Ray* __restrict events;
+    int* __restrict eventCounts;
+    Rand* __restrict rands;
 };
 
 }  // namespace RAYX

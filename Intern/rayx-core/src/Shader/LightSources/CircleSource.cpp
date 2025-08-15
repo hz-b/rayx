@@ -27,7 +27,7 @@ CircleSource::CircleSource(const DesignSource& dSource) : ModelLightSource(dSour
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray CircleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
+Ray CircleSource::genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth
     auto x = (rand.randomDouble() - 0.5) * m_sourceWidth;
@@ -37,8 +37,8 @@ Ray CircleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     auto z = (rand.randomDouble() - 0.5) * m_sourceDepth;
     z += m_position.z;
 
-    // const auto en = selectEnergy();  // TODO: enable
-    const auto en = 300.0;  // LightSource.cpp
+    const auto en = selectEnergy(energyDistribution, rand);
+
     // double z = (rn[2] - 0.5) * m_sourceDepth;
     glm::dvec3 position = glm::dvec3(x, y, z);
 

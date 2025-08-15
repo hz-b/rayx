@@ -16,7 +16,7 @@ struct RAYX_API HardEdge {
     double m_centerEnergy;
     double m_energySpread;
 
-    HardEdge(double centerEnergy, double energySpread);
+    HardEdge(double centerEnergy, double energySpread) : m_centerEnergy(centerEnergy), m_energySpread(energySpread) {}
 };
 
 /// Describes a __normal__ distribution with mean `m_centerEnergy` and standard deviation `m_sigma`.
@@ -25,7 +25,7 @@ struct RAYX_API SoftEdge {
     double m_centerEnergy;
     double m_sigma;
 
-    SoftEdge(double centerEnergy, double sigma);
+    SoftEdge(double centerEnergy, double sigma) : m_centerEnergy(centerEnergy), m_sigma(sigma) {}
 };
 
 /// Describes a uniform distribution of `m_numberOfEnergies` many discrete energies.
@@ -42,7 +42,8 @@ struct RAYX_API SeparateEnergies {
     double m_energySpread;
     int m_numberOfEnergies;
 
-    SeparateEnergies(double centerEnergy, double energySpread, int numberOfEnergies);
+    SeparateEnergies(double centerEnergy, double energySpread, int numberOfEnergies)
+        : m_centerEnergy(centerEnergy), m_energySpread(energySpread), m_numberOfEnergies(numberOfEnergies) {}
 };
 
 using EnergyDistributionVariant = std::variant<DatFile, HardEdge, SoftEdge, SeparateEnergies>;
