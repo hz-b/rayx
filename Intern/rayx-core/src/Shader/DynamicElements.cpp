@@ -10,10 +10,16 @@ namespace RAYX {
 RAYX_FN_ACC
 void dynamicElements(const int gid, const ConstState& constState, MutableState& mutableState) {
     auto ray = constState.rays[gid];
+
+    int numRecorded = 0;
+    if (constState.recordMask.shouldRecordElement(ray.m_sourceID)) {
+        recordEvent(mutableState.events, ray, getRecordIndex(gid, numRecorded, constState.maxEvents));
+        ++numRecorded;
+    }
+
     auto rand = std::move(mutableState.rands[gid]);
 
     // Iterate through all bounces
-    int numRecorded = 0;
     bool colNotFound = false;
     for (int bounce = 0; bounce < constState.maxEvents; ++bounce) {
         // the ray might finalize due to being absorbed, or because an error occured while tracing!
@@ -65,7 +71,7 @@ void dynamicElements(const int gid, const ConstState& constState, MutableState& 
         }
 
         // write ray in local element coordinates to global memory
-        if (numRecorded < constState.maxEvents && (!constState.recordMask || constState.recordMask[col.elementIndex])) {
+        if (numRecorded < constState.maxEvents && (constState.recordMask.shouldRecordElement(col.elementIndex))) {
             recordEvent(mutableState.events, ray, getRecordIndex(gid, numRecorded, constState.maxEvents));
             ++numRecorded;
         }
@@ -77,7 +83,7 @@ void dynamicElements(const int gid, const ConstState& constState, MutableState& 
     // check if the number of events exceeds capacity
     if (!colNotFound && constState.sequential == Sequential::No && isRayActive(ray.m_eventType)) {
         Collision col = findCollisionNonSequential(ray.m_position, ray.m_direction, constState.elements, constState.numElements, rand);
-        if (col.found && (!constState.recordMask || constState.recordMask[col.elementIndex])) {
+        if (col.found && (constState.recordMask.shouldRecordElement(col.elementIndex))) {
             ray = terminateRay(ray, EventType::TooManyEvents);
             recordEvent(mutableState.events, ray, getRecordIndex(gid, numRecorded, constState.maxEvents));
         }

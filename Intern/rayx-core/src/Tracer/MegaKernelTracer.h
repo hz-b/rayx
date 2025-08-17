@@ -61,13 +61,14 @@ struct Resources {
     RaySoaBuf<Acc> soaEvents;
 
     /// holds configuration state of allocated resources. required to trace correctly
-    struct Config {
+    struct BeamlineConfig {
+        int numSources;
         int numElements;
     };
 
     /// update resources
     template <typename Queue>
-    Config update(Queue q, const Group& group, int maxEvents, int numRaysBatchAtMost, const std::vector<bool>& recordMask) {
+    BeamlineConfig update(Queue q, const Group& group, int maxEvents, int numRaysBatchAtMost, const std::vector<bool>& recordMask) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -91,14 +92,15 @@ struct Resources {
         alpaka::memcpy(q, *d_elements, alpaka::createView(devHost, elements, numElements));
 
         // record mask
-        assert(recordMask.size() == static_cast<size_t>(numElements));
-        allocBuf(q, d_recordMask, numElements);
-        std::unique_ptr<bool[]> tmpHostMask(new bool[numElements]);
-        for (int i = 0; i < numElements; ++i) {
+        const auto numSources = static_cast<int>(group.numSources());
+        RAYX_LOG << recordMask.size() << " " << (numSources + numElements);
+        assert(recordMask.size() == static_cast<size_t>(numSources + numElements));
+        allocBuf(q, d_recordMask, numSources + numElements);
+        std::unique_ptr<bool[]> tmpHostMask(new bool[numSources + numElements]);
+        for (int i = 0; i < numSources + numElements; ++i) {
             tmpHostMask[i] = recordMask[i];
         }
-        auto hostView = alpaka::createView(devHost, tmpHostMask.get(), numElements);
-        alpaka::memcpy(q, *d_recordMask, hostView);
+        alpaka::memcpy(q, *d_recordMask, alpaka::createView(devHost, tmpHostMask.get(), numSources + numElements));
 
         // output events
         allocBuf(q, d_events, numRaysBatchAtMost * maxEvents);
@@ -116,6 +118,7 @@ struct Resources {
 #undef X
 
         return {
+            .numSources = numSources,
             .numElements = numElements,
         };
     }
@@ -156,11 +159,11 @@ class MegaKernelTracer : public DeviceTracer {
         auto q = Queue(devAcc);
 
         const auto sourceConf = m_genRaysResources.update(q, beamline, maxBatchSize);
-        const auto elementConf = m_resources.update(q, beamline, maxEvents, sourceConf.numRaysBatchAtMost, recordMask);
+        const auto beamlineConf = m_resources.update(q, beamline, maxEvents, sourceConf.numRaysBatchAtMost, recordMask);
 
         RAYX_VERB << "trace beamline:";
-        RAYX_VERB << "\tnum elements: " << elementConf.numElements;
-        RAYX_VERB << "\tnum light sources: " << beamline.numSources();
+        RAYX_VERB << "\tnum elements: " << beamlineConf.numElements;
+        RAYX_VERB << "\tnum light sources: " << beamlineConf.numSources;
         RAYX_VERB << "\tsequential: " << (sequential == Sequential::Yes ? "yes" : "no");
         RAYX_VERB << "\tmax events: " << maxEvents;
         RAYX_VERB << "\tnum rays: " << sourceConf.numRaysTotal;
@@ -188,7 +191,7 @@ class MegaKernelTracer : public DeviceTracer {
             auto batchConf = m_genRaysResources.genRaysBatch(devAcc, q, batchIndex);
 
             // trace current batch
-            traceBatch(devAcc, q, elementConf.numElements, maxEvents, sequential, batchConf);
+            traceBatch(devAcc, q, beamlineConf.numSources, beamlineConf.numElements, maxEvents, sequential, batchConf);
 
             alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchConf.numRaysBatch), *m_resources.d_compactEventCounts,
                            batchConf.numRaysBatch);
@@ -248,7 +251,7 @@ class MegaKernelTracer : public DeviceTracer {
 
   private:
     template <typename DevAcc, typename Queue>
-    void traceBatch(DevAcc devAcc, Queue q, int numElements, int maxEvents, Sequential sequential, GenRaysAcc::BatchConfig& batchConf) {
+    void traceBatch(DevAcc devAcc, Queue q, int numSources, int numElements, int maxEvents, Sequential sequential, GenRaysAcc::BatchConfig& batchConf) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto constState = ConstState{
@@ -261,7 +264,7 @@ class MegaKernelTracer : public DeviceTracer {
             .numElements = numElements,
             .materialIndices = alpaka::getPtrNative(*m_resources.d_materialIndices),
             .materialTables = alpaka::getPtrNative(*m_resources.d_materialTable),
-            .recordMask = alpaka::getPtrNative(*m_resources.d_recordMask),
+            .recordMask = RecordMask{.numSources = numSources, .mask = alpaka::getPtrNative(*m_resources.d_recordMask)},
             .rays = alpaka::getPtrNative(*batchConf.d_rays),
         };
 
