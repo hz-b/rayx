@@ -58,17 +58,11 @@
     <param id="roughnessSubstrate" enabled="F">0</param>
     <param id="densitySubstrate" auto="T" enabled="F">19.300000000000001</param>
     <param id="surfaceCoating" comment="Multilayer Coating" enabled="T">2</param>
-    <param id="numLayers" enabled="T">2</param>
-    <param id="layer1" enabled="T">
-      <material>Au</material>
-      <thickness>10</thickness>
+    <param id="Coating" enabled="T">
+      <layer material="AU" thickness="10">layer0</layer>
+      <layer material="Au" thickness="20">layer1</layer>
+      <layer material="Au" thickness="30">layer2</layer>
     </param>
-    <param id="layer2" enabled="T">
-      <material>Si</material>
-      <thickness>20</thickness>
-    </param>
-    <param id="layer1Thickness" enabled="T">10</param>
-    <param id="layer1Roughness" enabled="T">0</param>
     <param id="materialCoating" enabled="F">Au</param>
     <param id="thicknessCoating" enabled="F">10</param>
     <param id="roughnessCoating" enabled="F">0</param>

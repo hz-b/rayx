@@ -527,16 +527,14 @@ Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coati
         oneCoating.roughness = getRoughnessCoating();
         return serializeOneCoating(oneCoating);
     } else if (type == SurfaceCoatingType::MultipleCoatings) {
-        return serializeSubstrateOnly(); // Placeholder for multiple coatings, needs implementation
-    } else {
         MultilayerCoating mlCoating;
         mlCoating.numLayers = m_elementParameters["numLayers"].as_int();
         for (int i = 0; i < mlCoating.numLayers; ++i) {
             std::string layerKey = "layer" + std::to_string(i + 1);
             try{
                 Layer layer;
-                layer.material = m_elementParameters["coating"][layerKey]["material"].as_int();
-                layer.thickness = m_elementParameters["coating"][layerKey]["thickness"].as_double();
+                layer.material = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"].as_int();
+                layer.thickness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"].as_double();
                 mlCoating.layers.push_back(layer);
             } catch (const std::exception& e) {
                 std::cerr << "Error deserializing layer " << layerKey << ": " << e.what() << std::endl;
@@ -547,6 +545,8 @@ Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coati
             return serializeSubstrateOnly(); // Default case if no layers are found
         }
         return serializeMultilayer(mlCoating);
+    } else {
+        return serializeSubstrateOnly(); // Placeholder for multiple coatings, needs implementation        
     }
 }
 
