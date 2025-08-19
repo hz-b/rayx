@@ -7,7 +7,7 @@ In the context of RAYX a beamline consists of two types of elements:
 
 In this section, you can read up on the design choices we made when implementing OpticalElements in RAYX.
 
-## Behavior, Cutout, Surface
+## Behavior, Cutout, Surface, Coating
 
 Next to its position and orientation, an OpticalElement is classified by three parts: The Behaviour, Surface and Cutout.
 - The Behavior defines how the element interacts with a ray (eg. reflecting, absorbing, redirecting)
@@ -90,6 +90,12 @@ A given 3D point `p` is _within the cutout c_, if `inCutout(c, p.x, p.z)` return
 
 Not all OpticalElements use exactly one Cutout.
 The Slit for example uses three Cutouts, one for the ray-absorbing shape around the "opening", then one for the "opening" itself, and another one for the ray-absorbing beamstop within the opening.
+
+
+### Coating
+
+The Coating describes the Layers a Mirror or Grating can have: No Layer, Single Layer or Multilayer. 
+
 
 ### Ray-OpticalElement collision
 

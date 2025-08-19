@@ -203,7 +203,7 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         r.m_order = 0;
     } else if (coating.m_type == SurfaceCoatingType::MultipleCoatings) {
         MultilayerCoating mlCoating = deserializeMultilayer(coating);
-                constexpr int vacuum_material = -1;
+        constexpr int vacuum_material = -1;
         const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
         const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 

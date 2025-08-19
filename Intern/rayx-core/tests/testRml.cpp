@@ -237,3 +237,8 @@ TEST_F(TestSuite, groupTransform2) {
     CHECK_EQ(orientationCorrect, orientationResult);
     CHECK_EQ(positionCorrect, positionResult);
 }
+
+// test multilayer cone
+TEST_F(TestSuite, multilayerCone) {
+    RAYX::Beamline bl = loadBeamline("multilayerCone");
+}
