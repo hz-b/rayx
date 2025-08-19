@@ -44,3 +44,6 @@ the reflectance of both polarizations is calculated with the fresnel equations:
 \\[r_p = \frac{N_2 \cdot \cos \theta_i - N_1 \cdot \cos \theta_t}{N_2 \cdot \cos \theta_i + N_1 \cdot \cos \theta_t}\\]
 
 (The transmitted power is then "the rest": \\(t_s = 1 - r_s\\) and \\(t_p = 1 -r_p\\))
+
+
+### Multilayer Reflection

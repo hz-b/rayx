@@ -348,6 +348,13 @@ bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
             RAYX_WARN << "Missing thickness for layer " << (i + 1);
             return false;
         }
+
+        if (auto* r = layerNode->first_attribute("roughness")) {
+            layer.roughness = std::stod(r->value());
+        } else {
+            RAYX_WARN << "Missing roughness for layer " << (i + 1);
+            return false;
+        }
     }
     return true;
 }

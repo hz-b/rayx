@@ -512,12 +512,13 @@ SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_eleme
 //set multilayer coating
 void DesignElement::setMultilayerCoating(const MultilayerCoating& coating) {
     m_elementParameters["numLayers"] = coating.numLayers;
+    m_elementParameters["coating"] = Map();
     for (size_t i = 0; i < coating.layers.size(); ++i) {
         const auto& layer = coating.layers[i];
-        m_elementParameters["coating"] = Map();
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)] = Map();
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = layer.material;
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = layer.thickness;
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"] = layer.roughness;
     }
 }
 
@@ -540,6 +541,7 @@ Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coati
                 Layer layer;
                 layer.material = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"].as_int();
                 layer.thickness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"].as_double();
+                layer.roughness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"].as_double();
                 mlCoating.layers.push_back(layer);
             } catch (const std::exception& e) {
                 std::cerr << "Error deserializing layer " << layerKey << ": " << e.what() << std::endl;
