@@ -8,8 +8,12 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
 
     # dev tools
-    python3
     clang # for clang-format
+    python313
+    python313Packages.pip
+    python313Packages.numpy
+    python313Packages.matplotlib
+    python313Packages.h5py
 
     # build tools
     pkg-config

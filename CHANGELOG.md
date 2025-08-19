@@ -57,6 +57,6 @@
 
 ## Probably coming soon
 
-* Mac support including multithreaded tracing on CPU using OpenMP (x86 and arm)
+* Mac support including multithreaded tracing on CPU using OpenMP (arm, x86)
 * Nix flake for reproducable dependency handling to make developing and building rayx more accessible
 * Multi layer foil
