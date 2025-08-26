@@ -70,6 +70,10 @@ elseif(WIN32)
     set(INSTALL_DATA_DIR ".")
     set(INSTALL_FONTS_DIR ".")
 endif()
+
+if(RAYX_CUSTOM_DATA_DIR)
+    set(INSTALL_DATA_DIR ${RAYX_CUSTOM_DATA_DIR})
+endif()
 # ------------------
 
 
