@@ -44,7 +44,7 @@ set(RAYX_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # ------------------------
 
 # ---- Code Coverage ----
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Extern/cmake)
+set(CMAKE_MODULE_PATH ${RAYX_SOURCE_DIR}/Extern/cmake)
 # ------------------
 
 # ---- CPack ----
