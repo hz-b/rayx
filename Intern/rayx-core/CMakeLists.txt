@@ -254,11 +254,11 @@ elseif(WIN32)
         ARCHIVE DESTINATION .
     )
 endif()
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data/nff
+install(DIRECTORY ${RAYX_SOURCE_DIR}/Data/nff
         DESTINATION ${INSTALL_DATA_DIR}/Data)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/Data/PALIK
+install(DIRECTORY ${RAYX_SOURCE_DIR}/Data/PALIK
         DESTINATION ${INSTALL_DATA_DIR}/Data)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/Scripts
+install(DIRECTORY ${RAYX_SOURCE_DIR}/Scripts
         DESTINATION ${INSTALL_DATA_DIR})
 include(InstallRequiredSystemLibraries)
 include(CPack)
