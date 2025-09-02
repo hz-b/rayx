@@ -92,7 +92,23 @@ BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
     return raySoAToBundleHistory(rays);
 }
 
-void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, const RayAttrFlag attr) {
+std::vector<std::string> readH5ElementNames(const std::filesystem::path& filepath) {
+    RAYX_VERB << "reading element names from '" << filepath;
+
+    auto element_names = std::vector<std::string>();
+
+    try {
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
+
+        file.getDataSet("/rayx/element_names").read(element_names);
+    } catch (const std::exception& e) {
+        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
+    }
+
+    return element_names;
+}
+
+void writeH5RaySoA(const std::filesystem::path& filepath, const std::vector<std::string>& element_names, const RaySoA& rays, const RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: "
               << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
@@ -108,14 +124,16 @@ void writeH5RaySoA(const std::filesystem::path& filepath, const RaySoA& rays, co
 #undef X
 
         file.createDataSet("rayx/num_paths", rays.num_paths);
+        file.createDataSet("rayx/element_names", element_names);
     } catch (const std::exception& e) {
         RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
     }
 }
 
-void writeH5BundleHistory(const std::filesystem::path& filepath, const BundleHistory& bundle, const RayAttrFlag attr) {
+void writeH5BundleHistory(const std::filesystem::path& filepath, const std::vector<std::string>& element_names, const BundleHistory& bundle,
+                          const RayAttrFlag attr) {
     const auto rays = bundleHistoryToRaySoA(bundle);
-    writeH5RaySoA(filepath, rays, attr);
+    writeH5RaySoA(filepath, element_names, rays, attr);
 }
 
 }  // namespace RAYX

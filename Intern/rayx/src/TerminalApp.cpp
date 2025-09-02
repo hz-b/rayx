@@ -203,7 +203,8 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
                 RAYX_EXIT << "Output directory '" << parent.string() << "' does not exist. Create it first or use a different -o path.";
             }
 
-            auto file = exportRays(rays, isCSV, outputPath, attr);
+            auto element_names = m_Beamline->getElementNames();
+            auto file = exportRays(rays, element_names, isCSV, outputPath, attr);
 
             // Plot
             if (m_CommandParser->m_args.m_plotFlag) {
@@ -303,7 +304,8 @@ void TerminalApp::run() {
     tracePath(m_CommandParser->m_args.m_providedFile);
 }
 
-std::filesystem::path TerminalApp::exportRays(const RAYX::RaySoA& rays, bool isCSV, const std::filesystem::path& path, const RAYX::RayAttrFlag attr) {
+std::filesystem::path TerminalApp::exportRays(const RAYX::RaySoA& rays, const std::vector<std::string>& element_names, bool isCSV,
+                                              const std::filesystem::path& path, const RAYX::RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (isCSV) {
@@ -312,7 +314,7 @@ std::filesystem::path TerminalApp::exportRays(const RAYX::RaySoA& rays, bool isC
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
-        writeH5RaySoA(path, rays, attr);
+        writeH5RaySoA(path, element_names, rays, attr);
 #endif
     }
 
