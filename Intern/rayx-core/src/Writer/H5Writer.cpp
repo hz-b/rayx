@@ -24,8 +24,8 @@ inline HighFive::DataType highfive_create_type_EventType() {
 
 inline HighFive::DataType highfive_create_type_ElectricField() {
     return HighFive::CompoundType({
-        {"real", HighFive::AtomicType<double>(), 0},
-        {"imag", HighFive::AtomicType<double>(), sizeof(double)},
+        {"r", HighFive::AtomicType<double>(), 0},
+        {"i", HighFive::AtomicType<double>(), sizeof(double)},
     });
 }
 }  // unnamed namespace
