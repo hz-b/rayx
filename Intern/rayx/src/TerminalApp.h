@@ -32,7 +32,8 @@ class TerminalApp {
     /// children of that directory.
     void tracePath(const std::filesystem::path& path);
     // returns the output filename (either .csv or .h5)
-    std::filesystem::path exportRays(const RAYX::RaySoA& rays, bool isCSV, const std::filesystem::path&, const RAYX::RayAttrFlag attr);
+    std::filesystem::path exportRays(const RAYX::RaySoA& rays, const std::vector<std::string>& element_names, bool isCSV,
+                                     const std::filesystem::path&, const RAYX::RayAttrFlag attr);
 
     std::string providedFile;
     std::unique_ptr<CommandParser> m_CommandParser;

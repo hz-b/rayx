@@ -214,6 +214,7 @@ TEST_F(TestSuite, testH5Writer) {
     const auto beamlineFilename = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
     const auto rayOriginal = traceRML(beamlineFilename);
     const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
+    const auto elementNamesOriginal = loadBeamline(beamlineFilename).getElementNames();
 
     // test conversion between BundleHistory and RaySoA
     {
@@ -225,9 +226,12 @@ TEST_F(TestSuite, testH5Writer) {
 
     // test if write and read of BundleHistory work without altering the contents
     {
-        writeH5BundleHistory(h5Filepath, rayOriginal);
+        writeH5BundleHistory(h5Filepath, elementNamesOriginal, rayOriginal);
         const auto bundle = readH5BundleHistory(h5Filepath);
         CHECK_EQ(rayOriginal, bundle);
+
+        const auto elementNames = readH5ElementNames(h5Filepath);
+        if (elementNamesOriginal != elementNames) ADD_FAILURE();
     }
 
     // test if write and read of partial BundleHistory work without altering the contents
@@ -241,7 +245,7 @@ TEST_F(TestSuite, testH5Writer) {
 
         // write only some attributes
         const auto attr = RayAttrFlag::Energy | RayAttrFlag::Position;
-        writeH5BundleHistory(h5Filepath, rayOriginal, attr);
+        writeH5BundleHistory(h5Filepath, elementNamesOriginal, rayOriginal, attr);
         // read only some attributes
         const auto raySoA = readH5RaySoA(h5Filepath, attr);
 

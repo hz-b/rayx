@@ -44,7 +44,7 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    RAYX::writeH5RaySoA(path, rays);
+    RAYX::writeH5RaySoA(path, m_Beamline.getElementNames(), rays);
 #else
     RAYX::writeCsv(bundleHist, path);
 #endif

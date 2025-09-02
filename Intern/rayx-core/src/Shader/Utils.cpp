@@ -5,9 +5,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-double RAYX_API energyToWaveLength(double x) {
-    return INV_NM_TO_EVOLT / x;
-}
+double RAYX_API energyToWaveLength(double x) { return INV_NM_TO_EVOLT / x; }
 
 RAYX_FN_ACC
 double waveLengthToEnergy(const double waveLength) { return INV_NM_TO_EVOLT / waveLength; }
