@@ -22,11 +22,7 @@
 
 namespace {
 
-void dumpBeamline(const std::filesystem::path& filepath) {
-    std::cout << "dumping beamline meta data from: " << filepath << std::endl;
-
-    const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
-
+void dumpBeamlineObjects(const RAYX::Beamline* beamline) {
     const auto sources = beamline->getSources();
     std::cout << "\tsources (" << sources.size() << "):" << std::endl;
 
@@ -47,6 +43,12 @@ void dumpBeamline(const std::filesystem::path& filepath) {
                   << std::endl;
         ++objectIndex;
     }
+}
+
+void dumpBeamline(const std::filesystem::path& filepath) {
+    std::cout << "dumping beamline meta data from: " << filepath << std::endl;
+    const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
+    dumpBeamlineObjects(beamline.get());
 }
 
 #ifndef NO_H5
@@ -136,50 +138,62 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
         }
     } else if (path.extension() == ".rml") {
         std::cout << "Tracing File: " << path << std::endl;
-        // Load RML file
+
+        // load RML file
         m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(path));
+
+        // dump beamline objects
+        if (RAYX::VERBOSE) {
+            dumpBeamlineObjects(m_Beamline.get());
+        }
+
+        const size_t numSources = m_Beamline->numSources();
+        const size_t numElements = m_Beamline->numElements();
+        const size_t numObjects = numSources + numElements;
+
+        // record mask. determine which elements should be recorded
+        const auto& recordIndices = m_CommandParser->m_args.m_recordIndices;
+        auto recordMask = RAYX::fullRecordMask(numSources, numElements);
+        if (!recordIndices.empty()) {
+            recordMask = std::vector<bool>(numObjects, false);
+            for (auto idx : recordIndices) {
+                if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
+                if (idx >= numObjects) RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
+                recordMask[idx] = true;
+            }
+        }
+
+        if (m_CommandParser->m_args.m_recordIndices.empty()) {
+            RAYX_VERB << "Record indices is empty. Defaulting to recording all elements";
+        }
+
+        if (RAYX::VERBOSE) {
+            const auto objectNames = m_Beamline->getObjectNames();
+            RAYX_VERB << "Record objects:";
+            for (int i = 0; i < static_cast<int>(recordMask.size()); ++i) {
+                if (recordMask[i]) {
+                    RAYX_VERB << "\t[" << i << "]" << objectNames[i];
+                };
+            }
+        }
+
+        // record attributes mask. determine which ray attributes should be recorded
+        const auto attr = RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
+
+        // sequential / non-sequential tracing
+        RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+
+        // max events to record per ray path
+        const int maxEvents =
+            (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
 
         // calculate max batch size
         uint64_t max_batch_size = RAYX::DEFAULT_BATCH_SIZE;
         if (m_CommandParser->m_args.m_BatchSize != 0) {
             max_batch_size = m_CommandParser->m_args.m_BatchSize;
         }
-        if (m_CommandParser->m_args.m_recordIndices.empty()) {
-            RAYX_VERB << "Passed no or empty array for which elements to record.";
-        } else {
-            RAYX_VERB << "First element of passed array: " << m_CommandParser->m_args.m_recordIndices[0];
-        }
 
-        // Run rayx core
-        RAYX::Sequential seq = m_CommandParser->m_args.m_sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-        const int maxEvents =
-            (m_CommandParser->m_args.m_maxEvents < 1) ? RAYX::Tracer::defaultMaxEvents(m_Beamline.get()) : m_CommandParser->m_args.m_maxEvents;
-        size_t numSources = m_Beamline->numSources();
-        size_t numElements = m_Beamline->numElements();
-
-        // Record mask
-        auto recordIndices = m_CommandParser->m_args.m_recordIndices;
-        auto recordMask = RAYX::fullRecordMask(numSources, numElements);
-        if (!recordIndices.empty()) {
-            recordMask = std::vector<bool>(numSources + numElements, false);
-            for (auto idx : recordIndices) {
-                if (idx < 0) RAYX_EXIT << "Only positive indices are possible for CLI option: -R/--record-indices!";
-                if (idx > numSources + numElements - 1)
-                    RAYX_EXIT << "Index {" << idx << "} provided with -R/--record-indices does not exist in the provided file.";
-                recordMask[idx] = true;
-            }
-        }
-
-        // Verbose log: print mask as a string of 0s and 1s
-        std::string maskStr;
-        maskStr.reserve(numSources + numElements);
-        for (auto b : recordMask) {
-            maskStr += b;
-        }
-        RAYX_VERB << "recordMask [size=" << (numSources + numElements) << "]: " << maskStr;
-
-        const auto attr = RAYX::formatStringToRayAttrFlag(m_CommandParser->m_args.m_format);
-
+        // do the trace
         const auto rays = m_Tracer->trace(*m_Beamline, seq, max_batch_size, maxEvents, recordMask, attr);
 
         if (!rays.num_events)
@@ -190,6 +204,9 @@ void TerminalApp::tracePath(const std::filesystem::path& path) {
             std::filesystem::path outputPath;
             if (!m_CommandParser->m_args.m_outPath.empty()) {
                 outputPath = m_CommandParser->m_args.m_outPath;
+                if (fs::is_directory(outputPath)) {
+
+                }
             } else {
                 outputPath = path;
                 outputPath.replace_extension("");  // strip .rml

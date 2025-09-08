@@ -93,7 +93,6 @@ struct Resources {
 
         // record mask
         const auto numSources = static_cast<int>(group.numSources());
-        RAYX_LOG << recordMask.size() << " " << (numSources + numElements);
         assert(recordMask.size() == static_cast<size_t>(numSources + numElements));
         allocBuf(q, d_recordMask, numSources + numElements);
         std::unique_ptr<bool[]> tmpHostMask(new bool[numSources + numElements]);

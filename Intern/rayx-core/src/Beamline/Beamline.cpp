@@ -182,6 +182,21 @@ std::vector<std::string> Group::getSourceNames() const {
     return names;
 }
 
+std::vector<std::string> Group::getObjectNames() const {
+    std::vector<std::string> names;
+    ctraverse([&names](const BeamlineNode& node) -> bool {
+        if (node.isSource()) {
+            const auto* source = static_cast<const DesignSource*>(&node);
+            names.push_back(source->getName());
+        } else if (node.isElement()) {
+            const auto* element = static_cast<const DesignElement*>(&node);
+            names.push_back(element->getName());
+        }
+        return false;
+    });
+    return names;
+}
+
 size_t Group::numElements() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
@@ -197,6 +212,17 @@ size_t Group::numSources() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
         if (node.isSource()) {
+            ++count;
+        }
+        return false;
+    });
+    return count;
+}
+
+size_t Grou::numObjects() const {
+    size_t count = 0;
+    ctraverse([&count](const BeamlineNode& node) -> bool {
+        if (node.isSource() || node.isElement()) {
             ++count;
         }
         return false;

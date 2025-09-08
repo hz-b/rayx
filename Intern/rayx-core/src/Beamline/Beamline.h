@@ -44,6 +44,7 @@ class RAYX_API Group : public BeamlineNode {
     void addChild(std::unique_ptr<BeamlineNode> child);
     size_t numElements() const;
     size_t numSources() const;
+    size_t numObjects() const;
 
     /**
      * @brief Creates a deep copy of this group and its children.
@@ -105,6 +106,7 @@ class RAYX_API Group : public BeamlineNode {
     std::vector<const DesignSource*> getSources() const;
     std::vector<std::string> getElementNames() const;
     std::vector<std::string> getSourceNames() const;
+    std::vector<std::string> getObjectNames() const;
     const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
     glm::dvec4 getPosition() const override { return m_position; }
     glm::dmat4 getOrientation() const override { return m_orientation; }

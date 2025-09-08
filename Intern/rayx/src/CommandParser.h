@@ -1,9 +1,30 @@
 #pragma once
-#include <CLI/CLI.hpp>
-#include <unordered_map>
 
-#include "Debug/Debug.h"
-#include "TerminalAppConfig.h"
+struct CliArgs {
+    bool plot = false;                      // -p --plot
+    bool csv = false;                       // -c --csv
+    bool cpu = false;                       // -x --cpu
+    bool gpu = false;                       // -X --gpu
+    bool listDevices = false;               // -l --list-devices
+    bool benchmark = false;                 // -B --benchmark
+    bool version = false;                   // -v --version
+    bool sequential = false;                // -S --sequential
+    bool verbose = false;                   // -V --verbose
+    bool defaultSeed;                       // -f, --default-seed
+    std::optional<int> maxEvents = -1;      // -m --maxevents
+    std::string dump;                       // -D --dump
+    std::vector<std::string> inputPaths;    // -i --input
+    std::optional<std::string> outputPath;  // -o --output
+    std::optional<int> seed;                // -s, --seed
+    std::optional<int> batchSize;           // -b --batch
+    std::optional<int> deviceId;            // -d --device
+    std::vector<int> recordIndices;         // -R --record-indices
+    std::vector<std::string> format = {     // -F --format
+        "path_id", "position_x",       "position_y",       "position_z",       "event_type",  "direction_x", "direction_y", "direction_z",
+        "energy",  "electric_field_x", "electric_field_y", "electric_field_z", "path_length", "order",       "element_id",  "source_id"};
+};
+
+CliArgs parseCliArgs(const int argc, char const* const* const argv);
 
 class CommandParser {
   public:
@@ -46,20 +67,6 @@ class CommandParser {
         std::vector<int> m_recordIndices = {};
         std::string m_dump = "";  // -D (dump)
     } m_args;
-
-    static inline void getVersion() {
-        RAYX_LOG << R"(
-        
-      ╔═══╗╔═══╗╔╗  ╔╗╔═╗╔═╗
-      ║╔═╗║║╔═╗║║╚╗╔╝║╚╗╚╝╔╝
-      ║╚═╝║║║ ║║╚╗╚╝╔╝ ╚╗╔╝ 
-      ║╔╗╔╝║╚═╝║ ╚╗╔╝  ╔╝╚╗ 
-      ║║║╚╗║╔═╗║  ║║  ╔╝╔╗╚╗
-      ╚╝╚═╝╚╝ ╚╝  ╚╝  ╚═╝╚═╝ HZB 2023.
-      )";
-        RAYX_LOG << "\n\t rayx terminal application " << TERMINALAPP_VERSION_MAJOR << "." << TERMINALAPP_VERSION_MINOR << "."
-                 << TERMINALAPP_VERSION_PATCH << "\n \t GIT: " << GIT_REVISION << "\n \t BUILD: " << BUILD_TIMESTAMP;
-    };
 
   private:
     int m_cli11_return;

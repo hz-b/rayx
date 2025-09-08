@@ -100,7 +100,7 @@ jobs:
       - name: CPack (Windows - ZIP)
         if: matrix.os == 'windows-latest'
         working-directory: ${{github.workspace}}/build
-        run: cpack -G ZIP 
+        run: cpack -G ZIP
 
       - name: CPack (Windows - NSIS Installer)
         if: matrix.os == 'windows-latest'
