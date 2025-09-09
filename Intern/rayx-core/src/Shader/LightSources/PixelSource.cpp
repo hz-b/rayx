@@ -9,6 +9,7 @@ namespace RAYX {
 PixelSource::PixelSource(const DesignSource& deso)
     : ModelLightSource(deso),
       m_pol(deso.getStokes()),
+      m_horDivergence(deso.getHorDivergence()),
       m_verDivergence(deso.getVerDivergence()),
       m_sourceDepth(deso.getSourceDepth()),
       m_sourceHeight(deso.getSourceHeight()),

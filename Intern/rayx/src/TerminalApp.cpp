@@ -74,6 +74,7 @@ void scanGroup(const HighFive::Group& group, const int depth = 0, const std::str
                 break;
             case HighFive::ObjectType::Dataset:
                 indent();
+                // TODO: dump dataset datatype and number of elements
                 std::cout << full_path << " (dataset)" << std::endl;
                 break;
             default:
@@ -127,7 +128,7 @@ TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
 void TerminalApp::tracePath(const fs::path& path) {
     if (!fs::exists(path)) {
-        RAYX_EXIT << "Trying to access file / directory '" << path << "' but it was not found!";
+        RAYX_EXIT << "Trying to access file or directory " << path << " but it was not found!";
     }
 
     if (fs::is_directory(path)) {
@@ -135,23 +136,54 @@ void TerminalApp::tracePath(const fs::path& path) {
             tracePath(p.path());
         }
     } else if (path.extension() == ".rml") {
-        traceRml(path);
+        traceRmlAndExportRays(path);
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
 }
 
-void TerminalApp::traceRml(const fs::path& filepath) {
-    std::cout << "Tracing file: " << filepath << std::endl;
+RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
+    auto beamline = RAYX::importBeamline(filepath);
 
-    fs::path outputPath = m_cliArgs.outputPath ? fs::path(*m_cliArgs.outputPath) : filepath;
-    outputPath.replace_extension(m_cliArgs.csv ? ".csv" : ".h5");
+    // override number of rays for all sources
+    if (m_cliArgs.numberOfRays) {
+        beamline.traverse([n = *m_cliArgs.numberOfRays](RAYX::BeamlineNode& node) -> bool {
+            if (node.isSource()) {
+                auto* source = static_cast<RAYX::DesignSource*>(&node);
+                source->setNumberOfRays(n);
+            }
+            return false;
+        });
+    }
 
-    const auto beamline = RAYX::importBeamline(filepath);
-    traceBeamline(beamline, outputPath);
+    return beamline;
 }
 
-void TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const fs::path& outputPath) {
+void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
+    using namespace std::chrono;
+    const auto start_time = steady_clock::now();
+
+    std::cout << "Processing: " << inputFilepath << std::endl;
+
+    // record mask for attributes. determine which ray attributes should be recorded
+    const auto attr = RAYX::rayAttrStringsToRayAttrMask(m_cliArgs.format);
+
+    const auto beamline = loadBeamline(inputFilepath);
+
+    const auto rays = traceBeamline(beamline, attr);
+
+    if (!rays.num_events)
+        std::cout << "No events were recorded!" << std::endl;
+    else {
+        auto outputFilepath = exportRays(inputFilepath, rays, attr);
+
+        const auto end_time = steady_clock::now();
+        const auto elapsed_time = duration_cast<milliseconds>(end_time - start_time).count();
+        std::cout << "Finished in " << elapsed_time << "ms. Exported rays to: " << outputFilepath << std::endl;
+    }
+}
+
+RAYX::RaySoA TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrFlag attr) {
     // dump beamline objects
     if (RAYX::getDebugVerbose()) {
         dumpBeamlineObjects(&beamline);
@@ -186,9 +218,6 @@ void TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const fs::path& 
         }
     }
 
-    // record mask for attributes. determine which ray attributes should be recorded
-    const auto attr = RAYX::rayAttrStringsToRayAttrMask(m_cliArgs.format);
-
     // sequential / non-sequential tracing
     RAYX::Sequential seq = m_cliArgs.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
 
@@ -200,33 +229,7 @@ void TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const fs::path& 
 
     // do the trace
     const auto rays = m_tracer->trace(beamline, seq, batchSize, maxEvents, recordMask, attr);
-
-    if (!rays.num_events)
-        std::cout << "No events were recorded!" << std::endl;
-    else {
-        // Error handling in case provided path does not exist
-        auto parent = outputPath.parent_path();
-        if (!parent.empty() && !fs::exists(parent)) {
-            RAYX_EXIT << "Output directory '" << parent.string() << "' does not exist. Create it first or use a different output path.";
-        }
-
-        auto file = exportRays(rays, m_cliArgs.csv, outputPath, attr);
-
-        // Plot
-        if (m_cliArgs.plot) {
-            if (m_cliArgs.csv) {
-                RAYX_WARN << "You can only plot .h5 files!";
-                RAYX_EXIT << "Have you selected .csv exporting?";
-            }
-
-            auto cmd =
-                std::string("python ") + RAYX::ResourceHandler::getInstance().getResourcePath("Scripts/plot.py").string() + " " + file.string();
-            auto ret = system(cmd.c_str());
-            if (ret != 0) {
-                RAYX_WARN << "received error code while printing";
-            }
-        }
-    }
+    return rays;
 }
 
 void TerminalApp::run() {
@@ -293,22 +296,37 @@ void TerminalApp::run() {
 
     if (!m_cliArgs.inputPaths.size()) RAYX_EXIT << "Please provide an input RML file or directory. Use --help for more information";
 
-    // Trace, export and plot
+    // trace and export
     for (const auto path : m_cliArgs.inputPaths) tracePath(path);
 }
 
-fs::path TerminalApp::exportRays(const RAYX::RaySoA& rays, bool isCSV, const fs::path& path, const RAYX::RayAttrFlag attr) {
+fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const RAYX::RaySoA& rays, const RAYX::RayAttrFlag attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    if (isCSV) {
-        writeCsv(RAYX::raySoAToBundleHistory(rays), path.string());
+    fs::path outputFilepath;
+    if (m_cliArgs.outputPath) {
+        outputFilepath = *m_cliArgs.outputPath;
+        if (fs::is_directory(outputFilepath)) outputFilepath /= inputFilepath.filename();
+    } else {
+        outputFilepath = inputFilepath;
+    }
+    outputFilepath.replace_extension(m_cliArgs.csv ? ".csv" : ".h5");
+
+    // Error handling in case provided path does not exist
+    auto parent = outputFilepath.parent_path();
+    if (!parent.empty() && !fs::exists(parent)) {
+        RAYX_EXIT << "Output directory '" << parent.string() << "' does not exist. Create it first or use a different output path.";
+    }
+
+    if (m_cliArgs.csv) {
+        writeCsv(RAYX::raySoAToBundleHistory(rays), outputFilepath.string());
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
-        writeH5RaySoA(path, rays, attr);
+        writeH5RaySoA(outputFilepath, rays, attr);
 #endif
     }
 
-    return path;
+    return outputFilepath;
 }

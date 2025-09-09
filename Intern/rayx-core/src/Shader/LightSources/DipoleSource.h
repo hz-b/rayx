@@ -77,6 +77,7 @@ class RAYX_API DipoleSource : public ModelLightSource {
     // double m_photonFluxOrg;
     double m_maxFlux;
     double m_maxIntensity;
+    double m_horDivergence;
     double m_verDivergence;
 };
 

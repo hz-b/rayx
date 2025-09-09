@@ -36,10 +36,6 @@ class RAYX_API ModelLightSource {
 
     int32_t m_numberOfRays;
 
-    // in rad:
-    double m_horDivergence;  // phi
-    // double m_verDivergence;  // psi
-
     glm::dmat4x4 m_orientation = glm::dmat4x4();
     glm::dvec4 m_position = glm::dvec4();
 

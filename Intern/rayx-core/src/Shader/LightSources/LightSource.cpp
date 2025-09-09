@@ -8,8 +8,6 @@
 namespace RAYX {
 ModelLightSource::ModelLightSource(const DesignSource& dSource)
     : m_numberOfRays(static_cast<uint32_t>(dSource.getNumberOfRays())),
-      m_horDivergence(dSource.getHorDivergence()),
-      // m_verDivergence(dSource.getVerDivergence()),
       m_orientation(dSource.getOrientation()),
       m_position(dSource.getPosition()),
       m_misalignmentParams(dSource.getMisalignment()) {}

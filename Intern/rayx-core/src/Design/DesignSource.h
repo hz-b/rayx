@@ -97,8 +97,8 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setMisalignment(Misalignment m);
     Misalignment getMisalignment() const;
 
-    void setNumberOfRays(double value);
-    double getNumberOfRays() const;
+    void setNumberOfRays(int value);
+    int getNumberOfRays() const;
 
     void setPosition(glm::dvec4 p);
     glm::dvec4 getPosition() const override;

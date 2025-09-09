@@ -241,8 +241,8 @@ EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
     return en;
 }
 
-void DesignSource::setNumberOfRays(double value) { m_elementParameters["numberOfRays"] = value; }
-double DesignSource::getNumberOfRays() const { return m_elementParameters["numberOfRays"].as_double(); }
+void DesignSource::setNumberOfRays(int value) { m_elementParameters["numberOfRays"] = value; }
+int DesignSource::getNumberOfRays() const { return m_elementParameters["numberOfRays"].as_int(); }
 
 void DesignSource::setNumOfCircles(int value) { m_elementParameters["numOfCircles"] = value; }
 

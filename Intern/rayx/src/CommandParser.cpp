@@ -52,13 +52,14 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
                  "Enable CPU devices. Can be combined with --gpu. Affects --list-devices and --device-index. Default behaviour if neither --cpu and "
                  "--gpu are provided: Both will be enabled");
     app.add_flag("-X,--gpu", args.gpu, "Same as --cpu, but for GPU instead of CPU");
-    app.add_option(
-        "-d,--device-index", args.deviceId,
-        "Pick device via device index. Available devices are determined by --cpu and --gpu. Default: the best device will be picked automatically. Use --list-devices to see the available devices");
+    app.add_option("-d,--device-index", args.deviceId,
+                   "Pick device via device index. Available devices are determined by --cpu and --gpu. Default: the best device will be picked "
+                   "automatically. Use --list-devices to see the available devices");
     app.add_flag("-c,--csv", args.csv, "Output stored as csv instead of hdf5 file");
     app.add_flag("-V,--verbose", args.verbose, "Dump more information");
     app.add_option("-m,--maxevents", args.maxEvents, "Maximum number of events per ray. Default: number_of_elements_in_beamline * 2 + 8");
     app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", RAYX::DEFAULT_BATCH_SIZE));
+    app.add_option("-n,--number-of-rays", args.numberOfRays, "Override the number of rays for all sources");
     app.add_flag("-B,--benchmark", args.benchmark, "Dump benchmark durations");
     app.add_option("-R,--record-indices", args.recordIndices,
                    "Record events only for specific sources / elements. Use --dump to list the objects of a beamline");
@@ -74,7 +75,6 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     app.add_flag("-v,--version", args.version, "Show version information")->group(groupPrograms);
     app.add_flag("-l,--list-devices", args.listDevices, "List devices available for tracing. Affected by --cpu and --gpu")->group(groupPrograms);
     app.add_option("-D,--dump", args.dump, "Dump the meta data of a file (h5 or rml)")->group(groupPrograms);
-    app.add_flag("-p,--plot", args.plot, "Plot output footprints and histograms")->group(groupPrograms);
 
     try {
         app.parse(argc, argv);
@@ -97,8 +97,14 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
 
     const bool isMoreThanOnePath = args.inputPaths.size() > 1;
     const bool isFirstPathDirectory = args.inputPaths.size() == 1 && std::filesystem::is_directory(args.inputPaths[0]);
-    if (args.outputPath && (isMoreThanOnePath || isFirstPathDirectory))
-        RAYX_EXIT << "Please only provide --output when exactly one --input argument is provided and it directs to an RML file";
+    if (args.outputPath && (isMoreThanOnePath || isFirstPathDirectory)) {
+        if (std::filesystem::is_directory(*args.outputPath)) {
+            std::cout << "warning: you specified an output directory and potentially multiple input files. input files with the same name can lead "
+                         "to name collisions when exporting to the output directory" << std::endl;
+        } else {
+            RAYX_EXIT << "error: the output path must be a directory, when multiple input files or an input directory is specified";
+        }
+    }
 
     return args;
 }

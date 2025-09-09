@@ -15,6 +15,7 @@ struct CliArgs {
     bool sequential = false;                // -S --sequential
     bool verbose = false;                   // -V --verbose
     bool defaultSeed = false;               // -f, --default-seed
+    std::optional<int> numberOfRays;        // -n --number-of-rays
     std::optional<int> maxEvents;           // -m --maxevents
     std::optional<std::string> dump;        // -D --dump
     std::vector<std::string> inputPaths;    // -i --input

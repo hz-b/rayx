@@ -33,6 +33,7 @@ PointSource::PointSource(const DesignSource& dSource)
       m_horDist(dSource.getHorDist()),
       m_verDist(dSource.getVerDist()),
       m_pol(dSource.getStokes()),
+      m_horDivergence(dSource.getHorDivergence()),
       m_verDivergence(dSource.getVerDivergence()),
       m_sourceDepth(dSource.getSourceDepth()),
       m_sourceHeight(dSource.getSourceHeight()),

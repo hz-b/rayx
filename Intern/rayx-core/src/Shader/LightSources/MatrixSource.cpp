@@ -12,6 +12,7 @@ namespace RAYX {
 MatrixSource::MatrixSource(const DesignSource& dSource)
     : ModelLightSource(dSource),
       m_pol(dSource.getStokes()),
+      m_horDivergence(dSource.getHorDivergence()),
       m_verDivergence(dSource.getVerDivergence()),
       m_sourceDepth(dSource.getSourceDepth()),
       m_sourceHeight(dSource.getSourceHeight()),

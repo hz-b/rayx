@@ -16,6 +16,7 @@ class RAYX_API MatrixSource : public ModelLightSource {
   private:
     glm::dvec4 m_pol;
 
+    double m_horDivergence;
     double m_verDivergence;
     double m_sourceDepth;
     double m_sourceHeight;
