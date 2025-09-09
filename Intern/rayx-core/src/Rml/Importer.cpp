@@ -7,7 +7,6 @@
 #include <string>
 
 #include "Beamline/Beamline.h"
-#include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
@@ -97,7 +96,6 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::fil
             setMatrixSource(parser, ds.get());
             break;
         case ElementType::DipoleSource:
-        case ElementType::DipoleSrc:
             setDipoleSource(parser, ds.get());
             break;
         case ElementType::PixelSource:

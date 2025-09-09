@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-#include "LightSource.h"
+#include "Shader/LightSources/LightSource.h"
 
 namespace RAYX {
 
@@ -86,7 +86,6 @@ const std::map<std::string, BehaviourType> StringToBehaviourType = {{"Mirror", B
                                                                     {"Slit", BehaviourType::Slit},
                                                                     {"Rzp", BehaviourType::Rzp},
                                                                     {"ImagePlane", BehaviourType::ImagePlane}};
-
 // FigureRotation conversion
 const std::map<FigureRotation, std::string> FigureRotationToString = {
     {FigureRotation::Yes, "Yes"}, {FigureRotation::Plane, "Plane"}, {FigureRotation::A11, "A11"}};
@@ -115,5 +114,54 @@ const std::map<std::string, Material> StringToMaterial = {
 #include "Material/materials.xmacro"
 #undef X
 };
+
+// ElementType conversion
+const std::map<ElementType, std::string> ElementTypeToString = {{ElementType::CircleSource, "Circle Source"},
+                                                                {ElementType::CylinderMirror, "Cylinder"},
+                                                                {ElementType::ImagePlane, "ImagePlane"},
+                                                                {ElementType::MatrixSource, "Matrix Source"},
+                                                                {ElementType::ParaboloidMirror, "Paraboloid"},
+                                                                {ElementType::PlaneGrating, "Plane Grating"},
+                                                                {ElementType::PointSource, "Point Source"},
+                                                                {ElementType::ReflectionZoneplate, "Reflection Zoneplate"},
+                                                                {ElementType::SimpleUndulatorSource, "Simple Undulator"},
+                                                                {ElementType::Slit, "Slit"},
+                                                                {ElementType::Sphere, "Sphere"},
+                                                                {ElementType::ConeMirror, "Cone"},
+                                                                {ElementType::ExpertsMirror, "Experts Optics"},
+                                                                {ElementType::PlaneMirror, "Plane Mirror"},
+                                                                {ElementType::SphereGrating, "Spherical Grating"},
+                                                                {ElementType::SphereMirror, "Sphere Mirror"},
+                                                                {ElementType::ToroidMirror, "Toroid"},
+                                                                {ElementType::ToroidGrating, "Toroidal Grating"},
+                                                                {ElementType::DipoleSource, "Dipole Source"},
+                                                                {ElementType::PixelSource, "Pixel Source"},
+                                                                {ElementType::EllipsoidMirror, "Ellipsoid"},
+                                                                {ElementType::Crystal, "Crystal"},
+                                                                {ElementType::Foil, "Foil"}};
+const std::map<std::string, ElementType> StringToElementType = {{"Circle Source", ElementType::CircleSource},
+                                                                {"Cylinder", ElementType::CylinderMirror},
+                                                                {"ImagePlane", ElementType::ImagePlane},
+                                                                {"Matrix Source", ElementType::MatrixSource},
+                                                                {"Paraboloid", ElementType::ParaboloidMirror},
+                                                                {"Plane Grating", ElementType::PlaneGrating},
+                                                                {"Point Source", ElementType::PointSource},
+                                                                {"Reflection Zoneplate", ElementType::ReflectionZoneplate},
+                                                                {"Simple Undulator", ElementType::SimpleUndulatorSource},
+                                                                {"Slit", ElementType::Slit},
+                                                                {"Sphere", ElementType::Sphere},
+                                                                {"Cone", ElementType::ConeMirror},
+                                                                {"Experts Optics", ElementType::ExpertsMirror},
+                                                                {"Plane Mirror", ElementType::PlaneMirror},
+                                                                {"Spherical Grating", ElementType::SphereGrating},
+                                                                {"Sphere Mirror", ElementType::SphereMirror},
+                                                                {"Toroid", ElementType::ToroidMirror},
+                                                                {"Toroidal Grating", ElementType::ToroidGrating},
+                                                                {"Dipole Source", ElementType::DipoleSource},
+                                                                {"Dipole", ElementType::DipoleSource},  // legacy rml
+                                                                {"Pixel Source", ElementType::PixelSource},
+                                                                {"Ellipsoid", ElementType::EllipsoidMirror},
+                                                                {"Crystal", ElementType::Crystal},
+                                                                {"Foil", ElementType::Foil}};
 
 }  // namespace RAYX

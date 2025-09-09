@@ -9,10 +9,13 @@
 
 #include "Angle.h"
 #include "Beamline/Definitions.h"
+#include "Beamline/EnergyDistribution.h"
+#include "Beamline/Misalignment.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
+#include "Shader/LightSources/LightSource.h"
 #include "Shader/SlopeError.h"
 
 namespace RAYX {
@@ -36,16 +39,6 @@ enum class SpreadType;
 enum class ElementType;
 enum class CrystalType;
 enum class OffsetAngleType;  // TODO:see if this is needed
-
-// An error in position and orientation that an object might have.
-struct Misalignment {
-    double m_translationXerror;
-    double m_translationYerror;
-    double m_translationZerror;
-    Rad m_rotationXerror;
-    Rad m_rotationYerror;
-    Rad m_rotationZerror;
-};
 
 namespace xml {
 
@@ -96,7 +89,7 @@ struct RAYX_API Parser {
     Misalignment parseMisalignment() const;
     SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
-    EnergyDistribution parseEnergyDistribution() const;
+    EnergyDistributionVariant parseEnergyDistribution() const;
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;

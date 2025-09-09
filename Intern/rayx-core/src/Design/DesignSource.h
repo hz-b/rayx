@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Beamline/Node.h"
-#include "Shader/Ray.h"
 #include "Value.h"
 
 namespace RAYX {
@@ -19,7 +18,6 @@ struct RAYX_API DesignSource : public BeamlineNode {
     std::unique_ptr<BeamlineNode> clone() const override;
 
     DesignMap m_elementParameters;
-    std::vector<Ray> compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
     bool isSource() const override { return true; }
 
     void setStokeslin0(double value);
@@ -93,13 +91,14 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setPhotonFlux(double value);
     double getPhotonFlux() const;
 
-    EnergyDistribution getEnergyDistribution() const;
+    void setEnergyDistribution(const EnergyDistributionVariant& value);
+    EnergyDistributionVariant getEnergyDistribution() const;
 
     void setMisalignment(Misalignment m);
     Misalignment getMisalignment() const;
 
-    void setNumberOfRays(double value);
-    double getNumberOfRays() const;
+    void setNumberOfRays(int value);
+    int getNumberOfRays() const;
 
     void setPosition(glm::dvec4 p);
     glm::dvec4 getPosition() const override;

@@ -9,30 +9,32 @@ TEST_F(TestSuite, allBeamlineObjects) {
 }
 
 TEST_F(TestSuite, loadDatFile) {
-    RAYX::Beamline bl = loadBeamline("loadDatFile");
-    CHECK_EQ(bl.numSources(), 1);
-    CHECK_EQ(bl.numElements(), 1);
-
-    // This only works due to fixed seeding!
-    // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    const auto source0 = bl.getSources()[0];
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 15, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 12, 0.1);
+    ADD_FAILURE();
+    // RAYX::Beamline bl = loadBeamline("loadDatFile");
+    // CHECK_EQ(bl.numSources(), 1);
+    // CHECK_EQ(bl.numElements(), 1);
+    //
+    // // This only works due to fixed seeding!
+    // // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
+    // const auto source0 = bl.getSources()[0];
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 15, 0.1);
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 12, 0.1);
 }
 
 TEST_F(TestSuite, loadDatFile2) {
-    RAYX::Beamline bl = loadBeamline("loadDatFile2");
-    CHECK_EQ(bl.numSources(), 1);
-    CHECK_EQ(bl.numElements(), 1);
-
-    // This only works due to fixed seeding!
-    // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    const auto source0 = bl.getSources()[0];
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 14.7, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17.1, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 16.7, 0.1);
+    ADD_FAILURE();
+    // RAYX::Beamline bl = loadBeamline("loadDatFile2");
+    // CHECK_EQ(bl.numSources(), 1);
+    // CHECK_EQ(bl.numElements(), 1);
+    //
+    // // This only works due to fixed seeding!
+    // // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
+    // const auto source0 = bl.getSources()[0];
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 14.7, 0.1);
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17.1, 0.1);
+    // CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 16.7, 0.1);
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -56,36 +58,37 @@ TEST_F(TestSuite, groupTransform) {
 }
 
 TEST_F(TestSuite, testEnergyDistribution) {
-    struct testInput {
-        std::string rmlFile;
-        double energy;
-    };
-
-    std::vector<testInput> testinput = {
-        {
-            .rmlFile = "PointSourceSeparateEnergies",
-            .energy = 100,
-        },
-        {
-            .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy = 104.042,
-        },
-        {
-            .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy = 51.29,
-        },
-        {
-            .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy = 123.19,
-        },
-    };
-
-    for (auto values : testinput) {
-        auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.getSources()[0]->getEnergyDistribution().selectEnergy();
-
-        CHECK_EQ(energy, values.energy, 0.1);
-    }
+    ADD_FAILURE();
+    // struct testInput {
+    //     std::string rmlFile;
+    //     double energy;
+    // };
+    //
+    // std::vector<testInput> testinput = {
+    //     {
+    //         .rmlFile = "PointSourceSeparateEnergies",
+    //         .energy = 100,
+    //     },
+    //     {
+    //         .rmlFile = "PointSourceSoftEdgeEnergy",
+    //         .energy = 104.042,
+    //     },
+    //     {
+    //         .rmlFile = "PointSourceThreeSoftEdgeEnergies",
+    //         .energy = 51.29,
+    //     },
+    //     {
+    //         .rmlFile = "PointSourceHardEdgeEnergy",
+    //         .energy = 123.19,
+    //     },
+    // };
+    //
+    // for (auto values : testinput) {
+    //     auto beamline = loadBeamline(values.rmlFile);
+    //     auto energy = beamline.getSources()[0]->getEnergyDistribution().selectEnergy();
+    //
+    //     CHECK_EQ(energy, values.energy, 0.1);
+    // }
 }
 
 TEST_F(TestSuite, testParaboloidQuad) {
@@ -203,18 +206,20 @@ TEST_F(TestSuite, testExpertsOptic) {
  * Tests if two sources can be traced in one go.
  * Its a static test, so every change can result in a fail even if it's still working correctly
  */
+// TODO: write more tests with two or more sources. also test energy distributions, especially DatFile
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
-    auto beamline = loadBeamline("twoSourcesTest");
-
-    const auto dipolesource = beamline.getSources()[0];
-
-    const auto pointsource = beamline.getSources()[1];
-
-    CHECK_EQ(100, dipolesource->getEnergy());
-    CHECK_EQ(150.24724068638105, pointsource->getEnergyDistribution().selectEnergy());
-
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
+    ADD_FAILURE();
+    // auto beamline = loadBeamline("twoSourcesTest");
+    //
+    // const auto dipolesource = beamline.getSources()[0];
+    //
+    // const auto pointsource = beamline.getSources()[1];
+    //
+    // CHECK_EQ(100, dipolesource->getEnergy());
+    // CHECK_EQ(150.24724068638105, pointsource->getEnergyDistribution().selectEnergy());
+    //
+    // RAYX::fixSeed(RAYX::FIXED_SEED);
+    // CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
 }
 
 TEST_F(TestSuite, groupTransform2) {

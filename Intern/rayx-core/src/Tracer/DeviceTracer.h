@@ -10,7 +10,19 @@
 namespace RAYX {
 
 // Small helper to make passing the full record mask easier.
-inline std::vector<bool> fullRecordMask(size_t numElements) { return std::vector<bool>(numElements, true); }
+inline std::vector<bool> fullRecordMask(size_t numSources, size_t numElements) { return std::vector<bool>(numSources + numElements, true); }
+
+inline std::vector<bool> sourcesRecordMask(size_t numSources, size_t numElements) {
+    auto mask = std::vector<bool>(numSources + numElements, false);
+    for (size_t i = 0; i < numSources; ++i) mask[i] = true;
+    return mask;
+}
+
+inline std::vector<bool> elementsRecordMask(size_t numSources, size_t numElements) {
+    auto mask = std::vector<bool>(numSources + numElements, false);
+    for (size_t i = 0; i < numElements; ++i) mask[i + numSources] = true;
+    return mask;
+}
 
 /**
  * @brief DeviceTracer is an interface to a tracer implementation

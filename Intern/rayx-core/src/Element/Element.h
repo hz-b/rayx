@@ -37,7 +37,6 @@ enum class ElementType {
     PointSource,
     MatrixSource,
     DipoleSource,
-    DipoleSrc,
     PixelSource,
     CircleSource,
     SimpleUndulatorSource
@@ -66,9 +65,5 @@ RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 o
 // constructs an OpticalElement given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
 OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane = DesignPlane::XZ,
                            std::optional<Cutout> cutout = {});
-
-extern std::map<ElementType, std::string> RAYX_API ElementStringMap;
-ElementType RAYX_API findElementString(const std::string& name);
-std::string RAYX_API elementTypeToString(const ElementType type);
 
 }  // namespace RAYX

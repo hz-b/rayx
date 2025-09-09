@@ -54,3 +54,9 @@
 #else
 #define RAYX_FN_ACC
 #endif
+
+#if defined(RAYX_BUILD_DLL) && defined(RAYX_CUDA_ENABLED)
+#define RAYX_CONSTEXPR_ACC constexpr __device__
+#else
+#define RAYX_CONSTEXPR_ACC constexpr
+#endif

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Beamline/LightSource.h"
+#include "LightSource.h"
+#include "Shader/Rand.h"
 
 namespace RAYX {
 
-class RAYX_API PixelSource : public LightSource {
+class RAYX_API PixelSource : public ModelLightSource {
   public:
     PixelSource(const DesignSource&);
-    virtual ~PixelSource() = default;
 
-    std::vector<Ray> getRays(int thread_count = 1) const override;
+    RAYX_FN_ACC Ray genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const;
 
   private:
     // Geometric Params
@@ -17,6 +17,7 @@ class RAYX_API PixelSource : public LightSource {
 
     glm::dvec4 m_pol;
 
+    double m_horDivergence;
     double m_verDivergence;
     double m_sourceDepth;
     double m_sourceHeight;
