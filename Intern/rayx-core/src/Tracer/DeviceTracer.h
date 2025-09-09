@@ -14,15 +14,13 @@ inline std::vector<bool> fullRecordMask(size_t numSources, size_t numElements) {
 
 inline std::vector<bool> sourcesRecordMask(size_t numSources, size_t numElements) {
     auto mask = std::vector<bool>(numSources + numElements, false);
-    for (size_t i = 0; i < numSources; ++i)
-        mask[i] = true;
+    for (size_t i = 0; i < numSources; ++i) mask[i] = true;
     return mask;
 }
 
 inline std::vector<bool> elementsRecordMask(size_t numSources, size_t numElements) {
     auto mask = std::vector<bool>(numSources + numElements, false);
-    for (size_t i = 0; i < numElements; ++i)
-        mask[i + numSources] = true;
+    for (size_t i = 0; i < numElements; ++i) mask[i + numSources] = true;
     return mask;
 }
 

@@ -219,7 +219,7 @@ size_t Group::numSources() const {
     return count;
 }
 
-size_t Grou::numObjects() const {
+size_t Group::numObjects() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
         if (node.isSource() || node.isElement()) {

@@ -16,26 +16,16 @@ class TerminalApp {
     ~TerminalApp();
 
     void run();
-    const std::string& getProvidedFilePath() const { return providedFile; };
 
   private:
-    /**
-     * @brief Write Rays into output file
-     * @return true
-     * @return false
-     */
-    char** m_argv;
-    int m_argc;
-
-    /// if `path` is an RML file, it will trace this file.
-    /// if `path` is a directory, it will call `tracePath(child)` for all
-    /// children of that directory.
     void tracePath(const std::filesystem::path& path);
-    // returns the output filename (either .csv or .h5)
+    void traceRml(const std::filesystem::path& path);
+    void traceBeamline(const RAYX::Beamline& beamline, const std::filesystem::path& outputPath);
+
+    /// write rays to file
+    /// @returns the output filename (either .csv or .h5)
     std::filesystem::path exportRays(const RAYX::RaySoA& rays, bool isCSV, const std::filesystem::path&, const RAYX::RayAttrFlag attr);
 
-    std::string providedFile;
-    std::unique_ptr<CommandParser> m_CommandParser;
-    std::unique_ptr<RAYX::Tracer> m_Tracer;
-    std::unique_ptr<RAYX::Beamline> m_Beamline;
+    std::unique_ptr<RAYX::Tracer> m_tracer;
+    CliArgs m_cliArgs;
 };

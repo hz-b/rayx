@@ -250,7 +250,8 @@ class MegaKernelTracer : public DeviceTracer {
 
   private:
     template <typename DevAcc, typename Queue>
-    void traceBatch(DevAcc devAcc, Queue q, int numSources, int numElements, int maxEvents, Sequential sequential, GenRaysAcc::BatchConfig& batchConf) {
+    void traceBatch(DevAcc devAcc, Queue q, int numSources, int numElements, int maxEvents, Sequential sequential,
+                    GenRaysAcc::BatchConfig& batchConf) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto constState = ConstState{

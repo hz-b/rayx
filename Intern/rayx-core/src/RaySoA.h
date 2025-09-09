@@ -136,4 +136,9 @@ using BundleHistory = std::vector<RayHistory>;
 RAYX_API RaySoA bundleHistoryToRaySoA(const BundleHistory& bundle);
 RAYX_API BundleHistory raySoAToBundleHistory(const RaySoA& rays);
 
+/// get a full list of attr names
+RAYX_API std::vector<std::string> getRayAttrNames();
+/// convert list of attr names to attr mask
+RAYX_API RayAttrFlag rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings);
+
 }  // namespace RAYX
