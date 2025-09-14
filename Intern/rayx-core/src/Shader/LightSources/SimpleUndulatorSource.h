@@ -5,7 +5,7 @@
 
 namespace RAYX {
 
-class RAYX_API SimpleUndulatorSource : public ModelLightSource {
+class RAYX_API SimpleUndulatorSource : public LightSourceBase {
   public:
     SimpleUndulatorSource(const DesignSource&);
 

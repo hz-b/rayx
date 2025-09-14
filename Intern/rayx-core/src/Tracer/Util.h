@@ -12,6 +12,15 @@ namespace RAYX {
 template <typename Acc, typename T>
 using OptBuf = std::optional<alpaka::Buf<Acc, T, alpaka::DimInt<1>, int32_t>>;
 
+// this struct is analog to struct Rays. It contains OptBufs instead of vectors, so it can be used as buffers on CPU or GPU
+template <typename Acc>
+struct RaysBuf {
+#define X(type, name, flag, map) OptBuf<Acc, type> name;
+
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+};
+
 inline int ceilIntDivision(const int dividend, const int divisor) { return (divisor + dividend - 1) / divisor; }
 
 inline int nextPowerOfTwo(const int value) { return static_cast<int>(glm::pow(2, glm::ceil(glm::log(value) / glm::log(2)))); }

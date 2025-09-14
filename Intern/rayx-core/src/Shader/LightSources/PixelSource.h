@@ -5,7 +5,7 @@
 
 namespace RAYX {
 
-class RAYX_API PixelSource : public ModelLightSource {
+class RAYX_API PixelSource : public LightSourceBase {
   public:
     PixelSource(const DesignSource&);
 

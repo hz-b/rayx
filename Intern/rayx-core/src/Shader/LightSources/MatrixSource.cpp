@@ -10,7 +10,7 @@
 namespace RAYX {
 
 MatrixSource::MatrixSource(const DesignSource& dSource)
-    : ModelLightSource(dSource),
+    : LightSourceBase(dSource),
       m_pol(dSource.getStokes()),
       m_horDivergence(dSource.getHorDivergence()),
       m_verDivergence(dSource.getVerDivergence()),
@@ -27,9 +27,18 @@ MatrixSource::MatrixSource(const DesignSource& dSource)
 RAYX_FN_ACC
 Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                          Rand& __restrict rand) const {
+    // Calculate grid size
     const int rmat = int(std::sqrt(m_numberOfRays));
+    const int nGrid = rmat * rmat;
     const int row  = rayIndex % rmat;
     const int col  = (rayIndex / rmat) % rmat;
+
+    // Count how many rays share this origin
+    int originIndex = row + rmat * col;
+    int raysPerOrigin = m_numberOfRays / nGrid;
+    int extraRays = m_numberOfRays % nGrid;
+    // The first 'extraRays' origins get one extra ray
+    int nRaysThisOrigin = raysPerOrigin + (originIndex < extraRays ? 1 : 0);
 
     double rn = rand.randomDouble();  // in [0, 1]
     auto x    = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + m_misalignmentParams.m_translationXerror;
@@ -49,7 +58,9 @@ Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, const Ener
     glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
     direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-    const auto field = stokesToElectricField(m_pol, m_orientation);
+    // Scale the field so that each origin emits the same total intensity
+    auto field = stokesToElectricField(m_pol, m_orientation);
+    field /= static_cast<double>(nRaysThisOrigin);
 
     return Ray{
         .m_position    = position,

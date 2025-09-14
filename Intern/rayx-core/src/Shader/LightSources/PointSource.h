@@ -5,7 +5,7 @@
 
 namespace RAYX {
 
-class RAYX_API PointSource : public ModelLightSource {
+class RAYX_API PointSource : public LightSourceBase {
   public:
     PointSource(const DesignSource&);
 

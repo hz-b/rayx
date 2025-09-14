@@ -27,7 +27,7 @@ double getCoord(const SourceDist l, const double extent, Rand& __restrict rand) 
 }  // unnamed namespace
 
 PointSource::PointSource(const DesignSource& dSource)
-    : ModelLightSource(dSource),
+    : LightSourceBase(dSource),
       m_widthDist(dSource.getWidthDist()),
       m_heightDist(dSource.getHeightDist()),
       m_horDist(dSource.getHorDist()),

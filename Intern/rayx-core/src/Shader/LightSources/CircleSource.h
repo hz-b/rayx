@@ -5,7 +5,7 @@
 
 namespace RAYX {
 
-class RAYX_API CircleSource : public ModelLightSource {
+class RAYX_API CircleSource : public LightSourceBase {
   public:
     CircleSource(const DesignSource&);
 

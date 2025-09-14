@@ -362,7 +362,7 @@ double calcMaxFlux(double photonEnergy, double energySpread, double criticalEner
 double calcGamma(double electronEnergy) { return std::fabs(electronEnergy) * get_factorElectronEnergy(); }
 
 DipoleSource::DipoleSource(const DesignSource& dSource)
-    : ModelLightSource(dSource),
+    : LightSourceBase(dSource),
       m_bendingRadius(dSource.getBendingRadius()),
       m_electronEnergyOrientation(dSource.getElectronEnergyOrientation()),
       // m_photonFlux(dSource.getPhotonFlux()),

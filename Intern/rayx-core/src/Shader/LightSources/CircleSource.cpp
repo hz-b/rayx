@@ -6,7 +6,7 @@
 
 namespace RAYX {
 
-CircleSource::CircleSource(const DesignSource& dSource) : ModelLightSource(dSource) {
+CircleSource::CircleSource(const DesignSource& dSource) : LightSourceBase(dSource) {
     m_stokes = dSource.getStokes();
 
     m_sourceDepth  = dSource.getSourceDepth();

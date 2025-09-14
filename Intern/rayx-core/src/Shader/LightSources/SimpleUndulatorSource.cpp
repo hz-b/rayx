@@ -52,7 +52,7 @@ double getSourceHeight(const double electronSigmaY, const double undulatorSigma)
 
 }  // unnamed namespace
 
-SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : ModelLightSource(dSource) {
+SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : LightSourceBase(dSource) {
     const auto sigmaType       = dSource.getSigmaType();
     const auto undulatorLength = dSource.getUndulatorLength();
     // const auto photonEnergy = dSource.getEnergy();

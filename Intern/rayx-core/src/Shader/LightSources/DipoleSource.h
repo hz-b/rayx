@@ -29,7 +29,7 @@ RAYX_API RAYX_FN_ACC double schwinger(double energy, double gamma, double critic
 RAYX_API double calcMaxFlux(double photonEnergy, double energySpread, double criticalEnergy, double gamma);
 RAYX_API double calcGamma(double electronEnergy);
 
-class RAYX_API DipoleSource : public ModelLightSource {
+class RAYX_API DipoleSource : public LightSourceBase {
   public:
     DipoleSource(const DesignSource&);
 

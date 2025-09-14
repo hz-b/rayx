@@ -4,15 +4,6 @@
 
 namespace RAYX {
 
-// this struct is analog to struct Rays. It contains OptBufs instead of vectors, so it can be used as buffers on CPU or GPU
-template <typename Acc>
-struct RaysBuf {
-#define X(type, name, flag, map) OptBuf<Acc, type> name;
-
-    RAYX_X_MACRO_RAY_ATTR
-#undef X
-};
-
 // this struct is analog to struct Rays. It contains pointers to the attribute arrays
 struct RaysPtr {
 #define X(type, name, flag, map) type* __restrict name;

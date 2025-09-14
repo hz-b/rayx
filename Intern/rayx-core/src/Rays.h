@@ -3,7 +3,9 @@
 #include <vector>
 
 #include "Core.h"
-#include "Shader/Ray.h"
+#include "Shader/EventType.h"
+#include "Shader/ElectricField.h"
+#include "Shader/Rand.h"
 
 // TODO: all this macros should be invisible to the user
 
@@ -19,6 +21,7 @@
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X         X(double, direction_x, DirectionX)
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y         X(double, direction_y, DirectionY)
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z         X(double, direction_z, DirectionZ)
+// TODO; this should be std::complex<double>, but our ubuntu CLI did not yet catch up to support std::complex in cuda device code
 #define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(complex::Complex, electric_field_x, ElectricFieldX)
 #define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(complex::Complex, electric_field_y, ElectricFieldY)
 #define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(complex::Complex, electric_field_z, ElectricFieldZ)

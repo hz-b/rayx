@@ -6,7 +6,7 @@
 #include "Design/DesignSource.h"
 
 namespace RAYX {
-ModelLightSource::ModelLightSource(const DesignSource& dSource)
+LightSourceBase::LightSourceBase(const DesignSource& dSource)
     : m_numberOfRays(static_cast<uint32_t>(dSource.getNumberOfRays())),
       m_orientation(dSource.getOrientation()),
       m_position(dSource.getPosition()),
@@ -14,7 +14,7 @@ ModelLightSource::ModelLightSource(const DesignSource& dSource)
 
 // needed for many of the light sources, from two angles to one direction vector
 RAYX_FN_ACC
-glm::dvec3 ModelLightSource::getDirectionFromAngles(const double phi, const double psi) {
+glm::dvec3 LightSourceBase::getDirectionFromAngles(const double phi, const double psi) {
     double al = cos(psi) * sin(phi);
     double am = -sin(psi);
     double an = cos(psi) * cos(phi);
@@ -23,7 +23,7 @@ glm::dvec3 ModelLightSource::getDirectionFromAngles(const double phi, const doub
 
 //  (see RAYX.FOR select_energy)
 //  TODO: enable
-// double ModelLightSource::selectEnergy() const { return m_EnergyDistribution.selectEnergy(); }
-// double ModelLightSource::selectEnergy() const { return 300.0; }
+// double LightSourceBase::selectEnergy() const { return m_EnergyDistribution.selectEnergy(); }
+// double LightSourceBase::selectEnergy() const { return 300.0; }
 
 }  // namespace RAYX

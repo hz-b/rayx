@@ -15,9 +15,8 @@ namespace RAYX {
 class RAYX_API Tracer {
   public:
     /**
-     * @brief Constructs Tracer for the desired platform
-     * @param platform specify the platform
-     * @param deviceIndex index of the picked divice on specified platform
+     * @brief Construct a new Tracer object
+     * @param deviceConfig Configuration for the device to be used for tracing
      */
     Tracer(const DeviceConfig& deviceConfig);
 

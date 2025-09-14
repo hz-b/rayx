@@ -6,7 +6,7 @@
 namespace RAYX {
 struct DesignSource;
 
-class RAYX_API MatrixSource : public ModelLightSource {
+class RAYX_API MatrixSource : public LightSourceBase {
   public:
     MatrixSource(const DesignSource&);
 
