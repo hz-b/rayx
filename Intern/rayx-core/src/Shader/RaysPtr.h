@@ -2,6 +2,8 @@
 
 #include "Rays.h"
 
+namespace RAYX {
+
 // this struct is analog to struct Rays. It contains pointers to the attribute arrays
 struct RaysPtr {
 #define X(type, name, flag, map) type* __restrict name;
@@ -30,3 +32,13 @@ struct RaysPtr {
         electric_field_z[i] = electric_field.z;
     }
 };
+
+template <typename Acc>
+struct RaysBuf {
+#define X(type, name, flag, map) OptBuf<Acc, type> name;
+
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+};
+
+}  // namespace RAYX

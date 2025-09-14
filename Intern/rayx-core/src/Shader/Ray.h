@@ -8,23 +8,30 @@
 
 namespace RAYX {
 
-// this struct is menat, only for the usage inside a kernel
+// this struct is for the usage inside a kernel
+// it is padded for optimal memory access on the CPU
+// the GPU does not care about padding as long as Ray stays in registers
 struct Ray {
-    int path_id;
-    int event_id;
-    glm::dvec3 position;
-    EventType event_type;
-    glm::dvec3 direction;
-    double energy;
-    ElectricField electric_field;
+    // keep position and direction together for better cache performance, since they are likely to be used together
+    glm::dvec3 position;  
+    glm::dvec3 direction; 
+
+    double energy;      
     double optical_path_length;
-    int order;
-    int object_id;
-    int source_id;
-    Rand rand;  // inherently deletes copy ctor of Ray
+
+    ElectricField electric_field;
+
+    Rand rand;  // deletes copy constructor/assignment
+
+    int path_id;          
+    int path_event_id;    
+    int order;            
+    int object_id;        
+    int source_id;        
+    EventType event_type; 
 };
 
-// make sure Ray is not copy constructable/assignable to protect us from doing costly copies
+// make sure Ray is not copy constructable/assignable to protect it from costly copies
 static_assert(!std::is_copy_constructible_v<Ray> && !std::is_copy_assignable_v<Ray>);
 
 }  // namespace RAYX

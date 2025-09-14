@@ -80,7 +80,7 @@ struct GenRays {
     struct BatchConfig {
         int numRaysBatch;
         int batchStartRayIndex;
-        OptBuf<Acc, Ray> d_rays;
+        RaysPtr d_rays;
         OptBuf<Acc, Rand> d_rands;
     };
 
@@ -192,8 +192,12 @@ struct GenRays {
         }
 
         m_numRaysBatchAtMost = std::min(m_numRaysTotal, maxBatchSize);
-        allocBuf(q, d_rays, m_numRaysBatchAtMost);
-        allocBuf(q, d_rands, m_numRaysBatchAtMost);
+
+#define X(type, name, flag, map) \
+    if (!!(attrMask & RayAttrFlag::flag)) allocBuf(q, d_rays.name, m_numRaysBatchAtMost);
+
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
 
         const auto numBatches = ceilIntDivision(m_numRaysTotal, m_numRaysBatchAtMost);
 
@@ -254,7 +258,7 @@ struct GenRays {
   private:
     // resources per batch. constant per batch
     /// input rays
-    OptBuf<Acc, Ray> d_rays;
+    RaysBuf d_rays;
 
     // resources per batch.
     /// random counter per ray path

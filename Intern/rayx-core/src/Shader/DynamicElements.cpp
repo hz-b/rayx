@@ -10,18 +10,18 @@ namespace RAYX {
 RAYX_FN_ACC
 Ray loadRay(const int i, const Rays& __restrict rays) {
     return {
-        .path_id             = rays.path_id[i],
-        .path_event_id       = rays.path_event_id[i],
         .position            = rays.position(i),
-        .event_type          = rays.event_type[i],
         .direction           = rays.direction(i),
         .energy              = rays.energy[i],
-        .electric_field      = rays.electric_field(i),
         .optical_path_length = rays.optical_path_length[i],
+        .electric_field      = rays.electric_field(i),
+        .rand                = Rand(rays.rand_counter[i]),
+        .path_id             = rays.path_id[i],
+        .path_event_id       = rays.path_event_id[i],
         .order               = rays.order[i],
         .object_id           = rays.object_id[i],
         .source_id           = rays.source_id[i],
-        .rand                = Rand(rays.rand_counter[i]),
+        .event_type          = rays.event_type[i],
     };
 }
 
