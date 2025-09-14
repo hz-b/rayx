@@ -1,16 +1,16 @@
-#include "RaySoA.h"
+#include "Rays.h"
 
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {
 
-RaySoA bundleHistoryToRaySoA(const BundleHistory& bundle) {
+Rays bundleHistoryToRays(const BundleHistory& bundle) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    RaySoA rays;
+    Rays rays;
 
     int32_t event_id = 0;
-    int32_t path_id = 0;
+    int32_t path_id  = 0;
     for (const auto& hist : bundle) {
         for (const auto& event : hist) {
             rays.path_id.push_back(path_id);
@@ -26,16 +26,16 @@ RaySoA bundleHistoryToRaySoA(const BundleHistory& bundle) {
     }
 
     rays.num_events = event_id;
-    rays.num_paths = path_id;
+    rays.num_paths  = path_id;
     return rays;
 }
 
-BundleHistory raySoAToBundleHistory(const RaySoA& rays) {
+BundleHistory raySoAToBundleHistory(const Rays& rays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (rays.num_events == 0) return BundleHistory();
     int maxPathId = *std::max_element(rays.path_id.begin(), rays.path_id.end());
-    auto bundle = BundleHistory(maxPathId + 1);
+    auto bundle   = BundleHistory(maxPathId + 1);
 
     for (int i = 0; i < rays.num_events; ++i) {
         const auto path_id = rays.path_id[i];
@@ -64,9 +64,7 @@ RayAttrFlag rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings)
 
     auto attr = RayAttrFlag::None;
 
-    for (const auto& str : strings) {
-        attr |= stringToAttr(str);
-    }
+    for (const auto& str : strings) { attr |= stringToAttr(str); }
 
     return attr;
 }

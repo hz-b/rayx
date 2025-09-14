@@ -40,7 +40,7 @@ struct RAYX_API RectCutout {
 RAYX_FN_ACC
 inline Cutout serializeRect(RectCutout cut) {
     Cutout ser;
-    ser.m_type = CutoutType::Rect;
+    ser.m_type                            = CutoutType::Rect;
     ser.m_private_serialization_params[0] = cut.m_width;
     ser.m_private_serialization_params[1] = cut.m_length;
     return ser;
@@ -49,7 +49,7 @@ inline Cutout serializeRect(RectCutout cut) {
 RAYX_FN_ACC
 inline RectCutout deserializeRect(Cutout ser) {
     RectCutout cut;
-    cut.m_width = ser.m_private_serialization_params[0];
+    cut.m_width  = ser.m_private_serialization_params[0];
     cut.m_length = ser.m_private_serialization_params[1];
     return cut;
 }
@@ -71,7 +71,7 @@ struct RAYX_API EllipticalCutout {
 RAYX_FN_ACC
 inline Cutout serializeElliptical(EllipticalCutout cut) {
     Cutout ser;
-    ser.m_type = CutoutType::Elliptical;
+    ser.m_type                            = CutoutType::Elliptical;
     ser.m_private_serialization_params[0] = cut.m_diameter_x;
     ser.m_private_serialization_params[1] = cut.m_diameter_z;
     return ser;
@@ -103,7 +103,7 @@ struct RAYX_API TrapezoidCutout {
 RAYX_FN_ACC
 inline Cutout serializeTrapezoid(TrapezoidCutout cut) {
     Cutout ser;
-    ser.m_type = CutoutType::Trapezoid;
+    ser.m_type                            = CutoutType::Trapezoid;
     ser.m_private_serialization_params[0] = cut.m_widthA;
     ser.m_private_serialization_params[1] = cut.m_widthB;
     ser.m_private_serialization_params[2] = cut.m_length;

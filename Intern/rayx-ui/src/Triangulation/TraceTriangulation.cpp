@@ -22,21 +22,21 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
             double z = -length / 2 + zStep * j;
             glm::dvec3 pos, dir;
             constexpr double distanceToObj = 2000.0f;
-            pos = glm::dvec3(x, distanceToObj, z);
-            dir = glm::dvec3(0.0f, -1.0f, 0.0f);
-            const auto stokes = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
-            const auto field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, dir);
+            pos                            = glm::dvec3(x, distanceToObj, z);
+            dir                            = glm::dvec3(0.0f, -1.0f, 0.0f);
+            const auto stokes              = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
+            const auto field               = RAYX::stokesToElectricFieldWithBaseConvention(stokes, dir);
 
             RAYX::Ray ray = {
-                .m_position = pos,
-                .m_eventType = RAYX::EventType::Emitted,
-                .m_direction = dir,
-                .m_energy = 1.0f,
-                .m_field = field,
-                .m_pathLength = 0.0f,
-                .m_order = 0,
+                .m_position    = pos,
+                .m_eventType   = RAYX::EventType::Emitted,
+                .m_direction   = dir,
+                .m_energy      = 1.0f,
+                .m_field       = field,
+                .m_pathLength  = 0.0f,
+                .m_order       = 0,
                 .m_lastElement = -1,
-                .m_sourceID = 0,
+                .m_sourceID    = 0,
             };
             grid[i][j] = ray;
         }
@@ -52,10 +52,10 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
  */
 void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     using DeviceType = RAYX::DeviceConfig::DeviceType;
-    auto tracer = RAYX::Tracer(RAYX::DeviceConfig(DeviceType::Cpu).enableBestDevice());
+    auto tracer      = RAYX::Tracer(RAYX::DeviceConfig(DeviceType::Cpu).enableBestDevice());
 
-    constexpr size_t gridSize = 20;
-    auto [width, length] = getRectangularDimensions(compiled.m_cutout);
+    constexpr size_t gridSize   = 20;
+    auto [width, length]        = getRectangularDimensions(compiled.m_cutout);
     RAYX::BundleHistory rayGrid = createRayGrid(gridSize, width, length);
 
     RAYX::Collision coll;
@@ -66,7 +66,7 @@ void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<Texture
         for (size_t j = 0; j < gridSize; ++j) {
             const auto& ray = rayGrid[i][j];
             RAYX::Collision collision =
-                RAYX::findCollisionInElementCoords(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
+                RAYX::findCollisionInElementCoordsWithoutSlopeError(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }
@@ -95,7 +95,5 @@ void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<Texture
             }
         }
     }
-    if (vertices.empty() || indices.empty()) {
-        throw std::runtime_error("Failed: Missing vertices or indices at a render object!");
-    }
+    if (vertices.empty() || indices.empty()) { throw std::runtime_error("Failed: Missing vertices or indices at a render object!"); }
 }

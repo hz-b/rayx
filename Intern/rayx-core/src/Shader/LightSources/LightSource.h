@@ -37,7 +37,7 @@ class RAYX_API ModelLightSource {
     int32_t m_numberOfRays;
 
     glm::dmat4x4 m_orientation = glm::dmat4x4();
-    glm::dvec4 m_position = glm::dvec4();
+    glm::dvec4 m_position      = glm::dvec4();
 
     Misalignment m_misalignmentParams;  // x, y, psi, phi
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <string>
 
@@ -163,5 +164,45 @@ const std::map<std::string, ElementType> StringToElementType = {{"Circle Source"
                                                                 {"Ellipsoid", ElementType::EllipsoidMirror},
                                                                 {"Crystal", ElementType::Crystal},
                                                                 {"Foil", ElementType::Foil}};
+
+const std::map<std::string, EventType> StringToEventType = {
+    {"Uninitialized", EventType::Uninitialized}, {"Emitted", EventType::Emitted},   {"HitElement", EventType::HitElement},
+    {"FatalError", EventType::FatalError},       {"Absorbed", EventType::Absorbed}, {"BeyondHorizon", EventType::BeyondHorizon},
+    {"TooManyEvents", EventType::TooManyEvents},
+};
+
+const std::map<EventType, std::string> EventTypeToString = {
+    {EventType::Uninitialized, "Uninitialized"}, {EventType::Emitted, "Emitted"},   {EventType::HitElement, "HitElement"},
+    {EventType::FatalError, "FatalError"},       {EventType::Absorbed, "Absorbed"}, {EventType::BeyondHorizon, "BeyondHorizon"},
+    {EventType::TooManyEvents, "TooManyEvents"},
+};
+
+// Generic helper for all enums
+template <typename Enum>
+std::ostream& streamEnum(std::ostream& os, const Enum value, const std::map<Enum, std::string>& toStringMap) {
+    if (auto it = toStringMap.find(value); it != toStringMap.end()) {
+        os << it->second;
+    } else {
+        os << "<unknown>";
+    }
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const SpreadType v) { return streamEnum(os, v, SpreadTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const EnergyDistributionType v) { return streamEnum(os, v, EnergyDistributionTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const SourceDist v) { return streamEnum(os, v, SourceDistToString); }
+inline std::ostream& operator<<(std::ostream& os, const ElectronEnergyOrientation v) { return streamEnum(os, v, ElectronEnergyOrientationToString); }
+inline std::ostream& operator<<(std::ostream& os, const EnergySpreadUnit v) { return streamEnum(os, v, EnergySpreadUnitToString); }
+inline std::ostream& operator<<(std::ostream& os, const RZPType v) { return streamEnum(os, v, RZPTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const CentralBeamstop v) { return streamEnum(os, v, CentralBeamstopToString); }
+inline std::ostream& operator<<(std::ostream& os, const GratingMount v) { return streamEnum(os, v, GratingMountToString); }
+inline std::ostream& operator<<(std::ostream& os, const ParaboloidType v) { return streamEnum(os, v, ParaboloidTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const CurvatureType v) { return streamEnum(os, v, CurvatureTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const BehaviourType v) { return streamEnum(os, v, BehaviourTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const FigureRotation v) { return streamEnum(os, v, FigureRotationToString); }
+inline std::ostream& operator<<(std::ostream& os, const SigmaType v) { return streamEnum(os, v, SigmaTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const Material v) { return streamEnum(os, v, MaterialToString); }
+inline std::ostream& operator<<(std::ostream& os, const ElementType v) { return streamEnum(os, v, ElementTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const EventType v) { return streamEnum(os, v, EventTypeToString); }
 
 }  // namespace RAYX

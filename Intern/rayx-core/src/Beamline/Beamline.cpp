@@ -13,21 +13,17 @@ namespace RAYX {
 // Move constructor
 Group::Group(Group&& other) noexcept
     : m_position(std::move(other.m_position)), m_orientation(std::move(other.m_orientation)), m_children(std::move(other.m_children)) {
-    for (auto& child : m_children) {
-        child->m_Parent = this;
-    }
+    for (auto& child : m_children) { child->m_Parent = this; }
 }
 
 // Move assignment operator
 Group& Group::operator=(Group&& other) noexcept {
     if (this != &other) {
-        m_position = std::move(other.m_position);
+        m_position    = std::move(other.m_position);
         m_orientation = std::move(other.m_orientation);
-        m_children = std::move(other.m_children);
+        m_children    = std::move(other.m_children);
 
-        for (auto& child : m_children) {
-            child->m_Parent = this;
-        }
+        for (auto& child : m_children) { child->m_Parent = this; }
     }
     return *this;
 }
@@ -47,9 +43,7 @@ std::unique_ptr<BeamlineNode> Group::clone() const {
 void Group::ctraverse(const std::function<bool(const BeamlineNode&)>& callback) const {
     for (const auto& child : m_children) {
         assert(child && "m_children contains a nullptr!");
-        if (callback(*child)) {
-            return;
-        }
+        if (callback(*child)) { return; }
         if (child->isGroup()) {
             auto groupPtr = static_cast<Group*>(child.get());
             groupPtr->ctraverse(callback);
@@ -60,9 +54,7 @@ void Group::ctraverse(const std::function<bool(const BeamlineNode&)>& callback) 
 void Group::traverse(const std::function<bool(BeamlineNode&)>& callback) {
     for (auto& child : m_children) {
         assert(child && "m_children contains a nullptr!");
-        if (callback(*child)) {
-            return;
-        }
+        if (callback(*child)) { return; }
         assert(child && "m_children contains a nullptr! This should never happen.");
         if (child->isGroup()) {
             auto groupPtr = static_cast<Group*>(child.get());
@@ -85,9 +77,7 @@ MaterialTables Group::calcMinimalMaterialTables() const {
     relevantMaterials.fill(false);
     for (const auto& elemPtr : elements) {
         int material = static_cast<int>(elemPtr->getMaterial());  // assuming getMaterial() exists
-        if (material >= 1 && material <= 92) {
-            relevantMaterials[material - 1] = true;
-        }
+        if (material >= 1 && material <= 92) { relevantMaterials[material - 1] = true; }
     }
     return loadMaterialTables(relevantMaterials);
 }
@@ -101,13 +91,11 @@ void Group::accumulateLightSourcesWorldPositions(const Group& group, const glm::
         assert(child && "m_children contains a nullptr!");
         if (child->isSource()) {
             DesignSource* srcPtr = static_cast<DesignSource*>(child.get());
-            glm::dvec4 worldPos = currentOri * srcPtr->getPosition() + currentPos;
+            glm::dvec4 worldPos  = currentOri * srcPtr->getPosition() + currentPos;
             positions.push_back(worldPos);
         } else if (child->isGroup()) {
             Group* grpPtr = static_cast<Group*>(child.get());
-            if (grpPtr) {
-                accumulateLightSourcesWorldPositions(*grpPtr, currentPos, currentOri, positions);
-            }
+            if (grpPtr) { accumulateLightSourcesWorldPositions(*grpPtr, currentPos, currentOri, positions); }
         }
     }
 }
@@ -139,9 +127,7 @@ std::vector<OpticalElement> Group::compileElements() const {
 std::vector<const DesignElement*> Group::getElements() const {
     std::vector<const DesignElement*> elements;
     ctraverse([&elements](const BeamlineNode& node) -> bool {
-        if (node.isElement()) {
-            elements.push_back(static_cast<const DesignElement*>(&node));
-        }
+        if (node.isElement()) { elements.push_back(static_cast<const DesignElement*>(&node)); }
         return false;
     });
     return elements;
@@ -150,9 +136,7 @@ std::vector<const DesignElement*> Group::getElements() const {
 std::vector<const DesignSource*> Group::getSources() const {
     std::vector<const DesignSource*> sources;
     ctraverse([&sources](const BeamlineNode& node) -> bool {
-        if (node.isSource()) {
-            sources.push_back(static_cast<const DesignSource*>(&node));
-        }
+        if (node.isSource()) { sources.push_back(static_cast<const DesignSource*>(&node)); }
         return false;
     });
     return sources;
@@ -200,9 +184,7 @@ std::vector<std::string> Group::getObjectNames() const {
 size_t Group::numElements() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
-        if (node.isElement()) {
-            ++count;
-        }
+        if (node.isElement()) { ++count; }
         return false;
     });
     return count;
@@ -211,9 +193,7 @@ size_t Group::numElements() const {
 size_t Group::numSources() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
-        if (node.isSource()) {
-            ++count;
-        }
+        if (node.isSource()) { ++count; }
         return false;
     });
     return count;
@@ -222,9 +202,7 @@ size_t Group::numSources() const {
 size_t Group::numObjects() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
-        if (node.isSource() || node.isElement()) {
-            ++count;
-        }
+        if (node.isSource() || node.isElement()) { ++count; }
         return false;
     });
     return count;

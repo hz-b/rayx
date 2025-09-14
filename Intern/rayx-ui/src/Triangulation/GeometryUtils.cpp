@@ -10,26 +10,26 @@
  * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
  */
 std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
-    double width = 0.0;
+    double width  = 0.0;
     double length = 0.0;
 
     switch (cutout.m_type) {
         case RAYX::CutoutType::Rect: {
             RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
-            width = rect.m_width;
-            length = rect.m_length;
+            width                 = rect.m_width;
+            length                = rect.m_length;
             break;
         }
         case RAYX::CutoutType::Elliptical: {
             RAYX::EllipticalCutout ell = RAYX::deserializeElliptical(cutout);
-            width = ell.m_diameter_x;   // Diameter is essentially the max width
-            length = ell.m_diameter_z;  // Diameter is the max length
+            width                      = ell.m_diameter_x;  // Diameter is essentially the max width
+            length                     = ell.m_diameter_z;  // Diameter is the max length
             break;
         }
         case RAYX::CutoutType::Trapezoid: {
             RAYX::TrapezoidCutout trap = RAYX::deserializeTrapezoid(cutout);
-            width = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
-            length = trap.m_length;
+            width                      = std::max(trap.m_widthA, trap.m_widthB);  // max of the two sides
+            length                     = trap.m_length;
             break;
         }
         default: {  // RAYX::CutoutType::Unlimited and unknown types
@@ -42,9 +42,7 @@ std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
 }
 
 void Outline::calculateForQuadrilateral(double widthA, double widthB, double lengthA, double lengthB) {
-    if (widthA <= 0 || widthB <= 0 || lengthA <= 0 || lengthB <= 0) {
-        return;
-    }
+    if (widthA <= 0 || widthB <= 0 || lengthA <= 0 || lengthB <= 0) { return; }
     // Right handed coord system when looking down the negative y axis: x is to the left and z is up
     vertices = {
         TextureVertex(glm::vec4(-widthB / 2.0f, 0, -lengthA / 2.0f, 1.0f), glm::vec2(1.0f, 1.0f)),  // Bottom-right
@@ -55,15 +53,13 @@ void Outline::calculateForQuadrilateral(double widthA, double widthB, double len
 }
 
 void Outline::calculateForElliptical(double diameterA, double diameterB) {
-    if (diameterA <= 0.0 || diameterB <= 0.0) {
-        return;
-    }
+    if (diameterA <= 0.0 || diameterB <= 0.0) { return; }
     constexpr uint32_t numVertices = 20;
     vertices.reserve(numVertices);
 
     // Calculate vertices
     for (uint32_t i = 0; i < numVertices; i++) {
-        double angle = 2.0f * RAYX::PI * i / numVertices;
+        double angle  = 2.0f * RAYX::PI * i / numVertices;
         glm::vec4 pos = {-diameterA * cos(angle) / 2.0f, 0, diameterB * sin(angle) / 2.0f, 1.0f};
         vertices.emplace_back(pos, OPT_ELEMENT_COLOR);
     }

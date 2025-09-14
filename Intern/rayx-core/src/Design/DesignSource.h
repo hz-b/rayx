@@ -6,10 +6,10 @@
 namespace RAYX {
 
 struct RAYX_API DesignSource : public BeamlineNode {
-    DesignSource() = default;
+    DesignSource()  = default;
     ~DesignSource() = default;
     // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
-    DesignSource(const DesignSource& other) = delete;
+    DesignSource(const DesignSource& other)            = delete;
     DesignSource& operator=(const DesignSource& other) = delete;
     // Allow move
     DesignSource(DesignSource&& other) noexcept;

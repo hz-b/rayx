@@ -59,21 +59,21 @@ Ray PixelSource::genRay(const SourceId sourceId, const EnergyDistributionDataVar
     // get corresponding angles based on distribution and deviation from
     // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
     glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-    glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
-    direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+    glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
+    direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
     const auto field = stokesToElectricField(m_pol, m_orientation);
 
     return Ray{
-        .m_position = position,
-        .m_eventType = EventType::Emitted,
-        .m_direction = direction,
-        .m_energy = en,
-        .m_field = field,
-        .m_pathLength = 0.0,
-        .m_order = 0,
+        .m_position    = position,
+        .m_eventType   = EventType::Emitted,
+        .m_direction   = direction,
+        .m_energy      = en,
+        .m_field       = field,
+        .m_pathLength  = 0.0,
+        .m_order       = 0,
         .m_lastElement = -1,
-        .m_sourceID = sourceId,
+        .m_sourceID    = sourceId,
     };
 }
 

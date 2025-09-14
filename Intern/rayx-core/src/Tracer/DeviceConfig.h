@@ -9,12 +9,12 @@ namespace RAYX {
 
 struct RAYX_API DeviceConfig {
     enum RAYX_API DeviceType {
-        Unsupported = 0,         //
-        Cpu = 1 << 0,            //
-        GpuCuda = 1 << 1,        //
-        GpuHip = 1 << 2,         //
-        Gpu = GpuCuda | GpuHip,  //
-        All = Cpu | Gpu,         //
+        Unsupported = 0,                 //
+        Cpu         = 1 << 0,            //
+        GpuCuda     = 1 << 1,            //
+        GpuHip      = 1 << 2,            //
+        Gpu         = GpuCuda | GpuHip,  //
+        All         = Cpu | Gpu,         //
     };
 
     struct RAYX_API Device {
@@ -30,10 +30,10 @@ struct RAYX_API DeviceConfig {
 
     DeviceConfig(DeviceType fetchedDeviceType = DeviceType::All);
     DeviceConfig(const DeviceConfig&) = default;
-    DeviceConfig(DeviceConfig&&) = default;
+    DeviceConfig(DeviceConfig&&)      = default;
 
     DeviceConfig& operator=(const DeviceConfig&) = default;
-    DeviceConfig& operator=(DeviceConfig&&) = default;
+    DeviceConfig& operator=(DeviceConfig&&)      = default;
 
     void dumpDevices() const;
     size_t enabledDevicesCount() const;

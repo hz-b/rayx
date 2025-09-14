@@ -51,9 +51,7 @@ std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, do
 
 void dumpFootprint(std::vector<std::vector<uint32_t>> footprint) {
     for (auto row : footprint) {
-        for (auto cell : row) {
-            std::cout << cell << " ";
-        }
+        for (auto cell : row) { std::cout << cell << " "; }
         std::cout << std::endl;
     }
 }
@@ -64,15 +62,15 @@ std::vector<std::vector<uint32_t>> makeFootprintSquare(std::vector<RAYX::Ray> ra
 
 void writeFootprintAsPNG(std::vector<std::vector<uint32_t>> footprint, const char* filename) {
     uint32_t width, height;
-    constexpr uint32_t channels = 4;  // RGBA is forced for now
+    constexpr uint32_t channels           = 4;  // RGBA is forced for now
     std::unique_ptr<unsigned char[]> data = footprintAsImage(footprint, width, height);
     stbi_write_png(filename, width, height, channels, data.get(), width * channels);
 }
 
 std::unique_ptr<unsigned char[]> footprintAsImage(const std::vector<std::vector<uint32_t>>& footprint, uint32_t& width, uint32_t& height) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    width = static_cast<uint32_t>(footprint.size());
-    height = static_cast<uint32_t>(footprint[0].size());
+    width                       = static_cast<uint32_t>(footprint.size());
+    height                      = static_cast<uint32_t>(footprint[0].size());
     constexpr uint32_t channels = 4;  // RGBA is forced for now
     std::unique_ptr<unsigned char[]> data(new unsigned char[width * height * channels]);
 
@@ -84,13 +82,11 @@ std::unique_ptr<unsigned char[]> footprintAsImage(const std::vector<std::vector<
     // Find max value in a single pass
     uint32_t max = 0;
     for (const auto& row : footprint) {
-        for (uint32_t value : row) {
-            max = std::max(max, value);
-        }
+        for (uint32_t value : row) { max = std::max(max, value); }
     }
 
     if (max == 0) max = 1;
-    const float logMax = std::log10(static_cast<float>(max) + 1.0f);
+    const float logMax    = std::log10(static_cast<float>(max) + 1.0f);
     const float invLogMax = 1.0f / logMax;
 
     {
@@ -100,8 +96,8 @@ std::unique_ptr<unsigned char[]> footprintAsImage(const std::vector<std::vector<
         // Initialize LUT (do this once)
         for (int i = 0; i < LUT_SIZE; ++i) {
             float normalizedValue = std::log10(static_cast<float>(i) + 1.0f) * invLogMax;
-            glm::vec4 color = low + colorDiff * normalizedValue;
-            colorLUT[i] = glm::u8vec4(color * 255.0f);
+            glm::vec4 color       = low + colorDiff * normalizedValue;
+            colorLUT[i]           = glm::u8vec4(color * 255.0f);
         }
 
         for (uint32_t y = 0; y < height; ++y) {

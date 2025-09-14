@@ -12,7 +12,6 @@
 #include "Debug/Debug.h"
 
 extern "C" {
-
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     RAYX_VERB << "SDL_AppInit: initializing application...";
     *appstate = new Application(1920, 1080, "RAYX-UI", argc, argv);

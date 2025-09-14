@@ -6,9 +6,7 @@
 /// Get the last event for each ray of the bundle.
 std::vector<Ray> extractLastEvents(const BundleHistory& hist) {
     std::vector<Ray> out;
-    for (auto& ray_hist : hist) {
-        out.push_back(ray_hist.back());
-    }
+    for (auto& ray_hist : hist) { out.push_back(ray_hist.back()); }
 
     return out;
 }
@@ -21,9 +19,7 @@ TEST_F(TestSuite, PlaneMirrorDef) {
     RAYX_LOG << "planemirrdef ";
     // additional path length test
     auto rays = extractLastEvents(traceRML("PlaneMirrorDef"));
-    for (auto r : rays) {
-        CHECK_IN(r.m_pathLength, 11000, 11001)
-    }
+    for (auto r : rays) { CHECK_IN(r.m_pathLength, 11000, 11001) }
 }
 TEST_F(TestSuite, PlaneMirrorMis) { compareLastAgainstRayUI("PlaneMirrorMis"); }
 TEST_F(TestSuite, SphereMirrorDefault) { compareLastAgainstRayUI("SphereMirrorDefault", 1e-10); }

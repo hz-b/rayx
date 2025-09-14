@@ -5,8 +5,8 @@
 
 namespace RAYX {
 
-using Stokes = glm::dvec4;
-using ElectricField = cvec3;
+using Stokes             = glm::dvec4;
+using ElectricField      = cvec3;
 using LocalElectricField = cvec2;
 
 RAYX_FN_ACC
@@ -34,18 +34,17 @@ inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm
  * @param distance distance traveled in media
  * @param ior_real real component of complex index of refraction of media
  * @return advanced electric field
- * @TODO: check if waveLength and distance use the same
  */
 RAYX_FN_ACC
-inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double distance, const float ior_real) {
+inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double opticalPathLength) {
     // bring wavelength from nanometers into millimeters
     waveLength /= 1e6;
 
     // compute wave number (2π * n / λ)
     const double waveNumber = 2.0 * PI * ior_real / waveLength;
 
-    // reduce the distance modulo wavelength to avoid large angle errors
-    const double reducedDistance = std::fmod(distance, waveLength);
+    // reduce the distance modulo wavelength to avoid large angle errors, thus improving numerical stability
+    const double reducedDistance = std::fmod(opticalPathLength, waveLength);
 
     // compute the phase shift using the reduced distance
     const double deltaPhi = waveNumber * reducedDistance;
@@ -79,21 +78,21 @@ inline RotationBase forwardVectorToBaseConvention(const glm::dvec3 forward) {
 
     // if the forward vector is not close to being vertical, we initialize the up vector to (0, 1, 0)
     if (!close_to_vertical) {
-        up = glm::dvec3(0, 1, 0);
+        up    = glm::dvec3(0, 1, 0);
         right = glm::normalize(glm::cross(up, forward));
-        up = glm::normalize(glm::cross(forward, right));
+        up    = glm::normalize(glm::cross(forward, right));
     }
 
     // otherwise initialize the right vector to (1, 0, 0)
     else {
         right = glm::dvec3(1, 0, 0);
-        up = glm::normalize(glm::cross(forward, right));
+        up    = glm::normalize(glm::cross(forward, right));
         right = glm::normalize(glm::cross(up, forward));
     }
 
     return RotationBase{
-        .right = right,
-        .up = up,
+        .right   = right,
+        .up      = up,
         .forward = forward,
     };
 }
@@ -149,7 +148,7 @@ inline LocalElectricField globalToLocalElectricField(const ElectricField field, 
 
 RAYX_FN_ACC
 inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
-    const auto mag = complex::abs(field);
+    const auto mag   = complex::abs(field);
     const auto theta = complex::arg(field);
 
     return Stokes(mag.x * mag.x + mag.y * mag.y, mag.x * mag.x - mag.y * mag.y, 2.0 * mag.x * mag.y * glm::cos(theta.x - theta.y),
@@ -158,10 +157,10 @@ inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
 
 RAYX_FN_ACC
 inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
-    const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
-    const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
+    const auto x_real  = glm::sqrt((stokes.x + stokes.y) / 2.0);
+    const auto y_mag   = glm::sqrt((stokes.x - stokes.y) / 2.0);
     const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
-    const auto y = complex::polar(y_mag, y_theta);
+    const auto y       = complex::polar(y_mag, y_theta);
     return LocalElectricField({x_real, 0}, y);
 }
 

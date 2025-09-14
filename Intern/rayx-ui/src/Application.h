@@ -39,7 +39,7 @@ class Application {
     Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv);
     ~Application();
 
-    Application(const Application&) = delete;
+    Application(const Application&)            = delete;
     Application& operator=(const Application&) = delete;
 
     void run();
@@ -91,8 +91,8 @@ class Application {
     RAYX::BundleHistory m_rays;                        ///< All rays
     std::vector<std::vector<RAYX::Ray>> m_sortedRays;  ///< Rays sorted by element
     bool m_buildElementsNeeded = true;
-    bool m_buildTextureNeeded = true;
-    VkExtent2D sceneExtent = {1920, 1080};  // TODO: why do we need this?
+    bool m_buildTextureNeeded  = true;
+    VkExtent2D sceneExtent     = {1920, 1080};  // TODO: why do we need this?
 
     // TODO: Should be in Scene
     std::future<void> m_beamlineFuture;

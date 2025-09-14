@@ -8,10 +8,10 @@
 namespace RAYX {
 
 struct RAYX_API DesignElement : public BeamlineNode {
-    DesignElement() = default;
+    DesignElement()  = default;
     ~DesignElement() = default;
     // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
-    DesignElement(const DesignElement& other) = delete;
+    DesignElement(const DesignElement& other)            = delete;
     DesignElement& operator=(const DesignElement& other) = delete;
     // Allow move
     DesignElement(DesignElement&& other) noexcept;

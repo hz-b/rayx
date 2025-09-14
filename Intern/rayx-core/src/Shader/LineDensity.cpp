@@ -47,29 +47,29 @@ given direction on the grating
 RAYX_FN_ACC
 void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
-    int RZP_TYPE = int(b.m_rzpType);
-    double risag = b.m_designSagittalEntranceArmLength;
-    double rosag = b.m_designSagittalExitArmLength;
-    double rimer = b.m_designMeridionalEntranceArmLength;
-    double romer = b.m_designMeridionalExitArmLength;
-    double alpha = b.m_designAlphaAngle;
-    double beta = b.m_designBetaAngle;
-    double WL = 1e-06 * b.m_designWavelength;  // source energy/design energy
-    double Ord = b.m_orderOfDiffraction;
+    int RZP_TYPE   = int(b.m_rzpType);
+    double risag   = b.m_designSagittalEntranceArmLength;
+    double rosag   = b.m_designSagittalExitArmLength;
+    double rimer   = b.m_designMeridionalEntranceArmLength;
+    double romer   = b.m_designMeridionalExitArmLength;
+    double alpha   = b.m_designAlphaAngle;
+    double beta    = b.m_designBetaAngle;
+    double WL      = 1e-06 * b.m_designWavelength;  // source energy/design energy
+    double Ord     = b.m_orderOfDiffraction;
 
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
-    double X = r.m_position.x;
-    double Y = r.m_position.y;
-    double Z = r.m_position.z;
+    double X  = r.m_position.x;
+    double Y  = r.m_position.y;
+    double Z  = r.m_position.z;
 
     if (RZP_TYPE == 1)  // meridional (wie VLS grating)
         X = 0;
 
     // avoid calculating the same sinus/cosinus multiple times (costly)
-    double s_beta = glm::sin(beta);
-    double c_beta = glm::cos(beta);
+    double s_beta  = glm::sin(beta);
+    double c_beta  = glm::cos(beta);
     double s_alpha = glm::sin(alpha);
     double c_alpha = glm::cos(alpha);
 
@@ -105,10 +105,10 @@ void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& D
             ym = -(FX * X) - FY * Y - FZ * Z + FZ * rosag * c_beta + FY * rosag * s_beta;
         }
     } else if (IMAGE_TYPE == IT_ASTIGMATIC2ASTIGMATIC) {
-        double s_rim = glm::sign(rimer);
-        double s_rom = glm::sign(romer);
+        double s_rim    = glm::sign(rimer);
+        double s_rom    = glm::sign(romer);
         double c_2alpha = glm::cos(2 * alpha);
-        double c_2beta = glm::cos(2 * beta);
+        double c_2beta  = glm::cos(2 * beta);
         if (FX == 0 && FZ == 0) {  //   !plane
 
             zi = s_rim * (rimer * c_alpha + Z);
@@ -121,13 +121,13 @@ void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& D
             ym = s_rom * (romer * s_beta - Y);
         } else {
             double denominator = Z * c_alpha + risag * c_2alpha + Y * s_alpha;
-            double nominator = X * (Z * c_alpha + rimer * c_2alpha + Y * s_alpha);
+            double nominator   = X * (Z * c_alpha + rimer * c_2alpha + Y * s_alpha);
             zi = s_rim * ((FX * FX + FY * FY) * (Z + rimer * c_alpha) - FY * FZ * (Y - rimer * s_alpha) - (FX * FZ * nominator) / denominator);
             xi = s_rim * (-(FX * Y) + FX * rimer * s_alpha + (FY * nominator) / denominator);
             yi = s_rim * (FZ * (Z + rimer * c_alpha) + FY * (Y - rimer * s_alpha) + (FX * nominator) / denominator);
 
             denominator = (-(Z * c_beta) + rosag * c_2beta + Y * s_beta);
-            nominator = X * (-(Z * c_beta) + romer * c_2beta + Y * s_beta);
+            nominator   = X * (-(Z * c_beta) + romer * c_2beta + Y * s_beta);
             zm = s_rom * ((FX * FX + FY * FY) * (-Z + romer * c_beta) + FY * FZ * (Y - romer * s_beta) + (FX * FZ * nominator) / denominator);
             xm = s_rom * (FX * (Y - romer * s_beta) - (FY * nominator) / denominator);
             ym = s_rom * (FZ * (-Z + romer * c_beta) + FY * (-Y + romer * s_beta) - (FX * nominator) / denominator);

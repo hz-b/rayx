@@ -22,7 +22,7 @@ struct InitRandomCountersKernel {
     template <typename Acc>
     RAYX_FN_ACC void operator()(const Acc& __restrict acc, Rand* __restrict rands, const int startRayIndex, const int numRaysTotal, const double seed,
                                 const int n) const {
-        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+        const auto gid      = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
         const auto rayIndex = gid + startRayIndex;
 
         if (gid < n) rands[gid] = Rand(rayIndex, numRaysTotal, seed);
@@ -55,12 +55,12 @@ struct GenRaysKernel {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
         if (gid < n) {
-            const auto rayIndex = startRayIndex + gid;
+            const auto rayIndex    = startRayIndex + gid;
             const auto dstRayIndex = dstStartRayIndex + gid;
-            auto rand = std::move(rands[gid]);
-            const auto ray = genRay(source, sourceId, energyDistribution, rayIndex, rand);
-            rays[dstRayIndex] = ray;
-            rands[gid] = std::move(rand);
+            auto rand              = std::move(rands[gid]);
+            const auto ray         = genRay(source, sourceId, energyDistribution, rayIndex, rand);
+            rays[dstRayIndex]      = ray;
+            rands[gid]             = std::move(rand);
         }
     }
 };
@@ -89,7 +89,7 @@ struct GenRays {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
-        const auto devHost = alpaka::getDevByIdx(platformHost, 0);
+        const auto devHost      = alpaka::getDevByIdx(platformHost, 0);
 
         m_startRayIndex = 0;
 
@@ -114,22 +114,16 @@ struct GenRays {
             }
         };
 
-        auto energyDistributionListIndex = 0;
+        auto energyDistributionListIndex     = 0;
         const auto compileEnergyDistribution = [&](const DesignSource& designSource) -> std::optional<EnergyDistributionDataVariant> {
             // special case: DipoleSource has no energy distribution
             if (designSource.getType() == ElementType::DipoleSource) return std::nullopt;
 
             return std::visit(
                 [&]<typename T>(const T& value) -> std::optional<EnergyDistributionDataVariant> {
-                    if constexpr (std::is_same_v<T, HardEdge>) {
-                        return value;
-                    }
-                    if constexpr (std::is_same_v<T, SoftEdge>) {
-                        return value;
-                    }
-                    if constexpr (std::is_same_v<T, SeparateEnergies>) {
-                        return value;
-                    }
+                    if constexpr (std::is_same_v<T, HardEdge>) { return value; }
+                    if constexpr (std::is_same_v<T, SoftEdge>) { return value; }
+                    if constexpr (std::is_same_v<T, SeparateEnergies>) { return value; }
                     if constexpr (std::is_same_v<T, DatFile>) {
                         assert(value.m_Lines.size() > 0);
                         assert(d_energyDistributionListWeights.size() == d_energyDistributionListEnergies.size());
@@ -147,7 +141,7 @@ struct GenRays {
 
                         // alloc device buffers and transfer data
                         const auto index = energyDistributionListIndex++;
-                        const auto size = static_cast<int>(value.m_Lines.size());
+                        const auto size  = static_cast<int>(value.m_Lines.size());
                         if (static_cast<int>(d_energyDistributionListWeights.size()) <= index) {
                             d_energyDistributionListWeights.emplace_back();
                             d_energyDistributionListEnergies.emplace_back();
@@ -159,13 +153,13 @@ struct GenRays {
 
                         return EnergyDistributionList{
                             .prefixWeights = alpaka::getPtrNative(*d_energyDistributionListWeights[index]),
-                            .weightSum = weightSum,
-                            .energies = alpaka::getPtrNative(*d_energyDistributionListWeights[index]),
-                            .size = size,
-                            .start = value.m_start,
-                            .end = value.m_end,
-                            .step = value.m_step,
-                            .continous = value.m_continuous,
+                            .weightSum     = weightSum,
+                            .energies      = alpaka::getPtrNative(*d_energyDistributionListWeights[index]),
+                            .size          = size,
+                            .start         = value.m_start,
+                            .end           = value.m_end,
+                            .step          = value.m_step,
+                            .continous     = value.m_continuous,
                         };
                     }
 
@@ -175,23 +169,23 @@ struct GenRays {
                 designSource.getEnergyDistribution());
         };
 
-        m_numRaysTotal = 0;
+        m_numRaysTotal      = 0;
         auto numRaysSources = std::vector<int>();
-        auto sourceId = static_cast<SourceId>(0);
+        auto sourceId       = static_cast<SourceId>(0);
 
         const auto designSources = beamline.getSources();
         for (const auto* designSource : designSources) {
-            const auto source = *compileSource(*designSource);
+            const auto source             = *compileSource(*designSource);
             const auto energyDistribution = compileEnergyDistribution(*designSource);
-            const auto numRaysSource = static_cast<int>(designSource->getNumberOfRays());
+            const auto numRaysSource      = static_cast<int>(designSource->getNumberOfRays());
             m_numRaysTotal += numRaysSource;
 
             m_sourceStates.push_back(SourceState{
-                .source = source,
-                .sourceId = sourceId,
-                .energyDistribution = energyDistribution,
+                .source                 = source,
+                .sourceId               = sourceId,
+                .energyDistribution     = energyDistribution,
                 .numRaysSourceRemaining = numRaysSource,
-                .name = designSource->getName(),
+                .name                   = designSource->getName(),
             });
 
             ++sourceId;
@@ -206,9 +200,9 @@ struct GenRays {
         m_seed = randomDouble();
 
         return {
-            .numRaysTotal = m_numRaysTotal,
+            .numRaysTotal       = m_numRaysTotal,
             .numRaysBatchAtMost = m_numRaysBatchAtMost,
-            .numBatches = numBatches,
+            .numBatches         = numBatches,
         };
     }
 
@@ -216,10 +210,10 @@ struct GenRays {
     BatchConfig genRaysBatch(DevAcc devAcc, Queue q, const int batchIndex) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
-        const auto batchStartRayIndex = batchIndex * m_numRaysBatchAtMost;
+        const auto batchStartRayIndex    = batchIndex * m_numRaysBatchAtMost;
         const auto numRaysTotalRemaining = m_numRaysTotal - batchStartRayIndex;
-        const auto numRaysBatch = std::min(numRaysTotalRemaining, m_numRaysBatchAtMost);
-        auto numRaysBatchRemaining = numRaysBatch;
+        const auto numRaysBatch          = std::min(numRaysTotalRemaining, m_numRaysBatchAtMost);
+        auto numRaysBatchRemaining       = numRaysBatch;
 
         RAYX_VERB << "execute InitRandomCountersKernel";
         execWithValidWorkDiv<Acc>(devAcc, q, numRaysBatch, BlockSizeConstraint::None{}, InitRandomCountersKernel{}, alpaka::getPtrNative(*d_rands),
@@ -250,10 +244,10 @@ struct GenRays {
         }
 
         return BatchConfig{
-            .numRaysBatch = numRaysBatch,
+            .numRaysBatch       = numRaysBatch,
             .batchStartRayIndex = batchStartRayIndex,
-            .d_rays = d_rays,
-            .d_rands = d_rands,
+            .d_rays             = d_rays,
+            .d_rands            = d_rands,
         };
     }
 

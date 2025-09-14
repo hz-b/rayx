@@ -14,7 +14,7 @@
 class UIHandler {
   public:
     UIHandler(const Window& window, const Device& device, VkFormat imageFormat, VkFormat depthFormat, uint32_t imageCount);
-    UIHandler(const UIHandler&) = delete;
+    UIHandler(const UIHandler&)            = delete;
     UIHandler& operator=(const UIHandler&) = delete;
     ~UIHandler();
 
@@ -27,9 +27,7 @@ class UIHandler {
 
     VkClearValue getClearValue() const {
         VkClearValue v;
-        for (int i = 0; i < 4; i++) {
-            v.color.float32[i] = m_ClearColor[i];
-        }
+        for (int i = 0; i < 4; i++) { v.color.float32[i] = m_ClearColor[i]; }
         return v;
     }
 
@@ -40,12 +38,12 @@ class UIHandler {
     float m_ClearColor[4] = {0.01f, 0.01f, 0.01f, 1.00f};
 
     bool m_isDarkTheme = true;
-    float m_scale = 1.0f;
-    float m_oldScale = 1.0f;
+    float m_scale      = 1.0f;
+    float m_oldScale   = 1.0f;
     std::vector<ImFont*> m_fonts;
 
     bool m_showRMLNotExistPopup = false;
-    bool m_loadh5withRML = true;
+    bool m_loadh5withRML        = true;
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;

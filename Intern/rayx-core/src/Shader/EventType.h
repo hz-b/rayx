@@ -5,69 +5,52 @@
 
 namespace RAYX {
 
+// TODO: doc this enum and all its members
 enum class EventType {
-
-    // The meaning of the `m_eventType` field of a `Ray`:
-    ////////////////////////////////////////////////////
-
-    // This Ray has just hit `m_lastElement`.
-    // And will continue tracing afterwards.
-    // Ray is in element coordinates of the hit element.
-    HitElement = 1,
-
-    // If the storage space for the events is insufficient for the amount of events that were recorded in a shader call.
-    TooManyEvents = 2,
-
-    // This Ray was absorbed by `m_lastElement`.
-    // Ray is in element coordinates, relative to `m_lastElement`.
-    Absorbed = 3,
-
-    // This is a yet uninitialized ray from outputData.
-    // This is the initial weight within outputData, and if less events than `maxEvents` are taken,
-    // the remaining weights in outputData will stay EventType::Uninitialized even when returned to the CPU.
-    Uninitialized = 4,
-
-    // This is an error code.
-    // Functions like refrac2D can error due to "ray beyond horizon", see Utils.h.
-    // In that case this is returned as final event.
+    Uninitialized = 0,
+    Emitted       = 1,
+    HitElement    = 2,
+    FatalError    = 3,
+    Absorbed      = 4,
     BeyondHorizon = 5,
-
-    // This is a general error code that means some assertion failed in the shader.
-    // This error code is typically generated using `_throw`.
-    FatalError = 6,
-
-    // These rays have just been emitted and not had any other events
-    // If there are no other elements the ray has this eventtype
-    Emitted = 7,
-
-    // This ray transmits through an element
-    // and is not terminated.
-    Transmitted = 8,
-
+    TooManyEvents = 6,
 };
 
-inline std::string findEventTypeString(const EventType eventType) {
-    switch (eventType) {
-        case EventType::HitElement:
-            return "HitElement";
-        case EventType::TooManyEvents:
-            return "HitElement";
-        case EventType::Absorbed:
-            return "Absorbed";
-        case EventType::Uninitialized:
-            return "Uninitialized";
-        case EventType::BeyondHorizon:
-            return "BeyondHoizon";
-        case EventType::FatalError:
-            return "FatalError";
-        case EventType::Emitted:
-            return "Emitted";
-        default:
-            //_debug_throw("unable to convert EventType (%d) to string!", static_cast<int>(eventType));
-            return "<unknown-event-type>";
-    }
+RAYX_FN_ACC inline bool isRayTerminated(const EventType eventType) {
+    return !(eventType == EventType::Emitted || eventType == EventType::HitElement);
+}
+RAYX_FN_ACC inline void terminateRay(Ray& __restrict ray, const EventType eventType) {
+    _debug_warn(!isRayTerminated(ray.event_type), "ray about to be terminated, but ray is already terminated!");
+    _debug_assert(isRayTerminated(eventType), "ray about to be terminated, but provided event type (%d) is not a valid termination event type!",
+                  static_cast<int>(eventType));
+    ray.m_event_type = eventType;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const EventType eventType) { return os << findEventTypeString(eventType); }
+enum class EventTypeMask {
+    Uninitialized = 1 << static_cast<int>(EventType::Uninitialized),
+    Emitted       = 1 << static_cast<int>(EventType::Emitted),
+    HitElement    = 1 << static_cast<int>(EventType::HitElement),
+    FatalError    = 1 << static_cast<int>(EventType::FatalError),
+    Absorbed      = 1 << static_cast<int>(EventType::Absorbed),
+    BeyondHorizon = 1 << static_cast<int>(EventType::BeyondHorizon),
+    TooManyEvents = 1 << static_cast<int>(EventType::TooManyEvents),
+    None          = 0,
+};
+
+RAYX_FN_ACC constexpr inline EventTypeMask operator|(const EventTypeMask lhs, const EventTypeMask rhs) {
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type<EventTypeMask>>(lhs) & static_cast<std::underlying_type<EventTypeMask>>(rhs));
+}
+RAYX_FN_ACC constexpr inline EventTypeMask operator&(const EventTypeMask lhs, const EventTypeMask rhs) {
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type<EventTypeMask>>(lhs) & static_cast<std::underlying_type<EventTypeMask>>(rhs));
+}
+RAYX_FN_ACC constexpr inline EventTypeMask operator^(const EventTypeMask lhs, const EventTypeMask rhs) {
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type<EventTypeMask>>(lhs) ^ static_cast<std::underlying_type<EventTypeMask>>(rhs));
+}
+RAYX_FN_ACC constexpr inline EventTypeMask operator~(const EventTypeMask lhs) {
+    return static_cast<EventTypeMask>(~static_cast<std::underlying_type<EventTypeMask>>(lhs));
+}
+RAYX_FN_ACC constexpr inline EventTypeMask operator|=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs | rhs; }
+RAYX_FN_ACC constexpr inline EventTypeMask operator&=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs & rhs; }
+RAYX_FN_ACC constexpr inline EventTypeMask operator^=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs ^ rhs; }
 
 }  // namespace RAYX

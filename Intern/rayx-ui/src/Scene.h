@@ -39,7 +39,7 @@ class Scene {
     Device& m_Device;
 
     std::vector<RenderObject> m_ElementRObjects = {};
-    std::vector<RenderObject> m_RayRObjects = {};
-    RAYX::BundleHistory m_rayCache = {};
+    std::vector<RenderObject> m_RayRObjects     = {};
+    RAYX::BundleHistory m_rayCache              = {};
     mutable std::vector<Texture::TextureInput> m_textureInputCache;  ///< Texture cache
 };

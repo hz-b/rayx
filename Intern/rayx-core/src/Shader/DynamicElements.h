@@ -5,9 +5,7 @@
 
 namespace RAYX {
 
-// @brief: Dynamic ray tracing: check which ray hits which element first
-// in this function we need to make sure that rayData ALWAYS remains in GLOBAL coordinates (it can be changed in a function but needs to be changed
-// back before the function returns to this function)
-RAYX_FN_ACC void dynamicElements(const int gid, const ConstState& constState, MutableState& mutableState);
+RAYX_FN_ACC void traceSequential(const int gid, const ConstState& __restrict constState, MutableState& __restrict mutableState);
+RAYX_FN_ACC void traceNonSequential(const int gid, const ConstState& __restrict constState, MutableState& __restrict mutableState);
 
 }  // namespace RAYX

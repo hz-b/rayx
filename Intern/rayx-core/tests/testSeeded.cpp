@@ -15,9 +15,7 @@
 
 TEST_F(TestSuite, randomNumbers) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    for (int i = 0; i < 4; i++) {
-        std::cout << randomDouble() << std::endl;
-    }
+    for (int i = 0; i < 4; i++) { std::cout << randomDouble() << std::endl; }
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
     double r;
@@ -33,9 +31,7 @@ TEST_F(TestSuite, randomNumbers) {
 
 TEST_F(TestSuite, randomNumbers_normal) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    for (int i = 0; i < 4; i++) {
-        std::cout << randomNormal(0, 1) << std::endl;
-    }
+    for (int i = 0; i < 4; i++) { std::cout << randomNormal(0, 1) << std::endl; }
 
     RAYX::fixSeed(RAYX::FIXED_SEED);
     double r;

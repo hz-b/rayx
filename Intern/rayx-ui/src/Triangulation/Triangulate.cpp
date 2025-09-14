@@ -60,9 +60,7 @@ double absoluteAngle(const Point2D& p1, const Point2D& p2) { return atan2(p2.x -
 
 VertexType toVertexType(const Point2D& prev, const Point2D& current, const Point2D& next) {
     double angle = atan2(next.x - current.x, next.y - current.y) - atan2(prev.x - current.x, prev.y - current.y);
-    if (angle < 0) {
-        angle += RAYX::PI * 2;
-    }
+    if (angle < 0) { angle += RAYX::PI * 2; }
     if (prev < current && next < current) {
         return angle < RAYX::PI ? Start : Split;
     } else if (prev > current && next > current) {
@@ -98,25 +96,21 @@ struct EdgeList {
         Point2D p1 = getOrigin(edge);
         Point2D p2 = getOrigin(getNext(edge));
 
-        if (p1.y == p1.y) {
-            return (p1.x + p2.x) / 2;
-        }
+        if (p1.y == p1.y) { return (p1.x + p2.x) / 2; }
 
         return p1.x + (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y);
     }
 
     EdgeList(const PolygonComplex& poly, std::vector<TextureVertex>& verts) {
         points.reserve(verts.size());
-        for (auto& vert : verts) {
-            points.push_back({-vert.pos.x, vert.pos.z});
-        }
+        for (auto& vert : verts) { points.push_back({-vert.pos.x, vert.pos.z}); }
         uint32_t startI = 0;
         for (auto& simple : poly) {
             int simpleSize = static_cast<int>(simple.size());
             for (int i = 0; i < simpleSize; i++) {
-                int prevI = translateIndex(i - 1, simpleSize);
-                int currentI = i;
-                int nextI = translateIndex(i + 1, simpleSize);
+                int prevI       = translateIndex(i - 1, simpleSize);
+                int currentI    = i;
+                int nextI       = translateIndex(i + 1, simpleSize);
                 VertexType type = toVertexType(points[simple[prevI]], points[simple[currentI]], points[simple[nextI]]);
                 edges.push_back(EdgeEntry{{simple[currentI], type}, startI + static_cast<uint32_t>(prevI), startI + static_cast<uint32_t>(nextI)});
             }
@@ -131,18 +125,18 @@ struct EdgeList {
         edges.push_back(EdgeEntry{v.origin, v.prev, w_i});
         uint32_t vw = static_cast<uint32_t>(edges.size()) - 1;
         edges.push_back(EdgeEntry{w.origin, w.prev, v_i});
-        uint32_t wv = static_cast<uint32_t>(edges.size()) - 1;
+        uint32_t wv                 = static_cast<uint32_t>(edges.size()) - 1;
         edges[edges[v_i].prev].next = vw;
-        edges[v_i].prev = wv;
+        edges[v_i].prev             = wv;
         edges[edges[w_i].prev].next = wv;
-        edges[w_i].prev = vw;
+        edges[w_i].prev             = vw;
         return {vw, wv};
     }
 
     // merge the left and right chain into a sorted sequence
     std::vector<std::pair<uint32_t, ChainType>> toSortedSequence(uint32_t top_edge) {
         std::vector<std::pair<uint32_t, ChainType>> result;
-        uint32_t currentLeft = getNext(top_edge);
+        uint32_t currentLeft  = getNext(top_edge);
         uint32_t currentRight = getPrev(top_edge);
         result.push_back(std::make_pair(top_edge, Left));
         while (currentLeft != currentRight) {
@@ -163,26 +157,22 @@ struct EdgeList {
         double y;  // current y coordinate of the sweep line
         // set of edges intersecting the sweep line, ordered by x coordinate
         auto cmp_set = [&y, this](uint32_t a, uint32_t b) { return xAtY(a, y) < xAtY(b, y); };
-        auto set = std::set<uint32_t, decltype(cmp_set)>(cmp_set);
+        auto set     = std::set<uint32_t, decltype(cmp_set)>(cmp_set);
 
         auto getLeftEdge = [&set](uint32_t edge) {
             auto it = set.lower_bound(edge);
-            if (it == set.begin()) {
-                throw std::runtime_error("Triangulate: invalid polygon");
-            }
+            if (it == set.begin()) { throw std::runtime_error("Triangulate: invalid polygon"); }
             it--;
             return *it;
         };
 
         // priority queue of edges, ordered by y coordinate of the origin
-        auto cmp_prio = [this](uint32_t a, uint32_t b) { return getOrigin(a) < getOrigin(b); };
+        auto cmp_prio       = [this](uint32_t a, uint32_t b) { return getOrigin(a) < getOrigin(b); };
         auto priority_queue = std::priority_queue<uint32_t, std::vector<uint32_t>, decltype(cmp_prio)>(cmp_prio);
 
         auto helper = std::map<uint32_t, uint32_t>();
 
-        for (uint32_t i = 0; i < edges.size(); i++) {
-            priority_queue.push(i);
-        }
+        for (uint32_t i = 0; i < edges.size(); i++) { priority_queue.push(i); }
 
         while (!priority_queue.empty()) {
             auto edge = priority_queue.top();
@@ -198,16 +188,14 @@ struct EdgeList {
                 }
                 case End: {
                     uint32_t prev = getPrev(edge);
-                    if (getOriginType(helper[prev]) == Merge) {
-                        split(edge, helper[prev]);
-                    }
+                    if (getOriginType(helper[prev]) == Merge) { split(edge, helper[prev]); }
                     helper.erase(prev);
                     set.erase(prev);
                     break;
                 }
                 case Split: {
-                    auto left_edge = getLeftEdge(edge);
-                    auto diags = split(edge, helper[left_edge]);
+                    auto left_edge    = getLeftEdge(edge);
+                    auto diags        = split(edge, helper[left_edge]);
                     helper[left_edge] = diags.first;
                     set.insert(edge);
                     helper[edge] = edge;
@@ -215,14 +203,12 @@ struct EdgeList {
                 }
                 case Merge: {
                     uint32_t prev = getPrev(edge);
-                    if (getOriginType(helper[prev]) == Merge) {
-                        split(edge, helper[prev]);
-                    }
+                    if (getOriginType(helper[prev]) == Merge) { split(edge, helper[prev]); }
                     helper.erase(prev);
                     set.erase(prev);
                     auto left_edge = getLeftEdge(edge);
                     if (getOriginType(helper[left_edge]) == Merge) {
-                        auto diags = split(edge, helper[left_edge]);
+                        auto diags        = split(edge, helper[left_edge]);
                         helper[left_edge] = diags.first;
                     } else {
                         helper[left_edge] = edge;
@@ -233,9 +219,7 @@ struct EdgeList {
                     bool isLeft = getOrigin(edge) < getOrigin(getPrev(edge));
                     if (isLeft) {
                         uint32_t prev = getPrev(edge);
-                        if (getOriginType(helper[prev]) == Merge) {
-                            split(edge, helper[prev]);
-                        }
+                        if (getOriginType(helper[prev]) == Merge) { split(edge, helper[prev]); }
                         helper.erase(prev);
                         set.erase(prev);
                         set.insert(edge);
@@ -243,7 +227,7 @@ struct EdgeList {
                     } else {
                         auto left_edge = getLeftEdge(edge);
                         if (getOriginType(helper[left_edge]) == Merge) {
-                            auto diags = split(edge, helper[left_edge]);
+                            auto diags        = split(edge, helper[left_edge]);
                             helper[left_edge] = diags.first;
                         } else {
                             helper[left_edge] = edge;
@@ -271,12 +255,12 @@ struct EdgeList {
 
         for (uint32_t i = 2; i < sortedSequence.size() - 1; i++) {
             auto current = sortedSequence[i];
-            auto last = stack.back();
+            auto last    = stack.back();
             stack.pop_back();
             if (current.second == Left) {
                 if (last.second == Left) {
                     while (!stack.empty() && checkAngle(Left, current.first, last.first, stack.back().first)) {
-                        auto diag = split(current.first, stack.back().first);
+                        auto diag  = split(current.first, stack.back().first);
                         last.first = diag.second;
                         stack.pop_back();
                     }
@@ -284,15 +268,15 @@ struct EdgeList {
                     stack.push_back(current);
                 } else {
                     uint32_t currentInside = current.first;
-                    auto beforeCurrent = last;
-                    bool firstIteration = true;
+                    auto beforeCurrent     = last;
+                    bool firstIteration    = true;
                     while (stack.size() > 0) {
                         auto diag = split(currentInside, last.first);
-                        last = stack.back();
+                        last      = stack.back();
                         stack.pop_back();
                         currentInside = diag.first;
                         if (firstIteration) {
-                            firstIteration = false;
+                            firstIteration      = false;
                             beforeCurrent.first = diag.second;
                         }
                     }
@@ -303,7 +287,7 @@ struct EdgeList {
                 if (last.second == Right) {
                     while (!stack.empty() && checkAngle(Right, current.first, last.first, stack.back().first)) {
                         auto diag = split(current.first, stack.back().first);
-                        last = stack.back();
+                        last      = stack.back();
                         stack.pop_back();
                         current.first = diag.first;
                     }
@@ -311,14 +295,14 @@ struct EdgeList {
                     stack.push_back(current);
                 } else {
                     auto currentOutside = current;
-                    auto lastCopy = last;
+                    auto lastCopy       = last;
                     bool firstIteration = true;
                     while (stack.size() > 0) {
                         auto diag = split(current.first, last.first);
-                        last = stack.back();
+                        last      = stack.back();
                         stack.pop_back();
                         if (firstIteration) {
-                            firstIteration = false;
+                            firstIteration       = false;
                             currentOutside.first = diag.first;
                         }
                     }
@@ -339,9 +323,9 @@ struct EdgeList {
             }
         } else {
             while (!stack.empty()) {
-                auto diag = split(bottom.first, last.first);
+                auto diag    = split(bottom.first, last.first);
                 bottom.first = diag.first;
-                last = stack.back();
+                last         = stack.back();
                 stack.pop_back();
             }
         }
@@ -355,13 +339,9 @@ void triangulate(const PolygonComplex& poly, std::vector<TextureVertex>& points,
     edge_list.makeMonotone();
     std::vector<uint32_t> tops;
     for (uint32_t edge = 0; edge < edge_list.edges.size(); edge++) {
-        if (edge_list.isTop(edge)) {
-            tops.push_back(edge);
-        }
+        if (edge_list.isTop(edge)) { tops.push_back(edge); }
     }
-    for (uint32_t top : tops) {
-        edge_list.triangulateMonotone(top);
-    }
+    for (uint32_t top : tops) { edge_list.triangulateMonotone(top); }
     for (uint32_t edge = 0; edge < edge_list.edges.size(); edge++) {
         if (edge_list.isTop(edge)) {
             indices.push_back(edge_list.getOriginIndex(edge_list.getPrev(edge)));

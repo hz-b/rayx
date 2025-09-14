@@ -27,7 +27,7 @@ OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dm
 
     // Create a temporary copy with world instead of local pos/ori
     std::unique_ptr<BeamlineNode> de = this->clone();
-    DesignElement* dePtr = static_cast<DesignElement*>(de.get());
+    DesignElement* dePtr             = static_cast<DesignElement*>(de.get());
     dePtr->setPosition(worldPos);
     dePtr->setOrientation(worldOri);
 
@@ -36,7 +36,7 @@ OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dm
     if (getType() == ElementType::ExpertsMirror) {
         return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr), plane);
     } else {
-        Surface surface = makeSurface(*dePtr);
+        Surface surface     = makeSurface(*dePtr);
         Behaviour behaviour = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
             return makeElement(*dePtr, behaviour, surface, plane, {});
@@ -55,7 +55,7 @@ std::string DesignElement::getName() const { return m_elementParameters["name"].
 ElementType DesignElement::getType() const { return m_elementParameters["type"].as_elementType(); }
 
 void DesignElement::setPosition(glm::dvec4 p) {
-    m_elementParameters["position"] = Map();
+    m_elementParameters["position"]      = Map();
     m_elementParameters["position"]["x"] = p.x;
     m_elementParameters["position"]["y"] = p.y;
     m_elementParameters["position"]["z"] = p.z;
@@ -72,19 +72,19 @@ glm::dvec4 DesignElement::getPosition() const {
 }
 
 void DesignElement::setOrientation(glm::dmat4x4 o) {
-    m_elementParameters["xDirection"] = Map();
+    m_elementParameters["xDirection"]      = Map();
     m_elementParameters["xDirection"]["x"] = o[0][0];
     m_elementParameters["xDirection"]["y"] = o[0][1];
     m_elementParameters["xDirection"]["z"] = o[0][2];
     m_elementParameters["xDirection"]["w"] = o[0][3];
 
-    m_elementParameters["yDirection"] = Map();
+    m_elementParameters["yDirection"]      = Map();
     m_elementParameters["yDirection"]["x"] = o[1][0];
     m_elementParameters["yDirection"]["y"] = o[1][1];
     m_elementParameters["yDirection"]["z"] = o[1][2];
     m_elementParameters["yDirection"]["w"] = o[1][3];
 
-    m_elementParameters["zDirection"] = Map();
+    m_elementParameters["zDirection"]      = Map();
     m_elementParameters["zDirection"]["x"] = o[2][0];
     m_elementParameters["zDirection"]["y"] = o[2][1];
     m_elementParameters["zDirection"]["z"] = o[2][2];
@@ -135,23 +135,23 @@ Misalignment DesignElement::getMisalignment() const {
     return m;
 }
 void DesignElement::setSlopeError(SlopeError s) {
-    m_elementParameters["SlopeError"] = Map();
-    m_elementParameters["SlopeError"]["slopeErrorSag"] = s.m_sag;
-    m_elementParameters["SlopeError"]["slopeErrorMer"] = s.m_mer;
-    m_elementParameters["SlopeError"]["thermalDistortionAmp"] = s.m_thermalDistortionAmp;
+    m_elementParameters["SlopeError"]                            = Map();
+    m_elementParameters["SlopeError"]["slopeErrorSag"]           = s.m_sag;
+    m_elementParameters["SlopeError"]["slopeErrorMer"]           = s.m_mer;
+    m_elementParameters["SlopeError"]["thermalDistortionAmp"]    = s.m_thermalDistortionAmp;
     m_elementParameters["SlopeError"]["thermalDistortionSigmaX"] = s.m_thermalDistortionSigmaX;
     m_elementParameters["SlopeError"]["thermalDistortionSigmaZ"] = s.m_thermalDistortionSigmaZ;
-    m_elementParameters["SlopeError"]["cylindricalBowingAmp"] = s.m_cylindricalBowingAmp;
+    m_elementParameters["SlopeError"]["cylindricalBowingAmp"]    = s.m_cylindricalBowingAmp;
     m_elementParameters["SlopeError"]["cylindricalBowingRadius"] = s.m_cylindricalBowingRadius;
 }
 SlopeError DesignElement::getSlopeError() const {
     SlopeError s;
-    s.m_sag = m_elementParameters["SlopeError"]["slopeErrorSag"].as_double();
-    s.m_mer = m_elementParameters["SlopeError"]["slopeErrorMer"].as_double();
-    s.m_thermalDistortionAmp = m_elementParameters["SlopeError"]["thermalDistortionAmp"].as_double();
+    s.m_sag                     = m_elementParameters["SlopeError"]["slopeErrorSag"].as_double();
+    s.m_mer                     = m_elementParameters["SlopeError"]["slopeErrorMer"].as_double();
+    s.m_thermalDistortionAmp    = m_elementParameters["SlopeError"]["thermalDistortionAmp"].as_double();
     s.m_thermalDistortionSigmaX = m_elementParameters["SlopeError"]["thermalDistortionSigmaX"].as_double();
     s.m_thermalDistortionSigmaZ = m_elementParameters["SlopeError"]["thermalDistortionSigmaZ"].as_double();
-    s.m_cylindricalBowingAmp = m_elementParameters["SlopeError"]["cylindricalBowingAmp"].as_double();
+    s.m_cylindricalBowingAmp    = m_elementParameters["SlopeError"]["cylindricalBowingAmp"].as_double();
     s.m_cylindricalBowingRadius = m_elementParameters["SlopeError"]["cylindricalBowingRadius"].as_double();
 
     return s;
@@ -160,15 +160,15 @@ SlopeError DesignElement::getSlopeError() const {
 void DesignElement::setCutout(Cutout c) {
     m_elementParameters["geometricalShape"] = c.m_type;
     if (c.m_type == CutoutType::Rect) {
-        RectCutout rect = deserializeRect(c);
-        m_elementParameters["CutoutWidth"] = rect.m_width;
+        RectCutout rect                     = deserializeRect(c);
+        m_elementParameters["CutoutWidth"]  = rect.m_width;
         m_elementParameters["CutoutLength"] = rect.m_length;
     } else if (c.m_type == CutoutType::Elliptical) {
-        EllipticalCutout elli = deserializeElliptical(c);
+        EllipticalCutout elli                  = deserializeElliptical(c);
         m_elementParameters["CutoutDiameterX"] = elli.m_diameter_x;
         m_elementParameters["CutoutDiameterZ"] = elli.m_diameter_z;
     } else if (c.m_type == CutoutType::Trapezoid) {
-        TrapezoidCutout trapi = deserializeTrapezoid(c);
+        TrapezoidCutout trapi               = deserializeTrapezoid(c);
         m_elementParameters["CutoutWidthA"] = trapi.m_widthA;
         m_elementParameters["CutoutWidthB"] = trapi.m_widthB;
         m_elementParameters["CutoutLength"] = trapi.m_length;
@@ -181,20 +181,20 @@ Cutout DesignElement::getCutout() const {
 
     if (c.m_type == CutoutType::Rect) {  // Rectangle
         RectCutout rect;
-        rect.m_width = m_elementParameters["CutoutWidth"].as_double();
+        rect.m_width  = m_elementParameters["CutoutWidth"].as_double();
         rect.m_length = m_elementParameters["CutoutLength"].as_double();
-        c = serializeRect(rect);
+        c             = serializeRect(rect);
     } else if (c.m_type == CutoutType::Elliptical) {  // Ellipsoid
         EllipticalCutout elli;
         elli.m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double();
         elli.m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double();
-        c = serializeElliptical(elli);
+        c                 = serializeElliptical(elli);
     } else if (c.m_type == CutoutType::Trapezoid) {  // Trapezoid
         TrapezoidCutout trapi;
         trapi.m_widthA = m_elementParameters["CutoutWidthA"].as_double();
         trapi.m_widthB = m_elementParameters["CutoutWidthB"].as_double();
         trapi.m_length = m_elementParameters["CutoutLength"].as_double();
-        c = serializeTrapezoid(trapi);
+        c              = serializeTrapezoid(trapi);
     }
 
     return c;
@@ -220,8 +220,8 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 }
 
 void DesignElement::setExpertsOptics(Surface value) {
-    QuadricSurface qua = deserializeQuadric(value);
-    m_elementParameters["expertsParams"] = Map();
+    QuadricSurface qua                          = deserializeQuadric(value);
+    m_elementParameters["expertsParams"]        = Map();
     m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
     m_elementParameters["expertsParams"]["A12"] = qua.m_a12;
     m_elementParameters["expertsParams"]["A13"] = qua.m_a13;
@@ -251,8 +251,8 @@ Surface DesignElement::getExpertsOptics() const {
 }
 
 void DesignElement::setExpertsCubic(Surface value) {
-    CubicSurface cub = deserializeCubic(value);
-    m_elementParameters["expertsParams"] = Map();
+    CubicSurface cub                            = deserializeCubic(value);
+    m_elementParameters["expertsParams"]        = Map();
     m_elementParameters["expertsParams"]["A11"] = cub.m_a11;
     m_elementParameters["expertsParams"]["A12"] = cub.m_a12;
     m_elementParameters["expertsParams"]["A13"] = cub.m_a13;

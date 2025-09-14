@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Core.h"
-#include "RaySoA.h"
+#include "Rays.h"
 #include "Shader/InvocationState.h"
 
 namespace RAYX {
@@ -17,8 +17,8 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual RaySoA trace(const Group& beamline, Sequential sequential, const int maxBatchSize, const int maxEvents,
-                         const std::vector<bool>& recordMask, const RayAttrFlag attr) = 0;
+    virtual Rays trace(const Group& beamline, Sequential sequential, const int maxBatchSize, const int maxEvents, const std::vector<bool>& recordMask,
+                       const RayAttrFlag attr) = 0;
 };
 
 }  // namespace RAYX

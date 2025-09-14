@@ -15,7 +15,7 @@ class Texture {
     Texture(const Device& device, VkFormat format, VkImageUsageFlags usage, VkImageAspectFlags aspectFlags, VkExtent2D extent);
     ~Texture();
 
-    Texture(const Texture&) = delete;
+    Texture(const Texture&)            = delete;
     Texture& operator=(const Texture&) = delete;
     Texture(Texture&& other) noexcept;
     Texture& operator=(Texture&& other) noexcept;
@@ -47,15 +47,15 @@ class Texture {
         // Move assignment operator
         TextureInput& operator=(TextureInput&& other) noexcept {
             if (this != &other) {
-                data = std::move(other.data);
-                width = other.width;
+                data   = std::move(other.data);
+                width  = other.width;
                 height = other.height;
             }
             return *this;
         }
 
         // Delete copy constructor and copy assignment operator
-        TextureInput(const TextureInput&) = delete;
+        TextureInput(const TextureInput&)            = delete;
         TextureInput& operator=(const TextureInput&) = delete;
     };
 

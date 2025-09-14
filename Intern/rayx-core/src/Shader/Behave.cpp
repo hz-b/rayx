@@ -18,18 +18,18 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision col) {
+void behaveCrystal(Ray& __restrict ray, const Behaviour behaviour, [[maybe_unused]] Collision col) {
     CrystalBehaviour b = deserializeCrystal(behaviour);
 
-    double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
-    double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
+    double theta0    = getTheta(ray.direction, col.normal, b.m_offsetAngle);
+    double bragg     = getBraggAngle(ray.energy, b.m_dSpacing2);
     double asymmetry = -getAsymmetryFactor(bragg, b.m_offsetAngle);
 
     double polFactorS = 1.0;
     double polFactorP = std::fabs(cos(2 * bragg));
 
-    double wavelength = energyToWaveLength(r.m_energy);
-    double gamma = getDiffractionPrefactor(wavelength, b.m_unitCellVolume);
+    double wavelength = energyToWaveLength(ray.energy);
+    double gamma      = getDiffractionPrefactor(wavelength, b.m_unitCellVolume);
 
     std::complex<double> F0(b.m_structureFactorReF0, b.m_structureFactorImF0);
     std::complex<double> FH(b.m_structureFactorReFH, b.m_structureFactorImFH);
@@ -44,16 +44,15 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
     auto RS = computeR(etaS, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
     auto RP = computeR(etaP, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
 
-    const auto incident_vec = r.m_direction;
-    const auto reflect_vec = glm::reflect(incident_vec, col.normal);
-    r.m_direction = reflect_vec;
+    const auto incident_vec = ray.direction;
+    const auto reflect_vec  = glm::reflect(incident_vec, col.normal);
+    ray.direction           = reflect_vec;
 
     ComplexFresnelCoeffs fresnelCoeff = {RS, RP};
 
-    const auto reflect_field = interceptReflectCrystal(r.m_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
-    r.m_field = reflect_field;
-
-    return r;
+    const auto reflect_field = interceptReflectCrystal(ray.electric_field, incident_vec, reflect_vec, col.normal, fresnelCoeff);
+    ray.electric_field       = reflect_field;
+    ray.order                = 0;
 }
 
 // Implementation based on dynamical diffraction theory from:
@@ -61,36 +60,37 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
 // Reviews of Modern Physics, 36(3), 681-717. https://doi.org/10.1103/RevModPhys.36.681
 
 RAYX_FN_ACC
-Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
+void behaveSlit(Ray& __restrict ray, const Behaviour behaviour) {
     SlitBehaviour b = deserializeSlit(behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
-    Cutout openingCutout = b.m_openingCutout;
+    Cutout openingCutout  = b.m_openingCutout;
     Cutout beamstopCutout = b.m_beamstopCutout;
-    bool withinOpening = inCutout(openingCutout, r.m_position.x, r.m_position.z);
-    bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
+    bool withinOpening    = inCutout(openingCutout, ray.position.x, ray.position.z);
+    bool withinBeamstop   = inCutout(beamstopCutout, ray.position.x, ray.position.z);
 
     if (!withinOpening || withinBeamstop) {
-        return terminateRay(r, EventType::Absorbed);
+        terminateRay(ray, EventType::Absorbed);
+        return;
     }
 
     double phi;
     double psi;
-    directionToSphericalCoords(r.m_direction, phi, psi);
+    directionToSphericalCoords(ray.direction, phi, psi);
 
-    double dPhi = 0;
-    double dPsi = 0;
-    double wavelength = energyToWaveLength(r.m_energy);
+    double dPhi       = 0;
+    double dPsi       = 0;
+    double wavelength = energyToWaveLength(ray.energy);
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
         if (openingCutout.m_type == CutoutType::Rect) {
             RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi, rand);
-            fraun_diff(r.m_length, wavelength, dPsi, rand);
+            fraun_diff(r.m_width, wavelength, dPhi, ray.rand);
+            fraun_diff(r.m_length, wavelength, dPsi, ray.rand);
         } else if (openingCutout.m_type == CutoutType::Elliptical) {
             EllipticalCutout e = deserializeElliptical(openingCutout);
-            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, rand);
+            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, ray.rand);
         } else {
             _throw("encountered Slit with unsupported openingCutout: %d!", static_cast<int>(openingCutout.m_type));
         }
@@ -99,108 +99,127 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
     phi += dPhi;
     psi += dPsi;
 
-    sphericalCoordsToDirection(phi, psi, r.m_direction);
+    sphericalCoordsToDirection(phi, psi, ray.direction);
 
-    r.m_order = 0;
-    return r;
+    ray.order = 0;
 }
 
 RAYX_FN_ACC
-Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __restrict rand) {
+void behaveRZP(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col) {
     RZPBehaviour b = deserializeRZP(behaviour);
 
-    double WL = energyToWaveLength(r.m_energy);
-    double Ord = b.m_orderOfDiffraction;
+    double WL            = energyToWaveLength(ray.energy);
+    double Ord           = b.m_orderOfDiffraction;
     int additional_order = int(b.m_additionalOrder);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
-    RZPLineDensity(r, col.normal, b, DX, DZ);
+    RZPLineDensity(ray, col.normal, b, DX, DZ);
 
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection)
     // instead of the given order
     if (additional_order == 1) {
-        if (rand.randomDouble() > 0.5) Ord = 0;
+        if (ray.rand.randomDouble() > 0.5) Ord = 0;
     }
 
     // only 2D case, not 2 1D gratings with 90 degree rotation as in old RAY
     double az = WL * DZ * Ord * 1e-6;
     double ax = WL * DX * Ord * 1e-6;
-    r = refrac2D(r, col.normal, az, ax);
+    refrac2D(ray, col.normal, az, ax);
 
-    r.m_order = static_cast<Order>(Ord);
-    return r;
+    ray.order = static_cast<Order>(Ord);
 }
 
 RAYX_FN_ACC
-Ray behaveGrating(Ray r, const Behaviour behaviour, const Collision col) {
+void behaveGrating(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col) {
     GratingBehaviour b = deserializeGrating(behaviour);
 
     // vls parameters passed in q.elementParams
-    double WL = energyToWaveLength(r.m_energy);
-    double lineDensity = b.m_lineDensity;
+    double WL                 = energyToWaveLength(ray.energy);
+    double lineDensity        = b.m_lineDensity;
     double orderOfDiffraction = b.m_orderOfDiffraction;
 
     // adjusted linedensity = WL * default_linedensity * order * 1e-06
-    double adjustedLinedensity = vlsGrating(lineDensity, col.normal, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
-    r.m_order = static_cast<Order>(orderOfDiffraction);
+    double adjustedLinedensity = vlsGrating(lineDensity, col.normal, ray.position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
+    ray.order                  = static_cast<Order>(orderOfDiffraction);
     // no additional zero order here?
 
     // refraction
-    r = refrac2D(r, col.normal, adjustedLinedensity, 0);
-
-    return r;
+    refrac2D(ray, col.normal, adjustedLinedensity, 0);
 }
 
 RAYX_FN_ACC
-Ray behaveMirror(Ray r, const Collision col, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
+void behaveMirror(Ray& __restrict ray, const CollisionPoint& __restrict col, const int material, const int* __restrict materialIndices,
+                  const double* __restrict materialTable) {
     // calculate the new direction after the reflection
-    const auto incident_vec = r.m_direction;
-    const auto reflect_vec = glm::reflect(incident_vec, col.normal);
-    r.m_direction = reflect_vec;
+    const auto incident_vec = ray.direction;
+    const auto reflect_vec  = glm::reflect(incident_vec, col.normal);
+    ray.direction           = reflect_vec;
+    ray.order               = 0;
 
-    if (material != -2) {
-        constexpr int vacuum_material = -1;
-        const auto ior_i = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
-        const auto ior_t = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+    // 100% efficiency reflection
+    if (material == -2) return;
 
-        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, ior_i, ior_t);
+    constexpr int vacuum_material = -1;
+    const auto ior_i              = getRefractiveIndex(ray.energy, vacuum_material, materialIndices, materialTable);
+    const auto ior_t              = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
 
-        r.m_field = reflect_field;
-        r.m_order = 0;
-    }
-
-    return r;
+    ray.electric_field = interceptReflect(ray.electric_field, incident_vec, reflect_vec, col.normal, ior_i, ior_t);
 }
 
 RAYX_FN_ACC
-Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int material, const int* __restrict materialIndices,
-               const double* __restrict materialTable) {
-    FoilBehaviour f = deserializeFoil(behaviour);
-    const double wavelength = energyToWaveLength(r.m_energy);
+void behaveFoil(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col, const int material,
+                const int* __restrict materialIndices, const double* __restrict materialTable) {
+    FoilBehaviour f         = deserializeFoil(behaviour);
+    const double wavelength = energyToWaveLength(ray.energy);
 
-    const auto indexVacuum = complex::Complex(1., 0.);
-    const auto indexMaterial = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+    const auto indexVacuum   = complex::Complex(1., 0.);
+    const auto indexMaterial = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
 
-    double angle = angleBetweenUnitVectors(-r.m_direction, col.normal);  // in rad
+    double angle = angleBetweenUnitVectors(-ray.direction, col.normal);  // in rad
 
-    // std::isnan is not tagged as device function, when compiling with nvcc
 #if !defined(RAYX_CUDA_ENABLED)
+    // std::isnan is not tagged as device function, when compiling with nvcc
     using std::isnan;
 #endif
+
     if (isnan(angle) || angle == 0) angle = 1e-8;
     const auto incidentAngle = complex::Complex(angle, 0);
 
     const auto totalTransmission = computeTransmittance(wavelength, incidentAngle, indexVacuum, indexMaterial, f.m_thicknessSubstrate);
 
     // calc efficiency
-    r.m_field = interceptFoil(r.m_field, r.m_direction, col.normal, totalTransmission);
+    ray.electric_field = interceptFoil(ray.electric_field, ray.direction, col.normal, totalTransmission);
 
-    r.m_eventType = EventType::Transmitted;
-
-    return r;
+    ray.order = 0;
 }
 
-RAYX_FN_ACC Ray behaveImagePlane(Ray r) { return r; }
+RAYX_FN_ACC void behaveImagePlane(Ray& __restrict ray) { ray.order = 0; }
+
+RAYX_FN_ACC
+void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const Element& __restrict element, const Materials& __restrict materials) {
+    switch (element.m_behaviour.m_type) {
+        case BehaveType::Mirror:
+            behaveMirror(ray, col, element.m_material, materials.materialIndices, materials.materialTables);
+            break;
+        case BehaveType::Grating:
+            behaveGrating(ray, behaviour, col);
+            break;
+        case BehaveType::Slit:
+            behaveSlit(ray, behaviour);
+            break;
+        case BehaveType::RZP:
+            behaveRZP(ray, behaviour, col);
+            break;
+        case BehaveType::Crystal:
+            behaveCrystal(ray, behaviour, col);
+            break;
+        case BehaveType::ImagePlane:
+            break;
+        case BehaveType::Foil:
+            behaveFoil(ray, behaviour, col, element.m_material, constState.materialIndices, constState.materialTables);
+            break;
+    }
+}
 
 }  // namespace RAYX

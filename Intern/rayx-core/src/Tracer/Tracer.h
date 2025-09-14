@@ -7,7 +7,7 @@
 #include "Core.h"
 #include "DeviceConfig.h"
 #include "DeviceTracer.h"
-#include "RaySoA.h"
+#include "Rays.h"
 
 // Abstract Tracer base class.
 namespace RAYX {
@@ -30,8 +30,8 @@ class RAYX_API Tracer {
     // See `BundleHistory` for information about the return value.
     // `max_batch_size` corresponds to the maximal number of rays that will be put into `traceRaw` in one batch.
 
-    RaySoA trace(const Group& group, const Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask,
-                 const RayAttrFlag attr = RayAttrFlag::All);
+    Rays trace(const Group& group, const Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask,
+               const RayAttrFlag attr = RayAttrFlag::All);
 
     static int defaultMaxEvents(const Group* group);
 

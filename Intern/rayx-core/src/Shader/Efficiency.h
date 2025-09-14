@@ -155,12 +155,12 @@ RAYX_FN_ACC
 inline ElectricField interceptReflect(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
                                       const glm::dvec3 normalVec, const complex::Complex iorI, const complex::Complex iorT) {
     const auto incidentAngle = complex::Complex(angleBetweenUnitVectors(incidentVec, -normalVec), 0);
-    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, iorT);
+    const auto refractAngle  = calcRefractAngle(incidentAngle, iorI, iorT);
 
     const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, iorT);
 
     // TODO: make this more robust
-    const auto isNormalIncidence = incidentVec == -normalVec;
+    const auto isNormalIncidence         = incidentVec == -normalVec;
     const auto reflectPolarizationMatrix = isNormalIncidence ? calcReflectPolarizationMatrixAtNormalIncidence(reflectAmplitude)
                                                              : calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
 

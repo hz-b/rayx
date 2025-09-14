@@ -106,20 +106,18 @@ double get_factorOmega() {
 
 RAYX_FN_ACC
 double dipoleBessel(double hnue, double zeta) {
-    double h = 0.1;
+    double h      = 0.1;
     double result = h / 2.0 * exp(-zeta);
-    double c1 = 1;
-    double c2 = 0;
+    double c1     = 1;
+    double c2     = 0;
     for (int i = 1; c1 > c2; i++) {
         double cosh1 = (exp(h * i) + exp(-h * i)) / 2.0;
         double cosh2 = (exp(h * i * hnue) + exp(-h * i * hnue)) / 2.0;
-        c1 = h * exp(-zeta * cosh1) * cosh2;
+        c1           = h * exp(-zeta * cosh1) * cosh2;
 
-        if ((zeta * cosh1) > 225) {
-            return result;
-        }
+        if ((zeta * cosh1) > 225) { return result; }
         result = result + c1;
-        c2 = result / 1e6;
+        c2     = result / 1e6;
     }
     return result;
 }
@@ -130,16 +128,14 @@ glm::dvec4 getStokesSyn(double energy, double psi1, double psi2, double electron
     double fak = 3453345200000000.0;  // getFactorDistribution
 
     double gamma = fabs(electronEnergy) * 1957;  // getFactorElectronEnergy
-    double y0 = energy / criticalEnergy / 1000.0;
+    double y0    = energy / criticalEnergy / 1000.0;
     double xnue1 = 1.0 / 3.0;
     double xnue2 = 2.0 / 3.0;
 
     double dpsi = (psi2 - psi1) / 101.0;
-    double psi = psi1 + dpsi / 2.0;
+    double psi  = psi1 + dpsi / 2.0;
 
-    if (dpsi < 0.001) {
-        dpsi = 0.001;
-    }
+    if (dpsi < 0.001) { dpsi = 0.001; }
 
     glm::dvec4 stokes = glm::dvec4(0.0, 0.0, 0.0, 0.0);
 
@@ -147,21 +143,21 @@ glm::dvec4 getStokesSyn(double energy, double psi1, double psi2, double electron
         double sign1 = (electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? PI : -PI) / 2;
         double sign2 = psi >= 0.0 ? 1.0 : -1.0;
         double phase = -(sign1 * sign2);
-        double x = gamma * psi * 0.001;
-        double zeta = pow(1.0 + pow(x, 2), (3.0 / 2.0)) * 0.5 * y0;
-        double xkn2 = dipoleBessel(xnue2, zeta);
-        double xkn1 = dipoleBessel(xnue1, zeta);
-        double xint = fak * pow(gamma, 2.0) * pow(y0, 2.0) * pow(1.0 + pow(x, 2.0), 2.0);
+        double x     = gamma * psi * 0.001;
+        double zeta  = pow(1.0 + pow(x, 2), (3.0 / 2.0)) * 0.5 * y0;
+        double xkn2  = dipoleBessel(xnue2, zeta);
+        double xkn1  = dipoleBessel(xnue1, zeta);
+        double xint  = fak * pow(gamma, 2.0) * pow(y0, 2.0) * pow(1.0 + pow(x, 2.0), 2.0);
         double xintp = xint * pow(xkn2, 2.0);
         double xints = xint * (pow(x, 2.0) / (1.0 + pow(x, 2.0)) * pow(xkn1, 2.0));
-        xintp = xintp * dpsi * 1e-6;
-        xints = xints * dpsi * 1e-6;
+        xintp        = xintp * dpsi * 1e-6;
+        xints        = xints * dpsi * 1e-6;
 
         stokes[0] = stokes[0] + xintp - xints;
         stokes[1] = stokes[1] + 2.0 * sqrt(xintp * xints) * sin(phase);
         stokes[2] = stokes[2] + xintp;
         stokes[3] = stokes[3] + xints;
-        psi = psi + dpsi;
+        psi       = psi + dpsi;
     }
     return stokes;
 }
@@ -169,29 +165,25 @@ glm::dvec4 getStokesSyn(double energy, double psi1, double psi2, double electron
 RAYX_FN_ACC
 PsiAndStokes calcDipoleFold(double psi, double photonEnergy, double sigpsi, double electronEnergy, double criticalEnergy,
                             ElectronEnergyOrientation electronEnergyOrientation, Rand& __restrict rand) {
-    int ln = (int)sigpsi;
+    int ln        = (int)sigpsi;
     double trsgyp = 0.0;
-    double sgyp = 0.0;
-    double sy = 0.0;
-    double zw = 0.0;
-    double wy = 0.0;
+    double sgyp   = 0.0;
+    double sy     = 0.0;
+    double zw     = 0.0;
+    double wy     = 0.0;
     double newpsi = 0.0;
 
     glm::dvec4 ST = glm::dvec4(0.0, 0.0, 0.0, 0.0);
     glm::dvec4 Stokes;
 
     if (sigpsi != 0) {
-        if (ln > 10) {
-            ln = 10;
-        }
-        if (ln == 0) {
-            ln = 10;
-        }
+        if (ln > 10) { ln = 10; }
+        if (ln == 0) { ln = 10; }
         trsgyp = -0.5 / sigpsi / sigpsi;
-        sgyp = 4.0e-3 * sigpsi;
+        sgyp   = 4.0e-3 * sigpsi;
     } else {
         trsgyp = 0;
-        ln = 1;
+        ln     = 1;
     }
 
     for (int i = 1; i <= ln; i++) {
@@ -204,14 +196,10 @@ PsiAndStokes calcDipoleFold(double psi, double photonEnergy, double sigpsi, doub
         newpsi = psi + sy;
         Stokes = getStokesSyn(photonEnergy, newpsi, newpsi, electronEnergy, criticalEnergy, electronEnergyOrientation);
 
-        for (int i = 0; i < 4; i++) {
-            ST[i] = ST[i] + Stokes[i];
-        }
+        for (int i = 0; i < 4; i++) { ST[i] = ST[i] + Stokes[i]; }
     }
 
-    for (int i = 0; i < 4; i++) {
-        Stokes[i] = ST[i] / ln;
-    }
+    for (int i = 0; i < 4; i++) { Stokes[i] = ST[i] / ln; }
     PsiAndStokes psiandstokes;
     psiandstokes.psi = newpsi;
 
@@ -228,10 +216,10 @@ PsiAndStokes calcDipoleFold(double psi, double photonEnergy, double sigpsi, doub
 double calcMaxIntensity(double photonEnergy, double verDivergence, double electronEnergy, double criticalEnergy,
                         ElectronEnergyOrientation electronEnergyOrientation, Rand& __restrict rand) {
     double smax = 0.0;
-    double psi = -verDivergence;
+    double psi  = -verDivergence;
 
     for (int i = 1; i < 250; i++) {
-        psi = psi + 0.05;
+        psi    = psi + 0.05;
         auto S = calcDipoleFold(psi, photonEnergy, 1.0, electronEnergy, criticalEnergy, electronEnergyOrientation, rand);
         if (smax < (S.stokes[2] + S.stokes[3])) {
             smax = S.stokes[2] + S.stokes[3];
@@ -263,9 +251,7 @@ double calcFluxOrg(double photonEnergy, double energySpread, EnergySpreadUnit en
 
 double calcVerDivergence(double energy, double sigv, double electronEnergy, double criticalEnergy) {
     double gamma = fabs(electronEnergy) * get_factorElectronEnergy();
-    if (gamma == 0.0 || criticalEnergy == 0.0) {
-        return 0;
-    }
+    if (gamma == 0.0 || criticalEnergy == 0.0) { return 0; }
     double psi = get_factorOmega() * 1.e-18 * 0.1 / gamma * pow(criticalEnergy * 1000.0 / energy, 0.43);
     return sqrt(pow(psi, 2) + pow(sigv * 0.001, 2));
 }
@@ -313,13 +299,11 @@ RAYX_FN_ACC
 double getDipoleInterpolation(double energy) {
     double functionOne = 0.0;
     double functionTwo = 0.0;
-    double result = 0.0;
-    int x0Position = 0;
+    double result      = 0.0;
+    int x0Position     = 0;
 
     for (int i = 0; i < int(m_schwingerLogX.size()) && x0Position < int(m_schwingerLogX.size()); i++) {
-        if (energy < m_schwingerLogX[i]) {
-            break;
-        }
+        if (energy < m_schwingerLogX[i]) { break; }
         x0Position++;  // TODO: out of bounds checken
     }
 
@@ -342,21 +326,18 @@ RAYX_FN_ACC
 double schwinger(double energy, double gamma, double criticalEnergy) {
     double preFactor = FACTOR_SCHWINGER_RAY * 1.e-3;
 
-    double Y0 = energy / criticalEnergy;
-    Y0 = Y0 / 1000;
+    double Y0  = energy / criticalEnergy;
+    Y0         = Y0 / 1000;
     double yg0 = 0.0;
     double flux;
 
     if (Y0 > 0) {
-        if (Y0 > 10) {
-            yg0 = 0.777 * sqrt(Y0) * pow(ELEMENTARY_CHARGE, -Y0);
-        }
+        if (Y0 > 10) { yg0 = 0.777 * sqrt(Y0) * pow(ELEMENTARY_CHARGE, -Y0); }
         if (Y0 < 1.e-4) {
             yg0 = 1.333 * pow(Y0, (1.0 / 3.0));
-
         } else {
             double y = log(Y0);
-            yg0 = exp(getDipoleInterpolation(y));
+            yg0      = exp(getDipoleInterpolation(y));
         }
     }
     flux = preFactor * gamma * yg0;
@@ -366,8 +347,8 @@ double schwinger(double energy, double gamma, double criticalEnergy) {
 
 double calcMaxFlux(double photonEnergy, double energySpread, double criticalEnergy, double gamma) {
     double EMAXS = 285.81224786 * criticalEnergy;  // welche Zahl ist das?
-    double Emax = photonEnergy + energySpread / 2;
-    double Emin = photonEnergy - energySpread / 2;
+    double Emax  = photonEnergy + energySpread / 2;
+    double Emin  = photonEnergy - energySpread / 2;
 
     if (Emax < EMAXS) {
         return schwinger(Emax, gamma, criticalEnergy);
@@ -395,12 +376,12 @@ DipoleSource::DipoleSource(const DesignSource& dSource)
       // m_photonWaveLength(hvlam(m_photonEnergy)),
       m_energySpread(dSource.getEnergySpread()),
       m_horDivergence(dSource.getHorDivergence()) {
-    auto rand = Rand(randomUint());
-    m_gamma = calcGamma(m_electronEnergy);
+    auto rand       = Rand(randomUint());
+    m_gamma         = calcGamma(m_electronEnergy);
     m_verDivergence = calcVerDivergence(m_photonEnergy, m_verEbeamDivergence, m_electronEnergy, m_criticalEnergy);
     // m_stokes = DipoleSource::getStokesSyn(m_photonEnergy, -3 * m_verDivergence, 3 * m_verDivergence);
     m_maxIntensity = calcMaxIntensity(m_photonEnergy, m_verDivergence, m_electronEnergy, m_criticalEnergy, m_electronEnergyOrientation, rand);
-    m_maxFlux = calcMaxFlux(m_photonEnergy, m_energySpread, m_criticalEnergy, m_gamma);
+    m_maxFlux      = calcMaxFlux(m_photonEnergy, m_energySpread, m_criticalEnergy, m_gamma);
     // m_flux = calcFluxOrg(m_photonEnergy, m_energySpread, dSource.getEnergySpreadUnit(), m_horDivergence, m_stokes);
 }
 
@@ -426,28 +407,28 @@ Ray DipoleSource::genRay(const SourceId sourceId, Rand& __restrict rand) const {
     en = getEnergy(rand);  // Verteilung nach Schwingerfunktion
 
     auto psiandstokes = getPsiandStokes(en, rand);
-    psiandstokes.psi = psiandstokes.psi + m_misalignmentParams.m_rotationYerror.rad;
+    psiandstokes.psi  = psiandstokes.psi + m_misalignmentParams.m_rotationYerror.rad;
 
     phi = phi + m_misalignmentParams.m_rotationXerror.rad;
 
     // get corresponding angles based on distribution and deviation from
     // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
     glm::dvec3 direction = getDirectionFromAngles(phi, psiandstokes.psi);
-    glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
-    direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+    glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
+    direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
     const auto field = stokesToElectricField(psiandstokes.stokes, m_orientation);
 
     return Ray{
-        .m_position = position,
-        .m_eventType = EventType::Emitted,
-        .m_direction = direction,
-        .m_energy = en,
-        .m_field = field,
-        .m_pathLength = 0.0,
-        .m_order = 0,
+        .m_position    = position,
+        .m_eventType   = EventType::Emitted,
+        .m_direction   = direction,
+        .m_energy      = en,
+        .m_field       = field,
+        .m_pathLength  = 0.0,
+        .m_order       = 0,
         .m_lastElement = -1,
-        .m_sourceID = sourceId,
+        .m_sourceID    = sourceId,
     };
 }
 
@@ -463,10 +444,10 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi, Rand& __restrict rand) const
     double sign = m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? -1.0 : 1.0;
 
     double x = sign * (x1 * cos(phi) + (m_bendingRadius * 1000 * (1 - cos(phi))));  // bendingRadius in mm
-    x = x + m_position.x + m_misalignmentParams.m_translationXerror;
+    x        = x + m_position.x + m_misalignmentParams.m_translationXerror;
 
     double y = getNormalFromRange(m_sourceHeight, rand);
-    y = y + m_position.y + m_misalignmentParams.m_translationYerror;
+    y        = y + m_position.y + m_misalignmentParams.m_translationYerror;
 
     double z = sign * (m_bendingRadius * 1000 - x1) * sin(phi) + m_misalignmentParams.m_translationZerror;
 
@@ -482,7 +463,7 @@ double DipoleSource::getNormalFromRange(double range, Rand& __restrict rand) con
     double expanse = -0.5 / range / range;
 
     do {
-        value = (rand.randomDouble() - 0.5) * 9 * range;
+        value        = (rand.randomDouble() - 0.5) * 9 * range;
         Distribution = exp(expanse * value * value);
     } while (Distribution < rand.randomDouble());
 
@@ -494,12 +475,12 @@ double DipoleSource::getNormalFromRange(double range, Rand& __restrict rand) con
  */
 RAYX_FN_ACC
 double DipoleSource::getEnergy(Rand& __restrict rand) const {
-    double flux = 0.0;
+    double flux   = 0.0;
     double energy = 0.0;
 
     do {
         energy = m_photonEnergy + (rand.randomDouble() - 0.5) * m_energySpread;
-        flux = schwinger(energy, m_gamma, m_criticalEnergy);
+        flux   = schwinger(energy, m_gamma, m_criticalEnergy);
     } while ((flux / m_maxFlux - rand.randomDouble()) < 0);
     return energy;
 }

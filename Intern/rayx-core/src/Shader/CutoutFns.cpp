@@ -12,10 +12,10 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
             return true;
         case CutoutType::Rect: {
             RectCutout rect = deserializeRect(cutout);
-            double x_min = -rect.m_width / 2.0;
-            double x_max = rect.m_width / 2.0;
-            double z_min = -rect.m_length / 2.0;
-            double z_max = rect.m_length / 2.0;
+            double x_min    = -rect.m_width / 2.0;
+            double x_max    = rect.m_width / 2.0;
+            double z_min    = -rect.m_length / 2.0;
+            double z_max    = rect.m_length / 2.0;
 
             return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
         }
@@ -74,12 +74,12 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
     double l = 0;
     if (cutout.m_type == CutoutType::Unlimited) {
         double inf = 1e100;
-        w = inf;
-        l = inf;
+        w          = inf;
+        l          = inf;
     } else if (cutout.m_type == CutoutType::Rect) {
         RectCutout rect = deserializeRect(cutout);
-        w = rect.m_width / 2.0;
-        l = rect.m_length / 2.0;
+        w               = rect.m_width / 2.0;
+        l               = rect.m_length / 2.0;
     } else if (cutout.m_type == CutoutType::Trapezoid) {
         TrapezoidCutout t = deserializeTrapezoid(cutout);
 
@@ -95,12 +95,12 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
         return ret;
     } else if (cutout.m_type == CutoutType::Elliptical) {
         EllipticalCutout ell = deserializeElliptical(cutout);
-        double rx = ell.m_diameter_x / 2.0;
-        double rz = ell.m_diameter_z / 2.0;
-        ret[0] = glm::dvec4(rx, 0.0, 0.0, 0.0);
-        ret[1] = glm::dvec4(0.0, 0.0, rz, 0.0);
-        ret[2] = glm::dvec4(-rx, 0.0, 0.0, 0.0);
-        ret[3] = glm::dvec4(0.0, 0.0, -rz, 0.0);
+        double rx            = ell.m_diameter_x / 2.0;
+        double rz            = ell.m_diameter_z / 2.0;
+        ret[0]               = glm::dvec4(rx, 0.0, 0.0, 0.0);
+        ret[1]               = glm::dvec4(0.0, 0.0, rz, 0.0);
+        ret[2]               = glm::dvec4(-rx, 0.0, 0.0, 0.0);
+        ret[3]               = glm::dvec4(0.0, 0.0, -rz, 0.0);
         return ret;
     } else {
         _throw("invalid cutout type in inCutout!");
@@ -115,7 +115,7 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
 // returns width and length of the bounding box.
 RAYX_FN_ACC
 glm::dvec2 RAYX_API cutoutBoundingBox(Cutout cutout) {
-    glm::dvec2 ret = glm::dvec2(0.0, 0.0);
+    glm::dvec2 ret       = glm::dvec2(0.0, 0.0);
     glm::dmat4 keypoints = keyCutoutPoints(cutout);
     for (int i = 0; i < 4; i++) {
         double x = glm::abs(keypoints[i][0]) * 2.0;

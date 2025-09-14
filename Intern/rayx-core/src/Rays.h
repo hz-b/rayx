@@ -53,23 +53,22 @@ namespace RAYX {
 
 using RayAttrFlagType = uint32_t;
 enum class RayAttrFlag : RayAttrFlagType {
-    // clang-format off
-    PathId         = 1 << 0,
-    PositionX      = 1 << 1,
-    PositionY      = 1 << 2,
-    PositionZ      = 1 << 3,
-    EventType      = 1 << 4,
-    DirectionX     = 1 << 5,
-    DirectionY     = 1 << 6,
-    DirectionZ     = 1 << 7,
-    Energy         = 1 << 8,
-    ElectricFieldX = 1 << 9,
-    ElectricFieldY = 1 << 10,
-    ElectricFieldZ = 1 << 11,
-    PathLength     = 1 << 12,
-    Order          = 1 << 13,
-    ElementId      = 1 << 14,
-    SourceId       = 1 << 15,
+    PathId           = 1 << 0,
+    PositionX        = 1 << 1,
+    PositionY        = 1 << 2,
+    PositionZ        = 1 << 3,
+    EventType        = 1 << 4,
+    DirectionX       = 1 << 5,
+    DirectionY       = 1 << 6,
+    DirectionZ       = 1 << 7,
+    Energy           = 1 << 8,
+    ElectricFieldX   = 1 << 9,
+    ElectricFieldY   = 1 << 10,
+    ElectricFieldZ   = 1 << 11,
+    PathLength       = 1 << 12,
+    Order            = 1 << 13,
+    ElementId        = 1 << 14,
+    SourceId         = 1 << 15,
     RayAttrFlagCount = 16,
 
     Position      = PositionX | PositionY | PositionZ,
@@ -77,25 +76,26 @@ enum class RayAttrFlag : RayAttrFlagType {
     ElectricField = ElectricFieldX | ElectricFieldY | ElectricFieldZ,
 
     None = 0,
-    All = (1 << RayAttrFlagCount) - 1,
-    // clang-format on
+    All  = (1 << RayAttrFlagCount) - 1,
 };
 
-constexpr inline RayAttrFlag operator|(const RayAttrFlag lhs, const RayAttrFlag rhs) {
-    return static_cast<RayAttrFlag>(static_cast<RayAttrFlagType>(lhs) | static_cast<RayAttrFlagType>(rhs));
+RAYX_FN_ACC constexpr inline RayAttrFlag operator|(const RayAttrFlag lhs, const RayAttrFlag rhs) {
+    return static_cast<RayAttrFlag>(static_cast<std::underlying_type<RayAttrFlag>>(lhs) | static_cast<std::underlying_type<RayAttrFlag>>(rhs));
 }
-constexpr inline RayAttrFlag operator&(const RayAttrFlag lhs, const RayAttrFlag rhs) {
-    return static_cast<RayAttrFlag>(static_cast<RayAttrFlagType>(lhs) & static_cast<RayAttrFlagType>(rhs));
+RAYX_FN_ACC constexpr inline RayAttrFlag operator&(const RayAttrFlag lhs, const RayAttrFlag rhs) {
+    return static_cast<RayAttrFlag>(static_cast<std::underlying_type<RayAttrFlag>>(lhs) & static_cast<std::underlying_type<RayAttrFlag>>(rhs));
 }
-constexpr inline RayAttrFlag operator^(const RayAttrFlag lhs, const RayAttrFlag rhs) {
-    return static_cast<RayAttrFlag>(static_cast<RayAttrFlagType>(lhs) ^ static_cast<RayAttrFlagType>(rhs));
+RAYX_FN_ACC constexpr inline RayAttrFlag operator^(const RayAttrFlag lhs, const RayAttrFlag rhs) {
+    return static_cast<RayAttrFlag>(static_cast<std::underlying_type<RayAttrFlag>>(lhs) ^ static_cast<std::underlying_type<RayAttrFlag>>(rhs));
 }
-constexpr inline RayAttrFlag operator|=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs | rhs; }
-constexpr inline RayAttrFlag operator&=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs & rhs; }
-constexpr inline RayAttrFlag operator^=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs ^ rhs; }
-constexpr inline RayAttrFlag operator~(const RayAttrFlag lhs) { return static_cast<RayAttrFlag>(~static_cast<RayAttrFlagType>(lhs)); }
+RAYX_FN_ACC constexpr inline RayAttrFlag operator~(const RayAttrFlag lhs) {
+    return static_cast<RayAttrFlag>(~static_cast<std::underlying_type<RayAttrFlag>>(lhs));
+}
+RAYX_FN_ACC constexpr inline RayAttrFlag operator|=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs | rhs; }
+RAYX_FN_ACC constexpr inline RayAttrFlag operator&=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs & rhs; }
+RAYX_FN_ACC constexpr inline RayAttrFlag operator^=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs ^ rhs; }
 
-struct RaySoA {
+struct Rays {
     int num_events;
     int num_paths;
     RayAttrFlag attr;
@@ -105,25 +105,29 @@ struct RaySoA {
     RAYX_X_MACRO_RAY_ATTR
 #undef X
 
-    glm::dvec3 position(int i) const { return glm::dvec3(position_x[i], position_y[i], position_z[i]); }
-    glm::dvec3 direction(int i) const { return glm::dvec3(direction_x[i], direction_y[i], direction_z[i]); }
-    ElectricField field(int i) const { return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]); }
-    Ray ray(int i) const {
-        return Ray{
-            .m_position = position(i),
-            .m_eventType = event_type[i],
-            .m_direction = direction(i),
-            .m_energy = energy[i],
-            .m_field = field(i),
-            .m_pathLength = path_length[i],
-            .m_order = order[i],
-            .m_lastElement = element_id[i],
-            .m_sourceID = source_id[i],
-        };
+    glm::dvec3 position(const int i) const { return glm::dvec3(position_x[i], position_y[i], position_z[i]); }
+    void position(const int i, const glm::dvec3 position) {
+        position_x[i] = position.x;
+        position_y[i] = position.y;
+        position_z[i] = position.z;
+    }
+
+    glm::dvec3 direction(const int i) const { return glm::dvec3(direction_x[i], direction_y[i], direction_z[i]); }
+    void direction(const int i, const glm::dvec3 direction) {
+        direction_x[i] = direction.x;
+        direction_y[i] = direction.y;
+        direction_z[i] = direction.z;
+    }
+
+    ElectricField electric_field(const int i) const { return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]); }
+    void electric_field(const int i, const ElectricField electric_field) {
+        electric_field_x[i] = electric_field.x;
+        electric_field_y[i] = electric_field.y;
+        electric_field_z[i] = electric_field.z;
     }
 };
 
-static_assert(std::is_nothrow_default_constructible_v<RaySoA>);
+static_assert(std::is_nothrow_default_constructible_v<Rays>);
 
 /// Contains all the events of a single Ray in chronological order.
 using RayHistory = std::vector<Ray>;
@@ -133,8 +137,8 @@ using RayHistory = std::vector<Ray>;
 /// hist[i][j] is the j'th event of the i'th ray of the bundle.
 using BundleHistory = std::vector<RayHistory>;
 
-RAYX_API RaySoA bundleHistoryToRaySoA(const BundleHistory& bundle);
-RAYX_API BundleHistory raySoAToBundleHistory(const RaySoA& rays);
+RAYX_API Rays bundleHistoryToRays(const BundleHistory& bundle);
+RAYX_API BundleHistory raySoAToBundleHistory(const Rays& rays);
 
 /// get a full list of attr names
 RAYX_API std::vector<std::string> getRayAttrNames();

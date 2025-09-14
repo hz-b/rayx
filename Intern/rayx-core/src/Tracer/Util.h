@@ -23,7 +23,7 @@ inline int nextPowerOfTwo(const int value) { return static_cast<int>(glm::pow(2,
 /// beamlines one after the other)
 template <typename Queue, typename Buf>
 inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
-    using Idx = alpaka::Idx<Buf>;
+    using Idx  = alpaka::Idx<Buf>;
     using Elem = alpaka::Elem<Buf>;
 
     const auto shouldAlloc = !buf || alpaka::getExtents(*buf)[0] < size;
@@ -37,8 +37,8 @@ inline bool checkTooManyEvents(const std::vector<Ray>& compactEvents, const std:
 
     for (int i = 0; i < batchSize; ++i) {
         if (0 < compactEventCounts[i]) {
-            const auto offset = compactEventOffsets[i];
-            const auto count = compactEventCounts[i];
+            const auto offset         = compactEventOffsets[i];
+            const auto count          = compactEventCounts[i];
             const auto lastEventIndex = offset + count - 1;
             if (compactEvents[lastEventIndex].m_eventType == EventType::TooManyEvents) return true;
         }
@@ -54,7 +54,7 @@ inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, 
 
     for (int i = 0; i < batchSize; i++) {
         const auto begin = compactEvents.data() + compactEventOffsets[i];
-        const auto end = begin + compactEventCounts[i];
+        const auto end   = begin + compactEventCounts[i];
 
         // add events to history, only if there are events
         bool hasEvents = 0 < std::distance(begin, end);
@@ -92,8 +92,8 @@ template <typename Acc, typename DevAcc, typename Queue, typename Kernel, typena
 inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraint::Variant blockSizeConstraint,
                                  const Kernel& kernel, Args&&... args) {
     const auto conf = alpaka::KernelCfg<Acc>{
-        .gridElemExtent = numElements,
-        .threadElemExtent = 1,
+        .gridElemExtent                        = numElements,
+        .threadElemExtent                      = 1,
         .blockThreadMustDivideGridThreadExtent = false,
     };
 
@@ -103,13 +103,13 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
             if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::Exact>) {
                 assert(workDiv.m_blockThreadExtent[0] <= constraint.value && "BlockSizeConstraint::Exact exceeds the capabilities this device");
                 workDiv.m_blockThreadExtent = constraint.value;
-                workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+                workDiv.m_gridBlockExtent   = ceilIntDivision(numElements, constraint.value);
             }
 
             if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::AtMost>) {
                 if (constraint.value < workDiv.m_blockThreadExtent[0]) {
                     workDiv.m_blockThreadExtent = constraint.value;
-                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+                    workDiv.m_gridBlockExtent   = ceilIntDivision(numElements, constraint.value);
                 }
             }
 
@@ -121,7 +121,7 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
                 assert(constraint.atLeast <= workDiv.m_blockThreadExtent[0] && "BlockSizeConstraint::InRange exceeds capabilities of this device");
                 if (constraint.atMost < workDiv.m_blockThreadExtent[0]) {
                     workDiv.m_blockThreadExtent = constraint.atMost;
-                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.atMost);
+                    workDiv.m_gridBlockExtent   = ceilIntDivision(numElements, constraint.atMost);
                 }
             }
         },
@@ -144,12 +144,12 @@ struct GatherIndicesKernel {
 
         if (gid < n) {
             const auto offset = srcOffsets[gid];
-            const auto size = srcSizes[gid];
+            const auto size   = srcSizes[gid];
 
             for (int i = 0; i < size; ++i) {
-                const auto idst = offset + i;
-                const auto isrc = gid * maxEvents + i;
-                srcIndices[idst] = isrc;
+                const auto idst    = offset + i;
+                const auto isrc    = gid * maxEvents + i;
+                srcIndices[idst]   = isrc;
                 attr_path_id[idst] = gid + batchStartRayIndex;
             }
         }
@@ -164,7 +164,7 @@ struct GatherKernel {
 
         if (gid < n) {
             const auto isrc = srcIndices[gid];
-            dst[gid] = src[isrc];
+            dst[gid]        = src[isrc];
         }
     }
 };
@@ -199,7 +199,7 @@ inline RaySoaRef raySoaBufToRaySoaRef(RaySoaBuf<Acc>& buf) {
     };
 }
 
-struct CompactRaysToRaySoAKernel {
+struct CompactRaysToRaysKernel {
     template <typename Acc>
     RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaySoaRef raysoa, const Ray* __restrict rays, const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];

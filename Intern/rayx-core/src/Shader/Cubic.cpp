@@ -6,8 +6,8 @@ namespace RAYX {
 RAYX_FN_ACC
 glm::dvec3 RAYX_API cubicPosition(const glm::dvec3& __restrict rayPosition, double alpha) {
     double yy = rayPosition[1];
-    double y = yy * glm::cos(alpha) - rayPosition[2] * glm::sin(alpha);
-    double z = (rayPosition[2]) * glm::cos(alpha) + yy * glm::sin(alpha);
+    double y  = yy * glm::cos(alpha) - rayPosition[2] * glm::sin(alpha);
+    double z  = (rayPosition[2]) * glm::cos(alpha) + yy * glm::sin(alpha);
 
     return glm::dvec3(0, y, z);
 }

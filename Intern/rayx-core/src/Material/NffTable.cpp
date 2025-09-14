@@ -18,9 +18,7 @@ bool NffTable::load(const char* element, NffTable* out) {
     RAYX_VERB << "Loading NffTable from " << f;
     std::ifstream s(f);
 
-    if (s.fail()) {
-        return false;
-    }
+    if (s.fail()) { return false; }
 
     std::string line;
 
@@ -29,9 +27,7 @@ bool NffTable::load(const char* element, NffTable* out) {
 
     // line 2..EOF
     for (uint32_t lineidx = 2; std::getline(s, line); lineidx++) {
-        if (line.empty()) {
-            continue;
-        }
+        if (line.empty()) { continue; }
 
         NffEntry e{};
 #if defined(WIN32)

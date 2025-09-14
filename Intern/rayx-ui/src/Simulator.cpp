@@ -13,27 +13,21 @@ void Simulator::runSimulation() {
         return;
     }
     // Run rayx core
-    if (!m_maxEvents) {
-        m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
-    }
+    if (!m_maxEvents) { m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline); }
 
-    const auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents,
-                                      RAYX::recordMaskAllElements(m_Beamline.numSources(), m_Beamline.numElements()));
+    const auto rays       = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents,
+                                            RAYX::recordMaskAllElements(m_Beamline.numSources(), m_Beamline.numElements()));
     const auto bundleHist = RAYX::raySoAToBundleHistory(rays);
 
     bool notEnoughEvents = false;
 
     for (auto& ray : bundleHist) {
         for (auto& event : ray) {
-            if (event.m_eventType == RAYX::EventType::TooManyEvents) {
-                notEnoughEvents = true;
-            }
+            if (event.m_eventType == RAYX::EventType::TooManyEvents) { notEnoughEvents = true; }
         }
     }
 
-    if (notEnoughEvents) {
-        RAYX_LOG << "Not enough events (" << m_maxEvents << ")! Consider increasing m_maxEvents.";
-    }
+    if (notEnoughEvents) { RAYX_LOG << "Not enough events (" << m_maxEvents << ")! Consider increasing m_maxEvents."; }
 
     // Export Rays to external data.
     std::string path = m_RMLPath.string();
@@ -45,7 +39,7 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    RAYX::writeH5RaySoA(path, m_Beamline.getSourceNames(), m_Beamline.getElementNames(), rays);
+    RAYX::writeH5Rays(path, m_Beamline.getSourceNames(), m_Beamline.getElementNames(), rays);
 #else
     RAYX::writeCsv(bundleHist, path);
 #endif
@@ -59,17 +53,16 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
         m_Tracer = std::make_unique<RAYX::Tracer>(m_deviceConfig);
     }
 
-    m_RMLPath = RMLPath;
-    m_Beamline = std::move(*static_cast<RAYX::Beamline*>(beamline.clone().get()));
+    m_RMLPath        = RMLPath;
+    m_Beamline       = std::move(*static_cast<RAYX::Beamline*>(beamline.clone().get()));
     m_max_batch_size = simulationInfo.maxBatchSize;
-    m_seq = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
-    m_maxEvents = simulationInfo.maxEvents;
+    m_seq            = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+    m_maxEvents      = simulationInfo.maxEvents;
     if (simulationInfo.fixedSeed) {
         if (simulationInfo.seed != -1) {
             RAYX::fixSeed(simulationInfo.seed);
         } else
             RAYX::fixSeed(RAYX::FIXED_SEED);
-
     } else {
         RAYX::randomSeed();
     }

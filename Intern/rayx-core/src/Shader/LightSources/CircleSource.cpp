@@ -9,13 +9,13 @@ namespace RAYX {
 CircleSource::CircleSource(const DesignSource& dSource) : ModelLightSource(dSource) {
     m_stokes = dSource.getStokes();
 
-    m_sourceDepth = dSource.getSourceDepth();
+    m_sourceDepth  = dSource.getSourceDepth();
     m_sourceHeight = dSource.getSourceHeight();
-    m_sourceWidth = dSource.getSourceWidth();
+    m_sourceWidth  = dSource.getSourceWidth();
 
-    m_numOfCircles = dSource.getNumOfCircles();
-    m_maxOpeningAngle = dSource.getMaxOpeningAngle();
-    m_minOpeningAngle = dSource.getMinOpeningAngle();
+    m_numOfCircles      = dSource.getNumOfCircles();
+    m_maxOpeningAngle   = dSource.getMaxOpeningAngle();
+    m_minOpeningAngle   = dSource.getMinOpeningAngle();
     m_deltaOpeningAngle = dSource.getDeltaOpeningAngle();
 }
 
@@ -49,15 +49,15 @@ Ray CircleSource::genRay(const SourceId sourceId, const EnergyDistributionDataVa
     const auto field = stokesToElectricField(m_stokes, m_orientation);
 
     return Ray{
-        .m_position = position,
-        .m_eventType = EventType::Emitted,
-        .m_direction = direction,
-        .m_energy = en,
-        .m_field = field,
-        .m_pathLength = 0.0,
-        .m_order = 0,
+        .m_position    = position,
+        .m_eventType   = EventType::Emitted,
+        .m_direction   = direction,
+        .m_energy      = en,
+        .m_field       = field,
+        .m_pathLength  = 0.0,
+        .m_order       = 0,
         .m_lastElement = -1,
-        .m_sourceID = sourceId,
+        .m_sourceID    = sourceId,
     };
 }
 
@@ -72,23 +72,23 @@ glm::dvec3 CircleSource::getDirection(Rand& __restrict rand) const {
 
     const auto min = std::min(1, m_numOfCircles);
     const auto max = std::min(1, m_numOfCircles);
-    circle = rand.randomIntInRange(min, max) - 1;
+    circle         = rand.randomIntInRange(min, max) - 1;
 
     double thetabetweencircles = (m_maxOpeningAngle.rad - m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
-    double theta = thetabetweencircles * circle;
-    theta = theta + (rand.randomDouble() - 0.5) * m_deltaOpeningAngle.rad + m_minOpeningAngle.rad;
+    double theta               = thetabetweencircles * circle;
+    theta                      = theta + (rand.randomDouble() - 0.5) * m_deltaOpeningAngle.rad + m_minOpeningAngle.rad;
 
     double al = cos(angle) * cos(m_misalignmentParams.m_rotationYerror.rad);
-    al = al + sin(angle) * sin(m_misalignmentParams.m_rotationYerror.rad) * sin(m_misalignmentParams.m_rotationXerror.rad);
-    al = al * sin(theta);
-    al = al + cos(m_misalignmentParams.m_rotationXerror.rad) * cos(theta) * sin(m_misalignmentParams.m_rotationYerror.rad);
+    al        = al + sin(angle) * sin(m_misalignmentParams.m_rotationYerror.rad) * sin(m_misalignmentParams.m_rotationXerror.rad);
+    al        = al * sin(theta);
+    al        = al + cos(m_misalignmentParams.m_rotationXerror.rad) * cos(theta) * sin(m_misalignmentParams.m_rotationYerror.rad);
 
     double am = -cos(theta) * sin(m_misalignmentParams.m_rotationXerror.rad);
-    am = am + cos(m_misalignmentParams.m_rotationXerror.rad) * sin(angle) * sin(theta);
+    am        = am + cos(m_misalignmentParams.m_rotationXerror.rad) * sin(angle) * sin(theta);
 
     double an = (-cos(angle) * sin(m_misalignmentParams.m_rotationYerror.rad)) * sin(theta);
-    an = an + cos(m_misalignmentParams.m_rotationYerror.rad) * cos(m_misalignmentParams.m_rotationXerror.rad) * cos(theta);
-    an = an + cos(m_misalignmentParams.m_rotationYerror.rad) * sin(angle) * sin(m_misalignmentParams.m_rotationXerror.rad) * sin(theta);
+    an        = an + cos(m_misalignmentParams.m_rotationYerror.rad) * cos(m_misalignmentParams.m_rotationXerror.rad) * cos(theta);
+    an        = an + cos(m_misalignmentParams.m_rotationYerror.rad) * sin(angle) * sin(m_misalignmentParams.m_rotationXerror.rad) * sin(theta);
 
     return glm::dvec3(al, am, an);
 }

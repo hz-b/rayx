@@ -25,7 +25,7 @@ class Renderer {
     Renderer(Window& window, Device& device);
     ~Renderer();
 
-    Renderer(const Renderer&) = delete;
+    Renderer(const Renderer&)            = delete;
     Renderer& operator=(const Renderer&) = delete;
 
     VkRenderPass getSwapChainRenderPass() const { return m_SwapChain->getRenderPass(); }

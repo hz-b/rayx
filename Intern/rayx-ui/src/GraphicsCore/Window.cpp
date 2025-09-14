@@ -17,9 +17,9 @@
  * @see: framebufferResizeCallback() for more information on the callback function.
  */
 Window::Window(uint32_t width, uint32_t height, const char* title) {
-    m_width = width;
+    m_width  = width;
     m_height = height;
-    m_title = title;
+    m_title  = title;
 
     SDL_SetHint(SDL_HINT_WINDOWS_GAMEINPUT, "0");
     SDL_Init(SDL_INIT_VIDEO);
@@ -47,15 +47,13 @@ void Window::framebufferResizeCallback(SDL_Window* rawWindow, int width, int hei
 
 void Window::onFramebufferResize(int width, int height) {
     m_framebufferResized = true;
-    m_width = width;
-    m_height = height;
+    m_width              = width;
+    m_height             = height;
 }
 
 /**
  * Creates a Vulkan surface associated with the window.
  */
 void Window::createSurface(VkInstance instance, VkSurfaceKHR* surface) {
-    if (!SDL_Vulkan_CreateSurface(m_Window, instance, nullptr, surface)) {
-        throw std::runtime_error("failed to create window surface!");
-    }
+    if (!SDL_Vulkan_CreateSurface(m_Window, instance, nullptr, surface)) { throw std::runtime_error("failed to create window surface!"); }
 }

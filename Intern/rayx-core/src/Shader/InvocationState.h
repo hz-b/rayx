@@ -2,8 +2,8 @@
 
 #include "Element/Element.h"
 #include "Rand.h"
-#include "Ray.h"
 #include "RecordMask.h"
+#include "RaysPtr.h
 
 namespace RAYX {
 
@@ -16,18 +16,20 @@ enum class Sequential { No, Yes };
 struct RAYX_API ConstState {
     int maxEvents;
     Sequential sequential = Sequential::No;
+    int numSources;
+    int numElements;
 
     OpticalElement* __restrict elements;
-    int numElements;
     int* __restrict materialIndices;
     double* __restrict materialTables;
-    RecordMask recordMask;  //< Mask that decides which elements to record events for (array length is numElements)
-    Ray* __restrict rays;
+    bool* __restrict elementRecordMask;  // Mask that decides which elements to record events for (array length is numElements)
+    RayAttrFlag attrRecordMask;
+    RaysPtr rays;
 };
 
 /// stores all mutable buffers
 struct RAYX_API MutableState {
-    Ray* __restrict events;
+    RaysPtr events;
     int* __restrict eventCounts;
     Rand* __restrict rands;
 };

@@ -22,7 +22,7 @@
 #include <vector>
 
 // This include is necessary, as Debug implements a special formatting for Ray.
-#include "RaySoA.h"
+#include "Rays.h"
 #include "Shader/Ray.h"
 
 // Debug only code; use it as: DEBUG(<statement>);
@@ -128,9 +128,7 @@ struct RAYX_API Verb {
 
     template <typename T>
     Verb& operator<<(T t) {
-        if (getDebugVerbose()) {
-            std::cout << t;
-        }
+        if (getDebugVerbose()) { std::cout << t; }
         return *this;
     }
 };
@@ -148,23 +146,23 @@ extern void RAYX_API (*error_fn)();
 // Defines the actual RAYX logging macros using the structs defined above.
 // The __FILE__ and __LINE__ macros contain the current filename and linenumber.
 // They are defined for us by c++ https://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
-#define RAYX_LOG RAYX::Log(__FILE__, __LINE__)
+#define RAYX_LOG  RAYX::Log(__FILE__, __LINE__)
 #define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
 #define RAYX_EXIT RAYX::Exit(__FILE__, __LINE__)
 #define RAYX_VERB RAYX::Verb(__FILE__, __LINE__)
 
 #ifdef RAYX_DEBUG_MODE
 // In debug mode, RAYX_D_LOG is just the same as RAYX_LOG.
-#define RAYX_D_LOG RAYX_LOG
+#define RAYX_D_LOG  RAYX_LOG
 #define RAYX_D_WARN RAYX_WARN
-#define RAYX_D_ERR RAYX_EXIT
+#define RAYX_D_ERR  RAYX_EXIT
 #define RAYX_D_VERB RAYX_VERB
 
 #else
 // In release mode, RAYX_D_LOG instead calls the IgnoreLog, hence discarding the print.
-#define RAYX_D_LOG RAYX::IgnoreLog()
+#define RAYX_D_LOG  RAYX::IgnoreLog()
 #define RAYX_D_WARN RAYX::IgnoreLog()
-#define RAYX_D_ERR RAYX::IgnoreLog()
+#define RAYX_D_ERR  RAYX::IgnoreLog()
 #define RAYX_D_VERB RAYX::IgnoreLog()
 #endif
 
@@ -244,7 +242,7 @@ inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
     return arg;
 }
 
-inline std::vector<double> formatAsVec(const RaySoA& rays) {
+inline std::vector<double> formatAsVec(const Rays& rays) {
     std::vector<double> out;
     auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
 

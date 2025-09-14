@@ -4,15 +4,11 @@
 #include "setupTests.h"
 
 void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
-    for (auto r : rays) {
-        CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread);
-    }
+    for (auto r : rays) { CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread); }
 }
 
 void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
-    for (auto r : rays) {
-        CHECK_IN(r.m_position.z, center - spread, center + spread);
-    }
+    for (auto r : rays) { CHECK_IN(r.m_position.z, center - spread, center + spread); }
 }
 
 void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHeight) {
@@ -26,7 +22,7 @@ void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth,
 void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
     for (auto r : rays) {
         double psi = asin(r.m_direction.y);
-        psi = abs(psi);
+        psi        = abs(psi);
         CHECK_IN(psi, minAngle, maxAngle);
     }
 }
@@ -131,9 +127,7 @@ TEST_F(TestSuite, CircleSourcetest) {
 
 TEST_F(TestSuite, testCircleSourceDirections) {
     auto bundle = traceRML("CircleSource_default");
-    for (auto rays : bundle) {
-        checkDirectionDistribution(rays, 0.0, 105.0);
-    }
+    for (auto rays : bundle) { checkDirectionDistribution(rays, 0.0, 105.0); }
 }
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
@@ -144,15 +138,15 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
     };
     std::vector<InOutPair> inouts = {
         {
-            .in = 1.5298292375594387,
+            .in  = 1.5298292375594387,
             .out = -3.5010758381905855,
         },
         {
-            .in = 2,
+            .in  = 2,
             .out = -6.0742663050458416,
         },
         {
-            .in = -1,
+            .in  = -1,
             .out = -0.095123518041340588,
         },
     };
@@ -172,8 +166,8 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
     };
     std::vector<InOutPair> inouts = {{
         .energy = 100,
-        .sigv = 1,
-        .out = 1.591581814000419,
+        .sigv   = 1,
+        .out    = 1.591581814000419,
     }};
 
     const auto electronEnergy = 1.7;
@@ -193,33 +187,33 @@ TEST_F(TestSuite, testBesselDipole) {
     };
     std::vector<InOutPair> inouts = {{
                                          .proportion = 1 / 3,
-                                         .zeta = 78.126966373103443,
-                                         .out = 1.664046593883771e-35,
+                                         .zeta       = 78.126966373103443,
+                                         .out        = 1.664046593883771e-35,
                                      },
                                      {
                                          .proportion = 1 / 3,
-                                         .zeta = 73.550785975500432,
-                                         .out = 1.6659366793149262e-33,
+                                         .zeta       = 73.550785975500432,
+                                         .out        = 1.6659366793149262e-33,
                                      },
                                      {
                                          .proportion = 1 / 3,
-                                         .zeta = 46.422887861754496,
-                                         .out = 1.2672053903555623e-21,
+                                         .zeta       = 46.422887861754496,
+                                         .out        = 1.2672053903555623e-21,
                                      },
                                      {
                                          .proportion = 2 / 3,
-                                         .zeta = 78.126966373103443,
-                                         .out = 1.6675777760881476e-35,
+                                         .zeta       = 78.126966373103443,
+                                         .out        = 1.6675777760881476e-35,
                                      },
                                      {
                                          .proportion = 2 / 3,
-                                         .zeta = 73.550785975500432,
-                                         .out = 1.6696906039215801e-33,
+                                         .zeta       = 73.550785975500432,
+                                         .out        = 1.6696906039215801e-33,
                                      },
                                      {
                                          .proportion = 2 / 3,
-                                         .zeta = 49.798819164687949,
-                                         .out = 4.1969864622545434e-23,
+                                         .zeta       = 49.798819164687949,
+                                         .out        = 4.1969864622545434e-23,
                                      }};
 
     for (auto values : inouts) {
@@ -235,28 +229,28 @@ TEST_F(TestSuite, testSchwingerDipole) {
     };
     std::vector<InOutPair> inouts = {{
                                          .energy = 6520.0878532052693,
-                                         .flux = 566462407647095.5,
+                                         .flux   = 566462407647095.5,
                                      },
                                      {.energy = 100, .flux = 2855336264551178},
                                      {
                                          .energy = 900,
-                                         .flux = 3762078406399219,
+                                         .flux   = 3762078406399219,
                                      },
                                      {
                                          .energy = 2000,
-                                         .flux = 2907004029317153.5,
+                                         .flux   = 2907004029317153.5,
                                      },
                                      {
                                          .energy = 0.667,
-                                         .flux = 596812742357665.25,
+                                         .flux   = 596812742357665.25,
                                      },
                                      {
                                          .energy = 2456,
-                                         .flux = 2526853293939861,
+                                         .flux   = 2526853293939861,
                                      }};
 
     const auto electronEnergy = 1.7;
-    const auto gamma = calcGamma(electronEnergy);
+    const auto gamma          = calcGamma(electronEnergy);
     const auto criticalEnergy = get_factorCriticalEnergy();
 
     for (auto values : inouts) {
@@ -275,22 +269,22 @@ TEST_F(TestSuite, testLightsourceGetters) {
     };
 
     std::vector<RmlInput> rmlinputs = {{
-        .rmlFile = "PointSourceHardEdge",
+        .rmlFile       = "PointSourceHardEdge",
         .horDivergence = 0.001,  // conversion /1000 in the parser
-        .sourceHeight = 0.04,
-        .sourceWidth = 0.065,
-        .sourceDepth = 1,
+        .sourceHeight  = 0.04,
+        .sourceWidth   = 0.065,
+        .sourceDepth   = 1,
     }};
     for (auto values : rmlinputs) {
-        auto beamline = loadBeamline(values.rmlFile);
+        auto beamline           = loadBeamline(values.rmlFile);
         const DesignSource* src = beamline.getSources()[0];
 
-        auto test2 = values.horDivergence;
-        auto test4 = values.sourceDepth;
-        auto test6 = values.sourceWidth;
-        auto horResult = src->getHorDivergence();
+        auto test2        = values.horDivergence;
+        auto test4        = values.sourceDepth;
+        auto test6        = values.sourceWidth;
+        auto horResult    = src->getHorDivergence();
         auto heightResult = src->getSourceHeight();
-        auto widthResult = src->getSourceWidth();
+        auto widthResult  = src->getSourceWidth();
 
         CHECK_EQ(horResult, values.horDivergence);
         CHECK_EQ(heightResult, values.sourceHeight);
@@ -300,14 +294,14 @@ TEST_F(TestSuite, testLightsourceGetters) {
 
 #ifndef NO_H5
 TEST_F(TestSuite, testH5Writer) {
-    const auto beamlineFilename = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
-    const auto rayOriginal = traceRML(beamlineFilename);
-    const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
-    const auto beamline = loadBeamline(beamlineFilename);
-    const auto sourceNamesOriginal = beamline.getSourceNames();
+    const auto beamlineFilename     = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
+    const auto rayOriginal          = traceRML(beamlineFilename);
+    const auto rayOriginalSoA       = bundleHistoryToRays(rayOriginal);
+    const auto beamline             = loadBeamline(beamlineFilename);
+    const auto sourceNamesOriginal  = beamline.getSourceNames();
     const auto elementNamesOriginal = beamline.getElementNames();
 
-    // test conversion between BundleHistory and RaySoA
+    // test conversion between BundleHistory and Rays
     {
         const auto bundle = raySoAToBundleHistory(rayOriginalSoA);
         CHECK_EQ(rayOriginal, bundle);
@@ -331,8 +325,8 @@ TEST_F(TestSuite, testH5Writer) {
     // test if write and read of partial BundleHistory work without altering the contents
     {
         // ground thruth
-        RaySoA partialRayOriginalSoA;
-        partialRayOriginalSoA.energy = rayOriginalSoA.energy;
+        Rays partialRayOriginalSoA;
+        partialRayOriginalSoA.energy     = rayOriginalSoA.energy;
         partialRayOriginalSoA.position_x = rayOriginalSoA.position_x;
         partialRayOriginalSoA.position_y = rayOriginalSoA.position_y;
         partialRayOriginalSoA.position_z = rayOriginalSoA.position_z;
@@ -341,7 +335,7 @@ TEST_F(TestSuite, testH5Writer) {
         const auto attr = RayAttrFlag::Energy | RayAttrFlag::Position;
         writeH5BundleHistory(h5Filepath, sourceNamesOriginal, elementNamesOriginal, rayOriginal, attr);
         // read only some attributes
-        const auto raySoA = readH5RaySoA(h5Filepath, attr);
+        const auto raySoA = readH5Rays(h5Filepath, attr);
 
         CHECK_EQ(partialRayOriginalSoA, raySoA);
     }

@@ -58,9 +58,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
-    if (mats.size() != 92) {
-        RAYX_EXIT << "unexpected number of materials. this is a bug.";
-    }
+    if (mats.size() != 92) { RAYX_EXIT << "unexpected number of materials. this is a bug."; }
 
     // add palik table content
     for (size_t i = 0; i < mats.size(); i++) {
@@ -68,9 +66,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
         if (relevantMaterials[i]) {
             PalikTable t;
 
-            if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_EXIT << "could not load PalikTable!";
-            }
+            if (!PalikTable::load(getMaterialName(mats[i]), &t)) { RAYX_EXIT << "could not load PalikTable!"; }
 
             for (auto x : t.m_Lines) {
                 out.materials.push_back(x.m_energy);
@@ -86,9 +82,7 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
         if (relevantMaterials[i]) {
             NffTable t;
 
-            if (!NffTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_EXIT << "could not load NffTable!";
-            }
+            if (!NffTable::load(getMaterialName(mats[i]), &t)) { RAYX_EXIT << "could not load NffTable!"; }
 
             for (auto x : t.m_Lines) {
                 out.materials.push_back(x.m_energy);

@@ -8,25 +8,19 @@ namespace RAYX {
 
 RAYX_FN_ACC
 double RAYX_API fact(int a) {
-    if (a < 0) {
-        return a;
-    }
+    if (a < 0) { return a; }
     double f = 1;
-    for (int i = 2; i <= a; i++) {
-        f *= i;
-    }
+    for (int i = 2; i <= a; i++) { f *= i; }
     return f;
 }
 
 /**returns first bessel function of parameter v*/
 RAYX_FN_ACC
 double RAYX_API bessel1(double v) {
-    if (v < 0.0 || v > 20.0) {
-        return 0.0;
-    }
+    if (v < 0.0 || v > 20.0) { return 0.0; }
 
     double sum = 0;
-    int large = 30;
+    int large  = 30;
 
     double PO1;
     double PO2;
@@ -51,20 +45,18 @@ zoneplates
 */
 RAYX_FN_ACC
 void bessel_diff(double radius, double wl, double& __restrict dphi, double& __restrict dpsi, Rand& __restrict rand) {
-    double b = glm::abs(radius) * 1e06;
+    double b     = glm::abs(radius) * 1e06;
     double ximax = 5.0 * wl / b;
 
     double rn1[3];
     double c = -1;
     while (c < 0) {  // while c = wd - rn1[2] < 0 continue
-        for (int i = 0; i < 3; i++) {
-            rn1[i] = rand.randomDouble();
-        }
+        for (int i = 0; i < 3; i++) { rn1[i] = rand.randomDouble(); }
 
-        dphi = rn1[0] * ximax;
-        dpsi = rn1[1] * ximax;
+        dphi      = rn1[0] * ximax;
+        dpsi      = rn1[1] * ximax;
         double xi = sqrt(0.5 * (dphi * dphi + dpsi * dpsi));
-        double u = 2.0 * PI * b * xi / wl;
+        double u  = 2.0 * PI * b * xi / wl;
         double wd = 1;
         if (u != 0) {
             wd = 2.0 * bessel1(u) / u;
@@ -88,17 +80,15 @@ void bessel_diff(double radius, double wl, double& __restrict dphi, double& __re
 RAYX_FN_ACC
 void fraun_diff(double dim, double wl, double& __restrict dAngle, Rand& __restrict rand) {
     if (dim == 0) return;        // no diffraction in this direction
-    double b = dim * 1e06;       // slit opening
+    double b   = dim * 1e06;     // slit opening
     double div = 10.0 * wl / b;  // up to 2nd maximum
 
     double rna[2];  // 2 uniform random numbers in [0,1]
     double c = -1;
     while (c < 0) {  // while c = wd - uni[1] < 0 continue
-        for (int i = 0; i < 2; i++) {
-            rna[i] = rand.randomDouble();
-        }
-        dAngle = (rna[0] - 0.5) * div;
-        double u = PI * b * glm::sin(dAngle) / wl;
+        for (int i = 0; i < 2; i++) { rna[i] = rand.randomDouble(); }
+        dAngle    = (rna[0] - 0.5) * div;
+        double u  = PI * b * glm::sin(dAngle) / wl;
         double wd = 1;
         if (u != 0) {
             wd = glm::sin(u) / u;

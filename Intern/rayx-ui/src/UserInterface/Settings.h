@@ -28,12 +28,12 @@ struct UIRayInfo {
 };
 
 struct UISimulationInfo {
-    uint32_t maxEvents = 0;
+    uint32_t maxEvents    = 0;
     uint32_t maxBatchSize = 100000;
-    bool sequential = false;
+    bool sequential       = false;
     std::vector<std::string> availableDevices;
     uint32_t deviceIndex = 0;
-    bool fixedSeed = false;
+    bool fixedSeed       = false;
     int seed;
 
     UISimulationInfo(int maxEvents, int maxBatchSize, bool sequential, const std::vector<std::string>& availableDevices, int deviceIndex,
@@ -50,9 +50,9 @@ struct UISimulationInfo {
 enum class SelectedType { None = -1, LightSource = 0, OpticalElement = 1, Group = 2 };
 
 struct UIBeamlineInfo {
-    RAYX::Beamline* beamline = nullptr;          // Beamline optional, lifetime managed by Application
+    RAYX::Beamline* beamline         = nullptr;  // Beamline optional, lifetime managed by Application
     RAYX::BeamlineNode* selectedNode = nullptr;  // Selection optional, lifetime managed by Beamline
-    bool elementsChanged = false;
+    bool elementsChanged             = false;
 };
 
 struct UIParameters {
@@ -63,7 +63,7 @@ struct UIParameters {
     bool rmlReady;
     bool h5Ready;
     bool isSceneWindowHovered = false;
-    bool showH5NotExistPopup = false;
+    bool showH5NotExistPopup  = false;
     float frameTime;
     UIRayInfo rayInfo;
     bool runSimulation;
@@ -94,19 +94,13 @@ struct UIParameters {
     void updatePath(const std::filesystem::path& path) {
         if (path.empty()) return;
         if (path == rmlPath) return;
-        if (!std::filesystem::exists(path)) {
-            RAYX_EXIT << "RML file does not exist: " << path.string();
-        }
+        if (!std::filesystem::exists(path)) { RAYX_EXIT << "RML file does not exist: " << path.string(); }
 #ifdef NO_H5
-        if (std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".csv")) {
-            h5Ready = true;
-        }
+        if (std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".csv")) { h5Ready = true; }
 #else
-        if (std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".h5")) {
-            h5Ready = true;
-        }
+        if (std::filesystem::exists(path.string().substr(0, path.string().size() - 4) + ".h5")) { h5Ready = true; }
 #endif
-        rmlPath = path;
+        rmlPath  = path;
         rmlReady = true;
     }
 };

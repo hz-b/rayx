@@ -39,7 +39,7 @@ inline auto getWorkDivForAcc(alpaka::Idx<Acc> numElements) {
     using Dim = alpaka::Dim<Acc>;
 
     constexpr int blockSize = getBlockSize<Acc>();
-    const int gridSize = (numElements - 1) / blockSize + 1;
+    const int gridSize      = (numElements - 1) / blockSize + 1;
 
     using Vec = alpaka::Vec<Dim, Idx>;
     return alpaka::WorkDivMembers<Dim, Idx>{

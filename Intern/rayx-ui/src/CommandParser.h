@@ -18,7 +18,7 @@ class CommandParser {
         std::string m_providedFile;  // -i (Input)
         std::optional<int> m_deviceID;
         bool m_benchmark = false;
-        bool m_verbose = false;
+        bool m_verbose   = false;
     } m_args;
 
   private:

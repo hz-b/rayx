@@ -12,7 +12,7 @@ RAYX_FN_ACC
 uint64_t RAYX_API squares64(uint64_t& ctr) {
     uint64_t x, y, z, t;
     y = x = ctr * RNG_KEY;
-    z = y + RNG_KEY;
+    z     = y + RNG_KEY;
     ctr++;
 
     x = x * x + y;
@@ -22,13 +22,13 @@ uint64_t RAYX_API squares64(uint64_t& ctr) {
     x = x * x + y;
     x = (x >> 32) | (x << 32); /* round 3 */
     t = x = (x * x + z);
-    x = (x >> 32) | (x << 32); /* round 4 */
+    x     = (x >> 32) | (x << 32); /* round 4 */
     return t ^ ((x * x + y) >> 32);
 }
 
 RAYX_FN_ACC
 double RAYX_API squaresDoubleRNG(uint64_t& ctr) {
-    double a = double(squares64(ctr));
+    double a   = double(squares64(ctr));
     double div = double(uint64_t(0) - 1);
     return a / div;
 }

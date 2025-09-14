@@ -71,13 +71,13 @@ inline Behaviour serializeGrating(GratingBehaviour g) {
 RAYX_FN_ACC
 inline GratingBehaviour deserializeGrating(Behaviour b) {
     GratingBehaviour g;
-    g.m_vls[0] = b.m_private_serialization_params[0];
-    g.m_vls[1] = b.m_private_serialization_params[1];
-    g.m_vls[2] = b.m_private_serialization_params[2];
-    g.m_vls[3] = b.m_private_serialization_params[3];
-    g.m_vls[4] = b.m_private_serialization_params[4];
-    g.m_vls[5] = b.m_private_serialization_params[5];
-    g.m_lineDensity = b.m_private_serialization_params[6];
+    g.m_vls[0]             = b.m_private_serialization_params[0];
+    g.m_vls[1]             = b.m_private_serialization_params[1];
+    g.m_vls[2]             = b.m_private_serialization_params[2];
+    g.m_vls[3]             = b.m_private_serialization_params[3];
+    g.m_vls[4]             = b.m_private_serialization_params[4];
+    g.m_vls[5]             = b.m_private_serialization_params[5];
+    g.m_lineDensity        = b.m_private_serialization_params[6];
     g.m_orderOfDiffraction = b.m_private_serialization_params[7];
     return g;
 }
@@ -118,12 +118,12 @@ RAYX_FN_ACC
 inline SlitBehaviour deserializeSlit(Behaviour b) {
     SlitBehaviour s;
 
-    s.m_openingCutout.m_type = static_cast<CutoutType>(b.m_private_serialization_params[0]);
+    s.m_openingCutout.m_type                            = static_cast<CutoutType>(b.m_private_serialization_params[0]);
     s.m_openingCutout.m_private_serialization_params[0] = b.m_private_serialization_params[1];
     s.m_openingCutout.m_private_serialization_params[1] = b.m_private_serialization_params[2];
     s.m_openingCutout.m_private_serialization_params[2] = b.m_private_serialization_params[3];
 
-    s.m_beamstopCutout.m_type = static_cast<CutoutType>(b.m_private_serialization_params[4]);
+    s.m_beamstopCutout.m_type                            = static_cast<CutoutType>(b.m_private_serialization_params[4]);
     s.m_beamstopCutout.m_private_serialization_params[0] = b.m_private_serialization_params[5];
     s.m_beamstopCutout.m_private_serialization_params[1] = b.m_private_serialization_params[6];
     s.m_beamstopCutout.m_private_serialization_params[2] = b.m_private_serialization_params[7];
@@ -156,16 +156,16 @@ inline Behaviour serializeRZP(RZPBehaviour r) {
     Behaviour b;
     b.m_type = BehaveType::RZP;
 
-    b.m_private_serialization_params[0] = r.m_imageType;
-    b.m_private_serialization_params[1] = r.m_rzpType;
-    b.m_private_serialization_params[2] = r.m_derivationMethod;
-    b.m_private_serialization_params[3] = r.m_designWavelength;
-    b.m_private_serialization_params[4] = r.m_designOrderOfDiffraction;
-    b.m_private_serialization_params[5] = r.m_orderOfDiffraction;
-    b.m_private_serialization_params[6] = r.m_fresnelZOffset;
-    b.m_private_serialization_params[7] = r.m_designSagittalEntranceArmLength;
-    b.m_private_serialization_params[8] = r.m_designSagittalExitArmLength;
-    b.m_private_serialization_params[9] = r.m_designMeridionalEntranceArmLength;
+    b.m_private_serialization_params[0]  = r.m_imageType;
+    b.m_private_serialization_params[1]  = r.m_rzpType;
+    b.m_private_serialization_params[2]  = r.m_derivationMethod;
+    b.m_private_serialization_params[3]  = r.m_designWavelength;
+    b.m_private_serialization_params[4]  = r.m_designOrderOfDiffraction;
+    b.m_private_serialization_params[5]  = r.m_orderOfDiffraction;
+    b.m_private_serialization_params[6]  = r.m_fresnelZOffset;
+    b.m_private_serialization_params[7]  = r.m_designSagittalEntranceArmLength;
+    b.m_private_serialization_params[8]  = r.m_designSagittalExitArmLength;
+    b.m_private_serialization_params[9]  = r.m_designMeridionalEntranceArmLength;
     b.m_private_serialization_params[10] = r.m_designMeridionalExitArmLength;
     b.m_private_serialization_params[11] = r.m_designAlphaAngle;
     b.m_private_serialization_params[12] = r.m_designBetaAngle;
@@ -176,20 +176,20 @@ inline Behaviour serializeRZP(RZPBehaviour r) {
 RAYX_FN_ACC
 inline RZPBehaviour deserializeRZP(Behaviour b) {
     RZPBehaviour r;
-    r.m_imageType = b.m_private_serialization_params[0];
-    r.m_rzpType = b.m_private_serialization_params[1];
-    r.m_derivationMethod = b.m_private_serialization_params[2];
-    r.m_designWavelength = b.m_private_serialization_params[3];
-    r.m_designOrderOfDiffraction = b.m_private_serialization_params[4];
-    r.m_orderOfDiffraction = b.m_private_serialization_params[5];
-    r.m_fresnelZOffset = b.m_private_serialization_params[6];
-    r.m_designSagittalEntranceArmLength = b.m_private_serialization_params[7];
-    r.m_designSagittalExitArmLength = b.m_private_serialization_params[8];
+    r.m_imageType                         = b.m_private_serialization_params[0];
+    r.m_rzpType                           = b.m_private_serialization_params[1];
+    r.m_derivationMethod                  = b.m_private_serialization_params[2];
+    r.m_designWavelength                  = b.m_private_serialization_params[3];
+    r.m_designOrderOfDiffraction          = b.m_private_serialization_params[4];
+    r.m_orderOfDiffraction                = b.m_private_serialization_params[5];
+    r.m_fresnelZOffset                    = b.m_private_serialization_params[6];
+    r.m_designSagittalEntranceArmLength   = b.m_private_serialization_params[7];
+    r.m_designSagittalExitArmLength       = b.m_private_serialization_params[8];
     r.m_designMeridionalEntranceArmLength = b.m_private_serialization_params[9];
-    r.m_designMeridionalExitArmLength = b.m_private_serialization_params[10];
-    r.m_designAlphaAngle = b.m_private_serialization_params[11];
-    r.m_designBetaAngle = b.m_private_serialization_params[12];
-    r.m_additionalOrder = b.m_private_serialization_params[13];
+    r.m_designMeridionalExitArmLength     = b.m_private_serialization_params[10];
+    r.m_designAlphaAngle                  = b.m_private_serialization_params[11];
+    r.m_designBetaAngle                   = b.m_private_serialization_params[12];
+    r.m_additionalOrder                   = b.m_private_serialization_params[13];
     return r;
 }
 
@@ -245,14 +245,14 @@ RAYX_FN_ACC
 inline CrystalBehaviour deserializeCrystal(const Behaviour& b) {
     CrystalBehaviour c;
 
-    c.m_dSpacing2 = b.m_private_serialization_params[0];
+    c.m_dSpacing2      = b.m_private_serialization_params[0];
     c.m_unitCellVolume = b.m_private_serialization_params[1];
-    c.m_offsetAngle = b.m_private_serialization_params[2];
+    c.m_offsetAngle    = b.m_private_serialization_params[2];
 
-    c.m_structureFactorReF0 = b.m_private_serialization_params[3];
-    c.m_structureFactorImF0 = b.m_private_serialization_params[4];
-    c.m_structureFactorReFH = b.m_private_serialization_params[5];
-    c.m_structureFactorImFH = b.m_private_serialization_params[6];
+    c.m_structureFactorReF0  = b.m_private_serialization_params[3];
+    c.m_structureFactorImF0  = b.m_private_serialization_params[4];
+    c.m_structureFactorReFH  = b.m_private_serialization_params[5];
+    c.m_structureFactorImFH  = b.m_private_serialization_params[6];
     c.m_structureFactorReFHC = b.m_private_serialization_params[7];
     c.m_structureFactorImFHC = b.m_private_serialization_params[8];
 
@@ -272,7 +272,7 @@ struct FoilBehaviour {
 RAYX_FN_ACC
 inline Behaviour serializeFoil(FoilBehaviour f) {
     Behaviour b;
-    b.m_type = BehaveType::Foil;
+    b.m_type                            = BehaveType::Foil;
     b.m_private_serialization_params[0] = f.m_thicknessSubstrate;
     b.m_private_serialization_params[1] = f.m_roughnessSubstrate;
     return b;

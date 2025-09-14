@@ -20,9 +20,7 @@ constexpr int PREFIX_LEN = 30;
  * */
 void formatDebugMsg(std::string filename, int line, std::ostream& o) {
     size_t idx = filename.find_last_of("/\\");
-    if (idx != std::string::npos) {
-        filename = filename.substr(idx + 1);
-    }
+    if (idx != std::string::npos) { filename = filename.substr(idx + 1); }
 
     std::stringstream strm;
     strm << line;
@@ -30,16 +28,14 @@ void formatDebugMsg(std::string filename, int line, std::ostream& o) {
 
     // this shortens filenames which are too long
     if (filename.size() + line_string.size() + 4 > PREFIX_LEN) {
-        filename = filename.substr(0, PREFIX_LEN - 4 - line_string.size());
+        filename                      = filename.substr(0, PREFIX_LEN - 4 - line_string.size());
         filename[filename.size() - 1] = '.';
         filename[filename.size() - 2] = '.';
         filename[filename.size() - 3] = '.';
     }
 
     std::string pad;
-    while (4 + line_string.size() + filename.size() + pad.size() < PREFIX_LEN) {
-        pad += " ";
-    }
+    while (4 + line_string.size() + filename.size() + pad.size() < PREFIX_LEN) { pad += " "; }
     o.precision(17);
     o << "[" << pad << filename << ":" << line_string << "] ";
 }
@@ -75,15 +71,11 @@ Exit::~Exit() {
 
 Verb::Verb(std::string filename, int line) {
     // only print if the verbose flag it set!
-    if (getDebugVerbose()) {
-        formatDebugMsg(std::move(filename), line, std::cout);
-    }
+    if (getDebugVerbose()) { formatDebugMsg(std::move(filename), line, std::cout); }
 }
 
 Verb::~Verb() {
-    if (getDebugVerbose()) {
-        std::cout << std::endl;
-    }
+    if (getDebugVerbose()) { std::cout << std::endl; }
 }
 
 // The default error_fn value. Exit with an error code of 1.
@@ -100,9 +92,7 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
     int counter = 0;  // stores the number of elements in the stringstream
     std::stringstream s;
     for (size_t i = 0; i < v.size(); i++) {
-        if (counter != 0) {
-            s << " ";
-        }
+        if (counter != 0) { s << " "; }
         s << std::setprecision(PREC) << v[i];
 
         counter++;
@@ -112,9 +102,7 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
             s = std::stringstream();
         }
     }
-    if (counter > 0) {
-        RAYX::Log(filename, line) << s.str();
-    }
+    if (counter > 0) { RAYX::Log(filename, line) << s.str(); }
 }
 
 // The verbose flag used for RAYX_VERB printing.

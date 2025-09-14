@@ -6,7 +6,7 @@
 
 namespace {
 
-using DeviceType = RAYX::DeviceConfig::DeviceType;
+using DeviceType  = RAYX::DeviceConfig::DeviceType;
 using DeviceIndex = RAYX::DeviceConfig::Device::Index;
 
 inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceType, DeviceIndex deviceIndex) {
@@ -51,8 +51,8 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask,
-                     const RayAttrFlag attr) {
+Rays Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask,
+                   const RayAttrFlag attr) {
     // in sequential tracing, maxEvents should be equal to the number of elements
     if (sequential == Sequential::Yes) maxEvents = group.numElements();
 

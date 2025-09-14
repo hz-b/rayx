@@ -53,23 +53,23 @@ double getSourceHeight(const double electronSigmaY, const double undulatorSigma)
 }  // unnamed namespace
 
 SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : ModelLightSource(dSource) {
-    const auto sigmaType = dSource.getSigmaType();
+    const auto sigmaType       = dSource.getSigmaType();
     const auto undulatorLength = dSource.getUndulatorLength();
     // const auto photonEnergy = dSource.getEnergy();
     const auto photonWaveLength = energyToWaveLength(m_photonEnergy);
-    const auto electronSigmaX = dSource.getElectronSigmaX();
-    const auto electronSigmaXs = dSource.getElectronSigmaXs();
-    const auto electronSigmaY = dSource.getElectronSigmaY();
-    const auto electronSigmaYs = dSource.getElectronSigmaYs();
-    const auto undulatorSigma = calcUndulatorSigma(sigmaType, photonWaveLength, undulatorLength);
-    const auto undulatorSigmaS = calcUndulatorSigmaS(sigmaType, photonWaveLength, undulatorLength);
+    const auto electronSigmaX   = dSource.getElectronSigmaX();
+    const auto electronSigmaXs  = dSource.getElectronSigmaXs();
+    const auto electronSigmaY   = dSource.getElectronSigmaY();
+    const auto electronSigmaYs  = dSource.getElectronSigmaYs();
+    const auto undulatorSigma   = calcUndulatorSigma(sigmaType, photonWaveLength, undulatorLength);
+    const auto undulatorSigmaS  = calcUndulatorSigmaS(sigmaType, photonWaveLength, undulatorLength);
 
-    m_sourceDepth = dSource.getSourceDepth();
-    m_pol = dSource.getStokes();
+    m_sourceDepth   = dSource.getSourceDepth();
+    m_pol           = dSource.getStokes();
     m_horDivergence = getHorDivergence(electronSigmaXs, undulatorSigmaS);
     m_verDivergence = getVerDivergence(electronSigmaYs, undulatorSigmaS);
-    m_sourceWidth = getSourceWidth(electronSigmaX, undulatorSigma);
-    m_sourceHeight = getSourceHeight(electronSigmaY, undulatorSigma);
+    m_sourceWidth   = getSourceWidth(electronSigmaX, undulatorSigma);
+    m_sourceHeight  = getSourceHeight(electronSigmaY, undulatorSigma);
 }
 
 /**
@@ -94,7 +94,7 @@ Ray SimpleUndulatorSource::genRay(const SourceId sourceId, const EnergyDistribut
     auto y = getCoord(m_sourceHeight, rand);
     auto z = (rand.randomDouble() - 0.5) * m_sourceDepth;
     z += m_position.z;
-    const auto en = selectEnergy(energyDistribution, rand);
+    const auto en       = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     const auto phi = getCoord(m_horDivergence, rand);
@@ -102,21 +102,21 @@ Ray SimpleUndulatorSource::genRay(const SourceId sourceId, const EnergyDistribut
     // get corresponding angles based on distribution and deviation from
     // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
     glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-    glm::dvec4 tempDir = m_orientation * glm::dvec4(direction, 0.0);
-    direction = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
+    glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
+    direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
     const auto field = stokesToElectricField(m_pol, m_orientation);
 
     return Ray{
-        .m_position = position,
-        .m_eventType = EventType::Emitted,
-        .m_direction = direction,
-        .m_energy = en,
-        .m_field = field,
-        .m_pathLength = 0.0,
-        .m_order = 0,
+        .m_position    = position,
+        .m_eventType   = EventType::Emitted,
+        .m_direction   = direction,
+        .m_energy      = en,
+        .m_field       = field,
+        .m_pathLength  = 0.0,
+        .m_order       = 0,
         .m_lastElement = -1,
-        .m_sourceID = sourceId,
+        .m_sourceID    = sourceId,
     };
 }
 

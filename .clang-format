@@ -10,6 +10,14 @@ PointerAlignment: Left
 UseTab: Never
 TabWidth: 4
 # extra
-# AlignConsecutiveAssignments: true
 ColumnLimit: 150
-# AlignConsecutiveMacros : true
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveBitFields: Consecutive
+# AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+# AlignConsecutiveShortCaseStatements: 
+# AlignEscapedNewlines: ENAS_LeftWithLastLine
+# AlignOperands: True
+# AlignTrailingComments: TCAS_Always
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: WithoutElse

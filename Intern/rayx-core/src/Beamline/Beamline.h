@@ -19,11 +19,11 @@ namespace RAYX {
  */
 class RAYX_API Group : public BeamlineNode {
   public:
-    Group() = default;
+    Group()  = default;
     ~Group() = default;
     Group(Group&& other) noexcept;
     Group& operator=(Group&& other) noexcept;
-    Group(const Group&) = delete;
+    Group(const Group&)            = delete;
     Group& operator=(const Group&) = delete;
 
     bool isGroup() const override { return true; }
@@ -116,7 +116,7 @@ class RAYX_API Group : public BeamlineNode {
 
   private:
     // Position and orientation could in theory be put into one transform matrix but this follows the rml style
-    glm::dvec4 m_position = glm::dvec4(0, 0, 0, 1);
+    glm::dvec4 m_position    = glm::dvec4(0, 0, 0, 1);
     glm::dmat4 m_orientation = glm::dmat4(1);
     // m_children vec is not checked for dangling or nullptrs anywhere, changes to the Group interface/implementation are to be made with care
     std::vector<std::unique_ptr<BeamlineNode>> m_children;

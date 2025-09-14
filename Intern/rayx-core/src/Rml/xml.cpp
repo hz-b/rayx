@@ -20,14 +20,10 @@ namespace RAYX::xml {
 // The most general param function. It finds a <param> within the parent tag by the name `paramname`,
 // and returns it in `out`.
 bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xml_node<>** out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     for (rapidxml::xml_node<>* p = node->first_node(); p; p = p->next_sibling()) {
-        if (strcmp(p->name(), "param") != 0) {
-            continue;
-        }
+        if (strcmp(p->name(), "param") != 0) { continue; }
         if (strcmp(p->first_attribute("id")->value(), paramname) == 0) {
             *out = p;
             return true;
@@ -38,14 +34,10 @@ bool param(const rapidxml::xml_node<>* node, const char* paramname, rapidxml::xm
 
 // calls `param` and converts to a double.
 bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     rapidxml::xml_node<>* ref;
-    if (!param(node, paramname, &ref)) {
-        return false;
-    }
+    if (!param(node, paramname, &ref)) { return false; }
 
 #if defined(WIN32)
     if (sscanf_s(ref->value(), "%le", out) != 1) {
@@ -60,14 +52,10 @@ bool paramDouble(const rapidxml::xml_node<>* node, const char* paramname, double
 
 // calls `param` and converts to a int.
 bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     rapidxml::xml_node<>* ref;
-    if (!param(node, paramname, &ref)) {
-        return false;
-    }
+    if (!param(node, paramname, &ref)) { return false; }
 #if defined(WIN32)
     if (sscanf_s(ref->value(), "%d", out) != 1) {
 #else
@@ -81,31 +69,23 @@ bool paramInt(const rapidxml::xml_node<>* node, const char* paramname, int* out)
 
 // calls `param` and converts to a string.
 bool paramStr(const rapidxml::xml_node<>* node, const char* paramname, const char** out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     rapidxml::xml_node<>* ref;
-    if (!param(node, paramname, &ref)) {
-        return false;
-    }
+    if (!param(node, paramname, &ref)) { return false; }
     *out = ref->value();
     return true;
 }
 
 // calls `param` and converts to a dvec3.
 bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dvec3* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     rapidxml::xml_node<>* subnode;
-    if (!param(node, paramname, &subnode)) {
-        return false;
-    }
+    if (!param(node, paramname, &subnode)) { return false; }
 
     const char* names[3] = {"x", "y", "z"};
-    double* ptrs[3] = {&out->x, &out->y, &out->z};
+    double* ptrs[3]      = {&out->x, &out->y, &out->z};
 
     for (rapidxml::xml_node<>* p = subnode->first_node(); p; p = p->next_sibling()) {
         for (uint32_t i = 0; i < 3; i++) {
@@ -126,9 +106,7 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
 }
 
 bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     rapidxml::xml_node<>* p;
 
@@ -166,14 +144,10 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
 // loads the "raw" position without considering how the group context affects the position.
 // In other words, this is the position "within" the group.
 std::optional<glm::dvec4> paramPosition(const rapidxml::xml_node<>* node) {
-    if (!node) {
-        return std::nullopt;
-    }
+    if (!node) { return std::nullopt; }
 
     glm::dvec3 position3;
-    if (!xml::paramDvec3(node, "worldPosition", &position3)) {
-        return std::nullopt;
-    }
+    if (!xml::paramDvec3(node, "worldPosition", &position3)) { return std::nullopt; }
     return glm::dvec4(position3, 1);
 }
 
@@ -189,9 +163,7 @@ std::filesystem::path Parser::parseEnergyDistributionFile() const {
     std::filesystem::path combinedPath = rmlFile.parent_path() / datpath;
     try {
         combinedPath = std::filesystem::canonical(combinedPath);
-    } catch (const std::exception& e) {
-        RAYX_EXIT << "Failed to canonicalize datfile path: " << combinedPath.string() << " -- Error: " << e.what();
-    }
+    } catch (const std::exception& e) { RAYX_EXIT << "Failed to canonicalize datfile path: " << combinedPath.string() << " -- Error: " << e.what(); }
 
     RAYX_VERB << "Combined datfile path: " << combinedPath;
     return combinedPath;
@@ -199,38 +171,26 @@ std::filesystem::path Parser::parseEnergyDistributionFile() const {
 
 // analoguous to paramPosition but for orientation.
 std::optional<glm::dmat4x4> paramOrientation(const rapidxml::xml_node<>* node) {
-    if (!node) {
-        return std::nullopt;
-    }
+    if (!node) { return std::nullopt; }
 
     glm::dvec3 worldXdirection, worldYdirection, worldZdirection;
-    if (!xml::paramDvec3(node, "worldXdirection", &worldXdirection)) {
-        return std::nullopt;
-    }
-    if (!xml::paramDvec3(node, "worldYdirection", &worldYdirection)) {
-        return std::nullopt;
-    }
-    if (!xml::paramDvec3(node, "worldZdirection", &worldZdirection)) {
-        return std::nullopt;
-    }
+    if (!xml::paramDvec3(node, "worldXdirection", &worldXdirection)) { return std::nullopt; }
+    if (!xml::paramDvec3(node, "worldYdirection", &worldYdirection)) { return std::nullopt; }
+    if (!xml::paramDvec3(node, "worldZdirection", &worldZdirection)) { return std::nullopt; }
 
 #ifdef RAYX_DEBUG_MODE
 
     // check if vectors are a basis (determinant =/= 0)
     glm::dmat3x3 worldDirections = {worldXdirection, worldYdirection, worldZdirection};
-    double determinant = glm::determinant(worldDirections);
+    double determinant           = glm::determinant(worldDirections);
 
-    if (determinant == 0) {
-        RAYX_WARN << "Vectors are not a basis.";
-    }
+    if (determinant == 0) { RAYX_WARN << "Vectors are not a basis."; }
 
     // ((v1 x v2) dot v3) > 0 ==> right-handed (else left-handed)
     glm::dvec3 crossProduct = glm::cross(worldXdirection, worldYdirection);
-    double dotProduct = glm::dot(crossProduct, worldZdirection);
+    double dotProduct       = glm::dot(crossProduct, worldZdirection);
 
-    if (dotProduct < 0) {
-        RAYX_WARN << "Coordinate system is not right-handed.";
-    }
+    if (dotProduct < 0) { RAYX_WARN << "Coordinate system is not right-handed."; }
 
 #endif
 
@@ -244,16 +204,12 @@ std::optional<glm::dmat4x4> paramOrientation(const rapidxml::xml_node<>* node) {
 }
 
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     *out = {0, 0, 0, 0, 0, 0, 0};
 
     rapidxml::xml_node<>* p;
-    if (!param(node, "slopeError", &p)) {
-        return false;
-    }
+    if (!param(node, "slopeError", &p)) { return false; }
 
     if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
         // all slopeError-values will be left at 0 if they are missing.
@@ -272,16 +228,12 @@ bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out) {
 }
 
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     out->fill(0.f);
 
     rapidxml::xml_node<>* p;
-    if (!param(node, "lineSpacing", &p)) {
-        return false;
-    }
+    if (!param(node, "lineSpacing", &p)) { return false; }
 
     if (strcmp(p->first_attribute("comment")->value(), "variable (VLS)") == 0) {
         // all vls-values will be left at 0 if they are missing.
@@ -300,20 +252,14 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistributionVariant* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     int energyDistributionType_int;
-    if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType_int)) {
-        return false;
-    }
+    if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType_int)) { return false; }
     auto energyDistributionType = static_cast<EnergyDistributionType>(energyDistributionType_int);
 
     int spreadType_int;
-    if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
-        return false;
-    }
+    if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) { return false; }
 
     /**
      * a different output is set for all Energy Distribution Types
@@ -326,38 +272,26 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 
     if (energyDistributionType == EnergyDistributionType::File) {
         const char* filename;
-        if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) {
-            return false;
-        }
+        if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) { return false; }
         std::filesystem::path path = std::filesystem::canonical(rmlFile);
         path.replace_filename(filename);  // this makes the path `filename` be relative to the
                                           // path of the rml file
 
         DatFile df;
-        if (!DatFile::load(path, &df)) {
-            return false;
-        }
+        if (!DatFile::load(path, &df)) { return false; }
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
-        *out = EnergyDistributionVariant(df);
+        *out            = EnergyDistributionVariant(df);
         return true;
-
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy;
-        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
-            return false;
-        }
+        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return false; }
 
         double energySpread;
-        if (!xml::paramDouble(node, "energySpread", &energySpread)) {
-            return false;
-        }
+        if (!xml::paramDouble(node, "energySpread", &energySpread)) { return false; }
 
         if (spreadType == SpreadType::SoftEdge) {
-            if (energySpread == 0) {
-                energySpread = 1;
-            }
+            if (energySpread == 0) { energySpread = 1; }
             *out = EnergyDistributionVariant(SoftEdge(photonEnergy, energySpread));
-
         } else if (spreadType == SpreadType::SeparateEnergies) {
             int numOfEnergies;
             if (!xml::paramInt(node, "SeparateEnergies", &numOfEnergies)) {
@@ -365,7 +299,7 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
                 numOfEnergies = 3;
             }
             numOfEnergies = abs(numOfEnergies);
-            *out = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
+            *out          = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else {
             *out = EnergyDistributionVariant(HardEdge(photonEnergy, energySpread));
         }
@@ -380,35 +314,25 @@ bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesy
 }
 
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
     int energyOrientation_int;
-    if (!xml::paramInt(node, "electronEnergyOrientation", &energyOrientation_int)) {
-        return false;
-    }
+    if (!xml::paramInt(node, "electronEnergyOrientation", &energyOrientation_int)) { return false; }
     *out = static_cast<ElectronEnergyOrientation>(energyOrientation_int);
 
     return false;
 }
 
 bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
     int spreadType_int;
-    if (!xml::paramInt(node, "sourcePulseType", &spreadType_int)) {
-        return false;
-    }
+    if (!xml::paramInt(node, "sourcePulseType", &spreadType_int)) { return false; }
     *out = static_cast<SourcePulseType>(spreadType_int);
 
     return false;
 }
 
 bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
-    if (!node || !out) {
-        return false;
-    }
+    if (!node || !out) { return false; }
 
     int reflType;
     if (paramInt(node, "reflectivityType", &reflType) && reflType == 0) {
@@ -418,17 +342,13 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
 
     const char* str;
 
-    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "crystalMaterial", &str)) {
-        return false;
-    }
+    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "crystalMaterial", &str)) { return false; }
 
     return materialFromString(str, out);
 }
 
 std::optional<Group> parseGroup(rapidxml::xml_node<>* node) {
-    if (!node || (std::strcmp(node->name(), "group") != 0)) {
-        return std::nullopt;
-    }
+    if (!node || (std::strcmp(node->name(), "group") != 0)) { return std::nullopt; }
 
     Group group;
 
@@ -461,82 +381,62 @@ ElementType Parser::type() const {
 // parsers for fundamental types
 double Parser::parseDouble(const char* paramname) const {
     double d;
-    if (!paramDouble(node, paramname, &d)) {
-        RAYX_EXIT << "parseDouble failed for \"" << paramname << "\"";
-    }
+    if (!paramDouble(node, paramname, &d)) { RAYX_EXIT << "parseDouble failed for \"" << paramname << "\""; }
     return d;
 }
 
 int Parser::parseInt(const char* paramname) const {
     int i;
-    if (!paramInt(node, paramname, &i)) {
-        RAYX_EXIT << "parseInt failed for \"" << paramname << "\"";
-    }
+    if (!paramInt(node, paramname, &i)) { RAYX_EXIT << "parseInt failed for \"" << paramname << "\""; }
     return i;
 }
 
 const char* Parser::parseStr(const char* paramname) const {
     const char* s = nullptr;
-    if (!paramStr(node, paramname, &s)) {
-        RAYX_EXIT << "parseStr failed for \"" << paramname << "\"";
-    }
+    if (!paramStr(node, paramname, &s)) { RAYX_EXIT << "parseStr failed for \"" << paramname << "\""; }
     return s;
 }
 
 glm::dvec3 Parser::parseDvec3(const char* paramname) const {
     glm::dvec3 v;
-    if (!paramDvec3(node, paramname, &v)) {
-        RAYX_EXIT << "parseDvec3 failed for \"" << paramname << "\"";
-    }
+    if (!paramDvec3(node, paramname, &v)) { RAYX_EXIT << "parseDvec3 failed for \"" << paramname << "\""; }
     return v;
 }
 
 // parsers for derived parameters
 Misalignment Parser::parseMisalignment() const {
     Misalignment x;
-    if (!paramMisalignment(node, &x)) {
-        RAYX_EXIT << "parseMisalignment failed";
-    }
+    if (!paramMisalignment(node, &x)) { RAYX_EXIT << "parseMisalignment failed"; }
     return x;
 }
 
 SlopeError Parser::parseSlopeError() const {
     SlopeError x;
-    if (!paramSlopeError(node, &x)) {
-        x = {0, 0, 0, 0, 0, 0, 0};
-    }
+    if (!paramSlopeError(node, &x)) { x = {0, 0, 0, 0, 0, 0, 0}; }
     return x;
 }
 
 std::array<double, 6> Parser::parseVls() const {
     std::array<double, 6> x{};
-    if (!paramVls(node, &x)) {
-        RAYX_EXIT << "parseVls failed";
-    }
+    if (!paramVls(node, &x)) { RAYX_EXIT << "parseVls failed"; }
     return x;
 }
 
 EnergyDistributionVariant Parser::parseEnergyDistribution() const {
     EnergyDistributionVariant x;
-    if (!paramEnergyDistribution(node, rmlFile, &x)) {
-        RAYX_EXIT << "parseEnergyDistribution failed";
-    }
+    if (!paramEnergyDistribution(node, rmlFile, &x)) { RAYX_EXIT << "parseEnergyDistribution failed"; }
     return x;
 }
 
 glm::dvec4 Parser::parsePosition() const {
     auto positionOpt = paramPosition(node);
-    if (!positionOpt) {
-        RAYX_EXIT << "parsePosition failed";
-    }
+    if (!positionOpt) { RAYX_EXIT << "parsePosition failed"; }
     return *positionOpt;
 }
 
 glm::dmat4x4 Parser::parseOrientation() const {
     auto orientationOpt = paramOrientation(node);
-    if (!orientationOpt) {
-        RAYX_EXIT << "parseOrientation failed";
-    }
+    if (!orientationOpt) { RAYX_EXIT << "parseOrientation failed"; }
     return *orientationOpt;
 }
 
@@ -552,9 +452,7 @@ Material Parser::parseMaterial() const {
 Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
     int geom_shape_int;
     if (!paramInt(node, "geometricalShape", &geom_shape_int)) {
-        if (type == "ImagePlane") {
-            return serializeUnlimited();
-        }
+        if (type == "ImagePlane") { return serializeUnlimited(); }
         RAYX_EXIT << "geometricalShape missing, but required!";
     }
 
@@ -575,7 +473,7 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
 
     if (geom_shape == CutoutType::Rect) {
         RectCutout rect;
-        rect.m_width = x();
+        rect.m_width  = x();
         rect.m_length = z();
         return serializeRect(rect);
     } else if (geom_shape == CutoutType::Elliptical) {
@@ -599,16 +497,16 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
 QuadricSurface Parser::parseQuadricParameters() const {
     QuadricSurface s;
     s.m_icurv = parseInt("surfaceBending");  // icurv
-    s.m_a11 = parseDouble("A11");
-    s.m_a12 = parseDouble("A12");
-    s.m_a13 = parseDouble("A13");
-    s.m_a14 = parseDouble("A14");
-    s.m_a22 = parseDouble("A22");
-    s.m_a23 = parseDouble("A23");
-    s.m_a24 = parseDouble("A24");
-    s.m_a33 = parseDouble("A33");
-    s.m_a34 = parseDouble("A34");
-    s.m_a44 = parseDouble("A44");
+    s.m_a11   = parseDouble("A11");
+    s.m_a12   = parseDouble("A12");
+    s.m_a13   = parseDouble("A13");
+    s.m_a14   = parseDouble("A14");
+    s.m_a22   = parseDouble("A22");
+    s.m_a23   = parseDouble("A23");
+    s.m_a24   = parseDouble("A24");
+    s.m_a33   = parseDouble("A33");
+    s.m_a34   = parseDouble("A34");
+    s.m_a44   = parseDouble("A44");
 
     return s;
 }
@@ -616,16 +514,16 @@ QuadricSurface Parser::parseQuadricParameters() const {
 CubicSurface Parser::parseCubicParameters() const {
     CubicSurface c;
     c.m_icurv = parseInt("surfaceBending");  // icurv
-    c.m_a11 = parseDouble("A11");
-    c.m_a12 = parseDouble("A12");
-    c.m_a13 = parseDouble("A13");
-    c.m_a14 = parseDouble("A14");
-    c.m_a22 = parseDouble("A22");
-    c.m_a23 = parseDouble("A23");
-    c.m_a24 = parseDouble("A24");
-    c.m_a33 = parseDouble("A33");
-    c.m_a34 = parseDouble("A34");
-    c.m_a44 = parseDouble("A44");
+    c.m_a11   = parseDouble("A11");
+    c.m_a12   = parseDouble("A12");
+    c.m_a13   = parseDouble("A13");
+    c.m_a14   = parseDouble("A14");
+    c.m_a22   = parseDouble("A22");
+    c.m_a23   = parseDouble("A23");
+    c.m_a24   = parseDouble("A24");
+    c.m_a33   = parseDouble("A33");
+    c.m_a34   = parseDouble("A34");
+    c.m_a44   = parseDouble("A44");
 
     c.m_b12 = parseDouble("B12");
     c.m_b13 = parseDouble("B13");
@@ -640,18 +538,14 @@ CubicSurface Parser::parseCubicParameters() const {
 
 ElectronEnergyOrientation Parser::parseElectronEnergyOrientation() const {
     auto orientation = ElectronEnergyOrientation::Clockwise;  // default initialize, even tho we dont know at this point
-    if (!paramElectronEnergyOrientation(node, &orientation)) {
-        return orientation;
-    }
+    if (!paramElectronEnergyOrientation(node, &orientation)) { return orientation; }
 
     return orientation;
 }
 
 SourcePulseType Parser::parseSourcePulseType() const {
     auto spreadType = SourcePulseType::None;  // default initialize, even tho we dont know at this point
-    if (!paramSourcePulseType(node, &spreadType)) {
-        return spreadType;
-    }
+    if (!paramSourcePulseType(node, &spreadType)) { return spreadType; }
 
     return spreadType;
 }
@@ -659,9 +553,7 @@ SourcePulseType Parser::parseSourcePulseType() const {
 double Parser::parseImageType() const {
     int imageType_int;
 
-    if (!xml::paramInt(node, "imageType", &imageType_int)) {
-        RAYX_EXIT << "Cannot determine image type!";
-    }
+    if (!xml::paramInt(node, "imageType", &imageType_int)) { RAYX_EXIT << "Cannot determine image type!"; }
 
     return (double)imageType_int;
 }

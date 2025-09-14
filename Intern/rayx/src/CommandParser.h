@@ -5,15 +5,15 @@
 #include <vector>
 
 struct CliArgs {
-    bool plot = false;                      // -p --plot
-    bool csv = false;                       // -c --csv
-    bool cpu = false;                       // -x --cpu
-    bool gpu = false;                       // -X --gpu
+    bool plot        = false;               // -p --plot
+    bool csv         = false;               // -c --csv
+    bool cpu         = false;               // -x --cpu
+    bool gpu         = false;               // -X --gpu
     bool listDevices = false;               // -l --list-devices
-    bool benchmark = false;                 // -B --benchmark
-    bool version = false;                   // -v --version
-    bool sequential = false;                // -S --sequential
-    bool verbose = false;                   // -V --verbose
+    bool benchmark   = false;               // -B --benchmark
+    bool version     = false;               // -v --version
+    bool sequential  = false;               // -S --sequential
+    bool verbose     = false;               // -V --verbose
     bool defaultSeed = false;               // -f, --default-seed
     std::optional<int> numberOfRays;        // -n --number-of-rays
     std::optional<int> maxEvents;           // -m --maxevents

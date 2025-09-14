@@ -28,7 +28,7 @@ class RenderSystem {
     RenderSystem(Device& device, const Input& input, const std::vector<VkDescriptorSetLayout>& setLayouts);
     virtual ~RenderSystem();
 
-    RenderSystem(const RenderSystem&) = delete;
+    RenderSystem(const RenderSystem&)            = delete;
     RenderSystem& operator=(const RenderSystem&) = delete;
 
     /**
