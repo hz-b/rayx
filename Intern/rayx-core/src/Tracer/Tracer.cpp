@@ -35,6 +35,12 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
     }
 }
 
+int defaultMaxEvents(const RAYX::ObjectRecordMask& mask) { return mask.objectsToRecord() * 2 + 8; }
+
+// this value is picked in a 'good' way if it can divide number of rays without rest. for a number of rays picked by humans, this
+// value is probably good. though, if it could be power of two, the shader would benefit
+constexpr int DEFAULT_BATCH_SIZE = 100000;
+
 }  // unnamed namespace
 
 namespace RAYX {
@@ -51,17 +57,23 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-Rays Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask,
-                   const RayAttrFlag attr) {
-    // in sequential tracing, maxEvents should be equal to the number of elements
-    if (sequential == Sequential::Yes) maxEvents = group.numElements();
+Rays Tracer::trace(const Group& group, const Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrFlag attrRecordMask,
+                   std::optional<int> maxEvents, std::optional<int> maxBatchSize) {
+    if (group.numSources() != objectRecordMask.numSources() || group.numElements() != objectRecordMask.numElements()) {
+        RAYX_EXIT << "Group and ObjectRecordMask do not match! group has " << group.numSources() << " sources and " << group.numElements()
+                  << " elements, but ObjectRecordMask has " << objectRecordMask.numSources() << " sources and " << objectRecordMask.numElements()
+                  << " elements.";
+    }
 
-    return m_deviceTracer->trace(group, sequential, static_cast<int>(maxBatchSize), static_cast<int>(maxEvents), recordMask, attr);
-}
+    const auto actualMaxEvents =
+        // in sequential mode maxEvents will be the same as the number of objects to record
+        sequential == Sequential::Yes ? objectRecordMask.numObjectsToRecord()
+                                      // in non-sequential mode maxEvents is optional, if not set, it will be estimated
+                                      : (maxEvents ? *maxEvents : defaultMaxEvents(objectRecordMask));
 
-int Tracer::defaultMaxEvents(const Group* group) {
-    if (group) return group->numElements() * 2 + 8;
-    return 32;
+    const auto actualMaxBatchSize = maxBatchSize ? *maxBatchSize : DEFAULT_BATCH_SIZE;
+
+    return m_deviceTracer->trace(group, sequential, objectRecordMask, attrRecordMask, actualMaxEvents, actualMaxBatchSize);
 }
 
 }  // namespace RAYX

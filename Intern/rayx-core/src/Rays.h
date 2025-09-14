@@ -52,10 +52,9 @@
 
 namespace RAYX {
 
-#define X(type, name, flag) \
-    static_assert(std::is_nothrow_move_constructible_v<type>);  // ensure efficient moves
+#define X(type, name, flag) static_assert(std::is_nothrow_move_constructible_v<type>);  // ensure efficient moves
 
-    RAYX_X_MACRO_RAY_ATTR
+RAYX_X_MACRO_RAY_ATTR
 #undef X
 
 enum class RAYX_API RayAttrFlag : uint32_t {
@@ -99,9 +98,7 @@ RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator^(const RayAttrFlag lh
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator~(const RayAttrFlag lhs) {
     return static_cast<RayAttrFlag>(~static_cast<std::underlying_type<RayAttrFlag>>(lhs));
 }
-RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrFlag lhs) {
-    return lhs == RayAttrFlag::None;
-}
+RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrFlag lhs) { return lhs == RayAttrFlag::None; }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator|=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs | rhs; }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator&=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs & rhs; }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator^=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs ^ rhs; }
@@ -110,8 +107,7 @@ struct RAYX_API Rays {
     int num_events;
     RayAttrFlag attr;
 
-#define X(type, name, flag) \
-    std::vector<type> name;
+#define X(type, name, flag) std::vector<type> name;
 
     RAYX_X_MACRO_RAY_ATTR
 #undef X

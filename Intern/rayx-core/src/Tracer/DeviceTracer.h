@@ -11,14 +11,14 @@ namespace RAYX {
 
 /**
  * @brief DeviceTracer is an interface to a tracer implementation
- * we use this interface to remove the actual implementation from the rayx api
+ * we need this interface to remove the actual implementation from the rayx api
  */
 class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual Rays trace(const Group& beamline, Sequential sequential, const int maxBatchSize, const int maxEvents, const std::vector<bool>& recordMask,
-                       const RayAttrFlag attr) = 0;
+    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrFlag attr,
+                       const int maxEvents, const int maxBatchSize) = 0;
 };
 
 }  // namespace RAYX

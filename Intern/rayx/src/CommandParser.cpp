@@ -57,7 +57,8 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
                    "automatically. Use --list-devices to see the available devices");
     app.add_flag("-c,--csv", args.csv, "Output stored as csv instead of hdf5 file");
     app.add_flag("-V,--verbose", args.verbose, "Dump more information");
-    app.add_option("-m,--maxevents", args.maxEvents, "Maximum number of events per ray. Default: number_of_elements_in_beamline * 2 + 8");
+    app.add_option("-m,--maxevents", args.maxEvents,
+                   "Maximum number of events per ray. Default: A multiple of the number of objects to record events for");
     app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", RAYX::DEFAULT_BATCH_SIZE));
     app.add_option("-n,--number-of-rays", args.numberOfRays, "Override the number of rays for all sources");
     app.add_flag("-B,--benchmark", args.benchmark, "Dump benchmark durations");

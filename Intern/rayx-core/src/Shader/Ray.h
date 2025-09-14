@@ -13,22 +13,22 @@ namespace RAYX {
 // the GPU does not care about padding as long as Ray stays in registers
 struct Ray {
     // keep position and direction together for better cache performance, since they are likely to be used together
-    glm::dvec3 position;  
-    glm::dvec3 direction; 
+    glm::dvec3 position;
+    glm::dvec3 direction;
 
-    double energy;      
+    double energy;
     double optical_path_length;
 
     ElectricField electric_field;
 
     Rand rand;  // deletes copy constructor/assignment
 
-    int path_id;          
-    int path_event_id;    
-    int order;            
-    int object_id;        
-    int source_id;        
-    EventType event_type; 
+    int path_id;
+    int path_event_id;
+    int order;
+    int object_id;
+    int source_id;
+    EventType event_type;
 };
 
 // make sure Ray is not copy constructable/assignable to protect it from costly copies

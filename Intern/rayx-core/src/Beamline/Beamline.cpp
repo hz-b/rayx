@@ -40,6 +40,7 @@ std::unique_ptr<BeamlineNode> Group::clone() const {
     return copy;
 }
 
+// TODO: this function should be benchmarked, because it is used quite often
 void Group::ctraverse(const std::function<bool(const BeamlineNode&)>& callback) const {
     for (const auto& child : m_children) {
         assert(child && "m_children contains a nullptr!");

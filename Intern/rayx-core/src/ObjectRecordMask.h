@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Debug/Debug.h"
+#include "Core.h"
 
 namespace RAYX {
 
@@ -15,6 +15,8 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
+    // TODO: would ne nice if this did not require to know numSources and numElements, because then, ObjectRecordMask in the paramter list of function
+    // Tracer::trace, could take a default value
     static ObjectRecordMask all(const int numSources, const int numElements) {
         return {
             .sourceMask  = std::vector<bool>(numSources, true),
@@ -71,11 +73,6 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
-    bool shouldRecordSource(int source_id) const { return sourceMask.at(source_id); }
-    void setShouldRecordSource(int source_id, bool value) { sourceMask.at(source_id) = value; }
-    bool shouldRecordElement(int element_id) const { return elementMask.at(element_id); }
-    void setShouldRecordElement(int element_id, bool value) { elementMask.at(element_id) = value; }
-
     bool shouldRecordObject(int object_id) const {
         const auto numSources = static_cast<int>(sourceMask.size());
         if (object_id < numSources) return sourceMask.at(object_id);
@@ -87,6 +84,20 @@ class RAYX_API ObjectRecordMask {
         if (object_id < numSources) sourceMask.at(object_id) = value;
         elementMask.at(object_id - numSources) = value;
     }
+
+    int numSources() const { return static_cast<int>(sourceMask.size()); }
+    int numElements() const { return static_cast<int>(elementMask.size()); }
+    int numObjects() const { return numSources() + numElements(); }
+
+    int numSourcesToRecord() const { return static_cast<int>(std::count(sourceMask.begin(), sourceMask.end(), true)); }
+    int numElementsToRecord() const { return static_cast<int>(std::count(elementMask.begin(), elementMask.end(), true)); }
+    int numObjectsToRecord() const { return numSourcesToRecord() + numElementsToRecord(); }
+
+    bool shouldRecordSource(int source_id) const { return sourceMask.at(source_id); }
+    void setShouldRecordSource(int source_id, bool value) { sourceMask.at(source_id) = value; }
+
+    bool shouldRecordElement(int element_id) const { return elementMask.at(element_id); }
+    void setShouldRecordElement(int element_id, bool value) { elementMask.at(element_id) = value; }
 
   private:
     std::vector<bool> sourceMask;

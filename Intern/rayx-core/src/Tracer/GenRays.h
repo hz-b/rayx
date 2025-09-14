@@ -85,7 +85,7 @@ struct GenRays {
     };
 
     template <typename Queue>
-    SourceConfig update(Queue q, const Group& beamline, const int maxBatchSize) {
+    SourceConfig update(Queue q, const Group& beamline, const int maxBatchSize, const int attrMask) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -193,7 +193,7 @@ struct GenRays {
 
         m_numRaysBatchAtMost = std::min(m_numRaysTotal, maxBatchSize);
 
-#define X(type, name, flag, map) \
+#define X(type, name, flag) \
     if (!!(attrMask & RayAttrFlag::flag)) allocBuf(q, d_rays.name, m_numRaysBatchAtMost);
 
         RAYX_X_MACRO_RAY_ATTR
