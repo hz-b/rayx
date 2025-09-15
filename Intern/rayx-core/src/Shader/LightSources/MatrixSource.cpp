@@ -25,7 +25,7 @@ MatrixSource::MatrixSource(const DesignSource& dSource)
  * returns vector of rays
  */
 RAYX_FN_ACC
-Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+Ray MatrixSource::genRay(const int rayPathIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                          Rand& __restrict rand) const {
     // Calculate grid size
     const int rmat  = int(std::sqrt(m_numberOfRays));
@@ -58,20 +58,23 @@ Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, const Ener
     glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
     direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-    // Scale the field so that each origin emits the same total intensity
-    auto field = stokesToElectricField(m_pol, m_orientation);
-    field /= static_cast<double>(nRaysThisOrigin);
+    // Scale the electic field so that each origin emits the same total intensity
+    auto electricField = stokesToElectricField(m_pol, m_orientation);
+    electricField /= static_cast<double>(nRaysThisOrigin);
 
     return Ray{
-        .m_position    = position,
-        .m_eventType   = EventType::Emitted,
-        .m_direction   = direction,
-        .m_energy      = en,
-        .m_field       = field,
-        .m_pathLength  = 0.0,
-        .m_order       = 0,
-        .m_lastElement = -1,
-        .m_sourceID    = sourceId,
+        .position            = position,
+        .direction           = direction,
+        .energy              = en,
+        .optical_path_length = 0.0,
+        .electric_field      = electricField,
+        .rand                = std::move(rand),
+        .path_id             = rayPathIndex,
+        .path_event_id       = 0,
+        .order               = 0,
+        .object_id           = sourceId,
+        .source_id           = sourceId,
+        .event_type          = EventType::Emitted,
     };
 }
 

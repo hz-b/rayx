@@ -22,7 +22,7 @@ inline HighFive::DataType highfive_create_type_EventType() {
     });
 }
 
-inline HighFive::DataType highfive_create_type_ElectricField() {
+inline HighFive::DataType highfive_create_type_Complex() {
     return HighFive::CompoundType({
         {"r", HighFive::AtomicType<double>(), 0},
         {"i", HighFive::AtomicType<double>(), sizeof(double)},
@@ -30,7 +30,8 @@ inline HighFive::DataType highfive_create_type_ElectricField() {
 }
 }  // unnamed namespace
 HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
-HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_ElectricField);
+HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_Complex);
+HIGHFIVE_REGISTER_TYPE(RAYX::RayAttrMask, highfive_create_type_RayAttrMask);
 
 namespace RAYX {
 
@@ -45,7 +46,7 @@ int getNumEvents(const Rays& rays) {
         size = std::max(size, v_size);
     };
 
-#define X(type, name, flag, map) resize(rays.name);
+#define X(type, name, flag) resize(rays.name);
 
     RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -71,7 +72,7 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
                     address);
         };
 
-#define X(type, name, flag, map)                                                           \
+#define X(type, name, flag)                                                           \
     RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrMask::flag) != RayAttrMask::None) loadData("rayx/events/" #name, rays.name);
 
@@ -85,40 +86,21 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
     return rays;
 }
 
-BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
-    const auto rays = readH5Rays(filepath);
-    return raySoAToBundleHistory(rays);
-}
-
-std::vector<std::string> readH5SourceNames(const std::filesystem::path& filepath) {
-    RAYX_VERB << "reading source names from '" << filepath;
-
-    auto source_names = std::vector<std::string>();
-
-    try {
-        auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
-
-        file.getDataSet("/rayx/source_names").read(source_names);
-    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what(); }
-
-    return source_names;
-}
-
-std::vector<std::string> readH5ElementNames(const std::filesystem::path& filepath) {
+std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath) {
     RAYX_VERB << "reading element names from '" << filepath;
 
-    auto element_names = std::vector<std::string>();
+    auto object_names = std::vector<std::string>();
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
 
-        file.getDataSet("/rayx/element_names").read(element_names);
+        file.getDataSet("/rayx/object_names").read(object_names);
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what(); }
 
-    return element_names;
+    return object_names;
 }
 
-void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::string>& source_names, const std::vector<std::string>& element_names,
+void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::string>& object_names,
                  const Rays& rays, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: "
@@ -127,23 +109,17 @@ void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::s
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-#define X(type, name, flag, map)                                                         \
+#define X(type, name, flag)                                                         \
     RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrMask::flag) != RayAttrMask::None) file.createDataSet("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
 
+        // TODO: store RayAttrMask
         file.createDataSet("rayx/num_paths", rays.num_paths);
-        file.createDataSet("rayx/source_names", source_names);
-        file.createDataSet("rayx/element_names", element_names);
+        file.createDataSet("rayx/object_names", object_names);
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
-}
-
-void writeH5BundleHistory(const std::filesystem::path& filepath, const std::vector<std::string>& source_names,
-                          const std::vector<std::string>& element_names, const BundleHistory& bundle, const RayAttrMask attr) {
-    const auto rays = bundleHistoryToRays(bundle);
-    writeH5Rays(filepath, source_names, element_names, rays, attr);
 }
 
 }  // namespace RAYX

@@ -6,7 +6,7 @@ namespace RAYX {
 
 // this struct is analog to struct Rays. It contains pointers to the attribute arrays
 struct RaysPtr {
-#define X(type, name, flag, map) type* __restrict name;
+#define X(type, name, flag) type* __restrict name;
 
     RAYX_X_MACRO_RAY_ATTR
 #undef X

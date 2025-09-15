@@ -2,7 +2,6 @@
 
 #include "Element/Element.h"
 #include "ObjectMask.h"
-#include "Rand.h"
 #include "RaysPtr.h"
 
 namespace RAYX {

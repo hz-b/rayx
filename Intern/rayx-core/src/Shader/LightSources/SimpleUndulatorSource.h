@@ -9,7 +9,8 @@ class RAYX_API SimpleUndulatorSource : public LightSourceBase {
   public:
     SimpleUndulatorSource(const DesignSource&);
 
-    RAYX_FN_ACC Ray genRay(const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const;
+    RAYX_FN_ACC Ray genRay(const int rayPathIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+                           Rand& __restrict rand) const;
 
     RAYX_FN_ACC double getCoord(const double extent, Rand& __restrict rand) const;
 

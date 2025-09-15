@@ -183,19 +183,7 @@ extern void RAYX_API (*error_fn)();
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<double>(arg)}; }
 
-inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
-
-inline std::vector<double> formatAsVec(const Ray arg) {
-    std::vector<double> out;
-    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
-
-#define X(type, name, flag, map) insert(formatAsVec(arg.map));
-
-    RAYX_X_MACRO_RAY_ATTR_MAPPED
-#undef X
-
-    return out;
-}
+inline std::vector<double> formatAsVec(complex::Complex arg) { return {arg.real(), arg.imag()}; }
 
 template <int N, int M, typename T>
 inline std::vector<double> formatAsVec(const glm::mat<N, M, T> arg) {
@@ -214,6 +202,30 @@ inline std::vector<double> formatAsVec(const glm::vec<N, T> arg) {
         auto data = formatAsVec(arg[i]);
         out.insert(out.end(), data.begin(), data.end());
     }
+    return out;
+}
+
+inline std::vector<double> formatAsVec(const Ray& arg) {
+    std::vector<double> out;
+    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
+
+#define X(type, name, flag) insert(formatAsVec(arg.name));
+
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+
+    return out;
+}
+
+inline std::vector<double> formatAsVec(const Rays& rays) {
+    std::vector<double> out;
+    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
+
+#define X(type, name, flag) insert(formatAsVec(rays.name));
+
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+
     return out;
 }
 
@@ -240,18 +252,6 @@ inline std::vector<double> formatAsVec(const std::vector<T> arg) {
 template <>
 inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
     return arg;
-}
-
-inline std::vector<double> formatAsVec(const Rays& rays) {
-    std::vector<double> out;
-    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
-
-#define X(type, name, flag, map) insert(formatAsVec(rays.name));
-
-    RAYX_X_MACRO_RAY_ATTR
-#undef X
-
-    return out;
 }
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);

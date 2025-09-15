@@ -18,49 +18,32 @@
 namespace RAYX {
 namespace {
 
-struct InitRandomCountersKernel {
-    template <typename Acc>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, Rand* __restrict rands, const int startRayIndex, const int numRaysTotal, const double seed,
-                                const int n) const {
-        const auto gid      = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-        const auto rayIndex = gid + startRayIndex;
-
-        if (gid < n) rands[gid] = Rand(rayIndex, numRaysTotal, seed);
-    }
-};
-
 struct GenRaysKernel {
     template <typename Source>
     RAYX_FN_ACC Ray genRay(const Source& __restrict source, const SourceId sourceId,
-                           const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution, [[maybe_unused]] const int rayIndex,
+                           const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution, const int rayPathIndex,
                            Rand& __restrict rand) const {
-        return source.genRay(sourceId, *energyDistribution, rand);
-    }
-
-    RAYX_FN_ACC Ray genRay(const MatrixSource& source, const SourceId sourceId,
-                           const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution, const int rayIndex, Rand& rand) const {
-        return source.genRay(rayIndex, sourceId, *energyDistribution, rand);
+        return source.genRay(rayPathIndex, sourceId, *energyDistribution, rand);
     }
 
     RAYX_FN_ACC Ray genRay(const DipoleSource& source, const SourceId sourceId,
-                           [[maybe_unused]] const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution,
-                           [[maybe_unused]] const int rayIndex, Rand& rand) const {
-        return source.genRay(sourceId, rand);
+                           [[maybe_unused]] const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution, const int rayPathIndex,
+                           Rand& __restrict rand) const {
+        return source.genRay(rayPathIndex, sourceId, rand);
     }
 
     template <typename Acc, typename Source>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, Ray* __restrict rays, Rand* __restrict rands, const int dstStartRayIndex,
-                                const Source source, const SourceId sourceId, const std::optional<EnergyDistributionDataVariant> energyDistribution,
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaysPtr* __restrict rays, const int dstStartRayIndex, const Source source,
+                                const SourceId sourceId, const std::optional<EnergyDistributionDataVariant> energyDistribution,
                                 const int startRayIndex, const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
         if (gid < n) {
-            const auto rayIndex    = startRayIndex + gid;
-            const auto dstRayIndex = dstStartRayIndex + gid;
-            auto rand              = std::move(rands[gid]);
-            const auto ray         = genRay(source, sourceId, energyDistribution, rayIndex, rand);
-            rays[dstRayIndex]      = ray;
-            rands[gid]             = std::move(rand);
+            const auto rayPathIndex = startRayIndex + gid;
+            auto rand               = Rand(rayPathIndex, numRaysTotal, seed);
+            const auto ray          = genRay(source, sourceId, energyDistribution, rayPathIndex, rand);
+            const auto dstRayIndex  = dstStartRayIndex + gid;
+            storeRay(dstRayIndex, rays, ray);
         }
     }
 };
@@ -218,10 +201,6 @@ struct GenRays {
         const auto numRaysBatch          = std::min(numRaysTotalRemaining, m_numRaysBatchAtMost);
         auto numRaysBatchRemaining       = numRaysBatch;
 
-        RAYX_VERB << "execute InitRandomCountersKernel";
-        execWithValidWorkDiv<Acc>(devAcc, q, numRaysBatch, BlockSizeConstraint::None{}, InitRandomCountersKernel{}, alpaka::getPtrNative(*d_rands),
-                                  m_startRayIndex, m_numRaysTotal, m_seed, numRaysBatch);
-
         for (auto& sourceState : m_sourceStates) {
             const auto numRaysBatchSource = std::min(numRaysBatchRemaining, sourceState.numRaysSourceRemaining);
 
@@ -233,9 +212,9 @@ struct GenRays {
                 std::visit(
                     [&]<typename Source>(const Source& source) {
                         RAYX_VERB << "execute GenRaysKernel<Source> with Source = '" << sourceState.name << "'";
-                        execWithValidWorkDiv<Acc>(devAcc, q, numRaysBatchSource, BlockSizeConstraint::None{}, GenRaysKernel{},
-                                                  alpaka::getPtrNative(*d_rays), alpaka::getPtrNative(*d_rands), startRayIndexBatch, source,
-                                                  sourceState.sourceId, sourceState.energyDistribution, m_startRayIndex, numRaysBatchSource);
+                        execWithValidWorkDiv<Acc>(devAcc, q, numRaysBatchSource, BlockSizeConstraint::None{}, GenRaysKernel{}, raysBufToPtr(d_rays),
+                                                  startRayIndexBatch, source, sourceState.sourceId, sourceState.energyDistribution, m_startRayIndex,
+                                                  numRaysBatchSource);
                     },
                     sourceState.source);
 
@@ -256,12 +235,8 @@ struct GenRays {
 
   private:
     // resources per batch. constant per batch
-    /// input rays
+    /// generated rays
     RaysBuf d_rays;
-
-    // resources per batch.
-    /// random counter per ray path
-    OptBuf<Acc, Rand> d_rands;
 
     // buffers for EnergyDistributionList (DatFile)
     std::vector<OptBuf<Acc, double>> d_energyDistributionListWeights;

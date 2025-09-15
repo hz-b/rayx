@@ -38,12 +38,19 @@ struct Rand {
     explicit Rand(const RandCounter ctr) noexcept : counter(ctr) {}
 
     RAYX_FN_ACC
-    explicit Rand(const int rayIndex, const int numRaysTotal, const double randomSeed) noexcept {
+    explicit Rand(const int rayPathIndex, const int numRaysTotal, const double randomSeed) noexcept {
         // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
         const RandCounter MAX_UINT64   = ~(static_cast<RandCounter>(0));
         const double MAX_UINT64_DOUBLE = 18446744073709551616.0;
         RandCounter workerCounterNum   = MAX_UINT64 / static_cast<RandCounter>(numRaysTotal);
-        counter                        = rayIndex * workerCounterNum + static_cast<RandCounter>(randomSeed * MAX_UINT64_DOUBLE);
+        counter                        = rayPathIndex * workerCounterNum + static_cast<RandCounter>(randomSeed * MAX_UINT64_DOUBLE);
+
+        // TODO: replace above with below and test if it works correctly
+        // constexpr auto MAX_UINT64 = std::numeric_limits<RandCounter>::max();
+        // constexpr auto MAX_UINT64_DOUBLE = static_cast<double>(MAX_UINT64);
+        // const auto workerCounterNum =  MAX_UINT64 / static_cast<RandCounter>(numRaysTotal);
+        // const auto randomPhase = static_cast<RandCounter>(randomSeed * MAX_UINT64_DOUBLE);
+        // counter = rayPathIndex * workerCounterNum + randomPhase;
     }
 
     RAYX_FN_ACC

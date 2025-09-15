@@ -1,37 +1,85 @@
 #pragma once
 
 #include "Ray.h"
-#include "Utils.h"
+#include "Rays.h"
 
 namespace RAYX {
 
 RAYX_FN_ACC
-inline int getRecordIndex(const int pathId, const int bounceId, const int maxEvents) { return pathId * maxEvents + bounceId; }
+int getRecordIndex(int gid, int numRecorded, int gridStride) { return gid + numRecorded * gridStride; }
 
 RAYX_FN_ACC
-inline void recordEvent(Ray* __restrict output, Ray& __restrict ray, const int recordIndex) {
-    // we use a temporary here, to avoid copying the whole ray when writing the ray with the correct field value
-    const auto tmpField = ray.m_field;
-    ray.m_field         = advanceElectricField(ray.m_field, energyToWaveLength(ray.m_energy), ray.m_pathLength, 1.0);
-    output[recordIndex] = ray;
-    ray.m_field         = tmpField;
+Ray loadRay(const int i, const RaysPtr& __restrict rays) {
+    return {
+        .position            = rays.position(i),
+        .direction           = rays.direction(i),
+        .energy              = rays.energy[i],
+        .optical_path_length = rays.optical_path_length[i],
+        .electric_field      = rays.electric_field(i),
+        .rand                = Rand(rays.rand_counter[i]),
+        .path_id             = rays.path_id[i],
+        .path_event_id       = rays.path_event_id[i],
+        .order               = rays.order[i],
+        .object_id           = rays.object_id[i],
+        .source_id           = rays.source_id[i],
+        .event_type          = rays.event_type[i],
+    };
 }
 
 RAYX_FN_ACC
-inline bool recordEventForElement(RaysPtr& outputEvents, const int outputIndex, const ObjectMask objectRecordMask, const EventTypeMask eventTypeMask,
-                                  const RayAttrMask attrRecordMask) {
-    ray_electric_field = advanceElectricField(ray_electric_field, energyToWaveLength(ray_energy), ray_optical_path_length);
+void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restrict ray) {
+    rays.path_id[i]             = ray.path_id;
+    rays.path_event_id[i]       = ray.path_event_id;
+    rays.position_x[i]          = ray.position.x;
+    rays.position_y[i]          = ray.position.y;
+    rays.position_z[i]          = ray.position.z;
+    rays.event_type[i]          = ray.event_type;
+    rays.direction_x[i]         = ray.direction.x;
+    rays.direction_y[i]         = ray.direction.y;
+    rays.direction_z[i]         = ray.direction.z;
+    rays.energy[i]              = ray.energy;
+    rays.electric_field_x[i]    = ray.electric_field.x;
+    rays.electric_field_y[i]    = ray.electric_field.y;
+    rays.electric_field_z[i]    = ray.electric_field.z;
+    rays.optical_path_length[i] = ray.optical_path_length;
+    rays.order[i]               = ray.order;
+    rays.object_id[i]           = ray.object_id;
+    rays.source_id[i]           = ray.source_id;
+    rays.rand_counter[i]        = ray.rand.counter;
+}
 
-    if (objectRecordMask.shouldRecordElement(ray_element_id) && eventTypeMask.shouldRecord(ray_event_type)) {
-#define X(type, name, flag, map) \
-    if ((RayAttrMask::flag | attrRecordMask) != RayAttrMask::None) outputEvents.name[outputIndex] = ray_##name;
+RAYX_FN_ACC
+void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restrict ray, const bool* __restrict elementRecordMask, const int elementIndex,
+              const RayAttrMask attrRecordMask, bool* __restrict storedFlag) {
+    // element record mask
+    if (!recordMasks.elementRecordMask[elementIndex]) return;
 
-        RAYX_X_MACRO_RAY_ATTR
-#undef X
+    // event type record mask
+    // TODO: this should be done on path level
+    // if ((recordMasks.eventTypeRecordMask & EventTypeMask::Success) == EventTypeMask::None) return;
 
-        return true;
-    }
-    return false;
+    // attribute record mask
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PathId)) rays.path_id[i] = ray.path_id;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PathEventId)) rays.path_event_id[i] = ray.path_event_id;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PositionX)) rays.position_x[i] = ray.position.x;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PositionY)) rays.position_y[i] = ray.position.y;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PositionZ)) rays.position_z[i] = ray.position.z;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::EventType)) rays.event_type[i] = ray.event_type;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::DirectionX)) rays.direction_x[i] = ray.direction.x;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::DirectionY)) rays.direction_y[i] = ray.direction.y;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::DirectionZ)) rays.direction_z[i] = ray.direction.z;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::Energy)          rays.energy[i]           = ray.energy;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ElectricFieldX)) rays.electric_field_x[i] = ray.electric_field.x;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ElectricFieldY)) rays.electric_field_y[i] = ray.electric_field.y;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ElectricFieldZ)) rays.electric_field_z[i] = ray.electric_field.z;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::OpticalPathLength)) rays.optical_path_length[i] = ray.optical_path_length;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::Order)) rays.order[i] = ray.order;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ObjectId)) rays.object_id[i] = ray.object_id;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::SourceId)) rays.source_id[i] = ray.source_id;
+    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::RandCounter)) rays.rand_counter[i] = ray.rand.counter;
+
+    // mark as stored
+    storedFlag[i] = true;
 }
 
 }  // namespace RAYX

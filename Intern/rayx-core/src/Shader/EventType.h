@@ -6,7 +6,7 @@
 namespace RAYX {
 
 // TODO: doc this enum and all its members
-enum class EventType {
+enum class EventType : uint32_t {
     Uninitialized = 0,
     Emitted       = 1,
     HitElement    = 2,
@@ -26,7 +26,7 @@ RAYX_FN_ACC inline void terminateRay(Ray& __restrict ray, const EventType eventT
     ray.m_event_type = eventType;
 }
 
-enum class EventTypeMask {
+enum class EventTypeMask : std::underlying_type<EventType> {
     Uninitialized = 1 << static_cast<int>(EventType::Uninitialized),
     Emitted       = 1 << static_cast<int>(EventType::Emitted),
     HitElement    = 1 << static_cast<int>(EventType::HitElement),
@@ -52,5 +52,9 @@ RAYX_FN_ACC constexpr inline EventTypeMask operator~(const EventTypeMask lhs) {
 RAYX_FN_ACC constexpr inline EventTypeMask operator|=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs | rhs; }
 RAYX_FN_ACC constexpr inline EventTypeMask operator&=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs & rhs; }
 RAYX_FN_ACC constexpr inline EventTypeMask operator^=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs ^ rhs; }
+
+RAYX_FN_ACC constexpr inline EventTypeMask eventTypeToMask(const EventType eventType) {
+    return static_cast<EventTypeMask>(1 << static_cast<std::underlying_type<EventType>>(eventType));
+}
 
 }  // namespace RAYX

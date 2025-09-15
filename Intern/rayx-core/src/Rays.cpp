@@ -5,14 +5,14 @@
 namespace RAYX {
 
 RAYX_API std::vector<std::string> getRayAttrNames() {
-#define X(type, name, flag, map) #name,
+#define X(type, name, flagp) #name,
     return std::vector<std::string>{RAYX_X_MACRO_RAY_ATTR};
 #undef X
 }
 
 RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings) {
     auto stringToAttr = [](const std::string& str) -> RayAttrMask {
-#define X(type, name, flag, map) \
+#define X(type, name, flag) \
     if (str == #name) return RayAttrMask::flag;
         RAYX_X_MACRO_RAY_ATTR
 #undef X
