@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core.h"
+#include <cstdint>
+
 #include "Throw.h"
 
 namespace RAYX {
@@ -19,14 +20,16 @@ enum class EventType : uint32_t {
 RAYX_FN_ACC inline bool isRayTerminated(const EventType eventType) {
     return !(eventType == EventType::Emitted || eventType == EventType::HitElement);
 }
-RAYX_FN_ACC inline void terminateRay(Ray& __restrict ray, const EventType eventType) {
-    _debug_warn(!isRayTerminated(ray.event_type), "ray about to be terminated, but ray is already terminated!");
-    _debug_assert(isRayTerminated(eventType), "ray about to be terminated, but provided event type (%d) is not a valid termination event type!",
-                  static_cast<int>(eventType));
-    ray.m_event_type = eventType;
+
+RAYX_FN_ACC inline void terminateRay(EventType& __restrict dstEventType, const EventType srcEventType) {
+    _debug_warn(!isRayTerminated(dstEventType), "ray about to be terminated, but ray is already terminated!");
+    _debug_assert(isRayTerminated(srcEventType), "ray about to be terminated, but provided event type (%d) is not a valid termination event type!",
+                  static_cast<int>(srcEventType));
+    dstEventType = srcEventType;
 }
 
-enum class EventTypeMask : std::underlying_type<EventType> {
+enum class EventTypeMask : std::underlying_type_t<EventType> {
+    None          = 0,
     Uninitialized = 1 << static_cast<int>(EventType::Uninitialized),
     Emitted       = 1 << static_cast<int>(EventType::Emitted),
     HitElement    = 1 << static_cast<int>(EventType::HitElement),
@@ -34,27 +37,26 @@ enum class EventTypeMask : std::underlying_type<EventType> {
     Absorbed      = 1 << static_cast<int>(EventType::Absorbed),
     BeyondHorizon = 1 << static_cast<int>(EventType::BeyondHorizon),
     TooManyEvents = 1 << static_cast<int>(EventType::TooManyEvents),
-    None          = 0,
 };
 
 RAYX_FN_ACC constexpr inline EventTypeMask operator|(const EventTypeMask lhs, const EventTypeMask rhs) {
-    return static_cast<EventTypeMask>(static_cast<std::underlying_type<EventTypeMask>>(lhs) & static_cast<std::underlying_type<EventTypeMask>>(rhs));
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) & static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator&(const EventTypeMask lhs, const EventTypeMask rhs) {
-    return static_cast<EventTypeMask>(static_cast<std::underlying_type<EventTypeMask>>(lhs) & static_cast<std::underlying_type<EventTypeMask>>(rhs));
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) & static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator^(const EventTypeMask lhs, const EventTypeMask rhs) {
-    return static_cast<EventTypeMask>(static_cast<std::underlying_type<EventTypeMask>>(lhs) ^ static_cast<std::underlying_type<EventTypeMask>>(rhs));
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) ^ static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator~(const EventTypeMask lhs) {
-    return static_cast<EventTypeMask>(~static_cast<std::underlying_type<EventTypeMask>>(lhs));
+    return static_cast<EventTypeMask>(~static_cast<std::underlying_type_t<EventTypeMask>>(lhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator|=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs | rhs; }
 RAYX_FN_ACC constexpr inline EventTypeMask operator&=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs & rhs; }
 RAYX_FN_ACC constexpr inline EventTypeMask operator^=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs ^ rhs; }
 
 RAYX_FN_ACC constexpr inline EventTypeMask eventTypeToMask(const EventType eventType) {
-    return static_cast<EventTypeMask>(1 << static_cast<std::underlying_type<EventType>>(eventType));
+    return static_cast<EventTypeMask>(1 << static_cast<std::underlying_type_t<EventType>>(eventType));
 }
 
 }  // namespace RAYX

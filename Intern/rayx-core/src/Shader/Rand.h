@@ -7,7 +7,7 @@
 namespace RAYX {
 
 /// Internal type for the random counter-based RNG
-using RandCounter = RandCounter;
+using RandCounter = uint64_t;
 
 /*
  * Title: "Squares: A Fast Counter-Based RNG"

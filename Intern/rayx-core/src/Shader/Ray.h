@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "ElectricField.h"
 #include "EventType.h"
+#include "Rand.h"
 
 namespace RAYX {
 

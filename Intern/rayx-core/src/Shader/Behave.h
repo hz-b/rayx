@@ -21,12 +21,11 @@ RAYX_FN_ACC void behaveCrystal(Ray& __restrict ray, const Behaviour& __restrict 
 RAYX_FN_ACC void behaveSlit(Ray& __restrict ray, const Behaviour& __restrict behaviour);
 RAYX_FN_ACC void behaveRZP(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col);
 RAYX_FN_ACC void behaveGrating(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col);
-RAYX_FN_ACC void behaveMirror(Ray& __restrict rar, const CollisionPoint& __restrict col, int material, const int* materialIndices,
-                              const double* materialTable);
+RAYX_FN_ACC void behaveMirror(Ray& __restrict rar, const CollisionPoint& __restrict col, int material, const Material materials);
 RAYX_FN_ACC void behaveFoil(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col, int material,
-                            const int* materialIndices, const double* materialTable);
+                            const Materials materials);
 RAYX_FN_ACC void behaveImagePlane(Ray& __restrict ray);
-RAYX_FN_ACC void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const Element& __restrict element,
-                        const Materials& __restrict materials);
+RAYX_FN_ACC void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const OpticalElement& __restrict element,
+                        const Materials materials);
 
 }  // namespace RAYX

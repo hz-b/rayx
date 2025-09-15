@@ -28,28 +28,31 @@ RAYX_FN_ACC
 inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
 
 /**
- * Advances an electric field propagating in a certain media by a certain distance
- * @param field electric field of incident photon
- * @param waveLength wavelength of incident photon
- * @param distance distance traveled in media
- * @param ior_real real component of complex index of refraction of media
- * @return advanced electric field
+ * Advances an electric field propagating along a given optical path length.
+ * @param field Electric field of incident photon
+ * @param waveLength Wavelength of incident photon (in nanometers)
+ * @param opticalPathLength Optical path length traveled (in millimeters)
+ * @return Advanced electric field
  */
 RAYX_FN_ACC
-inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double opticalPathLength) {
+inline ElectricField advanceElectricField(
+    const ElectricField field,
+    double waveLength,
+    const double opticalPathLength) 
+{
     // bring wavelength from nanometers into millimeters
     waveLength /= 1e6;
 
-    // compute wave number (2π * n / λ)
-    const double waveNumber = 2.0 * PI * ior_real / waveLength;
+    // compute wave number (2π / λ), since opticalPathLength already includes IOR
+    const double waveNumber = 2.0 * PI / waveLength;
 
-    // reduce the distance modulo wavelength to avoid large angle errors, thus improving numerical stability
+    // reduce the distance modulo wavelength to avoid large angle errors
     const double reducedDistance = std::fmod(opticalPathLength, waveLength);
 
-    // compute the phase shift using the reduced distance
+    // compute the phase shift
     const double deltaPhi = waveNumber * reducedDistance;
 
-    // apply the complex exponential of the phase shift
+    // apply the phase shift as a complex exponential
     const auto phaseShift = complex::exp(complex::Complex(0.0, deltaPhi));
 
     return field * phaseShift;

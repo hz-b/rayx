@@ -9,7 +9,7 @@
 #include "GenRays.h"
 #include "Material/Material.h"
 #include "Random.h"
-#include "Shader/DynamicElements.h"
+#include "Shader/Trace.h"
 #include "Util.h"
 
 namespace RAYX {
@@ -310,8 +310,7 @@ class MegaKernelTracer : public DeviceTracer {
 
             // buffers
             .elements          = alpaka::getPtrNative(*m_resources.d_elements),
-            .materialIndices   = alpaka::getPtrNative(*m_resources.d_materialIndices),
-            .materialTables    = alpaka::getPtrNative(*m_resources.d_materialTable),
+            .materials = Materials { .indices = alpaka::getPtrNative(*m_resources.d_materialIndices), tables = alpaka::getPtrNative(*m_resources.d_materialTable) },
             .elementEecordMask = alpaka::getPtrNative(*m_resources.d_elementRecordMask),
             .attrRecordMask    = attrRecordMask,
             .rays              = raysBufToRaysPtr(batchConfig.d_rays),

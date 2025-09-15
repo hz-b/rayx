@@ -41,11 +41,10 @@ double RAYX_API vlsGrating(double lineDensity, glm::dvec3 normal, double z, doub
 /**
 calculates DX and DZ (line spacing in x and z direction) at a given point for a
 given direction on the grating
-@params: lots
 @returns: (inplace) DX, DZ
 */
 RAYX_FN_ACC
-void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
+void RAYX_API RZPLineDensity(const Ray& __restrict r, const glm::dvec3& __restrict normal, const RZPBehaviour& __restrict b, double& __restrict DX, double& __restrict DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE   = int(b.m_rzpType);
     double risag   = b.m_designSagittalEntranceArmLength;
@@ -196,8 +195,6 @@ void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& D
 
     DX = (ai + am) / (WL * Ord);
     DZ = (-bi - bm) / (WL * Ord);
-
-    return;
 }
 
 }  // namespace RAYX

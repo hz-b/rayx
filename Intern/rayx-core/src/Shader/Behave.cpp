@@ -14,11 +14,12 @@
 #include "Throw.h"
 #include "Transmission.h"
 #include "Utils.h"
+#include "InvocationState.h"
 
 namespace RAYX {
 
 RAYX_FN_ACC
-void behaveCrystal(Ray& __restrict ray, const Behaviour behaviour, [[maybe_unused]] Collision col) {
+void behaveCrystal(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col) {
     CrystalBehaviour b = deserializeCrystal(behaviour);
 
     double theta0    = getTheta(ray.direction, col.normal, b.m_offsetAngle);
@@ -60,7 +61,7 @@ void behaveCrystal(Ray& __restrict ray, const Behaviour behaviour, [[maybe_unuse
 // Reviews of Modern Physics, 36(3), 681-717. https://doi.org/10.1103/RevModPhys.36.681
 
 RAYX_FN_ACC
-void behaveSlit(Ray& __restrict ray, const Behaviour behaviour) {
+void behaveSlit(Ray& __restrict ray, const Behaviour& __restrict behaviour) {
     SlitBehaviour b = deserializeSlit(behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -127,7 +128,7 @@ void behaveRZP(Ray& __restrict ray, const Behaviour& __restrict behaviour, const
     double ax = WL * DX * Ord * 1e-6;
     refrac2D(ray, col.normal, az, ax);
 
-    ray.order = static_cast<Order>(Ord);
+    ray.order = static_cast<int>(Ord);
 }
 
 RAYX_FN_ACC
@@ -141,7 +142,7 @@ void behaveGrating(Ray& __restrict ray, const Behaviour& __restrict behaviour, c
 
     // adjusted linedensity = WL * default_linedensity * order * 1e-06
     double adjustedLinedensity = vlsGrating(lineDensity, col.normal, ray.position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
-    ray.order                  = static_cast<Order>(orderOfDiffraction);
+    ray.order                  = static_cast<int>(orderOfDiffraction);
     // no additional zero order here?
 
     // refraction
@@ -149,8 +150,7 @@ void behaveGrating(Ray& __restrict ray, const Behaviour& __restrict behaviour, c
 }
 
 RAYX_FN_ACC
-void behaveMirror(Ray& __restrict ray, const CollisionPoint& __restrict col, const int material, const int* __restrict materialIndices,
-                  const double* __restrict materialTable) {
+void behaveMirror(Ray& __restrict ray, const CollisionPoint& __restrict col, const int material, const Materials materials) {
     // calculate the new direction after the reflection
     const auto incident_vec = ray.direction;
     const auto reflect_vec  = glm::reflect(incident_vec, col.normal);
@@ -161,20 +161,20 @@ void behaveMirror(Ray& __restrict ray, const CollisionPoint& __restrict col, con
     if (material == -2) return;
 
     constexpr int vacuum_material = -1;
-    const auto ior_i              = getRefractiveIndex(ray.energy, vacuum_material, materialIndices, materialTable);
-    const auto ior_t              = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
+    const auto ior_i              = getRefractiveIndex(ray.energy, vacuum_material, materials.indices, materials.tables);
+    const auto ior_t              = getRefractiveIndex(ray.energy, material, material.indices, material.tables);
 
     ray.electric_field = interceptReflect(ray.electric_field, incident_vec, reflect_vec, col.normal, ior_i, ior_t);
 }
 
 RAYX_FN_ACC
 void behaveFoil(Ray& __restrict ray, const Behaviour& __restrict behaviour, const CollisionPoint& __restrict col, const int material,
-                const int* __restrict materialIndices, const double* __restrict materialTable) {
+                const Materials materials) {
     FoilBehaviour f         = deserializeFoil(behaviour);
     const double wavelength = energyToWaveLength(ray.energy);
 
     const auto indexVacuum   = complex::Complex(1., 0.);
-    const auto indexMaterial = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
+    const auto indexMaterial = getRefractiveIndex(ray.energy, material, materials.indices, materials.table);
 
     double angle = angleBetweenUnitVectors(-ray.direction, col.normal);  // in rad
 
@@ -197,10 +197,10 @@ void behaveFoil(Ray& __restrict ray, const Behaviour& __restrict behaviour, cons
 RAYX_FN_ACC void behaveImagePlane(Ray& __restrict ray) { ray.order = 0; }
 
 RAYX_FN_ACC
-void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const Element& __restrict element, const Materials& __restrict materials) {
+void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const OpticalElement& __restrict element, const Materials materials) {
     switch (element.m_behaviour.m_type) {
         case BehaveType::Mirror:
-            behaveMirror(ray, col, element.m_material, materials.materialIndices, materials.materialTables);
+            behaveMirror(ray, col, element.m_material, materials);
             break;
         case BehaveType::Grating:
             behaveGrating(ray, behaviour, col);
@@ -217,7 +217,7 @@ void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const Ele
         case BehaveType::ImagePlane:
             break;
         case BehaveType::Foil:
-            behaveFoil(ray, behaviour, col, element.m_material, constState.materialIndices, constState.materialTables);
+            behaveFoil(ray, behaviour, col, element.m_material, materials);
             break;
     }
 }

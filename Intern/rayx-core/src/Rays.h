@@ -78,7 +78,7 @@ enum class RAYX_API RayAttrMask : uint32_t {
     OpticalPathLength = 1 << 11,
     Energy            = 1 << 12,
     Order             = 1 << 13,
-    ObjecttId         = 1 << 14,
+    ObjectId         = 1 << 14,
     SourceId          = 1 << 15,
     EventType         = 1 << 16,
     RandCounter       = 1 << 17,
@@ -93,16 +93,16 @@ enum class RAYX_API RayAttrMask : uint32_t {
 };
 
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|(const RayAttrMask lhs, const RayAttrMask rhs) {
-    return static_cast<RayAttrMask>(static_cast<std::underlying_type<RayAttrMask>>(lhs) | static_cast<std::underlying_type<RayAttrMask>>(rhs));
+    return static_cast<RayAttrMask>(static_cast<std::underlying_type_t<RayAttrMask>>(lhs) | static_cast<std::underlying_type_t<RayAttrMask>>(rhs));
 }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator&(const RayAttrMask lhs, const RayAttrMask rhs) {
-    return static_cast<RayAttrMask>(static_cast<std::underlying_type<RayAttrMask>>(lhs) & static_cast<std::underlying_type<RayAttrMask>>(rhs));
+    return static_cast<RayAttrMask>(static_cast<std::underlying_type_t<RayAttrMask>>(lhs) & static_cast<std::underlying_type_t<RayAttrMask>>(rhs));
 }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator^(const RayAttrMask lhs, const RayAttrMask rhs) {
-    return static_cast<RayAttrMask>(static_cast<std::underlying_type<RayAttrMask>>(lhs) ^ static_cast<std::underlying_type<RayAttrMask>>(rhs));
+    return static_cast<RayAttrMask>(static_cast<std::underlying_type_t<RayAttrMask>>(lhs) ^ static_cast<std::underlying_type_t<RayAttrMask>>(rhs));
 }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator~(const RayAttrMask lhs) {
-    return static_cast<RayAttrMask>(~static_cast<std::underlying_type<RayAttrMask>>(lhs));
+    return static_cast<RayAttrMask>(~static_cast<std::underlying_type_t<RayAttrMask>>(lhs));
 }
 RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrMask lhs) { return lhs == RayAttrMask::None; }
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs | rhs; }

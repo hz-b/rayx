@@ -36,7 +36,4 @@ inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& _
 // returns angle between ray direction and surface normal at intersection point
 RAYX_FN_ACC double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal);
 
-RAYX_FN_ACC
-inline constexpr bool isRayActive(const EventType eventType) { return eventType == EventType::HitElement; }
-
 }  // namespace RAYX

@@ -11,6 +11,11 @@ namespace RAYX {
 /// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
 enum class Sequential { No, Yes };
 
+struct Materials {
+    int* __restrict indices;
+    double* __restrict tables;
+};
+
 /// stores all constant buffers
 struct RAYX_API ConstState {
     int maxEvents;
@@ -19,8 +24,7 @@ struct RAYX_API ConstState {
     int numElements;
 
     OpticalElement* __restrict elements;
-    int* __restrict materialIndices;
-    double* __restrict materialTables;
+    Materials materials;
     bool* __restrict elementRecordMask;  // Mask that decides which elements to record events for (array length is numElements)
     RayAttrMask attrRecordMask;
     RaysPtr rays;

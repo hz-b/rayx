@@ -27,7 +27,7 @@ CircleSource::CircleSource(const DesignSource& dSource) : LightSourceBase(dSourc
  * @returns list of rays
  */
 RAYX_FN_ACC
-Ray CircleSource::genRay(const int rayPathIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+Ray CircleSource::genRay(const int rayPathIndex, const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                          Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth

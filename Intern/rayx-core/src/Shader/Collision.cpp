@@ -142,11 +142,7 @@ OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, 
  */
 RAYX_FN_ACC
 OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, CubicSurface cu) {
-    Collision col;
-    col.found    = true;
-    col.hitpoint = glm::dvec3(0, 0, 0);
-    col.normal   = glm::dvec3(0, 0, 0);
-
+    // TODO: what is this and do we need it?
     // Ray r = rotateForCubic(rin, cu.m_psi, 1000);
 
     int cs = 1;
@@ -353,9 +349,13 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
     double fy = 2 * cu.m_a24 + 2 * cu.m_a12 * x + 2 * cu.m_a22 * y + 2 * cu.m_a23 * z;
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
 
-    col.normal = normalize(glm::dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
-    col.hitpoint = glm::dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
-    return col;
+    const auto hitpoint = glm::dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
+    const auto normal = normalize(glm::dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
+
+    return CollisionPoint {
+        .hitpoint = hitpoint,
+        .normal = normal,
+    };
 }
 
 /**************************************************************

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "Core.h"
 
 #define _throw(string, ...)                                                                       \
