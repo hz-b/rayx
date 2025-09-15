@@ -34,7 +34,7 @@ class RAYX_API Tracer {
      *  @param maxBatchSize Optional maximum batch size for tracing
      *  @return A `Rays` struct containing the traced ray attributes, specified by `attrRecordMask` and filtered by `objectRecordMask`
      */
-    Rays trace(const Group& group, const Sequential sequential, const ObjectRecordMask& objectRecordMask,
+    Rays trace(const Group& group, const Sequential sequential, const ObjectMask& objectRecordMask,
                const RayAttrMask attrRecordMask = RayAttrMask::All, std::optional<int> maxEvents = std::nullopt,
                std::optional<int> maxBatchSize = std::nullopt);
 

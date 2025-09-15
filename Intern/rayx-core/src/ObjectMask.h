@@ -6,39 +6,39 @@
 
 namespace RAYX {
 
-class RAYX_API ObjectRecordMask {
+class RAYX_API ObjectMask {
   public:
-    static ObjectRecordMask none(const int numSources, const int numElements) {
+    static ObjectMask none(const int numSources, const int numElements) {
         return {
             .sourceMask  = std::vector<bool>(numSources, false),
             .elementMask = std::vector<bool>(numElements, false),
         };
     }
 
-    // TODO: would ne nice if this did not require to know numSources and numElements, because then, ObjectRecordMask in the paramter list of function
+    // TODO: would ne nice if this did not require to know numSources and numElements, because then, ObjectMask in the paramter list of function
     // Tracer::trace, could take a default value
-    static ObjectRecordMask all(const int numSources, const int numElements) {
+    static ObjectMask all(const int numSources, const int numElements) {
         return {
             .sourceMask  = std::vector<bool>(numSources, true),
             .elementMask = std::vector<bool>(numElements, true),
         };
     }
 
-    static ObjectRecordMask allSources(const int numSources, const int numElements) {
+    static ObjectMask allSources(const int numSources, const int numElements) {
         return {
             .sourceMask  = std::vector<bool>(numSources, true),
             .elementMask = std::vector<bool>(numElements, false),
         };
     }
 
-    static ObjectRecordMask allElements(const int numSources, const int numElements) {
+    static ObjectMask allElements(const int numSources, const int numElements) {
         return {
             .sourceMask  = std::vector<bool>(numSources, false),
             .elementMask = std::vector<bool>(numElements, true),
         };
     }
 
-    static ObjectRecordMask fromSourceIndices(const int numSources, const int numElements, const std::vector<int>& sourceIndices) {
+    static ObjectMask fromSourceIndices(const int numSources, const int numElements, const std::vector<int>& sourceIndices) {
         auto sourceMask = std::vector<bool>(numSources, false);
         for (const auto i : sourceIndices) sourceMask.at(i) = true;
         return {
@@ -47,7 +47,7 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
-    static ObjectRecordMask fromElementIndices(const int numSources, const int numElements, const std::vector<int>& elementIndices) {
+    static ObjectMask fromElementIndices(const int numSources, const int numElements, const std::vector<int>& elementIndices) {
         auto elementMask = std::vector<bool>(numElements, false);
         for (const auto i : elementIndices) elementMask.at(i) = true;
         return {
@@ -56,7 +56,7 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
-    static ObjectRecordMask fromObjectIndices(const int numSources, const int numElements, const std::vector<int>& objectIndices) {
+    static ObjectMask fromObjectIndices(const int numSources, const int numElements, const std::vector<int>& objectIndices) {
         auto sourceMask  = std::vector<bool>(numSources, false);
         auto elementMask = std::vector<bool>(numElements, false);
 

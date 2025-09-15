@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Element/Element.h"
-#include "ObjectRecordMask.h"
+#include "ObjectMask.h"
 #include "Rand.h"
 #include "RaysPtr.h"
 

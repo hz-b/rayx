@@ -188,8 +188,8 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
 
     // record mask for elements. determine which elements should be recorded
     auto objectRecordMask = m_cliArgs.objectRecordIndices.empty()
-                                ? RAYX::ObjectRecordMask::All(numSources, numObjects)
-                                : RAYX::ObjectRecordMask::FromObjectIndices(numSources, numObjects, m_cliArgs.objectRecordIndices);
+                                ? RAYX::ObjectMask::All(numSources, numObjects)
+                                : RAYX::ObjectMask::FromObjectIndices(numSources, numObjects, m_cliArgs.objectRecordIndices);
 
     if (m_cliArgs.objectRecordIndices.empty()) { RAYX_VERB << "Record indices is empty. Defaulting to recording all elements"; }
 

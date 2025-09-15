@@ -18,8 +18,8 @@ inline void recordEvent(Ray* __restrict output, Ray& __restrict ray, const int r
 }
 
 RAYX_FN_ACC
-inline bool recordEventForElement(RaysPtr& outputEvents, const int outputIndex, const ObjectRecordMask objectRecordMask,
-                                  const EventTypeMask eventTypeMask, const RayAttrMask attrRecordMask) {
+inline bool recordEventForElement(RaysPtr& outputEvents, const int outputIndex, const ObjectMask objectRecordMask, const EventTypeMask eventTypeMask,
+                                  const RayAttrMask attrRecordMask) {
     ray_electric_field = advanceElectricField(ray_electric_field, energyToWaveLength(ray_energy), ray_optical_path_length);
 
     if (objectRecordMask.shouldRecordElement(ray_element_id) && eventTypeMask.shouldRecord(ray_event_type)) {

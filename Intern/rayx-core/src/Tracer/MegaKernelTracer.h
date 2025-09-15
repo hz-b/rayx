@@ -77,7 +77,7 @@ struct Resources {
 
     /// update resources
     template <typename Queue>
-    BeamlineConfig update(Queue q, const Group& group, int maxEvents, int numRaysBatchAtMost, const ObjectRecordMask& objectRecordMask) {
+    BeamlineConfig update(Queue q, const Group& group, int maxEvents, int numRaysBatchAtMost, const ObjectMask& objectRecordMask) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -154,7 +154,7 @@ class MegaKernelTracer : public DeviceTracer {
     GenRaysAcc m_genRaysResources;
 
   public:
-    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrMask attrRecordMask,
+    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectMask& objectRecordMask, const RayAttrMask attrRecordMask,
                        const int maxEvents, const int maxBatchSize) override;
     RAYX_PROFILE_FUNCTION_STDOUT();
 

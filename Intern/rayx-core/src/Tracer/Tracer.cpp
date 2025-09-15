@@ -35,7 +35,7 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
     }
 }
 
-int defaultMaxEvents(const RAYX::ObjectRecordMask& mask) { return mask.objectsToRecord() * 2 + 8; }
+int defaultMaxEvents(const RAYX::ObjectMask& mask) { return mask.objectsToRecord() * 2 + 8; }
 
 // this value is picked in a 'good' way if it can divide number of rays without rest. for a number of rays picked by humans, this
 // value is probably good. though, if it could be power of two, the shader would benefit
@@ -57,11 +57,11 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-Rays Tracer::trace(const Group& group, const Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrMask attrRecordMask,
+Rays Tracer::trace(const Group& group, const Sequential sequential, const ObjectMask& objectRecordMask, const RayAttrMask attrRecordMask,
                    std::optional<int> maxEvents, std::optional<int> maxBatchSize) {
     if (group.numSources() != objectRecordMask.numSources() || group.numElements() != objectRecordMask.numElements()) {
-        RAYX_EXIT << "Group and ObjectRecordMask do not match! group has " << group.numSources() << " sources and " << group.numElements()
-                  << " elements, but ObjectRecordMask has " << objectRecordMask.numSources() << " sources and " << objectRecordMask.numElements()
+        RAYX_EXIT << "Group and ObjectMask do not match! group has " << group.numSources() << " sources and " << group.numElements()
+                  << " elements, but ObjectMask has " << objectRecordMask.numSources() << " sources and " << objectRecordMask.numElements()
                   << " elements.";
     }
 
