@@ -9,7 +9,7 @@ class RAYX_API PointSource : public LightSourceBase {
   public:
     PointSource(const DesignSource&);
 
-    RAYX_FN_ACC Ray genRay(const int rayPathIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+    RAYX_FN_ACC Ray genRay(const int rayPathIndex, const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                            Rand& __restrict rand) const;
 
   private:

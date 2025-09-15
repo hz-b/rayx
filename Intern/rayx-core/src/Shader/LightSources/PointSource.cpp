@@ -49,7 +49,7 @@ PointSource::PointSource(const DesignSource& dSource)
  *
  * @returns list of rays
  */
-RAYX_FN_ACC Ray PointSource::genRay(const int rayPathIndex, const SourceId sourceId,
+RAYX_FN_ACC Ray PointSource::genRay(const int rayPathIndex, const int sourceId,
                                     const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence

@@ -231,7 +231,7 @@ RAYX::BundleHistory loadCsv(const std::string& filename) {
         const auto rayElementId = static_cast<ElementId>(d[o]);
         o += 1;
 
-        const auto raySourceId = static_cast<SourceId>(d[o]);
+        const auto rayint = static_cast<int>(d[o]);
         o += 1;
 
         assert(o == 18);

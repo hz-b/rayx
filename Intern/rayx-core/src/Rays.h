@@ -29,7 +29,7 @@
 #define RAYX_X_MACRO_RAY_ATTR_ENERGY              X(double, energy, Energy)
 #define RAYX_X_MACRO_RAY_ATTR_ORDER               X(int32_t, order, Order)
 #define RAYX_X_MACRO_RAY_ATTR_OBJECT_ID           X(int32_t, object_id, ObjectId)
-#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           X(int32_t, source_id, SourceId)
+#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           X(int32_t, source_id, int)
 #define RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          X(EventType, event_type, EventType)
 #define RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER        X(RandCounter, rand_counter, RandCounter)
 

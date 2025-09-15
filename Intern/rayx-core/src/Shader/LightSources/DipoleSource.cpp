@@ -395,7 +395,7 @@ DipoleSource::DipoleSource(const DesignSource& dSource)
  * @returns Ray
  */
 RAYX_FN_ACC
-Ray DipoleSource::genRay(const int rayPathIndex, const SourceId sourceId, Rand& __restrict rand) const {
+Ray DipoleSource::genRay(const int rayPathIndex, const int sourceId, Rand& __restrict rand) const {
     double phi, en;  // phi=horizontal Angle, en=energy
 
     // create ray with random position and divergence within the given span

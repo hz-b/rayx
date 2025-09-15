@@ -25,7 +25,7 @@ MatrixSource::MatrixSource(const DesignSource& dSource)
  * returns vector of rays
  */
 RAYX_FN_ACC
-Ray MatrixSource::genRay(const int rayPathIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                          Rand& __restrict rand) const {
     // Calculate grid size
     const int rmat  = int(std::sqrt(m_numberOfRays));

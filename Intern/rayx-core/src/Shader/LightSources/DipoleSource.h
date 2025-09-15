@@ -33,7 +33,7 @@ class RAYX_API DipoleSource : public LightSourceBase {
   public:
     DipoleSource(const DesignSource&);
 
-    RAYX_FN_ACC Ray genRay(const int rayPathIndex, const SourceId sourceId, Rand& __restrict rand) const;
+    RAYX_FN_ACC Ray genRay(const int rayPathIndex, const int sourceId, Rand& __restrict rand) const;
 
   private:
     // calculate Ray-Information

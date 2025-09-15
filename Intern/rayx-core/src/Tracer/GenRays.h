@@ -20,13 +20,13 @@ namespace {
 
 struct GenRaysKernel {
     template <typename Source>
-    RAYX_FN_ACC Ray genRay(const Source& __restrict source, const SourceId sourceId,
+    RAYX_FN_ACC Ray genRay(const Source& __restrict source, const int sourceId,
                            const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution, const int rayPathIndex,
                            Rand& __restrict rand) const {
         return source.genRay(rayPathIndex, sourceId, *energyDistribution, rand);
     }
 
-    RAYX_FN_ACC Ray genRay(const DipoleSource& source, const SourceId sourceId,
+    RAYX_FN_ACC Ray genRay(const DipoleSource& source, const int sourceId,
                            [[maybe_unused]] const std::optional<EnergyDistributionDataVariant>& __restrict energyDistribution, const int rayPathIndex,
                            Rand& __restrict rand) const {
         return source.genRay(rayPathIndex, sourceId, rand);
@@ -34,7 +34,7 @@ struct GenRaysKernel {
 
     template <typename Acc, typename Source>
     RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaysPtr* __restrict rays, const int dstStartRayIndex, const Source source,
-                                const SourceId sourceId, const std::optional<EnergyDistributionDataVariant> energyDistribution,
+                                const int sourceId, const std::optional<EnergyDistributionDataVariant> energyDistribution,
                                 const int startRayIndex, const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
@@ -154,7 +154,7 @@ struct GenRays {
 
         m_numRaysTotal      = 0;
         auto numRaysSources = std::vector<int>();
-        auto sourceId       = static_cast<SourceId>(0);
+        auto sourceId       = static_cast<int>(0);
 
         for (const auto* designSource : beamline.getSources()) {
             const auto source             = *compileSource(*designSource);
@@ -253,7 +253,7 @@ struct GenRays {
 
     struct SourceState {
         const SourceVariant source;
-        const SourceId sourceId;
+        const int sourceId;
         const std::optional<EnergyDistributionDataVariant> energyDistribution;
         int numRaysSourceRemaining;
         std::string name;
