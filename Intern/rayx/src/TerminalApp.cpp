@@ -143,11 +143,11 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
     std::cout << "Processing: " << inputFilepath << std::endl;
 
     // record mask for attributes. determine which ray attributes should be recorded
-    const auto attr = RAYX::rayAttrStringsToRayAttrMask(m_cliArgs.format);
+    const auto attrMask = RAYX::rayAttrStringsToRayAttrMask(m_cliArgs.attrRecordMask);
 
     const auto beamline = loadBeamline(inputFilepath);
 
-    const auto rays = traceBeamline(beamline, attr);
+    const auto rays = traceBeamline(beamline, attrMask);
 
     if (!rays.num_events)
         std::cout << "No events were recorded!" << std::endl;
@@ -155,7 +155,7 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
         // TODO: write object names instead of element names (include sources)
         const auto sourceNames  = beamline.getSourceNames();
         const auto elementNames = beamline.getElementNames();
-        auto outputFilepath     = exportRays(inputFilepath, sourceNames, elementNames, rays, attr);
+        auto outputFilepath     = exportRays(inputFilepath, sourceNames, elementNames, rays, attrMask);
 
         const auto end_time     = steady_clock::now();
         const auto elapsed_time = duration_cast<milliseconds>(end_time - start_time).count();
@@ -180,37 +180,38 @@ RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
     return beamline;
 }
 
-RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrFlag attr) {
+RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attrRecordMask) {
     // dump beamline objects
     if (RAYX::getDebugVerbose()) { dumpBeamlineObjects(&beamline); }
 
     const size_t numObjects = beamline.numObjects();
 
     // record mask for elements. determine which elements should be recorded
-    auto recordMask =
-        m_cliArgs.recordIndices.empty() ? RAYX::recordMaskAll(numObjects) : RAYX::recordMaskByIndices(numObjects, m_cliArgs.recordIndices);
+    auto objectRecordMask = m_cliArgs.objectRecordIndices.empty()
+                                ? RAYX::ObjectRecordMask::All(numSources, numObjects)
+                                : RAYX::ObjectRecordMask::FromObjectIndices(numSources, numObjects, m_cliArgs.objectRecordIndices);
 
-    if (m_cliArgs.recordIndices.empty()) { RAYX_VERB << "Record indices is empty. Defaulting to recording all elements"; }
+    if (m_cliArgs.objectRecordIndices.empty()) { RAYX_VERB << "Record indices is empty. Defaulting to recording all elements"; }
 
     if (RAYX::getDebugVerbose()) {
         const auto objectNames = beamline.getObjectNames();
         RAYX_VERB << "Recording objects:";
-        for (int i = 0; i < static_cast<int>(recordMask.size()); ++i) {
-            if (recordMask[i]) { RAYX_VERB << "\t- [" << i << "] '" << objectNames[i] << "'"; };
+        for (int i = 0; i < static_cast<int>(objectRecordMask.size()); ++i) {
+            if (objectRecordMask[i]) { RAYX_VERB << "\t- [" << i << "] '" << objectNames[i] << "'"; };
         }
     }
 
     // sequential / non-sequential tracing
-    RAYX::Sequential seq = m_cliArgs.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+    RAYX::Sequential sequential = m_cliArgs.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
 
     // max events to record per ray path
-    const int maxEvents = m_cliArgs.maxEvents ? *m_cliArgs.maxEvents : RAYX::Tracer::defaultMaxEvents(&beamline);
+    const auto maxEvents = m_cliArgs.maxEvents;
 
     // max batch size
-    uint64_t batchSize = m_cliArgs.batchSize ? *m_cliArgs.batchSize : RAYX::DEFAULT_BATCH_SIZE;
+    const auto maxBatchSize = m_cliArgs.batchSize;
 
     // do the trace
-    const auto rays = m_tracer->trace(beamline, seq, batchSize, maxEvents, recordMask, attr);
+    const auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMask, maxEvents, maxBatchSize);
 
     return rays;
 }
@@ -282,7 +283,7 @@ void TerminalApp::run() {
 }
 
 fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vector<std::string>& sourceNames,
-                                 const std::vector<std::string>& elementNames, const RAYX::Rays& rays, const RAYX::RayAttrFlag attr) {
+                                 const std::vector<std::string>& elementNames, const RAYX::Rays& rays, const RAYX::RayAttrMask attrMask) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     fs::path outputFilepath;
@@ -306,7 +307,7 @@ fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vecto
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
-        writeH5Rays(outputFilepath, sourceNames, elementNames, rays, attr);
+        writeH5Rays(outputFilepath, sourceNames, elementNames, rays, attrMask);
 #endif
     }
 

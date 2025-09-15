@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "Core.h"
-#include "Shader/EventType.h"
 #include "Shader/ElectricField.h"
+#include "Shader/EventType.h"
 #include "Shader/Rand.h"
 
 // TODO: all this macros should be invisible to the user
@@ -13,14 +13,14 @@
 #error 'X' must not be defined at this point
 #endif
 
-#define RAYX_X_MACRO_RAY_ATTR_PATH_ID             X(int32_t, path_id, PathId)
-#define RAYX_X_MACRO_RAY_ATTR_PATH_EVENT_ID       X(int32_t, path_event_id, PathEventId)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_X          X(double, position_x, PositionX)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_Y          X(double, position_y, PositionY)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_Z          X(double, position_z, PositionZ)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X         X(double, direction_x, DirectionX)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y         X(double, direction_y, DirectionY)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z         X(double, direction_z, DirectionZ)
+#define RAYX_X_MACRO_RAY_ATTR_PATH_ID       X(int32_t, path_id, PathId)
+#define RAYX_X_MACRO_RAY_ATTR_PATH_EVENT_ID X(int32_t, path_event_id, PathEventId)
+#define RAYX_X_MACRO_RAY_ATTR_POSITION_X    X(double, position_x, PositionX)
+#define RAYX_X_MACRO_RAY_ATTR_POSITION_Y    X(double, position_y, PositionY)
+#define RAYX_X_MACRO_RAY_ATTR_POSITION_Z    X(double, position_z, PositionZ)
+#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X   X(double, direction_x, DirectionX)
+#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y   X(double, direction_y, DirectionY)
+#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z   X(double, direction_z, DirectionZ)
 // TODO; this should be std::complex<double>, but our ubuntu CLI did not yet catch up to support std::complex in cuda device code
 #define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(complex::Complex, electric_field_x, ElectricFieldX)
 #define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(complex::Complex, electric_field_y, ElectricFieldY)
@@ -60,7 +60,10 @@ namespace RAYX {
 RAYX_X_MACRO_RAY_ATTR
 #undef X
 
-enum class RAYX_API RayAttrFlag : uint32_t {
+/** @brief Mask to specify ray attributes
+ * It is used to configure which attributes are recorded during ray tracing.
+ */
+enum class RAYX_API RayAttrMask : uint32_t {
     PathId            = 1 << 0,
     PathEventId       = 1 << 1,
     PositionX         = 1 << 2,
@@ -79,36 +82,39 @@ enum class RAYX_API RayAttrFlag : uint32_t {
     SourceId          = 1 << 15,
     EventType         = 1 << 16,
     RandCounter       = 1 << 17,
-    RayAttrFlagCount  = 18,
+    RayAttrMaskCount  = 18,
 
     Position      = PositionX | PositionY | PositionZ,
     Direction     = DirectionX | DirectionY | DirectionZ,
     ElectricField = ElectricFieldX | ElectricFieldY | ElectricFieldZ,
 
     None = 0,
-    All  = (1 << RayAttrFlagCount) - 1,
+    All  = (1 << RayAttrMaskCount) - 1,
 };
 
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator|(const RayAttrFlag lhs, const RayAttrFlag rhs) {
-    return static_cast<RayAttrFlag>(static_cast<std::underlying_type<RayAttrFlag>>(lhs) | static_cast<std::underlying_type<RayAttrFlag>>(rhs));
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|(const RayAttrMask lhs, const RayAttrMask rhs) {
+    return static_cast<RayAttrMask>(static_cast<std::underlying_type<RayAttrMask>>(lhs) | static_cast<std::underlying_type<RayAttrMask>>(rhs));
 }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator&(const RayAttrFlag lhs, const RayAttrFlag rhs) {
-    return static_cast<RayAttrFlag>(static_cast<std::underlying_type<RayAttrFlag>>(lhs) & static_cast<std::underlying_type<RayAttrFlag>>(rhs));
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator&(const RayAttrMask lhs, const RayAttrMask rhs) {
+    return static_cast<RayAttrMask>(static_cast<std::underlying_type<RayAttrMask>>(lhs) & static_cast<std::underlying_type<RayAttrMask>>(rhs));
 }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator^(const RayAttrFlag lhs, const RayAttrFlag rhs) {
-    return static_cast<RayAttrFlag>(static_cast<std::underlying_type<RayAttrFlag>>(lhs) ^ static_cast<std::underlying_type<RayAttrFlag>>(rhs));
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator^(const RayAttrMask lhs, const RayAttrMask rhs) {
+    return static_cast<RayAttrMask>(static_cast<std::underlying_type<RayAttrMask>>(lhs) ^ static_cast<std::underlying_type<RayAttrMask>>(rhs));
 }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator~(const RayAttrFlag lhs) {
-    return static_cast<RayAttrFlag>(~static_cast<std::underlying_type<RayAttrFlag>>(lhs));
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator~(const RayAttrMask lhs) {
+    return static_cast<RayAttrMask>(~static_cast<std::underlying_type<RayAttrMask>>(lhs));
 }
-RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrFlag lhs) { return lhs == RayAttrFlag::None; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator|=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs | rhs; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator&=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs & rhs; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrFlag operator^=(RayAttrFlag& lhs, const RayAttrFlag rhs) { return lhs = lhs ^ rhs; }
+RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrMask lhs) { return lhs == RayAttrMask::None; }
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs | rhs; }
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator&=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs & rhs; }
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator^=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs ^ rhs; }
 
+/** @brief Struct to hold ray attributes
+ * Each attribute is stored in a separate vector, allowing for efficient access and manipulation of ray data.
+ */
 struct RAYX_API Rays {
     int num_events;
-    RayAttrFlag attr;
+    RayAttrMask attr;
 
 #define X(type, name, flag) std::vector<type> name;
 
@@ -137,9 +143,9 @@ struct RAYX_API Rays {
     }
 };
 
-/// get a full list of attr names
+/// get a full list of ray attribute names
 RAYX_API std::vector<std::string> getRayAttrNames();
-/// convert list of attr names to attr mask
-RAYX_API RayAttrFlag rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings);
+/// convert list of ray attribute names to RayAttrMask
+RAYX_API RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings);
 
 }  // namespace RAYX

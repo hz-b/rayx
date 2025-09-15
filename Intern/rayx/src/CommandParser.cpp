@@ -34,14 +34,18 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
 
     // add positional argument to input paths
     std::vector<std::string> inputPaths;
-    app.add_option("inputs", inputPaths, "Same as --input");
+    app.add_option("inputs", inputPaths, "Input RML files or directories (recursive search for RML files). Same as --input");
 
     const auto groupPrograms = "Alternative programs, no tracing";
 
     // the order here, determines the order in the --help print
 
+    // other programs than tracing
+    app.add_flag("-v,--version", args.version, "Show version information")->group(groupPrograms);
+    app.add_option("-D,--dump", args.dump, "Dump the meta data of a file (RML or H5)")->group(groupPrograms);
+
     // tracing related options
-    app.add_option("-i,--input", args.inputPaths, "Input RML files or directories (traversed recursively, looking for RML files)");
+    app.add_option("-i,--input", args.inputPaths, "Input RML files or directories (recursive search for RML files)");
     app.add_option("-o,--output", args.outputPath,
                    "Output filepath. Can only be used if a single input is provided, that directs to an RML file. Default: put the output file "
                    "next to the RML");
@@ -52,30 +56,26 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
                  "Enable CPU devices. Can be combined with --gpu. Affects --list-devices and --device-index. Default behaviour if neither --cpu and "
                  "--gpu are provided: Both will be enabled");
     app.add_flag("-X,--gpu", args.gpu, "Same as --cpu, but for GPU instead of CPU");
+    app.add_flag("-l,--list-devices", args.listDevices, "List devices available for tracing. Affected by --cpu and --gpu")->group(groupPrograms);
     app.add_option("-d,--device-index", args.deviceId,
                    "Pick device via device index. Available devices are determined by --cpu and --gpu. Default: the best device will be picked "
                    "automatically. Use --list-devices to see the available devices");
-    app.add_flag("-c,--csv", args.csv, "Output stored as csv instead of hdf5 file");
+    app.add_flag("-c,--csv", args.csv, "Output stored as csv instead of H5 file");
     app.add_flag("-V,--verbose", args.verbose, "Dump more information");
     app.add_option("-m,--maxevents", args.maxEvents,
                    "Maximum number of events per ray. Default: A multiple of the number of objects to record events for");
     app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", RAYX::DEFAULT_BATCH_SIZE));
     app.add_option("-n,--number-of-rays", args.numberOfRays, "Override the number of rays for all sources");
     app.add_flag("-B,--benchmark", args.benchmark, "Dump benchmark durations");
-    app.add_option("-R,--record-indices", args.recordIndices,
+    app.add_option("-R,--record-indices", args.objectRecordIndices,
                    "Record events only for specific sources / elements. Use --dump to list the objects of a beamline");
 
     auto formatAttrNames    = RAYX::getRayAttrNames();
     auto formatAttrNamesStr = std::string();
     for (const auto attrName : formatAttrNames) formatAttrNamesStr += "\n\t" + attrName;
     app.add_option(
-        "-F,--format", args.format,
+        "-A,--attributes", args.attrRecordMask,
         std::format("Record only specific Ray attributes to the output H5 file. Default: record all attributes. Attributes: {}", formatAttrNamesStr));
-
-    // other programs than tracing
-    app.add_flag("-v,--version", args.version, "Show version information")->group(groupPrograms);
-    app.add_flag("-l,--list-devices", args.listDevices, "List devices available for tracing. Affected by --cpu and --gpu")->group(groupPrograms);
-    app.add_option("-D,--dump", args.dump, "Dump the meta data of a file (h5 or rml)")->group(groupPrograms);
 
     try {
         app.parse(argc, argv);
@@ -100,9 +100,13 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     const bool isFirstPathDirectory = args.inputPaths.size() == 1 && std::filesystem::is_directory(args.inputPaths[0]);
     if (args.outputPath && (isMoreThanOnePath || isFirstPathDirectory)) {
         if (std::filesystem::is_directory(*args.outputPath)) {
-            std::cout << "warning: you specified an output directory and potentially multiple input files. input files with the same name can lead "
-                         "to name collisions when exporting to the output directory"
+            std::cout << "warning: specifying multiple input files and an output directory can lead to name collisions between output filenames"
                       << std::endl;
+
+            if (!objectRecordIndices.empty())
+                std::cout << "warning: you specified --record-indices, but different input files may have different beamline objects, so the "
+                             "recorded objects may differ between files"
+                          << std::endl;
         } else {
             RAYX_EXIT << "error: the output path must be a directory, when multiple input files or an input directory is specified";
         }

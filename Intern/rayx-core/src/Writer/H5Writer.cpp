@@ -53,10 +53,10 @@ int getNumEvents(const Rays& rays) {
     return size;
 }
 
-Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrFlag attr) {
+Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
+              << std::bitset<static_cast<RayAttrMaskType>(RayAttrMask::RayAttrMaskCount)>(static_cast<RayAttrMaskType>(attr));
 
     Rays rays;
 
@@ -73,7 +73,7 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrFlag attr) {
 
 #define X(type, name, flag, map)                                                           \
     RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) loadData("rayx/events/" #name, rays.name);
+    if ((attr & RayAttrMask::flag) != RayAttrMask::None) loadData("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -119,17 +119,17 @@ std::vector<std::string> readH5ElementNames(const std::filesystem::path& filepat
 }
 
 void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::string>& source_names, const std::vector<std::string>& element_names,
-                 const Rays& rays, const RayAttrFlag attr) {
+                 const Rays& rays, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
+              << std::bitset<static_cast<RayAttrMaskType>(RayAttrMask::RayAttrMaskCount)>(static_cast<RayAttrMaskType>(attr));
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
 #define X(type, name, flag, map)                                                         \
     RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) file.createDataSet("rayx/events/" #name, rays.name);
+    if ((attr & RayAttrMask::flag) != RayAttrMask::None) file.createDataSet("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -141,7 +141,7 @@ void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::s
 }
 
 void writeH5BundleHistory(const std::filesystem::path& filepath, const std::vector<std::string>& source_names,
-                          const std::vector<std::string>& element_names, const BundleHistory& bundle, const RayAttrFlag attr) {
+                          const std::vector<std::string>& element_names, const BundleHistory& bundle, const RayAttrMask attr) {
     const auto rays = bundleHistoryToRays(bundle);
     writeH5Rays(filepath, source_names, element_names, rays, attr);
 }

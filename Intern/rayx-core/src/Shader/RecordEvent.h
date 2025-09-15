@@ -19,12 +19,12 @@ inline void recordEvent(Ray* __restrict output, Ray& __restrict ray, const int r
 
 RAYX_FN_ACC
 inline bool recordEventForElement(RaysPtr& outputEvents, const int outputIndex, const ObjectRecordMask objectRecordMask,
-                                  const EventTypeMask eventTypeMask, const RayAttrFlag attrRecordMask) {
+                                  const EventTypeMask eventTypeMask, const RayAttrMask attrRecordMask) {
     ray_electric_field = advanceElectricField(ray_electric_field, energyToWaveLength(ray_energy), ray_optical_path_length);
 
     if (objectRecordMask.shouldRecordElement(ray_element_id) && eventTypeMask.shouldRecord(ray_event_type)) {
 #define X(type, name, flag, map) \
-    if ((RayAttrFlag::flag | attrRecordMask) != RayAttrFlag::None) outputEvents.name[outputIndex] = ray_##name;
+    if ((RayAttrMask::flag | attrRecordMask) != RayAttrMask::None) outputEvents.name[outputIndex] = ray_##name;
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X

@@ -38,7 +38,7 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
-    static ObjectRecordMask bySourceIndices(const int numSources, const int numElements, const std::vector<int>& sourceIndices) {
+    static ObjectRecordMask fromSourceIndices(const int numSources, const int numElements, const std::vector<int>& sourceIndices) {
         auto sourceMask = std::vector<bool>(numSources, false);
         for (const auto i : sourceIndices) sourceMask.at(i) = true;
         return {
@@ -47,7 +47,7 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
-    static ObjectRecordMask byElementIndices(const int numSources, const int numElements, const std::vector<int>& elementIndices) {
+    static ObjectRecordMask fromElementIndices(const int numSources, const int numElements, const std::vector<int>& elementIndices) {
         auto elementMask = std::vector<bool>(numElements, false);
         for (const auto i : elementIndices) elementMask.at(i) = true;
         return {
@@ -56,7 +56,7 @@ class RAYX_API ObjectRecordMask {
         };
     }
 
-    static ObjectRecordMask byObjectIndices(const int numSources, const int numElements, const std::vector<int>& objectIndices) {
+    static ObjectRecordMask fromObjectIndices(const int numSources, const int numElements, const std::vector<int>& objectIndices) {
         auto sourceMask  = std::vector<bool>(numSources, false);
         auto elementMask = std::vector<bool>(numElements, false);
 

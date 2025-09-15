@@ -17,7 +17,7 @@ class RAYX_API DeviceTracer {
   public:
     virtual ~DeviceTracer() = default;
 
-    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrFlag attr,
+    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrMask attrRecordMask,
                        const int maxEvents, const int maxBatchSize) = 0;
 };
 

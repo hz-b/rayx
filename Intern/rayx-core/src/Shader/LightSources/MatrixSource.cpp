@@ -28,15 +28,15 @@ RAYX_FN_ACC
 Ray MatrixSource::genRay(const int rayIndex, const SourceId sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                          Rand& __restrict rand) const {
     // Calculate grid size
-    const int rmat = int(std::sqrt(m_numberOfRays));
+    const int rmat  = int(std::sqrt(m_numberOfRays));
     const int nGrid = rmat * rmat;
-    const int row  = rayIndex % rmat;
-    const int col  = (rayIndex / rmat) % rmat;
+    const int row   = rayIndex % rmat;
+    const int col   = (rayIndex / rmat) % rmat;
 
     // Count how many rays share this origin
-    int originIndex = row + rmat * col;
+    int originIndex   = row + rmat * col;
     int raysPerOrigin = m_numberOfRays / nGrid;
-    int extraRays = m_numberOfRays % nGrid;
+    int extraRays     = m_numberOfRays % nGrid;
     // The first 'extraRays' origins get one extra ray
     int nRaysThisOrigin = raysPerOrigin + (originIndex < extraRays ? 1 : 0);
 

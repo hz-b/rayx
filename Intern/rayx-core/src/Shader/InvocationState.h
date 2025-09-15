@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Element/Element.h"
-#include "Rand.h"
 #include "ObjectRecordMask.h"
+#include "Rand.h"
 #include "RaysPtr.h"
 
 namespace RAYX {
@@ -23,7 +23,7 @@ struct RAYX_API ConstState {
     int* __restrict materialIndices;
     double* __restrict materialTables;
     bool* __restrict elementRecordMask;  // Mask that decides which elements to record events for (array length is numElements)
-    RayAttrFlag attrRecordMask;
+    RayAttrMask attrRecordMask;
     RaysPtr rays;
 };
 

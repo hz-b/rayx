@@ -173,8 +173,7 @@ struct GenRays {
         auto numRaysSources = std::vector<int>();
         auto sourceId       = static_cast<SourceId>(0);
 
-        const auto designSources = beamline.getSources();
-        for (const auto* designSource : designSources) {
+        for (const auto* designSource : beamline.getSources()) {
             const auto source             = *compileSource(*designSource);
             const auto energyDistribution = compileEnergyDistribution(*designSource);
             const auto numRaysSource      = static_cast<int>(designSource->getNumberOfRays());
@@ -194,7 +193,7 @@ struct GenRays {
         m_numRaysBatchAtMost = std::min(m_numRaysTotal, maxBatchSize);
 
 #define X(type, name, flag) \
-    if (!!(attrMask & RayAttrFlag::flag)) allocBuf(q, d_rays.name, m_numRaysBatchAtMost);
+    if (!!(attrMask & RayAttrMask::flag)) allocBuf(q, d_rays.name, m_numRaysBatchAtMost);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X

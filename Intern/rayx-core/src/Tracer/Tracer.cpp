@@ -57,7 +57,7 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-Rays Tracer::trace(const Group& group, const Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrFlag attrRecordMask,
+Rays Tracer::trace(const Group& group, const Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrMask attrRecordMask,
                    std::optional<int> maxEvents, std::optional<int> maxBatchSize) {
     if (group.numSources() != objectRecordMask.numSources() || group.numElements() != objectRecordMask.numElements()) {
         RAYX_EXIT << "Group and ObjectRecordMask do not match! group has " << group.numSources() << " sources and " << group.numElements()

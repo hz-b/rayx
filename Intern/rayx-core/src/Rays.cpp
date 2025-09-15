@@ -10,18 +10,18 @@ RAYX_API std::vector<std::string> getRayAttrNames() {
 #undef X
 }
 
-RayAttrFlag rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings) {
-    auto stringToAttr = [](const std::string& str) -> RayAttrFlag {
+RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings) {
+    auto stringToAttr = [](const std::string& str) -> RayAttrMask {
 #define X(type, name, flag, map) \
-    if (str == #name) return RayAttrFlag::flag;
+    if (str == #name) return RayAttrMask::flag;
         RAYX_X_MACRO_RAY_ATTR
 #undef X
         std::cerr << "error: failed to parse format string: unknown token: '" << str << "'";
         std::exit(1);
-        return RayAttrFlag::None;
+        return RayAttrMask::None;
     };
 
-    auto attr = RayAttrFlag::None;
+    auto attr = RayAttrMask::None;
 
     for (const auto& str : strings) { attr |= stringToAttr(str); }
 

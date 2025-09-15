@@ -154,7 +154,7 @@ class MegaKernelTracer : public DeviceTracer {
     GenRaysAcc m_genRaysResources;
 
   public:
-    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrFlag attr,
+    virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectRecordMask& objectRecordMask, const RayAttrMask attrRecordMask,
                        const int maxEvents, const int maxBatchSize) override;
     RAYX_PROFILE_FUNCTION_STDOUT();
 
@@ -200,7 +200,7 @@ class MegaKernelTracer : public DeviceTracer {
         auto batchConf = m_genRaysResources.genRaysBatch(devAcc, q, batchIndex);
 
         // trace current batch
-        traceBatch(devAcc, q, beamlineConf.numSources, beamlineConf.numElements, maxEvents, sequential, attr, batchConf);
+        traceBatch(devAcc, q, beamlineConf.numSources, beamlineConf.numElements, maxEvents, sequential, attrRecordMask, batchConf);
 
         alpaka::memcpy(q, alpaka::createView(devHost, compactEventCounts, batchConf.numRaysBatch), *m_resources.d_compactEventCounts,
                        batchConf.numRaysBatch);
@@ -215,8 +215,8 @@ class MegaKernelTracer : public DeviceTracer {
         // transpose events from AoS to SoA data layout
         compactEventsToRays(devAcc, q, numEventsBatch);
 
-#define X(type, name, flag, map)                                                                      \
-    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) {                                            \
+#define X(type, name, flag)                                                                           \
+    if (!!(attrRecordMask & RayAttrMask::flag)) {                                                     \
         raysoaBatch[batchIndex].name.resize(numEventsBatch);                                          \
         auto name##_view = alpaka::createView(devHost, raysoaBatch[batchIndex].name, numEventsBatch); \
         alpaka::memcpy(q, name##_view, *m_resources.soaEvents.name, numEventsBatch);                  \
@@ -234,7 +234,7 @@ class MegaKernelTracer : public DeviceTracer {
 
     Rays raysoa;
 #define X(type, name, flag, map)                                                                                                    \
-    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) {                                                                          \
+    if ((attrRecordMask & RayAttrMask::flag) != RayAttrMask::None) {                                                                \
         int batchOffset = 0;                                                                                                        \
         raysoa.name.resize(numEventsTotal);                                                                                         \
         for (int batchIndex = 0; batchIndex < sourceConf.numBatches; ++batchIndex) {                                                \
@@ -260,7 +260,7 @@ class MegaKernelTracer : public DeviceTracer {
 
 private : template <typename DevAcc, typename Queue>
           void
-          traceBatch(DevAcc devAcc, Queue q, int numSources, int numElements, int maxEvents, Sequential sequential, RayAttrFlag attr,
+          traceBatch(DevAcc devAcc, Queue q, int numSources, int numElements, int maxEvents, Sequential sequential, RayAttrMask attrRecordMask,
                      GenRaysAcc::BatchConfig& batchConf) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
@@ -276,8 +276,8 @@ private : template <typename DevAcc, typename Queue>
         .materialIndices   = alpaka::getPtrNative(*m_resources.d_materialIndices),
         .materialTables    = alpaka::getPtrNative(*m_resources.d_materialTable),
         .elementEecordMask = alpaka::getPtrNative(*m_resources.d_elementRecordMask),
-        .attrRecordMask    = attr,
-        .rays              = alpaka::getPtrNative(*batchConf.d_rays),
+        .attrRecordMask    = attrRecordMask,
+        .rays              = batchConfig.d_rays,
     };
 
     const auto mutableState = MutableState{

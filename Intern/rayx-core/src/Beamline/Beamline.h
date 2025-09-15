@@ -102,17 +102,20 @@ class RAYX_API Group : public BeamlineNode {
     static void accumulateLightSourcesWorldPositions(const Group& group, const glm::dvec4& parentPos, const glm::dmat4& parentOri,
                                                      std::vector<glm::dvec4>& positions);
 
-    std::vector<const DesignElement*> getElements() const;
-    std::vector<const DesignSource*> getSources() const;
     std::vector<std::string> getElementNames() const;
     std::vector<std::string> getSourceNames() const;
     std::vector<std::string> getObjectNames() const;
-    const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
-    glm::dvec4 getPosition() const override { return m_position; }
-    glm::dmat4 getOrientation() const override { return m_orientation; }
 
+    std::vector<const DesignElement*> getElements() const;
+    std::vector<const DesignSource*> getSources() const;
+
+    glm::dvec4 getPosition() const override { return m_position; }
     void setPosition(const glm::dvec4& pos) { m_position = pos; }
+
+    glm::dmat4 getOrientation() const override { return m_orientation; }
     void setOrientation(const glm::dmat4& orientation) { m_orientation = orientation; }
+
+    const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
 
   private:
     // Position and orientation could in theory be put into one transform matrix but this follows the rml style

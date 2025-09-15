@@ -332,7 +332,7 @@ TEST_F(TestSuite, testH5Writer) {
         partialRayOriginalSoA.position_z = rayOriginalSoA.position_z;
 
         // write only some attributes
-        const auto attr = RayAttrFlag::Energy | RayAttrFlag::Position;
+        const auto attr = RayAttrMask::Energy | RayAttrMask::Position;
         writeH5BundleHistory(h5Filepath, sourceNamesOriginal, elementNamesOriginal, rayOriginal, attr);
         // read only some attributes
         const auto raySoA = readH5Rays(h5Filepath, attr);
