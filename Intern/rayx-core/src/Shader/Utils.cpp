@@ -8,7 +8,7 @@ namespace RAYX {
 RAYX_FN_ACC
 double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal) {
     normal    = glm::normalize(normal);
-    double ar = glm::dot(glm::dvec3(normal), r.m_direction);
+    double ar = glm::dot(glm::dvec3(normal), r.direction);
     // cut to interval [-1,1]
     if (ar < -1.0)
         ar = -1.0;

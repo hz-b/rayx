@@ -31,33 +31,14 @@ inline HighFive::DataType highfive_create_type_Complex() {
 }  // unnamed namespace
 HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
 HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_Complex);
-HIGHFIVE_REGISTER_TYPE(RAYX::RayAttrMask, highfive_create_type_RayAttrMask);
 
 namespace RAYX {
-
-/// get number of events, which is the number of entries in an active attribute
-/// also check wether every active attribute has the same number of entries
-int getNumEvents(const Rays& rays) {
-    auto size   = 0;
-    auto resize = [&size](const auto& v) {
-        const auto v_size = static_cast<int>(v.size());
-        _assert(v_size == 0 || v_size == size || size == 0,
-                "error: file corrupted: at least two non-empty Ray attributes have different number of elements!");
-        size = std::max(size, v_size);
-    };
-
-#define X(type, name, flag) resize(rays.name);
-
-    RAYX_X_MACRO_RAY_ATTR
-#undef X
-
-    return size;
-}
 
 Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<RayAttrMaskType>(RayAttrMask::RayAttrMaskCount)>(static_cast<RayAttrMaskType>(attr));
+              << std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
+                     static_cast<std::underlying_type_t<RayAttrMask>>(attr));
 
     Rays rays;
 
@@ -72,15 +53,12 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
                     address);
         };
 
-#define X(type, name, flag)                                                           \
+#define X(type, name, flag)                                                                \
     RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrMask::flag) != RayAttrMask::None) loadData("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
-
-        rays.num_paths  = file.getDataSet("rayx/num_paths").read<int32_t>();
-        rays.num_events = getNumEvents(rays);
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what(); }
 
     return rays;
@@ -100,16 +78,16 @@ std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath
     return object_names;
 }
 
-void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::string>& object_names,
-                 const Rays& rays, const RayAttrMask attr) {
+void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::string>& object_names, const Rays& rays, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<RayAttrMaskType>(RayAttrMask::RayAttrMaskCount)>(static_cast<RayAttrMaskType>(attr));
+              << std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
+                     static_cast<std::underlying_type_t<RayAttrMask>>(attr));
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
-#define X(type, name, flag)                                                         \
+#define X(type, name, flag)                                                              \
     RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if ((attr & RayAttrMask::flag) != RayAttrMask::None) file.createDataSet("rayx/events/" #name, rays.name);
 
@@ -117,7 +95,7 @@ void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::s
 #undef X
 
         // TODO: store RayAttrMask
-        file.createDataSet("rayx/num_paths", rays.num_paths);
+        file.createDataSet("rayx/num_events", rays.numEvents());
         file.createDataSet("rayx/object_names", object_names);
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
 }

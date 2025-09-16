@@ -34,7 +34,7 @@ RAYX_FN_ACC OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeE
                                                                                      const glm::dvec3& __restrict rayDirection, Surface surface,
                                                                                      Cutout cutout, bool isTriangul);
 
-RAYX_FN_ACC OptCollisionPoint findCollisionInElementCoords(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const int elementIndex,
+RAYX_FN_ACC OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                            const OpticalElement& __restrict element, Rand& __restrict rand);
 
 RAYX_FN_ACC OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection,

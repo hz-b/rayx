@@ -36,6 +36,16 @@ inline int ceilIntDivision(const int dividend, const int divisor) { return (divi
 
 inline int nextPowerOfTwo(const int value) { return static_cast<int>(glm::pow(2, glm::ceil(glm::log(value) / glm::log(2)))); }
 
+inline int nextMultiple(const int value, const int divisor) {
+    if (divisor == 0) RAYX_EXIT << "error: divisor must not be zero";
+
+    long long remainder = value % divisor;
+
+    if (remainder == 0)
+        return value;  // already a multiple
+    else
+        return value + (divisor - remainder);  // next bigger multiple
+}
 /// conditionally allocate buffer with specified minimum size.
 /// if the buffer already fulfills size requirements, this function does nothing.
 /// this function never shrinks a buffer.
@@ -50,21 +60,6 @@ inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
     const auto shouldAlloc = !buf || alpaka::getExtents(*buf)[0] < size;
     if (shouldAlloc) RAYX_VERB << (!buf ? "new alloc on device: " : "realloc on device: ") << nextPowerOfTwo(size * sizeof(Elem)) << " bytes";
     if (shouldAlloc) buf = alpaka::allocAsyncBufIfSupported<Elem, Idx>(q, nextPowerOfTwo(size));
-}
-
-inline void collectCompactEventsIntoBundleHistory(BundleHistory& bundleHistory, const std::vector<Ray>& compactEvents,
-                                                  const std::vector<int>& compactEventCounts, const std::vector<int>& compactEventOffsets,
-                                                  const int batchSize) {
-    RAYX_PROFILE_FUNCTION_STDOUT();
-
-    for (int i = 0; i < batchSize; i++) {
-        const auto begin = compactEvents.data() + compactEventOffsets[i];
-        const auto end   = begin + compactEventCounts[i];
-
-        // add events to history, only if there are events
-        bool hasEvents = 0 < std::distance(begin, end);
-        if (hasEvents) bundleHistory.emplace_back(begin, end);
-    }
 }
 
 namespace BlockSizeConstraint {
@@ -134,8 +129,7 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
 
     RAYX_VERB << "execute kernel with launch config: "
               << "blocks = " << workDiv.m_gridBlockExtent[0] << ", "
-              << "threads = " << workDiv.m_blockThreadExtent[0] << ", "
-              << "elements = " << workDiv.m_threadElemExtent[0];
+              << "threads = " << workDiv.m_blockThreadExtent[0];
 
     alpaka::exec<Acc>(q, workDiv, kernel, std::forward<Args>(args)...);
 }

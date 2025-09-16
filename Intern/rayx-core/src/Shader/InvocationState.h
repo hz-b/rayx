@@ -22,6 +22,7 @@ struct RAYX_API ConstState {
     Sequential sequential = Sequential::No;
     int numSources;
     int numElements;
+    int outputEventsGridStride;
 
     OpticalElement* __restrict elements;
     Materials materials;
@@ -33,8 +34,7 @@ struct RAYX_API ConstState {
 /// stores all mutable buffers
 struct RAYX_API MutableState {
     RaysPtr events;
-    int* __restrict eventCounts;
-    Rand* __restrict rands;
+    bool* __restrict storedFlags;
 };
 
 }  // namespace RAYX

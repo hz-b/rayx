@@ -44,7 +44,8 @@ given direction on the grating
 @returns: (inplace) DX, DZ
 */
 RAYX_FN_ACC
-void RAYX_API RZPLineDensity(const Ray& __restrict r, const glm::dvec3& __restrict normal, const RZPBehaviour& __restrict b, double& __restrict DX, double& __restrict DZ) {
+void RAYX_API RZPLineDensity(const Ray& __restrict r, const glm::dvec3& __restrict normal, const RZPBehaviour& __restrict b, double& __restrict DX,
+                             double& __restrict DZ) {
     int IMAGE_TYPE = int(b.m_imageType);
     int RZP_TYPE   = int(b.m_rzpType);
     double risag   = b.m_designSagittalEntranceArmLength;
@@ -59,9 +60,9 @@ void RAYX_API RZPLineDensity(const Ray& __restrict r, const glm::dvec3& __restri
     double FX = normal.x;
     double FY = normal.y;
     double FZ = normal.z;
-    double X  = r.m_position.x;
-    double Y  = r.m_position.y;
-    double Z  = r.m_position.z;
+    double X  = r.position.x;
+    double Y  = r.position.y;
+    double Z  = r.position.z;
 
     if (RZP_TYPE == 1)  // meridional (wie VLS grating)
         X = 0;

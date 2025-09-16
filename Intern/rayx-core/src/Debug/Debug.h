@@ -182,7 +182,10 @@ extern void RAYX_API (*error_fn)();
 
 // catch any unimplemented usage of formatAsVec
 template <typename T>
-inline std::vector<double> formatAsVec(T) { static_assert(false && "Unimplemented: formatAsVec is not implemented for this type"); return {}; }
+inline std::vector<double> formatAsVec(T) {
+    static_assert(false && "Unimplemented: formatAsVec is not implemented for this type");
+    return {};
+}
 
 inline std::vector<double> formatAsVec(int arg) { return {static_cast<double>(arg)}; }
 inline std::vector<double> formatAsVec(RandCounter arg) { return {static_cast<double>(arg)}; }

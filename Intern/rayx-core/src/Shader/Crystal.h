@@ -25,9 +25,9 @@ inline double getTheta(const glm::dvec3& __restrict rayDirection, const glm::dve
     double am = normal[1];
     double an = normal[2];
 
-    double fx = r.m_direction[0];
-    double fy = r.m_direction[1];
-    double fz = r.m_direction[2];
+    double fx = rayDirection[0];
+    double fy = rayDirection[1];
+    double fz = rayDirection[2];
 
     // Normalize incoming ray vector
     double fn = complex::sqrt(fx * fx + fy * fy + fz * fz);

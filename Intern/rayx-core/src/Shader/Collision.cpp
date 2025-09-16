@@ -350,11 +350,12 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
     double fz = 2 * cu.m_a34 + 2 * cu.m_a13 * x + 2 * cu.m_a23 * y + 2 * cu.m_a33 * z;
 
     const auto hitpoint = glm::dvec3(x, y * glm::cos(-cu.m_psi) - z * glm::sin(-cu.m_psi), z * glm::cos(-cu.m_psi) + y * glm::sin(-cu.m_psi));
-    const auto normal = normalize(glm::dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
+    const auto normal =
+        normalize(glm::dvec3(fx, fy * glm::cos(-cu.m_psi) - fz * glm::sin(-cu.m_psi), fz * glm::cos(-cu.m_psi) + fy * glm::sin(-cu.m_psi)));
 
-    return CollisionPoint {
+    return CollisionPoint{
         .hitpoint = hitpoint,
-        .normal = normal,
+        .normal   = normal,
     };
 }
 
@@ -371,11 +372,6 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
 
     double longRad  = toroid.m_longRadius;
     double shortRad = (toroid.m_toroidType == TOROID_TYPE_CONVEX) ? -toroid.m_shortRadius : toroid.m_shortRadius;
-
-    Collision col;
-    col.found    = true;
-    col.hitpoint = glm::dvec3(0, 0, 0);
-    col.normal   = glm::dvec3(0, 0, 0);
 
     // sign radius: +1 = concave, -1 = convex
     double isigro = glm::sign(shortRad);
@@ -413,6 +409,7 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
         if (n >= NEW_MAX_ITERATIONS) { return std::nullopt; }
     } while (glm::abs(dz) > NEW_TOLERANCE);
 
+    CollisionPoint col;
     col.normal   = normalize(glm::dvec3(normal));
     col.hitpoint = glm::dvec3(xx, yy, zz);
 
@@ -459,7 +456,7 @@ OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const g
                                                                          const glm::dvec3& __restrict rayDirection,
                                                                          const OpticalElement& __restrict element, bool isTriangul) {
     OptCollisionPoint col;
-    switch (surface.m_type) {
+    switch (element.m_surface.m_type) {
         case SurfaceType::Plane:
             col = getPlaneCollision(rayPosition, rayDirection);
             break;
@@ -480,7 +477,7 @@ OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const g
     if (!col) return std::nullopt;
 
     // cutout is applied in the XZ plane.
-    if (!inCutout(cutout, col.hitpoint.x, col.hitpoint.z)) { return std::nullopt; }
+    if (!inCutout(element.m_cutout, col->hitpoint.x, col->hitpoint.z)) { return std::nullopt; }
 
     // Both rayDirection and col.normal are in element coordinates.
     // The collision normal should point 'outward from the surface', meaning it should oppose the ray's direction.
@@ -488,33 +485,36 @@ OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const g
     // The default normal may oppose the concave part of the overall shape
     // Depending on whether the element is hit on a concave or convex surface,
     // we flip the normal to ensure it points against the ray's direction.
-    if (dot(rayDirection, col.normal) > 0.0) { col.normal = col.normal * -1.0; }
+    if (dot(rayDirection, col->normal) > 0.0) { col->normal *= -1.0; }
     return col;
 }
 
 // checks whether `r` collides with the element of the given `id`,
 // and returns a Collision accordingly.
 RAYX_FN_ACC
-OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& rayPosition, const glm::dvec3& rayDirection,
+OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                const OpticalElement& __restrict element, Rand& __restrict rand) {
-    Collision col = findCollisionInElementCoordsWithoutSlopeError(rayPosition, rayDirection, element, false);
+    auto col = findCollisionInElementCoordsWithoutSlopeError(rayPosition, rayDirection, element, false);
 
     if (!col) return std::nullopt;
 
     SlopeError sE = element.m_slopeError;
     col->normal   = applySlopeError(col->normal, sE, 0, rand);
+
     return col;
 }
 
 RAYX_FN_ACC
-Collision findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const OpticalElement* __restrict elements, const int numElements,
-                                    Rand& __restrict rand) {
+OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const OpticalElement* __restrict elements,
+                                                  const int numElements, Rand& __restrict rand) {
     // global coordinates of first intersection point of ray among all elements in beamline
     OptCollisionPoint best_col = std::nullopt;
 
     // the distance the ray has to travel to reach `best_col`.
     auto best_dist = std::numeric_limits<double>::max();
-    int best_element;
+
+    // best element so far
+    auto best_element = 0;
 
     // move ray slightly forward.
     // -> prevents hitting an element very close to the previous collision.
@@ -530,7 +530,7 @@ Collision findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirect
         if (!current_col) continue;
 
         // calculate distance from ray start to intersection point. doing in element coordinates is totally fine
-        const auto current_dist = glm::length(col->hitpoint - rayPosition);
+        const auto current_dist = glm::length(current_col->hitpoint - rayPosition);
 
         if (current_dist < best_dist) {
             best_col     = current_col;
@@ -541,7 +541,7 @@ Collision findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirect
     }
 
     if (!best_col) return std::nullopt;
-    return OptCollsionWithElement{*best_col, best_element};
+    return CollisionWithElement{*best_col, best_element};
 }
 
 }  // namespace RAYX

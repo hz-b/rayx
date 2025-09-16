@@ -10,7 +10,7 @@
 // TODO: all this macros should be invisible to the user
 
 #ifdef RAYX_X
-#error 'X' must not be defined at this point
+#error macro 'X' must not be defined at this point
 #endif
 
 #define RAYX_X_MACRO_RAY_ATTR_PATH_ID       X(int32_t, path_id, PathId)
@@ -29,7 +29,7 @@
 #define RAYX_X_MACRO_RAY_ATTR_ENERGY              X(double, energy, Energy)
 #define RAYX_X_MACRO_RAY_ATTR_ORDER               X(int32_t, order, Order)
 #define RAYX_X_MACRO_RAY_ATTR_OBJECT_ID           X(int32_t, object_id, ObjectId)
-#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           X(int32_t, source_id, int)
+#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           X(int32_t, source_id, SourceId)
 #define RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          X(EventType, event_type, EventType)
 #define RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER        X(RandCounter, rand_counter, RandCounter)
 
@@ -78,7 +78,7 @@ enum class RAYX_API RayAttrMask : uint32_t {
     OpticalPathLength = 1 << 11,
     Energy            = 1 << 12,
     Order             = 1 << 13,
-    ObjectId         = 1 << 14,
+    ObjectId          = 1 << 14,
     SourceId          = 1 << 15,
     EventType         = 1 << 16,
     RandCounter       = 1 << 17,
@@ -105,17 +105,14 @@ RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator~(const RayAttrMask lh
     return static_cast<RayAttrMask>(~static_cast<std::underlying_type_t<RayAttrMask>>(lhs));
 }
 RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrMask lhs) { return lhs == RayAttrMask::None; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs | rhs; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator&=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs & rhs; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator^=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs ^ rhs; }
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator|=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs | rhs; }
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator&=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs & rhs; }
+RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator^=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs ^ rhs; }
 
-/** @brief Struct to hold ray attributes
- * Each attribute is stored in a separate vector, allowing for efficient access and manipulation of ray data.
+/** @brief Struct to hold a list of rays
+ * Each attribute is stored in a separate vector, allowing for efficient per-attribute access
  */
-struct RAYX_API Rays {
-    int num_events;
-    RayAttrMask attr;
-
+struct RAYX_API Rays{
 #define X(type, name, flag) std::vector<type> name;
 
     RAYX_X_MACRO_RAY_ATTR
@@ -140,6 +137,31 @@ struct RAYX_API Rays {
         electric_field_x[i] = electric_field.x;
         electric_field_y[i] = electric_field.y;
         electric_field_z[i] = electric_field.z;
+    }
+
+    RayAttrMask attrMask() const {
+        RayAttrMask mask;
+#define X(type, name, flag) \
+        if (name.size() != 0) mask |= RayAttrMask::flag;
+
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
+        return mask;
+    }
+
+    int numEvents() const {
+        auto size = 0;
+#define X(type, name, flag) size = std::max(size, static_cast<int>(name.size()));
+
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
+        return size;
+    }
+
+    int numPaths() const {
+        auto path_ids = path_id;
+        std::sort(path_ids.begin(), path_ids.end());
+        return std::unique(path_ids.begin(), path_ids.end()) - path_ids.begin();
     }
 };
 

@@ -8,14 +8,15 @@ namespace RAYX {
 
 class RAYX_API ObjectMask {
     ObjectMask(const std::vector<bool>& sourceMask, const std::vector<bool>& elementMask) : m_sourceMask(sourceMask), m_elementMask(elementMask) {}
-    ObjectMask(std::vector<bool>&& sourceMask, std::vector<bool>&& elementMask) : m_sourceMask(std::move(sourceMask)), m_elementMask(std::move(elementMask)) {}
+    ObjectMask(std::vector<bool>&& sourceMask, std::vector<bool>&& elementMask)
+        : m_sourceMask(std::move(sourceMask)), m_elementMask(std::move(elementMask)) {}
 
   public:
-    ObjectMask() = default;
-    ObjectMask(const ObjectMask&) = default;
-    ObjectMask(ObjectMask&&) = default;
+    ObjectMask()                             = default;
+    ObjectMask(const ObjectMask&)            = default;
+    ObjectMask(ObjectMask&&)                 = default;
     ObjectMask& operator=(const ObjectMask&) = default;
-    ObjectMask& operator=(ObjectMask&&) = default;
+    ObjectMask& operator=(ObjectMask&&)      = default;
 
     static ObjectMask none(const int numSources, const int numElements) {
         return {

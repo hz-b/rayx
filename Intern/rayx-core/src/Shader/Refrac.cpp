@@ -25,22 +25,22 @@ void refrac2D(Ray& __restrict ray, glm::dvec3 normal, double density_z, double d
     double sin_e = glm::sin(-eps1);
     auto rot     = glm::dmat3(cos_e, cos_d * sin_e, sin_d * sin_e, -sin_e, cos_d * cos_e, sin_d * cos_e, 0, -sin_d, cos_d);
     auto inv_rot = glm::dmat3(cos_e, -sin_e, 0, cos_d * sin_e, cos_d * cos_e, -sin_d, sin_d * sin_e, sin_d * cos_e, cos_d);
-    ray.m_direction =
-        rot * ray.m_direction;  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
+    ray.direction =
+        rot * ray.direction;  // ! The rotation should not be applied if the normal is (0, 1, 0) but it is applied in RAY-UI so we do it too
 
-    double x1 = ray.m_direction.x - density_x;
-    double z1 = ray.m_direction.z - density_z;
+    double x1 = ray.direction.x - density_x;
+    double z1 = ray.direction.z - density_z;
     double y1 = 1 - x1 * x1 - z1 * z1;
 
     if (y1 > 0) {
         y1 = sqrt(y1);
 
-        ray.m_direction.x = x1;
-        ray.m_direction.y = y1;
-        ray.m_direction.z = z1;
-        ray.m_direction   = inv_rot * ray.m_direction;
+        ray.direction.x = x1;
+        ray.direction.y = y1;
+        ray.direction.z = z1;
+        ray.direction   = inv_rot * ray.direction;
     } else {  // beyond horizon - when divergence too large
-        terminateRay(ray, EventType::BeyondHorizon);
+        terminateRay(ray.event_type, EventType::BeyondHorizon);
     }
 }
 

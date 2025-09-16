@@ -9,7 +9,8 @@ class RAYX_API PixelSource : public LightSourceBase {
   public:
     PixelSource(const DesignSource&);
 
-    RAYX_FN_ACC Ray genRay(const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const;
+    RAYX_FN_ACC Ray genRay(const int rayPathIndex, const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
+                           Rand& __restrict rand) const;
 
   private:
     // Geometric Params

@@ -9,8 +9,9 @@
 
 namespace RAYX {
 
-void RAYX_API writeCsv(const RAYX::BundleHistory&, const std::string& filename);
-
-RAYX::BundleHistory RAYX_API loadCsv(const std::string& filename);
+// TODO: enable
+// void RAYX_API writeCsv(const RAYX::BundleHistory&, const std::string& filename);
+//
+// RAYX::BundleHistory RAYX_API loadCsv(const std::string& filename);
 
 }  // namespace RAYX

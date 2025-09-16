@@ -35,11 +35,7 @@ inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm
  * @return Advanced electric field
  */
 RAYX_FN_ACC
-inline ElectricField advanceElectricField(
-    const ElectricField field,
-    double waveLength,
-    const double opticalPathLength) 
-{
+inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double opticalPathLength) {
     // bring wavelength from nanometers into millimeters
     waveLength /= 1e6;
 

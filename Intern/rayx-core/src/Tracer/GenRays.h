@@ -14,6 +14,7 @@
 #include "Shader/LightSources/PointSource.h"
 #include "Shader/LightSources/SimpleUndulatorSource.h"
 #include "Util.h"
+#include "Shader/RecordEvent.h"
 
 namespace RAYX {
 namespace {
@@ -33,9 +34,9 @@ struct GenRaysKernel {
     }
 
     template <typename Acc, typename Source>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaysPtr* __restrict rays, const int dstStartRayIndex, const Source source,
-                                const int sourceId, const std::optional<EnergyDistributionDataVariant> energyDistribution,
-                                const int startRayIndex, const int n) const {
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaysPtr rays, const int dstStartRayIndex, const Source source, const int sourceId,
+                                const std::optional<EnergyDistributionDataVariant> energyDistribution, const int startRayIndex,
+                                const int numRaysTotal, const double seed, const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
         if (gid < n) {
@@ -63,12 +64,11 @@ struct GenRays {
     struct BatchConfig {
         int numRaysBatch;
         int batchStartRayIndex;
-        RaysPtr d_rays;
-        OptBuf<Acc, Rand> d_rands;
+        RaysBuf<Acc> d_rays;
     };
 
     template <typename Queue>
-    SourceConfig update(Queue q, const Group& beamline, const int maxBatchSize, const int attrMask) {
+    SourceConfig update(Queue q, const Group& beamline, const int maxBatchSize, const RayAttrMask attrMask) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
@@ -212,9 +212,9 @@ struct GenRays {
                 std::visit(
                     [&]<typename Source>(const Source& source) {
                         RAYX_VERB << "execute GenRaysKernel<Source> with Source = '" << sourceState.name << "'";
-                        execWithValidWorkDiv<Acc>(devAcc, q, numRaysBatchSource, BlockSizeConstraint::None{}, GenRaysKernel{}, raysBufToPtr(d_rays),
-                                                  startRayIndexBatch, source, sourceState.sourceId, sourceState.energyDistribution, m_startRayIndex,
-                                                  numRaysBatchSource);
+                        execWithValidWorkDiv<Acc>(devAcc, q, numRaysBatchSource, BlockSizeConstraint::None{}, GenRaysKernel{},
+                                                  raysBufToRaysPtr(d_rays), startRayIndexBatch, source, sourceState.sourceId,
+                                                  sourceState.energyDistribution, m_startRayIndex, m_numRaysTotal, m_seed, numRaysBatchSource);
                     },
                     sourceState.source);
 
@@ -229,14 +229,13 @@ struct GenRays {
             .numRaysBatch       = numRaysBatch,
             .batchStartRayIndex = batchStartRayIndex,
             .d_rays             = d_rays,
-            .d_rands            = d_rands,
         };
     }
 
   private:
     // resources per batch. constant per batch
     /// generated rays
-    RaysBuf d_rays;
+    RaysBuf<Acc> d_rays;
 
     // buffers for EnergyDistributionList (DatFile)
     std::vector<OptBuf<Acc, double>> d_energyDistributionListWeights;

@@ -5,6 +5,7 @@
 #include "Diffraction.h"
 #include "Efficiency.h"
 #include "EventType.h"
+#include "InvocationState.h"
 #include "LineDensity.h"
 #include "Rand.h"
 #include "Ray.h"
@@ -14,7 +15,6 @@
 #include "Throw.h"
 #include "Transmission.h"
 #include "Utils.h"
-#include "InvocationState.h"
 
 namespace RAYX {
 
@@ -71,7 +71,7 @@ void behaveSlit(Ray& __restrict ray, const Behaviour& __restrict behaviour) {
     bool withinBeamstop   = inCutout(beamstopCutout, ray.position.x, ray.position.z);
 
     if (!withinOpening || withinBeamstop) {
-        terminateRay(ray, EventType::Absorbed);
+        terminateRay(ray.event_type, EventType::Absorbed);
         return;
     }
 
@@ -162,7 +162,7 @@ void behaveMirror(Ray& __restrict ray, const CollisionPoint& __restrict col, con
 
     constexpr int vacuum_material = -1;
     const auto ior_i              = getRefractiveIndex(ray.energy, vacuum_material, materials.indices, materials.tables);
-    const auto ior_t              = getRefractiveIndex(ray.energy, material, material.indices, material.tables);
+    const auto ior_t              = getRefractiveIndex(ray.energy, material, materials.indices, materials.tables);
 
     ray.electric_field = interceptReflect(ray.electric_field, incident_vec, reflect_vec, col.normal, ior_i, ior_t);
 }
@@ -174,7 +174,7 @@ void behaveFoil(Ray& __restrict ray, const Behaviour& __restrict behaviour, cons
     const double wavelength = energyToWaveLength(ray.energy);
 
     const auto indexVacuum   = complex::Complex(1., 0.);
-    const auto indexMaterial = getRefractiveIndex(ray.energy, material, materials.indices, materials.table);
+    const auto indexMaterial = getRefractiveIndex(ray.energy, material, materials.indices, materials.tables);
 
     double angle = angleBetweenUnitVectors(-ray.direction, col.normal);  // in rad
 
@@ -199,25 +199,25 @@ RAYX_FN_ACC void behaveImagePlane(Ray& __restrict ray) { ray.order = 0; }
 RAYX_FN_ACC
 void behave(Ray& __restrict ray, const CollisionPoint& __restrict col, const OpticalElement& __restrict element, const Materials materials) {
     switch (element.m_behaviour.m_type) {
+        case BehaveType::ImagePlane:
+            break;
         case BehaveType::Mirror:
             behaveMirror(ray, col, element.m_material, materials);
             break;
         case BehaveType::Grating:
-            behaveGrating(ray, behaviour, col);
+            behaveGrating(ray, element.m_behaviour, col);
             break;
         case BehaveType::Slit:
-            behaveSlit(ray, behaviour);
+            behaveSlit(ray, element.m_behaviour);
             break;
         case BehaveType::RZP:
-            behaveRZP(ray, behaviour, col);
+            behaveRZP(ray, element.m_behaviour, col);
             break;
         case BehaveType::Crystal:
-            behaveCrystal(ray, behaviour, col);
-            break;
-        case BehaveType::ImagePlane:
+            behaveCrystal(ray, element.m_behaviour, col);
             break;
         case BehaveType::Foil:
-            behaveFoil(ray, behaviour, col, element.m_material, materials);
+            behaveFoil(ray, element.m_behaviour, col, element.m_material, materials);
             break;
     }
 }

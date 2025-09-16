@@ -1,15 +1,15 @@
 #pragma once
 
 #include "Ray.h"
-#include "Rays.h"
+#include "RaysPtr.h"
 
 namespace RAYX {
 
 RAYX_FN_ACC
-int getRecordIndex(int gid, int numRecorded, int gridStride) { return gid + numRecorded * gridStride; }
+inline int getRecordIndex(int gid, int numRecorded, int gridStride) { return gid + numRecorded * gridStride; }
 
 RAYX_FN_ACC
-Ray loadRay(const int i, const RaysPtr& __restrict rays) {
+inline Ray loadRay(const int i, const RaysPtr& __restrict rays) {
     return {
         .position            = rays.position(i),
         .direction           = rays.direction(i),
@@ -27,7 +27,7 @@ Ray loadRay(const int i, const RaysPtr& __restrict rays) {
 }
 
 RAYX_FN_ACC
-void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restrict ray) {
+inline void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restrict ray) {
     rays.path_id[i]             = ray.path_id;
     rays.path_event_id[i]       = ray.path_event_id;
     rays.position_x[i]          = ray.position.x;
@@ -49,37 +49,33 @@ void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restrict ray) 
 }
 
 RAYX_FN_ACC
-void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restrict ray, const bool* __restrict elementRecordMask, const int elementIndex,
-              const RayAttrMask attrRecordMask, bool* __restrict storedFlag) {
+inline void storeRay(const int i, bool* __restrict storedFlags, RaysPtr& __restrict rays, const Ray& __restrict ray,
+              const bool* __restrict elementRecordMask, const int elementIndex, const RayAttrMask attrRecordMask) {
     // element record mask
-    if (!recordMasks.elementRecordMask[elementIndex]) return;
-
-    // event type record mask
-    // TODO: this should be done on path level
-    // if ((recordMasks.eventTypeRecordMask & EventTypeMask::Success) == EventTypeMask::None) return;
+    if (!elementRecordMask[elementIndex]) return;
 
     // attribute record mask
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PathId)) rays.path_id[i] = ray.path_id;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PathEventId)) rays.path_event_id[i] = ray.path_event_id;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PositionX)) rays.position_x[i] = ray.position.x;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PositionY)) rays.position_y[i] = ray.position.y;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::PositionZ)) rays.position_z[i] = ray.position.z;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::EventType)) rays.event_type[i] = ray.event_type;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::DirectionX)) rays.direction_x[i] = ray.direction.x;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::DirectionY)) rays.direction_y[i] = ray.direction.y;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::DirectionZ)) rays.direction_z[i] = ray.direction.z;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::Energy)          rays.energy[i]           = ray.energy;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ElectricFieldX)) rays.electric_field_x[i] = ray.electric_field.x;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ElectricFieldY)) rays.electric_field_y[i] = ray.electric_field.y;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ElectricFieldZ)) rays.electric_field_z[i] = ray.electric_field.z;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::OpticalPathLength)) rays.optical_path_length[i] = ray.optical_path_length;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::Order)) rays.order[i] = ray.order;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::ObjectId)) rays.object_id[i] = ray.object_id;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::SourceId)) rays.source_id[i] = ray.source_id;
-    if (RayAttrMask::None != (attrRecordMask & RayAttrMask::RandCounter)) rays.rand_counter[i] = ray.rand.counter;
+    if (!!(attrRecordMask & RayAttrMask::PathId)) rays.path_id[i] = ray.path_id;
+    if (!!(attrRecordMask & RayAttrMask::PathEventId)) rays.path_event_id[i] = ray.path_event_id;
+    if (!!(attrRecordMask & RayAttrMask::PositionX)) rays.position_x[i] = ray.position.x;
+    if (!!(attrRecordMask & RayAttrMask::PositionY)) rays.position_y[i] = ray.position.y;
+    if (!!(attrRecordMask & RayAttrMask::PositionZ)) rays.position_z[i] = ray.position.z;
+    if (!!(attrRecordMask & RayAttrMask::EventType)) rays.event_type[i] = ray.event_type;
+    if (!!(attrRecordMask & RayAttrMask::DirectionX)) rays.direction_x[i] = ray.direction.x;
+    if (!!(attrRecordMask & RayAttrMask::DirectionY)) rays.direction_y[i] = ray.direction.y;
+    if (!!(attrRecordMask & RayAttrMask::DirectionZ)) rays.direction_z[i] = ray.direction.z;
+    if (!!(attrRecordMask & RayAttrMask::Energy)) rays.energy[i] = ray.energy;
+    if (!!(attrRecordMask & RayAttrMask::ElectricFieldX)) rays.electric_field_x[i] = ray.electric_field.x;
+    if (!!(attrRecordMask & RayAttrMask::ElectricFieldY)) rays.electric_field_y[i] = ray.electric_field.y;
+    if (!!(attrRecordMask & RayAttrMask::ElectricFieldZ)) rays.electric_field_z[i] = ray.electric_field.z;
+    if (!!(attrRecordMask & RayAttrMask::OpticalPathLength)) rays.optical_path_length[i] = ray.optical_path_length;
+    if (!!(attrRecordMask & RayAttrMask::Order)) rays.order[i] = ray.order;
+    if (!!(attrRecordMask & RayAttrMask::ObjectId)) rays.object_id[i] = ray.object_id;
+    if (!!(attrRecordMask & RayAttrMask::SourceId)) rays.source_id[i] = ray.source_id;
+    if (!!(attrRecordMask & RayAttrMask::RandCounter)) rays.rand_counter[i] = ray.rand.counter;
 
     // mark as stored
-    storedFlag[i] = true;
+    storedFlags[i] = true;
 }
 
 }  // namespace RAYX

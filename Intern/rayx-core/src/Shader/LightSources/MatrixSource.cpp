@@ -30,8 +30,8 @@ Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, const Energ
     // Calculate grid size
     const int rmat  = int(std::sqrt(m_numberOfRays));
     const int nGrid = rmat * rmat;
-    const int row   = rayIndex % rmat;
-    const int col   = (rayIndex / rmat) % rmat;
+    const int row   = rayPathIndex % rmat;
+    const int col   = (rayPathIndex / rmat) % rmat;
 
     // Count how many rays share this origin
     int originIndex   = row + rmat * col;

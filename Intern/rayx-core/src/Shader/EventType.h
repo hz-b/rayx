@@ -40,13 +40,16 @@ enum class EventTypeMask : std::underlying_type_t<EventType> {
 };
 
 RAYX_FN_ACC constexpr inline EventTypeMask operator|(const EventTypeMask lhs, const EventTypeMask rhs) {
-    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) & static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) &
+                                      static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator&(const EventTypeMask lhs, const EventTypeMask rhs) {
-    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) & static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) &
+                                      static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator^(const EventTypeMask lhs, const EventTypeMask rhs) {
-    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) ^ static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
+    return static_cast<EventTypeMask>(static_cast<std::underlying_type_t<EventTypeMask>>(lhs) ^
+                                      static_cast<std::underlying_type_t<EventTypeMask>>(rhs));
 }
 RAYX_FN_ACC constexpr inline EventTypeMask operator~(const EventTypeMask lhs) {
     return static_cast<EventTypeMask>(~static_cast<std::underlying_type_t<EventTypeMask>>(lhs));
