@@ -15,6 +15,7 @@ void traceSequential(const int gid, const ConstState& __restrict constState, Mut
         if (isRayTerminated(ray.event_type)) break;
 
         const auto element = constState.elements[elementIndex];
+
         rayMatrixMult(element.m_inTrans, ray.position, ray.direction, ray.electric_field);
 
         const auto col = findCollisionInElementCoords(ray.position, ray.direction, element, ray.rand);

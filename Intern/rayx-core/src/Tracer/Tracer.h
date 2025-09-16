@@ -12,6 +12,10 @@
 // Abstract Tracer base class.
 namespace RAYX {
 
+// this value is picked in a 'good' way if it can divide number of rays without rest. for a number of rays picked by humans, this
+// value is probably good. though, if it could be power of two, the shader would benefit
+constexpr int DEFAULT_BATCH_SIZE = 100000;
+
 class RAYX_API Tracer {
   public:
     /**

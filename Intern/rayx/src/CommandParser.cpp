@@ -87,7 +87,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
 
     args.inputPaths.insert(args.inputPaths.end(), inputPaths.begin(), inputPaths.end());
 
-    if (args.format.empty()) args.format = formatAttrNames;
+    if (args.attrRecordMask.empty()) args.attrRecordMask = formatAttrNames;
 
     if (args.version) {
         getVersion();
@@ -103,7 +103,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
             std::cout << "warning: specifying multiple input files and an output directory can lead to name collisions between output filenames"
                       << std::endl;
 
-            if (!objectRecordIndices.empty())
+            if (!args.objectRecordIndices.empty())
                 std::cout << "warning: you specified --record-indices, but different input files may have different beamline objects, so the "
                              "recorded objects may differ between files"
                           << std::endl;

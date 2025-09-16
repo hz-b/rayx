@@ -198,20 +198,20 @@ class MegaKernelTracer : public DeviceTracer {
         const auto beamlineConf = m_resources.update(q, beamline, maxEvents, sourceConf.numRaysBatchAtMost, objectRecordMask, attrRecordMask);
 
         RAYX_VERB << "trace beamline:";
-        RAYX_VERB << "\tnum elements: " << beamlineConf.numElements;
-        RAYX_VERB << "\tnum light sources: " << beamlineConf.numSources;
-        RAYX_VERB << "\tsequential: " << (sequential == Sequential::Yes ? "yes" : "no");
-        RAYX_VERB << "\tmax events: " << maxEvents;
-        RAYX_VERB << "\tnum rays: " << sourceConf.numRaysTotal;
-        RAYX_VERB << "\tmax batch size: " << maxBatchSize;
-        RAYX_VERB << "\tbatch size: " << sourceConf.numRaysBatchAtMost;
-        RAYX_VERB << "\tnum batches: " << sourceConf.numBatches;
-        // TODO: object mask
-        // TODO: attr mask
-        RAYX_VERB << "\tbackend tag: " << AccTag{}.get_name();
-        RAYX_VERB << "\tdevice index: " << m_deviceIndex;
-        RAYX_VERB << "\tdevice name: " << alpaka::getName(devAcc);
-        RAYX_VERB << "\thost device name: " << alpaka::getName(devHost);
+        RAYX_VERB << "\t- num sources: " << beamlineConf.numSources;
+        RAYX_VERB << "\t- num elements: " << beamlineConf.numElements;
+        RAYX_VERB << "\t- sequential: " << (sequential == Sequential::Yes ? "yes" : "no");
+        RAYX_VERB << "\t- max events: " << maxEvents;
+        RAYX_VERB << "\t- num rays: " << sourceConf.numRaysTotal;
+        RAYX_VERB << "\t- max batch size: " << maxBatchSize;
+        RAYX_VERB << "\t- batch size: " << sourceConf.numRaysBatchAtMost;
+        RAYX_VERB << "\t- num batches: " << sourceConf.numBatches;
+        // TODO: print object mask
+        RAYX_VERB << "\t- using ray attribute mask: " << to_string(attrRecordMask);
+        RAYX_VERB << "\t- backend tag: " << AccTag{}.get_name();
+        RAYX_VERB << "\t- device index: " << m_deviceIndex;
+        RAYX_VERB << "\t- device name: " << alpaka::getName(devAcc);
+        RAYX_VERB << "\t- host device name: " << alpaka::getName(devHost);
 
         // const auto numEventsBatchAtMost                     = sourceConf.numRaysBatchAtMost * maxEvents;
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;

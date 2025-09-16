@@ -2,7 +2,6 @@
 
 #include "H5Writer.h"
 
-#include <bitset>
 #include <highfive/highfive.hpp>
 
 #include "Debug/Debug.h"
@@ -36,9 +35,7 @@ namespace RAYX {
 
 Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
-                     static_cast<std::underlying_type_t<RayAttrMask>>(attr));
+    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: " << to_string(attr);
 
     Rays rays;
 
@@ -78,11 +75,9 @@ std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath
     return object_names;
 }
 
-void writeH5Rays(const std::filesystem::path& filepath, const std::vector<std::string>& object_names, const Rays& rays, const RayAttrMask attr) {
+void writeH5(const std::filesystem::path& filepath, const std::vector<std::string>& object_names, const Rays& rays, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
-                     static_cast<std::underlying_type_t<RayAttrMask>>(attr));
+    RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: " << to_string(attr);
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);

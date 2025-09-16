@@ -434,8 +434,7 @@ OptCollisionPoint getPlaneCollision(const glm::dvec3& __restrict rayPosition, co
     // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
     double time = -rayPosition.y / rayDirection.y;
 
-    // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set
-    // `found = false`.
+    // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane)
     if (time < 0) return std::nullopt;
 
     CollisionPoint col;
@@ -522,14 +521,15 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
     rayPosition += rayDirection * COLLISION_EPSILON;
 
     // Find intersection point through all elements
-    for (int elementIndex = 0; elementIndex < numElements; elementIndex++) {
+    for (int elementIndex = 0; elementIndex < numElements; ++elementIndex) {
         const auto& element = elements[elementIndex];
 
         rayMatrixMult(element.m_inTrans, rayPosition, rayDirection);
+
         const auto current_col = findCollisionInElementCoords(rayPosition, rayDirection, element, rand);
         if (!current_col) continue;
 
-        // calculate distance from ray start to intersection point. doing in element coordinates is totally fine
+        // calculate distance from ray start to intersection point. doing this in element coordinates is totally fine
         const auto current_dist = glm::length(current_col->hitpoint - rayPosition);
 
         if (current_dist < best_dist) {
@@ -537,6 +537,7 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
             best_dist    = current_dist;
             best_element = elementIndex;
         }
+
         rayMatrixMult(element.m_outTrans, rayPosition, rayDirection);
     }
 

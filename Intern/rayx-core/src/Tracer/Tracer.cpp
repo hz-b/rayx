@@ -37,10 +37,6 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
 
 int defaultMaxEvents(const RAYX::ObjectMask& mask) { return mask.numObjectsToRecord() * 2 + 8; }
 
-// this value is picked in a 'good' way if it can divide number of rays without rest. for a number of rays picked by humans, this
-// value is probably good. though, if it could be power of two, the shader would benefit
-constexpr int DEFAULT_BATCH_SIZE = 100000;
-
 }  // unnamed namespace
 
 namespace RAYX {
