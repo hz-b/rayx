@@ -223,6 +223,8 @@ class MegaKernelTracer : public DeviceTracer {
         auto h_compactEventsBatch                           = std::vector<Rays>(sourceConf.numBatches);
 
         for (int batchIndex = 0; batchIndex < sourceConf.numBatches; ++batchIndex) {
+            RAYX_VERB << "processing batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ")";
+
             // generate input rays for batch
             auto batchConf = m_genRaysResources.genRaysBatch(devAcc, q, batchIndex);
 
@@ -275,8 +277,8 @@ class MegaKernelTracer : public DeviceTracer {
                                                                                      h_compactEventsBatch[batchIndex].event_type.end(), isEventTypeTooManyEvents);
             }
 
-            RAYX_VERB << "batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ") with batch size = " << batchConf.numRaysBatch
-                      << ", traced " << numEventsBatch << " events";
+            RAYX_VERB << "finished batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ") with batch size = " << batchConf.numRaysBatch
+                      << ", recorded " << numEventsBatch << " events";
         }
 
         RAYX_VERB << "number of recorded events: " << numEventsTotal;

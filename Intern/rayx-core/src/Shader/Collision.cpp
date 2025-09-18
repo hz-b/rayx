@@ -1,5 +1,3 @@
-#define COLLISION_EPSILON 1e-6
-
 #include "Collision.h"
 
 #include "ApplySlopeError.h"
@@ -8,6 +6,10 @@
 #include "InvocationState.h"
 #include "Throw.h"
 #include "Utils.h"
+
+namespace {
+    constexpr double COLLISION_EPSILON = 1e-6;
+}  // unnamed namespace
 
 namespace RAYX {
 
@@ -527,22 +529,23 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
         rayMatrixMult(element.m_inTrans, rayPosition, rayDirection);
 
         const auto current_col = findCollisionInElementCoords(rayPosition, rayDirection, element, rand);
-        if (!current_col) continue;
+        if (current_col) {
+            // calculate distance from ray start to intersection point. doing this in element coordinates is totally fine.
+            // we basically shortened the distance when we moved the ray position by collision epsilon, so here we put it back
+            const auto current_dist = glm::length(current_col->hitpoint - rayPosition) + COLLISION_EPSILON;
 
-        // calculate distance from ray start to intersection point. doing this in element coordinates is totally fine
-        const auto current_dist = glm::length(current_col->hitpoint - rayPosition);
-
-        if (current_dist < best_dist) {
-            best_col     = current_col;
-            best_dist    = current_dist;
-            best_element = elementIndex;
+            if (current_dist < best_dist) {
+                best_col     = current_col;
+                best_dist    = current_dist;
+                best_element = elementIndex;
+            }
         }
 
         rayMatrixMult(element.m_outTrans, rayPosition, rayDirection);
     }
 
     if (!best_col) return std::nullopt;
-    return CollisionWithElement{*best_col, best_element};
+    return CollisionWithElement{.point = *best_col, .elementIndex = best_element};
 }
 
 }  // namespace RAYX
