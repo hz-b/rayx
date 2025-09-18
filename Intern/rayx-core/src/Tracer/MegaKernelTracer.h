@@ -272,6 +272,7 @@ class MegaKernelTracer : public DeviceTracer {
                 auto dstViewObjects = alpaka::createView(devHost, dst, numEventsBatchObjects);
 
                 // transfer source events
+                // TODO: these events are in global space, but must be in local element space
                 auto dstViewSources = alpaka::createSubView(dstViewObjects, numEventsBatchSources, 0);
                 alpaka::memcpy(q, dstViewSources, *d_eventsBatchSources, numEventsBatchSources);
 
