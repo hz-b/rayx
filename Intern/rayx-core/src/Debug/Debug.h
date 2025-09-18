@@ -183,7 +183,8 @@ extern void RAYX_API (*error_fn)();
 // catch any unimplemented usage of formatAsVec
 template <typename T>
 inline std::vector<double> formatAsVec(T) {
-    static_assert(false && "Unimplemented: formatAsVec is not implemented for this type");
+    // abort compilation and print type T
+    [[maybe_unused]] typedef typename T::something_made_up X;
     return {};
 }
 
