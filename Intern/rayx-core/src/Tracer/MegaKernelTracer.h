@@ -194,7 +194,7 @@ class MegaKernelTracer : public DeviceTracer {
         using Queue             = alpaka::Queue<Acc, alpaka::Blocking>;
         auto q                  = Queue(devAcc);
 
-        const auto sourceConf   = m_genRaysResources.update(q, beamline, maxBatchSize, attrRecordMask);
+        const auto sourceConf   = m_genRaysResources.update(q, beamline, maxBatchSize);
         const auto beamlineConf = m_resources.update(q, beamline, maxEvents, sourceConf.numRaysBatchAtMost, objectRecordMask, attrRecordMask);
 
         RAYX_VERB << "trace beamline:";
