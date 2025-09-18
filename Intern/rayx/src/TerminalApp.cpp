@@ -221,7 +221,7 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
 
 void TerminalApp::validateEvents(const RAYX::Rays& rays, const RAYX::RayAttrMask attrRecordMask) {
     if (!(attrRecordMask & RAYX::RayAttrMask::EventType)) {
-        RAYX_WARN << "warning: unable to test events for errors after tracing, because ray attribute event_type was not recorded";
+        std::cout << "warning: unable to test events for errors after tracing, because ray attribute event_type was not recorded";
     } else {
         const auto eventTypes =
             std::ranges::fold_left(rays.event_type.begin(), rays.event_type.end(), RAYX::EventTypeMask::None,

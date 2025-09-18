@@ -174,8 +174,7 @@ struct GenRays {
 
         m_numRaysBatchAtMost = std::min(m_numRaysTotal, maxBatchSize);
 
-#define X(type, name, flag) \
-    allocBuf(q, d_rays.name, m_numRaysBatchAtMost);
+#define X(type, name, flag) allocBuf(q, d_rays.name, m_numRaysBatchAtMost);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -225,8 +224,8 @@ struct GenRays {
         }
 
         return BatchConfig{
-            .numRaysBatch       = numRaysBatch,
-            .d_rays             = d_rays,
+            .numRaysBatch = numRaysBatch,
+            .d_rays       = d_rays,
         };
     }
 

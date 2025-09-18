@@ -217,10 +217,10 @@ class MegaKernelTracer : public DeviceTracer {
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
         auto numEventsTotal                                 = 0;
         // TODO: think about extending lifetime of these buffers to make the reusable for the next beamline
-        auto h_eventStoreFlags                              = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
-        auto h_eventStoreFlagsPrefixSum                     = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
-        auto h_compactEvents                                = Rays();
-        auto h_compactEventsBatch                           = std::vector<Rays>(sourceConf.numBatches);
+        auto h_eventStoreFlags          = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
+        auto h_eventStoreFlagsPrefixSum = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
+        auto h_compactEvents            = Rays();
+        auto h_compactEventsBatch       = std::vector<Rays>(sourceConf.numBatches);
 
         for (int batchIndex = 0; batchIndex < sourceConf.numBatches; ++batchIndex) {
             RAYX_VERB << "processing batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ")";
