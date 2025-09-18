@@ -25,7 +25,9 @@ struct RaysPtr {
         direction_z[i] = direction.z;
     }
 
-    RAYX_FN_ACC ElectricField electric_field(const int i) const { return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]); }
+    RAYX_FN_ACC ElectricField electric_field(const int i) const {
+        return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]);
+    }
     RAYX_FN_ACC void electric_field(const int i, const ElectricField electric_field) {
         electric_field_x[i] = electric_field.x;
         electric_field_y[i] = electric_field.y;

@@ -34,7 +34,7 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
         return glm::transpose(g2e);
     } else {
         glm::dmat4x4 inv_translation = glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0, 1, position[2], 0, 0, 0, 1);  // o
-        glm::dmat4x4 inv_rotation = glm::transpose(rotation);
+        glm::dmat4x4 inv_rotation    = glm::transpose(rotation);
         // inverse of m_inMatrix
         glm::dmat4x4 e2g = inv_rotation * inv_translation;
         if (plane == DesignPlane::XY) e2g = yz_swap * e2g;

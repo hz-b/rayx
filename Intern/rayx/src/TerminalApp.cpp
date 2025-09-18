@@ -5,6 +5,7 @@
 #include <highfive/H5File.hpp>
 #endif
 
+#include <algorithm>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
@@ -149,11 +150,13 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
 
     const auto rays = traceBeamline(beamline, attrMask);
 
+    validateEvents(rays, attrMask);
+
     if (!rays.numEvents())
         std::cout << "No events were recorded!" << std::endl;
     else {
-        const auto objectNames  = beamline.getObjectNames();
-        auto outputFilepath     = exportRays(inputFilepath, objectNames, rays, attrMask);
+        const auto objectNames = beamline.getObjectNames();
+        auto outputFilepath    = exportRays(inputFilepath, objectNames, rays, attrMask);
 
         const auto end_time     = steady_clock::now();
         const auto elapsed_time = duration_cast<milliseconds>(end_time - start_time).count();
@@ -182,7 +185,7 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     // dump beamline objects
     if (RAYX::getDebugVerbose()) { dumpBeamlineObjects(&beamline); }
 
-    const size_t numSources = beamline.numSources();
+    const size_t numSources  = beamline.numSources();
     const size_t numElements = beamline.numElements();
 
     // record mask for elements. determine which elements should be recorded
@@ -214,6 +217,23 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     const auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMask, maxEvents, maxBatchSize);
 
     return rays;
+}
+
+void TerminalApp::validateEvents(const RAYX::Rays& rays, const RAYX::RayAttrMask attrRecordMask) {
+    if (!(attrRecordMask & RAYX::RayAttrMask::EventType)) {
+        RAYX_WARN << "warning: unable to test events for errors after tracing, because ray attribute event_type was not recorded";
+    } else {
+        const auto eventTypes =
+            std::ranges::fold_left(rays.event_type.begin(), rays.event_type.end(), RAYX::EventTypeMask::None,
+                                   [](RAYX::EventTypeMask acc, const RAYX::EventType eventType) { return acc | RAYX::eventTypeToMask(eventType); });
+
+        if (!!(eventTypes & RAYX::EventTypeMask::Uninitialized)) std::cout << "warning: one or more events in output are uninitialized" << std::endl;
+        if (!!(eventTypes & RAYX::EventTypeMask::FatalError)) std::cout << "warning: fatal error detected for one or more events" << std::endl;
+        if (!!(eventTypes & RAYX::EventTypeMask::BeyondHorizon))
+            std::cout << "warning: one or more events in output have gone beyond the horizon while refracting" << std::endl;
+        if (!!(eventTypes & RAYX::EventTypeMask::TooManyEvents))
+            std::cout << "warning: capacity of events exceeded. could not record all events! consider increasing max events." << std::endl;
+    }
 }
 
 void TerminalApp::run() {
@@ -282,8 +302,8 @@ void TerminalApp::run() {
     for (const auto path : m_cliArgs.inputPaths) tracePath(path);
 }
 
-fs::path TerminalApp::exportRays(const fs::path& inputFilepath,
-                                 const std::vector<std::string>& objectNames, const RAYX::Rays& rays, const RAYX::RayAttrMask attrMask) {
+fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vector<std::string>& objectNames, const RAYX::Rays& rays,
+                                 const RAYX::RayAttrMask attrMask) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     fs::path outputFilepath;

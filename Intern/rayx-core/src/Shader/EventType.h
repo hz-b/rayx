@@ -54,12 +54,14 @@ RAYX_FN_ACC constexpr inline EventTypeMask operator^(const EventTypeMask lhs, co
 RAYX_FN_ACC constexpr inline EventTypeMask operator~(const EventTypeMask lhs) {
     return static_cast<EventTypeMask>(~static_cast<std::underlying_type_t<EventTypeMask>>(lhs));
 }
+RAYX_FN_ACC constexpr inline bool operator!(const EventTypeMask lhs) { return lhs == EventTypeMask::None; }
+
 RAYX_FN_ACC constexpr inline EventTypeMask operator|=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs | rhs; }
 RAYX_FN_ACC constexpr inline EventTypeMask operator&=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs & rhs; }
 RAYX_FN_ACC constexpr inline EventTypeMask operator^=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs ^ rhs; }
 
 RAYX_FN_ACC constexpr inline EventTypeMask eventTypeToMask(const EventType eventType) {
-    return static_cast<EventTypeMask>(1 << static_cast<std::underlying_type_t<EventType>>(eventType));
+    return static_cast<EventTypeMask>(std::underlying_type_t<EventTypeMask>(1) << static_cast<std::underlying_type_t<EventTypeMask>>(eventType));
 }
 
 }  // namespace RAYX

@@ -50,7 +50,7 @@ inline void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restric
 
 RAYX_FN_ACC
 inline void storeRay(const int i, bool* __restrict storedFlags, RaysPtr& __restrict rays, const Ray& __restrict ray,
-              const bool* __restrict elementRecordMask, const int elementIndex, const RayAttrMask attrRecordMask) {
+                     const bool* __restrict elementRecordMask, const int elementIndex, const RayAttrMask attrRecordMask) {
     // element record mask
     if (!elementRecordMask[elementIndex]) return;
 

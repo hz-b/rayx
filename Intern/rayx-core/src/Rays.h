@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <bitset>
+#include <vector>
 
 #include "Core.h"
 #include "Shader/ElectricField.h"
@@ -112,13 +112,14 @@ RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator^=(RayAttrMask& lhs, 
 
 RAYX_API inline std::string to_string(const RayAttrMask attr) {
     return std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
-             static_cast<std::underlying_type_t<RayAttrMask>>(attr)).to_string();
+               static_cast<std::underlying_type_t<RayAttrMask>>(attr))
+        .to_string();
 }
 
 /** @brief Struct to hold a list of rays
  * Each attribute is stored in a separate vector, allowing for efficient per-attribute access
  */
-struct RAYX_API Rays{
+struct RAYX_API Rays {
 #define X(type, name, flag) std::vector<type> name;
 
     RAYX_X_MACRO_RAY_ATTR
@@ -148,7 +149,7 @@ struct RAYX_API Rays{
     RayAttrMask attrMask() const {
         RayAttrMask mask;
 #define X(type, name, flag) \
-        if (name.size() != 0) mask |= RayAttrMask::flag;
+    if (name.size() != 0) mask |= RayAttrMask::flag;
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X

@@ -8,7 +8,7 @@
 #include "Utils.h"
 
 namespace {
-    constexpr double COLLISION_EPSILON = 1e-6;
+constexpr double COLLISION_EPSILON = 1e-6;
 }  // unnamed namespace
 
 namespace RAYX {
@@ -531,8 +531,7 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
         const auto current_col = findCollisionInElementCoords(rayPosition, rayDirection, element, rand);
         if (current_col) {
             // calculate distance from ray start to intersection point. doing this in element coordinates is totally fine.
-            // we basically shortened the distance when we moved the ray position by collision epsilon, so here we put it back
-            const auto current_dist = glm::length(current_col->hitpoint - rayPosition) + COLLISION_EPSILON;
+            const auto current_dist = glm::length(current_col->hitpoint - rayPosition);
 
             if (current_dist < best_dist) {
                 best_col     = current_col;

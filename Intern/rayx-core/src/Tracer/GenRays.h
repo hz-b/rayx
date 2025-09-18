@@ -13,8 +13,8 @@
 #include "Shader/LightSources/PixelSource.h"
 #include "Shader/LightSources/PointSource.h"
 #include "Shader/LightSources/SimpleUndulatorSource.h"
-#include "Util.h"
 #include "Shader/RecordEvent.h"
+#include "Util.h"
 
 namespace RAYX {
 namespace {
