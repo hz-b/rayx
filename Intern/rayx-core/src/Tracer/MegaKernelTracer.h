@@ -216,7 +216,6 @@ class MegaKernelTracer : public DeviceTracer {
         // const auto numEventsBatchAtMost                     = sourceConf.numRaysBatchAtMost * maxEvents;
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
         auto numEventsTotal                                 = 0;
-        auto isTooManyEvents                                = false;
         auto h_eventStoreFlags                              = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
         auto h_eventStoreFlagsPrefixSum                     = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
         auto h_compactEvents                                = Rays();
