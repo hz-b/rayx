@@ -34,7 +34,7 @@ struct GenRaysKernel {
     }
 
     template <typename Acc, typename Source>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaysPtr rays, const int dstStartRayIndex, const Source source, const int sourceId,
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, RaysPtr rays, const int startRayIndexBatch, const Source source, const int sourceId,
                                 const std::optional<EnergyDistributionDataVariant> energyDistribution, const int startRayIndex,
                                 const int numRaysTotal, const double seed, const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
@@ -43,7 +43,7 @@ struct GenRaysKernel {
             const auto rayPathIndex = startRayIndex + gid;
             auto rand               = Rand(rayPathIndex, numRaysTotal, seed);
             const auto ray          = genRay(source, sourceId, energyDistribution, rayPathIndex, rand);
-            const auto dstRayIndex  = dstStartRayIndex + gid;
+            const auto dstRayIndex  = startRayIndexBatch + gid;
             storeRay(dstRayIndex, rays, ray);
         }
     }
@@ -63,7 +63,6 @@ struct GenRays {
     /// holds configuration state of one batch
     struct BatchConfig {
         int numRaysBatch;
-        int batchStartRayIndex;
         RaysBuf<Acc> d_rays;
     };
 
@@ -227,7 +226,6 @@ struct GenRays {
 
         return BatchConfig{
             .numRaysBatch       = numRaysBatch,
-            .batchStartRayIndex = batchStartRayIndex,
             .d_rays             = d_rays,
         };
     }

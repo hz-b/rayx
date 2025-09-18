@@ -216,6 +216,7 @@ class MegaKernelTracer : public DeviceTracer {
         // const auto numEventsBatchAtMost                     = sourceConf.numRaysBatchAtMost * maxEvents;
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
         auto numEventsTotal                                 = 0;
+        // TODO: think about extending lifetime of these buffers to make the reusable for the next beamline
         auto h_eventStoreFlags                              = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
         auto h_eventStoreFlagsPrefixSum                     = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
         auto h_compactEvents                                = Rays();
@@ -256,14 +257,32 @@ class MegaKernelTracer : public DeviceTracer {
 
             // end of acocunt for grid stride, because from here we use the compacted buffers
 
-            numEventsTotal += numEventsBatch;
+            const auto numEventsBatchSources  = batchConf.numRaysBatch;
+            const auto numEventsBatchElements = numEventsBatch;
+            const auto numEventsBatchObjects  = numEventsBatchSources + numEventsBatchElements;
+            numEventsTotal += numEventsBatchObjects;
 
-#define X(type, name, flag)                                                                                   \
-    if (!!(attrRecordMask & RayAttrMask::flag)) {                                                             \
-        h_compactEventsBatch[batchIndex].name.resize(numEventsBatch);                                         \
-        alpaka::memcpy(q, alpaka::createView(devHost, h_compactEventsBatch[batchIndex].name, numEventsBatch), \
-                       *m_resources.d_compactEventsBatch.name, numEventsBatch);                               \
-    }
+            const auto transferEvents = [&]<typename T>(std::vector<T>& dst, const OptBuf<Acc, T>& d_eventsBatchSources,
+                                                        const OptBuf<Acc, T>& d_compactEventsBatchElements) {
+                // TODO: use object record mask to determine which sources to record
+
+                // resize to fit source events and element events
+                dst.resize(numEventsBatchObjects);
+
+                auto dstViewObjects = alpaka::createView(devHost, dst, numEventsBatchObjects);
+
+                // transfer source events
+                auto dstViewSources = alpaka::createSubView(dstViewObjects, numEventsBatchSources, 0);
+                alpaka::memcpy(q, dstViewSources, *d_eventsBatchSources, numEventsBatchSources);
+
+                // transfer element events
+                auto dstViewElements = alpaka::createSubView(dstViewObjects, numEventsBatchElements, numEventsBatchSources);
+                alpaka::memcpy(q, dstViewElements, *d_compactEventsBatchElements, numEventsBatchElements);
+            };
+
+#define X(type, name, flag)                     \
+    if (!!(attrRecordMask & RayAttrMask::flag)) \
+        transferEvents(h_compactEventsBatch[batchIndex].name, batchConf.d_rays.name, m_resources.d_compactEventsBatch.name);
 
             RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -273,8 +292,6 @@ class MegaKernelTracer : public DeviceTracer {
         }
 
         RAYX_VERB << "number of recorded events: " << numEventsTotal;
-
-        // TODO: implement recording events of generated rays
 
 #define X(type, name, flag)                                                                                       \
     if (!!(attrRecordMask & RayAttrMask::flag)) {                                                                 \
@@ -357,6 +374,6 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_X_MACRO_RAY_ATTR
 #undef X
     }
-};
+};  // namespace RAYX
 
 }  // namespace RAYX
