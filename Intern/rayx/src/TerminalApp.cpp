@@ -165,6 +165,8 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
 }
 
 RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     auto beamline = RAYX::importBeamline(filepath);
 
     // override number of rays for all sources
@@ -182,6 +184,8 @@ RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
 }
 
 RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attrRecordMask) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     // dump beamline objects
     if (RAYX::getDebugVerbose()) { dumpBeamlineObjects(&beamline); }
 
@@ -214,12 +218,14 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     const auto maxBatchSize = m_cliArgs.batchSize;
 
     // do the trace
-    const auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMask, maxEvents, maxBatchSize);
+    auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMask, maxEvents, maxBatchSize);
 
     return rays;
 }
 
 void TerminalApp::validateEvents(const RAYX::Rays& rays, const RAYX::RayAttrMask attrRecordMask) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
     if (!(attrRecordMask & RAYX::RayAttrMask::EventType)) {
         std::cout << "warning: unable to test events for errors after tracing, because ray attribute event_type was not recorded";
     } else {

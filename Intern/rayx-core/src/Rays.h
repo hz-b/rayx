@@ -116,10 +116,26 @@ RAYX_API inline std::string to_string(const RayAttrMask attr) {
         .to_string();
 }
 
-/** @brief Struct to hold a list of rays
+/**
+ * @brief Struct to hold a list of rays
  * Each attribute is stored in a separate vector, allowing for efficient per-attribute access
  */
 struct RAYX_API Rays {
+protected:
+    // avoid costly costly copies by accident
+    Rays(const Rays&) = default;
+    Rays& operator=(const Rays&) = default;
+
+public:
+    Rays() = default;
+    Rays(Rays&&) = default;
+    Rays& operator=(Rays&&) = default;
+
+    Rays createCopy() const {
+        auto rays = *this;
+        return rays;
+    }
+
 #define X(type, name, flag) std::vector<type> name;
 
     RAYX_X_MACRO_RAY_ATTR
@@ -171,6 +187,8 @@ struct RAYX_API Rays {
         return std::unique(path_ids.begin(), path_ids.end()) - path_ids.begin();
     }
 };
+
+static_assert(std::is_nothrow_move_constructible_v<Rays>);  // ensure efficient moves
 
 /// get a full list of ray attribute names
 RAYX_API std::vector<std::string> getRayAttrNames();

@@ -134,12 +134,10 @@ struct RAYX_API Verb {
 };
 
 // An empty implementation used in release when using "debug-only" prints like RAYX_D_LOG.
-struct RAYX_API IgnoreLog {
-    template <typename T>
-    IgnoreLog& operator<<(T) {
-        return *this;
-    }
-};
+struct RAYX_API IgnoreLog{template <typename T> IgnoreLog & operator<<(T){return *this;
+}  // namespace RAYX
+}
+;
 
 // the function to be called after RAYX_EXIT happens.
 // normally exit(1), but in the test suite it's ADD_FAILURE.
