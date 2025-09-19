@@ -44,12 +44,9 @@ Ray PixelSource::genRay(const int rayPathIndex, const int sourceId, const Energy
                         Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
-    auto x = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);
-    x += m_position.x;
-    auto y = getPosInDistribution(SourceDist::Thirds, m_sourceHeight, rand);
-    y += m_position.y;
-    auto z = getPosInDistribution(SourceDist::Uniform, m_sourceDepth, rand);
-    z += m_position.z;
+    auto x        = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);
+    auto y        = getPosInDistribution(SourceDist::Thirds, m_sourceHeight, rand);
+    auto z        = getPosInDistribution(SourceDist::Uniform, m_sourceDepth, rand);
     const auto en = selectEnergy(energyDistribution, rand);
     // double z = (rn[2] - 0.5) * m_sourceDepth;
     glm::dvec3 position = glm::dvec3(x, y, z);
@@ -60,10 +57,8 @@ Ray PixelSource::genRay(const int rayPathIndex, const int sourceId, const Energy
     // get corresponding angles based on distribution and deviation from
     // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
     glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-    glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
-    direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-    const auto electricField = stokesToElectricField(m_pol, m_orientation);
+    const auto electricField = stokesToElectricField(m_pol, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
 
     return Ray{
         .position            = position,

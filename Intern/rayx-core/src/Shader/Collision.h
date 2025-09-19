@@ -37,8 +37,7 @@ RAYX_FN_ACC OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeE
 RAYX_FN_ACC OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                            const OpticalElement& __restrict element, Rand& __restrict rand);
 
-RAYX_FN_ACC OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection,
-                                                              const OpticalElement* __restrict elements, const int numElements,
-                                                              Rand& __restrict rand);
+RAYX_FN_ACC OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const OpticalElement* __restrict elements, const ObjectTransform* __restrict,
+                                                  const int numSources, const int numElements, Rand& __restrict rand);
 
 }  // namespace RAYX

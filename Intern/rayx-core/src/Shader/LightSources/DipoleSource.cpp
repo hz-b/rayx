@@ -407,17 +407,13 @@ Ray DipoleSource::genRay(const int rayPathIndex, const int sourceId, Rand& __res
     en = getEnergy(rand);  // Verteilung nach Schwingerfunktion
 
     auto psiandstokes = getPsiandStokes(en, rand);
-    psiandstokes.psi  = psiandstokes.psi + m_misalignmentParams.m_rotationYerror.rad;
-
-    phi = phi + m_misalignmentParams.m_rotationXerror.rad;
+    psiandstokes.psi  = psiandstokes.psi;
 
     // get corresponding angles based on distribution and deviation from
     // main ray (main ray: xDir=0,yDir=0,zDir=1 for phi=psi=0)
     glm::dvec3 direction = getDirectionFromAngles(phi, psiandstokes.psi);
-    glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
-    direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
-    const auto electricField = stokesToElectricField(psiandstokes.stokes, m_orientation);
+    const auto electricField = stokesToElectricField(psiandstokes.stokes, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
 
     return Ray{
         .position            = position,
@@ -447,12 +443,10 @@ glm::dvec3 DipoleSource::getXYZPosition(double phi, Rand& __restrict rand) const
     double sign = m_electronEnergyOrientation == ElectronEnergyOrientation::Clockwise ? -1.0 : 1.0;
 
     double x = sign * (x1 * cos(phi) + (m_bendingRadius * 1000 * (1 - cos(phi))));  // bendingRadius in mm
-    x        = x + m_position.x + m_misalignmentParams.m_translationXerror;
 
     double y = getNormalFromRange(m_sourceHeight, rand);
-    y        = y + m_position.y + m_misalignmentParams.m_translationYerror;
 
-    double z = sign * (m_bendingRadius * 1000 - x1) * sin(phi) + m_misalignmentParams.m_translationZerror;
+    double z = sign * (m_bendingRadius * 1000 - x1) * sin(phi);
 
     return glm::dvec3(x, y, z);
 }

@@ -484,8 +484,6 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                 }
                 break;
             }
-            // probably not needed
-            case RAYX::ValueType::Misalignment:
 
             // this needs a lot of parameters and handling
             case RAYX::ValueType::Surface:

@@ -89,30 +89,6 @@ glm::dmat4x4 DesignSource::getOrientation() const {
     return orientation;
 }
 
-void DesignSource::setMisalignment(Misalignment m) {
-    m_elementParameters["rotationXerror"] = m.m_rotationXerror.rad;
-    m_elementParameters["rotationYerror"] = m.m_rotationYerror.rad;
-    m_elementParameters["rotationZerror"] = m.m_rotationZerror.rad;
-
-    m_elementParameters["translationXerror"] = m.m_translationXerror;
-    m_elementParameters["translationYerror"] = m.m_translationYerror;
-    m_elementParameters["translationZerror"] = m.m_translationZerror;
-}
-
-Misalignment DesignSource::getMisalignment() const {
-    Misalignment m;
-
-    m.m_rotationXerror.rad = m_elementParameters["rotationXerror"].as_double();
-    m.m_rotationYerror.rad = m_elementParameters["rotationYerror"].as_double();
-    m.m_rotationZerror.rad = m_elementParameters["rotationZerror"].as_double();
-
-    m.m_translationXerror = m_elementParameters["translationXerror"].as_double();
-    m.m_translationYerror = m_elementParameters["translationYerror"].as_double();
-    m.m_translationZerror = m_elementParameters["translationZerror"].as_double();
-
-    return m;
-}
-
 void DesignSource::setStokeslin0(double value) {
     m_elementParameters["stokes"]            = Map();
     m_elementParameters["stokes"]["linPol0"] = value;

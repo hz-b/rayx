@@ -18,7 +18,7 @@ class RAYX_API CircleSource : public LightSourceBase {
     // Geometric Params
     // SourcePulseType m_sourceDistributionType;  // TODO unused.
 
-    glm::dvec4 m_stokes;
+    glm::dvec4 m_pol;
 
     double m_sourceDepth;
     double m_sourceHeight;

@@ -25,7 +25,6 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
 
     de->setPosition(parser.parsePosition());
     de->setOrientation(parser.parseOrientation());
-    de->setMisalignment(parser.parseMisalignment());
 
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());

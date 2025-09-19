@@ -14,7 +14,6 @@ namespace RAYX {
 void setAllMandatory(xml::Parser parser, DesignSource* ds) {
     ds->setName(parser.name());
     ds->setType(parser.type());
-    ds->setMisalignment(parser.parseMisalignment());
     ds->setNumberOfRays(parser.parseNumberRays());
     ds->setOrientation(parser.parseOrientation());
     ds->setPosition(parser.parsePosition());

@@ -40,26 +40,20 @@ Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, const Energ
     // The first 'extraRays' origins get one extra ray
     int nRaysThisOrigin = raysPerOrigin + (originIndex < extraRays ? 1 : 0);
 
-    double rn = rand.randomDouble();  // in [0, 1]
-    auto x    = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row + m_misalignmentParams.m_translationXerror;
-    x += m_position.x;
-    auto y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col + m_misalignmentParams.m_translationYerror;
-    y += m_position.y;
-
-    auto z = (rn - 0.5) * m_sourceDepth;
-    z += m_position.z;
+    double rn           = rand.randomDouble();  // in [0, 1]
+    auto x              = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row;
+    auto y              = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col;
+    auto z              = (rn - 0.5) * m_sourceDepth;
     const auto en       = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
-    const auto phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row + m_misalignmentParams.m_rotationXerror.rad;
-    const auto psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col + m_misalignmentParams.m_rotationYerror.rad;
+    const auto phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row;
+    const auto psi = -0.5 * m_verDivergence + (m_verDivergence / (rmat - 1)) * col;
 
     glm::dvec3 direction = getDirectionFromAngles(phi, psi);
-    glm::dvec4 tempDir   = m_orientation * glm::dvec4(direction, 0.0);
-    direction            = glm::dvec3(tempDir.x, tempDir.y, tempDir.z);
 
     // Scale the electic field so that each origin emits the same total intensity
-    auto electricField = stokesToElectricField(m_pol, m_orientation);
+    auto electricField = stokesToElectricField(m_pol, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
     electricField /= static_cast<double>(nRaysThisOrigin);
 
     return Ray{

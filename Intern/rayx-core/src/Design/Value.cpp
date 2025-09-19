@@ -29,7 +29,6 @@ ValueType DesignMap::type() const {
         ValueType::Dmat4x4,
         ValueType::Bool,
         ValueType::EnergyDistributionType,
-        ValueType::Misalignment,
         ValueType::CentralBeamstop,
         ValueType::Cutout,
         ValueType::CutoutType,  // Added
@@ -98,11 +97,6 @@ Rad DesignMap::as_rad() const {
 Material DesignMap::as_material() const {
     if (auto* x = std::get_if<Material>(&m_variant)) return *x;
     throw std::runtime_error("as_material() called on non-material!");
-}
-
-Misalignment DesignMap::as_misalignment() const {
-    if (auto* x = std::get_if<Misalignment>(&m_variant)) return *x;
-    throw std::runtime_error("as_misalignment() called on non-misalignment!");
 }
 
 CentralBeamstop DesignMap::as_centralBeamStop() const {

@@ -29,7 +29,6 @@ enum class ValueType {
     Bool,
     Rad,
     Material,
-    Misalignment,
     CentralBeamstop,
     Cutout,
     CutoutType,
@@ -79,7 +78,6 @@ class RAYX_API DesignMap {
     DesignMap(glm::dmat4x4 x) : m_variant(x) {}
     DesignMap(Rad x) : m_variant(x) {}
     DesignMap(Material x) : m_variant(x) {}
-    DesignMap(Misalignment x) : m_variant(x) {}
     DesignMap(CentralBeamstop x) : m_variant(x) {}
     DesignMap(Cutout x) : m_variant(x) {}
     DesignMap(CutoutType x) : m_variant(x) {}
@@ -109,7 +107,6 @@ class RAYX_API DesignMap {
     void operator=(glm::dmat4 x) { m_variant = x; }
     void operator=(Rad x) { m_variant = x; }
     void operator=(Material x) { m_variant = x; }
-    void operator=(Misalignment x) { m_variant = x; }
     void operator=(CentralBeamstop x) { m_variant = x; }
     void operator=(Cutout x) { m_variant = x; }
     void operator=(CutoutType x) { m_variant = x; }
@@ -144,7 +141,6 @@ class RAYX_API DesignMap {
     glm::dmat4 as_dmat4x4() const;
     Rad as_rad() const;
     Material as_material() const;
-    Misalignment as_misalignment() const;
     CentralBeamstop as_centralBeamStop() const;
     Cutout as_cutout() const;
     CutoutType as_openingShape() const;
@@ -238,7 +234,7 @@ class RAYX_API DesignMap {
     ConstIterator end() const;
 
   private:
-    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
+    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType,
                  CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist,
                  SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType,
                  DesignPlane>

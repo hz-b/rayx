@@ -101,8 +101,8 @@ void Group::accumulateLightSourcesWorldPositions(const Group& group, const glm::
     }
 }
 
-std::vector<OpticalElement> Group::compileElements() const {
-    std::vector<OpticalElement> elements;
+std::vector<OpticalElementAndTransform> Group::compileElements() const {
+    std::vector<OpticalElementAndTransform> elements;
 
     auto recurse = [&](auto& self, const Group& grp, const glm::dvec4& parentPos, const glm::dmat4& parentOri) -> void {
         glm::dvec4 thisGroupPos = parentOri * grp.getPosition() + parentPos;

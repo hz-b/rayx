@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "Beamline/Misalignment.h"
 #include "Core.h"
 #include "Element/Element.h"
 #include "EnergyDistributions/EnergyDistribution.h"
@@ -34,8 +33,6 @@ class RAYX_API LightSourceBase {
 
     glm::dmat4x4 m_orientation = glm::dmat4x4();
     glm::dvec4 m_position      = glm::dvec4();
-
-    Misalignment m_misalignmentParams;  // x, y, psi, phi
 };
 
 }  // namespace RAYX

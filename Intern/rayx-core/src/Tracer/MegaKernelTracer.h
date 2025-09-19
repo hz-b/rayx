@@ -15,7 +15,7 @@
 namespace RAYX {
 namespace {
 
-constexpr int WARP_SIZE = 32;
+constexpr int WARP_SIZE            = 32;
 constexpr int GRID_STRIDE_MULTIPLE = WARP_SIZE;
 
 struct TraceSequentialKernel {
@@ -51,13 +51,14 @@ struct ScatterCompactKernel {
 
 struct FilterByObjectIdKernel {
     template <typename Acc>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, bool* __restrict result, const int* __restrict object_ids, const int* objectRecordMask, const int n) const {
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, bool* __restrict result, const int* __restrict object_ids, const int* objectRecordMask,
+                                const int n) const {
         const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
 
         if (gid < n) {
-            const auto object_id = object_ids[gid];
+            const auto object_id   = object_ids[gid];
             const auto shouldStore = objectRecordMask[object_id];
-            result[gid] = shouldStore;
+            result[gid]            = shouldStore;
         }
     }
 };
@@ -77,6 +78,9 @@ struct Resources {
     OptBuf<Acc, double> d_materialTable;
 
     // resources per beamline. constant per beamline
+    /// beamline object transforms
+    OptBuf<Acc, ObjectTransform> d_objectTransforms;
+
     /// beamline elements
     OptBuf<Acc, OpticalElement> d_elements;
 
@@ -119,20 +123,41 @@ struct Resources {
         alpaka::memcpy(q, *d_materialTable, alpaka::createView(devHost, materialTable, materialTableSize));
 
         // beamline elements
-        const auto elements    = group.compileElements();
+        // TODO: this should be two arrays, one of elements, one for transforms
+        const auto elementsAndTransforms = group.compileElements();
+        auto elements                    = std::vector<OpticalElement>(elementsAndTransforms.size());
+        std::transform(elementsAndTransforms.begin(), elementsAndTransforms.end(), elements.begin(),
+                       [](const OpticalElementAndTransform& e) { return e.element; });
         const auto numElements = static_cast<int>(elements.size());
         allocBuf(q, d_elements, numElements);
         alpaka::memcpy(q, *d_elements, alpaka::createView(devHost, elements, numElements));
 
-        // object record mask
-        const auto numSources = static_cast<int>(group.numSources());
+        const auto sources    = group.getSources();
+        const auto numSources = static_cast<int>(sources.size());
         const auto numObjects = numSources + numElements;
+
+        // object transforms
+        // TODO: compiling of sources/elements should be revisited
+        auto h_objectTransforms = std::vector<ObjectTransform>(numObjects);
+        std::transform(sources.begin(), sources.end(), h_objectTransforms.begin(), [](const DesignSource* designSource) {
+            return ObjectTransform{
+                // TODO: make sure to do this DesignPlane:XZ thing correctly
+                .m_inTrans  = calcTransformationMatrices(designSource->getPosition(), designSource->getOrientation(), true, DesignPlane::XZ),
+                .m_outTrans = calcTransformationMatrices(designSource->getPosition(), designSource->getOrientation(), false, DesignPlane::XZ),
+            };
+        });
+        std::transform(elementsAndTransforms.begin(), elementsAndTransforms.end(), h_objectTransforms.begin() + numSources,
+                       [](const OpticalElementAndTransform& e) { return e.transform; });
+        allocBuf(q, d_objectTransforms, numObjects);
+        alpaka::memcpy(q, *d_objectTransforms, alpaka::createView(devHost, h_objectTransforms, numObjects), numObjects);
+
+        // object record mask
         allocBuf(q, d_objectRecordMask, numObjects);
         auto h_objectRecordMask = std::make_unique<bool[]>(numObjects);
         for (int i = 0; i < numObjects; ++i) { h_objectRecordMask[i] = objectRecordMask.shouldRecordObject(i); }
         alpaka::memcpy(q, *d_objectRecordMask, alpaka::createView(devHost, h_objectRecordMask.get(), numObjects));
 
-        const auto numEventsBatchAtMost = numRaysBatchAtMost * maxEvents;
+        const auto numEventsBatchAtMost                     = numRaysBatchAtMost * maxEvents;
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
 
         // output events and compacted output events
@@ -202,7 +227,7 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto maxEventsSources = 1;
-        const auto maxEvents = maxEventsSources + maxEventsElements;
+        const auto maxEvents        = maxEventsSources + maxEventsElements;
 
         const auto platformHost = alpaka::PlatformCpu{};
         const auto devHost      = alpaka::getDevByIdx(platformHost, 0);
@@ -230,11 +255,11 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_VERB << "\t- device name: " << alpaka::getName(devAcc);
         RAYX_VERB << "\t- host device name: " << alpaka::getName(devHost);
 
-        const auto numRaysBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE);
+        const auto numRaysBatchAtMostAccountForGridStride   = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE);
         const auto numEventsBatchAtMostAccountForGridStride = numRaysBatchAtMostAccountForGridStride * maxEvents;
-        auto h_compactEventsBatches = std::vector<Rays>(sourceConf.numBatches);
-        auto h_eventStoreFlags = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
-        auto h_eventStoreFlagsPrefixSum = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
+        auto h_compactEventsBatches                         = std::vector<Rays>(sourceConf.numBatches);
+        auto h_eventStoreFlags                              = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
+        auto h_eventStoreFlagsPrefixSum                     = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
         auto numEventsTotal                                 = 0;
 
         for (int batchIndex = 0; batchIndex < sourceConf.numBatches; ++batchIndex) {
@@ -257,9 +282,8 @@ class MegaKernelTracer : public DeviceTracer {
 
             alpaka::memcpy(q, alpaka::createView(devHost, h_eventStoreFlags.get(), numEventsBatchAccountForGridStride),
                            *m_resources.d_eventStoreFlags, numEventsBatchAccountForGridStride);
-            const auto h_eventStoreFlagsPrefixSumEnd =
-                std::exclusive_scan(h_eventStoreFlags.get(), h_eventStoreFlags.get() + numEventsBatchAccountForGridStride,
-                                    h_eventStoreFlagsPrefixSum.begin(), 0);
+            const auto h_eventStoreFlagsPrefixSumEnd = std::exclusive_scan(
+                h_eventStoreFlags.get(), h_eventStoreFlags.get() + numEventsBatchAccountForGridStride, h_eventStoreFlagsPrefixSum.begin(), 0);
             const auto numEventsBatch =
                 *(h_eventStoreFlagsPrefixSumEnd - 1);  // access the last element of the exclusive scan result to get the total count
             alpaka::memcpy(q, *m_resources.d_eventStoreFlagsPrefixSum,
@@ -301,12 +325,13 @@ class MegaKernelTracer : public DeviceTracer {
             .outputEventsGridStride = numRaysBatchAccountForGridStride,
 
             // buffers
-            .elements          = alpaka::getPtrNative(*m_resources.d_elements),
-            .materials         = Materials{.indices = alpaka::getPtrNative(*m_resources.d_materialIndices),
-                                           .tables  = alpaka::getPtrNative(*m_resources.d_materialTable)},
+            .objectTransforms = alpaka::getPtrNative(*m_resources.d_objectTransforms),
+            .elements         = alpaka::getPtrNative(*m_resources.d_elements),
+            .materials        = Materials{.indices = alpaka::getPtrNative(*m_resources.d_materialIndices),
+                                          .tables  = alpaka::getPtrNative(*m_resources.d_materialTable)},
             .objectRecordMask = alpaka::getPtrNative(*m_resources.d_objectRecordMask),
-            .attrRecordMask    = attrRecordMask,
-            .rays              = raysBufToRaysPtr(batchConf.d_rays),
+            .attrRecordMask   = attrRecordMask,
+            .rays             = raysBufToRaysPtr(batchConf.d_rays),
         };
 
         const auto mutableState = MutableState{
@@ -350,8 +375,7 @@ class MegaKernelTracer : public DeviceTracer {
     }
 
     template <typename DevHost, typename Queue>
-    Rays transferEventsBatch(DevHost& devHost, Queue q, const int numEventsBatch,
-                             const RayAttrMask attrRecordMask) {
+    Rays transferEventsBatch(DevHost& devHost, Queue q, const int numEventsBatch, const RayAttrMask attrRecordMask) {
         const auto transfer = [&]<typename T>(std::vector<T>& dst, const OptBuf<Acc, T>& d_compactEventsBatch) {
             // resize to fit source events and element events
             dst.resize(numEventsBatch);
@@ -362,9 +386,8 @@ class MegaKernelTracer : public DeviceTracer {
 
         Rays h_compactEventsBatch;
 
-#define X(type, name, flag)                     \
-    if (!!(attrRecordMask & RayAttrMask::flag)) \
-        transfer(h_compactEventsBatch.name, m_resources.d_compactEventsBatch.name);
+#define X(type, name, flag) \
+    if (!!(attrRecordMask & RayAttrMask::flag)) transfer(h_compactEventsBatch.name, m_resources.d_compactEventsBatch.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -372,19 +395,20 @@ class MegaKernelTracer : public DeviceTracer {
         return h_compactEventsBatch;
     }
 
-    Rays concatEventsFromBatches(const int numEventsTotal, const int numBatches, const std::vector<Rays>& h_compactEventsBatches, const RayAttrMask attrRecordMask) {
+    Rays concatEventsFromBatches(const int numEventsTotal, const int numBatches, const std::vector<Rays>& h_compactEventsBatches,
+                                 const RayAttrMask attrRecordMask) {
         // create returned object as local variable, to benefit from RVO
         auto h_compactEvents = Rays();
 
-#define X(type, name, flag)                                                                                                               \
-    if (!!(attrRecordMask & RayAttrMask::flag)) {                                                                                         \
-        auto batchOffset = 0;                                                                                                             \
-        h_compactEvents.name.resize(numEventsTotal);                                                                                      \
-        for (auto batchIndex = 0; batchIndex < numBatches; ++batchIndex) {                                                                \
+#define X(type, name, flag)                                                                                           \
+    if (!!(attrRecordMask & RayAttrMask::flag)) {                                                                     \
+        auto batchOffset = 0;                                                                                         \
+        h_compactEvents.name.resize(numEventsTotal);                                                                  \
+        for (auto batchIndex = 0; batchIndex < numBatches; ++batchIndex) {                                            \
             std::copy(h_compactEventsBatches[batchIndex].name.begin(), h_compactEventsBatches[batchIndex].name.end(), \
-                      h_compactEvents.name.begin() + batchOffset);                                                                        \
-            batchOffset += static_cast<int>(h_compactEventsBatches[batchIndex].name.size());                                    \
-        }                                                                                                                                 \
+                      h_compactEvents.name.begin() + batchOffset);                                                    \
+            batchOffset += static_cast<int>(h_compactEventsBatches[batchIndex].name.size());                          \
+        }                                                                                                             \
     }
 
         RAYX_X_MACRO_RAY_ATTR
@@ -392,7 +416,6 @@ class MegaKernelTracer : public DeviceTracer {
 
         return h_compactEvents;
     }
-
 };
 
 }  // namespace RAYX

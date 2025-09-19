@@ -10,7 +10,6 @@
 #include "Angle.h"
 #include "Beamline/Definitions.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Beamline/Misalignment.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
@@ -55,7 +54,6 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
 
 // These functions parse more complex parts of beamline objects, and are used by multiple objects in their construction mechanism.
 // They itself use the above param* functions.
-bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
@@ -86,7 +84,6 @@ struct RAYX_API Parser {
     glm::dvec3 parseDvec3(const char* paramname) const;
 
     // parsers for derived parameters
-    Misalignment parseMisalignment() const;
     SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
     EnergyDistributionVariant parseEnergyDistribution() const;
@@ -162,7 +159,6 @@ struct RAYX_API Parser {
     // those in rml file are wrong. not necessary when our recalculated position
     // and orientation is stored
     inline double parseDistancePreceding() const { return parseDouble("distancePreceding"); }
-    inline int parseMisalignmentCoordinateSystem() const { return parseInt("misalignmentCoordinateSystem"); }
     inline double parseVerEbeamDivergence() const { return parseDouble("verEbeamDiv"); }
     inline double parseElectronEnergy() const { return parseDouble("electronEnergy"); }
     inline int parseAlignmentError() const { return parseInt("alignmentError"); }

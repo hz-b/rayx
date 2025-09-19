@@ -74,6 +74,7 @@ class RAYX_API Group : public BeamlineNode {
      */
     void traverse(const std::function<bool(BeamlineNode&)>& callback);
 
+    // TODO: this should not be part of the API
     /**
      * @brief Calculates the minimal set of material tables required by elements in this Group.
      *
@@ -84,13 +85,15 @@ class RAYX_API Group : public BeamlineNode {
      */
     MaterialTables calcMinimalMaterialTables() const;
 
+    // TODO: this should not be part of the API
     /**
      * @brief Recursively converts all DesignElement nodes into OpticalElements with full transforms.
      *
-     * @return A vector of OpticalElement objects compiled from the Group hierarchy.
+     * @return A vector of OpticalElementAndTransform objects compiled from the Group hierarchy.
      */
-    std::vector<OpticalElement> compileElements() const;
+    std::vector<OpticalElementAndTransform> compileElements() const;
 
+    // TODO: why would we need this?
     /**
      * @brief Gathers the world positions of all light sources within a Group hierarchy.
      *

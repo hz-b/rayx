@@ -94,9 +94,6 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setEnergyDistribution(const EnergyDistributionVariant& value);
     EnergyDistributionVariant getEnergyDistribution() const;
 
-    void setMisalignment(Misalignment m);
-    Misalignment getMisalignment() const;
-
     void setNumberOfRays(int value);
     int getNumberOfRays() const;
 

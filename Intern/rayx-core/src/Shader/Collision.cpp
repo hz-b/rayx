@@ -506,8 +506,8 @@ OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayP
 }
 
 RAYX_FN_ACC
-OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const OpticalElement* __restrict elements,
-                                                  const int numElements, Rand& __restrict rand) {
+OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const OpticalElement* __restrict elements, const ObjectTransform* __restrict objectTransforms,
+                                                  const int numSources, const int numElements, Rand& __restrict rand) {
     // global coordinates of first intersection point of ray among all elements in beamline
     OptCollisionPoint best_col = std::nullopt;
 
@@ -526,7 +526,7 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
     for (int elementIndex = 0; elementIndex < numElements; ++elementIndex) {
         const auto& element = elements[elementIndex];
 
-        rayMatrixMult(element.m_inTrans, rayPosition, rayDirection);
+        rayMatrixMult(objectTransforms[elementIndex + numSources].m_inTrans, rayPosition, rayDirection);
 
         const auto current_col = findCollisionInElementCoords(rayPosition, rayDirection, element, rand);
         if (current_col) {
@@ -540,7 +540,7 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
             }
         }
 
-        rayMatrixMult(element.m_outTrans, rayPosition, rayDirection);
+        rayMatrixMult(objectTransforms[elementIndex + numSources].m_outTrans, rayPosition, rayDirection);
     }
 
     if (!best_col) return std::nullopt;

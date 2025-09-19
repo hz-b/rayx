@@ -52,21 +52,30 @@ inline glm::dmat4x4 defaultOutMatrix(const DesignElement& dele, DesignPlane plan
 
 inline int defaultMaterial(const DesignElement& dele) { return static_cast<int>(dele.getMaterial()); }
 
-OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane, std::optional<Cutout> cutout) {
+OpticalElementAndTransform makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane,
+                                       std::optional<Cutout> cutout) {
     if (!cutout) { cutout = dele.getCutout(); }
 
     auto inMat  = defaultInMatrix(dele, plane);
     auto outMat = defaultOutMatrix(dele, plane);
 
-    return OpticalElement{
-        .m_inTrans        = inMat,
-        .m_outTrans       = outMat,
+    const auto element = OpticalElement{
         .m_behaviour      = behaviour,
         .m_surface        = surface,
         .m_cutout         = *cutout,
         .m_slopeError     = dele.getSlopeError(),
         .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
         .m_material       = defaultMaterial(dele),
+    };
+
+    const auto transform = ObjectTransform{
+        .m_inTrans  = inMat,
+        .m_outTrans = outMat,
+    };
+
+    return OpticalElementAndTransform{
+        .element   = element,
+        .transform = transform,
     };
 }
 

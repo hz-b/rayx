@@ -24,6 +24,7 @@ struct RAYX_API ConstState {
     int numElements;
     int outputEventsGridStride;
 
+    ObjectTransform* __restrict objectTransforms;
     OpticalElement* __restrict elements;
     Materials materials;
     bool* __restrict objectRecordMask;  // Mask that decides which elements to record events for (array length is numElements)

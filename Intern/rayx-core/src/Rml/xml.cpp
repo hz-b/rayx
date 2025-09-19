@@ -105,42 +105,6 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
     return true;
 }
 
-bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
-    if (!node || !out) { return false; }
-
-    rapidxml::xml_node<>* p;
-
-    *out = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
-
-    if (!param(node, "alignmentError", &p)) {
-        return true;  // if error is not given, it'll be zero.
-    }
-
-    if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
-        // all misalignment-values will be left at 0 if they are missing.
-        // Hence we ignore the return values of the upcoming
-        // paramDouble-calls.
-        xml::paramDouble(node, "translationXerror", &out->m_translationXerror);
-        xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
-        xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
-
-        // keep in mind, rotation on the x-Axis changes the psi and y rotation changes phi
-        double x_mrad = 0;
-        xml::paramDouble(node, "rotationXerror", &x_mrad);
-        out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
-
-        double y_mrad = 0;
-        xml::paramDouble(node, "rotationYerror", &y_mrad);
-        out->m_rotationYerror = Rad(y_mrad / 1000.0);
-
-        double z_mrad = 0;
-        xml::paramDouble(node, "rotationZerror", &z_mrad);
-        out->m_rotationZerror = Rad(z_mrad / 1000.0);
-    }
-
-    return true;
-}
-
 // loads the "raw" position without considering how the group context affects the position.
 // In other words, this is the position "within" the group.
 std::optional<glm::dvec4> paramPosition(const rapidxml::xml_node<>* node) {
@@ -401,13 +365,6 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
     glm::dvec3 v;
     if (!paramDvec3(node, paramname, &v)) { RAYX_EXIT << "parseDvec3 failed for \"" << paramname << "\""; }
     return v;
-}
-
-// parsers for derived parameters
-Misalignment Parser::parseMisalignment() const {
-    Misalignment x;
-    if (!paramMisalignment(node, &x)) { RAYX_EXIT << "parseMisalignment failed"; }
-    return x;
 }
 
 SlopeError Parser::parseSlopeError() const {

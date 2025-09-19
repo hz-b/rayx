@@ -121,14 +121,14 @@ RAYX_API inline std::string to_string(const RayAttrMask attr) {
  * Each attribute is stored in a separate vector, allowing for efficient per-attribute access
  */
 struct RAYX_API Rays {
-protected:
+  protected:
     // avoid costly costly copies by accident
-    Rays(const Rays&) = default;
+    Rays(const Rays&)            = default;
     Rays& operator=(const Rays&) = default;
 
-public:
-    Rays() = default;
-    Rays(Rays&&) = default;
+  public:
+    Rays()                  = default;
+    Rays(Rays&&)            = default;
     Rays& operator=(Rays&&) = default;
 
     Rays createCopy() const {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Beamline/Misalignment.h"
 #include "Beamline/Node.h"
 #include "Element/Element.h"
 #include "Value.h"
@@ -20,7 +19,7 @@ struct RAYX_API DesignElement : public BeamlineNode {
     std::unique_ptr<BeamlineNode> clone() const override;
 
     DesignMap m_elementParameters;
-    OpticalElement compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
+    OpticalElementAndTransform compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
 
     void setName(std::string s);
     void setType(ElementType s);
@@ -34,9 +33,6 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setOrientation(glm::dmat4x4 o);
     glm::dmat4x4 getOrientation() const override;
-
-    void setMisalignment(Misalignment m);
-    Misalignment getMisalignment() const;
 
     void setSlopeError(SlopeError s);
     SlopeError getSlopeError() const;

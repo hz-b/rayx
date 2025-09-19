@@ -9,8 +9,8 @@ namespace RAYX {
 LightSourceBase::LightSourceBase(const DesignSource& dSource)
     : m_numberOfRays(static_cast<uint32_t>(dSource.getNumberOfRays())),
       m_orientation(dSource.getOrientation()),
-      m_position(dSource.getPosition()),
-      m_misalignmentParams(dSource.getMisalignment()) {}
+      m_position(dSource.getPosition())
+      {}
 
 // needed for many of the light sources, from two angles to one direction vector
 RAYX_FN_ACC
