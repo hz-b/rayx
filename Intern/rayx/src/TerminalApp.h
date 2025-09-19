@@ -22,7 +22,7 @@ class TerminalApp {
     void traceRmlAndExportRays(const std::filesystem::path& path);
     RAYX::Beamline loadBeamline(const std::filesystem::path& filepath);
     RAYX::Rays traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attr);
-    void validateEvents(const RAYX::Rays& rays, const RAYX::RayAttrMask attrRecordMask);
+    void validateEvents(const RAYX::Rays& rays);
 
     /// write rays to file
     /// @returns the output filename (either .csv or .h5)

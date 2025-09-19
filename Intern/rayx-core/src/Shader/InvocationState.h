@@ -26,7 +26,7 @@ struct RAYX_API ConstState {
 
     OpticalElement* __restrict elements;
     Materials materials;
-    bool* __restrict elementRecordMask;  // Mask that decides which elements to record events for (array length is numElements)
+    bool* __restrict objectRecordMask;  // Mask that decides which elements to record events for (array length is numElements)
     RayAttrMask attrRecordMask;
     RaysPtr rays;
 };

@@ -11,6 +11,9 @@ RAYX_FN_ACC
 void traceSequential(const int gid, const ConstState& __restrict constState, MutableState& __restrict mutableState) {
     auto ray = loadRay(gid, constState.rays);
 
+    storeRay(getRecordIndex(gid, 0, constState.outputEventsGridStride), mutableState.storedFlags, mutableState.events, ray,
+             constState.objectRecordMask, ray.object_id, constState.attrRecordMask);
+
     for (int elementIndex = 0; elementIndex < constState.numElements; ++elementIndex) {
         if (isRayTerminated(ray.event_type)) break;
 
@@ -33,8 +36,8 @@ void traceSequential(const int gid, const ConstState& __restrict constState, Mut
 
         behave(ray, *col, element, constState.materials);
 
-        storeRay(getRecordIndex(gid, elementIndex, constState.outputEventsGridStride), mutableState.storedFlags, mutableState.events, ray,
-                 constState.elementRecordMask, elementIndex, constState.attrRecordMask);
+        storeRay(getRecordIndex(gid, ray.object_id, constState.outputEventsGridStride), mutableState.storedFlags, mutableState.events, ray,
+                 constState.objectRecordMask, ray.object_id, constState.attrRecordMask);
 
         rayMatrixMult(element.m_outTrans, ray.position, ray.direction, ray.electric_field);
     }
@@ -43,6 +46,9 @@ void traceSequential(const int gid, const ConstState& __restrict constState, Mut
 RAYX_FN_ACC
 void traceNonSequential(const int gid, const ConstState& __restrict constState, MutableState& __restrict mutableState) {
     auto ray = loadRay(gid, constState.rays);
+
+    storeRay(getRecordIndex(gid, 0, constState.outputEventsGridStride), mutableState.storedFlags, mutableState.events, ray,
+             constState.objectRecordMask, ray.object_id, constState.attrRecordMask);
 
     for (int hitIndex = 0; hitIndex < constState.maxEvents; ++hitIndex) {
         if (isRayTerminated(ray.event_type)) break;
@@ -72,8 +78,9 @@ void traceNonSequential(const int gid, const ConstState& __restrict constState, 
                 ray.event_type = EventType::TooManyEvents;
         }
 
-        storeRay(getRecordIndex(gid, hitIndex, constState.outputEventsGridStride), mutableState.storedFlags, mutableState.events, ray,
-                 constState.elementRecordMask, col->elementIndex, constState.attrRecordMask);
+        const auto recordIndex = hitIndex + 1; // add 1 because the source rays have been stored already
+        storeRay(getRecordIndex(gid, recordIndex, constState.outputEventsGridStride), mutableState.storedFlags, mutableState.events, ray,
+                 constState.objectRecordMask, ray.object_id, constState.attrRecordMask);
 
         rayMatrixMult(element.m_outTrans, ray.position, ray.direction, ray.electric_field);
     }

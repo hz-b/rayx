@@ -6,7 +6,7 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-inline int getRecordIndex(int gid, int numRecorded, int gridStride) { return gid + numRecorded * gridStride; }
+inline int getRecordIndex(const int gid, const int numRecorded, const int gridStride) { return gid + numRecorded * gridStride; }
 
 RAYX_FN_ACC
 inline Ray loadRay(const int i, const RaysPtr& __restrict rays) {
@@ -50,9 +50,11 @@ inline void storeRay(const int i, RaysPtr& __restrict rays, const Ray& __restric
 
 RAYX_FN_ACC
 inline void storeRay(const int i, bool* __restrict storedFlags, RaysPtr& __restrict rays, const Ray& __restrict ray,
-                     const bool* __restrict elementRecordMask, const int elementIndex, const RayAttrMask attrRecordMask) {
-    // element record mask
-    if (!elementRecordMask[elementIndex]) return;
+                     const bool* __restrict objectRecordMask, const int objectIndex, const RayAttrMask attrRecordMask) {
+    // TODO: should we do a syncwarp here, to make the whole warp access gmem?
+
+    // object record mask
+    if (!objectRecordMask[objectIndex]) return;
 
     // attribute record mask
     if (!!(attrRecordMask & RayAttrMask::PathId)) rays.path_id[i] = ray.path_id;

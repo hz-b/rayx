@@ -15,7 +15,8 @@
 namespace RAYX {
 namespace {
 
-constexpr int GRID_STRIDE_MULTIPLE = 32;
+constexpr int WARP_SIZE = 32;
+constexpr int GRID_STRIDE_MULTIPLE = WARP_SIZE;
 
 struct TraceSequentialKernel {
     template <typename Acc>
@@ -48,6 +49,19 @@ struct ScatterCompactKernel {
     }
 };
 
+struct FilterByObjectIdKernel {
+    template <typename Acc>
+    RAYX_FN_ACC void operator()(const Acc& __restrict acc, bool* __restrict result, const int* __restrict object_ids, const int* objectRecordMask, const int n) const {
+        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+
+        if (gid < n) {
+            const auto object_id = object_ids[gid];
+            const auto shouldStore = objectRecordMask[object_id];
+            result[gid] = shouldStore;
+        }
+    }
+};
+
 }  // unnamed namespace
 
 /// keeps track of all resources used by the tracer. manages allocation and update of buffers
@@ -67,7 +81,7 @@ struct Resources {
     OptBuf<Acc, OpticalElement> d_elements;
 
     /// mask for which elements to record events
-    OptBuf<Acc, bool> d_elementRecordMask;
+    OptBuf<Acc, bool> d_objectRecordMask;
 
     // output events per tracing. required if 'events' is enabled in output config
     /// output events from tracer kernel
@@ -77,10 +91,6 @@ struct Resources {
     /// flag for each possible ouput event, wether it was stored or not. used for compaction
     OptBuf<Acc, bool> d_eventStoreFlags;
     OptBuf<Acc, int> d_eventStoreFlagsPrefixSum;
-
-    std::vector<Rays> h_compactEventsBatch;
-    std::unique_ptr<bool[]> h_eventStoreFlags;
-    std::vector<int> h_eventStoreFlagsPrefixSum;
 
     /// holds configuration state of allocated resources. required to trace correctly
     struct BeamlineConfig {
@@ -117,12 +127,12 @@ struct Resources {
         // object record mask
         const auto numSources = static_cast<int>(group.numSources());
         const auto numObjects = numSources + numElements;
-        allocBuf(q, d_elementRecordMask, numObjects);
-        auto h_elementRecordMask = std::make_unique<bool[]>(numElements);
-        for (int i = 0; i < numElements; ++i) { h_elementRecordMask[i] = objectRecordMask.shouldRecordElement(i); }
-        alpaka::memcpy(q, *d_elementRecordMask, alpaka::createView(devHost, h_elementRecordMask.get(), numElements));
+        allocBuf(q, d_objectRecordMask, numObjects);
+        auto h_objectRecordMask = std::make_unique<bool[]>(numObjects);
+        for (int i = 0; i < numObjects; ++i) { h_objectRecordMask[i] = objectRecordMask.shouldRecordObject(i); }
+        alpaka::memcpy(q, *d_objectRecordMask, alpaka::createView(devHost, h_objectRecordMask.get(), numObjects));
 
-        const auto numEventsBatchAtMost                     = numRaysBatchAtMost * maxEvents;
+        const auto numEventsBatchAtMost = numRaysBatchAtMost * maxEvents;
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
 
         // output events and compacted output events
@@ -188,8 +198,11 @@ class MegaKernelTracer : public DeviceTracer {
 
   public:
     virtual Rays trace(const Group& beamline, Sequential sequential, const ObjectMask& objectRecordMask, const RayAttrMask attrRecordMask,
-                       const int maxEvents, const int maxBatchSize) override {
+                       const int maxEventsElements, const int maxBatchSize) override {
         RAYX_PROFILE_FUNCTION_STDOUT();
+
+        const auto maxEventsSources = 1;
+        const auto maxEvents = maxEventsSources + maxEventsElements;
 
         const auto platformHost = alpaka::PlatformCpu{};
         const auto devHost      = alpaka::getDevByIdx(platformHost, 0);
@@ -205,7 +218,7 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_VERB << "\t- num sources: " << beamlineConf.numSources;
         RAYX_VERB << "\t- num elements: " << beamlineConf.numElements;
         RAYX_VERB << "\t- sequential: " << (sequential == Sequential::Yes ? "yes" : "no");
-        RAYX_VERB << "\t- max events: " << maxEvents;
+        RAYX_VERB << "\t- max events on elements: " << maxEventsElements;
         RAYX_VERB << "\t- num rays: " << sourceConf.numRaysTotal;
         RAYX_VERB << "\t- max batch size: " << maxBatchSize;
         RAYX_VERB << "\t- batch size: " << sourceConf.numRaysBatchAtMost;
@@ -217,16 +230,12 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_VERB << "\t- device name: " << alpaka::getName(devAcc);
         RAYX_VERB << "\t- host device name: " << alpaka::getName(devHost);
 
-        // const auto numEventsBatchAtMost                     = sourceConf.numRaysBatchAtMost * maxEvents;
-        const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
-        auto numEventsTotal                                 = 0;
-
+        const auto numRaysBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE);
+        const auto numEventsBatchAtMostAccountForGridStride = numRaysBatchAtMostAccountForGridStride * maxEvents;
+        auto h_compactEventsBatches = std::vector<Rays>(sourceConf.numBatches);
         auto h_eventStoreFlags = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
-        m_resources.h_eventStoreFlagsPrefixSum.resize(numEventsBatchAtMostAccountForGridStride);
-
-        // resize temporary buffer for element events. do not free memory, to optimize successive beamlines
-        if (static_cast<int>(m_resources.h_compactEventsBatch.size()) < sourceConf.numBatches)
-            m_resources.h_compactEventsBatch.resize(sourceConf.numBatches);
+        auto h_eventStoreFlagsPrefixSum = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
+        auto numEventsTotal                                 = 0;
 
         for (int batchIndex = 0; batchIndex < sourceConf.numBatches; ++batchIndex) {
             RAYX_VERB << "processing batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ")";
@@ -235,12 +244,12 @@ class MegaKernelTracer : public DeviceTracer {
             auto batchConf = m_genRaysResources.genRaysBatch(devAcc, q, batchIndex);
 
             const auto numRaysBatchAccountForGridStride   = nextMultiple(batchConf.numRaysBatch, GRID_STRIDE_MULTIPLE);
-            const auto numEventsBatchAccountForGridStride = nextMultiple(batchConf.numRaysBatch * maxEvents, GRID_STRIDE_MULTIPLE);
+            const auto numEventsBatchAccountForGridStride = numRaysBatchAccountForGridStride * maxEvents;
 
             // clear buffers
             alpaka::memset(q, *m_resources.d_eventStoreFlags, 0, numEventsBatchAccountForGridStride);
 
-            // from here we need to account for grid stride in the output buffers of the trace function: events and storedFlag
+            // from here we need to account for grid stride in the output buffers of the trace function: uncompacte events and storedFlag
 
             // trace current batch
             traceBatch(devAcc, q, beamlineConf.numSources, beamlineConf.numElements, maxEvents, sequential, attrRecordMask, batchConf,
@@ -250,11 +259,11 @@ class MegaKernelTracer : public DeviceTracer {
                            *m_resources.d_eventStoreFlags, numEventsBatchAccountForGridStride);
             const auto h_eventStoreFlagsPrefixSumEnd =
                 std::exclusive_scan(h_eventStoreFlags.get(), h_eventStoreFlags.get() + numEventsBatchAccountForGridStride,
-                                    m_resources.h_eventStoreFlagsPrefixSum.begin(), 0);
+                                    h_eventStoreFlagsPrefixSum.begin(), 0);
             const auto numEventsBatch =
                 *(h_eventStoreFlagsPrefixSumEnd - 1);  // access the last element of the exclusive scan result to get the total count
             alpaka::memcpy(q, *m_resources.d_eventStoreFlagsPrefixSum,
-                           alpaka::createView(devHost, m_resources.h_eventStoreFlagsPrefixSum, numEventsBatchAccountForGridStride),
+                           alpaka::createView(devHost, h_eventStoreFlagsPrefixSum, numEventsBatchAccountForGridStride),
                            numEventsBatchAccountForGridStride);
 
             // TODO: here we could apply more filters by turning off storedFlags
@@ -264,13 +273,9 @@ class MegaKernelTracer : public DeviceTracer {
 
             // end of acocunt for grid stride, because from here we use the compacted buffers
 
-            const auto numEventsBatchSources  = batchConf.numRaysBatch;
-            const auto numEventsBatchElements = numEventsBatch;
-            const auto numEventsBatchObjects  = numEventsBatchSources + numEventsBatchElements;
+            numEventsTotal += numEventsBatch;
 
-            numEventsTotal += numEventsBatchObjects;
-
-            transferEventsBatch(devHost, q, batchIndex, batchConf.d_rays, numEventsBatchSources, numEventsBatchElements, attrRecordMask);
+            h_compactEventsBatches[batchIndex] = transferEventsBatch(devHost, q, numEventsBatch, attrRecordMask);
 
             RAYX_VERB << "finished batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ") with batch size = " << batchConf.numRaysBatch
                       << ", recorded " << numEventsBatch << " events";
@@ -278,8 +283,7 @@ class MegaKernelTracer : public DeviceTracer {
 
         RAYX_VERB << "number of recorded events: " << numEventsTotal;
 
-        auto rays = concatEventsFromBatches(numEventsTotal, sourceConf.numBatches, attrRecordMask);
-        return rays;
+        return concatEventsFromBatches(numEventsTotal, sourceConf.numBatches, h_compactEventsBatches, attrRecordMask);
     }
 
   private:
@@ -300,7 +304,7 @@ class MegaKernelTracer : public DeviceTracer {
             .elements          = alpaka::getPtrNative(*m_resources.d_elements),
             .materials         = Materials{.indices = alpaka::getPtrNative(*m_resources.d_materialIndices),
                                            .tables  = alpaka::getPtrNative(*m_resources.d_materialTable)},
-            .elementRecordMask = alpaka::getPtrNative(*m_resources.d_elementRecordMask),
+            .objectRecordMask = alpaka::getPtrNative(*m_resources.d_objectRecordMask),
             .attrRecordMask    = attrRecordMask,
             .rays              = raysBufToRaysPtr(batchConf.d_rays),
         };
@@ -326,10 +330,8 @@ class MegaKernelTracer : public DeviceTracer {
     void compactEvents(DevAcc devAcc, Queue q, const int numEventsBatchAccountForGridStride, const RayAttrMask attrRecordMask) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
-        // we dont want to compact events if there are none
-        if (numEventsBatchAccountForGridStride == 0) return;
-
         // TODO: compare performance to single scatter kernel execution handling all attributes
+
         auto execKernel = [&]<typename TOptBuf>(TOptBuf& compactAttrBuf, const TOptBuf& attrBuf) {
             execWithValidWorkDiv<Acc>(devAcc, q, numEventsBatchAccountForGridStride, BlockSizeConstraint::None{}, ScatterCompactKernel{},
                                       alpaka::getPtrNative(*compactAttrBuf), alpaka::getPtrNative(*attrBuf),
@@ -347,39 +349,30 @@ class MegaKernelTracer : public DeviceTracer {
 #undef X
     }
 
-    template <typename Queue, typename DevHost>
-    void transferEventsBatch(DevHost& devHost, Queue q, const int batchIndex, const RaysBuf<Acc>& d_sourceRays, const int numEventsBatchSources,
-                             const int numEventsBatchElements, const RayAttrMask attrRecordMask) {
-        const auto numEventsBatchObjects = numEventsBatchSources + numEventsBatchElements;
-
-        const auto transfer = [&]<typename T>(std::vector<T>& dst, const OptBuf<Acc, T>& d_eventsBatchSources,
-                                              const OptBuf<Acc, T>& d_compactEventsBatchElements) {
-            // TODO: use object record mask to determine which sources to record
-            // TODO: source events are in global space, but must be in local element space
-
+    template <typename DevHost, typename Queue>
+    Rays transferEventsBatch(DevHost& devHost, Queue q, const int numEventsBatch,
+                             const RayAttrMask attrRecordMask) {
+        const auto transfer = [&]<typename T>(std::vector<T>& dst, const OptBuf<Acc, T>& d_compactEventsBatch) {
             // resize to fit source events and element events
-            dst.resize(numEventsBatchObjects);
+            dst.resize(numEventsBatch);
 
-            auto dstViewObjects = alpaka::createView(devHost, dst, numEventsBatchObjects);
-
-            // transfer source events
-            auto dstViewSources = alpaka::createSubView(dstViewObjects, numEventsBatchSources, 0);
-            alpaka::memcpy(q, dstViewSources, *d_eventsBatchSources, numEventsBatchSources);
-
-            // transfer element events
-            auto dstViewElements = alpaka::createSubView(dstViewObjects, numEventsBatchElements, numEventsBatchSources);
-            alpaka::memcpy(q, dstViewElements, *d_compactEventsBatchElements, numEventsBatchElements);
+            // transfer
+            alpaka::memcpy(q, alpaka::createView(devHost, dst, numEventsBatch), *d_compactEventsBatch, numEventsBatch);
         };
+
+        Rays h_compactEventsBatch;
 
 #define X(type, name, flag)                     \
     if (!!(attrRecordMask & RayAttrMask::flag)) \
-        transfer(m_resources.h_compactEventsBatch[batchIndex].name, d_sourceRays.name, m_resources.d_compactEventsBatch.name);
+        transfer(h_compactEventsBatch.name, m_resources.d_compactEventsBatch.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
+
+        return h_compactEventsBatch;
     }
 
-    Rays concatEventsFromBatches(const int numEventsTotal, const int numBatches, const RayAttrMask attrRecordMask) {
+    Rays concatEventsFromBatches(const int numEventsTotal, const int numBatches, const std::vector<Rays>& h_compactEventsBatches, const RayAttrMask attrRecordMask) {
         // create returned object as local variable, to benefit from RVO
         auto h_compactEvents = Rays();
 
@@ -388,9 +381,9 @@ class MegaKernelTracer : public DeviceTracer {
         auto batchOffset = 0;                                                                                                             \
         h_compactEvents.name.resize(numEventsTotal);                                                                                      \
         for (auto batchIndex = 0; batchIndex < numBatches; ++batchIndex) {                                                                \
-            std::copy(m_resources.h_compactEventsBatch[batchIndex].name.begin(), m_resources.h_compactEventsBatch[batchIndex].name.end(), \
+            std::copy(h_compactEventsBatches[batchIndex].name.begin(), h_compactEventsBatches[batchIndex].name.end(), \
                       h_compactEvents.name.begin() + batchOffset);                                                                        \
-            batchOffset += static_cast<int>(m_resources.h_compactEventsBatch[batchIndex].name.size());                                    \
+            batchOffset += static_cast<int>(h_compactEventsBatches[batchIndex].name.size());                                    \
         }                                                                                                                                 \
     }
 
