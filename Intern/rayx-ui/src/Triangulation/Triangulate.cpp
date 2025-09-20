@@ -443,26 +443,22 @@ bool isPlanar(const RAYX::QuadricSurface& q) {
  */
 void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
-    switch (compiled.m_surface.m_surface.index()) {
-        case 0: {
-            planarTriangulation(compiled, vertices, indices);
-            break;
-        }
-        case 1: {
-            RAYX::QuadricSurface q = cuda::std::get<RAYX::QuadricSurface>(compiled.m_surface.m_surface);
-            if (isPlanar(q)) {
+    cuda::std::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, RAYX::PlaneSurface>) {
                 planarTriangulation(compiled, vertices, indices);
-            } else {
+            } else if constexpr (std::is_same_v<T, RAYX::QuadricSurface>) {
+                if (isPlanar(arg)) {
+                    planarTriangulation(compiled, vertices, indices);
+                } else {
+                    traceTriangulation(compiled, vertices, indices);
+                }
+            } else if constexpr (std::is_same_v<T, RAYX::ToroidSurface>) {
                 traceTriangulation(compiled, vertices, indices);
+            } else {
+                RAYX_EXIT << "Unknown element type: " << typeid(T).name();
             }
-            break;
-        }
-        case 2: {
-            traceTriangulation(compiled, vertices, indices);
-            break;
-        }
-        default:
-            RAYX_EXIT << "Unknown element type: " << static_cast<int>(compiled.m_surface.m_surface.index());
-            break;
-    }
+        },
+        compiled.m_surface.m_surface);
 }
