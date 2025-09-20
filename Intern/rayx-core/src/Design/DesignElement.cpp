@@ -35,14 +35,14 @@ OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dm
     DesignPlane plane = getDesignPlane();
 
     if (getType() == ElementType::ExpertsMirror) {
-        return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr), plane);
+        return makeElement(*dePtr, Behaviour::Mirror{}, makeQuadric(*dePtr), plane);
     } else {
         Surface surface = makeSurface(*dePtr);
         Behaviour behaviour = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
             return makeElement(*dePtr, behaviour, surface, plane, {});
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*dePtr, behaviour, surface, plane, serializeUnlimited());
+            return makeElement(*dePtr, behaviour, surface, plane, Cutout::Unlimited{});
         } else {
             return makeElement(*dePtr, behaviour, surface, plane);
         }
@@ -159,49 +159,52 @@ SlopeError DesignElement::getSlopeError() const {
 }
 
 void DesignElement::setCutout(Cutout c) {
-    m_elementParameters["geometricalShape"] = c.m_type;
-    if (c.m_type == CutoutType::Rect) {
-        RectCutout rect = deserializeRect(c);
-        m_elementParameters["CutoutWidth"] = rect.m_width;
-        m_elementParameters["CutoutLength"] = rect.m_length;
-    } else if (c.m_type == CutoutType::Elliptical) {
-        EllipticalCutout elli = deserializeElliptical(c);
-        m_elementParameters["CutoutDiameterX"] = elli.m_diameter_x;
-        m_elementParameters["CutoutDiameterZ"] = elli.m_diameter_z;
-    } else if (c.m_type == CutoutType::Trapezoid) {
-        TrapezoidCutout trapi = deserializeTrapezoid(c);
-        m_elementParameters["CutoutWidthA"] = trapi.m_widthA;
-        m_elementParameters["CutoutWidthB"] = trapi.m_widthB;
-        m_elementParameters["CutoutLength"] = trapi.m_length;
-    }
+    variant::visit(
+        [&]<typename T>(const T& arg) {
+            if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Unlimited;
+            } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Rect;
+                m_elementParameters["CutoutWidth"] = arg.m_width;
+                m_elementParameters["CutoutLength"] = arg.m_length;
+            } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Elliptical;
+                m_elementParameters["CutoutDiameterX"] = arg.m_diameter_x;
+                m_elementParameters["CutoutDiameterZ"] = arg.m_diameter_z;
+            } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Trapezoid;
+                m_elementParameters["CutoutWidthA"] = arg.m_widthA;
+                m_elementParameters["CutoutWidthB"] = arg.m_widthB;
+                m_elementParameters["CutoutLength"] = arg.m_length;
+            }
+        },
+        c.m_variant);
 }
 Cutout DesignElement::getCutout() const {
-    Cutout c;
+    CutoutType type = m_elementParameters["geometricalShape"].as_openingShape();
 
-    c.m_type = m_elementParameters["geometricalShape"].as_openingShape();
-
-    if (c.m_type == CutoutType::Rect) {  // Rectangle
-        RectCutout rect;
-        rect.m_width = m_elementParameters["CutoutWidth"].as_double();
-        rect.m_length = m_elementParameters["CutoutLength"].as_double();
-        c = serializeRect(rect);
-    } else if (c.m_type == CutoutType::Elliptical) {  // Ellipsoid
-        EllipticalCutout elli;
-        elli.m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double();
-        elli.m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double();
-        c = serializeElliptical(elli);
-    } else if (c.m_type == CutoutType::Trapezoid) {  // Trapezoid
-        TrapezoidCutout trapi;
-        trapi.m_widthA = m_elementParameters["CutoutWidthA"].as_double();
-        trapi.m_widthB = m_elementParameters["CutoutWidthB"].as_double();
-        trapi.m_length = m_elementParameters["CutoutLength"].as_double();
-        c = serializeTrapezoid(trapi);
+    if (type == CutoutType::Rect) {  // Rectangle
+        return Cutout::Rect{
+            .m_width = m_elementParameters["CutoutWidth"].as_double(),
+            .m_length = m_elementParameters["CutoutLength"].as_double(),
+        };
+    } else if (type == CutoutType::Elliptical) {  // Ellipsoid
+        return Cutout::Elliptical{
+            .m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double(),
+            .m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double(),
+        };
+    } else if (type == CutoutType::Trapezoid) {  // Trapezoid
+        return Cutout::Trapezoid{
+            .m_widthA = m_elementParameters["CutoutWidthA"].as_double(),
+            .m_widthB = m_elementParameters["CutoutWidthB"].as_double(),
+            .m_length = m_elementParameters["CutoutLength"].as_double(),
+        };
     }
 
-    return c;
+    return Cutout::Unlimited{};
 }
 
-Cutout DesignElement::getGlobalCutout() const { return serializeUnlimited(); }
+Cutout DesignElement::getGlobalCutout() const { return Cutout::Unlimited{}; }
 
 void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
     m_elementParameters["vlsParams"] = Map();
@@ -221,8 +224,9 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 }
 
 void DesignElement::setExpertsOptics(Surface value) {
-    QuadricSurface qua = deserializeQuadric(value);
+    Surface::Quadric qua = variant::get<Surface::Quadric>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
+    m_elementParameters["expertsParams"]["surfaceBending"] = qua.m_icurv;
     m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
     m_elementParameters["expertsParams"]["A12"] = qua.m_a12;
     m_elementParameters["expertsParams"]["A13"] = qua.m_a13;
@@ -236,7 +240,8 @@ void DesignElement::setExpertsOptics(Surface value) {
 }
 
 Surface DesignElement::getExpertsOptics() const {
-    QuadricSurface qua;
+    Surface::Quadric qua;
+    qua.m_icurv = m_elementParameters["expertsParams"]["surfaceBending"].as_int();
     qua.m_a11 = m_elementParameters["expertsParams"]["A11"].as_double();
     qua.m_a12 = m_elementParameters["expertsParams"]["A12"].as_double();
     qua.m_a13 = m_elementParameters["expertsParams"]["A13"].as_double();
@@ -248,11 +253,11 @@ Surface DesignElement::getExpertsOptics() const {
     qua.m_a34 = m_elementParameters["expertsParams"]["A34"].as_double();
     qua.m_a44 = m_elementParameters["expertsParams"]["A44"].as_double();
 
-    return serializeQuadric(qua);
+    return qua;
 }
 
 void DesignElement::setExpertsCubic(Surface value) {
-    CubicSurface cub = deserializeCubic(value);
+    Surface::Cubic cub = variant::get<Surface::Cubic>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["A11"] = cub.m_a11;
     m_elementParameters["expertsParams"]["A12"] = cub.m_a12;
@@ -271,10 +276,12 @@ void DesignElement::setExpertsCubic(Surface value) {
     m_elementParameters["expertsParams"]["B23"] = cub.m_b23;
     m_elementParameters["expertsParams"]["B31"] = cub.m_b31;
     m_elementParameters["expertsParams"]["B32"] = cub.m_b32;
+
+    m_elementParameters["expertsParams"]["tangentAngleAlpha"] = cub.m_psi * 180 / PI;
 }
 
 Surface DesignElement::getExpertsCubic() const {
-    CubicSurface cub;
+    Surface::Cubic cub;
     cub.m_a11 = m_elementParameters["expertsParams"]["A11"].as_double();
     cub.m_a12 = m_elementParameters["expertsParams"]["A12"].as_double();
     cub.m_a13 = m_elementParameters["expertsParams"]["A13"].as_double();
@@ -293,7 +300,9 @@ Surface DesignElement::getExpertsCubic() const {
     cub.m_b31 = m_elementParameters["expertsParams"]["B31"].as_double();
     cub.m_b32 = m_elementParameters["expertsParams"]["B32"].as_double();
 
-    return serializeCubic(cub);
+    cub.m_psi = m_elementParameters["expertsParams"]["tangentAngleAlpha"].as_double() * PI / 180;
+
+    return Surface::Cubic{cub};
 }
 
 // for the spherical Mirror the radius can be calculated from grazing Inc angle, entrace Armlength and exit Armlength
@@ -426,8 +435,8 @@ Rad DesignElement::getDesignAlphaAngle() const { return m_elementParameters["Des
 void DesignElement::setDesignBetaAngle(Rad value) { m_elementParameters["DesignBetaAngle"] = value; }
 Rad DesignElement::getDesignBetaAngle() const { return m_elementParameters["DesignBetaAngle"].as_rad(); }
 
-void DesignElement::setDesignOrderOfDiffraction(double value) { m_elementParameters["DesignOrderDiffraction"] = value; }
-double DesignElement::getDesignOrderOfDiffraction() const { return m_elementParameters["DesignOrderDiffraction"].as_double(); }
+void DesignElement::setDesignOrderOfDiffraction(int value) { m_elementParameters["DesignOrderDiffraction"] = value; }
+int DesignElement::getDesignOrderOfDiffraction() const { return m_elementParameters["DesignOrderDiffraction"].as_int(); }
 
 void DesignElement::setDesignEnergy(double value) { m_elementParameters["DesignEnergy"] = value; }
 double DesignElement::getDesignEnergy() const { return m_elementParameters["DesignEnergy"].as_double(); }
@@ -444,14 +453,14 @@ double DesignElement::getDesignMeridionalEntranceArmLength() const { return m_el
 void DesignElement::setDesignMeridionalExitArmLength(double value) { m_elementParameters["DesignMeridionalExitArmLength"] = value; }
 double DesignElement::getDesignMeridionalExitArmLength() const { return m_elementParameters["DesignMeridionalExitArmLength"].as_double(); }
 
-void DesignElement::setOrderOfDiffraction(double value) { m_elementParameters["OrderDiffraction"] = value; }
-double DesignElement::getOrderOfDiffraction() const { return m_elementParameters["OrderDiffraction"].as_double(); }
+void DesignElement::setOrderOfDiffraction(int value) { m_elementParameters["OrderDiffraction"] = value; }
+int DesignElement::getOrderOfDiffraction() const { return m_elementParameters["OrderDiffraction"].as_int(); }
 
-void DesignElement::setAdditionalOrder(double value) { m_elementParameters["additionalOrder"] = value; }
-double DesignElement::getAdditionalOrder() const { return m_elementParameters["additionalOrder"].as_double(); }
+void DesignElement::setAdditionalOrder(int value) { m_elementParameters["additionalOrder"] = value; }
+int DesignElement::getAdditionalOrder() const { return m_elementParameters["additionalOrder"].as_int(); }
 
-void DesignElement::setImageType(double value) { m_elementParameters["imageType"] = value; }
-double DesignElement::getImageType() const { return m_elementParameters["imageType"].as_double(); }
+void DesignElement::setImageType(int value) { m_elementParameters["imageType"] = value; }
+int DesignElement::getImageType() const { return m_elementParameters["imageType"].as_int(); }
 
 void DesignElement::setCurvatureType(CurvatureType value) { m_elementParameters["curvatureType"] = value; }
 CurvatureType DesignElement::getCurvatureType() const { return m_elementParameters["curvatureType"].as_curvatureType(); }

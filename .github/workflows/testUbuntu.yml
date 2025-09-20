@@ -42,7 +42,8 @@ jobs:
         uses: Jimver/cuda-toolkit@master
         id: cuda-toolkit
         with:
-          cuda: '12.4.1'
+          cuda: '12.8.1'
+          method: 'network'
 
       - name: Configure CMake
         run: cmake -B ${{github.workspace}}/build -DRAYX_WERROR=ON -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DRAYX_REQUIRE_CUDA=ON
