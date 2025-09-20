@@ -1,6 +1,6 @@
 #pragma once
 
-#include <variant>
+#include <cuda/std/variant>
 
 #include "Core.h"
 
@@ -140,7 +140,7 @@ struct CubicSurface {
 };
 
 struct Surface {
-    std::variant<PlaneSurface, QuadricSurface, ToroidSurface, CubicSurface> m_surface = PlaneSurface{};
+    cuda::std::variant<PlaneSurface, QuadricSurface, ToroidSurface, CubicSurface> m_surface = PlaneSurface{};
 };
 
 struct DesignElement;
