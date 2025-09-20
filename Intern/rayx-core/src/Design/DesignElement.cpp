@@ -200,6 +200,7 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 void DesignElement::setExpertsOptics(Surface value) {
     Surface::Quadric qua = variant::get<Surface::Quadric>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
+    m_elementParameters["expertsParams"]["surfaceBending"] = qua.m_icurv;
     m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
     m_elementParameters["expertsParams"]["A12"] = qua.m_a12;
     m_elementParameters["expertsParams"]["A13"] = qua.m_a13;
@@ -214,6 +215,7 @@ void DesignElement::setExpertsOptics(Surface value) {
 
 Surface DesignElement::getExpertsOptics() const {
     Surface::Quadric qua;
+    qua.m_icurv = m_elementParameters["expertsParams"]["surfaceBending"].as_int();
     qua.m_a11 = m_elementParameters["expertsParams"]["A11"].as_double();
     qua.m_a12 = m_elementParameters["expertsParams"]["A12"].as_double();
     qua.m_a13 = m_elementParameters["expertsParams"]["A13"].as_double();
