@@ -429,12 +429,18 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
 }
 
 RAYX_FN_ACC
-OptCollisionPoint getPlaneCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection) {
-    // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
-    // velocity = distance/time <-> time = distance/velocity from school physics.
-    // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
-    // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
-    double time = -rayPosition.y / rayDirection.y;
+Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
+                                                Cutout cutout, bool isTriangul) {
+    Collision col;
+    switch (surface.m_surface.index()) {
+        case 0: {
+            col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
+
+            // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
+            // velocity = distance/time <-> time = distance/velocity from school physics.
+            // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
+            // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
+            double time = -rayPosition.y / rayDirection.y;
 
     // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane)
     if (time < 0) return std::nullopt;
@@ -461,18 +467,21 @@ OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const g
         case SurfaceType::Plane:
             col = getPlaneCollision(rayPosition, rayDirection);
             break;
-        case SurfaceType::Toroid:
-            col = getToroidCollision(rayPosition, rayDirection, deserializeToroid(element.m_surface), isTriangul);
+        }
+        case 2:
+            col = getToroidCollision(rayPosition, rayDirection, std::get<ToroidSurface>(surface.m_surface), isTriangul);
             break;
-        case SurfaceType::Quadric:
-            col = getQuadricCollision(rayPosition, rayDirection, deserializeQuadric(element.m_surface));
+        case 1:
+            col = getQuadricCollision(rayPosition, rayDirection, std::get<QuadricSurface>(surface.m_surface));
             break;
-        case SurfaceType::Cubic:
-            col = getCubicCollision(rayPosition, rayDirection, deserializeCubic(element.m_surface));
+        case 3:
+            col = getCubicCollision(rayPosition, rayDirection, std::get<CubicSurface>(surface.m_surface));
             break;
         default:
-            _throw("invalid surfaceType: %d!", static_cast<int>(element.m_surface.m_type));
-            return std::nullopt;
+            col.found = false;
+
+            _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_surface.index()));
+            return col;  // has found = false
     }
 
     if (!col) return std::nullopt;
