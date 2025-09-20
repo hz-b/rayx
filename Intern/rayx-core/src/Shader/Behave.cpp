@@ -19,7 +19,7 @@ namespace RAYX {
 
 RAYX_FN_ACC
 Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision col) {
-    CrystalBehaviour b = deserializeCrystal(behaviour);
+    Behaviour::Crystal b = variant::get<Behaviour::Crystal>(behaviour.m_behaviour);
 
     double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
     double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
@@ -62,7 +62,7 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
 
 RAYX_FN_ACC
 Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
-    SlitBehaviour b = deserializeSlit(behaviour);
+    Behaviour::Slit b = variant::get<Behaviour::Slit>(behaviour.m_behaviour);
 
     // slit lies in x-y plane instead of x-z plane as other elements
     Cutout openingCutout = b.m_openingCutout;
@@ -84,16 +84,19 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
-        if (openingCutout.m_type == CutoutType::Rect) {
-            RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi, rand);
-            fraun_diff(r.m_length, wavelength, dPsi, rand);
-        } else if (openingCutout.m_type == CutoutType::Elliptical) {
-            EllipticalCutout e = deserializeElliptical(openingCutout);
-            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, rand);
-        } else {
-            _throw("encountered Slit with unsupported openingCutout: %d!", static_cast<int>(openingCutout.m_type));
-        }
+        variant ::visit(
+            [&](auto&& arg) {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, Cutout::Rect>) {
+                    fraun_diff(arg.m_width, wavelength, dPhi, rand);
+                    fraun_diff(arg.m_length, wavelength, dPsi, rand);
+                } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+                    bessel_diff(arg.m_diameter_z, wavelength, dPhi, dPsi, rand);
+                } else {
+                    _throw("encountered Slit with unsupported openingCutout!");
+                }
+            },
+            openingCutout.m_variant);
     }
 
     phi += dPhi;
@@ -107,7 +110,7 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
 
 RAYX_FN_ACC
 Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __restrict rand) {
-    RZPBehaviour b = deserializeRZP(behaviour);
+    Behaviour::RZP b = variant::get<Behaviour::RZP>(behaviour.m_behaviour);
 
     double WL = energyToWaveLength(r.m_energy);
     double Ord = b.m_orderOfDiffraction;
@@ -134,7 +137,7 @@ Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __res
 
 RAYX_FN_ACC
 Ray behaveGrating(Ray r, const Behaviour behaviour, const Collision col) {
-    GratingBehaviour b = deserializeGrating(behaviour);
+    Behaviour::Grating b = variant::get<Behaviour::Grating>(behaviour.m_behaviour);
 
     // vls parameters passed in q.elementParams
     double WL = energyToWaveLength(r.m_energy);
@@ -176,7 +179,7 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
 RAYX_FN_ACC
 Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int material, const int* __restrict materialIndices,
                const double* __restrict materialTable) {
-    FoilBehaviour f = deserializeFoil(behaviour);
+    Behaviour::Foil f = variant::get<Behaviour::Foil>(behaviour.m_behaviour);
     const double wavelength = energyToWaveLength(r.m_energy);
 
     const auto indexVacuum = complex::Complex(1., 0.);

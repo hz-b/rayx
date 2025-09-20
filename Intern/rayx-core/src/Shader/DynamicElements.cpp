@@ -39,29 +39,29 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         ray.m_lastElement = col.elementIndex;
         ray.m_eventType = EventType::HitElement;
 
-        switch (behaviour.m_type) {
-            case BehaveType::Mirror:
-                ray = behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
-                break;
-            case BehaveType::Grating:
-                ray = behaveGrating(ray, behaviour, col);
-                break;
-            case BehaveType::Slit:
-                ray = behaveSlit(ray, behaviour, rand);
-                break;
-            case BehaveType::RZP:
-                ray = behaveRZP(ray, behaviour, col, rand);
-                break;
-            case BehaveType::Crystal:
-                ray = behaveCrystal(ray, behaviour, col);
-                break;
-            case BehaveType::ImagePlane:
-                ray = behaveImagePlane(ray);
-                break;
-            case BehaveType::Foil:
-                ray = behaveFoil(ray, behaviour, col, element.m_material, inv.materialIndices, inv.materialTables);
-                break;
-        }
+        ray = variant::visit(
+            [&](auto&& arg) -> Ray {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, Behaviour::Mirror>) {
+                    return behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
+                } else if constexpr (std::is_same_v<T, Behaviour::Grating>) {
+                    return behaveGrating(ray, behaviour, col);
+                } else if constexpr (std::is_same_v<T, Behaviour::Slit>) {
+                    return behaveSlit(ray, behaviour, rand);
+                } else if constexpr (std::is_same_v<T, Behaviour::RZP>) {
+                    return behaveRZP(ray, behaviour, col, rand);
+                } else if constexpr (std::is_same_v<T, Behaviour::Crystal>) {
+                    return behaveCrystal(ray, behaviour, col);
+                } else if constexpr (std::is_same_v<T, Behaviour::ImagePlane>) {
+                    return behaveImagePlane(ray);
+                } else if constexpr (std::is_same_v<T, Behaviour::Foil>) {
+                    return behaveFoil(ray, behaviour, col, element.m_material, inv.materialIndices, inv.materialTables);
+                } else {
+                    _throw("invalid behaviour type in dynamicElements!");
+                    return ray;
+                }
+            },
+            behaviour.m_behaviour);
 
         // write ray in local element coordinates to global memory
         if (numRecorded < inv.maxEvents && (!inv.recordMask || inv.recordMask[col.elementIndex])) {

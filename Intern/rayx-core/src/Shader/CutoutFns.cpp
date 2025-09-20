@@ -1,114 +1,113 @@
 #include "CutoutFns.h"
 
 #include "Throw.h"
+#include "Variant.h"
 
 namespace RAYX {
 
 // checks whether the point (x, z) is within the cutout.
 RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
-    switch (cutout.m_type) {
-        case CutoutType::Unlimited:
-            return true;
-        case CutoutType::Rect: {
-            RectCutout rect = deserializeRect(cutout);
-            double x_min = -rect.m_width / 2.0;
-            double x_max = rect.m_width / 2.0;
-            double z_min = -rect.m_length / 2.0;
-            double z_max = rect.m_length / 2.0;
+    bool result = variant::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
+                return true;
+            } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
+                double x_min = -arg.m_width / 2.0;
+                double x_max = arg.m_width / 2.0;
+                double z_min = -arg.m_length / 2.0;
+                double z_max = arg.m_length / 2.0;
 
-            return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
-        }
-        case CutoutType::Trapezoid: {
-            TrapezoidCutout t = deserializeTrapezoid(cutout);
+                return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
+            } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
+                // Check point is within the trapezoid
+                auto P = glm::dvec2(x, z);
 
-            // Check point is within the trapezoid
-            auto P = glm::dvec2(x, z);
+                // A, B, C, D are the four points on the trapezoid.
+                //
+                //    A--B    //
+                //   /    \   //
+                //  C------D  //
+                auto A = glm::dvec2(-arg.m_widthA / 2.0, -arg.m_length / 2.0);
+                auto B = glm::dvec2(arg.m_widthA / 2.0, -arg.m_length / 2.0);
+                auto C = glm::dvec2(arg.m_widthB / 2.0, arg.m_length / 2.0);
+                auto D = glm::dvec2(-arg.m_widthB / 2.0, arg.m_length / 2.0);
 
-            // A, B, C, D are the four points on the trapezoid.
-            //
-            //    A--B    //
-            //   /    \   //
-            //  C------D  //
-            auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
-            auto B = glm::dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
-            auto C = glm::dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
-            auto D = glm::dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
+                glm::dvec2 PmA = P - A;
+                glm::dvec2 BmA = B - A;
+                glm::dvec2 PmD = P - D;
+                glm::dvec2 CmD = C - D;
+                glm::dvec2 DmA = D - A;
+                glm::dvec2 PmB = P - B;
+                glm::dvec2 CmB = C - B;
 
-            glm::dvec2 PmA = P - A;
-            glm::dvec2 BmA = B - A;
-            glm::dvec2 PmD = P - D;
-            glm::dvec2 CmD = C - D;
-            glm::dvec2 DmA = D - A;
-            glm::dvec2 PmB = P - B;
-            glm::dvec2 CmB = C - B;
-
-            double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
-            double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
-            return l1 < 0 && l2 < 0;
-        }
-        case CutoutType::Elliptical: {
-            EllipticalCutout ell = deserializeElliptical(cutout);
-
-            double radius_x = ell.m_diameter_x / 2.0;
-            double radius_z = ell.m_diameter_z / 2.0;
-
-            double val1 = x / radius_x;
-            double val2 = z / radius_z;
-
-            double rd2 = val1 * val1 + val2 * val2;
-            return rd2 <= 1.0;
-        }
-        default:
-            _throw("invalid cutout type in inCutout %d!", static_cast<int>(cutout.m_type));
-            return false;
-    }
+                double l1 = (PmA.x * BmA.y - PmA.y * BmA.x) * (PmD.x * CmD.y - PmD.y * CmD.x);
+                double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
+                return l1 < 0 && l2 < 0;
+            } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+                double radius_x = arg.m_diameter_x / 2.0;
+                double radius_z = arg.m_diameter_z / 2.0;
+                double val1 = x / radius_x;
+                double val2 = z / radius_z;
+                double rd2 = val1 * val1 + val2 * val2;
+                return rd2 <= 1.0;
+            } else {
+                _throw("invalid cutout type in inCutout!");
+                return false;
+            }
+        },
+        cutout.m_variant);  // to ensure cutout is valid
+    return result;
 }
 
 // returns a matrix M where (M[i].x, M[i].z) are the key points of our cutout.
 // The key points are typically points on the boundary of the cutout.
 RAYX_FN_ACC
 glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
-    glm::dmat4 ret;
-    double w = 0;
-    double l = 0;
-    if (cutout.m_type == CutoutType::Unlimited) {
-        double inf = 1e100;
-        w = inf;
-        l = inf;
-    } else if (cutout.m_type == CutoutType::Rect) {
-        RectCutout rect = deserializeRect(cutout);
-        w = rect.m_width / 2.0;
-        l = rect.m_length / 2.0;
-    } else if (cutout.m_type == CutoutType::Trapezoid) {
-        TrapezoidCutout t = deserializeTrapezoid(cutout);
+    glm::dmat4 ret = variant::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
+                double inf = 1e100;
+                return glm::dmat4(glm::dvec4(inf, 0.0, inf, 0.0),    // Top-right
+                                  glm::dvec4(-inf, 0.0, -inf, 0.0),  // Bottom-left
+                                  glm::dvec4(-inf, 0.0, inf, 0.0),   // Top-left
+                                  glm::dvec4(inf, 0.0, -inf, 0.0)    // Bottom-right
+                );
+            } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
+                double w = arg.m_width / 2.0;
+                double l = arg.m_length / 2.0;
+                return glm::dmat4(glm::dvec4(w, 0.0, l, 0.0),    // Top-right
+                                  glm::dvec4(-w, 0.0, -l, 0.0),  // Bottom-left
+                                  glm::dvec4(-w, 0.0, l, 0.0),   // Top-left
+                                  glm::dvec4(w, 0.0, -l, 0.0)    // Bottom-right
+                );
+            } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
+                auto A = glm::dvec2(-arg.m_widthA / 2.0, -arg.m_length / 2.0);
+                auto B = glm::dvec2(arg.m_widthA / 2.0, -arg.m_length / 2.0);
+                auto C = glm::dvec2(arg.m_widthB / 2.0, arg.m_length / 2.0);
+                auto D = glm::dvec2(-arg.m_widthB / 2.0, arg.m_length / 2.0);
 
-        auto A = glm::dvec2(-t.m_widthA / 2.0, -t.m_length / 2.0);
-        auto B = glm::dvec2(t.m_widthA / 2.0, -t.m_length / 2.0);
-        auto C = glm::dvec2(t.m_widthB / 2.0, t.m_length / 2.0);
-        auto D = glm::dvec2(-t.m_widthB / 2.0, t.m_length / 2.0);
-
-        ret[0] = glm::dvec4(A[0], 0.0, A[1], 0.0);
-        ret[1] = glm::dvec4(B[0], 0.0, B[1], 0.0);
-        ret[2] = glm::dvec4(C[0], 0.0, C[1], 0.0);
-        ret[3] = glm::dvec4(D[0], 0.0, D[1], 0.0);
-        return ret;
-    } else if (cutout.m_type == CutoutType::Elliptical) {
-        EllipticalCutout ell = deserializeElliptical(cutout);
-        double rx = ell.m_diameter_x / 2.0;
-        double rz = ell.m_diameter_z / 2.0;
-        ret[0] = glm::dvec4(rx, 0.0, 0.0, 0.0);
-        ret[1] = glm::dvec4(0.0, 0.0, rz, 0.0);
-        ret[2] = glm::dvec4(-rx, 0.0, 0.0, 0.0);
-        ret[3] = glm::dvec4(0.0, 0.0, -rz, 0.0);
-        return ret;
-    } else {
-        _throw("invalid cutout type in inCutout!");
-    }
-    ret[0] = glm::dvec4(w, 0.0, l, 0.0);
-    ret[1] = glm::dvec4(-w, 0.0, -l, 0.0);
-    ret[2] = glm::dvec4(-w, 0.0, l, 0.0);
-    ret[3] = glm::dvec4(w, 0.0, -l, 0.0);
+                return glm::dmat4(glm::dvec4(B[0], 0.0, B[1], 0.0),  // Top-right
+                                  glm::dvec4(A[0], 0.0, A[1], 0.0),  // Bottom-left
+                                  glm::dvec4(D[0], 0.0, D[1], 0.0),  // Top-left
+                                  glm::dvec4(C[0], 0.0, C[1], 0.0)   // Bottom-right
+                );
+            } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+                double rx = arg.m_diameter_x / 2.0;
+                double rz = arg.m_diameter_z / 2.0;
+                return glm::dmat4(glm::dvec4(rx, 0.0, 0.0, 0.0),   // Right
+                                  glm::dvec4(0.0, 0.0, rz, 0.0),   // Top
+                                  glm::dvec4(-rx, 0.0, 0.0, 0.0),  // Left
+                                  glm::dvec4(0.0, 0.0, -rz, 0.0)   // Bottom
+                );
+            } else {
+                _throw("invalid cutout type in keyCutoutPoints!");
+                return glm::dmat4(0.0);
+            }
+        },
+        cutout.m_variant);  // to ensure cutout is valid
     return ret;
 }
 

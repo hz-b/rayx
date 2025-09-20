@@ -191,7 +191,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     struct InOutPair {
         Ray in_ray;
         glm::dvec4 in_normal;
-        RZPBehaviour in_b;
+        Behaviour::RZP in_b;
 
         double out_DX;
         double out_DZ;
@@ -206,7 +206,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
                 },
             .in_normal = glm::dvec4(0, 1, 0, 0),
             .in_b =
-                RZPBehaviour{
+                Behaviour::RZP{
                     .m_imageType = 0,
                     .m_rzpType = 0,
                     .m_derivationMethod = 0,
@@ -231,7 +231,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
              },
          .in_normal = glm::dvec4(0, 1, 0, 0),
          .in_b =
-             RZPBehaviour{
+             Behaviour::RZP{
                  .m_imageType = 0,
                  .m_rzpType = 0,
                  .m_derivationMethod = 0,
@@ -251,7 +251,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
                        .m_direction = glm::dvec3(0.05047050067282087, 0.95514062789960552, -0.29182033770349552)},
          .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
          .in_b =
-             RZPBehaviour{
+             Behaviour::RZP{
                  .m_imageType = 0,
                  .m_rzpType = 0,
                  .m_derivationMethod = 0,
@@ -274,7 +274,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
              },
          .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
          .in_b =
-             RZPBehaviour{
+             Behaviour::RZP{
                  .m_imageType = 0,
                  .m_rzpType = 0,
                  .m_derivationMethod = 0,
@@ -305,7 +305,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     struct InOutPair {
         Ray in_ray;
         glm::dvec4 in_normal;
-        RZPBehaviour in_b;
+        Behaviour::RZP in_b;
 
         double out_DX;
         double out_DZ;
