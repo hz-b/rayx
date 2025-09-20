@@ -429,27 +429,23 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
 }
 
 RAYX_FN_ACC
-Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
-                                                Cutout cutout, bool isTriangul) {
+Collision getPlaneCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, PlaneSurface) {
     Collision col;
-    switch (surface.m_surface.index()) {
-        case 0: {
-            col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
+    col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
 
-            // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
-            // velocity = distance/time <-> time = distance/velocity from school physics.
-            // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
-            // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
-            double time = -rayPosition.y / rayDirection.y;
+    // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
+    // velocity = distance/time <-> time = distance/velocity from school physics.
+    // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
+    // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
+    double time = -rayPosition.y / rayDirection.y;
 
-    // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane)
-    if (time < 0) return std::nullopt;
-
-    CollisionPoint col;
-    col.normal     = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
     col.hitpoint.x = rayPosition.x + rayDirection.x * time;
     col.hitpoint.z = rayPosition.z + rayDirection.z * time;
     col.hitpoint.y = 0;
+
+    // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set
+    // `found = false`.
+    col.found = time >= 0;
     return col;
 }
 
@@ -457,34 +453,24 @@ Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict ray
  *                    Collision Finder
  **************************************************************/
 
-// TODO: remove parameter isTriangul, which is required by RAUX-UI
 RAYX_FN_ACC
-OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const glm::dvec3& __restrict rayPosition,
-                                                                         const glm::dvec3& __restrict rayDirection,
-                                                                         const OpticalElement& __restrict element, bool isTriangul) {
-    OptCollisionPoint col;
-    switch (element.m_surface.m_type) {
-        case SurfaceType::Plane:
-            col = getPlaneCollision(rayPosition, rayDirection);
-            break;
-        }
-        case 2:
-            col = getToroidCollision(rayPosition, rayDirection, std::get<ToroidSurface>(surface.m_surface), isTriangul);
-            break;
-        case 1:
-            col = getQuadricCollision(rayPosition, rayDirection, std::get<QuadricSurface>(surface.m_surface));
-            break;
-        case 3:
-            col = getCubicCollision(rayPosition, rayDirection, std::get<CubicSurface>(surface.m_surface));
-            break;
-        default:
-            col.found = false;
-
-            _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_surface.index()));
-            return col;  // has found = false
-    }
-
-    if (!col) return std::nullopt;
+Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
+                                                Cutout cutout, bool isTriangul) {
+    Collision col;
+    std::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, PlaneSurface>) {
+                col = getPlaneCollision(rayPosition, rayDirection, arg);
+            } else if constexpr (std::is_same_v<T, QuadricSurface>) {
+                col = getQuadricCollision(rayPosition, rayDirection, arg);
+            } else if constexpr (std::is_same_v<T, CubicSurface>) {
+                col = getCubicCollision(rayPosition, rayDirection, arg);
+            } else if constexpr (std::is_same_v<T, ToroidSurface>) {
+                col = getToroidCollision(rayPosition, rayDirection, arg, isTriangul);
+            }
+        },
+        surface.m_surface);
 
     // cutout is applied in the XZ plane.
     if (!inCutout(element.m_cutout, col->hitpoint.x, col->hitpoint.z)) { return std::nullopt; }
