@@ -182,7 +182,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     struct InOutPair {
         glm::dvec3 in_position;
         glm::dvec4 in_normal;
-        RZPBehaviour in_b;
+        Behaviour::RZP in_b;
 
         double out_DX;
         double out_DZ;
@@ -193,15 +193,15 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
             .in_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
             .in_normal   = glm::dvec4(0, 1, 0, 0),
             .in_b =
-                RZPBehaviour{
-                    .m_imageType                         = 0,
-                    .m_rzpType                           = 0,
-                    .m_derivationMethod                  = 0,
-                    .m_designWavelength                  = 1.239852e-05 * 1e6,
-                    .m_orderOfDiffraction                = -1,
-                    .m_fresnelZOffset                    = 0,
-                    .m_designSagittalEntranceArmLength   = 100,
-                    .m_designSagittalExitArmLength       = 500,
+                Behaviour::RZP{
+                    .m_imageType = 0,
+                    .m_rzpType = 0,
+                    .m_derivationMethod = 0,
+                    .m_designWavelength = 1.239852e-05 * 1e6,
+                    .m_orderOfDiffraction = -1,
+                    .m_fresnelZOffset = 0,
+                    .m_designSagittalEntranceArmLength = 100,
+                    .m_designSagittalExitArmLength = 500,
                     .m_designMeridionalEntranceArmLength = 100,
                     .m_designMeridionalExitArmLength     = 500,
                     .m_designAlphaAngle                  = 0.017453292519943295,
@@ -214,15 +214,15 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
         {.in_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
          .in_normal   = glm::dvec4(0, 1, 0, 0),
          .in_b =
-             RZPBehaviour{
-                 .m_imageType                         = 0,
-                 .m_rzpType                           = 0,
-                 .m_derivationMethod                  = 0,
-                 .m_designWavelength                  = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction                = -1,
-                 .m_fresnelZOffset                    = 0,
-                 .m_designSagittalEntranceArmLength   = 100,
-                 .m_designSagittalExitArmLength       = 500,
+             Behaviour::RZP{
+                 .m_imageType = 0,
+                 .m_rzpType = 0,
+                 .m_derivationMethod = 0,
+                 .m_designWavelength = 1.239852e-05 * 1e6,
+                 .m_orderOfDiffraction = -1,
+                 .m_fresnelZOffset = 0,
+                 .m_designSagittalEntranceArmLength = 100,
+                 .m_designSagittalExitArmLength = 500,
                  .m_designMeridionalEntranceArmLength = 100,
                  .m_designMeridionalExitArmLength     = 500,
                  .m_designAlphaAngle                  = 0.017453292519943295,
@@ -233,15 +233,15 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
         {.in_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
          .in_normal   = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
          .in_b =
-             RZPBehaviour{
-                 .m_imageType                         = 0,
-                 .m_rzpType                           = 0,
-                 .m_derivationMethod                  = 0,
-                 .m_designWavelength                  = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction                = -1,
-                 .m_fresnelZOffset                    = 0,
-                 .m_designSagittalEntranceArmLength   = 100,
-                 .m_designSagittalExitArmLength       = 500,
+             Behaviour::RZP{
+                 .m_imageType = 0,
+                 .m_rzpType = 0,
+                 .m_derivationMethod = 0,
+                 .m_designWavelength = 1.239852e-05 * 1e6,
+                 .m_orderOfDiffraction = -1,
+                 .m_fresnelZOffset = 0,
+                 .m_designSagittalEntranceArmLength = 100,
+                 .m_designSagittalExitArmLength = 500,
                  .m_designMeridionalEntranceArmLength = 100,
                  .m_designMeridionalExitArmLength     = 500,
                  .m_designAlphaAngle                  = 0.017453292519943295,
@@ -252,15 +252,15 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
         {.in_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
          .in_normal   = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
          .in_b =
-             RZPBehaviour{
-                 .m_imageType                         = 0,
-                 .m_rzpType                           = 0,
-                 .m_derivationMethod                  = 0,
-                 .m_designWavelength                  = 1.239852e-05 * 1e6,
-                 .m_orderOfDiffraction                = -1,
-                 .m_fresnelZOffset                    = 0,
-                 .m_designSagittalEntranceArmLength   = 100,
-                 .m_designSagittalExitArmLength       = 500,
+             Behaviour::RZP{
+                 .m_imageType = 0,
+                 .m_rzpType = 0,
+                 .m_derivationMethod = 0,
+                 .m_designWavelength = 1.239852e-05 * 1e6,
+                 .m_orderOfDiffraction = -1,
+                 .m_fresnelZOffset = 0,
+                 .m_designSagittalEntranceArmLength = 100,
+                 .m_designSagittalExitArmLength = 500,
                  .m_designMeridionalEntranceArmLength = 100,
                  .m_designMeridionalExitArmLength     = 500,
                  .m_designAlphaAngle                  = 0.017453292519943295,
@@ -283,7 +283,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     struct InOutPair {
         glm::dvec3 in_position;
         glm::dvec4 in_normal;
-        RZPBehaviour in_b;
+        Behaviour::RZP in_b;
 
         double out_DX;
         double out_DZ;

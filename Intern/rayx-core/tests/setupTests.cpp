@@ -144,21 +144,31 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
     const auto beamline    = loadBeamline(filename);
     const auto numSources  = beamline.numSources();
     const auto numElements = beamline.numElements();
-    const auto numObjects  = numSources + numElements;
+    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, fullRecordMask(numElements));
 
-    auto rays = tracer->trace(beamline, seq, ObjectMask::all(numSources, numElements), attrMaskCompatibleWithRayUi | RayAttrMask::ObjectId | RayAttrMask::PathId | RayAttrMask::PathEventId)
-                    .filterByObjectId(numObjects - 1)
-                    .sortByPathIdAndPathEventId();
+    const auto hist = raySoAToBundleHistory(rays);
 
-    const auto elements = beamline.compileElements();
-    const auto size     = rays.size();
-    for (int i = 0; i < size; ++i) {
-        const auto element_id = rays.object_id[i] - numSources;
-        const auto btype      = elements[element_id].element.m_behaviour.m_type;
-        if (btype == BehaveType::ImagePlane || btype == BehaveType::Slit || btype == BehaveType::Foil) {
-            // these elements have their local z axis along the beam direction, so we need to swap y and z to match Ray-UI
-            std::swap(rays.position_y[i], rays.position_z[i]);
-            std::swap(rays.direction_y[i], rays.direction_z[i]);
+    std::vector<RAYX::Ray> out;
+
+    auto compiled = beamline.compileElements();
+
+    for (auto ray_hist : hist) {
+        auto opt_ray = lastSequentialHit(ray_hist, beamline.numElements());
+
+        if (opt_ray) {
+            auto orig_r = *opt_ray;
+            auto r = orig_r;
+            int elem = (int)r.m_lastElement;
+            auto behaviour = compiled[elem].m_behaviour;
+            // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
+            // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
+            if (behaviour.is<Behaviour::ImagePlane>() || behaviour.is<Behaviour::Slit>() || behaviour.is<Behaviour::Foil>()) {
+                r.m_position.y = orig_r.m_position.z;
+                r.m_position.z = orig_r.m_position.y;
+                r.m_direction.y = orig_r.m_direction.z;
+                r.m_direction.z = orig_r.m_direction.y;
+            }
+            out.push_back(r);
         }
     }
 

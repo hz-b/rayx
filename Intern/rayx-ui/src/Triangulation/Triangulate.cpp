@@ -14,6 +14,7 @@
 #include "Element/Cutout.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
+#include "Shader/Variant.h"
 #include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {
@@ -359,29 +360,23 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
     constexpr double defWidthHeight = 50.0f;
     Outline outline;
 
-    switch (cutout.m_type) {
-        case RAYX::CutoutType::Trapezoid: {
-            RAYX::TrapezoidCutout trapezoid = RAYX::deserializeTrapezoid(cutout);
-            outline.calculateForQuadrilateral(trapezoid.m_widthA, trapezoid.m_widthB, trapezoid.m_length, trapezoid.m_length);
-            break;
-        }
-        case RAYX::CutoutType::Rect: {
-            RAYX::RectCutout rect = RAYX::deserializeRect(cutout);
-            outline.calculateForQuadrilateral(rect.m_width, rect.m_width, rect.m_length, rect.m_length);
-            break;
-        }
-        case RAYX::CutoutType::Elliptical: {
-            RAYX::EllipticalCutout ellipse = RAYX::deserializeElliptical(cutout);
-            outline.calculateForElliptical(ellipse.m_diameter_x, ellipse.m_diameter_z);
-            break;
-        }
-        case RAYX::CutoutType::Unlimited: {
-            outline.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
-            break;
-        }
-        default:
-            RAYX_EXIT << "Unknown cutout opening shape!";
-    }
+    RAYX::variant::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, RAYX::Cutout::Trapezoid>) {
+                outline.calculateForQuadrilateral(arg.m_widthA, arg.m_widthB, arg.m_length, arg.m_length);
+            } else if constexpr (std::is_same_v<T, RAYX::Cutout::Rect>) {
+                outline.calculateForQuadrilateral(arg.m_width, arg.m_width, arg.m_length, arg.m_length);
+            } else if constexpr (std::is_same_v<T, RAYX::Cutout::Elliptical>) {
+                outline.calculateForElliptical(arg.m_diameter_x, arg.m_diameter_z);
+            } else if constexpr (std::is_same_v<T, RAYX::Cutout::Unlimited>) {
+                outline.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
+            } else {
+                RAYX_EXIT << "Unknown cutout opening shape!";
+            }
+        },
+        cutout.m_variant);
+
     uint32_t offset = static_cast<uint32_t>(vertices.size());
     vertices.insert(vertices.end(), outline.vertices.begin(), outline.vertices.end());
     PolygonSimple indices;
@@ -401,14 +396,18 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
 void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
-    if (compiled.m_behaviour.m_type == RAYX::BehaveType::Slit) {
-        RAYX::SlitBehaviour slit = deserializeSlit(compiled.m_behaviour);
-        poly.push_back(calculateOutlineFromCutout(slit.m_beamstopCutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
-        poly.push_back(calculateOutlineFromCutout(slit.m_openingCutout, vertices, true));  // Hole -> Clockwise order
-    } else {
-        poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
-    }
+    RAYX::variant::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, RAYX::Behaviour::Slit>) {
+                poly.push_back(calculateOutlineFromCutout(arg.m_beamstopCutout, vertices));
+                poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
+                poly.push_back(calculateOutlineFromCutout(arg.m_openingCutout, vertices, true));  // Hole -> Clockwise order
+            } else {
+                poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
+            }
+        },
+        compiled.m_behaviour.m_behaviour);
     triangulate(poly, vertices, indices);
 }
 

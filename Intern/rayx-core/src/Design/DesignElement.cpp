@@ -34,14 +34,14 @@ OpticalElementAndTransform DesignElement::compile(const glm::dvec4& parentPos, c
     DesignPlane plane = getDesignPlane();
 
     if (getType() == ElementType::ExpertsMirror) {
-        return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr), plane);
+        return makeElement(*dePtr, Behaviour::Mirror{}, makeQuadric(*dePtr), plane);
     } else {
         Surface surface     = makeSurface(*dePtr);
         Behaviour behaviour = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
             return makeElement(*dePtr, behaviour, surface, plane, {});
         } else if (getType() == ElementType::ImagePlane) {
-            return makeElement(*dePtr, behaviour, surface, plane, serializeUnlimited());
+            return makeElement(*dePtr, behaviour, surface, plane, Cutout::Unlimited{});
         } else {
             return makeElement(*dePtr, behaviour, surface, plane);
         }
@@ -136,49 +136,53 @@ SlopeError DesignElement::getSlopeError() const {
 }
 
 void DesignElement::setCutout(Cutout c) {
-    m_elementParameters["geometricalShape"] = c.m_type;
-    if (c.m_type == CutoutType::Rect) {
-        RectCutout rect                     = deserializeRect(c);
-        m_elementParameters["CutoutWidth"]  = rect.m_width;
-        m_elementParameters["CutoutLength"] = rect.m_length;
-    } else if (c.m_type == CutoutType::Elliptical) {
-        EllipticalCutout elli                  = deserializeElliptical(c);
-        m_elementParameters["CutoutDiameterX"] = elli.m_diameter_x;
-        m_elementParameters["CutoutDiameterZ"] = elli.m_diameter_z;
-    } else if (c.m_type == CutoutType::Trapezoid) {
-        TrapezoidCutout trapi               = deserializeTrapezoid(c);
-        m_elementParameters["CutoutWidthA"] = trapi.m_widthA;
-        m_elementParameters["CutoutWidthB"] = trapi.m_widthB;
-        m_elementParameters["CutoutLength"] = trapi.m_length;
-    }
+    variant::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Unlimited;
+            } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Rect;
+                m_elementParameters["CutoutWidth"] = arg.m_width;
+                m_elementParameters["CutoutLength"] = arg.m_length;
+            } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Elliptical;
+                m_elementParameters["CutoutDiameterX"] = arg.m_diameter_x;
+                m_elementParameters["CutoutDiameterZ"] = arg.m_diameter_z;
+            } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
+                m_elementParameters["geometricalShape"] = CutoutType::Trapezoid;
+                m_elementParameters["CutoutWidthA"] = arg.m_widthA;
+                m_elementParameters["CutoutWidthB"] = arg.m_widthB;
+                m_elementParameters["CutoutLength"] = arg.m_length;
+            }
+        },
+        c.m_variant);
 }
 Cutout DesignElement::getCutout() const {
-    Cutout c;
+    CutoutType type = m_elementParameters["geometricalShape"].as_openingShape();
 
-    c.m_type = m_elementParameters["geometricalShape"].as_openingShape();
-
-    if (c.m_type == CutoutType::Rect) {  // Rectangle
-        RectCutout rect;
-        rect.m_width  = m_elementParameters["CutoutWidth"].as_double();
-        rect.m_length = m_elementParameters["CutoutLength"].as_double();
-        c             = serializeRect(rect);
-    } else if (c.m_type == CutoutType::Elliptical) {  // Ellipsoid
-        EllipticalCutout elli;
-        elli.m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double();
-        elli.m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double();
-        c                 = serializeElliptical(elli);
-    } else if (c.m_type == CutoutType::Trapezoid) {  // Trapezoid
-        TrapezoidCutout trapi;
-        trapi.m_widthA = m_elementParameters["CutoutWidthA"].as_double();
-        trapi.m_widthB = m_elementParameters["CutoutWidthB"].as_double();
-        trapi.m_length = m_elementParameters["CutoutLength"].as_double();
-        c              = serializeTrapezoid(trapi);
+    if (type == CutoutType::Rect) {  // Rectangle
+        return Cutout::Rect{
+            .m_width = m_elementParameters["CutoutWidth"].as_double(),
+            .m_length = m_elementParameters["CutoutLength"].as_double(),
+        };
+    } else if (type == CutoutType::Elliptical) {  // Ellipsoid
+        return Cutout::Elliptical{
+            .m_diameter_x = m_elementParameters["CutoutDiameterX"].as_double(),
+            .m_diameter_z = m_elementParameters["CutoutDiameterZ"].as_double(),
+        };
+    } else if (type == CutoutType::Trapezoid) {  // Trapezoid
+        return Cutout::Trapezoid{
+            .m_widthA = m_elementParameters["CutoutWidthA"].as_double(),
+            .m_widthB = m_elementParameters["CutoutWidthB"].as_double(),
+            .m_length = m_elementParameters["CutoutLength"].as_double(),
+        };
     }
 
-    return c;
+    return Cutout::Unlimited{};
 }
 
-Cutout DesignElement::getGlobalCutout() const { return serializeUnlimited(); }
+Cutout DesignElement::getGlobalCutout() const { return Cutout::Unlimited{}; }
 
 void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
     m_elementParameters["vlsParams"] = Map();
