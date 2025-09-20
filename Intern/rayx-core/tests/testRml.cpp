@@ -76,7 +76,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
     OpticalElement para = beamline.compileElements()[0];
-    auto parabo = cuda::std::get<QuadricSurface>(para.m_surface.m_surface);
+    auto parabo = cuda::std::get<Surface::Quadric>(para.m_surface.m_surface);
 
     CHECK_EQ(1, parabo.m_a11);
     CHECK_EQ(0, parabo.m_a12);
@@ -94,7 +94,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
 TEST_F(TestSuite, testSphereQuad) {
     auto beamline = loadBeamline("SphereMirrorDefault");
     OpticalElement sph = beamline.compileElements()[0];
-    auto sphere = cuda::std::get<QuadricSurface>(sph.m_surface.m_surface);
+    auto sphere = cuda::std::get<Surface::Quadric>(sph.m_surface.m_surface);
 
     CHECK_EQ(1, sphere.m_a11);
     CHECK_EQ(0, sphere.m_a12);
@@ -112,7 +112,7 @@ TEST_F(TestSuite, testSphereQuad) {
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
     OpticalElement elli = beamline.compileElements()[0];
-    auto ellips = cuda::std::get<QuadricSurface>(elli.m_surface.m_surface);
+    auto ellips = cuda::std::get<Surface::Quadric>(elli.m_surface.m_surface);
 
     CHECK_EQ(1, ellips.m_a11);
     CHECK_EQ(0, ellips.m_a12);
@@ -130,7 +130,7 @@ TEST_F(TestSuite, testEllipsoidQuad) {
 TEST_F(TestSuite, testCylinderQuad) {
     auto beamline = loadBeamline("CylinderDefault");
     OpticalElement cyli = beamline.compileElements()[0];
-    auto cylinder = cuda::std::get<QuadricSurface>(cyli.m_surface.m_surface);
+    auto cylinder = cuda::std::get<Surface::Quadric>(cyli.m_surface.m_surface);
 
     CHECK_EQ(0, cylinder.m_a11);
     CHECK_EQ(0, cylinder.m_a12);
@@ -148,7 +148,7 @@ TEST_F(TestSuite, testCylinderQuad) {
 TEST_F(TestSuite, testConeQuad) {
     auto beamline = loadBeamline("Cone");
     OpticalElement con = beamline.compileElements()[0];
-    auto cone = cuda::std::get<QuadricSurface>(con.m_surface.m_surface);
+    auto cone = cuda::std::get<Surface::Quadric>(con.m_surface.m_surface);
 
     CHECK_EQ(0.903353, cone.m_a11, 0.001);
     CHECK_EQ(0, cone.m_a12);
@@ -163,10 +163,10 @@ TEST_F(TestSuite, testConeQuad) {
     CHECK_EQ(1, cone.m_icurv);
 }
 
-TEST_F(TestSuite, testToroidSurface) {
+TEST_F(TestSuite, test_Toroid) {
     auto beamline = loadBeamline("toroid");
     OpticalElement trid = beamline.compileElements()[0];
-    auto toroid = cuda::std::get<ToroidSurface>(trid.m_surface.m_surface);
+    auto toroid = cuda::std::get<Surface::Toroid>(trid.m_surface.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
@@ -176,7 +176,7 @@ TEST_F(TestSuite, testToroidSurface) {
 TEST_F(TestSuite, testExpertsOptic) {
     auto beamline = loadBeamline("toroid");
     OpticalElement trid = beamline.compileElements()[0];
-    auto toroid = cuda::std::get<ToroidSurface>(trid.m_surface.m_surface);
+    auto toroid = cuda::std::get<Surface::Toroid>(trid.m_surface.m_surface);
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);

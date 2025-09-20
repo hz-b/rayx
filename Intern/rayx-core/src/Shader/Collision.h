@@ -27,12 +27,10 @@ using OptCollisionWithElement = std::optional<CollisionWithElement>;
 RAYX_FN_ACC OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                   QuadricSurface q);
 
-RAYX_FN_ACC OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
-                                                 ToroidSurface toroid, bool isTriangul);
+RAYX_FN_ACC Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Quadric q);
 
-RAYX_FN_ACC OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const glm::dvec3& __restrict rayPosition,
-                                                                                     const glm::dvec3& __restrict rayDirection, Surface surface,
-                                                                                     Cutout cutout, bool isTriangul);
+RAYX_FN_ACC Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Toroid toroid,
+                                         bool isTriangul);
 
 RAYX_FN_ACC OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                            const OpticalElement& __restrict element, Rand& __restrict rand);

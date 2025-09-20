@@ -198,7 +198,7 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 }
 
 void DesignElement::setExpertsOptics(Surface value) {
-    QuadricSurface qua = cuda::std::get<QuadricSurface>(value.m_surface);
+    Surface::Quadric qua = cuda::std::get<Surface::Quadric>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
     m_elementParameters["expertsParams"]["A12"] = qua.m_a12;
@@ -213,7 +213,7 @@ void DesignElement::setExpertsOptics(Surface value) {
 }
 
 Surface DesignElement::getExpertsOptics() const {
-    QuadricSurface qua;
+    Surface::Quadric qua;
     qua.m_a11 = m_elementParameters["expertsParams"]["A11"].as_double();
     qua.m_a12 = m_elementParameters["expertsParams"]["A12"].as_double();
     qua.m_a13 = m_elementParameters["expertsParams"]["A13"].as_double();
@@ -225,11 +225,11 @@ Surface DesignElement::getExpertsOptics() const {
     qua.m_a34 = m_elementParameters["expertsParams"]["A34"].as_double();
     qua.m_a44 = m_elementParameters["expertsParams"]["A44"].as_double();
 
-    return Surface{qua};
+    return qua;
 }
 
 void DesignElement::setExpertsCubic(Surface value) {
-    CubicSurface cub = cuda::std::get<CubicSurface>(value.m_surface);
+    Surface::Cubic cub = cuda::std::get<Surface::Cubic>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["A11"] = cub.m_a11;
     m_elementParameters["expertsParams"]["A12"] = cub.m_a12;
@@ -251,7 +251,7 @@ void DesignElement::setExpertsCubic(Surface value) {
 }
 
 Surface DesignElement::getExpertsCubic() const {
-    CubicSurface cub;
+    Surface::Cubic cub;
     cub.m_a11 = m_elementParameters["expertsParams"]["A11"].as_double();
     cub.m_a12 = m_elementParameters["expertsParams"]["A12"].as_double();
     cub.m_a13 = m_elementParameters["expertsParams"]["A13"].as_double();
@@ -270,7 +270,7 @@ Surface DesignElement::getExpertsCubic() const {
     cub.m_b31 = m_elementParameters["expertsParams"]["B31"].as_double();
     cub.m_b32 = m_elementParameters["expertsParams"]["B32"].as_double();
 
-    return Surface{CubicSurface{cub}};
+    return Surface::Cubic{cub};
 }
 
 // for the spherical Mirror the radius can be calculated from grazing Inc angle, entrace Armlength and exit Armlength

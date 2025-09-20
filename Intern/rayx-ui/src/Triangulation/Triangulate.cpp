@@ -412,7 +412,7 @@ void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<Textur
     triangulate(poly, vertices, indices);
 }
 
-bool isPlanar(const RAYX::QuadricSurface& q) {
+bool isPlanar(const RAYX::Surface::Quadric& q) {
     return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0);
 }
 
@@ -426,15 +426,15 @@ void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureV
     cuda::std::visit(
         [&](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<T, RAYX::PlaneSurface>) {
+            if constexpr (std::is_same_v<T, RAYX::Surface::Plane>) {
                 planarTriangulation(compiled, vertices, indices);
-            } else if constexpr (std::is_same_v<T, RAYX::QuadricSurface>) {
+            } else if constexpr (std::is_same_v<T, RAYX::Surface::Quadric>) {
                 if (isPlanar(arg)) {
                     planarTriangulation(compiled, vertices, indices);
                 } else {
                     traceTriangulation(compiled, vertices, indices);
                 }
-            } else if constexpr (std::is_same_v<T, RAYX::ToroidSurface>) {
+            } else if constexpr (std::is_same_v<T, RAYX::Surface::Toroid>) {
                 traceTriangulation(compiled, vertices, indices);
             } else {
                 RAYX_EXIT << "Unknown element type: " << typeid(T).name();

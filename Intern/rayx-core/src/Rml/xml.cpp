@@ -383,8 +383,8 @@ Cutout Parser::parseCutout(DesignPlane plane, std::string type) const {
     }
 }
 
-QuadricSurface Parser::parseQuadricParameters() const {
-    QuadricSurface s;
+Surface::Quadric Parser::parseQuadricParameters() const {
+    Surface::Quadric s;
     s.m_icurv = parseInt("surfaceBending");  // icurv
     s.m_a11   = parseDouble("A11");
     s.m_a12   = parseDouble("A12");
@@ -400,8 +400,8 @@ QuadricSurface Parser::parseQuadricParameters() const {
     return s;
 }
 
-CubicSurface Parser::parseCubicParameters() const {
-    CubicSurface c;
+Surface::Cubic Parser::parseCubicParameters() const {
+    Surface::Cubic c;
     c.m_icurv = parseInt("surfaceBending");  // icurv
     c.m_a11   = parseDouble("A11");
     c.m_a12   = parseDouble("A12");
