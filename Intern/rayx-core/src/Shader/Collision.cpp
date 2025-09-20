@@ -17,7 +17,7 @@ namespace RAYX {
  *                    Quadric collision
  **************************************************************/
 RAYX_FN_ACC
-Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, QuadricSurface q) {
+Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Quadric q) {
     Collision col;
     col.found = true;
     col.hitpoint = glm::dvec3(0, 0, 0);
@@ -145,7 +145,7 @@ Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const gl
  * Ray in in element koordinates.
  */
 RAYX_FN_ACC
-Collision getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, CubicSurface cu) {
+Collision getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Cubic cu) {
     Collision col;
     col.found = true;
     col.hitpoint = glm::dvec3(0, 0, 0);
@@ -374,7 +374,7 @@ Collision getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm:
  **************************************************************/
 // this uses newton to approximate a solution.
 RAYX_FN_ACC
-Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, ToroidSurface toroid,
+Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Toroid toroid,
                              bool isTriangul) {
     // Constants
     const double NEW_TOLERANCE = 0.0001;
@@ -447,7 +447,7 @@ Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm
 }
 
 RAYX_FN_ACC
-Collision getPlaneCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, PlaneSurface) {
+Collision getPlaneCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Plane) {
     Collision col;
     col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
 
@@ -478,13 +478,13 @@ Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict ray
     cuda::std::visit(
         [&](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<T, PlaneSurface>) {
+            if constexpr (std::is_same_v<T, Surface::Plane>) {
                 col = getPlaneCollision(rayPosition, rayDirection, arg);
-            } else if constexpr (std::is_same_v<T, QuadricSurface>) {
+            } else if constexpr (std::is_same_v<T, Surface::Quadric>) {
                 col = getQuadricCollision(rayPosition, rayDirection, arg);
-            } else if constexpr (std::is_same_v<T, CubicSurface>) {
+            } else if constexpr (std::is_same_v<T, Surface::Cubic>) {
                 col = getCubicCollision(rayPosition, rayDirection, arg);
-            } else if constexpr (std::is_same_v<T, ToroidSurface>) {
+            } else if constexpr (std::is_same_v<T, Surface::Toroid>) {
                 col = getToroidCollision(rayPosition, rayDirection, arg, isTriangul);
             }
         },

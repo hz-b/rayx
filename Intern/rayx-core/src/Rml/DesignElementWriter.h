@@ -221,7 +221,7 @@ void getExpertsCubic(xml::Parser parser, DesignElement* de) {
     de->setCurvatureType(CurvatureType::Cubic);
     de->setBehaviourType(BehaviourType::Mirror);
 
-    de->setExpertsCubic(Surface{parser.parseCubicParameters()});
+    de->setExpertsCubic(parser.parseCubicParameters());
 }
 
 void getExpertsOptics(xml::Parser parser, DesignElement* de) {
@@ -229,7 +229,7 @@ void getExpertsOptics(xml::Parser parser, DesignElement* de) {
     de->setCurvatureType(CurvatureType::Quadric);
     de->setBehaviourType(BehaviourType::Mirror);
 
-    de->setExpertsOptics(Surface{parser.parseQuadricParameters()});
+    de->setExpertsOptics(parser.parseQuadricParameters());
 }
 
 void getFoil(xml::Parser parser, DesignElement* de) {
