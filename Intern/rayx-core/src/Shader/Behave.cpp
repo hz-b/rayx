@@ -18,31 +18,31 @@
 namespace RAYX {
 
 RAYX_FN_ACC
-Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision col) {
-    CrystalBehaviour b = deserializeCrystal(behaviour);
-
-    double theta0 = getTheta(r, col.normal, b.m_offsetAngle);
-    double bragg = getBraggAngle(r.m_energy, b.m_dSpacing2);
-    double asymmetry = -getAsymmetryFactor(bragg, b.m_offsetAngle);
+Ray behaveCrystal(Ray r, const Behaviour::Crystal crystal, [[maybe_unused]] Collision col) {
+    double theta0 = getTheta(r, col.normal, crystal.m_offsetAngle);
+    double bragg = getBraggAngle(r.m_energy, crystal.m_dSpacing2);
+    double asymmetry = -getAsymmetryFactor(bragg, crystal.m_offsetAngle);
 
     double polFactorS = 1.0;
     double polFactorP = std::fabs(cos(2 * bragg));
 
     double wavelength = energyToWaveLength(r.m_energy);
-    double gamma = getDiffractionPrefactor(wavelength, b.m_unitCellVolume);
+    double gamma = getDiffractionPrefactor(wavelength, crystal.m_unitCellVolume);
 
-    std::complex<double> F0(b.m_structureFactorReF0, b.m_structureFactorImF0);
-    std::complex<double> FH(b.m_structureFactorReFH, b.m_structureFactorImFH);
-    std::complex<double> FHC(b.m_structureFactorReFHC, b.m_structureFactorImFHC);
+    std::complex<double> F0(crystal.m_structureFactorReF0, crystal.m_structureFactorImF0);
+    std::complex<double> FH(crystal.m_structureFactorReFH, crystal.m_structureFactorImFH);
+    std::complex<double> FHC(crystal.m_structureFactorReFHC, crystal.m_structureFactorImFHC);
 
-    auto etaS = computeEta(theta0, bragg, asymmetry, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC,
-                           b.m_structureFactorImFHC, b.m_structureFactorReF0, b.m_structureFactorImF0, polFactorS, gamma);
+    auto etaS = computeEta(theta0, bragg, asymmetry, crystal.m_structureFactorReFH, crystal.m_structureFactorImFH, crystal.m_structureFactorReFHC,
+                           crystal.m_structureFactorImFHC, crystal.m_structureFactorReF0, crystal.m_structureFactorImF0, polFactorS, gamma);
 
-    auto etaP = computeEta(theta0, bragg, asymmetry, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC,
-                           b.m_structureFactorImFHC, b.m_structureFactorReF0, b.m_structureFactorImF0, polFactorP, gamma);
+    auto etaP = computeEta(theta0, bragg, asymmetry, crystal.m_structureFactorReFH, crystal.m_structureFactorImFH, crystal.m_structureFactorReFHC,
+                           crystal.m_structureFactorImFHC, crystal.m_structureFactorReF0, crystal.m_structureFactorImF0, polFactorP, gamma);
 
-    auto RS = computeR(etaS, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
-    auto RP = computeR(etaP, b.m_structureFactorReFH, b.m_structureFactorImFH, b.m_structureFactorReFHC, b.m_structureFactorImFHC);
+    auto RS =
+        computeR(etaS, crystal.m_structureFactorReFH, crystal.m_structureFactorImFH, crystal.m_structureFactorReFHC, crystal.m_structureFactorImFHC);
+    auto RP =
+        computeR(etaP, crystal.m_structureFactorReFH, crystal.m_structureFactorImFH, crystal.m_structureFactorReFHC, crystal.m_structureFactorImFHC);
 
     const auto incident_vec = r.m_direction;
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);
@@ -61,12 +61,10 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
 // Reviews of Modern Physics, 36(3), 681-717. https://doi.org/10.1103/RevModPhys.36.681
 
 RAYX_FN_ACC
-Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
-    SlitBehaviour b = deserializeSlit(behaviour);
-
+Ray behaveSlit(Ray r, const Behaviour::Slit slit, Rand& __restrict rand) {
     // slit lies in x-y plane instead of x-z plane as other elements
-    Cutout openingCutout = b.m_openingCutout;
-    Cutout beamstopCutout = b.m_beamstopCutout;
+    Cutout openingCutout = slit.m_openingCutout;
+    Cutout beamstopCutout = slit.m_beamstopCutout;
     bool withinOpening = inCutout(openingCutout, r.m_position.x, r.m_position.z);
     bool withinBeamstop = inCutout(beamstopCutout, r.m_position.x, r.m_position.z);
 
@@ -84,16 +82,18 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
 
     // this was previously called "diffraction"
     if (wavelength > 0) {
-        if (openingCutout.m_type == CutoutType::Rect) {
-            RectCutout r = deserializeRect(openingCutout);
-            fraun_diff(r.m_width, wavelength, dPhi, rand);
-            fraun_diff(r.m_length, wavelength, dPsi, rand);
-        } else if (openingCutout.m_type == CutoutType::Elliptical) {
-            EllipticalCutout e = deserializeElliptical(openingCutout);
-            bessel_diff(e.m_diameter_z, wavelength, dPhi, dPsi, rand);
-        } else {
-            _throw("encountered Slit with unsupported openingCutout: %d!", static_cast<int>(openingCutout.m_type));
-        }
+        variant::visit(
+            [&]<typename T>(const T& arg) {
+                if constexpr (std::is_same_v<T, Cutout::Rect>) {
+                    fraun_diff(arg.m_width, wavelength, dPhi, rand);
+                    fraun_diff(arg.m_length, wavelength, dPsi, rand);
+                } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+                    bessel_diff(arg.m_diameter_z, wavelength, dPhi, dPsi, rand);
+                } else {
+                    _throw("encountered Slit with unsupported openingCutout!");
+                }
+            },
+            openingCutout.m_variant);
     }
 
     phi += dPhi;
@@ -106,16 +106,14 @@ Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
 }
 
 RAYX_FN_ACC
-Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __restrict rand) {
-    RZPBehaviour b = deserializeRZP(behaviour);
-
+Ray behaveRZP(Ray r, const Behaviour::RZP rzp, const Collision col, Rand& __restrict rand) {
     double WL = energyToWaveLength(r.m_energy);
-    double Ord = b.m_orderOfDiffraction;
-    int additional_order = int(b.m_additionalOrder);
+    double Ord = rzp.m_orderOfDiffraction;
+    int additional_order = int(rzp.m_additionalOrder);
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
-    RZPLineDensity(r, col.normal, b, DX, DZ);
+    RZPLineDensity(r, col.normal, rzp, DX, DZ);
 
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection)
     // instead of the given order
@@ -133,16 +131,14 @@ Ray behaveRZP(Ray r, const Behaviour behaviour, const Collision col, Rand& __res
 }
 
 RAYX_FN_ACC
-Ray behaveGrating(Ray r, const Behaviour behaviour, const Collision col) {
-    GratingBehaviour b = deserializeGrating(behaviour);
-
+Ray behaveGrating(Ray r, const Behaviour::Grating grating, const Collision col) {
     // vls parameters passed in q.elementParams
     double WL = energyToWaveLength(r.m_energy);
-    double lineDensity = b.m_lineDensity;
-    double orderOfDiffraction = b.m_orderOfDiffraction;
+    double lineDensity = grating.m_lineDensity;
+    double orderOfDiffraction = grating.m_orderOfDiffraction;
 
     // adjusted linedensity = WL * default_linedensity * order * 1e-06
-    double adjustedLinedensity = vlsGrating(lineDensity, col.normal, r.m_position.z, b.m_vls) * WL * orderOfDiffraction * 1e-06;
+    double adjustedLinedensity = vlsGrating(lineDensity, col.normal, r.m_position.z, grating.m_vls) * WL * orderOfDiffraction * 1e-06;
     r.m_order = static_cast<Order>(orderOfDiffraction);
     // no additional zero order here?
 
@@ -174,9 +170,8 @@ Ray behaveMirror(Ray r, const Collision col, const int material, const int* __re
 }
 
 RAYX_FN_ACC
-Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int material, const int* __restrict materialIndices,
+Ray behaveFoil(Ray r, const Behaviour::Foil foil, const Collision col, const int material, const int* __restrict materialIndices,
                const double* __restrict materialTable) {
-    FoilBehaviour f = deserializeFoil(behaviour);
     const double wavelength = energyToWaveLength(r.m_energy);
 
     const auto indexVacuum = complex::Complex(1., 0.);
@@ -191,7 +186,7 @@ Ray behaveFoil(Ray r, const Behaviour behaviour, const Collision col, const int 
     if (isnan(angle) || angle == 0) angle = 1e-8;
     const auto incidentAngle = complex::Complex(angle, 0);
 
-    const auto totalTransmission = computeTransmittance(wavelength, incidentAngle, indexVacuum, indexMaterial, f.m_thicknessSubstrate);
+    const auto totalTransmission = computeTransmittance(wavelength, incidentAngle, indexVacuum, indexMaterial, foil.m_thicknessSubstrate);
 
     // calc efficiency
     r.m_field = interceptFoil(r.m_field, r.m_direction, col.normal, totalTransmission);

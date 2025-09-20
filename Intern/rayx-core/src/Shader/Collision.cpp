@@ -8,6 +8,7 @@
 #include "InvocationState.h"
 #include "Throw.h"
 #include "Utils.h"
+#include "Variant.h"
 
 namespace RAYX {
 
@@ -15,7 +16,7 @@ namespace RAYX {
  *                    Quadric collision
  **************************************************************/
 RAYX_FN_ACC
-Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, QuadricSurface q) {
+Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Quadric q) {
     Collision col;
     col.found = true;
     col.hitpoint = glm::dvec3(0, 0, 0);
@@ -143,7 +144,7 @@ Collision getQuadricCollision(const glm::dvec3& __restrict rayPosition, const gl
  * Ray in in element koordinates.
  */
 RAYX_FN_ACC
-Collision getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, CubicSurface cu) {
+Collision getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Cubic cu) {
     Collision col;
     col.found = true;
     col.hitpoint = glm::dvec3(0, 0, 0);
@@ -372,7 +373,7 @@ Collision getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm:
  **************************************************************/
 // this uses newton to approximate a solution.
 RAYX_FN_ACC
-Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, ToroidSurface toroid,
+Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Toroid toroid,
                              bool isTriangul) {
     // Constants
     const double NEW_TOLERANCE = 0.0001;
@@ -444,6 +445,27 @@ Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm
     return col;
 }
 
+RAYX_FN_ACC
+Collision getPlaneCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface::Plane) {
+    Collision col;
+    col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
+
+    // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
+    // velocity = distance/time <-> time = distance/velocity from school physics.
+    // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
+    // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
+    double time = -rayPosition.y / rayDirection.y;
+
+    col.hitpoint.x = rayPosition.x + rayDirection.x * time;
+    col.hitpoint.z = rayPosition.z + rayDirection.z * time;
+    col.hitpoint.y = 0;
+
+    // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set
+    // `found = false`.
+    col.found = time >= 0;
+    return col;
+}
+
 /**************************************************************
  *                    Collision Finder
  **************************************************************/
@@ -451,41 +473,20 @@ Collision getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm
 RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
                                                 Cutout cutout, bool isTriangul) {
-    Collision col;
-    switch (surface.m_type) {
-        case SurfaceType::Plane: {
-            col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
-
-            // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
-            // velocity = distance/time <-> time = distance/velocity from school physics.
-            // (We need to negate the position, as with positive velocity, you need a negative position to eventually reach the zero point (aka the
-            // plane). Having positive position & positive velocity means that we never hit the plane as we move away from it.)
-            double time = -rayPosition.y / rayDirection.y;
-
-            col.hitpoint.x = rayPosition.x + rayDirection.x * time;
-            col.hitpoint.z = rayPosition.z + rayDirection.z * time;
-            col.hitpoint.y = 0;
-
-            // the ray should not face away from the plane (or equivalently, the ray should not come *from* the plane). If that is the case we set
-            // `found = false`.
-            col.found = time >= 0;
-            break;
-        }
-        case SurfaceType::Toroid:
-            col = getToroidCollision(rayPosition, rayDirection, deserializeToroid(surface), isTriangul);
-            break;
-        case SurfaceType::Quadric:
-            col = getQuadricCollision(rayPosition, rayDirection, deserializeQuadric(surface));
-            break;
-        case SurfaceType::Cubic:
-            col = getCubicCollision(rayPosition, rayDirection, deserializeCubic(surface));
-            break;
-        default:
-            col.found = false;
-
-            _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_type));
-            return col;  // has found = false
-    }
+    Collision col = variant::visit(
+        [&](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, Surface::Plane>) {
+                return getPlaneCollision(rayPosition, rayDirection, arg);
+            } else if constexpr (std::is_same_v<T, Surface::Quadric>) {
+                return getQuadricCollision(rayPosition, rayDirection, arg);
+            } else if constexpr (std::is_same_v<T, Surface::Cubic>) {
+                return getCubicCollision(rayPosition, rayDirection, arg);
+            } else if constexpr (std::is_same_v<T, Surface::Toroid>) {
+                return getToroidCollision(rayPosition, rayDirection, arg, isTriangul);
+            }
+        },
+        surface.m_surface);
 
     // cutout is applied in the XZ plane.
     if (!inCutout(cutout, col.hitpoint.x, col.hitpoint.z)) {

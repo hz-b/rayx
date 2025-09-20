@@ -19,7 +19,7 @@ namespace RAYX {
  *         specified by the VLS coefficients.
  */
 RAYX_FN_ACC
-double RAYX_API vlsGrating(double lineDensity, glm::dvec3 normal, double z, double vls[6]) {
+double RAYX_API vlsGrating(double lineDensity, glm::dvec3 normal, double z, const double vls[6]) {
     // Calculate the inclination angle from the vertical based on the z-component of the surface normal.
     double del1 = glm::asin(normal.z);
 
@@ -45,9 +45,9 @@ given direction on the grating
 @returns: (inplace) DX, DZ
 */
 RAYX_FN_ACC
-void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& DX, double& DZ) {
-    int IMAGE_TYPE = int(b.m_imageType);
-    int RZP_TYPE = int(b.m_rzpType);
+void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, Behaviour::RZP b, double& DX, double& DZ) {
+    int IMAGE_TYPE = b.m_imageType;
+    int RZP_TYPE = b.m_rzpType;
     double risag = b.m_designSagittalEntranceArmLength;
     double rosag = b.m_designSagittalExitArmLength;
     double rimer = b.m_designMeridionalEntranceArmLength;
@@ -55,7 +55,7 @@ void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, RZPBehaviour b, double& D
     double alpha = b.m_designAlphaAngle;
     double beta = b.m_designBetaAngle;
     double WL = 1e-06 * b.m_designWavelength;  // source energy/design energy
-    double Ord = b.m_orderOfDiffraction;
+    int Ord = b.m_orderOfDiffraction;
 
     double FX = normal.x;
     double FY = normal.y;

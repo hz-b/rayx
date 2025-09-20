@@ -194,10 +194,10 @@ std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
             auto orig_r = *opt_ray;
             auto r = orig_r;
             int elem = (int)r.m_lastElement;
-            auto btype = compiled[elem].m_behaviour.m_type;  // m_element.m_behaviour.m_type;
+            auto behaviour = compiled[elem].m_behaviour;
             // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
             // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
-            if (btype == BehaveType::ImagePlane || btype == BehaveType::Slit || btype == BehaveType::Foil) {
+            if (behaviour.is<Behaviour::ImagePlane>() || behaviour.is<Behaviour::Slit>() || behaviour.is<Behaviour::Foil>()) {
                 r.m_position.y = orig_r.m_position.z;
                 r.m_position.z = orig_r.m_position.y;
                 r.m_direction.y = orig_r.m_direction.z;
