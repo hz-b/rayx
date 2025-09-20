@@ -2,14 +2,13 @@
 
 #include "Collision.h"
 
-#include <cuda/std/variant>
-
 #include "ApplySlopeError.h"
 #include "Cubic.h"
 #include "CutoutFns.h"
 #include "InvocationState.h"
 #include "Throw.h"
 #include "Utils.h"
+#include "Variant.h"
 
 namespace RAYX {
 
@@ -474,7 +473,7 @@ Collision getPlaneCollision(const glm::dvec3& __restrict rayPosition, const glm:
 RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
                                                 Cutout cutout, bool isTriangul) {
-    Collision col = cuda::std::visit(
+    Collision col = variant::visit(
         [&](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, Surface::Plane>) {

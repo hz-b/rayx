@@ -221,7 +221,7 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 }
 
 void DesignElement::setExpertsOptics(Surface value) {
-    Surface::Quadric qua = cuda::std::get<Surface::Quadric>(value.m_surface);
+    Surface::Quadric qua = variant::get<Surface::Quadric>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
     m_elementParameters["expertsParams"]["A12"] = qua.m_a12;
@@ -252,7 +252,7 @@ Surface DesignElement::getExpertsOptics() const {
 }
 
 void DesignElement::setExpertsCubic(Surface value) {
-    Surface::Cubic cub = cuda::std::get<Surface::Cubic>(value.m_surface);
+    Surface::Cubic cub = variant::get<Surface::Cubic>(value.m_surface);
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["A11"] = cub.m_a11;
     m_elementParameters["expertsParams"]["A12"] = cub.m_a12;
