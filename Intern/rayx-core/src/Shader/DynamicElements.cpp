@@ -31,6 +31,10 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         const auto element = inv.elements[col.elementIndex];
         ray = rayMatrixMult(element.m_inTrans, ray);
 
+        // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
+        //const auto behaviour = element.m_behaviour;
+        const auto coating = element.m_coating;
+
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
         ray.m_lastElement = col.elementIndex;
@@ -39,7 +43,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         ray = variant::visit(
             [&]<typename T>(const T& behaviour) -> Ray {
                 if constexpr (std::is_same_v<T, Behaviour::Mirror>) {
-                    return behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
+                    return behaveMirror(ray, col, coating, element.m_material, inv.materialIndices, inv.materialTables);
                 } else if constexpr (std::is_same_v<T, Behaviour::Grating>) {
                     return behaveGrating(ray, behaviour, col);
                 } else if constexpr (std::is_same_v<T, Behaviour::Slit>) {

@@ -11,6 +11,8 @@ namespace RAYX {
 // Each behaviour type has its own `behave` function in `Behave.h`.
 enum class BehaveType { Mirror, Grating, Slit, RZP, ImagePlane, Crystal, Foil };
 
+
+
 struct Behaviour {
     struct Mirror {
         // no parameters
@@ -73,6 +75,7 @@ struct Behaviour {
     Behaviour(T t) : m_behaviour(t) {}
 
     template <typename T>
+    RAYX_FN_ACC
     bool is() const {
         return variant::holds_alternative<T>(m_behaviour);
     }

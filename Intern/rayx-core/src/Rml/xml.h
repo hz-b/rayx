@@ -10,6 +10,7 @@
 #include "Angle.h"
 #include "Beamline/Definitions.h"
 #include "Element/Cutout.h"
+#include "Element/Coating.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
@@ -36,6 +37,7 @@ enum class SpreadType;
 enum class ElementType;
 enum class CrystalType;
 enum class OffsetAngleType;  // TODO:see if this is needed
+enum class SurfaceCoatingType;  
 
 // An error in position and orientation that an object might have.
 struct Misalignment {
@@ -66,6 +68,7 @@ bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
+bool paramMultilayer(const rapidxml::xml_node<>* node, Coating* out);
 
 std::optional<glm::dvec4> paramPosition(const rapidxml::xml_node<>* node);
 std::optional<glm::dmat4x4> paramOrientation(const rapidxml::xml_node<>* node);
@@ -100,6 +103,7 @@ struct RAYX_API Parser {
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
+    Material parseMaterialCoating() const;
     Cutout parseCutout(DesignPlane, std::string) const;
     Surface::Quadric parseQuadricParameters() const;
     Surface::Cubic parseCubicParameters() const;
@@ -109,6 +113,7 @@ struct RAYX_API Parser {
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
     std::filesystem::path parseEnergyDistributionFile() const;
+    Coating::MultilayerCoating parseCoating() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.
@@ -213,6 +218,10 @@ struct RAYX_API Parser {
     inline double parseThicknessSubstrate() const { return parseDouble("thicknessSubstrate"); }
     inline double parseRoughnessSubstrate() const { return parseDouble("roughnessSubstrate"); }
     inline double parseDensitySubstrate() const { return parseDouble("densitySubstrate"); }
+
+    inline SurfaceCoatingType parseSurfaceCoatingType() const { return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));}  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+    inline double parseThicknessCoating() const { return parseDouble("thicknessCoating"); }
+    inline double parseRoughnessCoating() const { return parseDouble("roughnessCoating"); }
 
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;

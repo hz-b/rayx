@@ -53,6 +53,7 @@ ValueType DesignMap::type() const {
         ValueType::GratingMount,
         ValueType::CrystalType,
         ValueType::DesignPlane,
+        ValueType::SurfaceCoatingType,
     };
     return types[m_variant.index()];
 }
@@ -195,6 +196,11 @@ CrystalType DesignMap::as_crystalType() const {
 DesignPlane DesignMap::as_designPlane() const {
     if (auto* x = std::get_if<DesignPlane>(&m_variant)) return *x;
     throw std::runtime_error("as_designPlane() called on non-designPlane!");
+}
+
+SurfaceCoatingType DesignMap::as_surfaceCoatingType() const {
+    if (auto* x = std::get_if<SurfaceCoatingType>(&m_variant)) return *x;
+    throw std::runtime_error("as_surfaceCoatingType() called on non-surfaceCoatingType!");
 }
 
 const DesignMap& DesignMap::operator[](const std::string& s) const {

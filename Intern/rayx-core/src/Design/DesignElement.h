@@ -243,5 +243,21 @@ struct RAYX_API DesignElement : public BeamlineNode {
 
     void setDesignPlane(DesignPlane value);
     DesignPlane getDesignPlane() const;
+
+    void setSurfaceCoatingType(SurfaceCoatingType value);
+    SurfaceCoatingType getSurfaceCoatingType() const;
+
+    void setMultilayerCoating(const Coating::MultilayerCoating& coating);
+    
+    Coating getCoating() const;
+
+    void setMaterialCoating(Material value);
+    Material getMaterialCoating() const;
+
+    void setThicknessCoating(double value);
+    double getThicknessCoating() const;
+
+    void setRoughnessCoating(double value);
+    double getRoughnessCoating() const;
 };
 }  // namespace RAYX

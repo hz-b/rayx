@@ -2,8 +2,9 @@
 <lab>
 <version>1.12</version>
 <beamline>
+
   <object name="Matrix Source" type="Matrix Source">
-    <param id="numberRays" enabled="T">200</param>
+    <param id="numberRays" enabled="T">9</param>
     <param id="sourceWidth" enabled="T">0.065000000000000002</param>
     <param id="sourceHeight" enabled="T">0.040000000000000001</param>
     <param id="sourceDepth" enabled="T">0</param>
@@ -41,42 +42,30 @@
     </param>
   </object>
 
-  <object name="Plane Mirror" type="Plane Mirror">
+  <object name="Cone" type="Cone">
     <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
     <param id="totalWidth" enabled="T">50</param>
     <param id="totalLength" enabled="T">200</param>
-    <param id="grazingIncAngle" auto="T" enabled="T">10</param>
+    <param id="grazingIncAngle" enabled="T">10</param>
+    <param id="entranceArmLength" enabled="T">10000</param>
+    <param id="exitArmLength" enabled="T">1000</param>
+    <param id="upstreamRadius" auto="T" enabled="T">346.85522293840654</param>
+    <param id="downstreamRadius" auto="T" enabled="T">284.67930120577341</param>
     <param id="distancePreceding" enabled="T">10000</param>
-    <param id="azimuthalAngle" auto="T" enabled="T">0</param>
-    <param id="systemMount" comment="standalone" enabled="T">0</param>
-    <param id="premirrorShiftZ" enabled="F">0</param>
-    <param id="pimpaleAlpha1" enabled="F">1</param>
-    <param id="pimpaleAlpha2" enabled="F">2</param>
-    <param id="pimpaleAlpha3" enabled="F">3</param>
-    <param id="distancePremirrorGrating" enabled="T">0</param>
-    <param id="reflectivityType" comment="Derived by Material" enabled="T">1</param>
-    <param id="reflectivitySenkrecht" enabled="T">0.716391</param>
-    <param id="reflectivityParallel" enabled="T">0.674078</param>
-    <param id="reflectivityPhase" enabled="T">-7.72232</param>
-    <param id="materialSubstrate" enabled="T">Au</param>
-    <param id="roughnessSubstrate" enabled="T">0</param>
-    <param id="densitySubstrate" auto="T" enabled="T">19.300000000000001</param>
-    <param id="surfaceCoating" comment="Substrate only" enabled="T">0</param>
-    <param id="coatingFile" absolute="" enabled="F"></param>
-    <param id="numberLayer" enabled="F">2</param>
-    <param id="materialCoating1" enabled="F"></param>
-    <param id="thicknessCoating1" enabled="F">0</param>
-    <param id="roughnessCoating1" enabled="F">0</param>
-    <param id="densityCoating1" auto="T" enabled="F">0</param>
-    <param id="materialCoating2" enabled="F"></param>
-    <param id="thicknessCoating2" enabled="F">0</param>
-    <param id="roughnessCoating2" enabled="F">0</param>
-    <param id="densityCoating2" auto="T" enabled="F">0</param>
-    <param id="materialTopLayer" enabled="F"></param>
-    <param id="thicknessTopLayer" enabled="F">0</param>
-    <param id="roughnessTopLayer" enabled="F">0</param>
-    <param id="densityTopLayer" auto="T" enabled="F">0</param>
-    <param id="lateralThicknessGradientCoating1" comment="No" enabled="F">0</param>
+    <param id="azimuthalAngle" enabled="T">0</param>
+    <param id="reflectivityType" comment="Material" enabled="T">1</param>
+    <param id="materialSubstrate" enabled="F">Au</param>
+    <param id="roughnessSubstrate" enabled="F">0</param>
+    <param id="densitySubstrate" auto="T" enabled="F">19.300000000000001</param>
+    <param id="surfaceCoating" comment="Multilayer Coating" enabled="T">2</param>
+    <param id="NumberOfLayer" enabled="T">2</param>
+    <param id="Coating" enabled="T">
+      <layer material="Au" thickness="10" roughness="0">layer0</layer>
+      <layer material="Au" thickness="10" roughness="0">layer1</layer>
+    </param>
+    <param id="materialCoating" enabled="F">Au</param>
+    <param id="thicknessCoating" enabled="F">10</param>
+    <param id="roughnessCoating" enabled="F">0</param>
     <param id="gradientC1B1" enabled="F">0</param>
     <param id="gradientC1B2" enabled="F">0</param>
     <param id="gradientC1B3" enabled="F">0</param>
@@ -147,5 +136,9 @@
       <z>0.93969262078590832</z>
     </param>
   </object>
+
 </beamline>
+
+<ExtraData>
+</ExtraData>
 </lab>
