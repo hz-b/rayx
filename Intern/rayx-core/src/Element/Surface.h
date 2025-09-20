@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cuda/std/variant>
-
+#include "../Shader/Variant.h"
 #include "Core.h"
 
 namespace RAYX {
@@ -62,7 +61,7 @@ struct Surface {
         double m_psi;
     };
 
-    cuda::std::variant<Plane, Quadric, Toroid, Cubic> m_surface = Plane{};
+    variant::variant<Plane, Quadric, Toroid, Cubic> m_surface = Plane{};
 
     template <typename T>
     Surface(T t) : m_surface(t) {}

@@ -423,7 +423,7 @@ bool isPlanar(const RAYX::Surface::Quadric& q) {
  */
 void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
-    cuda::std::visit(
+    visit(
         [&](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, RAYX::Surface::Plane>) {
