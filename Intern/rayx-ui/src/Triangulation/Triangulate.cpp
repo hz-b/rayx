@@ -449,7 +449,7 @@ void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureV
             break;
         }
         case 1: {
-            RAYX::QuadricSurface q = std::get<RAYX::QuadricSurface>(compiled.m_surface.m_surface);
+            RAYX::QuadricSurface q = cuda::std::get<RAYX::QuadricSurface>(compiled.m_surface.m_surface);
             if (isPlanar(q)) {
                 planarTriangulation(compiled, vertices, indices);
             } else {
