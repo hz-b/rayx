@@ -452,8 +452,8 @@ RAYX_FN_ACC
 Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection, Surface surface,
                                                 Cutout cutout, bool isTriangul) {
     Collision col;
-    switch (surface.m_type) {
-        case SurfaceType::Plane: {
+    switch (surface.m_surface.index()) {
+        case 0: {
             col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
 
             // the `time` that it takes for the ray to hit the plane (if we understand the rays direction as its velocity).
@@ -471,19 +471,19 @@ Collision RAYX_API findCollisionInElementCoords(const glm::dvec3& __restrict ray
             col.found = time >= 0;
             break;
         }
-        case SurfaceType::Toroid:
-            col = getToroidCollision(rayPosition, rayDirection, deserializeToroid(surface), isTriangul);
+        case 2:
+            col = getToroidCollision(rayPosition, rayDirection, std::get<ToroidSurface>(surface.m_surface), isTriangul);
             break;
-        case SurfaceType::Quadric:
-            col = getQuadricCollision(rayPosition, rayDirection, deserializeQuadric(surface));
+        case 1:
+            col = getQuadricCollision(rayPosition, rayDirection, std::get<QuadricSurface>(surface.m_surface));
             break;
-        case SurfaceType::Cubic:
-            col = getCubicCollision(rayPosition, rayDirection, deserializeCubic(surface));
+        case 3:
+            col = getCubicCollision(rayPosition, rayDirection, std::get<CubicSurface>(surface.m_surface));
             break;
         default:
             col.found = false;
 
-            _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_type));
+            _throw("invalid surfaceType: %d!", static_cast<int>(surface.m_surface.index()));
             return col;  // has found = false
     }
 

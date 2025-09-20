@@ -1,5 +1,7 @@
 #pragma once
 
+#include <variant>
+
 #include "Core.h"
 
 namespace RAYX {
@@ -15,26 +17,6 @@ enum class SurfaceType {
     Plane,
     Cubic,
 };
-
-struct Surface {
-    SurfaceType m_type;
-
-    // These params are private. use the serialize & deserialize functions below instead.
-    double m_private_serialization_params[32];
-};
-
-struct DesignElement;
-enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
-Surface makeSurface(const DesignElement& dele);
-Surface makeToroid(const DesignElement& dele);      //< creates a toroid from the parameters given in ` dele`.
-Surface makeQuadric(const DesignElement& dele);     //< creates a quadric from the parameters given in ` dele`.
-Surface makeCubic(const DesignElement& dele);       //< creates a cubic from the parameters given in ` dele`.
-Surface makeEllipsoid(const DesignElement& dele);   //< creates a Ellipsoid from the parameters given in ` dele`.
-Surface makeCone(const DesignElement& dele);        //< creates a Cone from the parameters given in ` dele`.
-Surface makeCylinder(const DesignElement& dele);    //< creates a Cylinder from the parameters given in ` dele`.
-Surface makeSphere(double radius);                  //< creates a sphere from the radius .
-Surface makePlane();                                //< creates a plane surface
-Surface makeParaboloid(const DesignElement& dele);  //< creates a Paraboloid from the parameters given in ` dele`.
 
 ///////////////////
 // Quadric
@@ -54,41 +36,6 @@ struct QuadricSurface {
     double m_a44;
 };
 
-RAYX_FN_ACC
-inline Surface serializeQuadric(QuadricSurface surface) {
-    Surface ser;
-    ser.m_type = SurfaceType::Quadric;
-    ser.m_private_serialization_params[0] = double(surface.m_icurv);
-    ser.m_private_serialization_params[1] = surface.m_a11;
-    ser.m_private_serialization_params[2] = surface.m_a12;
-    ser.m_private_serialization_params[3] = surface.m_a13;
-    ser.m_private_serialization_params[4] = surface.m_a14;
-    ser.m_private_serialization_params[5] = surface.m_a22;
-    ser.m_private_serialization_params[6] = surface.m_a23;
-    ser.m_private_serialization_params[7] = surface.m_a24;
-    ser.m_private_serialization_params[8] = surface.m_a33;
-    ser.m_private_serialization_params[9] = surface.m_a34;
-    ser.m_private_serialization_params[10] = surface.m_a44;
-    return ser;
-}
-
-RAYX_FN_ACC
-inline QuadricSurface deserializeQuadric(Surface ser) {
-    QuadricSurface surface;
-    surface.m_icurv = int(ser.m_private_serialization_params[0]);
-    surface.m_a11 = ser.m_private_serialization_params[1];
-    surface.m_a12 = ser.m_private_serialization_params[2];
-    surface.m_a13 = ser.m_private_serialization_params[3];
-    surface.m_a14 = ser.m_private_serialization_params[4];
-    surface.m_a22 = ser.m_private_serialization_params[5];
-    surface.m_a23 = ser.m_private_serialization_params[6];
-    surface.m_a24 = ser.m_private_serialization_params[7];
-    surface.m_a33 = ser.m_private_serialization_params[8];
-    surface.m_a34 = ser.m_private_serialization_params[9];
-    surface.m_a44 = ser.m_private_serialization_params[10];
-    return surface;
-}
-
 //////////////
 // Toroid
 /////////////
@@ -103,37 +50,13 @@ struct ToroidSurface {
     ToroidType m_toroidType;
 };
 
-RAYX_FN_ACC
-inline Surface serializeToroid(ToroidSurface surface) {
-    Surface ser;
-    ser.m_type = SurfaceType::Toroid;
-    ser.m_private_serialization_params[0] = surface.m_longRadius;
-    ser.m_private_serialization_params[1] = surface.m_shortRadius;
-    ser.m_private_serialization_params[2] = surface.m_toroidType;
-    return ser;
-}
-
-RAYX_FN_ACC
-inline ToroidSurface deserializeToroid(Surface ser) {
-    ToroidSurface surface;
-    surface.m_longRadius = ser.m_private_serialization_params[0];
-    surface.m_shortRadius = ser.m_private_serialization_params[1];
-    surface.m_toroidType = ser.m_private_serialization_params[2];
-    return surface;
-}
-
 /////////////
 // Plane
 /////////////
 
-// `Plane` doesn't have any data so it doesn't need a struct.
-
-RAYX_FN_ACC
-inline Surface serializePlane() {
-    Surface ser;
-    ser.m_type = SurfaceType::Plane;
-    return ser;
-}
+struct PlaneSurface {
+    // no parameters
+};
 
 ///////////////////
 // Cubic
@@ -162,60 +85,22 @@ struct CubicSurface {
     double m_psi;
 };
 
-RAYX_FN_ACC
-inline Surface serializeCubic(CubicSurface surface) {
-    Surface ser;
-    ser.m_type = SurfaceType::Cubic;
-    ser.m_private_serialization_params[0] = double(surface.m_icurv);
-    ser.m_private_serialization_params[1] = surface.m_a11;
-    ser.m_private_serialization_params[2] = surface.m_a12;
-    ser.m_private_serialization_params[3] = surface.m_a13;
-    ser.m_private_serialization_params[4] = surface.m_a14;
-    ser.m_private_serialization_params[5] = surface.m_a22;
-    ser.m_private_serialization_params[6] = surface.m_a23;
-    ser.m_private_serialization_params[7] = surface.m_a24;
-    ser.m_private_serialization_params[8] = surface.m_a33;
-    ser.m_private_serialization_params[9] = surface.m_a34;
-    ser.m_private_serialization_params[10] = surface.m_a44;
+struct Surface {
+    std::variant<PlaneSurface, QuadricSurface, ToroidSurface, CubicSurface> m_surface = PlaneSurface{};
+};
 
-    ser.m_private_serialization_params[11] = surface.m_b12;
-    ser.m_private_serialization_params[12] = surface.m_b13;
-    ser.m_private_serialization_params[13] = surface.m_b21;
-    ser.m_private_serialization_params[14] = surface.m_b23;
-    ser.m_private_serialization_params[15] = surface.m_b31;
-    ser.m_private_serialization_params[16] = surface.m_b32;
-
-    ser.m_private_serialization_params[17] = surface.m_psi;
-
-    return ser;
-}
-
-RAYX_FN_ACC
-inline CubicSurface deserializeCubic(Surface ser) {
-    CubicSurface surface;
-    surface.m_icurv = int(ser.m_private_serialization_params[0]);
-    surface.m_a11 = ser.m_private_serialization_params[1];
-    surface.m_a12 = ser.m_private_serialization_params[2];
-    surface.m_a13 = ser.m_private_serialization_params[3];
-    surface.m_a14 = ser.m_private_serialization_params[4];
-    surface.m_a22 = ser.m_private_serialization_params[5];
-    surface.m_a23 = ser.m_private_serialization_params[6];
-    surface.m_a24 = ser.m_private_serialization_params[7];
-    surface.m_a33 = ser.m_private_serialization_params[8];
-    surface.m_a34 = ser.m_private_serialization_params[9];
-    surface.m_a44 = ser.m_private_serialization_params[10];
-
-    surface.m_b12 = ser.m_private_serialization_params[11];
-    surface.m_b13 = ser.m_private_serialization_params[12];
-    surface.m_b21 = ser.m_private_serialization_params[13];
-    surface.m_b23 = ser.m_private_serialization_params[14];
-    surface.m_b31 = ser.m_private_serialization_params[15];
-    surface.m_b32 = ser.m_private_serialization_params[16];
-
-    surface.m_psi = ser.m_private_serialization_params[17];
-
-    return surface;
-}
+struct DesignElement;
+enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
+Surface makeSurface(const DesignElement& dele);
+Surface makeToroid(const DesignElement& dele);      //< creates a toroid from the parameters given in ` dele`.
+Surface makeQuadric(const DesignElement& dele);     //< creates a quadric from the parameters given in ` dele`.
+Surface makeCubic(const DesignElement& dele);       //< creates a cubic from the parameters given in ` dele`.
+Surface makeEllipsoid(const DesignElement& dele);   //< creates a Ellipsoid from the parameters given in ` dele`.
+Surface makeCone(const DesignElement& dele);        //< creates a Cone from the parameters given in ` dele`.
+Surface makeCylinder(const DesignElement& dele);    //< creates a Cylinder from the parameters given in ` dele`.
+Surface makeSphere(double radius);                  //< creates a sphere from the radius .
+Surface makePlane();                                //< creates a plane surface
+Surface makeParaboloid(const DesignElement& dele);  //< creates a Paraboloid from the parameters given in ` dele`.
 
 // This prevents m_private_serialization_params from being used outside of this file - making them practically private.
 #define m_private_serialization_params "m_private_serialization_params are private! Use the corresponding serialize & deserialize functions instead."

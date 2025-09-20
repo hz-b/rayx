@@ -27,7 +27,7 @@ Surface makeSurface(const DesignElement& dele) {
     }
 }
 
-Surface makePlane() { return serializePlane(); }
+Surface makePlane() { return Surface{PlaneSurface{}}; }
 
 Surface makeCylinder(const DesignElement& dele) {
     auto cyl_direction = dele.getRadiusDirection();
@@ -60,7 +60,7 @@ Surface makeCylinder(const DesignElement& dele) {
         }
     }
 
-    return serializeQuadric({
+    return Surface{QuadricSurface{
         .m_icurv = icurv,
         .m_a11 = a11,
         .m_a12 = 0,
@@ -72,7 +72,7 @@ Surface makeCylinder(const DesignElement& dele) {
         .m_a33 = a33,
         .m_a34 = 0,
         .m_a44 = 0,
-    });
+    }};
 }
 
 Surface makeCone(const DesignElement& dele) {
@@ -115,7 +115,7 @@ Surface makeCone(const DesignElement& dele) {
         a24 = -upstreamRadius_R;
     }
 
-    return serializeQuadric({
+    return Surface{QuadricSurface{
         .m_icurv = icurv,
         .m_a11 = a11,
         .m_a12 = 0,
@@ -127,7 +127,7 @@ Surface makeCone(const DesignElement& dele) {
         .m_a33 = 0,
         .m_a34 = 0,
         .m_a44 = 0,
-    });
+    }};
 }
 
 Surface makeEllipsoid(const DesignElement& dele) {
@@ -189,7 +189,7 @@ Surface makeEllipsoid(const DesignElement& dele) {
     auto a34 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.cos() - y0 * tangentAngle.sin();
     auto a44 = -pow(shortHalfAxisB, 2) + pow(y0, 2) + pow(z0 * shortHalfAxisB / longHalfAxisA, 2);
 
-    return serializeQuadric({
+    return Surface{QuadricSurface{
         .m_icurv = 1,
         .m_a11 = a11,
         .m_a12 = 0,
@@ -201,11 +201,11 @@ Surface makeEllipsoid(const DesignElement& dele) {
         .m_a33 = a33,
         .m_a34 = a34,
         .m_a44 = a44,
-    });
+    }};
 }
 
 Surface makeSphere(double radius) {
-    return serializeQuadric({
+    return Surface{QuadricSurface{
         .m_icurv = 1,
         .m_a11 = 1,
         .m_a12 = 0,
@@ -217,15 +217,15 @@ Surface makeSphere(double radius) {
         .m_a33 = 1,
         .m_a34 = 0,
         .m_a44 = 0,
-    });
+    }};
 }
 
 Surface makeToroid(const DesignElement& dele) {
-    return serializeToroid({
+    return Surface{ToroidSurface{
         .m_longRadius = dele.getLongRadius(),
         .m_shortRadius = dele.getShortRadius(),
         .m_toroidType = TOROID_TYPE_CONCAVE,
-    });
+    }};
 }
 
 Surface makeParaboloid(const DesignElement& dele) {
@@ -249,8 +249,8 @@ Surface makeParaboloid(const DesignElement& dele) {
     a24 = -y0;
     a34 = -parameterP;
     a44 = pow(y0, 2) - 2 * parameterP * z0 - pow(parameterP, 2);
-    //-----------------------------------------------------------
-    return serializeQuadric({
+    //---------------------------- Serialization -------------------------------
+    return Surface{QuadricSurface{
         .m_icurv = 1,
         .m_a11 = a11,
         .m_a12 = 0,
@@ -262,7 +262,7 @@ Surface makeParaboloid(const DesignElement& dele) {
         .m_a33 = 0,
         .m_a34 = a34,
         .m_a44 = a44,
-    });
+    }};
 }
 
 Surface makeQuadric(const DesignElement& dele) { return dele.getExpertsOptics(); }
