@@ -496,6 +496,7 @@ void DesignElement::setMultilayerCoating(const MultilayerCoating& coating) {
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)] = Map();
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = layer.material;
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = layer.thickness;
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"] = layer.roughness;
     }
 }
 
@@ -518,6 +519,7 @@ Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coati
                 Layer layer;
                 layer.material = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"].as_int();
                 layer.thickness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"].as_double();
+                layer.roughness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"].as_double();
                 mlCoating.layers.push_back(layer);
             } catch (const std::exception& e) {
                 std::cerr << "Error deserializing layer " << layerKey << ": " << e.what() << std::endl;

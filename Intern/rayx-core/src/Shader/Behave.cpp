@@ -59,7 +59,6 @@ Ray behaveCrystal(Ray r, const Behaviour behaviour, [[maybe_unused]] Collision c
 // Implementation based on dynamical diffraction theory from:
 // Batterman, B. W., & Cole, H. (1964). "Dynamical Diffraction of X Rays by Perfect Crystals".
 // Reviews of Modern Physics, 36(3), 681-717. https://doi.org/10.1103/RevModPhys.36.681
-
 RAYX_FN_ACC
 Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& __restrict rand) {
     Behaviour::Slit b = variant::get<Behaviour::Slit>(behaviour.m_behaviour);
@@ -171,23 +170,18 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         r.m_order = 0;
         }
     } else if (coating.m_type == SurfaceCoatingType::OneCoating) {
-        // Extrahiere Coating-Informationen
         OneCoating oneCoating = deserializeOneCoating(coating);
 
-            // Refraktive Indizes
         constexpr int vacuum_material = -1;
         const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
         const auto coating_ior = getRefractiveIndex(r.m_energy, oneCoating.material, materialIndices, materialTable);
         const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
-            // Einfallswinkel bestimmen
         const auto angle = angleBetweenUnitVectors(-incident_vec, col.normal);
         const auto incidentAngle = complex::Complex(angle == 0.0 ? 1e-8 : angle, 0.0);
 
-            // Wellenlänge berechnen
         const double wavelength = energyToWaveLength(r.m_energy);
 
-            // Reflexionsamplituden (ohne Rauigkeit)
         const auto amplitude = computeSingleCoatingReflectance(
             incidentAngle,
             wavelength,
@@ -197,7 +191,6 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
             substrate_ior
         );
 
-            // Polarisationsmatrix anwenden
         const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
         r.m_field = polmat * r.m_field;
         r.m_order = 0;
