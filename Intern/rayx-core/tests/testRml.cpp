@@ -10,8 +10,8 @@ TEST_F(TestSuite, allBeamlineObjects) {
 
 TEST_F(TestSuite, loadDatFile) {
     // TODO: this should be tested with weights
-    const auto rays = traceRml("loadDatFile", RayAttrMask::Energy);
-    const auto expectedEnergies = std::vector<double> { 12.0, 15.0, 17.0 };
+    const auto rays             = traceRml("loadDatFile", RayAttrMask::Energy);
+    const auto expectedEnergies = std::vector<double>{12.0, 15.0, 17.0};
     CHECK_EQ(rays.energy[0], expectedEnergies[0]);
     CHECK_EQ(rays.energy[1], expectedEnergies[0]);
     CHECK_EQ(rays.energy[2], expectedEnergies[0]);
@@ -19,8 +19,8 @@ TEST_F(TestSuite, loadDatFile) {
 }
 
 TEST_F(TestSuite, loadDatFile2) {
-    const auto rays = traceRml("loadDatFile2", RayAttrMask::Energy);
-    const auto expectedEnergies = std::vector<double> { 12.0, 15.0, 17.0 };
+    const auto rays             = traceRml("loadDatFile2", RayAttrMask::Energy);
+    const auto expectedEnergies = std::vector<double>{12.0, 15.0, 17.0};
     CHECK_EQ(rays.energy[0], expectedEnergies[0]);
     CHECK_EQ(rays.energy[1], expectedEnergies[0]);
     CHECK_EQ(rays.energy[2], expectedEnergies[0]);
@@ -56,19 +56,19 @@ TEST_F(TestSuite, testEnergyDistribution) {
     std::vector<testInput> testinput = {
         {
             .rmlFile = "PointSourceSeparateEnergies",
-            .energy = 100,
+            .energy  = 100,
         },
         {
             .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy = 104.042,
+            .energy  = 104.042,
         },
         {
             .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy = 51.29,
+            .energy  = 51.29,
         },
         {
             .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy = 123.19,
+            .energy  = 123.19,
         },
     };
 

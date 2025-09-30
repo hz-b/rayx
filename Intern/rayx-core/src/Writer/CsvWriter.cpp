@@ -3,8 +3,8 @@
 #include <filesystem>
 #include <fstream>
 
-#include "Debug/Debug.h"
 #include "Beamline/StringConversion.h"
+#include "Debug/Debug.h"
 
 namespace RAYX {
 
@@ -12,31 +12,25 @@ namespace fs = std::filesystem;
 
 namespace {
 
-constexpr int PADDING = 0; // extra spaces on the left side in each cell for better readability
+constexpr int PADDING = 0;  // extra spaces on the left side in each cell for better readability
 
 // see https://stackoverflow.com/questions/1701055/what-is-the-maximum-length-in-chars-needed-to-represent-any-double-value
-constexpr int MAX_CELL_SIZE_FLOAT = 16 + PADDING;
+constexpr int MAX_CELL_SIZE_FLOAT  = 16 + PADDING;
 constexpr int MAX_CELL_SIZE_DOUBLE = 24 + PADDING;
 constexpr int MAX_CELL_SIZE_INT    = 11 + PADDING;
 constexpr int MAX_CELL_SIZE_UINT64 = 20 + PADDING;
-constexpr char DELIMITER      = ',';
+constexpr char DELIMITER           = ',';
 
 std::string format(const double v) {
     // std::format gives us the exact number of digits, that correctly represent the double.
     return std::format("{}", v);
 }
 
-std::string format(const int v) {
-    return std::to_string(v);
-}
+std::string format(const int v) { return std::to_string(v); }
 
-std::string format(const EventType v) {
-    return EventTypeToString.at(v);
-}
+std::string format(const EventType v) { return EventTypeToString.at(v); }
 
-std::string format(const RandCounter v) {
-    return std::to_string(v);
-}
+std::string format(const RandCounter v) { return std::to_string(v); }
 
 template <typename T>
 int calcCellSize(const std::string header);
@@ -65,11 +59,11 @@ int calcCellSize<RandCounter>(const std::string header) {
 
 std::vector<int> calcCellSizes(const RayAttrMask attr) {
     std::vector<int> cellSizes;
-#define X(type, name, flag)         \
+#define X(type, name, flag) \
     if (contains(attr, RayAttrMask::flag)) cellSizes.push_back(calcCellSize<type>(#name));
     RAYX_X_MACRO_RAY_ATTR_EXCEPT_ELECTRIC_FIELD
 #undef X
-#define X(type, name, flag)         \
+#define X(type, name, flag) \
     if (contains(attr, RayAttrMask::flag)) cellSizes.push_back(calcCellSize<typename type::value_type>(#name));
     RAYX_X_MACRO_RAY_ATTR_ONLY_ELECTRIC_FIELD
 #undef X
@@ -90,43 +84,44 @@ std::string formatAsCell(const T v, const int size) {
 
 void writeHeader(std::ostream& os, const RayAttrMask attr, const std::vector<int>& cellSizes) {
     const auto numAttr = countSetBits(attr);
-    int attrCount = 0;
+    int attrCount      = 0;
 
-#define X(type, name, flag)         \
-    if (contains(attr, RayAttrMask::flag)) { os << stringToCell(#name, cellSizes.at(attrCount)); \
-        if (++attrCount < numAttr) os << DELIMITER; \
+#define X(type, name, flag)                                 \
+    if (contains(attr, RayAttrMask::flag)) {                \
+        os << stringToCell(#name, cellSizes.at(attrCount)); \
+        if (++attrCount < numAttr) os << DELIMITER;         \
     }
     RAYX_X_MACRO_RAY_ATTR_EXCEPT_ELECTRIC_FIELD
 #undef X
 
-#define X(type, name, flag)         \
-    if (contains(attr, RayAttrMask::flag)) { \
-        const auto cellSize = cellSizes.at(attrCount); \
+#define X(type, name, flag)                                         \
+    if (contains(attr, RayAttrMask::flag)) {                        \
+        const auto cellSize = cellSizes.at(attrCount);              \
         os << stringToCell(#name " (real)", cellSize) << DELIMITER; \
-        os << stringToCell(#name " (imag)", cellSize); \
-        if (++attrCount < numAttr) os << DELIMITER; \
+        os << stringToCell(#name " (imag)", cellSize);              \
+        if (++attrCount < numAttr) os << DELIMITER;                 \
     }
     RAYX_X_MACRO_RAY_ATTR_ONLY_ELECTRIC_FIELD
 #undef X
 }
 
 void writeBodyLine(std::ostream& os, const int i, const RayAttrMask attr, const Rays& rays, const std::vector<int>& cellSizes) {
-    const auto numAttr   = countSetBits(attr);
-    auto attrCount = 0;
+    const auto numAttr = countSetBits(attr);
+    auto attrCount     = 0;
 
-#define X(type, name, flag) \
-    if (contains(attr, RayAttrMask::flag)) { \
+#define X(type, name, flag)                                        \
+    if (contains(attr, RayAttrMask::flag)) {                       \
         os << formatAsCell(rays.name[i], cellSizes.at(attrCount)); \
-        if (++attrCount < numAttr) os << DELIMITER; \
+        if (++attrCount < numAttr) os << DELIMITER;                \
     }
     RAYX_X_MACRO_RAY_ATTR_EXCEPT_ELECTRIC_FIELD
 #undef X
 
-#define X(type, name, flag) \
-    if (contains(attr, RayAttrMask::flag)) { \
+#define X(type, name, flag)                                                            \
+    if (contains(attr, RayAttrMask::flag)) {                                           \
         os << formatAsCell(rays.name[i].real(), cellSizes.at(attrCount)) << DELIMITER; \
-        os << formatAsCell(rays.name[i].imag(), cellSizes.at(attrCount)); \
-        if (++attrCount < numAttr) os << DELIMITER; \
+        os << formatAsCell(rays.name[i].imag(), cellSizes.at(attrCount));              \
+        if (++attrCount < numAttr) os << DELIMITER;                                    \
     }
     RAYX_X_MACRO_RAY_ATTR_ONLY_ELECTRIC_FIELD
 #undef X
@@ -152,7 +147,7 @@ void writeBodyLine(std::ostream& os, const int i, const RayAttrMask attr, const 
 }  // namespace
 
 void writeCsv(const fs::path& filepath, const Rays& rays) {
-    const auto attr = rays.attrMask();
+    const auto attr      = rays.attrMask();
     const auto cellSizes = calcCellSizes(attr);
 
     auto file = std::ofstream(filepath);

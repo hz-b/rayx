@@ -4,16 +4,13 @@
 
 namespace RAYX {
 
-
 int countSetBits(const RayAttrMask mask) {
     return std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
                static_cast<std::underlying_type_t<RayAttrMask>>(mask))
         .count();
 }
 
-bool isFlag(const RayAttrMask attr) {
-    return countSetBits(attr) == 1;
-}
+bool isFlag(const RayAttrMask attr) { return countSetBits(attr) == 1; }
 
 std::string to_string(const RayAttrMask attr) {
     return std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(

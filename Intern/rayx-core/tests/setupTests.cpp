@@ -83,10 +83,10 @@ Rays traceRml(std::string filename, RayAttrMask attrMask) {
 }
 
 std::pair<Beamline, Rays> loadBeamlineAndTrace(std::string filename, RayAttrMask attrMask) {
-    auto beamline    = loadBeamline(filename);
+    auto beamline          = loadBeamline(filename);
     const auto numSources  = beamline.numSources();
     const auto numElements = beamline.numElements();
-    auto rays        = tracer->trace(beamline, Sequential::No, ObjectMask::all(numSources, numElements), attrMask);
+    auto rays              = tracer->trace(beamline, Sequential::No, ObjectMask::all(numSources, numElements), attrMask);
     return std::make_pair(std::move(beamline), std::move(rays));
 }
 
@@ -112,29 +112,28 @@ void compare(const Rays& a, const Rays& b, double t, const RayAttrMask attrMask)
 
     const auto n = a.size();
     for (int i = 0; i < n; ++i) {
-#define X(type, name, flag) if(contains(attrMask, RayAttrMask::flag)) CHECK_EQ(a.name[i], b.name[i], t);
+#define X(type, name, flag) \
+    if (contains(attrMask, RayAttrMask::flag)) CHECK_EQ(a.name[i], b.name[i], t);
         RAYX_X_MACRO_RAY_ATTR
 #undef X
     }
 }
 
-void compareRayUiCompatible(const Rays& a, const Rays& b, double t) {
-    compare(a, b, t, attrMaskCompatibleWithRayUi);
-}
+void compareRayUiCompatible(const Rays& a, const Rays& b, double t) { compare(a, b, t, attrMaskCompatibleWithRayUi); }
 
 // returns the rayx rays converted to be ray-UI compatible.
 Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
-    const auto beamline                    = loadBeamline(filename);
-    const auto numSources                  = beamline.numSources();
-    const auto numElements                 = beamline.numElements();
-    const auto numObjects                  = numSources + numElements;
+    const auto beamline    = loadBeamline(filename);
+    const auto numSources  = beamline.numSources();
+    const auto numElements = beamline.numElements();
+    const auto numObjects  = numSources + numElements;
 
     auto rays = tracer->trace(beamline, seq, ObjectMask::all(numSources, numElements), attrMaskCompatibleWithRayUi | RayAttrMask::ObjectId)
                     .filterByLastEventInPath()
                     .sortByPathIdAndPathEventId();
 
     const auto elements = beamline.compileElements();
-    const auto size = rays.size();
+    const auto size     = rays.size();
     for (int i = 0; i < size; ++i) {
         const auto element_id = rays.object_id[i] - numSources;
         const auto btype      = elements[element_id].element.m_behaviour.m_type;

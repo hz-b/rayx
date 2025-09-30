@@ -65,7 +65,8 @@ TEST_F(TestSuite, DipoleSourcePosition) { checkEnergyDistribution(traceRml("dipo
 TEST_F(TestSuite, DipoleEnergyDistribution) { checkEnergyDistribution(traceRml("dipole_energySpread", RayAttrMask::Energy), 1000, 23000); }
 
 TEST_F(TestSuite, PixelPositionTest) {
-    const auto [beamline, rays] = loadBeamlineAndTrace("PixelSource", RayAttrMask::PositionX | RayAttrMask::PositionY | RayAttrMask::DirectionX | RayAttrMask::DirectionZ);
+    const auto [beamline, rays] =
+        loadBeamlineAndTrace("PixelSource", RayAttrMask::PositionX | RayAttrMask::PositionY | RayAttrMask::DirectionX | RayAttrMask::DirectionZ);
     const DesignSource* src = beamline.getSources()[0];
     auto width              = src->getSourceWidth();
     auto height             = src->getSourceHeight();
@@ -87,9 +88,7 @@ TEST_F(TestSuite, CircleSourcetest) {
     checkEnergyDistribution(rays, 99.5, 100.5);
 }
 
-TEST_F(TestSuite, testCircleSourceDirections) {
-    checkDirectionDistribution(traceRml("CircleSource_default", RayAttrMask::DirectionY), 0.0, 105.0);
-}
+TEST_F(TestSuite, testCircleSourceDirections) { checkDirectionDistribution(traceRml("CircleSource_default", RayAttrMask::DirectionY), 0.0, 105.0); }
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
     struct InOutPair {
@@ -253,9 +252,9 @@ TEST_F(TestSuite, testLightsourceGetters) {
 
 #ifndef NO_H5
 TEST_F(TestSuite, testH5) {
-    const auto beamlineFilename    = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
+    const auto beamlineFilename         = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
     const auto [beamline, raysOriginal] = loadBeamlineAndTrace(beamlineFilename);
-    const auto objectNamesOriginal = beamline.getObjectNames();
+    const auto objectNamesOriginal      = beamline.getObjectNames();
 
     const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("h5");
 
@@ -266,7 +265,9 @@ TEST_F(TestSuite, testH5) {
         CHECK_EQ(rays, raysOriginal);
         const auto objectNames = readH5ObjectNames(h5Filepath);
         // TODO: use new CHECK_EQ for strings/vecotr-of-strings when available
-        for (int i = 0; i < objectNames.size(); i++) { if(objectNames[i] != objectNamesOriginal[i]) ADD_FAILURE(); }
+        for (int i = 0; i < objectNames.size(); i++) {
+            if (objectNames[i] != objectNamesOriginal[i]) ADD_FAILURE();
+        }
     }
 
     // partial write and read

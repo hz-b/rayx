@@ -426,8 +426,8 @@ TEST_F(TestSuite, testRayMatrixMultWithComplexElectricField) {
     };
 
     for (auto const& p : inouts) {
-        glm::dvec3 pos    = p.in_position;
-        glm::dvec3 dir    = p.in_direction;
+        glm::dvec3 pos   = p.in_position;
+        glm::dvec3 dir   = p.in_direction;
         ElectricField ef = p.in_electric_field;
 
         rayMatrixMult(p.in_matrix, pos, dir, ef);
