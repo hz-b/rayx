@@ -244,7 +244,7 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setSurfaceCoatingType(SurfaceCoatingType value);
     SurfaceCoatingType getSurfaceCoatingType() const;
 
-    void setMultilayerCoating(const MultilayerCoating& coating);
+    void setMultilayerCoating(const Coating::MultilayerCoating& coating);
     
     Coating getCoating() const;
 

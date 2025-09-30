@@ -216,7 +216,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 //multilayer coating
-bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
+bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
     if (!node || !out) {
         return false;
     }
@@ -233,8 +233,13 @@ bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
     }
 
     int numLayers = 0;
+    int numDefinedLayers = 0;
     for (auto* l = layersRoot->first_node("layer"); l; l = l->next_sibling("layer")) {
-        numLayers++;
+        numDefinedLayers++;
+    }
+
+    if (!xml::paramInt(node, "numberOfLayers", &numLayers)) {
+        numLayers = numDefinedLayers;  // fallback: use number of actually defined layers
     }
 
     out->numLayers = numLayers;
@@ -242,10 +247,11 @@ bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
         RAYX_WARN << "Invalid number of layers: " << numLayers << ". Must be greater than 0.";
         return false;
     }
+
     out->layers.resize(numLayers);
     int i = 0;
     for (auto* layerNode = layersRoot->first_node("layer"); layerNode; layerNode = layerNode->next_sibling("layer"), ++i) {
-        Layer& layer = out->layers[i];
+        Coating::OneCoating& layer = out->layers[i];
 
         const char* materialStr = nullptr;
         if (auto* m = layerNode->first_attribute("material")) {
@@ -272,6 +278,13 @@ bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
             return false;
         }
     }
+    if (i < numLayers) {
+        // repeat the defined layers to fill the array 
+        for (; i < numLayers; ++i) {
+            out->layers[i] = out->layers[i % numDefinedLayers];
+        }
+    }
+
     return true;
 }
 
@@ -481,8 +494,8 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-MultilayerCoating Parser::parseCoating() const {
-    MultilayerCoating m;
+Coating::MultilayerCoating Parser::parseCoating() const {
+    Coating::MultilayerCoating m;
     // get children from param Cotaing 
     
     if (!paramCoating(node, &m)) {
