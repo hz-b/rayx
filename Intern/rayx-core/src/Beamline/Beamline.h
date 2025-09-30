@@ -45,6 +45,7 @@ class RAYX_API Group : public BeamlineNode {
     size_t numElements() const;
     size_t numSources() const;
     size_t numObjects() const;
+    size_t numRayPaths() const;
 
     /**
      * @brief Creates a deep copy of this group and its children.

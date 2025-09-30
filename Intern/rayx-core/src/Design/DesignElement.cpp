@@ -32,8 +32,6 @@ OpticalElementAndTransform DesignElement::compile(const glm::dvec4& parentPos, c
     dePtr->setOrientation(worldOri);
 
     DesignPlane plane = getDesignPlane();
-    if (plane == DesignPlane::XY) std::cout << "XY" << std::endl;
-    if (plane == DesignPlane::XZ) std::cout << "XY" << std::endl;
 
     if (getType() == ElementType::ExpertsMirror) {
         return makeElement(*dePtr, serializeMirror(), makeQuadric(*dePtr), plane);

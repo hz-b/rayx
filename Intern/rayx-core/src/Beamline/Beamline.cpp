@@ -209,4 +209,16 @@ size_t Group::numObjects() const {
     return count;
 }
 
+size_t Group::numRayPaths() const {
+    size_t count = 0;
+    ctraverse([&count](const BeamlineNode& node) -> bool {
+        if (node.isSource()) {
+            const auto* source = static_cast<const DesignSource*>(&node);
+            count += source->getNumberOfRays();
+        }
+        return false;
+    });
+    return count;
+}
+
 }  // namespace RAYX

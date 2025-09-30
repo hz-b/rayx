@@ -115,7 +115,7 @@ void behaveRZP(Ray& __restrict ray, const Behaviour& __restrict behaviour, const
 
     // calculate the RZP line density for the position of the intersection on the RZP
     double DX, DZ;
-    RZPLineDensity(ray, col.normal, b, DX, DZ);
+    RZPLineDensity(ray.position, col.normal, b, DX, DZ);
 
     // if additional zero order should be behaved, approx. half of the rays are randomly chosen to be behaved in order 0 (= ordinary reflection)
     // instead of the given order

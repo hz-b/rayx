@@ -1,140 +1,31 @@
 #pragma once
 
-#include <bitset>
+#include <numeric>
 #include <vector>
 
-#include "Core.h"
-#include "Shader/ElectricField.h"
-#include "Shader/EventType.h"
-#include "Shader/Rand.h"
-
-// TODO: all this macros should be invisible to the user
-
-#ifdef RAYX_X
-#error macro 'X' must not be defined at this point
-#endif
-
-#define RAYX_X_MACRO_RAY_ATTR_PATH_ID       X(int32_t, path_id, PathId)
-#define RAYX_X_MACRO_RAY_ATTR_PATH_EVENT_ID X(int32_t, path_event_id, PathEventId)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_X    X(double, position_x, PositionX)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_Y    X(double, position_y, PositionY)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_Z    X(double, position_z, PositionZ)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X   X(double, direction_x, DirectionX)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y   X(double, direction_y, DirectionY)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z   X(double, direction_z, DirectionZ)
-// TODO; this should be std::complex<double>, but our ubuntu CLI did not yet catch up to support std::complex in cuda device code
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(complex::Complex, electric_field_x, ElectricFieldX)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(complex::Complex, electric_field_y, ElectricFieldY)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(complex::Complex, electric_field_z, ElectricFieldZ)
-#define RAYX_X_MACRO_RAY_ATTR_OPTICAL_PATH_LENGTH X(double, optical_path_length, OpticalPathLength)
-#define RAYX_X_MACRO_RAY_ATTR_ENERGY              X(double, energy, Energy)
-#define RAYX_X_MACRO_RAY_ATTR_ORDER               X(int32_t, order, Order)
-#define RAYX_X_MACRO_RAY_ATTR_OBJECT_ID           X(int32_t, object_id, ObjectId)
-#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           X(int32_t, source_id, SourceId)
-#define RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          X(EventType, event_type, EventType)
-#define RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER        X(RandCounter, rand_counter, RandCounter)
-
-#define RAYX_X_MACRO_RAY_ATTR                 \
-    RAYX_X_MACRO_RAY_ATTR_PATH_ID             \
-    RAYX_X_MACRO_RAY_ATTR_PATH_EVENT_ID       \
-    RAYX_X_MACRO_RAY_ATTR_POSITION_X          \
-    RAYX_X_MACRO_RAY_ATTR_POSITION_Y          \
-    RAYX_X_MACRO_RAY_ATTR_POSITION_Z          \
-    RAYX_X_MACRO_RAY_ATTR_DIRECTION_X         \
-    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y         \
-    RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z         \
-    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    \
-    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    \
-    RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    \
-    RAYX_X_MACRO_RAY_ATTR_OPTICAL_PATH_LENGTH \
-    RAYX_X_MACRO_RAY_ATTR_ENERGY              \
-    RAYX_X_MACRO_RAY_ATTR_ORDER               \
-    RAYX_X_MACRO_RAY_ATTR_OBJECT_ID           \
-    RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           \
-    RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          \
-    RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER
+#include "Debug/Instrumentor.h"
+#include "RayAttrMask.h"
 
 namespace RAYX {
 
-#define X(type, name, flag) static_assert(std::is_nothrow_move_constructible_v<type>);  // ensure efficient moves
-
-RAYX_X_MACRO_RAY_ATTR
-#undef X
-
-/** @brief Mask to specify ray attributes
- * It is used to configure which attributes are recorded during ray tracing.
- */
-enum class RAYX_API RayAttrMask : uint32_t {
-    PathId            = 1 << 0,
-    PathEventId       = 1 << 1,
-    PositionX         = 1 << 2,
-    PositionY         = 1 << 3,
-    PositionZ         = 1 << 4,
-    DirectionX        = 1 << 5,
-    DirectionY        = 1 << 6,
-    DirectionZ        = 1 << 7,
-    ElectricFieldX    = 1 << 8,
-    ElectricFieldY    = 1 << 9,
-    ElectricFieldZ    = 1 << 10,
-    OpticalPathLength = 1 << 11,
-    Energy            = 1 << 12,
-    Order             = 1 << 13,
-    ObjectId          = 1 << 14,
-    SourceId          = 1 << 15,
-    EventType         = 1 << 16,
-    RandCounter       = 1 << 17,
-    RayAttrMaskCount  = 18,
-
-    Position      = PositionX | PositionY | PositionZ,
-    Direction     = DirectionX | DirectionY | DirectionZ,
-    ElectricField = ElectricFieldX | ElectricFieldY | ElectricFieldZ,
-
-    None = 0,
-    All  = (1 << RayAttrMaskCount) - 1,
-};
-
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|(const RayAttrMask lhs, const RayAttrMask rhs) {
-    return static_cast<RayAttrMask>(static_cast<std::underlying_type_t<RayAttrMask>>(lhs) | static_cast<std::underlying_type_t<RayAttrMask>>(rhs));
-}
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator&(const RayAttrMask lhs, const RayAttrMask rhs) {
-    return static_cast<RayAttrMask>(static_cast<std::underlying_type_t<RayAttrMask>>(lhs) & static_cast<std::underlying_type_t<RayAttrMask>>(rhs));
-}
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator^(const RayAttrMask lhs, const RayAttrMask rhs) {
-    return static_cast<RayAttrMask>(static_cast<std::underlying_type_t<RayAttrMask>>(lhs) ^ static_cast<std::underlying_type_t<RayAttrMask>>(rhs));
-}
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator~(const RayAttrMask lhs) {
-    return static_cast<RayAttrMask>(~static_cast<std::underlying_type_t<RayAttrMask>>(lhs));
-}
-RAYX_API RAYX_FN_ACC constexpr inline bool operator!(const RayAttrMask lhs) { return lhs == RayAttrMask::None; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator|=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs | rhs; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator&=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs & rhs; }
-RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask& operator^=(RayAttrMask& lhs, const RayAttrMask rhs) { return lhs = lhs ^ rhs; }
-
-RAYX_API inline std::string to_string(const RayAttrMask attr) {
-    return std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
-               static_cast<std::underlying_type_t<RayAttrMask>>(attr))
-        .to_string();
-}
-
 /**
- * @brief Struct to hold a list of rays
- * Each attribute is stored in a separate vector, allowing for efficient per-attribute access
+ * @brief A structure representing a collection of rays and their attributes.
+ * Each attribute is stored as a vector, allowing for efficient storage and manipulation of multiple rays.
+ * The Rays structure supports move semantics for efficient transfers, but disables copy semantics to prevent accidental costly copies.
+ * Use the `copy()` method to create an explicit copy when needed.
+ * @note Ensure that all attribute vectors are of the same length to maintain data integrity.
  */
 struct RAYX_API Rays {
   protected:
-    // avoid costly costly copies by accident
-    Rays(const Rays&)            = default;
+    /// Private copy constructor and assignment operator to prevent accidental copies
+    Rays(const Rays&) = default;
+    /// Private copy constructor and assignment operator to prevent accidental copies
     Rays& operator=(const Rays&) = default;
 
   public:
     Rays()                  = default;
     Rays(Rays&&)            = default;
     Rays& operator=(Rays&&) = default;
-
-    Rays createCopy() const {
-        auto rays = *this;
-        return rays;
-    }
 
 #define X(type, name, flag) std::vector<type> name;
 
@@ -162,37 +53,221 @@ struct RAYX_API Rays {
         electric_field_z[i] = electric_field.z;
     }
 
-    RayAttrMask attrMask() const {
-        RayAttrMask mask;
-#define X(type, name, flag) \
-    if (name.size() != 0) mask |= RayAttrMask::flag;
+    /**
+     * @brief Create a copy of the Rays instance.
+     * This function is an explicit copy of the Rays instance to avoid accidental costly copies.
+     * If you want to return a Rays instance from a function, you should make use of RVO/NRVO optimizations, instead of using this function.
+     * @return A new Rays instance that is a copy of the current instance.
+     */
+    [[nodiscard]] Rays copy() const;
 
-        RAYX_X_MACRO_RAY_ATTR
-#undef X
-        return mask;
-    }
+    /**
+     * @brief Get a mask indicating which ray attributes are recorded in this Rays instance.
+     * @return A RayAttrMask indicating the recorded attributes.
+     */
+    RayAttrMask attrMask() const;
 
-    int numEvents() const {
-        auto size = 0;
-#define X(type, name, flag) size = std::max(size, static_cast<int>(name.size()));
+    /**
+     * @brief Check if a specific attribute is recorded in this Rays instance.
+     * @param attr The RayAttrMask attribute to check.
+     * @return True if the attribute is recorded, false otherwise.
+     * @note When repeatedly checking on the same Rays instance, the free function contains(haystack, needle) should be preferred over this method.
+     */
+    bool contains(const RayAttrMask attr) const;
 
-        RAYX_X_MACRO_RAY_ATTR
-#undef X
-        return size;
-    }
+    /**
+     * @brief Check if the ray list is empty.
+     * @return True if the ray list is empty, false otherwise.
+     */
+    bool empty() const;
 
-    int numPaths() const {
-        auto path_ids = path_id;
-        std::sort(path_ids.begin(), path_ids.end());
-        return std::unique(path_ids.begin(), path_ids.end()) - path_ids.begin();
-    }
+    /**
+     * @brief Get the number of events in the ray list.
+     * @return The number of events in the ray list.
+     */
+    int size() const;
+
+    /**
+     * @brief Get the number of unique paths in the ray list.
+     * @return The number of unique path IDs in the ray list.
+     * @note Requires that path_id is recorded.
+     */
+    int numPaths() const;
+
+    /**
+     * @brief Append another Rays instance to this one.
+     * @param other The Rays instance to append.
+     * @return A reference to this Rays instance after appending.
+     */
+    Rays& append(const Rays& other);
+
+    /**
+     * @brief Concatenate multiple Rays instances into a single Rays instance.
+     * This is more efficient than using repeated append() calls.
+     * @param rays_list A vector of Rays instances to concatenate.
+     * @return A new Rays instance containing all rays from the input instances.
+     * @note Requires that all Rays instances in rays_list have the same attributes recorded.
+     */
+    [[nodiscard]] static Rays concat(const std::vector<Rays>& rays_list);
+
+    /**
+     * @brief Sort rays by object_id, so that rays interacting with the same object are grouped together.
+     * @return A new Rays instance with rays sorted by object_id.
+     * @note Requires that object_id is recorded.
+     */
+    [[nodiscard]] Rays sortByObjectId() const;
+
+    /**
+     * @brief Sort rays by path_id and then by path_event_id, so that rays belonging to the same path are grouped together,
+     * and within each path, rays are ordered by their event sequence.
+     * @return A new Rays instance with rays sorted by path_id and path_event_id.
+     * @note Requires that path_id and path_event_id are recorded.
+     * @note Every event is uniquely identified by the combination of path_id and path_event_id. Thus, sorting by these two attributes
+     * ensures that rays are in a well-defined order. This enables equality comparisons between different Rays instances.
+     */
+    [[nodiscard]] Rays sortByPathIdAndPathEventId() const;
+
+    /**
+     * @brief Sort rays using a custom comparison function.
+     * The comparison function should take two indices (int) and return true if the first index should come before the second.
+     * This method can be used to implement custom sorting logic, such as sorting by multiple attributes.
+     * @tparam Compare A callable type that defines the comparison function.
+     * @param comp The comparison function to use for sorting. Must satisfy the requirements of Compare, see
+     * https://en.cppreference.com/w/cpp/named_req/Compare. This is the same as for std::sort.
+     * @return A new Rays instance with rays sorted according to the comparison function.
+     * @note Requires that the attribute to sort by is recorded.
+     * @example
+     * ```cpp
+     * // sort by path_id.
+     * rays = rays.sort([&](int lhs, int rhs) { return rays.path_id[lhs] < rays.path_id[rhs]; });
+     * // sort by path_id and then by path_event_id.
+     * rays = rays.sort([&](int lhs, int rhs) { if (rays.path_id[lhs] == rays.path_id[rhs]) return rays.path_id[lhs] < rays.path_id[rhs]; else return
+     * rays.path_event_id[lhs] < rays.path_event_id[rhs]; });
+     * ```
+     */
+    template <typename Compare>
+    [[nodiscard]] Rays sort(Compare comp) const;
+
+    /**
+     * @brief Filter the rays to only include those with attributes specified in the given mask.
+     * This operation modifies the current Rays instance in place.
+     * @param mask A RayAttrMask specifying which attributes to retain.
+     */
+    Rays& filterByAttrMask(const RayAttrMask mask);
+
+    /**
+     * @brief Filter the rays to only include those that interacted with a specific object.
+     * @param object_id The ID of the object to filter by.
+     * @return A new Rays instance containing only rays that interacted with the specified object.
+     * @note Requires that object_id is recorded.
+     */
+    [[nodiscard]] Rays filterByObjectId(const int object_id) const;
+
+    /**
+     * @brief Filter the rays to only include the final event of each unique path.
+     * The final event is determined by the maximum path_event_id for each path_id.
+     * @return A new Rays instance containing only the final event of each path.
+     * @note Requires that path_id and path_event_id are recorded.
+     */
+    [[nodiscard]] Rays filterByLastEventInPath() const;
+
+    /**
+     * @brief Filter the rays using a custom predicate function.
+     * The predicate function should take an index (int) and return true if the ray at that index should be included.
+     * This method can be used to implement custom filtering logic, such as filtering by multiple attributes or complex conditions.
+     * @tparam Pred A callable type that defines the predicate function.
+     * @param pred The predicate function to use for filtering.
+     * @return A new Rays instance containing only rays for which the predicate returns true.
+     * @note Requires that path_event_id is recorded.
+     * @example
+     * ```cpp
+     * rays = rays.filter([&](int i) { return rays.path_event_id[i] == 3; }); // to filter by path_event_id == 3.
+     * ```
+     */
+    template <typename Pred>
+    [[nodiscard]] Rays filter(Pred pred) const;
+
+    /**
+     * @brief Count the number of rays that satisfy a given predicate function.
+     * The predicate function should take an index (int) and return true if the ray at that index satisfies the condition.
+     * @tparam Pred A callable type that defines the predicate function.
+     * @param pred The predicate function to use for counting.
+     * @return The number of rays for which the predicate returns true.
+     * @example
+     * ```cpp
+     * int count = rays.count([&](int i) { return rays.object_id[i] == 3; }); // to count rays with object_id == 3.
+     * ```
+     */
+    template <typename Pred>
+    int count(Pred pred) const;
+
+    /**
+     * @brief Check if the sizes of all recorded attribute vectors are valid (i.e., all the same length).
+     * @return True if all recorded attribute vectors have the same length, false otherwise.
+     */
+    bool attrSizesAreValid() const;
+
+    // TODO: implement helper methods to iterate over attributes, to get rid of most of the X-macros
 };
 
-static_assert(std::is_nothrow_move_constructible_v<Rays>);  // ensure efficient moves
+template <typename Compare>
+Rays Rays::sort(Compare comp) const {
+    RAYX_PROFILE_FUNCTION_STDOUT();
 
-/// get a full list of ray attribute names
-RAYX_API std::vector<std::string> getRayAttrNames();
-/// convert list of ray attribute names to RayAttrMask
-RAYX_API RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings);
+    const auto attr = attrMask();
+    const auto n    = size();
+
+    auto indices = std::vector<int>(n);
+    std::iota(indices.begin(), indices.end(), 0);
+    std::sort(indices.begin(), indices.end(), comp);
+
+    Rays result;
+#define X(type, name, flag)                                            \
+    if (!!(attr & RayAttrMask::flag)) {                                \
+        result.name.resize(name.size());                               \
+        for (int i = 0; i < n; ++i) result.name[i] = name[indices[i]]; \
+    }
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+
+    return result;
+}
+
+template <typename Pred>
+Rays Rays::filter(Pred pred) const {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+
+    const auto attr = attrMask();
+    const auto n    = size();
+
+    auto indices = std::vector<int>{};
+    for (int i = 0; i < n; ++i)
+        if (pred(i)) indices.push_back(i);
+
+    Rays result;
+#define X(type, name, flag)                                                                                           \
+    if (!!(attr & RayAttrMask::flag)) {                                                                               \
+        result.name.resize(indices.size());                                                                           \
+        std::transform(indices.begin(), indices.end(), result.name.begin(), [this](const int i) { return name[i]; }); \
+    }
+    RAYX_X_MACRO_RAY_ATTR
+#undef X
+
+    return result;
+}
+
+template <typename Pred>
+int Rays::count(Pred pred) const {
+    const int sz = size();
+    int count    = 0;
+    for (int i = 0; i < sz; ++i)
+        if (pred(i)) ++count;
+    return count;
+}
+
+static_assert(std::is_nothrow_move_constructible_v<Rays>);  // ensure efficient moves, when used in std::vector<Rays>
+
+bool operator==(const Rays& lhs, const Rays& rhs);
+bool operator!=(const Rays& lhs, const Rays& rhs);
 
 }  // namespace RAYX

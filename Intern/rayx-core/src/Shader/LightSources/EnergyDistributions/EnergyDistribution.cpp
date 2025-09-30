@@ -47,6 +47,7 @@ RAYX_FN_ACC double selectEnergy(const SeparateEnergies& __restrict separateEnerg
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionList& __restrict energyDistributionList, Rand& __restrict rand) {
     // TODO: implement all the other stuff from DayFile::selectEnergy
     const auto r    = rand.randomDouble() * energyDistributionList.weightSum;
+    // TODO: test this
     const int index = binarySearchPrefix(energyDistributionList.prefixWeights, energyDistributionList.size, r);
     return energyDistributionList.energies[index];
 }

@@ -17,6 +17,7 @@ struct EnergyDistributionList {
     bool continous;
 };
 
+// TODO: use cuda::std::variant
 using EnergyDistributionDataVariant = std::variant<HardEdge, SoftEdge, SeparateEnergies, EnergyDistributionList>;
 
 RAYX_FN_ACC double selectEnergy(const HardEdge& __restrict hardEdge, Rand& __restrict rand);

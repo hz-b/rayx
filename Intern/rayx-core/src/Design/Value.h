@@ -234,10 +234,9 @@ class RAYX_API DesignMap {
     ConstIterator end() const;
 
   private:
-    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType,
-                 CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist,
-                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType,
-                 DesignPlane>
+    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, CentralBeamstop, Cutout,
+                 CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist, SpreadType, Rad, Material,
+                 EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType, DesignPlane>
         m_variant;
 };
 

@@ -49,6 +49,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     app.add_option("-o,--output", args.outputPath,
                    "Output filepath. Can only be used if a single input is provided, that directs to an RML file. Default: put the output file "
                    "next to the RML");
+    app.add_flag("-a,--append", args.append, "Append to existing output file. Default: overwrite existing output file");
     app.add_flag("-S,--sequential", args.sequential, "Trace sequentially");
     app.add_option("-s,--seed", args.seed, "Specify a seed to be used for tracing");
     app.add_flag("-f,--default-seed", args.defaultSeed, std::format("Use default seed for tracing: {}", RAYX::FIXED_SEED));
@@ -67,6 +68,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", RAYX::DEFAULT_BATCH_SIZE));
     app.add_option("-n,--number-of-rays", args.numberOfRays, "Override the number of rays for all sources");
     app.add_flag("-B,--benchmark", args.benchmark, "Dump benchmark durations");
+    app.add_flag("-O,--sort-by-object-id", args.sortByObjectId, "Sort rays by object_id before writing to output file");
     app.add_option("-R,--record-indices", args.objectRecordIndices,
                    "Record events only for specific sources / elements. Use --dump to list the objects of a beamline");
 
@@ -111,6 +113,8 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
             RAYX_EXIT << "error: the output path must be a directory, when multiple input files or an input directory is specified";
         }
     }
+
+    if (args.append && args.csv) RAYX_EXIT << "error: appending to existing output files is not supported for csv output";
 
     return args;
 }

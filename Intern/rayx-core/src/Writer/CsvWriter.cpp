@@ -1,10 +1,210 @@
 #include "CsvWriter.h"
 
-#include <cstring>
+#include <filesystem>
 #include <fstream>
-#include <sstream>
 
 #include "Debug/Debug.h"
+#include "Beamline/StringConversion.h"
+
+namespace RAYX {
+
+namespace fs = std::filesystem;
+
+namespace {
+
+constexpr int PADDING = 0; // extra spaces on the left side in each cell for better readability
+
+// see https://stackoverflow.com/questions/1701055/what-is-the-maximum-length-in-chars-needed-to-represent-any-double-value
+constexpr int MAX_CELL_SIZE_FLOAT = 16 + PADDING;
+constexpr int MAX_CELL_SIZE_DOUBLE = 24 + PADDING;
+constexpr int MAX_CELL_SIZE_INT    = 11 + PADDING;
+constexpr int MAX_CELL_SIZE_UINT64 = 20 + PADDING;
+constexpr char DELIMITER      = ',';
+
+std::string format(const double v) {
+    // std::format gives us the exact number of digits, that correctly represent the double.
+    return std::format("{}", v);
+}
+
+std::string format(const int v) {
+    return std::to_string(v);
+}
+
+std::string format(const EventType v) {
+    return EventTypeToString.at(v);
+}
+
+std::string format(const RandCounter v) {
+    return std::to_string(v);
+}
+
+template <typename T>
+int calcCellSize(const std::string header);
+
+template <>
+int calcCellSize<double>(const std::string header) {
+    return std::max(MAX_CELL_SIZE_DOUBLE, static_cast<int>(header.size()) + PADDING);
+}
+
+template <>
+int calcCellSize<int>(const std::string header) {
+    return std::max(MAX_CELL_SIZE_INT, static_cast<int>(header.size()) + PADDING);
+}
+
+template <>
+int calcCellSize<EventType>(const std::string header) {
+    int maxSize = 0;
+    for (const auto& [_, str] : EventTypeToString) maxSize = std::max(maxSize, static_cast<int>(str.size()));
+    return std::max(maxSize, static_cast<int>(header.size()) + PADDING);
+}
+
+template <>
+int calcCellSize<RandCounter>(const std::string header) {
+    return std::max(MAX_CELL_SIZE_UINT64, static_cast<int>(header.size()) + PADDING);
+}
+
+std::vector<int> calcCellSizes(const RayAttrMask attr) {
+    std::vector<int> cellSizes;
+#define X(type, name, flag)         \
+    if (contains(attr, RayAttrMask::flag)) cellSizes.push_back(calcCellSize<type>(#name));
+    RAYX_X_MACRO_RAY_ATTR_EXCEPT_ELECTRIC_FIELD
+#undef X
+#define X(type, name, flag)         \
+    if (contains(attr, RayAttrMask::flag)) cellSizes.push_back(calcCellSize<typename type::value_type>(#name));
+    RAYX_X_MACRO_RAY_ATTR_ONLY_ELECTRIC_FIELD
+#undef X
+    return cellSizes;
+}
+
+std::string stringToCell(std::string s, const int size) {
+    if (size < static_cast<int>(s.size()))
+        RAYX_EXIT << "cell: string \"" << s << "\" needs to be shortened! maximum size: " << size << ", actual size: " << s.size();
+    s.insert(0, size - s.size(), ' ');
+    return s;
+}
+
+template <typename T>
+std::string formatAsCell(const T v, const int size) {
+    return stringToCell(format(v), size);
+}
+
+void writeHeader(std::ostream& os, const RayAttrMask attr, const std::vector<int>& cellSizes) {
+    const auto numAttr = countSetBits(attr);
+    int attrCount = 0;
+
+#define X(type, name, flag)         \
+    if (contains(attr, RayAttrMask::flag)) { os << stringToCell(#name, cellSizes.at(attrCount)); \
+        if (++attrCount < numAttr) os << DELIMITER; \
+    }
+    RAYX_X_MACRO_RAY_ATTR_EXCEPT_ELECTRIC_FIELD
+#undef X
+
+#define X(type, name, flag)         \
+    if (contains(attr, RayAttrMask::flag)) { \
+        const auto cellSize = cellSizes.at(attrCount); \
+        os << stringToCell(#name " (real)", cellSize) << DELIMITER; \
+        os << stringToCell(#name " (imag)", cellSize); \
+        if (++attrCount < numAttr) os << DELIMITER; \
+    }
+    RAYX_X_MACRO_RAY_ATTR_ONLY_ELECTRIC_FIELD
+#undef X
+}
+
+void writeBodyLine(std::ostream& os, const int i, const RayAttrMask attr, const Rays& rays, const std::vector<int>& cellSizes) {
+    const auto numAttr   = countSetBits(attr);
+    auto attrCount = 0;
+
+#define X(type, name, flag) \
+    if (contains(attr, RayAttrMask::flag)) { \
+        os << formatAsCell(rays.name[i], cellSizes.at(attrCount)); \
+        if (++attrCount < numAttr) os << DELIMITER; \
+    }
+    RAYX_X_MACRO_RAY_ATTR_EXCEPT_ELECTRIC_FIELD
+#undef X
+
+#define X(type, name, flag) \
+    if (contains(attr, RayAttrMask::flag)) { \
+        os << formatAsCell(rays.name[i].real(), cellSizes.at(attrCount)) << DELIMITER; \
+        os << formatAsCell(rays.name[i].imag(), cellSizes.at(attrCount)); \
+        if (++attrCount < numAttr) os << DELIMITER; \
+    }
+    RAYX_X_MACRO_RAY_ATTR_ONLY_ELECTRIC_FIELD
+#undef X
+}
+
+// std::vector<RayAttrMask> parseHeader(const std::string& line) {
+//     auto ss = std::istringstream(line);
+//     auto attr = std::vector<RayAttrMask>();
+//
+//     std::string item;
+//     while (std::getline(ss, item, DELIMITER)) {
+// #define X(type, name, flag)         \
+//     if (item == #name)      \
+//         attr.push_back(RayAttrMask::flag);
+//
+//         RAYX_X_MACRO_RAY_ATTR
+// #undef X
+//     }
+//
+//     return attr;
+// }
+
+}  // namespace
+
+void writeCsv(const fs::path& filepath, const Rays& rays) {
+    const auto attr = rays.attrMask();
+    const auto cellSizes = calcCellSizes(attr);
+
+    auto file = std::ofstream(filepath);
+
+    writeHeader(file, attr, cellSizes);
+    file << '\n';
+
+    const auto size = rays.size();
+    for (int i = 0; i < size; i++) {
+        writeBodyLine(file, i, attr, rays, cellSizes);
+        file << '\n';
+    }
+}
+
+// Rays readCsv(const fs::path& filepath) {
+//     auto file = std::ifstream(filepath);
+//
+//     std::string line;
+//
+//     // parse header
+//     std::getline(file, line);
+//     const auto attrVec = parseHeader(line);
+//
+//     Rays rays;
+// }
+
+}  // namespace RAYX
+
+// Rays readCsv(const fs::path& filepath) {
+//     auto file = std::ifstream(filepath);
+//
+//     std::string line;
+//
+//     // parse header
+//     std::getline(file, line);
+//     const auto attr = parseHeader(line);
+//
+//     Rays rays;
+//
+//     while (std::getline(file, line)) {
+//         auto ss = std::istringstream(line);
+//
+//         for (const auto a : attr) {
+//             std::string item;
+//             std::getline(ss, item, DELIMITER);
+//
+//             // TODO
+//         }
+//     }
+//
+//     return rays;
+// }
 
 // TODO: enable
 // namespace {

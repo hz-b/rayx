@@ -49,20 +49,6 @@ struct ScatterCompactKernel {
     }
 };
 
-struct FilterByObjectIdKernel {
-    template <typename Acc>
-    RAYX_FN_ACC void operator()(const Acc& __restrict acc, bool* __restrict result, const int* __restrict object_ids, const int* objectRecordMask,
-                                const int n) const {
-        const auto gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-
-        if (gid < n) {
-            const auto object_id   = object_ids[gid];
-            const auto shouldStore = objectRecordMask[object_id];
-            result[gid]            = shouldStore;
-        }
-    }
-};
-
 }  // unnamed namespace
 
 /// keeps track of all resources used by the tracer. manages allocation and update of buffers
@@ -307,7 +293,7 @@ class MegaKernelTracer : public DeviceTracer {
 
         RAYX_VERB << "number of recorded events: " << numEventsTotal;
 
-        return concatEventsFromBatches(numEventsTotal, sourceConf.numBatches, h_compactEventsBatches, attrRecordMask);
+        return Rays::concat(h_compactEventsBatches);
     }
 
   private:
@@ -393,28 +379,6 @@ class MegaKernelTracer : public DeviceTracer {
 #undef X
 
         return h_compactEventsBatch;
-    }
-
-    Rays concatEventsFromBatches(const int numEventsTotal, const int numBatches, const std::vector<Rays>& h_compactEventsBatches,
-                                 const RayAttrMask attrRecordMask) {
-        // create returned object as local variable, to benefit from RVO
-        auto h_compactEvents = Rays();
-
-#define X(type, name, flag)                                                                                           \
-    if (!!(attrRecordMask & RayAttrMask::flag)) {                                                                     \
-        auto batchOffset = 0;                                                                                         \
-        h_compactEvents.name.resize(numEventsTotal);                                                                  \
-        for (auto batchIndex = 0; batchIndex < numBatches; ++batchIndex) {                                            \
-            std::copy(h_compactEventsBatches[batchIndex].name.begin(), h_compactEventsBatches[batchIndex].name.end(), \
-                      h_compactEvents.name.begin() + batchOffset);                                                    \
-            batchOffset += static_cast<int>(h_compactEventsBatches[batchIndex].name.size());                          \
-        }                                                                                                             \
-    }
-
-        RAYX_X_MACRO_RAY_ATTR
-#undef X
-
-        return h_compactEvents;
     }
 };
 

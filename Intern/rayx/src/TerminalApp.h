@@ -18,7 +18,7 @@ class TerminalApp {
     void run();
 
   private:
-    void tracePath(const std::filesystem::path& path);
+    int tracePath(const std::filesystem::path& path);
     void traceRmlAndExportRays(const std::filesystem::path& path);
     RAYX::Beamline loadBeamline(const std::filesystem::path& filepath);
     RAYX::Rays traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attr);

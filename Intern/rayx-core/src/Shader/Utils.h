@@ -33,7 +33,4 @@ inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& _
     rayElectricField = glm::dmat3(m) * rayElectricField;
 }
 
-// returns angle between ray direction and surface normal at intersection point
-RAYX_FN_ACC double RAYX_API getIncidenceAngle(Ray r, glm::dvec3 normal);
-
 }  // namespace RAYX

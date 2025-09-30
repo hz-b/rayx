@@ -33,9 +33,11 @@ HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_Complex);
 
 namespace RAYX {
 
+// TODO: this function should not require, that attr is known beforehand. Mabye we should use attr only to further exclude attributes? Or provide an
+// extra attr that is repsonsible to check for existence?
 Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: " << to_string(attr);
+    RAYX_VERB << "reading rays from " << filepath << " with attribute flags: " << to_string(attr);
 
     Rays rays;
 
@@ -52,7 +54,7 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
 
 #define X(type, name, flag)                                                                \
     RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if ((attr & RayAttrMask::flag) != RayAttrMask::None) loadData("rayx/events/" #name, rays.name);
+    if (contains(attr, RayAttrMask::flag)) loadData("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
@@ -62,7 +64,7 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
 }
 
 std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath) {
-    RAYX_VERB << "reading element names from '" << filepath;
+    RAYX_VERB << "reading element names from " << filepath;
 
     auto object_names = std::vector<std::string>();
 
@@ -75,23 +77,50 @@ std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath
     return object_names;
 }
 
-void writeH5(const std::filesystem::path& filepath, const std::vector<std::string>& object_names, const Rays& rays, const RayAttrMask attr) {
+void writeH5(const std::filesystem::path& filepath, const std::vector<std::string>& object_names, const Rays& rays, const RayAttrMask attr,
+             const bool overwrite) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "write rays to '" << filepath << "' with attribute flags: " << to_string(attr);
+    RAYX_VERB << "write rays to " << filepath << " with attribute flags: " << to_string(attr);
 
     try {
-        auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
+        const auto flags = HighFive::File::ReadWrite | HighFive::File::Create | (overwrite ? HighFive::File::Truncate : HighFive::File::Excl);
+        auto file        = HighFive::File(filepath.string(), flags);
 
 #define X(type, name, flag)                                                              \
     RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if ((attr & RayAttrMask::flag) != RayAttrMask::None) file.createDataSet("rayx/events/" #name, rays.name);
+    if (contains(attr, RayAttrMask::flag)) file.createDataSet("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
 
         // TODO: store RayAttrMask
-        file.createDataSet("rayx/num_events", rays.numEvents());
+        file.createDataSet("rayx/num_events", rays.size());
         file.createDataSet("rayx/object_names", object_names);
+    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
+}
+
+// TODO: fix
+void appendH5(const std::filesystem::path& filepath, const Rays& rays, const RayAttrMask attr) {
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    RAYX_VERB << "append rays to " << filepath << " with attribute flags: " << to_string(attr);
+
+    if (!std::filesystem::is_regular_file(filepath))
+        RAYX_EXIT << "Cannot append to output file '" << filepath << "' because it does not exist or is not a regular file.";
+
+    try {
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite);
+
+#define X(type, name, flag)                                                               \
+    RAYX_VERB << "append ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+    if (contains(attr, RayAttrMask::flag)) {                                              \
+        auto dataset        = file.getDataSet("rayx/events/" #name);                      \
+        const auto old_size = dataset.getSpace().getDimensions()[0];                      \
+        dataset.resize({old_size + rays.name.size()});                                    \
+        dataset.select({old_size}, {rays.name.size()}).write(rays.name);                  \
+    }
+
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
 }
 

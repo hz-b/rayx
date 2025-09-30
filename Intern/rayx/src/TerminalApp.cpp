@@ -125,16 +125,21 @@ TerminalApp::TerminalApp(int argc, char** argv) {
 
 TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
-void TerminalApp::tracePath(const fs::path& path) {
+int TerminalApp::tracePath(const fs::path& path) {
     if (!fs::exists(path)) { RAYX_EXIT << "Trying to access file or directory " << path << " but it was not found!"; }
 
+    auto rmlCounter = 0;
+
     if (fs::is_directory(path)) {
-        for (const auto& p : fs::directory_iterator(path)) { tracePath(p.path()); }
+        for (const auto& p : fs::directory_iterator(path)) { rmlCounter += tracePath(p.path()); }
     } else if (path.extension() == ".rml") {
         traceRmlAndExportRays(path);
+        rmlCounter += 1;
     } else {
         RAYX_VERB << "ignoring non-rml file: '" << path << "'";
     }
+
+    return rmlCounter;
 }
 
 void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
@@ -148,16 +153,13 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
 
     const auto beamline = loadBeamline(inputFilepath);
 
-    // in order to validate the events, we always want to get the event types
-    const auto attrRecordMaskTrace = attrRecordMask | RAYX::RayAttrMask::EventType;
+    const auto rays = traceBeamline(beamline, attrRecordMask);
 
-    const auto rays = traceBeamline(beamline, attrRecordMaskTrace);
-
-    validateEvents(rays);
-
-    if (!rays.numEvents())
-        std::cout << "No events were recorded!" << std::endl;
-    else {
+    if (!rays.size()) {
+        const auto end_time     = steady_clock::now();
+        const auto elapsed_time = duration_cast<milliseconds>(end_time - start_time).count();
+        std::cout << "Finished in " << elapsed_time << "ms. No events were recorded!" << std::endl;
+    } else {
         const auto objectNames = beamline.getObjectNames();
         auto outputFilepath    = exportRays(inputFilepath, objectNames, rays, attrRecordMask);
 
@@ -220,8 +222,23 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     // max batch size
     const auto maxBatchSize = m_cliArgs.batchSize;
 
+    // in order to validate the events, we always want to get the event types
+    const auto attrRecordMaskTrace = attrRecordMask | RAYX::RayAttrMask::EventType;
+
     // do the trace
-    auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMask, maxEvents, maxBatchSize);
+    auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMaskTrace, maxEvents, maxBatchSize);
+
+    if (m_cliArgs.sortByObjectId) {
+        if (!(attrRecordMask & RAYX::RayAttrMask::ObjectId))
+            RAYX_WARN << "Cannot sort by object_id, because object_id is not recorded. Please add object_id to the attribute record mask.";
+
+        rays = rays.sortByObjectId();
+    }
+
+    validateEvents(rays);
+
+    // return to the user-specified attribute record mask
+    rays.filterByAttrMask(attrRecordMask);
 
     return rays;
 }
@@ -304,7 +321,10 @@ void TerminalApp::run() {
     if (!m_cliArgs.inputPaths.size()) RAYX_EXIT << "Please provide an input RML file or directory. Use --help for more information";
 
     // trace and export
-    for (const auto path : m_cliArgs.inputPaths) tracePath(path);
+    auto rmlCounter = 0;
+    for (const auto path : m_cliArgs.inputPaths) rmlCounter += tracePath(path);
+
+    std::cout << "Done. Processed " << rmlCounter << " RML file(s)" << std::endl;
 }
 
 fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vector<std::string>& objectNames, const RAYX::Rays& rays,
@@ -327,14 +347,15 @@ fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vecto
     }
 
     if (m_cliArgs.csv) {
-        RAYX_EXIT << "unimplemented!";
-        // TODO: enable
-        // writeCsv(RAYX::raySoAToBundleHistory(rays), outputFilepath.string());
+        writeCsv(outputFilepath, rays);
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
-        writeH5(outputFilepath, objectNames, rays, attrRecordMask);
+        if (m_cliArgs.append)
+            RAYX::appendH5(outputFilepath, rays, attrRecordMask);
+        else
+            RAYX::writeH5(outputFilepath, objectNames, rays, attrRecordMask);
 #endif
     }
 

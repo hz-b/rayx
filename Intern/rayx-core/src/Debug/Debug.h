@@ -15,6 +15,10 @@
 
 /// For quick debugging prints, this file further exposes RAYX_DBG(x).
 
+// TODO: this file has the downside, that it defines ostream operators and formatToVec for specific types. This means, that files that define these
+// types cannot include this file, due to circular dependencies. In order to improve this, the ostream operators and formatToVec functions should be
+// moved to the files that define these types.
+
 #include <array>
 #include <iomanip>
 #include <iostream>

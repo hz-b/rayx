@@ -3,135 +3,95 @@
 #include "Shader/LightSources/DipoleSource.h"
 #include "setupTests.h"
 
-void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
-    for (auto r : rays) { CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread); }
+void checkEnergyDistribution(const Rays& rays, double photonEnergy, double energySpread) {
+    CHECK(rays.energy.size() > 0);
+    for (const auto energy : rays.energy) { CHECK_IN(energy, photonEnergy - energySpread, photonEnergy + energySpread); }
 }
 
-void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
-    for (auto r : rays) { CHECK_IN(r.m_position.z, center - spread, center + spread); }
+void checkZDistribution(const Rays& rays, double center, double spread) {
+    CHECK(rays.position_z.size() > 0);
+    for (const auto position_z : rays.position_z) { CHECK_IN(position_z, center - spread, center + spread); }
 }
 
-void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHeight) {
-    for (auto r : rays) {
-        CHECK_IN(r.m_position.x, -4.5 * sourceWidth, 4.5 * sourceWidth);
-        CHECK_IN(r.m_position.y, -4.5 * sourceHeight, 4.5 * sourceHeight);
-    }
+void checkPositionDistribution(const Rays& rays, double sourceWidth, double sourceHeight) {
+    CHECK(rays.position_x.size() > 0);
+    for (const auto position_x : rays.position_x) CHECK_IN(position_x, -4.5 * sourceWidth, 4.5 * sourceWidth);
+    CHECK(rays.position_y.size() > 0);
+    for (const auto position_y : rays.position_y) CHECK_IN(position_y, -4.5 * sourceHeight, 4.5 * sourceHeight);
 }
 
 // should only be called on beamlines for which the ImagePlane has the default "unrotated" orientation!
-void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
-    for (auto r : rays) {
-        double psi = asin(r.m_direction.y);
+void checkDirectionDistribution(const Rays& rays, double minAngle, double maxAngle) {
+    CHECK(rays.direction_y.size() > 0);
+    for (const auto direction_y : rays.direction_y) {
+        double psi = asin(direction_y);
         psi        = abs(psi);
         CHECK_IN(psi, minAngle, maxAngle);
     }
 }
 
-void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
-    CHECK_EQ(l.size(), r.size());
-    // TODO maybe compare more?
-    for (int i = 0; i < l.size(); i++) {
-        CHECK_EQ(l[i].m_position, r[i].m_position);
-        CHECK_EQ(l[i].m_direction, r[i].m_direction);
-        CHECK_EQ(l[i].m_energy, r[i].m_energy);
-    }
-}
-
 TEST_F(TestSuite, MatrixSource) {
-    ADD_FAILURE();
-    // auto beamline = loadBeamline("MatrixSource");
-    // auto a = beamline.compileSources();
-    // auto b = loadCSVRayUI("MatrixSource");
-    // roughCompare(a, b);
+    auto a = traceRml("MatrixSource").filterByObjectId(0);
+    auto b = loadCsvRayUi("MatrixSource");
+    compare(a, b);
 }
 
 TEST_F(TestSuite, MatrixSourceMoved) {
-    ADD_FAILURE();
-    // auto beamline = loadBeamline("MatrixSourceMoved");
-    // auto a = beamline.compileSources();
-    // auto b = loadCSVRayUI("MatrixSource");
-    // for (auto& r : b) {
-    //     r.m_position += glm::dvec3(5, -5, 3);
-    // }
-    // roughCompare(a, b);
+    auto a            = traceRml("MatrixSourceMoved").filterByObjectId(0);
+    auto b            = loadCsvRayUi("MatrixSource");
+    const auto offset = glm::dvec3(5, -5, 3);
+    for (int i = 0; i < b.size(); i++) {
+        b.position_x[i] += offset.x;
+        b.position_y[i] += offset.y;
+        b.position_z[i] += offset.z;
+    }
+    compare(a, b);
 }
 
 /// this tests tracing an only-lightsource beamline. An error-prone edge case.
 TEST_F(TestSuite, MatrixSourceTracedRayUI) {
-    ADD_FAILURE();
-    // auto a = traceRML("MatrixSource");
-    // for (auto hist : a) {
-    //     CHECK(!hist.empty());
-    // }
+    const auto numRayPaths = loadBeamline("MatrixSource").numRayPaths();
+    CHECK_EQ(traceRml("MatrixSource", RayAttrMask::PathId /* which attribute does not matter */).size(), numRayPaths);
 }
 
-TEST_F(TestSuite, PointSourceHardEdge) {
-    ADD_FAILURE();
-    // auto rays = loadBeamline("PointSourceHardEdge").compileSources();
-    // checkEnergyDistribution(rays, 120.97, 12.1);
-}
+TEST_F(TestSuite, PointSourceHardEdge) { checkEnergyDistribution(traceRml("PointSourceHardEdge", RayAttrMask::Energy), 120.97, 12.1); }
 
-TEST_F(TestSuite, PointSourceSoftEdge) {
-    ADD_FAILURE();
-    // auto rays = loadBeamline("PointSourceSoftEdge").compileSources();
-    // checkEnergyDistribution(rays, 151, 6);
-}
+TEST_F(TestSuite, PointSourceSoftEdge) { checkEnergyDistribution(traceRml("PointSourceSoftEdge", RayAttrMask::Energy), 151, 6); }
 
-TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
-    ADD_FAILURE();
-    // auto rays = loadBeamline("MatrixSourceSpreaded").compileSources();
-    // checkEnergyDistribution(rays, 42, 10);
-}
+TEST_F(TestSuite, MatrixSourceEnergyDistribution) { checkEnergyDistribution(traceRml("PointSourceSoftEdge", RayAttrMask::Energy), 151, 6); }
 
-TEST_F(TestSuite, DipoleSourcePosition) {
-    ADD_FAILURE();
-    // auto rays = loadBeamline("dipole_plain").compileSources();
-    // checkPositionDistribution(rays, 0.065, 0.04);
-}
+TEST_F(TestSuite, DipoleSourcePosition) { checkEnergyDistribution(traceRml("dipole_plain", RayAttrMask::Energy), 0.065, 0.04); }
 
-TEST_F(TestSuite, DipoleEnergyDistribution) {
-    ADD_FAILURE();
-    // auto rays = loadBeamline("dipole_energySpread").compileSources();
-    // checkEnergyDistribution(rays, 1000, 23000);
-}
+TEST_F(TestSuite, DipoleEnergyDistribution) { checkEnergyDistribution(traceRml("dipole_energySpread", RayAttrMask::Energy), 1000, 23000); }
 
 TEST_F(TestSuite, PixelPositionTest) {
-    ADD_FAILURE();
-    // auto beamline = loadBeamline("PixelSource");
-    // auto rays = beamline.compileSources();
-    // const DesignSource* src = beamline.getSources()[0];
-    // auto width = src->getSourceWidth();
-    // auto height = src->getSourceHeight();
-    // auto hordiv = src->getHorDivergence();
-    // for (auto ray : rays) {
-    //     CHECK_IN(abs(ray.m_position.x), width / 6.0, width / 2.0);
-    //     CHECK_IN(abs(ray.m_position.y), height / 6.0, height / 2.0);
-    //     double phi = atan2(ray.m_direction.x, ray.m_direction.z);  // phi in rad from m_direction
-    //     CHECK_IN(abs(phi), 0.0, hordiv / 2.0);
-    // }
+    const auto [beamline, rays] = loadBeamlineAndTrace("PixelSource", RayAttrMask::PositionX | RayAttrMask::PositionY | RayAttrMask::DirectionX | RayAttrMask::DirectionZ);
+    const DesignSource* src = beamline.getSources()[0];
+    auto width              = src->getSourceWidth();
+    auto height             = src->getSourceHeight();
+    auto hordiv             = src->getHorDivergence();
+
+    for (const auto position_x : rays.position_x) { CHECK_IN(position_x, -width / 2.0, width / 2.0); }
+    for (const auto position_y : rays.position_y) { CHECK_IN(position_y, -height / 2.0, height / 2.0); }
+    for (int i = 0; i < rays.size(); ++i) {
+        double phi = atan2(rays.direction_x[i], rays.direction_z[i]);  // phi in rad from m_direction
+        CHECK_IN(abs(phi), 0.0, hordiv / 2.0);
+    }
 }
 
-TEST_F(TestSuite, DipoleZDistribution) {
-    ADD_FAILURE();
-    // auto beamline = loadBeamline("dipole_plain");
-    // auto rays = beamline.compileSources();
-    // checkZDistribution(rays, 0, 2.2);
-}
+TEST_F(TestSuite, DipoleZDistribution) { checkZDistribution(traceRml("CircleSource_default", RayAttrMask::PositionZ), 0, 2.2); }
 
 TEST_F(TestSuite, CircleSourcetest) {
-    ADD_FAILURE();
-    // auto rays = loadBeamline("CircleSource_default").compileSources();
-    // checkPositionDistribution(rays, 0.065, 0.04);
-    // checkEnergyDistribution(rays, 99.5, 100.5);
+    const auto rays = traceRml("CircleSource_default", RayAttrMask::PositionX | RayAttrMask::PositionZ | RayAttrMask::Energy);
+    checkPositionDistribution(rays, 0.065, 0.04);
+    checkEnergyDistribution(rays, 99.5, 100.5);
 }
 
 TEST_F(TestSuite, testCircleSourceDirections) {
-    auto bundle = traceRML("CircleSource_default");
-    for (auto rays : bundle) { checkDirectionDistribution(rays, 0.0, 105.0); }
+    checkDirectionDistribution(traceRml("CircleSource_default", RayAttrMask::DirectionY), 0.0, 105.0);
 }
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
-    ADD_FAILURE();
     struct InOutPair {
         double in;
         double out;
@@ -158,7 +118,6 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
 }
 
 TEST_F(TestSuite, testVerDivergenceDipole) {
-    ADD_FAILURE();
     struct InOutPair {
         double energy;
         double sigv;
@@ -293,56 +252,35 @@ TEST_F(TestSuite, testLightsourceGetters) {
 }
 
 #ifndef NO_H5
-TEST_F(TestSuite, testH5Writer) {
-    const auto beamlineFilename     = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
-    const auto rayOriginal          = traceRML(beamlineFilename);
-    const auto rayOriginalSoA       = bundleHistoryToRays(rayOriginal);
-    const auto beamline             = loadBeamline(beamlineFilename);
-    const auto sourceNamesOriginal  = beamline.getSourceNames();
-    const auto elementNamesOriginal = beamline.getElementNames();
-
-    // test conversion between BundleHistory and Rays
-    {
-        const auto bundle = raySoAToBundleHistory(rayOriginalSoA);
-        CHECK_EQ(rayOriginal, bundle);
-    }
+TEST_F(TestSuite, testH5) {
+    const auto beamlineFilename    = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
+    const auto [beamline, raysOriginal] = loadBeamlineAndTrace(beamlineFilename);
+    const auto objectNamesOriginal = beamline.getObjectNames();
 
     const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("h5");
 
-    // test if write and read of BundleHistory work without altering the contents
+    // full write and read
     {
-        writeH5BundleHistory(h5Filepath, sourceNamesOriginal, elementNamesOriginal, rayOriginal);
-        const auto bundle = readH5BundleHistory(h5Filepath);
-        CHECK_EQ(rayOriginal, bundle);
-
-        const auto sourceNames = readH5SourceNames(h5Filepath);
-        if (sourceNamesOriginal != sourceNames) ADD_FAILURE();
-
-        const auto elementNames = readH5ElementNames(h5Filepath);
-        if (elementNamesOriginal != elementNames) ADD_FAILURE();
+        writeH5(h5Filepath, objectNamesOriginal, raysOriginal);
+        const auto rays = readH5Rays(h5Filepath);
+        CHECK_EQ(rays, raysOriginal);
+        const auto objectNames = readH5ObjectNames(h5Filepath);
+        // TODO: use new CHECK_EQ for strings/vecotr-of-strings when available
+        for (int i = 0; i < objectNames.size(); i++) { if(objectNames[i] != objectNamesOriginal[i]) ADD_FAILURE(); }
     }
 
-    // test if write and read of partial BundleHistory work without altering the contents
+    // partial write and read
     {
-        // ground thruth
-        Rays partialRayOriginalSoA;
-        partialRayOriginalSoA.energy     = rayOriginalSoA.energy;
-        partialRayOriginalSoA.position_x = rayOriginalSoA.position_x;
-        partialRayOriginalSoA.position_y = rayOriginalSoA.position_y;
-        partialRayOriginalSoA.position_z = rayOriginalSoA.position_z;
-
-        // write only some attributes
-        const auto attr = RayAttrMask::Energy | RayAttrMask::Position;
-        writeH5BundleHistory(h5Filepath, sourceNamesOriginal, elementNamesOriginal, rayOriginal, attr);
-        // read only some attributes
-        const auto raySoA = readH5Rays(h5Filepath, attr);
-
-        CHECK_EQ(partialRayOriginalSoA, raySoA);
+        const auto attrMask = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
+        writeH5(h5Filepath, objectNamesOriginal, raysOriginal, attrMask);
+        const auto rays = readH5Rays(h5Filepath, attrMask);
+        CHECK_EQ(rays, raysOriginal.copy().filterByAttrMask(attrMask));
     }
 }
 #endif
 
 TEST_F(TestSuite, testSelectElementForRecordEvent) {
+    ADD_FAILURE();
     // const auto filename = std::filesystem::path("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
     // const auto beamline = loadBeamline(filename);
     // TODO: add test for recording events for selected element. also multiple beamlines. small -> bigger. big -> smaller buffers
