@@ -255,8 +255,7 @@ TEST_F(TestSuite, testH5) {
     const auto beamlineFilename         = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
     const auto [beamline, raysOriginal] = loadBeamlineAndTrace(beamlineFilename);
     const auto objectNamesOriginal      = beamline.getObjectNames();
-
-    const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("h5");
+    const auto h5Filepath = getBeamlineFilepath(beamlineFilename + "_test_h5").replace_extension("h5");
 
     // full write and read
     {
@@ -279,6 +278,28 @@ TEST_F(TestSuite, testH5) {
     }
 }
 #endif
+
+TEST_F(TestSuite, testCsv) {
+    const auto beamlineFilename         = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
+    const auto raysOriginal = TraceRml(beamlineFilename);
+    const auto csvFilepath = getBeamlineFilepath(beamlineFilename + "_test_csv").replace_extension("csv");
+
+    // full write and read
+    {
+        writeCsv(csvFilepath, raysOriginal);
+        const auto rays = readCsv(csvFilepath);
+        CHECK_EQ(rays, raysOriginal);
+    }
+
+    // partial write and read
+    {
+        const auto attrMask = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
+        const auto partialRaysOriginal = originalRays.copy().filterByAttrMask(attrMask);
+        writeCsv(csvFilepath, partialRaysOriginal);
+        const auto rays = readCsv(csvFilepath);
+        CHECK_EQ(rays, partialRaysOriginal);
+    }
+}
 
 TEST_F(TestSuite, testSelectElementForRecordEvent) {
     ADD_FAILURE();

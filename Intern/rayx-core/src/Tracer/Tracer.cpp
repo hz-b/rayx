@@ -71,7 +71,7 @@ Rays Tracer::trace(const Group& group, const Sequential sequential, const Object
     const auto actualMaxBatchSize = maxBatchSize ? *maxBatchSize : DEFAULT_BATCH_SIZE;
 
     auto rays = m_deviceTracer->trace(group, sequential, objectRecordMask, attrRecordMask, actualMaxEvents, actualMaxBatchSize);
-    if (!rays.attrSizesAreValid()) { RAYX_EXIT << "Tracer::trace produced Rays with invalid attribute sizes! This is a bug."; }
+    if (!rays.isValid()) RAYX_EXIT << "Tracer::trace: one or more recorded attributes have different number of items";
     return rays;
 }
 

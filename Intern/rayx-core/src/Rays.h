@@ -205,7 +205,7 @@ struct RAYX_API Rays {
      * @brief Check if the sizes of all recorded attribute vectors are valid (i.e., all the same length).
      * @return True if all recorded attribute vectors have the same length, false otherwise.
      */
-    bool attrSizesAreValid() const;
+    bool isValid() const;
 
     // TODO: implement helper methods to iterate over attributes, to get rid of most of the X-macros
 };
@@ -267,7 +267,7 @@ int Rays::count(Pred pred) const {
 
 static_assert(std::is_nothrow_move_constructible_v<Rays>);  // ensure efficient moves, when used in std::vector<Rays>
 
-bool operator==(const Rays& lhs, const Rays& rhs);
-bool operator!=(const Rays& lhs, const Rays& rhs);
+bool RAYX_API operator==(const Rays& lhs, const Rays& rhs);
+bool RAYX_API operator!=(const Rays& lhs, const Rays& rhs);
 
 }  // namespace RAYX

@@ -347,7 +347,9 @@ fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vecto
     }
 
     if (m_cliArgs.csv) {
-        writeCsv(outputFilepath, rays);
+        RAYX::writeCsv(outputFilepath, rays);
+        const auto rays2 = RAYX::readCsv(outputFilepath);
+        std::cout << (rays == rays2) << std::endl;
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";

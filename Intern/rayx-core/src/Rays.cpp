@@ -146,7 +146,7 @@ Rays Rays::filterByLastEventInPath() const {
     return result;
 }
 
-bool Rays::attrSizesAreValid() const {
+bool Rays::isValid() const {
     const auto attr = attrMask();
     const auto sz   = size();
 
