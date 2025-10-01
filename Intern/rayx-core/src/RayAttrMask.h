@@ -8,6 +8,7 @@
 #include "Shader/Rand.h"
 
 // TODO: all this macros should be invisible to the user
+// TODO: implement template based solution instead of macros
 
 #ifdef X
 #error macro 'X' must not be defined at this point

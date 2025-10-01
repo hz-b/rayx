@@ -255,7 +255,7 @@ TEST_F(TestSuite, testH5) {
     const auto beamlineFilename         = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
     const auto [beamline, raysOriginal] = loadBeamlineAndTrace(beamlineFilename);
     const auto objectNamesOriginal      = beamline.getObjectNames();
-    const auto h5Filepath = getBeamlineFilepath(beamlineFilename + "_test_h5").replace_extension("h5");
+    const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("testH5.h5");
 
     // full write and read
     {
@@ -274,15 +274,16 @@ TEST_F(TestSuite, testH5) {
         const auto attrMask = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
         writeH5(h5Filepath, objectNamesOriginal, raysOriginal, attrMask);
         const auto rays = readH5Rays(h5Filepath, attrMask);
-        CHECK_EQ(rays, raysOriginal.copy().filterByAttrMask(attrMask));
+        const auto partialRaysOriginal = std::move(raysOriginal.copy().filterByAttrMask(attrMask));
+        CHECK_EQ(rays, partialRaysOriginal);
     }
 }
 #endif
 
 TEST_F(TestSuite, testCsv) {
     const auto beamlineFilename         = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
-    const auto raysOriginal = TraceRml(beamlineFilename);
-    const auto csvFilepath = getBeamlineFilepath(beamlineFilename + "_test_csv").replace_extension("csv");
+    const auto raysOriginal = traceRml(beamlineFilename);
+    const auto csvFilepath = getBeamlineFilepath(beamlineFilename).replace_extension("testCsv.csv");
 
     // full write and read
     {
@@ -294,7 +295,7 @@ TEST_F(TestSuite, testCsv) {
     // partial write and read
     {
         const auto attrMask = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
-        const auto partialRaysOriginal = originalRays.copy().filterByAttrMask(attrMask);
+        const auto partialRaysOriginal = std::move(raysOriginal.copy().filterByAttrMask(attrMask));
         writeCsv(csvFilepath, partialRaysOriginal);
         const auto rays = readCsv(csvFilepath);
         CHECK_EQ(rays, partialRaysOriginal);

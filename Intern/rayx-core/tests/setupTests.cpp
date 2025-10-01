@@ -64,15 +64,15 @@ std::filesystem::path getBeamlineFilepath(std::string filename) {
 /// will look at Intern/rayx-core/tests/input/<filename>.rml
 Beamline loadBeamline(std::string filename) { return importBeamline(getBeamlineFilepath(filename)); }
 
-Rays loadFromCsv(std::string filename) {
+Rays readCsvUsingFilename(std::string filename) {
     const auto file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".csv").string();
-    return loadCsv(file);
+    return readCsv(file);
 }
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
-void writeToCsv(const Rays& rays, std::string filename) {
+void writeCsvUsingFilename(const Rays& rays, std::string filename) {
     const auto f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCsv(rays, f);
+    writeCsv(f, rays);
 }
 
 Rays traceRml(std::string filename, RayAttrMask attrMask) {
@@ -103,12 +103,25 @@ Rays loadCsvRayUi(std::string filename) {
     for (int i = 0; i < 2; i++) { std::getline(f, line); }
 
     Rays rays;
-    while (std::getline(f, line)) { parseRayUiCsvLineAndAppendEvent(rays, line); }
+    int i = 0;
+    while (std::getline(f, line)) {
+        // ray-ui only stores the last event of each ray path.
+        // we need to fabricate path_id and path_event_id here.
+        rays.path_id.push_back(i++);
+        rays.path_event_id.push_back(0);
+
+        parseRayUiCsvLineAndAppendEvent(rays, line);
+    }
     return rays.sortByPathIdAndPathEventId();
 }
 
 void compare(const Rays& a, const Rays& b, double t, const RayAttrMask attrMask) {
     CHECK_EQ(a.size(), b.size());
+
+    if ((a.attrMask() & attrMask) != (b.attrMask() & attrMask)) {
+        ADD_FAILURE();
+        return;
+    }
 
     const auto n = a.size();
     for (int i = 0; i < n; ++i) {
@@ -128,7 +141,7 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
     const auto numElements = beamline.numElements();
     const auto numObjects  = numSources + numElements;
 
-    auto rays = tracer->trace(beamline, seq, ObjectMask::all(numSources, numElements), attrMaskCompatibleWithRayUi | RayAttrMask::ObjectId)
+    auto rays = tracer->trace(beamline, seq, ObjectMask::all(numSources, numElements), attrMaskCompatibleWithRayUi | RayAttrMask::ObjectId | RayAttrMask::PathId | RayAttrMask::PathEventId)
                     .filterByLastEventInPath()
                     .sortByPathIdAndPathEventId();
 
@@ -144,6 +157,7 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
         }
     }
 
+    rays.filterByAttrMask(attrMaskCompatibleWithRayUi);
     return rays;
 }
 
@@ -151,8 +165,8 @@ void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance, Sequ
     auto rayx  = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
     auto rayui = loadCsvRayUi(filename);
 
-    writeToCsv(rayx, filename + ".rayx");
-    writeToCsv(rayui, filename + ".rayui");
+    writeCsvUsingFilename(rayx, filename + ".rayx");
+    writeCsvUsingFilename(rayui, filename + ".rayui");
 
     CHECK_EQ(rayx.size(), rayui.size());
 
@@ -168,8 +182,8 @@ void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance, Sequ
 
 void traceRmlAndCompareAgainstCorrectResults(std::string filename, double tolerance) {
     const auto a = traceRml(filename);
-    const auto b = loadFromCsv(filename + ".correct.csv");
-    writeToCsv(a, filename + ".rayx.csv");
+    const auto b = readCsvUsingFilename(filename + ".correct.csv");
+    writeCsvUsingFilename(a, filename + ".rayx.csv");
     compare(a, b, tolerance);
 }
 

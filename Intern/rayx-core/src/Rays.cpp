@@ -82,13 +82,14 @@ Rays Rays::concat(const std::vector<Rays>& rays_list) {
 }
 
 Rays Rays::sortByObjectId() const {
-    if (!contains(RayAttrMask::ObjectId)) throw std::runtime_error("Rays::sortByObjectId() requires object_id attribute");
+    if (!contains(RayAttrMask::ObjectId)) throw std::runtime_error("Rays::sortByObjectId() requires object_id attribute to be present");
     return sort([&object_id = object_id](int lhs, int rhs) { return object_id[lhs] < object_id[rhs]; });
 }
 
 Rays Rays::sortByPathIdAndPathEventId() const {
     if (!contains(RayAttrMask::PathId) || !contains(RayAttrMask::PathEventId))
-        throw std::runtime_error("Rays::sortByPathIdAndThenPathEventId() requires path_id and path_event_id attributes.");
+        throw std::runtime_error("Rays::sortByPathIdAndThenPathEventId() requires path_id and path_event_id attributes to be present");
+
     return sort([&path_id = path_id, &path_event_id = path_event_id](int lhs, int rhs) {
         if (path_id[lhs] != path_id[rhs])
             return path_id[lhs] < path_id[rhs];
@@ -106,7 +107,7 @@ Rays& Rays::filterByAttrMask(const RayAttrMask mask) {
 }
 
 Rays Rays::filterByObjectId(const int object_id) const {
-    if (!contains(RayAttrMask::ObjectId)) throw std::runtime_error("Rays::filterByObjectId requires object_id attribute");
+    if (!contains(RayAttrMask::ObjectId)) throw std::runtime_error("Rays::filterByObjectId requires object_id attribute to be present");
     return filter([&](int i) { return this->object_id[i] == object_id; });
 }
 
@@ -115,7 +116,7 @@ Rays Rays::filterByLastEventInPath() const {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (!contains(RayAttrMask::PathId) || !contains(RayAttrMask::PathEventId))
-        throw std::runtime_error("Rays::finalEventsPerPath requires path_id and path_event_id attributes.");
+        throw std::runtime_error("Rays::finalEventsPerPath requires path_id and path_event_id attributes to be present");
 
     const auto n = size();
     std::unordered_map<int32_t, int> bestIndex;  // path_id -> index of max path_event_id
@@ -136,13 +137,12 @@ Rays Rays::filterByLastEventInPath() const {
     const auto attr = attrMask();
     Rays result;
 #define X(type, name, flag)                                                                                           \
-    if (!!(attr & RayAttrMask::flag)) {                                                                               \
+    if (RAYX::contains(attr, RayAttrMask::flag)) {                                                                               \
         result.name.resize(indices.size());                                                                           \
         std::transform(indices.begin(), indices.end(), result.name.begin(), [this](const int i) { return name[i]; }); \
     }
     RAYX_X_MACRO_RAY_ATTR
 #undef X
-
     return result;
 }
 

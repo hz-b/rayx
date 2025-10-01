@@ -82,6 +82,11 @@ void writeH5(const std::filesystem::path& filepath, const std::vector<std::strin
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "write rays to " << filepath << " with attribute flags: " << to_string(attr);
 
+    if (!contains(rays.attrMask(), attr))
+        RAYX_EXIT << "Cannot write rays to output file '" << filepath
+                  << "' because the rays do not contain all attributes specified in the attribute mask: " << to_string(attr)
+                  << ". The rays contain the following attributes: " << to_string(rays.attrMask());
+
     try {
         const auto flags = HighFive::File::ReadWrite | HighFive::File::Create | (overwrite ? HighFive::File::Truncate : HighFive::File::Excl);
         auto file        = HighFive::File(filepath.string(), flags);
@@ -99,8 +104,10 @@ void writeH5(const std::filesystem::path& filepath, const std::vector<std::strin
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
 }
 
-// TODO: fix
 void appendH5(const std::filesystem::path& filepath, const Rays& rays, const RayAttrMask attr) {
+    // TODO: fix this function
+    assert(false && "unimplemented");
+
     RAYX_PROFILE_FUNCTION_STDOUT();
     RAYX_VERB << "append rays to " << filepath << " with attribute flags: " << to_string(attr);
 
