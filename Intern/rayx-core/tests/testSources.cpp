@@ -83,7 +83,7 @@ TEST_F(TestSuite, PixelPositionTest) {
 TEST_F(TestSuite, DipoleZDistribution) { checkZDistribution(traceRml("CircleSource_default", RayAttrMask::PositionZ), 0, 2.2); }
 
 TEST_F(TestSuite, CircleSourcetest) {
-    const auto rays = traceRml("CircleSource_default", RayAttrMask::PositionX | RayAttrMask::PositionZ | RayAttrMask::Energy);
+    const auto rays = traceRml("CircleSource_default", RayAttrMask::PositionX | RayAttrMask::PositionY | RayAttrMask::Energy | RayAttrMask::ObjectId).filterByObjectId(0);
     checkPositionDistribution(rays, 0.065, 0.04);
     checkEnergyDistribution(rays, 99.5, 100.5);
 }

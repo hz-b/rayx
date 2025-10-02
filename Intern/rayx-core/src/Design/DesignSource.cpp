@@ -167,7 +167,8 @@ void DesignSource::setEnergyDistributionFile(std::string value) { m_elementParam
 void DesignSource::setEnergySpreadType(SpreadType value) { m_elementParameters["energyDistribution"] = value; }
 SpreadType DesignSource::getEnergySpreadType() const { return m_elementParameters["energyDistribution"].as_energySpreadType(); }
 
-void DesignSource::setSeparateEnergies(int value) { m_elementParameters["SeparateEnergies"] = value; }
+void DesignSource::setNumberOfSeparateEnergies(int value) { m_elementParameters["SeparateEnergies"] = value; }
+int DesignSource::getNumberOfSeparateEnergies() const { return m_elementParameters["SeparateEnergies"].as_int(); }
 
 void DesignSource::setPhotonFlux(double value) { m_elementParameters["photonFlux"] = value; }
 double DesignSource::getPhotonFlux() const { return m_elementParameters["photonFlux"].as_double(); }

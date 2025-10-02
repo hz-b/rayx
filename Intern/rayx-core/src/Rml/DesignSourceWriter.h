@@ -17,8 +17,6 @@ void setAllMandatory(xml::Parser parser, DesignSource* ds) {
     ds->setNumberOfRays(parser.parseNumberRays());
     ds->setOrientation(parser.parseOrientation());
     ds->setPosition(parser.parsePosition());
-
-    ds->setSeparateEnergies(1);
 }
 
 void setDefaultEnergy(xml::Parser parser, DesignSource* ds) {
@@ -30,6 +28,8 @@ void setDefaultEnergy(xml::Parser parser, DesignSource* ds) {
     } else {
         ds->setEnergy(parser.parsePhotonEnergy());
         ds->setEnergySpread(parser.parseEnergySpread());
+        if (ds->getEnergySpreadType() == SpreadType::SeparateEnergies)
+            ds->setNumberOfSeparateEnergies(parser.parseNumberOfSeparateEnergies());
     }
 }
 

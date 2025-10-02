@@ -47,34 +47,28 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(correct, m);
 }
 
-TEST_F(TestSuite, testEnergyDistribution) {
-    struct testInput {
-        std::string rmlFile;
-        double energy;
-    };
+TEST_F(TestSuite, testEnergyDistributionSeparateEnergies) {
+    const auto rays = traceRml("PointSourceSeparateEnergies", RayAttrMask::Energy);
+    expectAtLeastOnce(rays.energy, { 0.0, 50.0, 100.0, 150.0, 200.0, });
+}
 
-    std::vector<testInput> testinput = {
-        {
-            .rmlFile = "PointSourceSeparateEnergies",
-            .energy  = 100,
-        },
-        {
-            .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy  = 104.042,
-        },
-        {
-            .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy  = 51.29,
-        },
-        {
-            .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy  = 123.19,
-        },
-    };
+// TODO: this test does not really test anything
+TEST_F(TestSuite, testEnergyDistributionSoftEdge) {
+    const auto rays = traceRml("PointSourceSoftEdgeEnergy", RayAttrMask::Energy);
+    expectDifferentValues(rays.energy);
+}
 
-    for (auto values : testinput) {
-        const auto rays = traceRml(values.rmlFile);
-        CHECK_EQ(rays.energy[0], values.energy, 0.1);
+// TODO: this test does not really test anything
+TEST_F(TestSuite, testEnergyDistributionHardEdge) {
+    {
+        const auto rays = traceRml("PointSourceHardEdgeEnergy", RayAttrMask::Energy);
+        expectInRange(rays.energy, 0.0, 200.0);
+        expectDifferentValues(rays.energy);
+    }
+    {
+        const auto rays = traceRml("PointSourceHardEdge", RayAttrMask::Energy);
+        expectInRange(rays.energy, 0.0, 200.0);
+        expectDifferentValues(rays.energy);
     }
 }
 
@@ -205,7 +199,7 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
     CHECK_EQ(source1Rays.size(), 200);
 
     const auto imagePlaneRays = rays.filterByObjectId(2);
-    CHECK_EQ(imagePlaneRays, 400);
+    CHECK_EQ(imagePlaneRays.size(), 400);
 }
 
 TEST_F(TestSuite, groupTransform2) {

@@ -33,15 +33,17 @@ RAYX_FN_ACC double selectEnergy(const SoftEdge& __restrict softEdge, Rand& __res
 }
 
 RAYX_FN_ACC double selectEnergy(const SeparateEnergies& __restrict separateEnergies, Rand& __restrict rand) {
-    // choose random spike from range of separate energies
-    // from energyspread calculate energy for given spike
-    if (separateEnergies.m_numberOfEnergies == 1) { return separateEnergies.m_centerEnergy; }
+    // separateEnergies.m_numberOfEnergies is expected to be equal or greater to 1
 
-    int randomenergy = rand.randomIntInRange(0, separateEnergies.m_numberOfEnergies - 1);
-    double energy    = (separateEnergies.m_centerEnergy - separateEnergies.m_energySpread / 2) +
-                    randomenergy * separateEnergies.m_energySpread / (separateEnergies.m_numberOfEnergies - 1);
+    const auto n =
+        // random number between 0 and number of energies
+        rand.randomIntInRange(0, separateEnergies.m_numberOfEnergies)
+        // normalize number between 0 and 1. use std::max to compensate for the case that number of energies is 1
+        / std::max(1.0, separateEnergies.m_numberOfEnergies - 1.0)
+        // shift by -0.5 so that the range is between -0.5 and +0.5. use std::min to not shift in case number of energies is 1
+        - std::min(0.5, separateEnergies.m_numberOfEnergies - 1.0);
 
-    return energy;
+    return separateEnergies.m_centerEnergy + n * separateEnergies.m_energySpread;
 }
 
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionList& __restrict energyDistributionList, Rand& __restrict rand) {

@@ -83,7 +83,8 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setElectronEnergyOrientation(ElectronEnergyOrientation value);
     ElectronEnergyOrientation getElectronEnergyOrientation() const;
 
-    void setSeparateEnergies(int value);
+    void setNumberOfSeparateEnergies(int value);
+    int getNumberOfSeparateEnergies() const;
 
     void setEnergy(double value);
     double getEnergy() const;
@@ -91,7 +92,6 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setPhotonFlux(double value);
     double getPhotonFlux() const;
 
-    void setEnergyDistribution(const EnergyDistributionVariant& value);
     EnergyDistributionVariant getEnergyDistribution() const;
 
     void setNumberOfRays(int value);

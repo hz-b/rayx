@@ -86,7 +86,6 @@ struct RAYX_API Parser {
     // parsers for derived parameters
     SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
-    EnergyDistributionVariant parseEnergyDistribution() const;
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
@@ -170,6 +169,7 @@ struct RAYX_API Parser {
         return static_cast<EnergyDistributionType>(parseInt("energyDistributionType"));
     }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
+    inline int parseNumberOfSeparateEnergies() const { return parseInt("SeparateEnergies"); }
     inline int parseNumOfEquidistantCircles() const { return static_cast<int>(parseDouble("numberCircles")); }
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
     inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }

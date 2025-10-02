@@ -215,68 +215,6 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
-bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistributionVariant* out) {
-    if (!node || !out) { return false; }
-
-    int energyDistributionType_int;
-    if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType_int)) { return false; }
-    auto energyDistributionType = static_cast<EnergyDistributionType>(energyDistributionType_int);
-
-    int spreadType_int;
-    if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) { return false; }
-
-    /**
-     * a different output is set for all Energy Distribution Types
-     *
-     * default: 0:HardEdge(WhiteBand)
-     *          1:SoftEdge(Energyspread = sigma)
-     *          2:SeparateEnergies(Spikes)
-     */
-    auto spreadType = static_cast<SpreadType>(spreadType_int);
-
-    if (energyDistributionType == EnergyDistributionType::File) {
-        const char* filename;
-        if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) { return false; }
-        std::filesystem::path path = std::filesystem::canonical(rmlFile);
-        path.replace_filename(filename);  // this makes the path `filename` be relative to the
-                                          // path of the rml file
-
-        DatFile df;
-        if (!DatFile::load(path, &df)) { return false; }
-        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
-        *out            = EnergyDistributionVariant(df);
-        return true;
-    } else if (energyDistributionType == EnergyDistributionType::Values) {
-        double photonEnergy;
-        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) { return false; }
-
-        double energySpread;
-        if (!xml::paramDouble(node, "energySpread", &energySpread)) { return false; }
-
-        if (spreadType == SpreadType::SoftEdge) {
-            if (energySpread == 0) { energySpread = 1; }
-            *out = EnergyDistributionVariant(SoftEdge(photonEnergy, energySpread));
-        } else if (spreadType == SpreadType::SeparateEnergies) {
-            int numOfEnergies;
-            if (!xml::paramInt(node, "SeparateEnergies", &numOfEnergies)) {
-                std::cout << "No Number for Separate Energies in RML File" << std::endl;
-                numOfEnergies = 3;
-            }
-            numOfEnergies = abs(numOfEnergies);
-            *out          = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
-        } else {
-            *out = EnergyDistributionVariant(HardEdge(photonEnergy, energySpread));
-        }
-
-        return true;
-    } else {
-        RAYX_EXIT << "paramEnergyDistribution is not implemented for "
-                     "energyDistributionType"
-                  << static_cast<int>(energyDistributionType) << "!";
-        return false;
-    }
-}
-
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out) {
     if (!node || !out) { return false; }
     int energyOrientation_int;
@@ -376,12 +314,6 @@ SlopeError Parser::parseSlopeError() const {
 std::array<double, 6> Parser::parseVls() const {
     std::array<double, 6> x{};
     if (!paramVls(node, &x)) { RAYX_EXIT << "parseVls failed"; }
-    return x;
-}
-
-EnergyDistributionVariant Parser::parseEnergyDistribution() const {
-    EnergyDistributionVariant x;
-    if (!paramEnergyDistribution(node, rmlFile, &x)) { RAYX_EXIT << "parseEnergyDistribution failed"; }
     return x;
 }
 

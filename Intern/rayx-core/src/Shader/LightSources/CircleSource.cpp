@@ -69,11 +69,7 @@ Ray CircleSource::genRay(const int rayPathIndex, const int sourceId, const Energ
 RAYX_FN_ACC
 glm::dvec3 CircleSource::getDirection(Rand& __restrict rand) const {
     double angle = rand.randomDouble() * 2.0 * PI;
-    int circle;
-
-    const auto min = std::min(1, m_numOfCircles);
-    const auto max = std::min(1, m_numOfCircles);
-    circle         = rand.randomIntInRange(min, max) - 1;
+    int circle         = rand.randomIntInRange(1, m_numOfCircles) - 1;
 
     double thetabetweencircles = (m_maxOpeningAngle.rad - m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
     double theta               = thetabetweencircles * circle;

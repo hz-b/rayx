@@ -128,6 +128,45 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         if (expr_check_in > high_check_in) { RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high; } \
     }
 
+/**
+ * @brief Checks if the given values are present at least once in the vector of expected values.
+ * If any value from expected is not found in values, a test failure is added.
+ * @tparam T The type of the elements in the vectors.
+ * @param values The vector of values to check.
+ * @param expected The vector of expected values to look for.
+ */
+template <typename T>
+inline void expectAtLeastOnce(const std::vector<T>& values, const std::vector<T>& expected) {
+    for (const auto& v : expected) {
+        const auto it = std::find(values.begin(), values.end(), v);
+        if (it == values.end()) ADD_FAILURE();
+    }
+}
+
+template <typename T>
+inline void expectInRange(const std::vector<T>& values, const T min, const T max) {
+    for (const auto& v : values) {
+        if (v != std::clamp(v, min, max)) ADD_FAILURE();
+    }
+}
+
+template <typename T>
+inline void expectDifferentValues(const std::vector<T>& values) {
+    if (values.size() <= 1) ADD_FAILURE();
+
+    bool f = false;
+    for (const auto a : values) {
+        for (const auto b : values) {
+            f = a != b;
+            if (f) break;
+        }
+
+        if (f) break;
+    }
+
+    CHECK(f);
+}
+
 // ShaderTest
 
 extern std::unique_ptr<RAYX::Tracer> tracer;

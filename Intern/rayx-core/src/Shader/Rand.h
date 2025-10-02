@@ -59,7 +59,7 @@ struct Rand {
     // TODO: review this function. does the combination of int and uint work as intended?
     RAYX_FN_ACC
     int randomIntInRange(const int min_inclusive, const int max_exclusive) {
-        return min_inclusive + squares64(counter) % (max_exclusive + 1 - min_inclusive);
+        return min_inclusive + squares64(counter) % (max_exclusive - min_inclusive);
     }
 
     RAYX_FN_ACC
