@@ -28,7 +28,7 @@ RAYX_FN_ACC
 Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                          Rand& __restrict rand) const {
     // Calculate grid size
-    const int rmat  = int(std::sqrt(m_numberOfRays));
+    const int rmat  = static_cast<int>(std::sqrt(m_numberOfRays));
     const int nGrid = rmat * rmat;
     const int row   = rayPathIndex % rmat;
     const int col   = (rayPathIndex / rmat) % rmat;

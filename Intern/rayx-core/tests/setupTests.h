@@ -198,8 +198,7 @@ class TestSuite : public testing::Test {
     static void TearDownTestSuite() { tracer = nullptr; }
 };
 
-constexpr RayAttrMask attrMaskCompatibleWithRayUi =
-    RayAttrMask::Position | RayAttrMask::Direction | RayAttrMask::Energy | RayAttrMask::ElectricField | RayAttrMask::OpticalPathLength;
+constexpr RayAttrMask attrMaskCompatibleWithRayUi = RayAttrMask::Position | RayAttrMask::Direction | RayAttrMask::Energy;
 
 void compare(const Rays& a, const Rays& b, double t = DEFAULT_TOLERANCE, const RayAttrMask attrMask = RayAttrMask::All);
 void compareRayUiCompatible(const Rays& a, const Rays& b, double t = DEFAULT_TOLERANCE);

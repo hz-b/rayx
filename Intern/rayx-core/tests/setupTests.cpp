@@ -118,7 +118,12 @@ Rays loadCsvRayUi(std::string filename) {
 void compare(const Rays& a, const Rays& b, double t, const RayAttrMask attrMask) {
     CHECK_EQ(a.size(), b.size());
 
-    if ((a.attrMask() & attrMask) != (b.attrMask() & attrMask)) {
+    if (!contains(a.attrMask(), attrMask)) {
+        ADD_FAILURE();
+        return;
+    }
+
+    if (!contains(b.attrMask(), attrMask)) {
         ADD_FAILURE();
         return;
     }
@@ -142,7 +147,7 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
     const auto numObjects  = numSources + numElements;
 
     auto rays = tracer->trace(beamline, seq, ObjectMask::all(numSources, numElements), attrMaskCompatibleWithRayUi | RayAttrMask::ObjectId | RayAttrMask::PathId | RayAttrMask::PathEventId)
-                    .filterByLastEventInPath()
+                    .filterByObjectId(numObjects - 1)
                     .sortByPathIdAndPathEventId();
 
     const auto elements = beamline.compileElements();
@@ -157,7 +162,6 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
         }
     }
 
-    rays.filterByAttrMask(attrMaskCompatibleWithRayUi);
     return rays;
 }
 
@@ -168,14 +172,7 @@ void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance, Sequ
     writeCsvUsingFilename(rayx, filename + ".rayx");
     writeCsvUsingFilename(rayui, filename + ".rayui");
 
-    CHECK_EQ(rayx.size(), rayui.size());
-
-    const int size = rayx.size();
-    for (int i = 0; i < size; ++i) {
-        CHECK_EQ(rayx.position(i), rayui.position(i), tolerance);
-        CHECK_EQ(rayx.direction(i), rayui.direction(i), tolerance);
-        CHECK_EQ(rayx.energy[i], rayui.energy[i], tolerance);
-    }
+    compareRayUiCompatible(rayx, rayui, tolerance);
 
     RAYX_LOG << "compareLastAgainstRayUI finished ";
 }
