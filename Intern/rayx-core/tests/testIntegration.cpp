@@ -93,4 +93,6 @@ TEST_F(TestSuite, RZP_spherical) { compareLastAgainstRayUI("test-rzp-1-spherical
 
 // TEST_F(TestSuite, Crystal) { compareLastAgainstRayUI("crystal"); }
 
+TEST_F(TestSuite, MultilayerCone) { compareLastAgainstRayUI("MultilayerCone", 1e-7); }
+
 TEST_F(TestSuite, Foil) { compareLastAgainstRayUI("Foil", 1e-9); }

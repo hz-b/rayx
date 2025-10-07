@@ -197,8 +197,8 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
         const int n = mlCoating.numLayers;
-        complex::Complex iors[17];
-        double thickness[15];
+        complex::Complex iors[1002];
+        double thickness[1000];
 
         iors[0] = vacuum_ior;
         for (int i = 0; i < n; ++i) {

@@ -67,6 +67,7 @@ OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surfa
         .m_behaviour = behaviour,
         .m_surface = surface,
         .m_cutout = *cutout,
+        .m_coating = dele.getCoating(),
         .m_slopeError = dele.getSlopeError(),
         .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
         .m_material = defaultMaterial(dele),

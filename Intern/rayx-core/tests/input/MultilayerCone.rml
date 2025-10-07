@@ -4,7 +4,7 @@
 <beamline>
 
   <object name="Matrix Source" type="Matrix Source">
-    <param id="numberRays" enabled="T">200</param>
+    <param id="numberRays" enabled="T">9</param>
     <param id="sourceWidth" enabled="T">0.065000000000000002</param>
     <param id="sourceHeight" enabled="T">0.040000000000000001</param>
     <param id="sourceDepth" enabled="T">0</param>
@@ -59,8 +59,8 @@
     <param id="densitySubstrate" auto="T" enabled="F">19.300000000000001</param>
     <param id="surfaceCoating" comment="Multilayer Coating" enabled="T">2</param>
     <param id="Coating" enabled="T">
-      <layer material="Au" thickness="5" roughness="0">layer0</layer>
-      <layer material="Au" thickness="5" roughness="2">layer1</layer>
+      <layer material="Au" thickness="10" roughness="0">layer0</layer>
+      <layer material="Au" thickness="10" roughness="0">layer1</layer>
     </param>
     <param id="materialCoating" enabled="F">Au</param>
     <param id="thicknessCoating" enabled="F">10</param>
