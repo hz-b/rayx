@@ -9,15 +9,14 @@ namespace RAYX {
 RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
     bool result = variant::visit(
-        [&](auto&& arg) {
-            using T = std::decay_t<decltype(arg)>;
+        [&]<typename T>(const T& cutout_type) {
             if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
                 return true;
             } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
-                double x_min = -arg.m_width / 2.0;
-                double x_max = arg.m_width / 2.0;
-                double z_min = -arg.m_length / 2.0;
-                double z_max = arg.m_length / 2.0;
+                double x_min = -cutout_type.m_width / 2.0;
+                double x_max = cutout_type.m_width / 2.0;
+                double z_min = -cutout_type.m_length / 2.0;
+                double z_max = cutout_type.m_length / 2.0;
 
                 return !(x <= x_min || x >= x_max || z <= z_min || z >= z_max);
             } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
@@ -29,10 +28,10 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
                 //    A--B    //
                 //   /    \   //
                 //  C------D  //
-                auto A = glm::dvec2(-arg.m_widthA / 2.0, -arg.m_length / 2.0);
-                auto B = glm::dvec2(arg.m_widthA / 2.0, -arg.m_length / 2.0);
-                auto C = glm::dvec2(arg.m_widthB / 2.0, arg.m_length / 2.0);
-                auto D = glm::dvec2(-arg.m_widthB / 2.0, arg.m_length / 2.0);
+                auto A = glm::dvec2(-cutout_type.m_widthA / 2.0, -cutout_type.m_length / 2.0);
+                auto B = glm::dvec2(cutout_type.m_widthA / 2.0, -cutout_type.m_length / 2.0);
+                auto C = glm::dvec2(cutout_type.m_widthB / 2.0, cutout_type.m_length / 2.0);
+                auto D = glm::dvec2(-cutout_type.m_widthB / 2.0, cutout_type.m_length / 2.0);
 
                 glm::dvec2 PmA = P - A;
                 glm::dvec2 BmA = B - A;
@@ -46,8 +45,8 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
                 double l2 = (PmA.x * DmA.y - PmA.y * DmA.x) * (PmB.x * CmB.y - PmB.y * CmB.x);
                 return l1 < 0 && l2 < 0;
             } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
-                double radius_x = arg.m_diameter_x / 2.0;
-                double radius_z = arg.m_diameter_z / 2.0;
+                double radius_x = cutout_type.m_diameter_x / 2.0;
+                double radius_z = cutout_type.m_diameter_z / 2.0;
                 double val1 = x / radius_x;
                 double val2 = z / radius_z;
                 double rd2 = val1 * val1 + val2 * val2;
@@ -66,8 +65,7 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
 RAYX_FN_ACC
 glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
     glm::dmat4 ret = variant::visit(
-        [&](auto&& arg) {
-            using T = std::decay_t<decltype(arg)>;
+        [&]<typename T>(const T& cutout_type) {
             if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
                 double inf = 1e100;
                 return glm::dmat4(glm::dvec4(inf, 0.0, inf, 0.0),    // Top-right
@@ -76,18 +74,18 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
                                   glm::dvec4(inf, 0.0, -inf, 0.0)    // Bottom-right
                 );
             } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
-                double w = arg.m_width / 2.0;
-                double l = arg.m_length / 2.0;
+                double w = cutout_type.m_width / 2.0;
+                double l = cutout_type.m_length / 2.0;
                 return glm::dmat4(glm::dvec4(w, 0.0, l, 0.0),    // Top-right
                                   glm::dvec4(-w, 0.0, -l, 0.0),  // Bottom-left
                                   glm::dvec4(-w, 0.0, l, 0.0),   // Top-left
                                   glm::dvec4(w, 0.0, -l, 0.0)    // Bottom-right
                 );
             } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
-                auto A = glm::dvec2(-arg.m_widthA / 2.0, -arg.m_length / 2.0);
-                auto B = glm::dvec2(arg.m_widthA / 2.0, -arg.m_length / 2.0);
-                auto C = glm::dvec2(arg.m_widthB / 2.0, arg.m_length / 2.0);
-                auto D = glm::dvec2(-arg.m_widthB / 2.0, arg.m_length / 2.0);
+                auto A = glm::dvec2(-cutout_type.m_widthA / 2.0, -cutout_type.m_length / 2.0);
+                auto B = glm::dvec2(cutout_type.m_widthA / 2.0, -cutout_type.m_length / 2.0);
+                auto C = glm::dvec2(cutout_type.m_widthB / 2.0, cutout_type.m_length / 2.0);
+                auto D = glm::dvec2(-cutout_type.m_widthB / 2.0, cutout_type.m_length / 2.0);
 
                 return glm::dmat4(glm::dvec4(B[0], 0.0, B[1], 0.0),  // Top-right
                                   glm::dvec4(A[0], 0.0, A[1], 0.0),  // Bottom-left
@@ -95,8 +93,8 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
                                   glm::dvec4(C[0], 0.0, C[1], 0.0)   // Bottom-right
                 );
             } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
-                double rx = arg.m_diameter_x / 2.0;
-                double rz = arg.m_diameter_z / 2.0;
+                double rx = cutout_type.m_diameter_x / 2.0;
+                double rz = cutout_type.m_diameter_z / 2.0;
                 return glm::dmat4(glm::dvec4(rx, 0.0, 0.0, 0.0),   // Right
                                   glm::dvec4(0.0, 0.0, rz, 0.0),   // Top
                                   glm::dvec4(-rx, 0.0, 0.0, 0.0),  // Left

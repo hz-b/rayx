@@ -19,7 +19,7 @@ namespace RAYX {
  *         specified by the VLS coefficients.
  */
 RAYX_FN_ACC
-double RAYX_API vlsGrating(double lineDensity, glm::dvec3 normal, double z, double vls[6]) {
+double RAYX_API vlsGrating(double lineDensity, glm::dvec3 normal, double z, const double vls[6]) {
     // Calculate the inclination angle from the vertical based on the z-component of the surface normal.
     double del1 = glm::asin(normal.z);
 

@@ -160,8 +160,7 @@ SlopeError DesignElement::getSlopeError() const {
 
 void DesignElement::setCutout(Cutout c) {
     variant::visit(
-        [&](auto&& arg) {
-            using T = std::decay_t<decltype(arg)>;
+        [&]<typename T>(const T& arg) {
             if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
                 m_elementParameters["geometricalShape"] = CutoutType::Unlimited;
             } else if constexpr (std::is_same_v<T, Cutout::Rect>) {

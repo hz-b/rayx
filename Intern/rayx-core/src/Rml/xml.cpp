@@ -615,7 +615,7 @@ Surface::Quadric Parser::parseQuadricParameters() const {
 
 Surface::Cubic Parser::parseCubicParameters() const {
     Surface::Cubic c;
-    c.m_icurv = parseInt("surfaceBending");  // icurv
+    // c.m_icurv = parseInt("surfaceBending");  // icurv
     c.m_a11 = parseDouble("A11");
     c.m_a12 = parseDouble("A12");
     c.m_a13 = parseDouble("A13");

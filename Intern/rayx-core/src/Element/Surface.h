@@ -39,7 +39,7 @@ struct Surface {
     };
 
     struct Cubic {
-        int m_icurv;
+        // int m_icurv;
         double m_a11;
         double m_a12;
         double m_a13;

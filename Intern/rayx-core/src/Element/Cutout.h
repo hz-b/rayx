@@ -22,7 +22,7 @@ struct RAYX_API Cutout {
 
     // Every point (x, z) is within this cutout, it's unlimited after all.
     // `Unlimited` doesn't have any data so it doesn't need a struct.
-    struct RAYX_API Unlimited {
+    struct Unlimited {
         // no parameters
     };
 
@@ -31,7 +31,7 @@ struct RAYX_API Cutout {
     ///////////////////////////////////
 
     // A rectangle specified by width/length centered at (x=0, z=0).
-    struct RAYX_API Rect {
+    struct Rect {
         double m_width;
         double m_length;
     };
@@ -46,7 +46,7 @@ struct RAYX_API Cutout {
     // It can be understood as a circle with individual stretch-factors for both dimensions.
     // The point (x=0, z=0) lies at the center of the ellipse.
 
-    struct RAYX_API Elliptical {
+    struct Elliptical {
         double m_diameter_x;
         double m_diameter_z;
     };
@@ -61,13 +61,15 @@ struct RAYX_API Cutout {
     // These lines have a distance of `m_length`.
     // The point (x=0, z=0) lies at the center of the trapezoid.
 
-    struct RAYX_API Trapezoid {
+    struct Trapezoid {
         double m_widthA;
         double m_widthB;
         double m_length;
     };
 
     variant::variant<Unlimited, Rect, Elliptical, Trapezoid> m_variant;
+
+    Cutout() : m_variant(Unlimited{}) {}
 
     template <typename T>
     Cutout(T t) : m_variant(t) {}

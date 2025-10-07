@@ -15,8 +15,7 @@ std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
     double length = 0.0;
 
     RAYX::variant::visit(
-        [&](auto&& arg) {
-            using T = std::decay_t<decltype(arg)>;
+        [&]<typename T>(const T& arg) {
             if constexpr (std::is_same_v<T, RAYX::Cutout::Rect>) {
                 width = arg.m_width;
                 length = arg.m_length;

@@ -17,12 +17,12 @@ namespace RAYX {
 /// - change the rays stokes vector
 /// - potentially absorb the ray (by calling `recordFinalEvent(_, EventType::Absorbed)`)
 
-RAYX_FN_ACC Ray behaveCrystal(Ray r, const Behaviour behaviour, Collision col);
-RAYX_FN_ACC Ray behaveSlit(Ray r, const Behaviour behaviour, Rand& rand);
-RAYX_FN_ACC Ray behaveRZP(Ray r, const Behaviour behaviour, Collision col, Rand& rand);
-RAYX_FN_ACC Ray behaveGrating(Ray r, const Behaviour behaviour, Collision col);
+RAYX_FN_ACC Ray behaveCrystal(Ray r, const Behaviour::Crystal crystal, Collision col);
+RAYX_FN_ACC Ray behaveSlit(Ray r, const Behaviour::Slit slit, Rand& rand);
+RAYX_FN_ACC Ray behaveRZP(Ray r, const Behaviour::RZP rzp, Collision col, Rand& rand);
+RAYX_FN_ACC Ray behaveGrating(Ray r, const Behaviour::Grating grating, Collision col);
 RAYX_FN_ACC Ray behaveMirror(Ray r, const Collision col, int material, const int* materialIndices, const double* materialTable);
 RAYX_FN_ACC Ray behaveImagePlane(Ray r);
-RAYX_FN_ACC Ray behaveFoil(Ray r, const Behaviour behaviour, Collision col, int material, const int* materialIndices, const double* materialTable);
+RAYX_FN_ACC Ray behaveFoil(Ray r, const Behaviour::Foil foil, Collision col, int material, const int* materialIndices, const double* materialTable);
 
 }  // namespace RAYX

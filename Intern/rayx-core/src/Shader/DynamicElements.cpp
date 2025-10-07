@@ -31,17 +31,13 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         const auto element = inv.elements[col.elementIndex];
         ray = rayMatrixMult(element.m_inTrans, ray);
 
-        // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        const auto behaviour = element.m_behaviour;
-
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
         ray.m_position = col.hitpoint;
         ray.m_lastElement = col.elementIndex;
         ray.m_eventType = EventType::HitElement;
 
         ray = variant::visit(
-            [&](auto&& arg) -> Ray {
-                using T = std::decay_t<decltype(arg)>;
+            [&]<typename T>(const T& behaviour) -> Ray {
                 if constexpr (std::is_same_v<T, Behaviour::Mirror>) {
                     return behaveMirror(ray, col, element.m_material, inv.materialIndices, inv.materialTables);
                 } else if constexpr (std::is_same_v<T, Behaviour::Grating>) {
@@ -61,7 +57,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
                     return ray;
                 }
             },
-            behaviour.m_behaviour);
+            element.m_behaviour.m_behaviour);
 
         // write ray in local element coordinates to global memory
         if (numRecorded < inv.maxEvents && (!inv.recordMask || inv.recordMask[col.elementIndex])) {
