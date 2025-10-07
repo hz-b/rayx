@@ -129,23 +129,24 @@ Behaviour makeRZPBehaviour(const DesignElement& dele) {
     // (param sourceEnergy), else designEnergy = designEnergy
     auto designWavelength = designEnergy == 0 ? 0 : energyToWaveLength(designEnergy);
     auto additionalOrder = dele.getAdditionalOrder();
+    auto additionalOrder = dele.getAdditionalOrder();
 
     auto imageType = dele.getImageType();
 
     return Behaviour::RZP{.m_imageType = imageType,
                           .m_rzpType = (int)RZPType::Elliptical,
                           .m_derivationMethod = 0,
-                          .m_designWavelength = designWavelength,
                           .m_designOrderOfDiffraction = designOrderOfDiffraction,
                           .m_orderOfDiffraction = orderOfDiffraction,
+                          .m_additionalOrder = additionalOrder,
+                          .m_designWavelength = designWavelength,
                           .m_fresnelZOffset = fresnelZOffset,
                           .m_designSagittalEntranceArmLength = designSagittalEntranceArmLength,
                           .m_designSagittalExitArmLength = designSagittalExitArmLength,
                           .m_designMeridionalEntranceArmLength = designMeridionalEntranceArmLength,
                           .m_designMeridionalExitArmLength = designMeridionalExitArmLength,
                           .m_designAlphaAngle = designAlphaAngle.rad,
-                          .m_designBetaAngle = designBetaAngle.rad,
-                          .m_additionalOrder = additionalOrder};
+                          .m_designBetaAngle = designBetaAngle.rad};
 }
 
 // Foil Behaviour
