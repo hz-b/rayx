@@ -128,7 +128,7 @@ Behaviour makeRZPBehaviour(const DesignElement& dele) {
     // designEnergy = designEnergy; // if Auto == true, take energy of Source
     // (param sourceEnergy), else designEnergy = designEnergy
     auto designWavelength = designEnergy == 0 ? 0 : energyToWaveLength(designEnergy);
-    auto additionalOrder = double(dele.getAdditionalOrder());
+    auto additionalOrder = dele.getAdditionalOrder();
 
     auto imageType = dele.getImageType();
 
@@ -145,7 +145,7 @@ Behaviour makeRZPBehaviour(const DesignElement& dele) {
                           .m_designMeridionalExitArmLength = designMeridionalExitArmLength,
                           .m_designAlphaAngle = designAlphaAngle.rad,
                           .m_designBetaAngle = designBetaAngle.rad,
-                          .m_additionalOrder = (double)additionalOrder};
+                          .m_additionalOrder = additionalOrder};
 }
 
 // Foil Behaviour

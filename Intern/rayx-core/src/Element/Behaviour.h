@@ -31,9 +31,10 @@ struct Behaviour {
         int m_imageType;
         int m_rzpType;
         int m_derivationMethod;
-        double m_designWavelength;
         int m_designOrderOfDiffraction;
         int m_orderOfDiffraction;
+        int m_additionalOrder;
+        double m_designWavelength;
         double m_fresnelZOffset;
         double m_designSagittalEntranceArmLength;
         double m_designSagittalExitArmLength;
@@ -41,7 +42,6 @@ struct Behaviour {
         double m_designMeridionalExitArmLength;
         double m_designAlphaAngle;
         double m_designBetaAngle;
-        double m_additionalOrder;
     };
 
     struct ImagePlane {
