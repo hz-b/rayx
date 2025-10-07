@@ -132,8 +132,8 @@ Behaviour makeRZPBehaviour(const DesignElement& dele) {
 
     auto imageType = dele.getImageType();
 
-    return Behaviour::RZP{.m_imageType = (double)imageType,
-                          .m_rzpType = (double)RZPType::Elliptical,
+    return Behaviour::RZP{.m_imageType = imageType,
+                          .m_rzpType = (int)RZPType::Elliptical,
                           .m_derivationMethod = 0,
                           .m_designWavelength = designWavelength,
                           .m_designOrderOfDiffraction = designOrderOfDiffraction,

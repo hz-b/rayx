@@ -431,8 +431,8 @@ Rad DesignElement::getDesignAlphaAngle() const { return m_elementParameters["Des
 void DesignElement::setDesignBetaAngle(Rad value) { m_elementParameters["DesignBetaAngle"] = value; }
 Rad DesignElement::getDesignBetaAngle() const { return m_elementParameters["DesignBetaAngle"].as_rad(); }
 
-void DesignElement::setDesignOrderOfDiffraction(double value) { m_elementParameters["DesignOrderDiffraction"] = value; }
-double DesignElement::getDesignOrderOfDiffraction() const { return m_elementParameters["DesignOrderDiffraction"].as_double(); }
+void DesignElement::setDesignOrderOfDiffraction(int value) { m_elementParameters["DesignOrderDiffraction"] = value; }
+int DesignElement::getDesignOrderOfDiffraction() const { return m_elementParameters["DesignOrderDiffraction"].as_int(); }
 
 void DesignElement::setDesignEnergy(double value) { m_elementParameters["DesignEnergy"] = value; }
 double DesignElement::getDesignEnergy() const { return m_elementParameters["DesignEnergy"].as_double(); }
@@ -449,14 +449,14 @@ double DesignElement::getDesignMeridionalEntranceArmLength() const { return m_el
 void DesignElement::setDesignMeridionalExitArmLength(double value) { m_elementParameters["DesignMeridionalExitArmLength"] = value; }
 double DesignElement::getDesignMeridionalExitArmLength() const { return m_elementParameters["DesignMeridionalExitArmLength"].as_double(); }
 
-void DesignElement::setOrderOfDiffraction(double value) { m_elementParameters["OrderDiffraction"] = value; }
-double DesignElement::getOrderOfDiffraction() const { return m_elementParameters["OrderDiffraction"].as_double(); }
+void DesignElement::setOrderOfDiffraction(int value) { m_elementParameters["OrderDiffraction"] = value; }
+int DesignElement::getOrderOfDiffraction() const { return m_elementParameters["OrderDiffraction"].as_int(); }
 
-void DesignElement::setAdditionalOrder(double value) { m_elementParameters["additionalOrder"] = value; }
-double DesignElement::getAdditionalOrder() const { return m_elementParameters["additionalOrder"].as_double(); }
+void DesignElement::setAdditionalOrder(int value) { m_elementParameters["additionalOrder"] = value; }
+int DesignElement::getAdditionalOrder() const { return m_elementParameters["additionalOrder"].as_int(); }
 
-void DesignElement::setImageType(double value) { m_elementParameters["imageType"] = value; }
-double DesignElement::getImageType() const { return m_elementParameters["imageType"].as_double(); }
+void DesignElement::setImageType(int value) { m_elementParameters["imageType"] = value; }
+int DesignElement::getImageType() const { return m_elementParameters["imageType"].as_int(); }
 
 void DesignElement::setCurvatureType(CurvatureType value) { m_elementParameters["curvatureType"] = value; }
 CurvatureType DesignElement::getCurvatureType() const { return m_elementParameters["curvatureType"].as_curvatureType(); }

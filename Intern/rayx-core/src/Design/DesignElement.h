@@ -163,8 +163,8 @@ struct RAYX_API DesignElement : public BeamlineNode {
     void setDesignBetaAngle(Rad value);
     Rad getDesignBetaAngle() const;
 
-    void setDesignOrderOfDiffraction(double value);
-    double getDesignOrderOfDiffraction() const;
+    void setDesignOrderOfDiffraction(int value);
+    int getDesignOrderOfDiffraction() const;
 
     void setDesignEnergy(double value);
     double getDesignEnergy() const;
@@ -184,14 +184,14 @@ struct RAYX_API DesignElement : public BeamlineNode {
     double getDesignMeridionalExitArmLength() const;
 
     // Setter and Getter for orderOfDiffraction
-    void setOrderOfDiffraction(double value);
-    double getOrderOfDiffraction() const;
+    void setOrderOfDiffraction(int value);
+    int getOrderOfDiffraction() const;
 
-    void setAdditionalOrder(double value);
-    double getAdditionalOrder() const;
+    void setAdditionalOrder(int value);
+    int getAdditionalOrder() const;
 
-    void setImageType(double value);
-    double getImageType() const;
+    void setImageType(int value);
+    int getImageType() const;
 
     void setCurvatureType(CurvatureType value);
     CurvatureType getCurvatureType() const;

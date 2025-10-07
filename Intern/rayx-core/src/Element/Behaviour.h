@@ -17,9 +17,9 @@ struct Behaviour {
     };
 
     struct Grating {
-        double m_vls[6];             // VLS coefficients
-        double m_lineDensity;        // lines per mm
-        double m_orderOfDiffraction; /* the diffraction order, usually 1 */
+        double m_vls[6];          // VLS coefficients
+        double m_lineDensity;     // lines per mm
+        int m_orderOfDiffraction; /* the diffraction order, usually 1 */
     };
 
     struct Slit {
@@ -28,12 +28,12 @@ struct Behaviour {
     };
 
     struct RZP {
-        double m_imageType;
-        double m_rzpType;
-        double m_derivationMethod;
+        int m_imageType;
+        int m_rzpType;
+        int m_derivationMethod;
         double m_designWavelength;
-        double m_designOrderOfDiffraction;
-        double m_orderOfDiffraction;
+        int m_designOrderOfDiffraction;
+        int m_orderOfDiffraction;
         double m_fresnelZOffset;
         double m_designSagittalEntranceArmLength;
         double m_designSagittalExitArmLength;
