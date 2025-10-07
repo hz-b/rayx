@@ -129,8 +129,6 @@ Behaviour makeRZPBehaviour(const DesignElement& dele) {
     // (param sourceEnergy), else designEnergy = designEnergy
     auto designWavelength = designEnergy == 0 ? 0 : energyToWaveLength(designEnergy);
     auto additionalOrder = dele.getAdditionalOrder();
-    auto additionalOrder = dele.getAdditionalOrder();
-
     auto imageType = dele.getImageType();
 
     return Behaviour::RZP{.m_imageType = imageType,
