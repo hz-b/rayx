@@ -113,7 +113,7 @@ struct RAYX_API Parser {
     double parseAdditionalOrder() const;
     Rad parseAzimuthalAngle() const;
     std::filesystem::path parseEnergyDistributionFile() const;
-    MultilayerCoating parseCoating() const;
+    Coating::MultilayerCoating parseCoating() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.

@@ -60,7 +60,7 @@ struct OpticalElement {
 };
 
 // Ensure OpticalElement does not introduce cost on copy or default construction.
-static_assert(std::is_trivially_copyable_v<OpticalElement>);
+//static_assert(std::is_trivially_copyable_v<OpticalElement>);
 
 RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
 

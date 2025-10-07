@@ -300,7 +300,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
 }
 
 //multilayer coating
-bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
+bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
     if (!node || !out) {
         return false;
     }
@@ -329,7 +329,7 @@ bool paramCoating(const rapidxml::xml_node<>* node, MultilayerCoating* out) {
     out->layers.resize(numLayers);
     int i = 0;
     for (auto* layerNode = layersRoot->first_node("layer"); layerNode; layerNode = layerNode->next_sibling("layer"), ++i) {
-        Layer& layer = out->layers[i];
+        Coating::OneCoating& layer = out->layers[i];
 
         const char* materialStr = nullptr;
         if (auto* m = layerNode->first_attribute("material")) {
@@ -610,8 +610,8 @@ Material Parser::parseMaterial() const {
     return m;
 }
 
-MultilayerCoating Parser::parseCoating() const {
-    MultilayerCoating m;
+Coating::MultilayerCoating Parser::parseCoating() const {
+    Coating::MultilayerCoating m;
     // get children from param Cotaing 
     
     if (!paramCoating(node, &m)) {
