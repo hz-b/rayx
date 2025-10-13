@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lab>
+<version>1.12</version>
+<beamline>
+
+  <object name="Plane Mirror" type="Plane Mirror">
+    <param id="geometricalShape" comment="rectangle" enabled="T">0</param>
+    <param id="totalWidth" enabled="T">50</param>
+    <param id="totalLength" enabled="T">200</param>
+    <param id="surfaceCoating" comment="Substrate only" enabled="F">0</param>
+    <param id="worldPosition" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>1000</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>0.70710678118654752440</x>
+      <y>0</y>
+      <z>0.70710678118654752440</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>-0.70710678118654752440</x>
+      <y>0</y>
+      <z>0.70710678118654752440</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>0</x>
+      <y>-1</y>
+      <z>0</z>
+    </param>
+  </object>
+
+  <object name="ImagePlane" type="ImagePlane">
+    <param id="worldPosition" enabled="F">
+      <x>1000</x>
+      <y>0</y>
+      <z>1000</z>
+    </param>
+    <param id="worldXdirection" enabled="F">
+      <x>0</x>
+      <y>0</y>
+      <z>1</z>
+    </param>
+    <param id="worldYdirection" enabled="F">
+      <x>0</x>
+      <y>1</y>
+      <z>0</z>
+    </param>
+    <param id="worldZdirection" enabled="F">
+      <x>-1</x>
+      <y>0</y>
+      <z>0</z>
+    </param>
+  </object>
+
+</beamline>
+
+<ExtraData>
+</ExtraData>
+</lab>

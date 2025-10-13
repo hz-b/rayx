@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "Beamline/Objects/MatrixSource.h"
 #include "Element/Element.h"
 #include "RenderObject.h"
+#include "BundleHistory.h"
 
 /**
  * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.
@@ -34,4 +34,4 @@ void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<Texture
  * @param length Total grid length.
  * @return 2D vector of Ray objects.
  */
-std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double length);
+std::vector<std::vector<Ray>> createRayGrid(size_t size, double width, double length);

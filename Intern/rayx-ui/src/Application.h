@@ -11,6 +11,7 @@
 #include "Scene.h"
 #include "Simulator.h"
 #include "UserInterface/UIHandler.h"
+#include "BundleHistory.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -24,8 +25,8 @@ class RenderObject;
 class GridRenderSystem;
 class RayRenderSystem;
 class ObjectRenderSystem;
-struct DesignElement;
-struct DesignSource;
+class DesignElement;
+class DesignSource;
 
 class Application {
   public:
@@ -88,8 +89,8 @@ class Application {
     // Caching, Helpers, and other stuff
     std::filesystem::path m_RMLPath;                   ///< Path to the RML file
     std::unique_ptr<RAYX::Beamline> m_Beamline;        ///< Beamline
-    RAYX::BundleHistory m_rays;                        ///< All rays
-    std::vector<std::vector<RAYX::Ray>> m_sortedRays;  ///< Rays sorted by element
+    BundleHistory m_rays;                        ///< All rays
+    std::vector<std::vector<Ray>> m_sortedRays;  ///< Rays sorted by element
     bool m_buildElementsNeeded = true;
     bool m_buildTextureNeeded = true;
     VkExtent2D sceneExtent = {1920, 1080};  // TODO: why do we need this?
@@ -104,6 +105,6 @@ class Application {
 
     void init();
 
-    void loadRays(const std::filesystem::path& rmlPath, const size_t numElements);
+    void loadRays(const std::filesystem::path& rmlPath, const size_t numSources, const size_t numElements);
     void loadBeamline(const std::filesystem::path& rmlPath);
 };

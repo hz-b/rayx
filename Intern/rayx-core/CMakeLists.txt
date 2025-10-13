@@ -90,7 +90,6 @@ if(MSVC)
     set(MSVC_CXX_FLAGS /W3) # enable warning level 3
     list(APPEND MSVC_CXX_FLAGS /wd4251) # disable warnings related to missing DLL export annotation on members of exported classes
     list(APPEND MSVC_CXX_FLAGS /wd4267) # disable warnings related to narrowing conversion
-    list(APPEND MSVC_CXX_FLAGS /wd221) # disable warnings related to narrowing conversion
     list(APPEND MSVC_CXX_FLAGS /Zc:preprocessor) # enable __VA_OPT__
     if(RAYX_WERROR)
         list(APPEND MSVC_CXX_FLAGS /WX) # handle warnings as errors
@@ -163,6 +162,9 @@ target_compile_definitions(${PROJECT_NAME}
     PUBLIC GLM_ENABLE_EXPERIMENTAL
     PUBLIC GLM_FORCE_UNRESTRICTED_GENTYPE
     PUBLIC GLM_FORCE_XYZW_ONLY
+    # TODO: enable this
+    # prevent accidental implicit conversion from glm::dvec3 to glm::vec3
+    # PUBLIC GLM_FORCE_EXPLICIT_CTOR
 )
 
 # Inform about the cuda and hip config of alpaka

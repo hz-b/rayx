@@ -8,7 +8,7 @@ namespace RAYX {
 // checks whether the point (x, z) is within the cutout.
 RAYX_FN_ACC
 bool RAYX_API inCutout(Cutout cutout, double x, double z) {
-    bool result = variant::visit(
+    return cutout.visit(
         [&]<typename T>(const T& cutout_type) {
             if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
                 return true;
@@ -55,16 +55,15 @@ bool RAYX_API inCutout(Cutout cutout, double x, double z) {
                 _throw("invalid cutout type in inCutout!");
                 return false;
             }
-        },
-        cutout.m_variant);  // to ensure cutout is valid
-    return result;
+        }
+        );  // to ensure cutout is valid
 }
 
 // returns a matrix M where (M[i].x, M[i].z) are the key points of our cutout.
 // The key points are typically points on the boundary of the cutout.
 RAYX_FN_ACC
 glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
-    glm::dmat4 ret = variant::visit(
+    return cutout.visit(
         [&]<typename T>(const T& cutout_type) {
             if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
                 double inf = 1e100;
@@ -104,9 +103,7 @@ glm::dmat4 RAYX_API keyCutoutPoints(Cutout cutout) {
                 _throw("invalid cutout type in keyCutoutPoints!");
                 return glm::dmat4(0.0);
             }
-        },
-        cutout.m_variant);  // to ensure cutout is valid
-    return ret;
+        });  // to ensure cutout is valid
 }
 
 // returns width and length of the bounding box.

@@ -2,7 +2,6 @@
 
 #include "H5Writer.h"
 
-#include <bitset>
 #include <highfive/highfive.hpp>
 
 #include "Debug/Debug.h"
@@ -22,7 +21,7 @@ inline HighFive::DataType highfive_create_type_EventType() {
     });
 }
 
-inline HighFive::DataType highfive_create_type_ElectricField() {
+inline HighFive::DataType highfive_create_type_Complex() {
     return HighFive::CompoundType({
         {"r", HighFive::AtomicType<double>(), 0},
         {"i", HighFive::AtomicType<double>(), sizeof(double)},
@@ -30,35 +29,17 @@ inline HighFive::DataType highfive_create_type_ElectricField() {
 }
 }  // unnamed namespace
 HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
-HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_ElectricField);
+HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_Complex);
 
 namespace RAYX {
 
-/// get number of events, which is the number of entries in an active attribute
-/// also check wether every active attribute has the same number of entries
-int getNumEvents(const RaySoA& rays) {
-    auto size = 0;
-    auto resize = [&size](const auto& v) {
-        const auto v_size = static_cast<int>(v.size());
-        _assert(v_size == 0 || v_size == size || size == 0,
-                "error: file corrupted: at least two non-empty Ray attributes have different number of elements!");
-        size = std::max(size, v_size);
-    };
-
-#define X(type, name, flag, map) resize(rays.name);
-
-    RAYX_X_MACRO_RAY_ATTR
-#undef X
-
-    return size;
-}
-
-RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlag attr) {
+// TODO: this function should not require, that attr is known beforehand. Mabye we should use attr only to further exclude attributes? Or provide an
+// extra attr that is repsonsible to check for existence?
+Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "reading rays from '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
+    RAYX_VERB << "reading rays from " << filepath << " with attribute flags: " << to_string(attr);
 
-    RaySoA rays;
+    Rays rays;
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
@@ -71,15 +52,12 @@ RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlag att
                     address);
         };
 
-#define X(type, name, flag, map)                                                           \
+#define X(type, name, flag)                                                                \
     RAYX_VERB << "reading ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) loadData("rayx/events/" #name, rays.name);
+    if (contains(attr, RayAttrMask::flag)) loadData("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
-
-        rays.num_paths = file.getDataSet("rayx/num_paths").read<int32_t>();
-        rays.num_events = getNumEvents(rays);
     } catch (const std::exception& e) {
         RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
     }
@@ -87,53 +65,78 @@ RaySoA readH5RaySoA(const std::filesystem::path& filepath, const RayAttrFlag att
     return rays;
 }
 
-BundleHistory readH5BundleHistory(const std::filesystem::path& filepath) {
-    const auto rays = readH5RaySoA(filepath);
-    return raySoAToBundleHistory(rays);
-}
+std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath) {
+    RAYX_VERB << "reading element names from " << filepath;
 
-std::vector<std::string> readH5ElementNames(const std::filesystem::path& filepath) {
-    RAYX_VERB << "reading element names from '" << filepath;
-
-    auto element_names = std::vector<std::string>();
+    auto object_names = std::vector<std::string>();
 
     try {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
 
-        file.getDataSet("/rayx/element_names").read(element_names);
+        file.getDataSet("/rayx/object_names").read(object_names);
     } catch (const std::exception& e) {
         RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
     }
 
-    return element_names;
+    return object_names;
 }
 
-void writeH5RaySoA(const std::filesystem::path& filepath, const std::vector<std::string>& element_names, const RaySoA& rays, const RayAttrFlag attr) {
+void writeH5(const std::filesystem::path& filepath, const std::vector<std::string>& object_names, const Rays& rays, const RayAttrMask attr,
+             const bool overwrite) {
     RAYX_PROFILE_FUNCTION_STDOUT();
-    RAYX_VERB << "writing rays to '" << filepath << "' with attribute flags: "
-              << std::bitset<static_cast<RayAttrFlagType>(RayAttrFlag::RayAttrFlagCount)>(static_cast<RayAttrFlagType>(attr));
+    RAYX_VERB << "write rays to " << filepath << " with attribute flags: " << to_string(attr);
+
+    if (!contains(rays.attrMask(), attr))
+        RAYX_EXIT << "Cannot write rays to output file '" << filepath
+                  << "' because the rays do not contain all attributes specified in the attribute mask: " << to_string(attr)
+                  << ". The rays contain the following attributes: " << to_string(rays.attrMask());
 
     try {
-        auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
+        const auto flags = HighFive::File::ReadWrite | HighFive::File::Create | (overwrite ? HighFive::File::Truncate : HighFive::File::Excl);
+        auto file = HighFive::File(filepath.string(), flags);
 
-#define X(type, name, flag, map)                                                           \
-    RAYX_VERB << "writing ray attribute: " #name " (" << rays.name.size() << " elements)"; \
-    if ((attr & RayAttrFlag::flag) != RayAttrFlag::None) file.createDataSet("rayx/events/" #name, rays.name);
+#define X(type, name, flag)                                                              \
+    RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+    if (contains(attr, RayAttrMask::flag)) file.createDataSet("rayx/events/" #name, rays.name);
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
 
-        file.createDataSet("rayx/num_paths", rays.num_paths);
-        file.createDataSet("rayx/element_names", element_names);
+        // TODO: store RayAttrMask
+        file.createDataSet("rayx/num_events", rays.size());
+        file.createDataSet("rayx/object_names", object_names);
     } catch (const std::exception& e) {
         RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
     }
 }
 
-void writeH5BundleHistory(const std::filesystem::path& filepath, const std::vector<std::string>& element_names, const BundleHistory& bundle,
-                          const RayAttrFlag attr) {
-    const auto rays = bundleHistoryToRaySoA(bundle);
-    writeH5RaySoA(filepath, element_names, rays, attr);
+void appendH5(const std::filesystem::path& filepath, const Rays& rays, const RayAttrMask attr) {
+    // TODO: fix this function
+    assert(false && "unimplemented");
+
+    RAYX_PROFILE_FUNCTION_STDOUT();
+    RAYX_VERB << "append rays to " << filepath << " with attribute flags: " << to_string(attr);
+
+    if (!std::filesystem::is_regular_file(filepath))
+        RAYX_EXIT << "Cannot append to output file '" << filepath << "' because it does not exist or is not a regular file.";
+
+    try {
+        auto file = HighFive::File(filepath.string(), HighFive::File::ReadWrite);
+
+#define X(type, name, flag)                                                               \
+    RAYX_VERB << "append ray attribute: " #name " (" << rays.name.size() << " elements)"; \
+    if (contains(attr, RayAttrMask::flag)) {                                              \
+        auto dataset = file.getDataSet("rayx/events/" #name);                             \
+        const auto old_size = dataset.getSpace().getDimensions()[0];                      \
+        dataset.resize({old_size + rays.name.size()});                                    \
+        dataset.select({old_size}, {rays.name.size()}).write(rays.name);                  \
+    }
+
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
+    } catch (const std::exception& e) {
+        RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
+    }
 }
 
 }  // namespace RAYX

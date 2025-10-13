@@ -14,7 +14,7 @@
  * of the rays within the specified range. Each cell in the grid contains the count of rays that
  * intersect that cell.
  */
-std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, double min_x, double max_x, double min_z, double max_z,
+std::vector<std::vector<uint32_t>> makeFootprint(const std::vector<Ray>& rays, double min_x, double max_x, double min_z, double max_z,
                                                  uint32_t cells_x, uint32_t cells_z) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<std::vector<uint32_t>> grid;
@@ -27,7 +27,7 @@ std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, do
     }
 
     // fill the grid.
-    for (auto r : rays) {
+    for (const auto& r : rays) {
         double x = -r.m_position.x;  // TODO: Figure out why this needs to be negated.
         double z = -r.m_position.z;
 
@@ -58,7 +58,7 @@ void dumpFootprint(std::vector<std::vector<uint32_t>> footprint) {
     }
 }
 
-std::vector<std::vector<uint32_t>> makeFootprintSquare(std::vector<RAYX::Ray> rays, double min_x, double max_x, uint32_t cells_x) {
+std::vector<std::vector<uint32_t>> makeFootprintSquare(std::vector<Ray> rays, double min_x, double max_x, uint32_t cells_x) {
     return makeFootprint(rays, min_x, max_x, min_x, max_x, cells_x, cells_x);
 }
 

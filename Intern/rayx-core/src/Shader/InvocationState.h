@@ -1,8 +1,7 @@
-
 #pragma once
 
 #include "Element/Element.h"
-#include "Ray.h"
+#include "RaysPtr.h"
 
 namespace RAYX {
 
@@ -11,26 +10,27 @@ namespace RAYX {
 /// On the other hand calling it with `Sequential::Yes` makes the meaning more clear.
 enum class Sequential { No, Yes };
 
-// The InvocationState stores all shader-global declarations, including the buffers and stuff like the random-state.
-struct RAYX_API InvState {
-    int numRaysTotal;
-    int batchSize;
-    int batchStartRayIndex;
+/// stores all constant buffers
+struct RAYX_API ConstState {
     int maxEvents;
-    double randomSeed;
     Sequential sequential = Sequential::No;
-
-    OpticalElement* elements;
+    int numSources;
     int numElements;
-    int* materialIndices;
-    double* materialTables;
-    bool* recordMask;  //< Mask that decides which elements to record events for (array length is numElements)
-    Ray* rays;
+    int outputEventsGridStride;
+
+    ObjectTransform* __restrict objectTransforms;
+    OpticalElement* __restrict elements;
+    int* __restrict materialIndices;
+    double* __restrict materialTable;
+    bool* __restrict objectRecordMask;  // Mask that decides which elements to record events for (array length is numElements)
+    RayAttrMask attrRecordMask;
+    RaysPtr rays;
 };
 
-struct RAYX_API OutputEvents {
-    Ray* events;
-    int* eventCounts;
+/// stores all mutable buffers
+struct RAYX_API MutableState {
+    RaysPtr events;
+    bool* __restrict storedFlags;
 };
 
 }  // namespace RAYX

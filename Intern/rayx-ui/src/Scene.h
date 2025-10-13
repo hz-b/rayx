@@ -8,6 +8,7 @@
 #include "RenderObject.h"
 #include "Tracer/DeviceTracer.h"
 #include "UserInterface/Settings.h"
+#include "BundleHistory.h"
 
 class Scene {
   public:
@@ -23,11 +24,11 @@ class Scene {
         std::vector<uint32_t> indices;
     };
 
-    void buildRayCache(UIRayInfo& rayInfo, const RAYX::BundleHistory& rays);
+    void buildRayCache(UIRayInfo& rayInfo, const BundleHistory& rays);
     void buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo, std::shared_ptr<DescriptorSetLayout> setLayout,
                           std::shared_ptr<DescriptorPool> descriptorPool);
 
-    std::vector<Scene::RenderObjectInput> getRObjectInputs(const RAYX::Beamline& beamline, const std::vector<std::vector<RAYX::Ray>>& sortedRays,
+    std::vector<Scene::RenderObjectInput> getRObjectInputs(const RAYX::Beamline& beamline, const std::vector<std::vector<Ray>>& sortedRays,
                                                            bool buildTexture);
 
     void buildRObjectsFromInput(std::vector<RenderObjectInput>&& inputs, std::shared_ptr<DescriptorSetLayout> setLayout,
@@ -40,6 +41,6 @@ class Scene {
 
     std::vector<RenderObject> m_ElementRObjects = {};
     std::vector<RenderObject> m_RayRObjects = {};
-    RAYX::BundleHistory m_rayCache = {};
+    BundleHistory m_rayCache = {};
     mutable std::vector<Texture::TextureInput> m_textureInputCache;  ///< Texture cache
 };

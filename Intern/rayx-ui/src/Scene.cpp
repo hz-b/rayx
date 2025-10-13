@@ -14,7 +14,7 @@
 
 Scene::Scene(Device& device) : m_Device(device) {}
 
-void Scene::buildRayCache(UIRayInfo& rayInfo, const RAYX::BundleHistory& rays) {
+void Scene::buildRayCache(UIRayInfo& rayInfo, const BundleHistory& rays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     rayInfo.maxAmountOfRays = (int)rays.size();
     if (rayInfo.renderAllRays) {
@@ -87,7 +87,7 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
     }
 }
 
-std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const RAYX::Beamline& beamline, const std::vector<std::vector<RAYX::Ray>>& sortedRays,
+std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const RAYX::Beamline& beamline, const std::vector<std::vector<Ray>>& sortedRays,
                                                               bool buildTexture) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     auto elements = beamline.getElements();
@@ -100,17 +100,17 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const RAYX::Beamli
         std::vector<uint32_t> indices;
 
         try {
-            triangulateObject(compiled[i], vertices, indices);
+            triangulateObject(compiled[i].element, vertices, indices);
         } catch (const std::exception& ex) {
             RAYX_WARN << ex.what() << ". Object \"" << elements[i]->getName()
                       << "\" can't be rendered due to triangulation issues. Make sure it is defined correctly in the RML file.";
             continue;  // Input is not generated --> Object won't be built/rendered
         }
 
-        glm::dmat4& modelMatrix = compiled[i].m_outTrans;
+        glm::dmat4& modelMatrix = compiled[i].transform.m_outTrans;
 
         if (buildTexture) {
-            auto [width, height] = getRectangularDimensions(compiled[i].m_cutout);
+            auto [width, height] = getRectangularDimensions(compiled[i].element.m_cutout);
 
             std::vector<std::vector<uint32_t>> footprint =
                 makeFootprint(sortedRays[i], -width / 2, width / 2, -height / 2, height / 2, (uint32_t)(width * 10), (uint32_t)(height * 10));

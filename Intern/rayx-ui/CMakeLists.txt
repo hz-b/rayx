@@ -34,7 +34,8 @@ if(Vulkan_FOUND)
     target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         GLM_FORCE_RADIANS
-        GLM_FORCE_DEPTH_ZERO_TO_ONE)
+        GLM_FORCE_DEPTH_ZERO_TO_ONE
+    )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG})

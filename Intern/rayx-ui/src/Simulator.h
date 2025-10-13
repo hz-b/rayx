@@ -3,6 +3,7 @@
 #include "Beamline/Beamline.h"
 #include "Tracer/Tracer.h"
 #include "UserInterface/Settings.h"
+#include "BundleHistory.h"
 
 class Simulator {
   public:
@@ -23,5 +24,5 @@ class Simulator {
     bool m_readyForSimulation = false;
 
     // after Simulation
-    RAYX::BundleHistory m_rays;  ///< Ray cache
+    BundleHistory m_rays;  ///< Ray cache
 };

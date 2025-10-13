@@ -6,12 +6,16 @@
 
 namespace RAYX {
 
-struct RAYX_API DesignElement : public BeamlineNode {
-    DesignElement() = default;
+class RAYX_API DesignElement : public BeamlineNode {
+  public:
+    DesignElement();
+    DesignElement(std::string name);
     ~DesignElement() = default;
+
     // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
     DesignElement(const DesignElement& other) = delete;
     DesignElement& operator=(const DesignElement& other) = delete;
+
     // Allow move
     DesignElement(DesignElement&& other) noexcept;
     DesignElement& operator=(DesignElement&& other) noexcept;
@@ -19,23 +23,21 @@ struct RAYX_API DesignElement : public BeamlineNode {
     std::unique_ptr<BeamlineNode> clone() const override;
 
     DesignMap m_elementParameters;
-    OpticalElement compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
+    OpticalElementAndTransform compile(const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
 
-    void setName(std::string s);
-    void setType(ElementType s);
     bool isElement() const override { return true; }
 
-    std::string getName() const;
+    std::string getName() const override;
+    void setName(std::string s) override;
+
     ElementType getType() const;
+    void setType(ElementType s);
 
     void setPosition(glm::dvec4 p);
     glm::dvec4 getPosition() const override;
 
     void setOrientation(glm::dmat4x4 o);
     glm::dmat4x4 getOrientation() const override;
-
-    void setMisalignment(Misalignment m);
-    Misalignment getMisalignment() const;
 
     void setSlopeError(SlopeError s);
     SlopeError getSlopeError() const;
@@ -248,7 +250,7 @@ struct RAYX_API DesignElement : public BeamlineNode {
     SurfaceCoatingType getSurfaceCoatingType() const;
 
     void setMultilayerCoating(const Coating::MultilayerCoating& coating);
-    
+
     Coating getCoating() const;
 
     void setMaterialCoating(Material value);

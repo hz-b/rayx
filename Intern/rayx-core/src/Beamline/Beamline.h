@@ -19,12 +19,15 @@ namespace RAYX {
  */
 class RAYX_API Group : public BeamlineNode {
   public:
-    Group() = default;
+    Group();
+    Group(std::string name);
     ~Group() = default;
-    Group(Group&& other) noexcept;
-    Group& operator=(Group&& other) noexcept;
+
     Group(const Group&) = delete;
     Group& operator=(const Group&) = delete;
+
+    Group(Group&& other) noexcept;
+    Group& operator=(Group&& other) noexcept;
 
     bool isGroup() const override { return true; }
 
@@ -42,8 +45,48 @@ class RAYX_API Group : public BeamlineNode {
      * @param child A unique_ptr to a BeamlineNode to be moved into this Group.
      */
     void addChild(std::unique_ptr<BeamlineNode> child);
+
+    [[nodiscard]] std::unique_ptr<BeamlineNode> releaseNodeFromChildren(const BeamlineNode* node);
+    [[nodiscard]] std::unique_ptr<BeamlineNode> releaseNodeFromTree(const BeamlineNode* node);
+
     size_t numElements() const;
     size_t numSources() const;
+    size_t numObjects() const;
+    size_t numRayPaths() const;
+
+    // recursive search
+
+    const BeamlineNode* findNodeByName(const std::string& name) const;
+    BeamlineNode* findNodeByName(const std::string& name);
+
+    const Group* findGroupByName(const std::string& name) const;
+    Group* findGroupByName(const std::string& name);
+
+    const DesignSource* findSourceByName(const std::string& name) const;
+    DesignSource* findSourceByName(const std::string& name);
+
+    const DesignElement* findElementByName(const std::string& name) const;
+    DesignElement* findElementByName(const std::string& name);
+
+    const BeamlineNode* findNode(const std::function<bool(const BeamlineNode&)>& pred) const;
+    BeamlineNode* findNode(const std::function<bool(const BeamlineNode&)>& pred);
+
+    const Group* findGroup(const std::function<bool(const Group&)>& pred) const;
+    Group* findGroup(const std::function<bool(const Group&)>& pred);
+
+    const DesignSource* findSource(const std::function<bool(const DesignSource&)>& pred) const;
+    DesignSource* findSource(const std::function<bool(const DesignSource&)>& pred);
+
+    const DesignElement* findElement(const std::function<bool(const DesignElement&)>& pred) const;
+    DesignElement* findElement(const std::function<bool(const DesignElement&)>& pred);
+
+    // declarative fashion api
+
+    const BeamlineNode* operator[](size_t index) const override;
+    BeamlineNode* operator[](size_t index) override;
+
+    const BeamlineNode* operator[](const std::string& name) const override;
+    BeamlineNode* operator[](const std::string& name) override;
 
     /**
      * @brief Creates a deep copy of this group and its children.
@@ -51,6 +94,9 @@ class RAYX_API Group : public BeamlineNode {
      * @return unique_ptr to the base class (can be statically casted)
      */
     std::unique_ptr<BeamlineNode> clone() const override;
+
+    std::string getName() const override;
+    void setName(std::string name) override;
 
     /**
      * @brief Recursively traverse the model/scene graph down from this node.
@@ -73,6 +119,7 @@ class RAYX_API Group : public BeamlineNode {
      */
     void traverse(const std::function<bool(BeamlineNode&)>& callback);
 
+    // TODO: this should not be part of the API
     /**
      * @brief Calculates the minimal set of material tables required by elements in this Group.
      *
@@ -83,24 +130,15 @@ class RAYX_API Group : public BeamlineNode {
      */
     MaterialTables calcMinimalMaterialTables() const;
 
+    // TODO: this should not be part of the API
     /**
      * @brief Recursively converts all DesignElement nodes into OpticalElements with full transforms.
      *
-     * @return A vector of OpticalElement objects compiled from the Group hierarchy.
+     * @return A vector of OpticalElementAndTransform objects compiled from the Group hierarchy.
      */
-    std::vector<OpticalElement> compileElements() const;
+    std::vector<OpticalElementAndTransform> compileElements() const;
 
-    /**
-     * @brief Recursively gathers Rays from all DesignSource nodes in the Group.
-     *
-     * Applies position/orientation transforms at each level. This method can be multithreaded
-     * if the design source compilation supports concurrency.
-     *
-     * @param thread_count Number of threads to use for sources' compilation.
-     * @return A vector of Rays from all sources.
-     */
-    std::vector<Ray> compileSources(int thread_count = 1) const;
-
+    // TODO: why would we need this? ray-ui uses this function
     /**
      * @brief Gathers the world positions of all light sources within a Group hierarchy.
      *
@@ -112,16 +150,24 @@ class RAYX_API Group : public BeamlineNode {
     static void accumulateLightSourcesWorldPositions(const Group& group, const glm::dvec4& parentPos, const glm::dmat4& parentOri,
                                                      std::vector<glm::dvec4>& positions);
 
-    std::vector<const DesignElement*> getElements() const;
-    std::vector<const DesignSource*> getSources() const;
     std::vector<std::string> getElementNames() const;
     std::vector<std::string> getSourceNames() const;
-    const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
-    glm::dvec4 getPosition() const override { return m_position; }
-    glm::dmat4 getOrientation() const override { return m_orientation; }
+    std::vector<std::string> getObjectNames() const;
 
+    std::vector<const DesignElement*> getElements() const;
+    std::vector<const DesignSource*> getSources() const;
+
+    glm::dvec4 getPosition() const override { return m_position; }
     void setPosition(const glm::dvec4& pos) { m_position = pos; }
+
+    glm::dmat4 getOrientation() const override { return m_orientation; }
     void setOrientation(const glm::dmat4& orientation) { m_orientation = orientation; }
+
+    const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
+
+    size_t findObjectIdByNode(const BeamlineNode* node) const;
+    const BeamlineNode* findNodeByObjectId(const size_t objectId) const;
+    BeamlineNode* findNodeByObjectId(const size_t objectId);
 
   private:
     // Position and orientation could in theory be put into one transform matrix but this follows the rml style
@@ -129,6 +175,7 @@ class RAYX_API Group : public BeamlineNode {
     glm::dmat4 m_orientation = glm::dmat4(1);
     // m_children vec is not checked for dangling or nullptrs anywhere, changes to the Group interface/implementation are to be made with care
     std::vector<std::unique_ptr<BeamlineNode>> m_children;
+    std::string m_name;
 };
 
 using Beamline = Group;  // Conceptually, a Beamline is a Group

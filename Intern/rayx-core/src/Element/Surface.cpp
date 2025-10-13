@@ -224,7 +224,7 @@ Surface makeToroid(const DesignElement& dele) {
     return Surface::Toroid{
         .m_longRadius = dele.getLongRadius(),
         .m_shortRadius = dele.getShortRadius(),
-        .m_toroidType = TOROID_TYPE_CONCAVE,
+        .m_toroidType = ToroidType::Concave,
     };
 }
 

@@ -14,6 +14,8 @@ DesignMap DesignMap::clone() const {
             newMap[key] = std::make_shared<DesignMap>(ptr->clone());
         }
         copy.m_variant = newMap;
+    } else if (std::holds_alternative<std::shared_ptr<Rays>>(m_variant)) {
+        copy.m_variant = std::make_shared<Rays>(std::get<std::shared_ptr<Rays>>(m_variant)->copy());
     } else {
         // For all other types, the variant’s copy is sufficient.
         copy.m_variant = m_variant;
@@ -31,7 +33,6 @@ ValueType DesignMap::type() const {
         ValueType::Dmat4x4,
         ValueType::Bool,
         ValueType::EnergyDistributionType,
-        ValueType::Misalignment,
         ValueType::CentralBeamstop,
         ValueType::Cutout,
         ValueType::CutoutType,  // Added
@@ -54,6 +55,7 @@ ValueType DesignMap::type() const {
         ValueType::CrystalType,
         ValueType::DesignPlane,
         ValueType::SurfaceCoatingType,
+        ValueType::RayList,
     };
     return types[m_variant.index()];
 }
@@ -101,11 +103,6 @@ Rad DesignMap::as_rad() const {
 Material DesignMap::as_material() const {
     if (auto* x = std::get_if<Material>(&m_variant)) return *x;
     throw std::runtime_error("as_material() called on non-material!");
-}
-
-Misalignment DesignMap::as_misalignment() const {
-    if (auto* x = std::get_if<Misalignment>(&m_variant)) return *x;
-    throw std::runtime_error("as_misalignment() called on non-misalignment!");
 }
 
 CentralBeamstop DesignMap::as_centralBeamStop() const {
@@ -201,6 +198,18 @@ DesignPlane DesignMap::as_designPlane() const {
 SurfaceCoatingType DesignMap::as_surfaceCoatingType() const {
     if (auto* x = std::get_if<SurfaceCoatingType>(&m_variant)) return *x;
     throw std::runtime_error("as_surfaceCoatingType() called on non-surfaceCoatingType!");
+}
+
+std::shared_ptr<Rays> DesignMap::as_rayList() const {
+    if (auto* x = std::get_if<std::shared_ptr<Rays>>(&m_variant)) return *x;
+    throw std::runtime_error("as_rayList() called on non-Rays!");
+}
+
+bool DesignMap::hasKey(const std::string& s) const {
+    if (auto* m = std::get_if<Map>(&m_variant)) {
+        return m->find(s) != m->end();
+    }
+    return false;
 }
 
 const DesignMap& DesignMap::operator[](const std::string& s) const {

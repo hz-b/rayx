@@ -29,11 +29,14 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
 #if defined(RAYX_OPENMP_ENABLED)
             using TagCpu = alpaka::TagCpuOmp2Blocks;
 #else
+            RAYX_WARN << "warning: rayx-core was compiled without OpenMP. The CPU tracer will run in a single thread.";
             using TagCpu = alpaka::TagCpuSerial;
 #endif
             return std::make_shared<RAYX::MegaKernelTracer<TagCpu>>(deviceIndex);
     }
 }
+
+int defaultNonSequentialMaxEvents(const int numObjects) { return RAYX::defaultMaxEvents(numObjects); }
 
 }  // unnamed namespace
 
@@ -51,17 +54,21 @@ Tracer::Tracer(const DeviceConfig& deviceConfig) {
     }
 }
 
-RaySoA Tracer::trace(const Group& group, Sequential sequential, uint64_t maxBatchSize, uint32_t maxEvents, const std::vector<bool>& recordMask,
-                     const RayAttrFlag attr) {
-    // in sequential tracing, maxEvents should be equal to the number of elements
-    if (sequential == Sequential::Yes) maxEvents = group.numElements();
+Rays Tracer::trace(const Group& group, const Sequential sequential, const ObjectMask& objectRecordMask, const RayAttrMask attrRecordMask,
+                   std::optional<int> maxEvents, std::optional<int> maxBatchSize) {
+    const auto actualObjectRecordMask = objectRecordMask.toObjectIndexMask(group.numSources(), group.numElements());
 
-    return m_deviceTracer->trace(group, sequential, static_cast<int>(maxBatchSize), static_cast<int>(maxEvents), recordMask, attr);
-}
+    const auto actualMaxEvents =
+        // in sequential mode maxEvents will be the same as the number of objects to record
+        sequential == Sequential::Yes ? actualObjectRecordMask.numObjects()
+                                      // in non-sequential mode maxEvents is optional, if not set, it will be estimated
+                                      : (maxEvents ? *maxEvents : defaultNonSequentialMaxEvents(actualObjectRecordMask.numObjects()));
 
-int Tracer::defaultMaxEvents(const Group* group) {
-    if (group) return group->numElements() * 2 + 8;
-    return 32;
+    const auto actualMaxBatchSize = maxBatchSize ? *maxBatchSize : DEFAULT_BATCH_SIZE;
+
+    auto rays = m_deviceTracer->trace(group, sequential, actualObjectRecordMask, attrRecordMask, actualMaxEvents, actualMaxBatchSize);
+    if (!rays.isValid()) RAYX_EXIT << "Tracer::trace: one or more recorded attributes have different number of items.";
+    return rays;
 }
 
 }  // namespace RAYX

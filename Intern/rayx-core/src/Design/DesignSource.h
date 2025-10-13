@@ -1,25 +1,29 @@
 #pragma once
 
 #include "Beamline/Node.h"
-#include "Shader/Ray.h"
 #include "Value.h"
 
 namespace RAYX {
 
-struct RAYX_API DesignSource : public BeamlineNode {
-    DesignSource() = default;
+class RAYX_API DesignSource : public BeamlineNode {
+  public:
+    DesignSource();
+    DesignSource(std::string name);
     ~DesignSource() = default;
+
     // Delete copy constructor because shallow copies of DesignMap lead to unexpected behavior
     DesignSource(const DesignSource& other) = delete;
     DesignSource& operator=(const DesignSource& other) = delete;
+
     // Allow move
     DesignSource(DesignSource&& other) noexcept;
     DesignSource& operator=(DesignSource&& other) noexcept;
+
     // Allow intentional copies
     std::unique_ptr<BeamlineNode> clone() const override;
 
     DesignMap m_elementParameters;
-    std::vector<Ray> compile(int numThreads, const glm::dvec4& groupPosition, const glm::dmat4& groupOrientation) const;
+
     bool isSource() const override { return true; }
 
     void setStokeslin0(double value);
@@ -27,9 +31,10 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setStokescirc(double value);
     glm::dvec4 getStokes() const;
 
-    void setName(std::string s);
+    void setName(std::string s) override;
+    std::string getName() const override;
+
     void setType(ElementType s);
-    std::string getName() const;
     ElementType getType() const;
 
     void setWidthDist(SourceDist value);
@@ -85,7 +90,8 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setElectronEnergyOrientation(ElectronEnergyOrientation value);
     ElectronEnergyOrientation getElectronEnergyOrientation() const;
 
-    void setSeparateEnergies(int value);
+    void setNumberOfSeparateEnergies(int value);
+    int getNumberOfSeparateEnergies() const;
 
     void setEnergy(double value);
     double getEnergy() const;
@@ -93,14 +99,12 @@ struct RAYX_API DesignSource : public BeamlineNode {
     void setPhotonFlux(double value);
     double getPhotonFlux() const;
 
-    EnergyDistribution getEnergyDistribution() const;
+    EnergyDistributionVariant getEnergyDistribution() const;
 
-    void setMisalignment(Misalignment m);
-    Misalignment getMisalignment() const;
+    void setNumberOfRays(int value);
+    int getNumberOfRays() const;
 
-    void setNumberOfRays(double value);
-    double getNumberOfRays() const;
-
+    // TODO: the w component is not used
     void setPosition(glm::dvec4 p);
     glm::dvec4 getPosition() const override;
 
@@ -136,5 +140,10 @@ struct RAYX_API DesignSource : public BeamlineNode {
 
     void setElectronSigmaYs(double value);
     double getElectronSigmaYs() const;
+
+    void setRayList(Rays rays);
+    void setRayList(std::shared_ptr<Rays>& rays);
+    std::shared_ptr<Rays> getRayList() const;
 };
+
 }  // namespace RAYX

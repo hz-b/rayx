@@ -6,13 +6,14 @@
 #include "Shader/Collision.h"
 #include "Tracer/Tracer.h"
 #include "Triangulation/GeometryUtils.h"
+#include "BundleHistory.h"
 
 /**
  * Given grid size, width, length, and a flag indicating the plane of the rays,
- * this function populates and returns a 2D grid of RAYX::Ray objects.
+ * this function populates and returns a 2D grid of Ray objects.
  */
-std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, double length) {
-    std::vector<std::vector<RAYX::Ray>> grid(size, std::vector<RAYX::Ray>(size));
+std::vector<std::vector<Ray>> createRayGrid(size_t size, double width, double length) {
+    std::vector<std::vector<Ray>> grid(size, std::vector<Ray>(size));
     double xStep = width / size;
     double zStep = length / size;
 
@@ -27,7 +28,7 @@ std::vector<std::vector<RAYX::Ray>> createRayGrid(size_t size, double width, dou
             const auto stokes = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
             const auto field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, dir);
 
-            RAYX::Ray ray = {
+            Ray ray = {
                 .m_position = pos,
                 .m_eventType = RAYX::EventType::Emitted,
                 .m_direction = dir,
@@ -56,17 +57,14 @@ void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<Texture
 
     constexpr size_t gridSize = 20;
     auto [width, length] = getRectangularDimensions(compiled.m_cutout);
-    RAYX::BundleHistory rayGrid = createRayGrid(gridSize, width, length);
+    BundleHistory rayGrid = createRayGrid(gridSize, width, length);
 
-    RAYX::Collision coll;
-    coll.found = false;
-    std::vector<std::vector<RAYX::Collision>> collisionGrid(gridSize, std::vector<RAYX::Collision>(gridSize, coll));
+    std::vector<std::vector<RAYX::OptCollisionPoint>> collisionGrid(gridSize, std::vector<RAYX::OptCollisionPoint>(gridSize, std::nullopt));
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
             const auto& ray = rayGrid[i][j];
-            RAYX::Collision collision =
-                RAYX::findCollisionInElementCoords(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
+            RAYX::OptCollisionPoint collision = RAYX::findCollisionInElementCoordsWithoutSlopeError(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }
@@ -75,19 +73,19 @@ void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<Texture
 
     for (size_t i = 0; i < gridSize - 1; ++i) {
         for (size_t j = 0; j < gridSize - 1; ++j) {
-            if (collisionGrid[i][j].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
-                vertices.push_back({glm::vec4(collisionGrid[i][j].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
-                vertices.push_back({glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
-                vertices.push_back({glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+            if (collisionGrid[i][j] && collisionGrid[i + 1][j] && collisionGrid[i][j + 1]) {
+                vertices.push_back({glm::vec4(collisionGrid[i][j]->hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i + 1][j]->hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i][j + 1]->hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
 
                 indices.push_back(index++);
                 indices.push_back(index++);
                 indices.push_back(index++);
             }
-            if (collisionGrid[i + 1][j + 1].found && collisionGrid[i + 1][j].found && collisionGrid[i][j + 1].found) {
-                vertices.push_back({glm::vec4(collisionGrid[i + 1][j + 1].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
-                vertices.push_back({glm::vec4(collisionGrid[i + 1][j].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
-                vertices.push_back({glm::vec4(collisionGrid[i][j + 1].hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+            if (collisionGrid[i + 1][j + 1] && collisionGrid[i + 1][j] && collisionGrid[i][j + 1]) {
+                vertices.push_back({glm::vec4(collisionGrid[i + 1][j + 1]->hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i + 1][j]->hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
+                vertices.push_back({glm::vec4(collisionGrid[i][j + 1]->hitpoint, 1.0f), glm::vec2(OPT_ELEMENT_COLOR)});
 
                 indices.push_back(index++);
                 indices.push_back(index++);

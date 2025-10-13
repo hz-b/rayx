@@ -21,6 +21,7 @@ given direction on the grating
 @params: lots
 @returns: (inplace) DX, DZ
 */
-RAYX_FN_ACC void RAYX_API RZPLineDensity(Ray r, glm::dvec3 normal, Behaviour::RZP b, double& DX, double& DZ);
+RAYX_FN_ACC void RAYX_API RZPLineDensity(const glm::dvec3& __restrict position, const glm::dvec3& __restrict normal,
+                                         const Behaviour::RZP& __restrict b, double& __restrict DX, double& __restrict DZ);
 
 }  // namespace RAYX

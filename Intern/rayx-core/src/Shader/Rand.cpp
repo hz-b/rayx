@@ -6,11 +6,11 @@
 
 namespace RAYX {
 
-constexpr uint64_t RNG_KEY = (uint64_t(0xc8e4fd15) << 32) | uint64_t(0x4ce32f6d);
+constexpr RandCounter RNG_KEY = (RandCounter(0xc8e4fd15) << 32) | RandCounter(0x4ce32f6d);
 
 RAYX_FN_ACC
-uint64_t RAYX_API squares64(uint64_t& ctr) {
-    uint64_t x, y, z, t;
+RandCounter RAYX_API squares64(RandCounter& ctr) {
+    RandCounter x, y, z, t;
     y = x = ctr * RNG_KEY;
     z = y + RNG_KEY;
     ctr++;
@@ -27,14 +27,14 @@ uint64_t RAYX_API squares64(uint64_t& ctr) {
 }
 
 RAYX_FN_ACC
-double RAYX_API squaresDoubleRNG(uint64_t& ctr) {
+double RAYX_API squaresDoubleRNG(RandCounter& ctr) {
     double a = double(squares64(ctr));
-    double div = double(uint64_t(0) - 1);
+    double div = double(RandCounter(0) - 1);
     return a / div;
 }
 
 RAYX_FN_ACC
-double RAYX_API squaresNormalRNG(uint64_t& ctr, double mu, double sigma) {
+double RAYX_API squaresNormalRNG(RandCounter& ctr, double mu, double sigma) {
     double U, V, R, Z;
     double two_pi = 2.0 * PI;
 

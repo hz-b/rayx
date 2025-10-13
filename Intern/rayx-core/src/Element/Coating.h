@@ -1,20 +1,21 @@
 #pragma once
 
-#include "Core.h"
 #include <vector>
+
+#include "Core.h"
+#include "Variant.h"
 
 namespace RAYX {
 
-
 enum class SurfaceCoatingType {
-    SubstrateOnly,  // No coating, only substrate
-    OneCoating,     // One coating layer
-    MultipleCoatings // Multiple coating layers
+    SubstrateOnly,    // No coating, only substrate
+    OneCoating,       // One coating layer
+    MultipleCoatings  // Multiple coating layers
 };
 
-struct RAYX_API Coating{
-
-    struct RAYX_API SubstrateOnly {
+namespace detail {
+struct CoatingTypes {
+    struct RAYX_API SubstrateOnly{
         // No additional parameters needed
     };
 
@@ -30,19 +31,10 @@ struct RAYX_API Coating{
         double thickness[1000];
         double roughness[1000];
     };
-
-    variant::variant<SubstrateOnly, OneCoating, MultilayerCoating> m_coating;
-
-    Coating() : Coating(SubstrateOnly{}) {}
-
-    template<typename T>
-    Coating(T t) : m_coating(t) {}
-
-    template <typename T>
-    RAYX_FN_ACC
-    bool is() const {
-        return variant::holds_alternative<T>(m_coating);
-    }
 };
+}  // namespace detail
 
-} // namespace RAYX
+using Coating =
+    Variant<detail::CoatingTypes, detail::CoatingTypes::SubstrateOnly, detail::CoatingTypes::OneCoating, detail::CoatingTypes::MultilayerCoating>;
+
+}  // namespace RAYX

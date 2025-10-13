@@ -1,19 +1,21 @@
 #pragma once
 
-#include "../Shader/Variant.h"
 #include "Core.h"
+#include "Variant.h"
 
 namespace RAYX {
 
-#define ToroidType double
-constexpr ToroidType TOROID_TYPE_CONVEX = 0;
-constexpr ToroidType TOROID_TYPE_CONCAVE = 1;
+enum class ToroidType {
+    Convex,
+    Concave,
+};
 
 // a surface is a potentially infinite curved surface in 3d space.
 // as our elements are mostly finite in size, they are represented by a (potentially infinite) surface in combination with a finite cutout (see CTYPE
 // constants)
 
-struct Surface {
+namespace detail {
+struct SurfaceTypes {
     struct Plane {
         // no parameters
     };
@@ -60,14 +62,13 @@ struct Surface {
 
         double m_psi;
     };
-
-    variant::variant<Plane, Quadric, Toroid, Cubic> m_surface = Plane{};
-
-    template <typename T>
-    Surface(T t) : m_surface(t) {}
 };
+}  // namespace detail
 
-struct DesignElement;
+using Surface = Variant<detail::SurfaceTypes, detail::SurfaceTypes::Plane, detail::SurfaceTypes::Quadric, detail::SurfaceTypes::Toroid,
+                        detail::SurfaceTypes::Cubic>;
+
+class DesignElement;
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 Surface makeSurface(const DesignElement& dele);
 Surface makeToroid(const DesignElement& dele);      //< creates a toroid from the parameters given in ` dele`.

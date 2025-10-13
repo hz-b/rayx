@@ -27,6 +27,9 @@ using Complex = tcomplex<double>;
 using cvec2 = glm::tvec2<complex::Complex>;
 using cvec3 = glm::tvec3<complex::Complex>;
 using cmat3 = glm::tmat3x3<complex::Complex>;
+static_assert(std::is_default_constructible_v<cvec2>);
+static_assert(std::is_default_constructible_v<cvec3>);
+static_assert(std::is_default_constructible_v<cmat3>);
 
 namespace complex {
 #if defined(RAYX_CUDA_ENABLED)
