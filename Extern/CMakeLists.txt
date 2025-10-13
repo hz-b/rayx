@@ -29,15 +29,20 @@ if(RAYX_ENABLE_OPENMP)
     find_package(OpenMP COMPONENTS CXX)
     if(OpenMP_CXX_FOUND)
        set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
+       set(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE OFF CACHE BOOL "" FORCE)
     else()
         if(RAYX_REQUIRE_OPENMP)
             message(FATAL_ERROR "No OpenMP CXX compiler found by CMake, but 'RAYX_REQUIRE_OPENMP is set.'")
         else()
             message(WARNING "No OpenMP CXX compiler found by CMake. OpenMP support will be disabled.'")
         endif()
+
+        set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE OFF CACHE BOOL "" FORCE)
+        set(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
     endif()
 else() # setting could be cached so force it off
     set(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE OFF CACHE BOOL "" FORCE)
+    set(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE ON CACHE BOOL "" FORCE)
 endif()
 
 # alpaka cuda backend
@@ -67,11 +72,6 @@ if(RAYX_ENABLE_CUDA)
 else() # setting could be cached so force it off
     set(alpaka_ACC_GPU_CUDA_ENABLE OFF CACHE BOOL "" FORCE)
     set(alpaka_RELOCATABLE_DEVICE_CODE OFF CACHE BOOL "" FORCE)
-endif()
-
-# at least one backend must be provided
-if(NOT alpaka_ACC_GPU_CUDA_ENABLE AND NOT alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE)
-    message(FATAL_ERROR "Neither OpenMP or Cuda backend have been enabled. At least one is required. Aborting.")
 endif()
 
 set(CMAKE_CUDA_RUNTIME_LIBRARY "Static")

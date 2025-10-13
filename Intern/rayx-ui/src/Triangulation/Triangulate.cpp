@@ -14,7 +14,7 @@
 #include "Element/Cutout.h"
 #include "GeometryUtils.h"
 #include "Shader/Constants.h"
-#include "Shader/Variant.h"
+#include "Variant.h"
 #include "Triangulation/TraceTriangulation.h"
 
 struct Point2D {
@@ -380,7 +380,7 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
     constexpr double defWidthHeight = 50.0f;
     Outline outline;
 
-    RAYX::variant::visit(
+    cutout.visit(
         [&]<typename T>(const T& cutout_type) {
             if constexpr (std::is_same_v<T, RAYX::Cutout::Trapezoid>) {
                 outline.calculateForQuadrilateral(cutout_type.m_widthA, cutout_type.m_widthB, cutout_type.m_length, cutout_type.m_length);
@@ -393,8 +393,7 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
             } else {
                 RAYX_EXIT << "Unknown cutout opening shape!";
             }
-        },
-        cutout.m_variant);
+        });
 
     uint32_t offset = static_cast<uint32_t>(vertices.size());
     vertices.insert(vertices.end(), outline.vertices.begin(), outline.vertices.end());
@@ -415,7 +414,7 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
 void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
-    RAYX::variant::visit(
+    compiled.m_behaviour.visit(
         [&]<typename T>(const T& behaviour) {
             if constexpr (std::is_same_v<T, RAYX::Behaviour::Slit>) {
                 poly.push_back(calculateOutlineFromCutout(behaviour.m_beamstopCutout, vertices));
@@ -424,8 +423,7 @@ void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<Textur
             } else {
                 poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
             }
-        },
-        compiled.m_behaviour.m_behaviour);
+        });
     triangulate(poly, vertices, indices);
 }
 
@@ -440,7 +438,7 @@ bool isPlanar(const RAYX::Surface::Quadric& q) {
  */
 void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
-    visit(
+    compiled.m_surface.visit(
         [&]<typename T>(const T& surface) {
             if constexpr (std::is_same_v<T, RAYX::Surface::Plane>) {
                 planarTriangulation(compiled, vertices, indices);
@@ -455,6 +453,5 @@ void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureV
             } else {
                 RAYX_EXIT << "Unknown element type: " << typeid(T).name();
             }
-        },
-        compiled.m_surface.m_surface);
+        });
 }

@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Cutout.h"
+#include "Variant.h"
 
 namespace RAYX {
 
@@ -11,9 +12,8 @@ namespace RAYX {
 // Each behaviour type has its own `behave` function in `Behave.h`.
 enum class BehaveType { Mirror, Grating, Slit, RZP, ImagePlane, Crystal, Foil };
 
-
-
-struct Behaviour {
+namespace detail {
+struct BehaviourTypes {
     struct Mirror {
         // no parameters
     };
@@ -68,20 +68,14 @@ struct Behaviour {
         double m_thicknessSubstrate;
         double m_roughnessSubstrate;
     };
-
-    variant::variant<Mirror, Grating, Slit, RZP, ImagePlane, Crystal, Foil> m_behaviour;
-
-    template <typename T>
-    Behaviour(T t) : m_behaviour(t) {}
-
-    template <typename T>
-    RAYX_FN_ACC
-    bool is() const {
-        return variant::holds_alternative<T>(m_behaviour);
-    }
 };
+}  // namespace detail
 
-struct DesignElement;
+using Behaviour =
+    Variant<detail::BehaviourTypes, detail::BehaviourTypes::Mirror, detail::BehaviourTypes::Grating, detail::BehaviourTypes::Slit,
+            detail::BehaviourTypes::RZP, detail::BehaviourTypes::ImagePlane, detail::BehaviourTypes::Crystal, detail::BehaviourTypes::Foil>;
+
+class DesignElement;
 enum class RZPType { Elliptical, Meriodional };
 enum class CentralBeamstop { None, Rectangle, Elliptical };
 Behaviour makeBehaviour(const DesignElement& dele);

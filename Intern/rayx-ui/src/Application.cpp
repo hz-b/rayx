@@ -135,10 +135,11 @@ void Application::run() {
                     m_UIParams.beamlineInfo.beamline = m_Beamline.get();
 
                     // Prepare for ray loading or element preparation
+                    size_t numSources = m_Beamline->numSources();
                     size_t numElements = m_Beamline->numElements();
                     m_sortedRays.resize(numElements);
                     if (m_UIParams.h5Ready) {
-                        m_raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, numElements);
+                        m_raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, numSources, numElements);
                         m_State = State::LoadingRays;
                     } else {
                         m_State = State::PrepareElements;
@@ -154,7 +155,7 @@ void Application::run() {
 
             case State::Simulating:
                 if (m_simulationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    m_raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->numElements());
+                    m_raysFuture = std::async(std::launch::async, &Application::loadRays, this, m_RMLPath, m_Beamline->numSources(), m_Beamline->numElements());
                     m_State = State::LoadingRays;
                 }
                 break;
@@ -315,20 +316,20 @@ void Application::handleEvent(const SDL_Event* event) {
     }
 }
 
-void Application::loadRays(const std::filesystem::path& rmlPath, const size_t numElements) {
+void Application::loadRays(const std::filesystem::path& rmlPath, const size_t numSources, const size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays = RAYX::readH5BundleHistory(rayFilePath);
+    m_rays = convertRaysToBundleHistory(RAYX::readH5Rays(rayFilePath), static_cast<int>(numSources));
 
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
-    m_rays = RAYX::loadCsv(rayFilePath);
+    m_rays = convertRaysToBundleHistory(RAYX::readCsv(rayFilePath), static_cast<int>(numSources));
 #endif
     sortRaysByElement(m_rays, m_sortedRays, numElements);
 }
 
 void Application::loadBeamline(const std::filesystem::path& rmlPath) {
     m_Beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath));
-    m_UIParams.simulationInfo.maxEvents = RAYX::Tracer::defaultMaxEvents(m_Beamline.get());
+    m_UIParams.simulationInfo.maxEvents = RAYX::defaultMaxEvents(m_Beamline->numObjects());
 }

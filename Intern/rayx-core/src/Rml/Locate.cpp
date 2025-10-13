@@ -14,6 +14,8 @@
 #include <unistd.h>
 #endif
 
+#include <Debug/Debug.h>
+
 namespace RAYX {
 
 // Adds a new lookup path where the handler will search for resources
@@ -80,31 +82,42 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
         }
     }
 
-#if defined(__linux__)
-    // Check in /usr (package install)
-    std::filesystem::path path = std::filesystem::path("/usr") / baseDir / relativePath;
-    if (fileExists(path)) return path;
+    RAYX_VERB << "locating file: " << relativePath;
+    auto found = [](std::filesystem::path path) {
+        RAYX_VERB << "\t\tfound!";
+        return path;
+    };
 
+#if defined(__linux__)
     // Check next to the executable (built from source)
     std::filesystem::path execDir = getExecutablePath().parent_path();
-    path = execDir / relativePath;
-    if (fileExists(path)) return path;
+    std::filesystem::path path = execDir / relativePath;
+    RAYX_VERB << "\tlooking at " << path;
+    if (fileExists(path)) return found(path);
+
+    // Check in /usr (package install)
+    path = std::filesystem::path("/usr") / baseDir / relativePath;
+    RAYX_VERB << "\tlooking at " << path;
+    if (fileExists(path)) return found(path);
 
     // Check in /usr/local (make install)
     path = std::filesystem::path("/usr/local") / baseDir / relativePath;
-    if (fileExists(path)) return path;
+    RAYX_VERB << "\tlooking at " << path;
+    if (fileExists(path)) return found(path);
 
 #elif defined(_WIN32)
     // On Windows, only look next to the executable
     std::filesystem::path execDir = getExecutablePath().parent_path();
     std::filesystem::path path = execDir / relativePath;
-    if (fileExists(path)) return path;
+    RAYX_VERB << "\tlooking at " << path;
+    if (fileExists(path)) return found(path);
 
 #elif defined(__APPLE__)
     static_assert(false, "macOS support is not implemented yet");
 
 #endif
     // Not found -> empty path
+    RAYX_VERB << "\tfailed to locate file: " << relativePath;
     return std::filesystem::path();
 }
 

@@ -9,12 +9,12 @@
 // Include your other dependencies.
 #include "Angle.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Beamline/LightSource.h"
 #include "Core.h"
 #include "Debug/Debug.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
+#include "Rml/xml.h"
 
 namespace RAYX {
 
@@ -29,7 +29,6 @@ enum class ValueType {
     Bool,
     Rad,
     Material,
-    Misalignment,
     CentralBeamstop,
     Cutout,
     CutoutType,
@@ -49,7 +48,8 @@ enum class ValueType {
     GratingMount,
     CrystalType,
     DesignPlane,
-    SurfaceCoatingType
+    SurfaceCoatingType,
+    RayList,
 };
 
 class Undefined {};
@@ -80,7 +80,6 @@ class RAYX_API DesignMap {
     DesignMap(glm::dmat4x4 x) : m_variant(x) {}
     DesignMap(Rad x) : m_variant(x) {}
     DesignMap(Material x) : m_variant(x) {}
-    DesignMap(Misalignment x) : m_variant(x) {}
     DesignMap(CentralBeamstop x) : m_variant(x) {}
     DesignMap(Cutout x) : m_variant(x) {}
     DesignMap(CutoutType x) : m_variant(x) {}
@@ -100,6 +99,7 @@ class RAYX_API DesignMap {
     DesignMap(CrystalType x) : m_variant(x) {}
     DesignMap(DesignPlane x) : m_variant(x) {}
     DesignMap(SurfaceCoatingType x) : m_variant(x) {}
+    DesignMap(std::shared_ptr<Rays> x) : m_variant(x) {}
 
     // Assignment operators
     void operator=(double x) { m_variant = x; }
@@ -111,7 +111,6 @@ class RAYX_API DesignMap {
     void operator=(glm::dmat4 x) { m_variant = x; }
     void operator=(Rad x) { m_variant = x; }
     void operator=(Material x) { m_variant = x; }
-    void operator=(Misalignment x) { m_variant = x; }
     void operator=(CentralBeamstop x) { m_variant = x; }
     void operator=(Cutout x) { m_variant = x; }
     void operator=(CutoutType x) { m_variant = x; }
@@ -132,6 +131,7 @@ class RAYX_API DesignMap {
     void operator=(CrystalType x) { m_variant = x; }
     void operator=(DesignPlane x) { m_variant = x; }
     void operator=(SurfaceCoatingType x) { m_variant = x; }
+    void operator=(std::shared_ptr<Rays> x) { m_variant = x; }
 
     // Deep copy (clone) method.
     DesignMap clone() const;
@@ -147,7 +147,6 @@ class RAYX_API DesignMap {
     glm::dmat4 as_dmat4x4() const;
     Rad as_rad() const;
     Material as_material() const;
-    Misalignment as_misalignment() const;
     CentralBeamstop as_centralBeamStop() const;
     Cutout as_cutout() const;
     CutoutType as_openingShape() const;
@@ -168,6 +167,9 @@ class RAYX_API DesignMap {
     CrystalType as_crystalType() const;
     DesignPlane as_designPlane() const;
     SurfaceCoatingType as_surfaceCoatingType() const;
+    std::shared_ptr<Rays> as_rayList() const;
+
+    bool hasKey(const std::string& s) const;
 
     // Subscript operators.
     const DesignMap& operator[](const std::string& s) const;
@@ -242,11 +244,13 @@ class RAYX_API DesignMap {
     ConstIterator end() const;
 
   private:
-    std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType, Misalignment,
-                 CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType, SourceDist,
-                 SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType, GratingMount, CrystalType,
-                 DesignPlane, SurfaceCoatingType>
-        m_variant;
+    using Variant = std::variant<Undefined, double, int, ElectronEnergyOrientation, glm::dvec4, glm::dmat4x4, bool, EnergyDistributionType,
+                                 CentralBeamstop, Cutout, CutoutType, EventType, CylinderDirection, FigureRotation, Map, Surface, CurvatureType,
+                                 SourceDist, SpreadType, Rad, Material, EnergySpreadUnit, std::string, SigmaType, BehaviourType, ElementType,
+                                 GratingMount, CrystalType, DesignPlane, SurfaceCoatingType, std::shared_ptr<Rays>>;
+    static_assert(std::is_copy_constructible_v<Variant>);
+
+    Variant m_variant;
 };
 
 }  // namespace RAYX

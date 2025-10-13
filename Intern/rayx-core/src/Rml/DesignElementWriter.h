@@ -7,6 +7,7 @@
 
 #include "Beamline/Beamline.h"
 #include "Beamline/Definitions.h"
+#include "Beamline/StringConversion.h"
 #include "Core.h"
 #include "Element/Cutout.h"
 
@@ -40,7 +41,6 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
 
     de->setPosition(parser.parsePosition());
     de->setOrientation(parser.parseOrientation());
-    de->setMisalignment(parser.parseMisalignment());
 
     de->setSlopeError(parser.parseSlopeError());
     de->setAzimuthalAngle(parser.parseAzimuthalAngle());
@@ -49,9 +49,9 @@ void setAllMandatory(xml::Parser parser, DesignElement* de, DesignPlane dp) {
     de->setSurfaceCoatingType(SurfaceCoatingType::SubstrateOnly);
     de->setDesignPlane(dp);
     if (de->getType() != ElementType::ImagePlane) {
-        de->setCutout(parser.parseCutout(dp, ElementStringMap[parser.type()]));
+        de->setCutout(parser.parseCutout(dp, ElementTypeToString.at(parser.type())));
     } else {
-        de->setCutout(parser.parseCutout(dp, ElementStringMap[parser.type()]));
+        de->setCutout(parser.parseCutout(dp, ElementTypeToString.at(parser.type())));
     }
 }
 

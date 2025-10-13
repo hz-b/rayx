@@ -49,7 +49,7 @@ void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& dis
     }
 }
 
-size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
+size_t getMaxEvents(const BundleHistory& bundleHist) {
     size_t maxEvents = 0;
     for (const auto& ray : bundleHist) {
         maxEvents = std::max(maxEvents, ray.size());
@@ -62,7 +62,7 @@ size_t getMaxEvents(const RAYX::BundleHistory& bundleHist) {
  * Depending on the event type associated with the ray, the function produces visual lines that represent
  * ray segments, colored based on the event type.
  */
-std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
+std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
                           uint32_t amountOfRays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
@@ -89,11 +89,11 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
         }
         glm::vec4 rayLastPos = sourceWorldPositions[static_cast<size_t>(rayHist[0].m_sourceID)];
 
-        for (const RAYX::Ray& event : rayHist) {
+        for (const Ray& event : rayHist) {
             if (event.m_lastElement >= static_cast<int>(beamline.numElements())) {
                 RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
-            glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].m_outTrans * glm::vec4(event.m_position, 1.0f);
+            glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].transform.m_outTrans * glm::vec4(event.m_position, 1.0f);
             glm::vec4 originColor = (event.m_eventType == RAYX::EventType::HitElement) ? YELLOW : WHITE;
             glm::vec4 pointColor = (event.m_eventType == RAYX::EventType::HitElement) ? ORANGE
                                    : (event.m_eventType == RAYX::EventType::Absorbed) ? RED
@@ -108,7 +108,7 @@ std::vector<Line> getRays(const RAYX::BundleHistory& rayCache, const RAYX::Beaml
     return rays;
 }
 
-void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<RAYX::Ray>>& sortedRays, size_t numElements) {
+void sortRaysByElement(const BundleHistory& rays, std::vector<std::vector<Ray>>& sortedRays, size_t numElements) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     sortedRays.clear();
@@ -119,12 +119,13 @@ void sortRaysByElement(const RAYX::BundleHistory& rays, std::vector<std::vector<
             if (ray.m_lastElement >= static_cast<int>(numElements)) {
                 continue;
             }
+            if (ray.m_lastElement < 0) RAYX_EXIT << "encountered event with element id: " << ray.m_lastElement;
             sortedRays[static_cast<size_t>(ray.m_lastElement)].push_back(ray);
         }
     }
 }
 
-std::vector<std::vector<float>> extractFeatures(const RAYX::BundleHistory& bundleHist, size_t eventIndex) {
+std::vector<std::vector<float>> extractFeatures(const BundleHistory& bundleHist, size_t eventIndex) {
     std::vector<std::vector<float>> features;
     for (const auto& rayHist : bundleHist) {
         if (eventIndex < rayHist.size()) {
@@ -161,13 +162,13 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
     return centralRaysIndices;
 }
 
-std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& rayCache, size_t k) {
+std::vector<size_t> kMeansFilter(const BundleHistory& rayCache, size_t k) {
     const size_t m = getMaxEvents(rayCache);
     std::vector<size_t> selectedRays;
     std::unordered_map<size_t, size_t> indexMap;  // Map filtered indices to original indices
 
     for (size_t j = 0; j < m; ++j) {
-        RAYX::BundleHistory filteredRays;
+        BundleHistory filteredRays;
         indexMap.clear();
 
         for (size_t i = 0; i < rayCache.size(); ++i) {
@@ -196,7 +197,7 @@ std::vector<size_t> kMeansFilter(const RAYX::BundleHistory& rayCache, size_t k) 
     return selectedRays;
 }
 
-std::vector<size_t> noFilter(const RAYX::BundleHistory& bundleHist, [[maybe_unused]] size_t k) {
+std::vector<size_t> noFilter(const BundleHistory& bundleHist, [[maybe_unused]] size_t k) {
     std::vector<size_t> selectedRays;
     for (size_t i = 0; i < bundleHist.size(); ++i) {
         selectedRays.push_back(i);

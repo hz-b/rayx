@@ -3,7 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "Shader/Ray.h"
+#include "Rays.h"
+#include "BundleHistory.h"
 
 /**
  * @brief Creates a grid representing the footprint of rays within a specified range.
@@ -22,7 +23,7 @@
  * @param cells_z The number of cells in the z direction.
  * @return The grid representing the footprint of the rays.
  */
-std::vector<std::vector<uint32_t>> makeFootprint(std::vector<RAYX::Ray> rays, double min_x, double max_x, double min_z, double max_z,
+std::vector<std::vector<uint32_t>> makeFootprint(const std::vector<Ray>& rays, double min_x, double max_x, double min_z, double max_z,
                                                  uint32_t cells_x, uint32_t cells_z);
 
 void dumpFootprint(std::vector<std::vector<uint32_t>> footprint);
@@ -32,7 +33,7 @@ void dumpFootprint(std::vector<std::vector<uint32_t>> footprint);
  *
  * @see makeFootprint
  */
-std::vector<std::vector<uint32_t>> makeFootprintSquare(std::vector<RAYX::Ray> rays, double min_x, double max_x, uint32_t cells_x);
+std::vector<std::vector<uint32_t>> makeFootprintSquare(std::vector<Ray> rays, double min_x, double max_x, uint32_t cells_x);
 
 /**
  * @brief Writes a footprint to a JPG file.

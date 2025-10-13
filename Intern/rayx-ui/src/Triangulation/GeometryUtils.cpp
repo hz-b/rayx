@@ -4,7 +4,7 @@
 
 #include "Colors.h"
 #include "Shader/Constants.h"
-#include "Shader/Variant.h"
+#include "Variant.h"
 
 /**
  * Given a Cutout object, this function calculates and returns the width and
@@ -14,7 +14,7 @@ std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
     double width = 0.0;
     double length = 0.0;
 
-    RAYX::variant::visit(
+    cutout.visit(
         [&]<typename T>(const T& arg) {
             if constexpr (std::is_same_v<T, RAYX::Cutout::Rect>) {
                 width = arg.m_width;
@@ -30,8 +30,7 @@ std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
                 width = 50.0;
                 length = 50.0;
             }
-        },
-        cutout.m_variant);
+        });
 
     return {width, length};
 }

@@ -8,7 +8,7 @@
 #include "Angle.h"
 #include "Beamline/Beamline.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Beamline/LightSource.h"
+#include "Beamline/StringConversion.h"
 #include "Debug/Debug.h"
 #include "Element/Element.h"
 #include "Shader/Constants.h"
@@ -120,44 +120,6 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
                 break;
             }
         }
-    }
-
-    return true;
-}
-
-bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out) {
-    if (!node || !out) {
-        return false;
-    }
-
-    rapidxml::xml_node<>* p;
-
-    *out = {0, 0, 0, Rad(0), Rad(0), Rad(0)};
-
-    if (!param(node, "alignmentError", &p)) {
-        return true;  // if error is not given, it'll be zero.
-    }
-
-    if (strcmp(p->first_attribute("comment")->value(), "Yes") == 0) {
-        // all misalignment-values will be left at 0 if they are missing.
-        // Hence we ignore the return values of the upcoming
-        // paramDouble-calls.
-        xml::paramDouble(node, "translationXerror", &out->m_translationXerror);
-        xml::paramDouble(node, "translationYerror", &out->m_translationYerror);
-        xml::paramDouble(node, "translationZerror", &out->m_translationZerror);
-
-        // keep in mind, rotation on the x-Axis changes the psi and y rotation changes phi
-        double x_mrad = 0;
-        xml::paramDouble(node, "rotationXerror", &x_mrad);
-        out->m_rotationXerror = Rad(x_mrad / 1000.0);  // convert mrad to rad.
-
-        double y_mrad = 0;
-        xml::paramDouble(node, "rotationYerror", &y_mrad);
-        out->m_rotationYerror = Rad(y_mrad / 1000.0);
-
-        double z_mrad = 0;
-        xml::paramDouble(node, "rotationZerror", &z_mrad);
-        out->m_rotationZerror = Rad(z_mrad / 1000.0);
     }
 
     return true;
@@ -299,7 +261,7 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
-//multilayer coating
+// multilayer coating
 bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
     if (!node || !out) {
         return false;
@@ -335,7 +297,6 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
 
     int i = 0;
     for (auto* layerNode = layersRoot->first_node("layer"); layerNode; layerNode = layerNode->next_sibling("layer"), ++i) {
-
         const char* materialStr = nullptr;
         if (auto* m = layerNode->first_attribute("material")) {
             materialStr = m->value();
@@ -371,86 +332,6 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
     }
 
     return true;
-}
-
-bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out) {
-    if (!node || !out) {
-        return false;
-    }
-
-    int energyDistributionType_int;
-    if (!xml::paramInt(node, "energyDistributionType", &energyDistributionType_int)) {
-        return false;
-    }
-    auto energyDistributionType = static_cast<EnergyDistributionType>(energyDistributionType_int);
-
-    int spreadType_int;
-    if (!xml::paramInt(node, "energySpreadType", &spreadType_int)) {
-        return false;
-    }
-
-    /**
-     * a different output is set for all Energy Distribution Types
-     *
-     * default: 0:HardEdge(WhiteBand)
-     *          1:SoftEdge(Energyspread = sigma)
-     *          2:SeparateEnergies(Spikes)
-     */
-    auto spreadType = static_cast<SpreadType>(spreadType_int);
-
-    if (energyDistributionType == EnergyDistributionType::File) {
-        const char* filename;
-        if (!xml::paramStr(node, "photonEnergyDistributionFile", &filename)) {
-            return false;
-        }
-        std::filesystem::path path = std::filesystem::canonical(rmlFile);
-        path.replace_filename(filename);  // this makes the path `filename` be relative to the
-                                          // path of the rml file
-
-        DatFile df;
-        if (!DatFile::load(path, &df)) {
-            return false;
-        }
-        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
-        *out = EnergyDistribution(df);
-        return true;
-
-    } else if (energyDistributionType == EnergyDistributionType::Values) {
-        double photonEnergy;
-        if (!xml::paramDouble(node, "photonEnergy", &photonEnergy)) {
-            return false;
-        }
-
-        double energySpread;
-        if (!xml::paramDouble(node, "energySpread", &energySpread)) {
-            return false;
-        }
-
-        if (spreadType == SpreadType::SoftEdge) {
-            if (energySpread == 0) {
-                energySpread = 1;
-            }
-            *out = EnergyDistribution(SoftEdge(photonEnergy, energySpread));
-
-        } else if (spreadType == SpreadType::SeparateEnergies) {
-            int numOfEnergies;
-            if (!xml::paramInt(node, "SeparateEnergies", &numOfEnergies)) {
-                std::cout << "No Number for Separate Energies in RML File" << std::endl;
-                numOfEnergies = 3;
-            }
-            numOfEnergies = abs(numOfEnergies);
-            *out = EnergyDistribution(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
-        } else {
-            *out = EnergyDistribution(HardEdge(photonEnergy, energySpread));
-        }
-
-        return true;
-    } else {
-        RAYX_EXIT << "paramEnergyDistribution is not implemented for "
-                     "energyDistributionType"
-                  << static_cast<int>(energyDistributionType) << "!";
-        return false;
-    }
 }
 
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out) {
@@ -530,7 +411,7 @@ const char* Parser::name() const { return node->first_attribute("name")->value()
 
 ElementType Parser::type() const {
     const char* val = node->first_attribute("type")->value();
-    return findElementString(std::string(val));
+    return StringToElementType.at(std::string(val));
 }
 
 // parsers for fundamental types
@@ -566,15 +447,6 @@ glm::dvec3 Parser::parseDvec3(const char* paramname) const {
     return v;
 }
 
-// parsers for derived parameters
-Misalignment Parser::parseMisalignment() const {
-    Misalignment x;
-    if (!paramMisalignment(node, &x)) {
-        RAYX_EXIT << "parseMisalignment failed";
-    }
-    return x;
-}
-
 SlopeError Parser::parseSlopeError() const {
     SlopeError x;
     if (!paramSlopeError(node, &x)) {
@@ -587,14 +459,6 @@ std::array<double, 6> Parser::parseVls() const {
     std::array<double, 6> x{};
     if (!paramVls(node, &x)) {
         RAYX_EXIT << "parseVls failed";
-    }
-    return x;
-}
-
-EnergyDistribution Parser::parseEnergyDistribution() const {
-    EnergyDistribution x;
-    if (!paramEnergyDistribution(node, rmlFile, &x)) {
-        RAYX_EXIT << "parseEnergyDistribution failed";
     }
     return x;
 }
@@ -626,8 +490,8 @@ Material Parser::parseMaterial() const {
 
 Coating::MultilayerCoating Parser::parseCoating() const {
     Coating::MultilayerCoating m;
-    // get children from param Cotaing 
-    
+    // get children from param Cotaing
+
     if (!paramCoating(node, &m)) {
         RAYX_EXIT << "parseCoating failed";
     }

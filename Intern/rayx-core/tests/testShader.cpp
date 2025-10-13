@@ -1,6 +1,6 @@
+#include <gtc/matrix_transform.hpp>
 #include <numeric>
 
-#include "Beamline/Objects/DipoleSource.h"
 #include "Shader/ApplySlopeError.h"
 #include "Shader/Approx.h"
 #include "Shader/Crystal.h"
@@ -189,7 +189,7 @@ TEST_F(TestSuite, testNormalCylindrical) {
 
 TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     struct InOutPair {
-        Ray in_ray;
+        glm::dvec3 in_position;
         glm::dvec4 in_normal;
         Behaviour::RZP in_b;
 
@@ -199,11 +199,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
 
     std::vector<InOutPair> inouts = {
         {
-            .in_ray =
-                Ray{
-                    .m_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
-                    .m_direction = glm::dvec3(0, 1, 0),
-                },
+            .in_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
             .in_normal = glm::dvec4(0, 1, 0, 0),
             .in_b =
                 Behaviour::RZP{
@@ -224,11 +220,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
             .out_DX = 3103.9106911246749,
             .out_DZ = 5.0771666330055218,
         },
-        {.in_ray =
-             Ray{
-                 .m_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
-                 .m_direction = glm::dvec3(0, 1, 0),
-             },
+        {.in_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
          .in_normal = glm::dvec4(0, 1, 0, 0),
          .in_b =
              Behaviour::RZP{
@@ -247,8 +239,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
              },
          .out_DX = 1034.8685185321938,
          .out_DZ = -13.320120179862876},
-        {.in_ray = Ray{.m_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
-                       .m_direction = glm::dvec3(0.05047050067282087, 0.95514062789960552, -0.29182033770349552)},
+        {.in_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
          .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
          .in_b =
              Behaviour::RZP{
@@ -267,11 +258,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
              },
          .out_DX = 4045.0989844091882,
          .out_DZ = -174.2085626048659},
-        {.in_ray =
-             Ray{
-                 .m_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
-                 .m_direction = glm::dvec3(0.016802365843267261, 0.98624074908228765, -0.16445931214643075),
-             },
+        {.in_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
          .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
          .in_b =
              Behaviour::RZP{
@@ -295,7 +282,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
+        RZPLineDensity(p.in_position, p.in_normal, p.in_b, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -303,7 +290,7 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
 
 TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     struct InOutPair {
-        Ray in_ray;
+        glm::dvec3 in_position;
         glm::dvec4 in_normal;
         Behaviour::RZP in_b;
 
@@ -314,11 +301,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     std::vector<InOutPair> inouts = {
 
         {
-            .in_ray =
-                {
-                    .m_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
-                    .m_direction = glm::dvec3(0, 1, 0),
-                },
+            .in_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
             .in_normal = glm::dvec4(0, 1, 0, 0),
             .in_b =
                 {
@@ -339,11 +322,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
             .out_DX = 3103.9106911246749,
             .out_DZ = 5.0771666330055218,
         },
-        {.in_ray =
-             {
-                 .m_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
-                 .m_direction = glm::dvec3(0, 1, 0),
-             },
+        {.in_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
          .in_normal = glm::dvec4(0, 1, 0, 0),
          .in_b =
              {
@@ -362,8 +341,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
              },
          .out_DX = 1034.8685185321938,
          .out_DZ = -13.320120179862876},
-        {.in_ray = {.m_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
-                    .m_direction = glm::dvec3(0.05047050067282087, 0.95514062789960552, -0.29182033770349552)},
+        {.in_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
          .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
          .in_b =
              {
@@ -382,11 +360,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
              },
          .out_DX = 4045.0989844091882,
          .out_DZ = -174.2085626048659},
-        {.in_ray =
-             {
-                 .m_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
-                 .m_direction = glm::dvec3(0.016802365843267261, 0.98624074908228765, -0.16445931214643075),
-             },
+        {.in_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
          .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
          .in_b =
              {
@@ -410,7 +384,7 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
     for (auto p : inouts) {
         double DX;
         double DZ;
-        RZPLineDensity(p.in_ray, p.in_normal, p.in_b, DX, DZ);
+        RZPLineDensity(p.in_position, p.in_normal, p.in_b, DX, DZ);
         CHECK_EQ(DX, p.out_DX);
         CHECK_EQ(DZ, p.out_DZ);
     }
@@ -418,58 +392,114 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
 
 TEST_F(TestSuite, testRayMatrixMult) {
     struct InOutPair {
-        Ray in_ray;
+        glm::dvec3 in_position;
+        glm::dvec3 in_direction;
         glm::dmat4 in_matrix;
 
-        Ray out_ray;
+        glm::dvec3 out_position;
+        glm::dvec3 out_direction;
     };
+
+    const auto rotate90 = glm::rotate(glm::dmat4(1), glm::radians(90.0), glm::dvec3(0, 0, 1));
+    const auto translate = glm::translate(glm::dmat4(1), glm::dvec3(1, 2, 3));
 
     std::vector<InOutPair> inouts = {
+        // position and direction get rotated
         {
-            .in_ray =
-                {
-                    .m_position = glm::dvec3(0, 0, 0),
-                    .m_direction = glm::dvec3(0, 0, 0),
-                },
-            .in_matrix = glm::dmat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16),
-            .out_ray =
-                {
-                    .m_position = glm::dvec3(13, 14, 15),
-                    .m_direction = glm::dvec3(0, 0, 0),
-                },
+            .in_position = glm::dvec3(1, 0, 0),
+            .in_direction = glm::dvec3(1, 0, 0),
+            .in_matrix = rotate90,
+            .out_position = glm::dvec3(0, 1, 0),
+            .out_direction = glm::dvec3(0, 1, 0),
         },
+        // position gets translated
         {
-            .in_ray =
-                {
-                    .m_position = glm::dvec3(1, 1, 0),
-                    .m_direction = glm::dvec3(0, 1, 1),
-                },
-            .in_matrix = glm::dmat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16),
-            .out_ray =
-                {
-                    .m_position = glm::dvec3(19, 22, 25),
-                    .m_direction = glm::dvec3(14, 16, 18),
-                },
+            .in_position = glm::dvec3(1, 0, 0),
+            .in_direction = glm::dvec3(1, 0, 0),
+            .in_matrix = translate,
+            .out_position = glm::dvec3(2, 2, 3),
+            .out_direction = glm::dvec3(1, 0, 0),
         },
+        // position and directionget rotated, then position gets translated
         {
-            .in_ray =
-                {
-                    .m_position = glm::dvec3(1, 2, 3),
-                    .m_direction = glm::dvec3(4, 5, 6),
-                },
-            .in_matrix = glm::dmat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16),
-            .out_ray =
-                {
-                    .m_position = glm::dvec3(51, 58, 65),
-                    .m_direction = glm::dvec3(83, 98, 113),
-                },
+            .in_position = glm::dvec3(1, 0, 0),
+            .in_direction = glm::dvec3(1, 0, 0),
+            .in_matrix = translate * rotate90,
+            .out_position = glm::dvec3(1, 3, 3),
+            .out_direction = glm::dvec3(0, 1, 0),
         },
-
     };
 
-    for (auto p : inouts) {
-        auto out_ray = rayMatrixMult(p.in_matrix, p.in_ray);
-        CHECK_EQ(out_ray, p.out_ray);
+    for (auto const& p : inouts) {
+        glm::dvec3 pos = p.in_position;
+        glm::dvec3 dir = p.in_direction;
+
+        rayMatrixMult(p.in_matrix, pos, dir);
+
+        CHECK_EQ(pos, p.out_position);
+        CHECK_EQ(dir, p.out_direction);
+    }
+}
+
+TEST_F(TestSuite, testRayMatrixMultWithComplexElectricField) {
+    struct InOutPair {
+        glm::dvec3 in_position;
+        glm::dvec3 in_direction;
+        ElectricField in_electric_field;
+        glm::dmat4 in_matrix;
+
+        glm::dvec3 out_position;
+        glm::dvec3 out_direction;
+        ElectricField out_electric_field;
+    };
+
+    const auto rotate90 = glm::rotate(glm::dmat4(1), glm::radians(90.0), glm::dvec3(0, 0, 1));
+    const auto translate = glm::translate(glm::dmat4(1), glm::dvec3(1, 2, 3));
+
+    std::vector<InOutPair> inouts = {
+        // position, direction and electric field get rotated
+        {
+            .in_position = glm::dvec3(1, 0, 0),
+            .in_direction = glm::dvec3(1, 0, 0),
+            .in_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            .in_matrix = rotate90,
+            .out_position = glm::dvec3(0, 1, 0),
+            .out_direction = glm::dvec3(0, 1, 0),
+            .out_electric_field = ElectricField{{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
+        },
+        // position gets translated
+        {
+            .in_position = glm::dvec3(1, 0, 0),
+            .in_direction = glm::dvec3(1, 0, 0),
+            .in_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            .in_matrix = translate,
+            .out_position = glm::dvec3(2, 2, 3),
+            .out_direction = glm::dvec3(1, 0, 0),
+            .out_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+        },
+        // position, direction and electric field get rotated, then position gets translated
+        {
+            .in_position = glm::dvec3(1, 0, 0),
+            .in_direction = glm::dvec3(1, 0, 0),
+            .in_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            .in_matrix = translate * rotate90,
+            .out_position = glm::dvec3(1, 3, 3),
+            .out_direction = glm::dvec3(0, 1, 0),
+            .out_electric_field = ElectricField{{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
+        },
+    };
+
+    for (auto const& p : inouts) {
+        glm::dvec3 pos = p.in_position;
+        glm::dvec3 dir = p.in_direction;
+        ElectricField ef = p.in_electric_field;
+
+        rayMatrixMult(p.in_matrix, pos, dir, ef);
+
+        CHECK_EQ(pos, p.out_position);
+        CHECK_EQ(dir, p.out_direction);
+
+        for (int i = 0; i < 3; i++) CHECK_EQ(ef[i], p.out_electric_field[i]);
     }
 }
 
@@ -884,28 +914,6 @@ TEST_F(TestSuite, testElectricFieldToStokesConversion) {
     CHECK_EQ(LocalElectricField({h, 0}, {-h, 0}), stokesToLocalElectricField(Stokes(1, 0, -1, 0)));
 }
 
-TEST_F(TestSuite, testGetIncidenceAngle) {
-    struct InOutPair {
-        Ray in_ray;
-        glm::dvec4 in_normal;
-
-        double out;
-    };
-
-    std::vector<InOutPair> inouts = {{.in_ray =
-                                          {
-                                              .m_position = glm::dvec3(0, 1, 0),
-                                              .m_direction = glm::dvec3(-0.00049999997222222275, -0.17381228817387082, 0.98477867487054738),
-                                          },
-                                      .in_normal = glm::dvec4(0, 1, 0, 0),
-                                      .out = 1.3960967569703167}};
-
-    for (auto p : inouts) {
-        auto out = getIncidenceAngle(p.in_ray, p.in_normal);
-        CHECK_EQ(out, p.out);
-    }
-}
-
 TEST_F(TestSuite, testSnell) {
     using namespace complex;
 
@@ -1307,91 +1315,6 @@ TEST_F(TestSuite, testRefractiveIndex) {
     // data taken from
     // https://refractiveindex.info/?shelf=main&book=Cu&page=Hagemann
     CHECK_EQ(getRefractiveIndex(25146.2, 29, mat.indices.data(), mat.materials.data()), glm::dvec2(1.0, 1.0328e-7), 1e-5);
-}
-
-TEST_F(TestSuite, testBesselDipole) {
-    struct InOutPair {
-        double proportion;
-        double zeta;
-        double out;
-    };
-    std::vector<InOutPair> inouts = {{
-                                         .proportion = 1 / 3,
-                                         .zeta = 78.126966373103443,
-                                         .out = 1.664046593883771e-35,
-                                     },
-                                     {
-                                         .proportion = 1 / 3,
-                                         .zeta = 73.550785975500432,
-                                         .out = 1.6659366793149262e-33,
-                                     },
-                                     {
-                                         .proportion = 1 / 3,
-                                         .zeta = 46.422887861754496,
-                                         .out = 1.2672053903555623e-21,
-                                     },
-                                     {
-                                         .proportion = 2 / 3,
-                                         .zeta = 78.126966373103443,
-                                         .out = 1.6675777760881476e-35,
-                                     },
-                                     {
-                                         .proportion = 2 / 3,
-                                         .zeta = 73.550785975500432,
-                                         .out = 1.6696906039215801e-33,
-                                     },
-                                     {
-                                         .proportion = 2 / 3,
-                                         .zeta = 49.798819164687949,
-                                         .out = 4.1969864622545434e-23,
-                                     }};
-
-    auto beamline = loadBeamline("dipole_plain");
-    const auto src = beamline.getSources()[0];
-    DipoleSource dipolesource(*src);
-
-    for (auto values : inouts) {
-        auto result = dipolesource.bessel(values.proportion, values.zeta);
-        CHECK_EQ(result, values.out, 0.1);
-    }
-}
-
-TEST_F(TestSuite, testSchwingerDipole) {
-    struct InOutPair {
-        double energy;
-        double flux;
-    };
-    std::vector<InOutPair> inouts = {{
-                                         .energy = 6520.0878532052693,
-                                         .flux = 566462407647095.5,
-                                     },
-                                     {.energy = 100, .flux = 2855336264551178},
-                                     {
-                                         .energy = 900,
-                                         .flux = 3762078406399219,
-                                     },
-                                     {
-                                         .energy = 2000,
-                                         .flux = 2907004029317153.5,
-                                     },
-                                     {
-                                         .energy = 0.667,
-                                         .flux = 596812742357665.25,
-                                     },
-                                     {
-                                         .energy = 2456,
-                                         .flux = 2526853293939861,
-                                     }};
-
-    auto beamline = loadBeamline("dipole_plain");
-    const auto src = beamline.getSources()[0];
-
-    DipoleSource dipolesource(*src);
-
-    for (auto values : inouts) {
-        auto result = dipolesource.schwinger(values.energy);
-        CHECK_EQ(result, values.flux, 0.000000001);
-    }
 }
 
 TEST_F(TestSuite, testSphericalCoords) {

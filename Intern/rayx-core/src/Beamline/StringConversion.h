@@ -1,9 +1,10 @@
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <string>
 
-#include "LightSource.h"
+#include "Shader/LightSources/LightSource.h"
 
 namespace RAYX {
 
@@ -86,7 +87,6 @@ const std::map<std::string, BehaviourType> StringToBehaviourType = {{"Mirror", B
                                                                     {"Slit", BehaviourType::Slit},
                                                                     {"Rzp", BehaviourType::Rzp},
                                                                     {"ImagePlane", BehaviourType::ImagePlane}};
-
 // FigureRotation conversion
 const std::map<FigureRotation, std::string> FigureRotationToString = {
     {FigureRotation::Yes, "Yes"}, {FigureRotation::Plane, "Plane"}, {FigureRotation::A11, "A11"}};
@@ -115,5 +115,99 @@ const std::map<std::string, Material> StringToMaterial = {
 #include "Material/materials.xmacro"
 #undef X
 };
+
+// ElementType conversion
+const std::map<ElementType, std::string> ElementTypeToString = {{ElementType::CircleSource, "Circle Source"},
+                                                                {ElementType::CylinderMirror, "Cylinder"},
+                                                                {ElementType::ImagePlane, "ImagePlane"},
+                                                                {ElementType::MatrixSource, "Matrix Source"},
+                                                                {ElementType::ParaboloidMirror, "Paraboloid"},
+                                                                {ElementType::PlaneGrating, "Plane Grating"},
+                                                                {ElementType::PointSource, "Point Source"},
+                                                                {ElementType::ReflectionZoneplate, "Reflection Zoneplate"},
+                                                                {ElementType::SimpleUndulatorSource, "Simple Undulator"},
+                                                                {ElementType::Slit, "Slit"},
+                                                                {ElementType::Sphere, "Sphere"},
+                                                                {ElementType::ConeMirror, "Cone"},
+                                                                {ElementType::ExpertsMirror, "Experts Optics"},
+                                                                {ElementType::PlaneMirror, "Plane Mirror"},
+                                                                {ElementType::SphereGrating, "Spherical Grating"},
+                                                                {ElementType::SphereMirror, "Sphere Mirror"},
+                                                                {ElementType::ToroidMirror, "Toroid"},
+                                                                {ElementType::ToroidGrating, "Toroidal Grating"},
+                                                                {ElementType::DipoleSource, "Dipole Source"},
+                                                                {ElementType::PixelSource, "Pixel Source"},
+                                                                {ElementType::EllipsoidMirror, "Ellipsoid"},
+                                                                {ElementType::Crystal, "Crystal"},
+                                                                {ElementType::Foil, "Foil"}};
+const std::map<std::string, ElementType> StringToElementType = {{"Circle Source", ElementType::CircleSource},
+                                                                {"Cylinder", ElementType::CylinderMirror},
+                                                                {"ImagePlane", ElementType::ImagePlane},
+                                                                {"Matrix Source", ElementType::MatrixSource},
+                                                                {"Paraboloid", ElementType::ParaboloidMirror},
+                                                                {"Plane Grating", ElementType::PlaneGrating},
+                                                                {"Point Source", ElementType::PointSource},
+                                                                {"Reflection Zoneplate", ElementType::ReflectionZoneplate},
+                                                                {"Simple Undulator", ElementType::SimpleUndulatorSource},
+                                                                {"Slit", ElementType::Slit},
+                                                                {"Sphere", ElementType::Sphere},
+                                                                {"Cone", ElementType::ConeMirror},
+                                                                {"Experts Optics", ElementType::ExpertsMirror},
+                                                                {"Plane Mirror", ElementType::PlaneMirror},
+                                                                {"Spherical Grating", ElementType::SphereGrating},
+                                                                {"Sphere Mirror", ElementType::SphereMirror},
+                                                                {"Toroid", ElementType::ToroidMirror},
+                                                                {"Toroidal Grating", ElementType::ToroidGrating},
+                                                                {"Dipole Source", ElementType::DipoleSource},
+                                                                {"Dipole", ElementType::DipoleSource},  // legacy rml
+                                                                {"Pixel Source", ElementType::PixelSource},
+                                                                {"Ellipsoid", ElementType::EllipsoidMirror},
+                                                                {"Crystal", ElementType::Crystal},
+                                                                {"Foil", ElementType::Foil}};
+
+const std::map<std::string, EventType> StringToEventType = {
+    {"Uninitialized", EventType::Uninitialized}, {"Emitted", EventType::Emitted},   {"HitElement", EventType::HitElement},
+    {"FatalError", EventType::FatalError},       {"Absorbed", EventType::Absorbed}, {"BeyondHorizon", EventType::BeyondHorizon},
+    {"TooManyEvents", EventType::TooManyEvents},
+};
+const std::map<EventType, std::string> EventTypeToString = {
+    {EventType::Uninitialized, "Uninitialized"}, {EventType::Emitted, "Emitted"},   {EventType::HitElement, "HitElement"},
+    {EventType::FatalError, "FatalError"},       {EventType::Absorbed, "Absorbed"}, {EventType::BeyondHorizon, "BeyondHorizon"},
+    {EventType::TooManyEvents, "TooManyEvents"},
+};
+
+const std::map<CutoutType, std::string> CutoutTypeToString = {
+    {CutoutType::Unlimited, "Unlimited"}, {CutoutType::Rect, "Rect"}, {CutoutType::Elliptical, "Elliptical"}, {CutoutType::Trapezoid, "Trapezoid"}};
+const std::map<std::string, CutoutType> StringToCutoutType = {
+    {"Unlimited", CutoutType::Unlimited}, {"Rect", CutoutType::Rect}, {"Elliptical", CutoutType::Elliptical}, {"Trapezoid", CutoutType::Trapezoid}};
+
+// Generic helper for all enums
+template <typename Enum>
+std::ostream& streamEnum(std::ostream& os, const Enum value, const std::map<Enum, std::string>& toStringMap) {
+    if (auto it = toStringMap.find(value); it != toStringMap.end()) {
+        os << it->second;
+    } else {
+        os << "<unknown>";
+    }
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const SpreadType v) { return streamEnum(os, v, SpreadTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const EnergyDistributionType v) { return streamEnum(os, v, EnergyDistributionTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const SourceDist v) { return streamEnum(os, v, SourceDistToString); }
+inline std::ostream& operator<<(std::ostream& os, const ElectronEnergyOrientation v) { return streamEnum(os, v, ElectronEnergyOrientationToString); }
+inline std::ostream& operator<<(std::ostream& os, const EnergySpreadUnit v) { return streamEnum(os, v, EnergySpreadUnitToString); }
+inline std::ostream& operator<<(std::ostream& os, const RZPType v) { return streamEnum(os, v, RZPTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const CentralBeamstop v) { return streamEnum(os, v, CentralBeamstopToString); }
+inline std::ostream& operator<<(std::ostream& os, const GratingMount v) { return streamEnum(os, v, GratingMountToString); }
+inline std::ostream& operator<<(std::ostream& os, const ParaboloidType v) { return streamEnum(os, v, ParaboloidTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const CurvatureType v) { return streamEnum(os, v, CurvatureTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const BehaviourType v) { return streamEnum(os, v, BehaviourTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const FigureRotation v) { return streamEnum(os, v, FigureRotationToString); }
+inline std::ostream& operator<<(std::ostream& os, const SigmaType v) { return streamEnum(os, v, SigmaTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const Material v) { return streamEnum(os, v, MaterialToString); }
+inline std::ostream& operator<<(std::ostream& os, const ElementType v) { return streamEnum(os, v, ElementTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const EventType v) { return streamEnum(os, v, EventTypeToString); }
+inline std::ostream& operator<<(std::ostream& os, const CutoutType v) { return streamEnum(os, v, CutoutTypeToString); }
 
 }  // namespace RAYX

@@ -9,6 +9,12 @@ using Stokes = glm::dvec4;
 using ElectricField = cvec3;
 using LocalElectricField = cvec2;
 
+static_assert(std::is_default_constructible_v<ElectricField>);
+static_assert(std::is_default_constructible_v<LocalElectricField>);
+#ifndef GLM_FORCE_XYZW_ONLY
+#error "GLM_FORCE_XYZW_ONLY should be defined, to enable default construction of ElectricField"
+#endif
+
 RAYX_FN_ACC
 inline double intensity(const LocalElectricField field) {
     const auto mag = complex::abs(field);
@@ -25,32 +31,30 @@ RAYX_FN_ACC
 inline double intensity(const Stokes stokes) { return stokes.x; }
 
 RAYX_FN_ACC
-inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::vec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
+inline double degreeOfPolarization(const Stokes stokes) { return glm::length(glm::dvec3(stokes.y, stokes.z, stokes.w)) / stokes.x; }
 
 /**
- * Advances an electric field propagating in a certain media by a certain distance
- * @param field electric field of incident photon
- * @param waveLength wavelength of incident photon
- * @param distance distance traveled in media
- * @param ior_real real component of complex index of refraction of media
- * @return advanced electric field
- * @TODO: check if waveLength and distance use the same
+ * Advances an electric field propagating along a given optical path length.
+ * @param field Electric field of incident photon
+ * @param waveLength Wavelength of incident photon (in nanometers)
+ * @param opticalPathLength Optical path length traveled (in millimeters)
+ * @return Advanced electric field
  */
 RAYX_FN_ACC
-inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double distance, const float ior_real) {
+inline ElectricField advanceElectricField(const ElectricField field, double waveLength, const double opticalPathLength) {
     // bring wavelength from nanometers into millimeters
     waveLength /= 1e6;
 
-    // compute wave number (2π * n / λ)
-    const double waveNumber = 2.0 * PI * ior_real / waveLength;
+    // compute wave number (2π / λ), since opticalPathLength already includes IOR
+    const double waveNumber = 2.0 * PI / waveLength;
 
     // reduce the distance modulo wavelength to avoid large angle errors
-    const double reducedDistance = std::fmod(distance, waveLength);
+    const double reducedDistance = std::fmod(opticalPathLength, waveLength);
 
-    // compute the phase shift using the reduced distance
+    // compute the phase shift
     const double deltaPhi = waveNumber * reducedDistance;
 
-    // apply the complex exponential of the phase shift
+    // apply the phase shift as a complex exponential
     const auto phaseShift = complex::exp(complex::Complex(0.0, deltaPhi));
 
     return field * phaseShift;
@@ -136,7 +140,7 @@ inline LocalElectricField globalToLocalElectricFieldWithBaseConvention(const Ele
 }
 
 RAYX_FN_ACC
-inline LocalElectricField globalToLocalElectricField(const ElectricField field, const glm::dvec3 forward, const glm::vec3 up) {
+inline LocalElectricField globalToLocalElectricField(const ElectricField field, const glm::dvec3 forward, const glm::dvec3 up) {
     return glm::transpose(rotationMatrix(forward, up)) * field;
 }
 

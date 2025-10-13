@@ -1,128 +1,100 @@
 #include <fstream>
 
+#include "Shader/LightSources/DipoleSource.h"
 #include "setupTests.h"
 
-void checkEnergyDistribution(const std::vector<Ray>& rays, double photonEnergy, double energySpread) {
-    for (auto r : rays) {
-        CHECK_IN(r.m_energy, photonEnergy - energySpread, photonEnergy + energySpread);
+void checkEnergyDistribution(const Rays& rays, double photonEnergy, double energySpread) {
+    CHECK(rays.energy.size() > 0);
+    for (const auto energy : rays.energy) {
+        CHECK_IN(energy, photonEnergy - energySpread, photonEnergy + energySpread);
     }
 }
 
-void checkZDistribution(const std::vector<Ray>& rays, double center, double spread) {
-    for (auto r : rays) {
-        CHECK_IN(r.m_position.z, center - spread, center + spread);
+void checkZDistribution(const Rays& rays, double center, double spread) {
+    CHECK(rays.position_z.size() > 0);
+    for (const auto position_z : rays.position_z) {
+        CHECK_IN(position_z, center - spread, center + spread);
     }
 }
 
-void checkPositionDistribution(const std::vector<Ray>& rays, double sourceWidth, double sourceHeight) {
-    for (auto r : rays) {
-        CHECK_IN(r.m_position.x, -4.5 * sourceWidth, 4.5 * sourceWidth);
-        CHECK_IN(r.m_position.y, -4.5 * sourceHeight, 4.5 * sourceHeight);
-    }
+void checkPositionDistribution(const Rays& rays, double sourceWidth, double sourceHeight) {
+    CHECK(rays.position_x.size() > 0);
+    for (const auto position_x : rays.position_x) CHECK_IN(position_x, -4.5 * sourceWidth, 4.5 * sourceWidth);
+    CHECK(rays.position_y.size() > 0);
+    for (const auto position_y : rays.position_y) CHECK_IN(position_y, -4.5 * sourceHeight, 4.5 * sourceHeight);
 }
 
 // should only be called on beamlines for which the ImagePlane has the default "unrotated" orientation!
-void checkDirectionDistribution(const std::vector<Ray>& rays, double minAngle, double maxAngle) {
-    for (auto r : rays) {
-        double psi = asin(r.m_direction.y);
+void checkDirectionDistribution(const Rays& rays, double minAngle, double maxAngle) {
+    CHECK(rays.direction_y.size() > 0);
+    for (const auto direction_y : rays.direction_y) {
+        double psi = asin(direction_y);
         psi = abs(psi);
         CHECK_IN(psi, minAngle, maxAngle);
     }
 }
 
-void roughCompare(std::vector<RAYX::Ray> l, std::vector<RAYX::Ray> r) {
-    CHECK_EQ(l.size(), r.size());
-    // TODO maybe compare more?
-    for (int i = 0; i < l.size(); i++) {
-        CHECK_EQ(l[i].m_position, r[i].m_position);
-        CHECK_EQ(l[i].m_direction, r[i].m_direction);
-        CHECK_EQ(l[i].m_energy, r[i].m_energy);
-    }
-}
-
 TEST_F(TestSuite, MatrixSource) {
-    auto beamline = loadBeamline("MatrixSource");
-    auto a = beamline.compileSources();
-    auto b = loadCSVRayUI("MatrixSource");
-    roughCompare(a, b);
+    auto a = traceRml("MatrixSource").filterByObjectId(0);
+    auto b = loadCsvRayUi("MatrixSource");
+    compareRayUiCompatible(a, b);
 }
 
-TEST_F(TestSuite, MatrixSourceMoved) {
-    auto beamline = loadBeamline("MatrixSourceMoved");
-    auto a = beamline.compileSources();
-    auto b = loadCSVRayUI("MatrixSource");
-    for (auto& r : b) {
-        r.m_position += glm::dvec3(5, -5, 3);
-    }
-    roughCompare(a, b);
+TEST_F(TestSuite, SourceEventsAreInLocalCoordinates) {
+    // no matter if the source was moved, the events are in local coordinates
+    auto a = traceRml("MatrixSourceMoved").filterByObjectId(0);
+    auto b = loadCsvRayUi("MatrixSource");
+    compareRayUiCompatible(a, b);
 }
 
 /// this tests tracing an only-lightsource beamline. An error-prone edge case.
 TEST_F(TestSuite, MatrixSourceTracedRayUI) {
-    auto a = traceRML("MatrixSource");
-    for (auto hist : a) {
-        CHECK(!hist.empty());
-    }
+    const auto numRayPaths = loadBeamline("MatrixSource").numRayPaths();
+    CHECK_EQ(traceRml("MatrixSource", RayAttrMask::PathId /* which attribute does not matter */).size(), numRayPaths);
 }
 
-TEST_F(TestSuite, PointSourceHardEdge) {
-    auto rays = loadBeamline("PointSourceHardEdge").compileSources();
-    checkEnergyDistribution(rays, 120.97, 12.1);
-}
+TEST_F(TestSuite, PointSourceHardEdge) { checkEnergyDistribution(traceRml("PointSourceHardEdge", RayAttrMask::Energy), 120.97, 12.1); }
 
-TEST_F(TestSuite, PointSourceSoftEdge) {
-    auto rays = loadBeamline("PointSourceSoftEdge").compileSources();
-    checkEnergyDistribution(rays, 151, 6);
-}
+TEST_F(TestSuite, PointSourceSoftEdge) { checkEnergyDistribution(traceRml("PointSourceSoftEdge", RayAttrMask::Energy), 151, 6); }
 
-TEST_F(TestSuite, MatrixSourceEnergyDistribution) {
-    auto rays = loadBeamline("MatrixSourceSpreaded").compileSources();
-    checkEnergyDistribution(rays, 42, 10);
-}
+TEST_F(TestSuite, MatrixSourceEnergyDistribution) { checkEnergyDistribution(traceRml("PointSourceSoftEdge", RayAttrMask::Energy), 151, 6); }
 
 TEST_F(TestSuite, DipoleSourcePosition) {
-    auto rays = loadBeamline("dipole_plain").compileSources();
-    checkPositionDistribution(rays, 0.065, 0.04);
+    checkPositionDistribution(traceRml("dipole_plain", RayAttrMask::PositionX | RayAttrMask::PositionY), 0.065, 0.04);
 }
 
-TEST_F(TestSuite, DipoleEnergyDistribution) {
-    auto rays = loadBeamline("dipole_energySpread").compileSources();
-    checkEnergyDistribution(rays, 1000, 23000);
-}
+TEST_F(TestSuite, DipoleEnergyDistribution) { checkEnergyDistribution(traceRml("dipole_energySpread", RayAttrMask::Energy), 1000, 23000); }
 
 TEST_F(TestSuite, PixelPositionTest) {
-    auto beamline = loadBeamline("PixelSource");
-    auto rays = beamline.compileSources();
+    const auto [beamline, rays] =
+        loadBeamlineAndTrace("PixelSource", RayAttrMask::PositionX | RayAttrMask::PositionY | RayAttrMask::DirectionX | RayAttrMask::DirectionZ);
     const DesignSource* src = beamline.getSources()[0];
     auto width = src->getSourceWidth();
     auto height = src->getSourceHeight();
     auto hordiv = src->getHorDivergence();
-    for (auto ray : rays) {
-        CHECK_IN(abs(ray.m_position.x), width / 6.0, width / 2.0);
-        CHECK_IN(abs(ray.m_position.y), height / 6.0, height / 2.0);
-        double phi = atan2(ray.m_direction.x, ray.m_direction.z);  // phi in rad from m_direction
+
+    for (const auto position_x : rays.position_x) {
+        CHECK_IN(position_x, -width / 2.0, width / 2.0);
+    }
+    for (const auto position_y : rays.position_y) {
+        CHECK_IN(position_y, -height / 2.0, height / 2.0);
+    }
+    for (int i = 0; i < rays.size(); ++i) {
+        double phi = atan2(rays.direction_x[i], rays.direction_z[i]);  // phi in rad from m_direction
         CHECK_IN(abs(phi), 0.0, hordiv / 2.0);
     }
 }
 
-TEST_F(TestSuite, DipoleZDistribution) {
-    auto beamline = loadBeamline("dipole_plain");
-    auto rays = beamline.compileSources();
-    checkZDistribution(rays, 0, 2.2);
-}
+TEST_F(TestSuite, DipoleZDistribution) { checkZDistribution(traceRml("dipole_plain", RayAttrMask::PositionZ), 0, 2.2); }
 
 TEST_F(TestSuite, CircleSourcetest) {
-    auto rays = loadBeamline("CircleSource_default").compileSources();
+    const auto rays = traceRml("CircleSource_default", RayAttrMask::PositionX | RayAttrMask::PositionY | RayAttrMask::Energy | RayAttrMask::ObjectId)
+                          .filterByObjectId(0);
     checkPositionDistribution(rays, 0.065, 0.04);
     checkEnergyDistribution(rays, 99.5, 100.5);
 }
 
-TEST_F(TestSuite, testCircleSourceDirections) {
-    auto bundle = traceRML("CircleSource_default");
-    for (auto rays : bundle) {
-        checkDirectionDistribution(rays, 0.0, 105.0);
-    }
-}
+TEST_F(TestSuite, testCircleSourceDirections) { checkDirectionDistribution(traceRml("CircleSource_default", RayAttrMask::DirectionY), 0.0, 105.0); }
 
 TEST_F(TestSuite, testInterpolationFunctionDipole) {
     struct InOutPair {
@@ -144,12 +116,8 @@ TEST_F(TestSuite, testInterpolationFunctionDipole) {
         },
     };
 
-    auto beamline = loadBeamline("dipole_plain");
-    const DesignSource* src = beamline.getSources()[0];
-    DipoleSource dipolesource(*src);
-
     for (auto values : inouts) {
-        auto result = dipolesource.getInterpolation(values.in);
+        auto result = getDipoleInterpolation(values.in);
         CHECK_EQ(result, values.out, 0.01);
     }
 }
@@ -166,13 +134,92 @@ TEST_F(TestSuite, testVerDivergenceDipole) {
         .out = 1.591581814000419,
     }};
 
-    auto beamline = loadBeamline("dipole_plain");
-    const DesignSource* src = beamline.getSources()[0];
-    DipoleSource dipolesource(*src);
+    const auto electronEnergy = 1.7;
+    const auto criticalEnergy = get_factorCriticalEnergy();
 
     for (auto values : inouts) {
-        auto result = dipolesource.vDivergence(values.energy, values.sigv);
+        auto result = calcVerDivergence(values.energy, values.sigv, electronEnergy, criticalEnergy);
         CHECK_EQ(result, values.out, 0.1);
+    }
+}
+
+TEST_F(TestSuite, testBesselDipole) {
+    struct InOutPair {
+        double proportion;
+        double zeta;
+        double out;
+    };
+    std::vector<InOutPair> inouts = {{
+                                         .proportion = 1 / 3,
+                                         .zeta = 78.126966373103443,
+                                         .out = 1.664046593883771e-35,
+                                     },
+                                     {
+                                         .proportion = 1 / 3,
+                                         .zeta = 73.550785975500432,
+                                         .out = 1.6659366793149262e-33,
+                                     },
+                                     {
+                                         .proportion = 1 / 3,
+                                         .zeta = 46.422887861754496,
+                                         .out = 1.2672053903555623e-21,
+                                     },
+                                     {
+                                         .proportion = 2 / 3,
+                                         .zeta = 78.126966373103443,
+                                         .out = 1.6675777760881476e-35,
+                                     },
+                                     {
+                                         .proportion = 2 / 3,
+                                         .zeta = 73.550785975500432,
+                                         .out = 1.6696906039215801e-33,
+                                     },
+                                     {
+                                         .proportion = 2 / 3,
+                                         .zeta = 49.798819164687949,
+                                         .out = 4.1969864622545434e-23,
+                                     }};
+
+    for (auto values : inouts) {
+        auto result = dipoleBessel(values.proportion, values.zeta);
+        CHECK_EQ(result, values.out, 0.1);
+    }
+}
+
+TEST_F(TestSuite, testSchwingerDipole) {
+    struct InOutPair {
+        double energy;
+        double flux;
+    };
+    std::vector<InOutPair> inouts = {{
+                                         .energy = 6520.0878532052693,
+                                         .flux = 566462407647095.5,
+                                     },
+                                     {.energy = 100, .flux = 2855336264551178},
+                                     {
+                                         .energy = 900,
+                                         .flux = 3762078406399219,
+                                     },
+                                     {
+                                         .energy = 2000,
+                                         .flux = 2907004029317153.5,
+                                     },
+                                     {
+                                         .energy = 0.667,
+                                         .flux = 596812742357665.25,
+                                     },
+                                     {
+                                         .energy = 2456,
+                                         .flux = 2526853293939861,
+                                     }};
+
+    const auto electronEnergy = 1.7;
+    const auto gamma = calcGamma(electronEnergy);
+    const auto criticalEnergy = get_factorCriticalEnergy();
+
+    for (auto values : inouts) {
+        auto result = schwinger(values.energy, gamma, criticalEnergy);
+        CHECK_EQ(result, values.flux, 0.000000001);
     }
 }
 
@@ -209,57 +256,31 @@ TEST_F(TestSuite, testLightsourceGetters) {
     }
 }
 
-#ifndef NO_H5
-TEST_F(TestSuite, testH5Writer) {
-    const auto beamlineFilename = "METRIX_U41_G1_H1_318eV_PS_MLearn_v114";
-    const auto rayOriginal = traceRML(beamlineFilename);
-    const auto rayOriginalSoA = bundleHistoryToRaySoA(rayOriginal);
-    const auto elementNamesOriginal = loadBeamline(beamlineFilename).getElementNames();
+TEST_F(TestSuite, testRayListSource) {
+    // generate rays from some other source
+    auto matrixSourceBeamline = loadBeamline("MatrixSource");
+    auto expectedNumRayPaths = matrixSourceBeamline.numRayPaths();
+    EXPECT_GE(expectedNumRayPaths, 1);  // at least one ray would be nice
+    auto inputRays = tracer->trace(matrixSourceBeamline);
+    EXPECT_EQ(inputRays.size(), expectedNumRayPaths);
 
-    // test conversion between BundleHistory and RaySoA
-    {
-        const auto bundle = raySoAToBundleHistory(rayOriginalSoA);
-        CHECK_EQ(rayOriginal, bundle);
-    }
+    // create a RayListSource, using the rays generated previously
+    auto rayListSource = std::make_unique<DesignSource>("testRayListSource");
+    rayListSource->setType(ElementType::RayListSource);
+    rayListSource->setRayList(inputRays.copy());
+    rayListSource->setNumberOfRays(expectedNumRayPaths);
+    // add the RayListSource to a beamline that comes without a source
+    auto beamline = loadBeamline("NoSource");
+    beamline.addChild(std::move(rayListSource));
+    EXPECT_EQ(beamline.numRayPaths(), expectedNumRayPaths);
 
-    const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("h5");
-
-    // test if write and read of BundleHistory work without altering the contents
-    {
-        writeH5BundleHistory(h5Filepath, elementNamesOriginal, rayOriginal);
-        const auto bundle = readH5BundleHistory(h5Filepath);
-        CHECK_EQ(rayOriginal, bundle);
-
-        const auto elementNames = readH5ElementNames(h5Filepath);
-        if (elementNamesOriginal != elementNames) ADD_FAILURE();
-    }
-
-    // test if write and read of partial BundleHistory work without altering the contents
-    {
-        // ground thruth
-        RaySoA partialRayOriginalSoA;
-        partialRayOriginalSoA.energy = rayOriginalSoA.energy;
-        partialRayOriginalSoA.position_x = rayOriginalSoA.position_x;
-        partialRayOriginalSoA.position_y = rayOriginalSoA.position_y;
-        partialRayOriginalSoA.position_z = rayOriginalSoA.position_z;
-
-        // write only some attributes
-        const auto attr = RayAttrFlag::Energy | RayAttrFlag::Position;
-        writeH5BundleHistory(h5Filepath, elementNamesOriginal, rayOriginal, attr);
-        // read only some attributes
-        const auto raySoA = readH5RaySoA(h5Filepath, attr);
-
-        CHECK_EQ(partialRayOriginalSoA, raySoA);
-    }
-}
-#endif
-
-TEST_F(TestSuite, testSelectElementForRecordEvent) {
-    // const auto filename = std::filesystem::path("METRIX_U41_G1_H1_318eV_PS_MLearn_v114");
-    // const auto beamline = loadBeamline(filename);
-    // TODO: add test for recording events for selected element
-    // - use fixed seed
-    // - trace: record all events
-    // - trace: record events from only one element
-    // - compare
+    // trace the beamline with the RayListSource added
+    auto rays = tracer->trace(beamline);
+    // test if the number of rays is ok
+    EXPECT_EQ(rays.filterByObjectId(2).size(), expectedNumRayPaths);
+    // test if the source id is 0
+    expectEqual(rays.source_id, 0);
+    // test if the generated rays from the first beamline are equal to the source rays from RayListSource
+    auto allAttrExceptPathEventId = exclude(RayAttrMask::All, RayAttrMask::PathEventId);
+    compare(rays.filterByObjectId(0), inputRays, allAttrExceptPathEventId, DEFAULT_TOLERANCE);
 }

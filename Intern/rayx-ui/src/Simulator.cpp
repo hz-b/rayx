@@ -14,11 +14,12 @@ void Simulator::runSimulation() {
     }
     // Run rayx core
     if (!m_maxEvents) {
-        m_maxEvents = RAYX::Tracer::defaultMaxEvents(&m_Beamline);
+        m_maxEvents = RAYX::defaultMaxEvents(m_Beamline.numObjects());
     }
 
-    const auto rays = m_Tracer->trace(m_Beamline, m_seq, m_max_batch_size, m_maxEvents, RAYX::fullRecordMask(m_Beamline.numElements()));
-    const auto bundleHist = RAYX::raySoAToBundleHistory(rays);
+    const auto rays = m_Tracer->trace(m_Beamline, m_seq, RAYX::ObjectMask::allElements(), RAYX::RayAttrMask::All, static_cast<int>(m_maxEvents),
+                                      static_cast<int>(m_max_batch_size));
+    const auto bundleHist = convertRaysToBundleHistory(rays.copy(), m_Beamline.numSources());
 
     bool notEnoughEvents = false;
 
@@ -44,9 +45,9 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    RAYX::writeH5RaySoA(path, m_Beamline.getElementNames(), rays);
+    RAYX::writeH5(path, m_Beamline.getObjectNames(), rays);
 #else
-    RAYX::writeCsv(bundleHist, path);
+    RAYX::writeCsv(path, rays);
 #endif
 }
 
@@ -68,7 +69,6 @@ void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, co
             RAYX::fixSeed(simulationInfo.seed);
         } else
             RAYX::fixSeed(RAYX::FIXED_SEED);
-
     } else {
         RAYX::randomSeed();
     }

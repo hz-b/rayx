@@ -6,18 +6,19 @@
 #include <string>
 
 #include "Behaviour.h"
+#include "Coating.h"
 #include "Core.h"
 #include "Cutout.h"
-#include "Coating.h"
 #include "Rml/xml.h"
 #include "Shader/SlopeError.h"
 #include "Surface.h"
 
 namespace RAYX {
 
-struct DesignElement;
+class DesignElement;
 
 enum class ElementType {
+    Undefined,
     ImagePlane,
     ConeMirror,
     Crystal,
@@ -38,18 +39,16 @@ enum class ElementType {
     PointSource,
     MatrixSource,
     DipoleSource,
-    DipoleSrc,
     PixelSource,
     CircleSource,
-    SimpleUndulatorSource
+    SimpleUndulatorSource,
+    RayListSource,
 };
 
 /**
  * @brief Structure to represent an element in the ray tracing simulation.
  */
 struct OpticalElement {
-    glm::dmat4 m_inTrans;     ///< In-transformation matrix: Converts a point from world coordinates to element coordinates.
-    glm::dmat4 m_outTrans;    ///< Out-transformation matrix: Converts a point from element coordinates back to world coordinates.
     Behaviour m_behaviour;    ///< Describes what happens to a ray once it collides with this OpticalElement.
     Surface m_surface;        ///< Describes how the OpticalElement's surface is curved.
     Cutout m_cutout;          ///< Limits the Surface to the dimensions of the actual OpticalElement.
@@ -60,16 +59,22 @@ struct OpticalElement {
 };
 
 // Ensure OpticalElement does not introduce cost on copy or default construction.
-//static_assert(std::is_trivially_copyable_v<OpticalElement>);
+// static_assert(std::is_trivially_copyable_v<OpticalElement>);
+
+struct ObjectTransform {
+    glm::dmat4 m_inTrans;   ///< In-transformation matrix: Converts a point from world coordinates to local object coordinates.
+    glm::dmat4 m_outTrans;  ///< Out-transformation matrix: Converts a point from local object coordinates to world coordinates.
+};
 
 RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
 
-// constructs an OpticalElement given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
-OpticalElement makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane = DesignPlane::XZ,
-                           std::optional<Cutout> cutout = {});
+struct OpticalElementAndTransform {
+    OpticalElement element;
+    ObjectTransform transform;
+};
 
-extern std::map<ElementType, std::string> RAYX_API ElementStringMap;
-ElementType RAYX_API findElementString(const std::string& name);
-std::string RAYX_API elementTypeToString(const ElementType type);
+// constructs an OpticalElement given all of its components. Some information that is not explicitly given, will be parsed from the ` dele`.
+OpticalElementAndTransform makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane = DesignPlane::XZ,
+                                       std::optional<Cutout> cutout = {});
 
 }  // namespace RAYX

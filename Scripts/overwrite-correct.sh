@@ -15,11 +15,11 @@
 
 prefix="Intern/rayx-core/tests/input"
 
-for f in "PointSource" "MatrixSource" "PlaneMirror_refl" "MatrixSource_distr" "slit1" "slit2" "slit3" "slit4" "slit5"
+for f in "PointSource" "MatrixSource" "PlaneMirror_refl" "MatrixSource_distr" "slit1" "slit2" "slit3" "slit4" "slit5" "ManyImagePlanes"
 do
     input="$prefix/${f}_seeded.rml"
     a="$prefix/${f}_seeded.csv"
     b="$prefix/${f}_seeded.correct.csv"
-    ./build/Debug/bin/debug/rayx -i "$input" -x -c -f
+    ./build/bin/debug/rayx -i "$input" -x -c -f
     mv "$a" "$b"
 done

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "Core.h"
 
 #define _throw(string, ...)                                                                       \
@@ -21,11 +23,11 @@
 #else
 #define _debug_throw(string, ...) \
     do {                          \
-    } while (0)
+    } while (false)
 #define _debug_assert(condition, string, ...) \
     do {                                      \
-    } while (0)
+    } while (false)
 #define _debug_warn(condition, string, ...) \
     do {                                    \
-    } while (0)
+    } while (false)
 #endif

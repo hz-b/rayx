@@ -6,7 +6,7 @@
 #include "Beamline/Beamline.h"
 #include "CommandParser.h"
 #include "Debug/Instrumentor.h"
-#include "RaySoA.h"
+#include "Rays.h"
 #include "TerminalAppConfig.h"
 #include "Tracer/Tracer.h"
 
@@ -16,27 +16,19 @@ class TerminalApp {
     ~TerminalApp();
 
     void run();
-    const std::string& getProvidedFilePath() const { return providedFile; };
 
   private:
-    /**
-     * @brief Write Rays into output file
-     * @return true
-     * @return false
-     */
-    char** m_argv;
-    int m_argc;
+    int tracePath(const std::filesystem::path& path);
+    void traceRmlAndExportRays(const std::filesystem::path& path);
+    RAYX::Beamline loadBeamline(const std::filesystem::path& filepath);
+    RAYX::Rays traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attr);
+    void validateEvents(const RAYX::Rays& rays);
 
-    /// if `path` is an RML file, it will trace this file.
-    /// if `path` is a directory, it will call `tracePath(child)` for all
-    /// children of that directory.
-    void tracePath(const std::filesystem::path& path);
-    // returns the output filename (either .csv or .h5)
-    std::filesystem::path exportRays(const RAYX::RaySoA& rays, const std::vector<std::string>& element_names, bool isCSV,
-                                     const std::filesystem::path&, const RAYX::RayAttrFlag attr);
+    /// write rays to file
+    /// @returns the output filename (either .csv or .h5)
+    std::filesystem::path exportRays(const std::filesystem::path& filepath, const std::vector<std::string>& objectNames, const RAYX::Rays& rays,
+                                     const RAYX::RayAttrMask attr);
 
-    std::string providedFile;
-    std::unique_ptr<CommandParser> m_CommandParser;
-    std::unique_ptr<RAYX::Tracer> m_Tracer;
-    std::unique_ptr<RAYX::Beamline> m_Beamline;
+    std::unique_ptr<RAYX::Tracer> m_tracer;
+    CliArgs m_cliArgs;
 };

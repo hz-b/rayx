@@ -9,12 +9,12 @@ namespace RAYX {
 
 struct RAYX_API DeviceConfig {
     enum RAYX_API DeviceType {
-        Unsupported = 0,         //
-        Cpu = 1 << 0,            //
-        GpuCuda = 1 << 1,        //
-        GpuHip = 1 << 2,         //
-        Gpu = GpuCuda | GpuHip,  //
-        All = Cpu | Gpu,         //
+        Unsupported = 0,
+        Cpu = 1 << 0,
+        GpuCuda = 1 << 1,
+        GpuHip = 1 << 2,
+        Gpu = GpuCuda | GpuHip,
+        All = Cpu | Gpu,
     };
 
     struct RAYX_API Device {

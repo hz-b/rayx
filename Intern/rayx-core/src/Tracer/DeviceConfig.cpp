@@ -79,7 +79,12 @@ std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All)
         devices.insert(devices.end(), platformDevices.begin(), platformDevices.end());
     };
 
-    if (deviceType & DeviceType::Cpu) append(alpaka::TagCpuOmp2Blocks{});
+#if defined(RAYX_OPENMP_ENABLED)
+    using TagCpu = alpaka::TagCpuOmp2Blocks;
+#else
+    using TagCpu = alpaka::TagCpuSerial;
+#endif
+    if (deviceType & DeviceType::Cpu) append(TagCpu{});
 
 #if defined(RAYX_CUDA_ENABLED)
     if (deviceType & DeviceType::GpuCuda) append(alpaka::TagGpuCudaRt{});

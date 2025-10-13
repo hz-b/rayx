@@ -5,7 +5,6 @@
 #include <sstream>
 #include <type_traits>
 
-#include "Beamline/Objects/Objects.h"
 #include "CanonicalizePath.h"
 #include "Core.h"
 #include "Debug/Debug.h"
@@ -36,18 +35,19 @@ extern char** GLOBAL_ARGV;
     CHECK_EQ(A, B);        // with default tolerance
 */
 
-const int PREC = 17;
+constexpr int PREC = 17;
+constexpr double DEFAULT_TOLERANCE = 1e-10;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
 /// asserts that tl and tr are the same up to a given tolerance, and give a fancy print if they mismatch.
 /// filename, line represents where CHECK_EQ is called.
 /// l and r are the printable strings representing tl and tr.
-/// vl and vr represent the doubles contained in tl and tr, obtained with RAYX::formatAsVec
+/// vl and vr represent the doubles contained in tl and tr, obtained with formatAsVec
 template <typename TL, typename TR>
 inline void checkEq(std::string filename, int line, std::string l, std::string r, const TL& tl, const TR& tr, std::vector<double> vl,
-                    std::vector<double> vr, double tolerance = 1e-10) {
+                    std::vector<double> vr, double tolerance = DEFAULT_TOLERANCE) {
     if (vl.size() != vr.size()) {
-        RAYX::Exit(filename, line) << l << " != " << r << ": different lengths!";
+        Exit(filename, line) << l << " != " << r << ": different lengths!";
         return;
     }
 
@@ -61,7 +61,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
     if (success) return;
 
-    RAYX::Warn(filename, line) << l << " != " << r << ":";
+    Warn(filename, line) << l << " != " << r << ":";
 
     int counter = 0;  // stores the number of elements in the stringstream
     std::stringstream s;
@@ -78,20 +78,20 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         counter++;
         if (counter == 4 && vl.size() == 16) {  // 4x4 things should be written in 4 rows
             counter = 0;
-            RAYX::Warn(filename, line) << s.str();
+            Warn(filename, line) << s.str();
             s = std::stringstream();
         }
     }
     if (counter > 0) {
-        RAYX::Warn(filename, line) << s.str();
+        Warn(filename, line) << s.str();
     }
     ADD_FAILURE();
 }
 
 /// specialized handling for rays, better prints!
 template <>
-inline void checkEq(std::string filename, int line, std::string l, std::string r, const RAYX::Ray& tl, const RAYX::Ray& tr, std::vector<double> vl,
-                    std::vector<double> vr, double tolerance) {
+inline void checkEq(std::string filename, int line, std::string l, std::string r, const detail::Ray& tl, const detail::Ray& tr,
+                    std::vector<double> vl, std::vector<double> vr, double tolerance) {
     std::vector<std::string> names = {".m_position.x",   ".m_position.y",   ".m_position.z",   ".m_eventType",    ".m_direction.x",
                                       ".m_direction.y",  ".m_direction.z",  ".m_energy",       ".m_field.x.real", ".m_field.x.imag",
                                       ".m_field.y.real", ".m_field.y.imag", ".m_field.z.real", ".m_field.z.imag", ".m_pathLength",
@@ -111,11 +111,11 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 /// check that L and R contain the same doubles.
 // within CHECK_EQ: the __VA_ARGS__ argument is either `double tolerance` or nothing.
 // all variables declared within CHECK_EQ end with `_check_eq` distinguish them from the variables that the user might write.
-#define CHECK_EQ(L, R, ...)                                                                                                                       \
-    {                                                                                                                                             \
-        auto l_check_eq = L;                                                                                                                      \
-        auto r_check_eq = R;                                                                                                                      \
-        checkEq(__FILE__, __LINE__, #L, #R, l_check_eq, r_check_eq, RAYX::formatAsVec(l_check_eq), RAYX::formatAsVec(r_check_eq), ##__VA_ARGS__); \
+#define CHECK_EQ(L, R, ...)                                                                                                           \
+    {                                                                                                                                 \
+        const auto& l_check_eq = L;                                                                                                   \
+        const auto& r_check_eq = R;                                                                                                   \
+        checkEq(__FILE__, __LINE__, #L, #R, l_check_eq, r_check_eq, formatAsVec(l_check_eq), formatAsVec(r_check_eq), ##__VA_ARGS__); \
     }
 
 /// assert that x holds, and give a fancy print otherwise.
@@ -140,16 +140,109 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         }                                                                                          \
     }
 
+template <typename T>
+inline bool isEqual(const T& a, const T& b, const double tolerance = DEFAULT_TOLERANCE) {
+    return std::abs(static_cast<double>(a) - static_cast<double>(b)) <= tolerance;
+}
+
+template <>
+inline bool isEqual<complex::Complex>(const complex::Complex& a, const complex::Complex& b, const double tolerance) {
+    return std::abs(static_cast<double>(a.real()) - static_cast<double>(b.real())) <= tolerance &&
+           std::abs(static_cast<double>(a.imag()) - static_cast<double>(b.imag())) <= tolerance;
+}
+
+/**
+ * @brief Checks if all expected values are present at least once in the vector of values.
+ * If any value from expected is not found in values, a test failure is added.
+ * @tparam T The type of the elements in the vectors.
+ * @param values The vector of values to check.
+ * @param expected The vector of values that should be present at least once.
+ */
+template <typename T>
+inline void expectAtLeastOnce(const std::vector<T>& values, const std::vector<T>& expected) {
+    for (const auto& v : expected) {
+        const auto it = std::find(values.begin(), values.end(), v);
+        EXPECT_NE(it, values.end());
+    }
+}
+
+/**
+ * @brief Checks if the given values are not present in the vector of expected values.
+ * If any value from expected is found in values, a test failure is added.
+ * @tparam T The type of the elements in the vectors.
+ * @param values The vector of values to check.
+ * @param expected The vector of values that should not be present.
+ */
+template <typename T>
+inline void expectNotEvenOnce(const std::vector<T>& values, const std::vector<T>& expected) {
+    for (const auto& v : expected) {
+        const auto it = std::find(values.begin(), values.end(), v);
+        EXPECT_EQ(it, values.end());
+    }
+}
+
+template <typename T>
+inline void expectEqual(const std::vector<T>& values, const T& expected, const T& tolerance = DEFAULT_TOLERANCE) {
+    for (const auto& v : values) EXPECT_NEAR(v, expected, tolerance);
+}
+
+template <typename T>
+inline void expectEqualAny(const std::vector<T>& values, const std::vector<T>& expected, const T& tolerance = DEFAULT_TOLERANCE) {
+    for (size_t i = 0; i < values.size(); ++i) {
+        bool found = false;
+        for (const auto& e : expected)
+            if (isEqual(values[i], e, tolerance)) {
+                found = true;
+                break;
+            }
+        EXPECT_TRUE(found) << "Could not find expected value '" << values[i] << "' (from array 'values' at index '" << i << "') in array 'expected'.";
+    }
+}
+
+/**
+ * @brief Checks if all values in the vector are within the specified range [min, max].
+ * If any value is found outside this range, a test failure is added.
+ * @tparam T The type of the elements in the vector.
+ * @param values The vector of values to check.
+ * @param min The minimum acceptable value (inclusive).
+ * @param max The maximum acceptable value (inclusive).
+ */
+template <typename T>
+inline void expectInRange(const std::vector<T>& values, const T min, const T max) {
+    for (const auto& v : values) {
+        EXPECT_GE(v, min);
+        EXPECT_LE(v, max);
+    }
+}
+
+// TODO: this test is kinda useless
+template <typename T>
+inline void expectDifferentValues(const std::vector<T>& values) {
+    EXPECT_GT(values.size(), 1);
+
+    bool f = false;
+    for (const auto a : values) {
+        for (const auto b : values) {
+            f = a != b;
+            if (f) break;
+        }
+
+        if (f) break;
+    }
+
+    EXPECT_TRUE(f);
+}
+
 // ShaderTest
 
-extern std::unique_ptr<RAYX::Tracer> tracer;
+extern std::unique_ptr<Tracer> tracer;
 
 inline void add_failure() { ADD_FAILURE(); }
 
 class TestSuite : public testing::Test {
   protected:
     static void SetUpTestSuite() {
-        RAYX::error_fn = add_failure;
+        error_fn = add_failure;
 
         bool cpu = false;
         for (int i = 1; i < GLOBAL_ARGC; i++) {
@@ -160,57 +253,48 @@ class TestSuite : public testing::Test {
         }
 
         // Choose Hardware
-        using DeviceType = RAYX::DeviceConfig::DeviceType;
+        using DeviceType = DeviceConfig::DeviceType;
         const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
-        tracer = std::make_unique<RAYX::Tracer>(RAYX::DeviceConfig(deviceType).enableBestDevice());
+        tracer = std::make_unique<Tracer>(DeviceConfig(deviceType).enableBestDevice());
     }
 
     // called before every test invocation.
-    void SetUp() override { RAYX::fixSeed(RAYX::FIXED_SEED); }
+    void SetUp() override { fixSeed(FIXED_SEED); }
 
     static void TearDownTestSuite() { tracer = nullptr; }
 };
 
-// helper functions for writing tests
+constexpr RayAttrMask attrMaskCompatibleWithRayUi = RayAttrMask::Position | RayAttrMask::Direction | RayAttrMask::Energy;
 
-/// will return the absolute path to the beamline
+void compare(const Rays& a, const Rays& b, const RayAttrMask attrMask = RayAttrMask::All, double t = DEFAULT_TOLERANCE);
+void compareRayUiCompatible(const Rays& a, const Rays& b, double t = DEFAULT_TOLERANCE);
+void compareRayUiCompatible_findAtLeastOnce(const Rays& rayx, const Rays& rayui, double t = DEFAULT_TOLERANCE);
+
 std::filesystem::path getBeamlineFilepath(std::string filename);
+Beamline loadBeamline(std::string filename);
+Rays traceRml(std::string filename, RayAttrMask attrMask = RayAttrMask::All, Sequential seq = Sequential::No);
+std::pair<Beamline, Rays> loadBeamlineAndTrace(std::string filename, RayAttrMask attrMask = RayAttrMask::All);
+Rays loadCsvRayUi(std::string filename);
 
-/// will look at Tests/input/<filename>.rml
-RAYX::Beamline loadBeamline(std::string filename);
+void writeCsvUsingFilename(const Rays& rays, std::string filename);
 
-/// will write to Tests/output/<filename>.csv
-void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename);
+/**
+ * @brief Trace a beamline and make the results compatible with RayUi.
+ * Only ray RAY-UI compatible ray attributes are recorded.
+ * Also, y and z coordinates are swapped for Position and Direction.
+ */
+Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq);
 
-/// Returns all traced rays
-RAYX::BundleHistory traceRML(std::string filename);
+/// Trace a beamline and compare the results against the RayUi results.
+void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance = DEFAULT_TOLERANCE, Sequential seq = Sequential::No);
 
-// extracts the last EventType::HitElement for each ray.
-std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory&);
+/// Trace a beamline and compare the results against the RayUi results.
+void traceRmlAndCompareAgainstRayUi_allowMontecarloRayUi(std::string filename, double tolerance = DEFAULT_TOLERANCE, Sequential seq = Sequential::No);
 
-/// will look at Tests/input/<filename>.csv
-/// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
-/// element coordinates of the relevant element!)
-std::vector<RAYX::Ray> loadCSVRayUI(std::string filename);
+/**
+ * @brief Trace a beamline and compare the results against correct results.
+ * @note Correct results are cached and can be overriden, using one of the scripts in the scripts folder.
+ */
+void traceRmlAndCompareAgainstCorrectResults(std::string filename, double tolerance = DEFAULT_TOLERANCE);
 
-/// Checks for equality up to the tolerance `t`.
-void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t = 1e-11);
-
-// If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
-// Otherwise, we return `{}`, aka None.
-std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamline_len);
-
-/// Only cares for the rays hitting the last object of the beamline, and check whether they are the same as their RayUI counter part.
-/// Ray UI rays are obtained Export > RawRaysOutgoing.
-/// This also filters out non-sequential rays to compare to Ray-UI correctly.
-void compareLastAgainstRayUI(std::string filename, double tolerance = 1e-4, Sequential seq = Sequential::No);
-
-// compares input/<filename>.correct.csv with the trace output.
-void compareAgainstCorrect(std::string filename, double tolerance = 1e-11);
-
-/// updates the material tables of the Cpu Tracer to contain exactly the
-/// materials given in the std::vector.
-MaterialTables createMaterialTables(std::vector<Material>);
-
-// returns the rayx rays converted to be ray-UI compatible.
-std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq = Sequential::No);
+MaterialTables createMaterialTables(std::vector<Material> mats_vec);

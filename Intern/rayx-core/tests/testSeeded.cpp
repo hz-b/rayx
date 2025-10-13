@@ -15,11 +15,6 @@
 
 TEST_F(TestSuite, randomNumbers) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    for (int i = 0; i < 4; i++) {
-        std::cout << randomDouble() << std::endl;
-    }
-
-    RAYX::fixSeed(RAYX::FIXED_SEED);
     double r;
     r = randomDouble();
     CHECK_EQ(r, 0.37454011439684315);
@@ -33,11 +28,6 @@ TEST_F(TestSuite, randomNumbers) {
 
 TEST_F(TestSuite, randomNumbers_normal) {
     RAYX::fixSeed(RAYX::FIXED_SEED);
-    for (int i = 0; i < 4; i++) {
-        std::cout << randomNormal(0, 1) << std::endl;
-    }
-
-    RAYX::fixSeed(RAYX::FIXED_SEED);
     double r;
     r = randomNormal(0, 1);
     CHECK_EQ(r, 0.40402608730396244);
@@ -49,17 +39,21 @@ TEST_F(TestSuite, randomNumbers_normal) {
     CHECK_EQ(r, -0.83114042984660008);
 }
 
-TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seeded", 1e-5); }
+// TODO: why are the tolerances so low, here?
+
+TEST_F(TestSuite, PointSource_seeded) { traceRmlAndCompareAgainstCorrectResults("PointSource_seeded", 1e-5); }
 
 // Tests sourceDepth of MatrixSource.
-TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded", 1e-5); }
+TEST_F(TestSuite, MatrixSource_seeded) { traceRmlAndCompareAgainstCorrectResults("MatrixSource_seeded", 1e-5); }
 
-TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded", 1e-5); }
+TEST_F(TestSuite, PlaneMirror_refl_seeded) { traceRmlAndCompareAgainstCorrectResults("PlaneMirror_refl_seeded", 1e-5); }
 
 // Tests the Energy Distribution of a MatrixSource.
-TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded", 1e-6); }
+TEST_F(TestSuite, MatrixSource_distr_seeded) { traceRmlAndCompareAgainstCorrectResults("MatrixSource_distr_seeded", 1e-6); }
 
-TEST_F(TestSuite, slit1_seeded) { compareAgainstCorrect("slit1_seeded", 1e-5); }
-TEST_F(TestSuite, slit2_seeded) { compareAgainstCorrect("slit2_seeded", 1e-6); }
-TEST_F(TestSuite, slit3_seeded) { compareAgainstCorrect("slit3_seeded", 1e-5); }
-TEST_F(TestSuite, slit4_seeded) { compareAgainstCorrect("slit4_seeded", 1e-5); }
+TEST_F(TestSuite, slit1_seeded) { traceRmlAndCompareAgainstCorrectResults("slit1_seeded", 1e-5); }
+TEST_F(TestSuite, slit2_seeded) { traceRmlAndCompareAgainstCorrectResults("slit2_seeded", 1e-6); }
+TEST_F(TestSuite, slit3_seeded) { traceRmlAndCompareAgainstCorrectResults("slit3_seeded", 1e-5); }
+TEST_F(TestSuite, slit4_seeded) { traceRmlAndCompareAgainstCorrectResults("slit4_seeded", 1e-5); }
+
+TEST_F(TestSuite, ManyImagePlanes) { traceRmlAndCompareAgainstCorrectResults("ManyImagePlanes_seeded"); }

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Constants.h"
 #include "ElectricField.h"
 #include "Rand.h"
-#include "Constants.h"
 
 namespace RAYX {
 
@@ -154,13 +154,10 @@ inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnel
 
 // Berechnet die komplexe Reflexionsamplitude für eine einzelne dünne Schicht (ohne Rauigkeit)
 RAYX_FN_ACC
-inline ComplexFresnelCoeffs computeSingleCoatingReflectance(
-    const complex::Complex incidentAngle,
-    const double wavelength,
-    const double thickness,
-    const complex::Complex iorI,   // n0: z. B. Vakuum
-    const complex::Complex iorC,   // n1: Beschichtung
-    const complex::Complex iorS    // n2: Substrat
+inline ComplexFresnelCoeffs computeSingleCoatingReflectance(const complex::Complex incidentAngle, const double wavelength, const double thickness,
+                                                            const complex::Complex iorI,  // n0: z. B. Vakuum
+                                                            const complex::Complex iorC,  // n1: Beschichtung
+                                                            const complex::Complex iorS   // n2: Substrat
 ) {
     // Winkel in der Beschichtung und im Substrat
     const auto theta1 = calcRefractAngle(incidentAngle, iorI, iorC);
@@ -181,14 +178,11 @@ inline ComplexFresnelCoeffs computeSingleCoatingReflectance(
     return {r_s, r_p};
 }
 
-
 RAYX_FN_ACC
 inline ComplexFresnelCoeffs computeMultilayerReflectance(
-    const complex::Complex incidentAngle,
-    const double wavelength,
-    int numLayers,
-    const double* __restrict thicknesses,          // Längen: numLayers
-    const complex::Complex* __restrict iors        // Längen: numLayers + 2 (Vakuum + Schichten + Substrat)
+    const complex::Complex incidentAngle, const double wavelength, int numLayers,
+    const double* __restrict thicknesses,    // Längen: numLayers
+    const complex::Complex* __restrict iors  // Längen: numLayers + 2 (Vakuum + Schichten + Substrat)
 ) {
     constexpr int MAX_ANGLES = 18;  // unterstützt bis zu 16 Schichten
     complex::Complex thetas[MAX_ANGLES];
@@ -200,8 +194,7 @@ inline ComplexFresnelCoeffs computeMultilayerReflectance(
     }
 
     // Startwert: Reflexion an Substratgrenze
-    ComplexFresnelCoeffs r = calcReflectAmplitude(thetas[numLayers], thetas[numLayers + 1],
-                                                  iors[numLayers], iors[numLayers + 1]);
+    ComplexFresnelCoeffs r = calcReflectAmplitude(thetas[numLayers], thetas[numLayers + 1], iors[numLayers], iors[numLayers + 1]);
 
     // Parratt-Rekursion von unten nach oben
     for (int j = numLayers - 1; j >= 0; --j) {

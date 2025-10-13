@@ -9,30 +9,14 @@ TEST_F(TestSuite, allBeamlineObjects) {
 }
 
 TEST_F(TestSuite, loadDatFile) {
-    RAYX::Beamline bl = loadBeamline("loadDatFile");
-    CHECK_EQ(bl.numSources(), 1);
-    CHECK_EQ(bl.numElements(), 1);
-
-    // This only works due to fixed seeding!
-    // The loaded DAT file only has the 3 energies 12, 15, 17 with equal probability.
-    const auto source0 = bl.getSources()[0];
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 15, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 12, 0.1);
+    const auto rays = traceRml("loadDatFile", RayAttrMask::Energy);
+    writeCsvUsingFilename(rays, "loadDatFile.rayx");
+    expectEqualAny(rays.energy, {12.0, 15.0, 17.0});
 }
 
 TEST_F(TestSuite, loadDatFile2) {
-    RAYX::Beamline bl = loadBeamline("loadDatFile2");
-    CHECK_EQ(bl.numSources(), 1);
-    CHECK_EQ(bl.numElements(), 1);
-
-    // This only works due to fixed seeding!
-    // The loaded DAT file only has the 3 energies 12, 15, 17 with - but it uses soft band.
-    const auto source0 = bl.getSources()[0];
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 14.7, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 17.1, 0.1);
-    CHECK_EQ(source0->getEnergyDistribution().selectEnergy(), 16.7, 0.1);
+    const auto rays = traceRml("loadDatFile2", RayAttrMask::Energy);
+    expectEqualAny(rays.energy, {12.0, 15.0, 17.0});
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -45,7 +29,7 @@ TEST_F(TestSuite, groupTransform) {
     RAYX::Beamline bl = loadBeamline("groupTransform");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
-    auto m = bl.compileElements()[0].m_inTrans;
+    auto m = bl.compileElements()[0].transform.m_inTrans;
     glm::dmat4x4 correct = {
         1,   0,     0,  0,  //
         0,   1,     0,  0,  //
@@ -55,44 +39,42 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(correct, m);
 }
 
-TEST_F(TestSuite, testEnergyDistribution) {
-    struct testInput {
-        std::string rmlFile;
-        double energy;
-    };
+TEST_F(TestSuite, testEnergyDistributionSeparateEnergies) {
+    const auto rays = traceRml("PointSourceSeparateEnergies", RayAttrMask::Energy);
+    expectAtLeastOnce(rays.energy, {
+                                       0.0,
+                                       50.0,
+                                       100.0,
+                                       150.0,
+                                       200.0,
+                                   });
+}
 
-    std::vector<testInput> testinput = {
-        {
-            .rmlFile = "PointSourceSeparateEnergies",
-            .energy = 100,
-        },
-        {
-            .rmlFile = "PointSourceSoftEdgeEnergy",
-            .energy = 104.042,
-        },
-        {
-            .rmlFile = "PointSourceThreeSoftEdgeEnergies",
-            .energy = 51.29,
-        },
-        {
-            .rmlFile = "PointSourceHardEdgeEnergy",
-            .energy = 123.19,
-        },
-    };
+// TODO: this test does not really test anything
+TEST_F(TestSuite, testEnergyDistributionSoftEdge) {
+    const auto rays = traceRml("PointSourceSoftEdgeEnergy", RayAttrMask::Energy);
+    expectDifferentValues(rays.energy);
+}
 
-    for (auto values : testinput) {
-        auto beamline = loadBeamline(values.rmlFile);
-        auto energy = beamline.getSources()[0]->getEnergyDistribution().selectEnergy();
-
-        CHECK_EQ(energy, values.energy, 0.1);
+// TODO: this test does not really test anything
+TEST_F(TestSuite, testEnergyDistributionHardEdge) {
+    {
+        const auto rays = traceRml("PointSourceHardEdgeEnergy", RayAttrMask::Energy);
+        expectInRange(rays.energy, 0.0, 200.0);
+        expectDifferentValues(rays.energy);
+    }
+    {
+        const auto rays = traceRml("PointSourceHardEdge", RayAttrMask::Energy);
+        expectInRange(rays.energy, 0.0, 200.0);
+        expectDifferentValues(rays.energy);
     }
 }
 
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
-    OpticalElement para = beamline.compileElements()[0];
-    auto parabo = variant::get<Surface::Quadric>(para.m_surface.m_surface);
+    OpticalElement para = beamline.compileElements()[0].element;
+    auto parabo = para.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(1, parabo.m_a11);
     CHECK_EQ(0, parabo.m_a12);
@@ -109,8 +91,8 @@ TEST_F(TestSuite, testParaboloidQuad) {
 
 TEST_F(TestSuite, testSphereQuad) {
     auto beamline = loadBeamline("SphereMirrorDefault");
-    OpticalElement sph = beamline.compileElements()[0];
-    auto sphere = variant::get<Surface::Quadric>(sph.m_surface.m_surface);
+    OpticalElement sph = beamline.compileElements()[0].element;
+    auto sphere = sph.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(1, sphere.m_a11);
     CHECK_EQ(0, sphere.m_a12);
@@ -127,8 +109,8 @@ TEST_F(TestSuite, testSphereQuad) {
 
 TEST_F(TestSuite, testEllipsoidQuad) {
     auto beamline = loadBeamline("Ellipsoid");
-    OpticalElement elli = beamline.compileElements()[0];
-    auto ellips = variant::get<Surface::Quadric>(elli.m_surface.m_surface);
+    OpticalElement elli = beamline.compileElements()[0].element;
+    auto ellips = elli.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(1, ellips.m_a11);
     CHECK_EQ(0, ellips.m_a12);
@@ -145,8 +127,8 @@ TEST_F(TestSuite, testEllipsoidQuad) {
 
 TEST_F(TestSuite, testCylinderQuad) {
     auto beamline = loadBeamline("CylinderDefault");
-    OpticalElement cyli = beamline.compileElements()[0];
-    auto cylinder = variant::get<Surface::Quadric>(cyli.m_surface.m_surface);
+    OpticalElement cyli = beamline.compileElements()[0].element;
+    auto cylinder = cyli.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(0, cylinder.m_a11);
     CHECK_EQ(0, cylinder.m_a12);
@@ -163,8 +145,8 @@ TEST_F(TestSuite, testCylinderQuad) {
 
 TEST_F(TestSuite, testConeQuad) {
     auto beamline = loadBeamline("Cone");
-    OpticalElement con = beamline.compileElements()[0];
-    auto cone = variant::get<Surface::Quadric>(con.m_surface.m_surface);
+    OpticalElement con = beamline.compileElements()[0].element;
+    auto cone = con.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(0.903353, cone.m_a11, 0.001);
     CHECK_EQ(0, cone.m_a12);
@@ -181,40 +163,41 @@ TEST_F(TestSuite, testConeQuad) {
 
 TEST_F(TestSuite, test_Toroid) {
     auto beamline = loadBeamline("toroid");
-    OpticalElement trid = beamline.compileElements()[0];
-    auto toroid = variant::get<Surface::Toroid>(trid.m_surface.m_surface);
+    OpticalElement trid = beamline.compileElements()[0].element;
+    auto toroid = trid.m_surface.get<Surface::Toroid>();
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
-    CHECK_EQ(1, toroid.m_toroidType);
+    EXPECT_EQ(toroid.m_toroidType, ToroidType::Concave);
 }
 
 TEST_F(TestSuite, testExpertsOptic) {
     auto beamline = loadBeamline("toroid");
-    OpticalElement trid = beamline.compileElements()[0];
-    auto toroid = variant::get<Surface::Toroid>(trid.m_surface.m_surface);
+    OpticalElement trid = beamline.compileElements()[0].element;
+    auto toroid = trid.m_surface.get<Surface::Toroid>();
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
-    CHECK_EQ(1, toroid.m_toroidType);
+    EXPECT_EQ(toroid.m_toroidType, ToroidType::Concave);
 }
 
 /***
  * Tests if two sources can be traced in one go.
  * Its a static test, so every change can result in a fail even if it's still working correctly
  */
+// TODO: write more tests with two or more sources
 TEST_F(TestSuite, testTwoSourcesInOneRML) {
-    auto beamline = loadBeamline("twoSourcesTest");
+    auto [beamline, rays] = loadBeamlineAndTrace("twoSourcesTest");
+    CHECK_EQ(beamline.numSources(), 2);
 
-    const auto dipolesource = beamline.getSources()[0];
+    const auto source0Rays = rays.filterByObjectId(0);
+    CHECK_EQ(source0Rays.size(), 200);
 
-    const auto pointsource = beamline.getSources()[1];
+    const auto source1Rays = rays.filterByObjectId(1);
+    CHECK_EQ(source1Rays.size(), 200);
 
-    CHECK_EQ(100, dipolesource->getEnergy());
-    CHECK_EQ(150.24724068638105, pointsource->getEnergyDistribution().selectEnergy());
-
-    RAYX::fixSeed(RAYX::FIXED_SEED);
-    CHECK_EQ(0, pointsource->getSourceWidth(), 0.1);
+    const auto imagePlaneRays = rays.filterByObjectId(2);
+    CHECK_EQ(imagePlaneRays.size(), 400);
 }
 
 TEST_F(TestSuite, groupTransform2) {
@@ -243,8 +226,8 @@ TEST_F(TestSuite, groupTransform2) {
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
     glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
 
-    glm::dmat4x4 inTrans = bl.compileElements()[0].m_inTrans * yz_swap;
-    glm::dmat4x4 outTrans = bl.compileElements()[0].m_outTrans * yz_swap;
+    glm::dmat4x4 inTrans = bl.compileElements()[0].transform.m_inTrans * yz_swap;
+    glm::dmat4x4 outTrans = bl.compileElements()[0].transform.m_outTrans * yz_swap;
 
     glm::dmat4x4 orientationResult = glm::dmat4x4(glm::dmat3x3(inTrans));
     glm::dvec4 positionResult = outTrans * glm::dvec4(0, 0, 0, 1);
@@ -252,4 +235,3 @@ TEST_F(TestSuite, groupTransform2) {
     CHECK_EQ(orientationCorrect, orientationResult);
     CHECK_EQ(positionCorrect, positionResult);
 }
-

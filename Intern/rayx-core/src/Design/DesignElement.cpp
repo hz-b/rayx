@@ -3,11 +3,31 @@
 #include <iostream>
 #include <memory>
 
-#include "Beamline/Objects/Objects.h"
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
 namespace RAYX {
+
+namespace {
+std::string getUniqueUnnamedElementName() {
+    static size_t counter = 0;
+    return std::format("<unnamed_element_{}>", counter++);
+}
+}  // unnamed namespace
+
+DesignElement::DesignElement() : m_elementParameters(RAYX::Map()) {
+    setName(getUniqueUnnamedElementName());
+    setPosition(glm::dvec4(0));
+    setOrientation(glm::dmat4(1.0));
+    setType(RAYX::ElementType::Undefined);
+}
+
+DesignElement::DesignElement(std::string name) : m_elementParameters(RAYX::Map()) {
+    setName(std::move(name));
+    setPosition(glm::dvec4(0));
+    setOrientation(glm::dmat4(1.0));
+    setType(RAYX::ElementType::Undefined);
+}
 
 DesignElement::DesignElement(DesignElement&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
 
@@ -22,7 +42,7 @@ std::unique_ptr<BeamlineNode> DesignElement::clone() const {
     return std::make_unique<DesignElement>(std::move(clone));
 }
 
-OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dmat4& parentOri) const {
+OpticalElementAndTransform DesignElement::compile(const glm::dvec4& parentPos, const glm::dmat4& parentOri) const {
     glm::dvec4 worldPos = parentOri * getPosition() + parentPos;
     glm::dmat4 worldOri = parentOri * getOrientation();
 
@@ -49,11 +69,11 @@ OpticalElement DesignElement::compile(const glm::dvec4& parentPos, const glm::dm
     }
 }
 
-void DesignElement::setName(std::string s) { m_elementParameters["name"] = s; }
-void DesignElement::setType(ElementType s) { m_elementParameters["type"] = s; }
-
 std::string DesignElement::getName() const { return m_elementParameters["name"].as_string(); }
+void DesignElement::setName(std::string s) { m_elementParameters["name"] = s; }
+
 ElementType DesignElement::getType() const { return m_elementParameters["type"].as_elementType(); }
+void DesignElement::setType(ElementType s) { m_elementParameters["type"] = s; }
 
 void DesignElement::setPosition(glm::dvec4 p) {
     m_elementParameters["position"] = Map();
@@ -113,28 +133,6 @@ glm::dmat4x4 DesignElement::getOrientation() const {
     return o;
 }
 
-void DesignElement::setMisalignment(Misalignment m) {
-    m_elementParameters["rotationXerror"] = m.m_rotationXerror.rad;
-    m_elementParameters["rotationYerror"] = m.m_rotationYerror.rad;
-    m_elementParameters["rotationZerror"] = m.m_rotationZerror.rad;
-
-    m_elementParameters["translationXerror"] = m.m_translationXerror;
-    m_elementParameters["translationYerror"] = m.m_translationYerror;
-    m_elementParameters["translationZerror"] = m.m_translationZerror;
-}
-
-Misalignment DesignElement::getMisalignment() const {
-    Misalignment m;
-    m.m_rotationXerror.rad = m_elementParameters["rotationXerror"].as_double();
-    m.m_rotationYerror.rad = m_elementParameters["rotationYerror"].as_double();
-    m.m_rotationZerror.rad = m_elementParameters["rotationZerror"].as_double();
-
-    m.m_translationXerror = m_elementParameters["translationXerror"].as_double();
-    m.m_translationYerror = m_elementParameters["translationYerror"].as_double();
-    m.m_translationZerror = m_elementParameters["translationZerror"].as_double();
-
-    return m;
-}
 void DesignElement::setSlopeError(SlopeError s) {
     m_elementParameters["SlopeError"] = Map();
     m_elementParameters["SlopeError"]["slopeErrorSag"] = s.m_sag;
@@ -159,7 +157,7 @@ SlopeError DesignElement::getSlopeError() const {
 }
 
 void DesignElement::setCutout(Cutout c) {
-    variant::visit(
+    c.visit(
         [&]<typename T>(const T& arg) {
             if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
                 m_elementParameters["geometricalShape"] = CutoutType::Unlimited;
@@ -177,8 +175,8 @@ void DesignElement::setCutout(Cutout c) {
                 m_elementParameters["CutoutWidthB"] = arg.m_widthB;
                 m_elementParameters["CutoutLength"] = arg.m_length;
             }
-        },
-        c.m_variant);
+        }
+        );
 }
 Cutout DesignElement::getCutout() const {
     CutoutType type = m_elementParameters["geometricalShape"].as_openingShape();
@@ -199,9 +197,10 @@ Cutout DesignElement::getCutout() const {
             .m_widthB = m_elementParameters["CutoutWidthB"].as_double(),
             .m_length = m_elementParameters["CutoutLength"].as_double(),
         };
+    } else {
+        RAYX_EXIT << "DesignElement::getCutout: Unknown CutoutType: " << static_cast<int>(type) << "!";
+        return Cutout::Unlimited{};
     }
-
-    return Cutout::Unlimited{};
 }
 
 Cutout DesignElement::getGlobalCutout() const { return Cutout::Unlimited{}; }
@@ -224,7 +223,7 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 }
 
 void DesignElement::setExpertsOptics(Surface value) {
-    Surface::Quadric qua = variant::get<Surface::Quadric>(value.m_surface);
+    Surface::Quadric qua = value.get<Surface::Quadric>();
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["surfaceBending"] = qua.m_icurv;
     m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
@@ -257,7 +256,7 @@ Surface DesignElement::getExpertsOptics() const {
 }
 
 void DesignElement::setExpertsCubic(Surface value) {
-    Surface::Cubic cub = variant::get<Surface::Cubic>(value.m_surface);
+    Surface::Cubic cub = value.get<Surface::Cubic>();
     m_elementParameters["expertsParams"] = Map();
     m_elementParameters["expertsParams"]["A11"] = cub.m_a11;
     m_elementParameters["expertsParams"]["A12"] = cub.m_a12;
@@ -512,7 +511,6 @@ DesignPlane DesignElement::getDesignPlane() const { return m_elementParameters["
 void DesignElement::setSurfaceCoatingType(SurfaceCoatingType value) { m_elementParameters["surfaceCoatingType"] = value; }
 SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_elementParameters["surfaceCoatingType"].as_surfaceCoatingType(); }
 
-
 void DesignElement::setMultilayerCoating(const Coating::MultilayerCoating& coating) {
     m_elementParameters["numLayers"] = coating.numLayers;
     m_elementParameters["coating"] = Map();
@@ -524,7 +522,7 @@ void DesignElement::setMultilayerCoating(const Coating::MultilayerCoating& coati
     }
 }
 
-Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+Coating DesignElement::getCoating() const {  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
     SurfaceCoatingType type = getSurfaceCoatingType();
     if (type == SurfaceCoatingType::SubstrateOnly) {
         return Coating::SubstrateOnly{};
@@ -549,11 +547,11 @@ Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coati
         }
         if (0 > mlCoating.material[0] || mlCoating.material[0] > 97) {
             std::cerr << "Warning: No coating layers found in DesignElement." << std::endl;
-            return Coating::SubstrateOnly{}; // Default case if no layers are found
+            return Coating::SubstrateOnly{};  // Default case if no layers are found
         }
         return Coating::MultilayerCoating{mlCoating};
     } else {
-        return Coating::SubstrateOnly{}; // Placeholder for multiple coatings, needs implementation
+        return Coating::SubstrateOnly{};  // Placeholder for multiple coatings, needs implementation
     }
 }
 

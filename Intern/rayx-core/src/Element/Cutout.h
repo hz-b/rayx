@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Shader/Variant.h"
 #include "Core.h"
+#include "Variant.h"
 
 namespace RAYX {
 
@@ -15,7 +15,8 @@ enum class CutoutType {
     Unlimited,
 };
 
-struct RAYX_API Cutout {
+namespace detail {
+struct RAYX_API CutoutTypes {
     /////////////////////////
     // Unlimited
     /////////////////////////
@@ -66,13 +67,10 @@ struct RAYX_API Cutout {
         double m_widthB;
         double m_length;
     };
-
-    variant::variant<Unlimited, Rect, Elliptical, Trapezoid> m_variant;
-
-    Cutout() : m_variant(Unlimited{}) {}
-
-    template <typename T>
-    Cutout(T t) : m_variant(t) {}
 };
+}  // namespace detail
+
+using Cutout = Variant<detail::CutoutTypes, detail::CutoutTypes::Rect, detail::CutoutTypes::Elliptical, detail::CutoutTypes::Trapezoid,
+                       detail::CutoutTypes::Unlimited>;
 
 }  // namespace RAYX

@@ -1,9 +1,9 @@
 #include "setupTests.h"
 
 // define globally decralred invocation state
-InvState inv;
+ConstState inv;
 
-std::unique_ptr<RAYX::Tracer> tracer;
+std::unique_ptr<Tracer> tracer;
 
 // helper functions
 
@@ -21,7 +21,7 @@ double parseDouble(std::string s) {
     return d;
 }
 
-RAYX::Ray parseCSVline(std::string line) {
+void parseRayUiCsvLineAndAppendEvent(Rays& rays, std::string line) {
     std::vector<double> vec;
 
     if (line.ends_with('\n')) {
@@ -39,26 +39,23 @@ RAYX::Ray parseCSVline(std::string line) {
         }
     }
 
-    RAYX::Ray ray;
     // order of doubles:
     // RN, RS, RO, position=(OX, OY, OZ), direction=(DX, DY, DZ), energy,
     // path length, stokes=(S0, S1, S2, S3)
 
-    ray.m_position = {vec[3], vec[4], vec[5]};
-    ray.m_direction = {vec[6], vec[7], vec[8]};
-    ray.m_energy = vec[9];
-    ray.m_pathLength = vec[10];
-
+    rays.position_x.push_back(vec[3]);
+    rays.position_y.push_back(vec[4]);
+    rays.position_z.push_back(vec[5]);
+    rays.direction_x.push_back(vec[6]);
+    rays.direction_y.push_back(vec[7]);
+    rays.direction_z.push_back(vec[8]);
+    rays.energy.push_back(vec[9]);
+    rays.optical_path_length.push_back(vec[10]);
     const auto stokes = glm::dvec4(vec[11], vec[12], vec[13], vec[14]);
-    ray.m_field = RAYX::stokesToElectricFieldWithBaseConvention(stokes, ray.m_direction);
-
-    // otherwise uninitialized:
-    ray.m_sourceID = -1;
-    ray.m_eventType = EventType::Uninitialized;
-    ray.m_lastElement = -1;
-    ray.m_order = -1;
-
-    return ray;
+    const auto electric_field = stokesToElectricFieldWithBaseConvention(stokes, rays.direction(rays.size() - 1));
+    rays.electric_field_x.push_back(electric_field.x);
+    rays.electric_field_y.push_back(electric_field.y);
+    rays.electric_field_z.push_back(electric_field.z);
 }
 
 /// will return the absolute path to the beamline
@@ -67,43 +64,35 @@ std::filesystem::path getBeamlineFilepath(std::string filename) {
 }
 
 /// will look at Intern/rayx-core/tests/input/<filename>.rml
-RAYX::Beamline loadBeamline(std::string filename) { return RAYX::importBeamline(getBeamlineFilepath(filename)); }
+Beamline loadBeamline(std::string filename) { return importBeamline(getBeamlineFilepath(filename)); }
+
+Rays readCsvUsingFilename(std::string filename) {
+    const auto file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".csv").string();
+    return readCsv(file);
+}
 
 /// will write to Intern/rayx-core/tests/output<filename>.csv
-void writeToOutputCSV(const RAYX::BundleHistory& hist, std::string filename) {
-    std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
-    writeCsv(hist, f);
+void writeCsvUsingFilename(const Rays& rays, std::string filename) {
+    const auto f = canonicalizeRepositoryPath("Intern/rayx-core/tests/output/" + filename + ".csv").string();
+    writeCsv(f, rays);
 }
 
-RAYX::BundleHistory traceRML(std::string filename) {
+Rays traceRml(std::string filename, RayAttrMask attrMask, Sequential seq) {
     const auto beamline = loadBeamline(filename);
-    const auto numElements = beamline.numElements();
-    const auto rays = tracer->trace(beamline, Sequential::No, DEFAULT_BATCH_SIZE, numElements + 2, fullRecordMask(numElements));
-    return raySoAToBundleHistory(rays);
+    return tracer->trace(beamline, seq, ObjectMask::all(), attrMask);
 }
 
-std::vector<RAYX::Ray> extractLastHit(const RAYX::BundleHistory& hist) {
-    std::vector<RAYX::Ray> outs;
-    for (auto rr : hist) {
-        Ray out;
-        out.m_eventType = EventType::Uninitialized;
-        for (auto r : rr) {
-            if (r.m_eventType == EventType::HitElement) {
-                out = r;
-            }
-        }
-        if (out.m_eventType != EventType::Uninitialized) {
-            outs.push_back(out);
-        }
-    }
-    return outs;
+std::pair<Beamline, Rays> loadBeamlineAndTrace(std::string filename, RayAttrMask attrMask) {
+    auto beamline = loadBeamline(filename);
+    auto rays = tracer->trace(beamline, Sequential::No, ObjectMask::all(), attrMask);
+    return std::make_pair(std::move(beamline), std::move(rays));
 }
 
 /// will look at Intern/rayx-core/tests/input/<filename>.csv
 /// the Ray-UI files are to be obtained by Export > RawRaysOutgoing (which are in
 /// element coordinates of the relevant element!)
-std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
-    std::string file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".csv").string();
+Rays loadCsvRayUi(std::string filename) {
+    const auto file = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".csv").string();
 
     std::ifstream f(file);
     std::string line;
@@ -113,147 +102,122 @@ std::vector<RAYX::Ray> loadCSVRayUI(std::string filename) {
         std::getline(f, line);
     }
 
-    std::vector<RAYX::Ray> out;
-
+    Rays rays;
+    int i = 0;
     while (std::getline(f, line)) {
-        out.push_back(parseCSVline(line));
+        // ray-ui only stores the last event of each ray path.
+        // we need to fabricate path_id and path_event_id here.
+        rays.path_id.push_back(i++);
+        rays.path_event_id.push_back(0);
+
+        parseRayUiCsvLineAndAppendEvent(rays, line);
     }
-
-    out.shrink_to_fit();
-
-    return out;
+    return rays;
 }
 
-void compareBundleHistories(const RAYX::BundleHistory& r1, const RAYX::BundleHistory& r2, double t) {
-    CHECK_EQ(r1.size(), r2.size());
+void compare(const Rays& a, const Rays& b, const RayAttrMask attrMask, double t) {
+    CHECK_EQ(a.size(), b.size());
 
-    auto it1 = r1.begin();
-    auto it1end = r1.end();
+    if (!contains(a.attrMask(), attrMask)) {
+        ADD_FAILURE();
+        return;
+    }
 
-    auto it2 = r2.begin();
+    if (!contains(b.attrMask(), attrMask)) {
+        ADD_FAILURE();
+        return;
+    }
 
-    while (it1 != it1end) {
-        auto& rr1 = *it1;
-        auto& rr2 = *it2;
-
-        CHECK_EQ(rr1.size(), rr2.size());
-
-        auto itr1 = rr1.begin();
-        auto itr1end = rr1.end();
-
-        auto itr2 = rr2.begin();
-
-        while (itr1 != itr1end) {
-            auto ray1 = *itr1;
-            auto ray2 = *itr2;
-
-            CHECK_EQ(ray1, ray2, t);
-
-            ++itr1;
-            ++itr2;
-        }
-
-        ++it1;
-        ++it2;
+    const auto n = a.size();
+    for (int i = 0; i < n; ++i) {
+#define X(type, name, flag) \
+    if (contains(attrMask, RayAttrMask::flag)) CHECK_EQ(a.name[i], b.name[i], t);
+        RAYX_X_MACRO_RAY_ATTR
+#undef X
     }
 }
 
-// If the ray from `ray_hist` went through the whole beamline sequentially, we return its last hit event.
-// Otherwise we return `{}`, aka None.
-std::optional<RAYX::Ray> lastSequentialHit(RayHistory ray_hist, uint32_t beamline_len) {
-    // The ray should hit every element from the beamline once.
-    if (ray_hist.size() != beamline_len) {
-        return {};
-    }
+void compareRayUiCompatible(const Rays& a, const Rays& b, double t) { compare(a, b, attrMaskCompatibleWithRayUi, t); }
 
-    for (int i = 0; i < beamline_len; i++) {
-        if (ray_hist[i].m_lastElement != i) {
-            return {};
+void compareRayUiCompatible_findAtLeastOnce(const Rays& rayx, const Rays& rayui, double t) {
+    const auto numEventsRayui = rayui.size();
+    const auto numEventsRayx = rayx.size();
+    for (auto i = 0; i < numEventsRayui; ++i) {
+        bool found = false;
+        for (auto j = 0; j < numEventsRayx; ++j) {
+            bool equal = true;
+
+#define X(type, name, flag) \
+    if (contains(attrMaskCompatibleWithRayUi, RayAttrMask::flag)) equal = equal && isEqual(rayx.name.at(j), rayui.name.at(i), t);
+            RAYX_X_MACRO_RAY_ATTR
+#undef X
+            if (equal) {
+                found = true;
+                break;
+            }
         }
+        EXPECT_TRUE(found) << "Could not find ray from rayui (with path_id = " << rayui.path_id.at(i)
+                           << " and path_event_id: " << rayui.path_event_id.at(i) << ") in list of rays from rayx.";
     }
-
-    return ray_hist.back();
 }
 
 // returns the rayx rays converted to be ray-UI compatible.
-std::vector<RAYX::Ray> rayUiCompat(std::string filename, Sequential seq) {
+Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
     const auto beamline = loadBeamline(filename);
+    const auto numSources = beamline.numSources();
     const auto numElements = beamline.numElements();
-    const auto rays = tracer->trace(beamline, seq, DEFAULT_BATCH_SIZE, beamline.numElements() + 2, fullRecordMask(numElements));
+    const auto numObjects = numSources + numElements;
 
-    const auto hist = raySoAToBundleHistory(rays);
+    auto rays =
+        tracer
+            ->trace(beamline, seq, ObjectMask::all(),
+                    attrMaskCompatibleWithRayUi | RayAttrMask::ObjectId | RayAttrMask::PathId | RayAttrMask::PathEventId | RayAttrMask::ElectricField)
+            // only events from last element
+            .filterByObjectId(numObjects - 1);
 
-    std::vector<RAYX::Ray> out;
+    // only last event of each path
+    rays = rays.filter([&](int i) { return rays.path_event_id[i] == numObjects - 1; }).sortByPathIdAndPathEventId();
 
-    auto compiled = beamline.compileElements();
-
-    for (auto ray_hist : hist) {
-        auto opt_ray = lastSequentialHit(ray_hist, beamline.numElements());
-
-        if (opt_ray) {
-            auto orig_r = *opt_ray;
-            auto r = orig_r;
-            int elem = (int)r.m_lastElement;
-            auto behaviour = compiled[elem].m_behaviour;
-            // these types of behaviours indicate that Ray-UI uses a DesignPlane::XY for this.
-            // Thus, (as rayx uses an XZ plane) to allow comparison with Ray-UI we need to swap the y and z coordinates here.
-            if (behaviour.is<Behaviour::ImagePlane>() || behaviour.is<Behaviour::Slit>() || behaviour.is<Behaviour::Foil>()) {
-                r.m_position.y = orig_r.m_position.z;
-                r.m_position.z = orig_r.m_position.y;
-                r.m_direction.y = orig_r.m_direction.z;
-                r.m_direction.z = orig_r.m_direction.y;
-            }
-            out.push_back(r);
+    const auto elements = beamline.compileElements();
+    const auto size = rays.size();
+    for (int i = 0; i < size; ++i) {
+        const auto element_id = rays.object_id[i] - numSources;
+        const auto behaviour = elements[element_id].element.m_behaviour;
+        if (behaviour.is<Behaviour::ImagePlane>() || behaviour.is<Behaviour::Slit>() || behaviour.is<Behaviour::Foil>()) {
+            // these elements have their local z axis along the beam direction, so we need to swap y and z to match Ray-UI
+            std::swap(rays.position_y[i], rays.position_z[i]);
+            std::swap(rays.direction_y[i], rays.direction_z[i]);
         }
     }
-    return out;
+
+    return rays;
 }
 
-BundleHistory convertToBundleHistory(const std::vector<Ray>& rays) {
-    BundleHistory out;
-    for (auto r : rays) {
-        out.push_back({r});
-    }
-    return out;
+void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance, Sequential seq) {
+    auto rayx = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
+    auto rayui = loadCsvRayUi(filename);
+
+    writeCsvUsingFilename(rayx, filename + ".rayx");
+    writeCsvUsingFilename(rayui, filename + ".rayui");
+
+    compareRayUiCompatible(rayx, rayui, tolerance);
 }
 
-void compareLastAgainstRayUI(std::string filename, double tolerance, Sequential seq) {
-    auto rayx_list = rayUiCompat(filename, seq);
-    auto rayui_list = loadCSVRayUI(filename);
+void traceRmlAndCompareAgainstRayUi_allowMontecarloRayUi(std::string filename, double tolerance, Sequential seq) {
+    auto rayx = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
+    auto rayui = loadCsvRayUi(filename);
 
-    writeToOutputCSV(convertToBundleHistory(rayx_list), filename + ".rayx");
-    writeToOutputCSV(convertToBundleHistory(rayui_list), filename + ".rayui");
+    writeCsvUsingFilename(rayx, filename + ".rayx");
+    writeCsvUsingFilename(rayui, filename + ".rayui");
 
-    CHECK_EQ(rayx_list.size(), rayui_list.size());
-
-    auto itRayX = rayx_list.begin();
-    auto itRayXEnd = rayx_list.end();
-
-    auto itRayUI = rayui_list.begin();
-
-    while (itRayX != itRayXEnd) {
-        auto rayx = *itRayX;
-        auto correct = *itRayUI;
-
-        // TODO: make more properties of the rays work the same!
-        CHECK_EQ(rayx.m_position, correct.m_position, tolerance);
-        CHECK_EQ(rayx.m_direction, correct.m_direction, tolerance);
-        CHECK_EQ(rayx.m_energy, correct.m_energy, tolerance);
-
-        ++itRayX;
-        ++itRayUI;
-    }
-    RAYX_LOG << "compareLastAgainstRayUI finished ";
+    compareRayUiCompatible_findAtLeastOnce(rayx, rayui, tolerance);
 }
 
-void compareAgainstCorrect(std::string filename, double tolerance) {
-    auto a = traceRML(filename);
-
-    std::string f = canonicalizeRepositoryPath("Intern/rayx-core/tests/input/" + filename + ".correct.csv").string();
-    auto b = loadCsv(f);
-
-    writeToOutputCSV(a, filename + ".rayx");
-    compareBundleHistories(a, b, tolerance);
+void traceRmlAndCompareAgainstCorrectResults(std::string filename, double tolerance) {
+    const auto a = traceRml(filename);
+    const auto b = readCsvUsingFilename(filename + ".correct");
+    writeCsvUsingFilename(a, filename + ".rayx");
+    compare(a, b, RayAttrMask::All, tolerance);
 }
 
 MaterialTables createMaterialTables(std::vector<Material> mats_vec) {

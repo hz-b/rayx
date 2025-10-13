@@ -15,6 +15,10 @@
 
 /// For quick debugging prints, this file further exposes RAYX_DBG(x).
 
+// TODO: this file has the downside, that it defines ostream operators and formatToVec for specific types. This means, that files that define these
+// types cannot include this file, due to circular dependencies. In order to improve this, the ostream operators and formatToVec functions should be
+// moved to the files that define these types.
+
 #include <array>
 #include <iomanip>
 #include <iostream>
@@ -22,7 +26,7 @@
 #include <vector>
 
 // This include is necessary, as Debug implements a special formatting for Ray.
-#include "RaySoA.h"
+#include "Rays.h"
 #include "Shader/Ray.h"
 
 // Debug only code; use it as: DEBUG(<statement>);
@@ -172,7 +176,7 @@ extern void RAYX_API (*error_fn)();
 // COLLECTION DEBUGGING SYSTEM
 /////////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  *
  * In the following we define
  * RAYX_DBG: prints collection to RAYX_LOG for debugging
@@ -182,22 +186,19 @@ extern void RAYX_API (*error_fn)();
  * RAYX_DBG(position);
  * */
 
-inline std::vector<double> formatAsVec(double arg) { return {arg}; }
-inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<double>(arg)}; }
-
-inline std::vector<double> formatAsVec(complex::Complex comp) { return {comp.real(), comp.imag()}; }
-
-inline std::vector<double> formatAsVec(const Ray arg) {
-    std::vector<double> out;
-    auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
-
-#define X(type, name, flag, map) insert(formatAsVec(arg.map));
-
-    RAYX_X_MACRO_RAY_ATTR_MAPPED
-#undef X
-
-    return out;
+// catch any unimplemented usage of formatAsVec
+template <typename T>
+inline std::vector<double> formatAsVec(T) {
+    // abort compilation and print type T
+    [[maybe_unused]] typedef typename T::something_made_up X;
+    return {};
 }
+
+inline std::vector<double> formatAsVec(int arg) { return {static_cast<double>(arg)}; }
+inline std::vector<double> formatAsVec(RandCounter arg) { return {static_cast<double>(arg)}; }
+inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<double>(arg)}; }
+inline std::vector<double> formatAsVec(double arg) { return {arg}; }
+inline std::vector<double> formatAsVec(complex::Complex arg) { return {arg.real(), arg.imag()}; }
 
 template <int N, int M, typename T>
 inline std::vector<double> formatAsVec(const glm::mat<N, M, T> arg) {
@@ -244,11 +245,11 @@ inline std::vector<double> formatAsVec<double>(const std::vector<double> arg) {
     return arg;
 }
 
-inline std::vector<double> formatAsVec(const RaySoA& rays) {
+inline std::vector<double> formatAsVec(const Rays& rays) {
     std::vector<double> out;
     auto insert = [&out](const std::vector<double>& v) { out.insert(out.end(), v.begin(), v.end()); };
 
-#define X(type, name, flag, map) insert(formatAsVec(rays.name));
+#define X(type, name, flag) insert(formatAsVec(rays.name));
 
     RAYX_X_MACRO_RAY_ATTR
 #undef X

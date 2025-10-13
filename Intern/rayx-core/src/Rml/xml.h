@@ -9,11 +9,13 @@
 
 #include "Angle.h"
 #include "Beamline/Definitions.h"
-#include "Element/Cutout.h"
+#include "Beamline/EnergyDistribution.h"
 #include "Element/Coating.h"
+#include "Element/Cutout.h"
 #include "Element/Surface.h"
 #include "Material/Material.h"
 #include "Shader/Constants.h"
+#include "Shader/LightSources/LightSource.h"
 #include "Shader/SlopeError.h"
 
 namespace RAYX {
@@ -37,17 +39,7 @@ enum class SpreadType;
 enum class ElementType;
 enum class CrystalType;
 enum class OffsetAngleType;  // TODO:see if this is needed
-enum class SurfaceCoatingType;  
-
-// An error in position and orientation that an object might have.
-struct Misalignment {
-    double m_translationXerror;
-    double m_translationYerror;
-    double m_translationZerror;
-    Rad m_rotationXerror;
-    Rad m_rotationYerror;
-    Rad m_rotationZerror;
-};
+enum class SurfaceCoatingType;
 
 namespace xml {
 
@@ -64,7 +56,6 @@ bool paramDvec3(const rapidxml::xml_node<>* node, const char* paramname, glm::dv
 
 // These functions parse more complex parts of beamline objects, and are used by multiple objects in their construction mechanism.
 // They itself use the above param* functions.
-bool paramMisalignment(const rapidxml::xml_node<>* node, Misalignment* out);
 bool paramSlopeError(const rapidxml::xml_node<>* node, SlopeError* out);
 bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
@@ -96,10 +87,8 @@ struct RAYX_API Parser {
     glm::dvec3 parseDvec3(const char* paramname) const;
 
     // parsers for derived parameters
-    Misalignment parseMisalignment() const;
     SlopeError parseSlopeError() const;
     std::array<double, 6> parseVls() const;
-    EnergyDistribution parseEnergyDistribution() const;
     glm::dvec4 parsePosition() const;
     glm::dmat4x4 parseOrientation() const;
     Material parseMaterial() const;
@@ -174,7 +163,6 @@ struct RAYX_API Parser {
     // those in rml file are wrong. not necessary when our recalculated position
     // and orientation is stored
     inline double parseDistancePreceding() const { return parseDouble("distancePreceding"); }
-    inline int parseMisalignmentCoordinateSystem() const { return parseInt("misalignmentCoordinateSystem"); }
     inline double parseVerEbeamDivergence() const { return parseDouble("verEbeamDiv"); }
     inline double parseElectronEnergy() const { return parseDouble("electronEnergy"); }
     inline int parseAlignmentError() const { return parseInt("alignmentError"); }
@@ -186,6 +174,7 @@ struct RAYX_API Parser {
         return static_cast<EnergyDistributionType>(parseInt("energyDistributionType"));
     }
     inline EnergySpreadUnit parseEnergySpreadUnit() const { return static_cast<EnergySpreadUnit>(parseInt("energySpreadUnit")); }
+    inline int parseNumberOfSeparateEnergies() const { return parseInt("SeparateEnergies"); }
     inline int parseNumOfEquidistantCircles() const { return static_cast<int>(parseDouble("numberCircles")); }
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
     inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }
@@ -219,7 +208,9 @@ struct RAYX_API Parser {
     inline double parseRoughnessSubstrate() const { return parseDouble("roughnessSubstrate"); }
     inline double parseDensitySubstrate() const { return parseDouble("densitySubstrate"); }
 
-    inline SurfaceCoatingType parseSurfaceCoatingType() const { return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));}  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+    inline SurfaceCoatingType parseSurfaceCoatingType() const {
+        return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));
+    }  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
     inline double parseThicknessCoating() const { return parseDouble("thicknessCoating"); }
     inline double parseRoughnessCoating() const { return parseDouble("roughnessCoating"); }
 
