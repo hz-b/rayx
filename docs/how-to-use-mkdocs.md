@@ -117,3 +117,15 @@ RAYX_FN_ACC double getBraggAngle(double energy, double dSpacing2) {
     ```
     
     1. :rainbow_flag: SCIENCE! With _inline_ `code`
+
+### Diagrams
+
+
+```mermaid
+graph LR
+  A[Start] --> B{Failure?};
+  B -->|Yes| C[Investigate...];
+  C --> D[Debug];
+  D --> B;
+  B ---->|No| E[Success!];
+```

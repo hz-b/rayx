@@ -1,8 +1,0 @@
-[book]
-title = "RAYX Wiki"
-
-[output.html]
-mathjax-support = true
-
-[output.html.fold]
-enable = true

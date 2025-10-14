@@ -2,6 +2,13 @@
 site_name: RAYX
 site_url: https://hz-b.github.io/rayx/
 repo_url: https://github.com/hz-b/rayx
+site_author: Helmholtz-Zentrum Berlin für Materialien und Energie (HZB)
+site_description: RAYX is a powerful, multi-component simulation platform designed to streamline the design and optimization of beamlines in synchrotron light source facilities.
+copyright: HZB 2025
+
+# nav:
+#   - README.md
+
 
 extra:
   version:
@@ -25,9 +32,14 @@ markdown_extensions:
   - pymdownx.details            # collapsible admonitions with ???
   - pymdownx.arithmatex:
       generic: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 extra_javascript:
-  - javascripts/mathjax.js
+  - js/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 theme:
@@ -35,6 +47,10 @@ theme:
   features:
     - content.code.copy
     - content.code.annotate
+    - navigation.tabs
+    - navigation.top
+    - navigation.tabs.sticky
+    - navigation.sections
   icon:
     repo: fontawesome/brands/github
   palette:
