@@ -153,8 +153,17 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
     const auto incident_vec = r.m_direction;
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);
     r.m_direction = reflect_vec;
-
-    if (coating.m_type == SurfaceCoatingType::SubstrateOnly) {
+    SurfaceCoatingType type;
+    if (coating.is<Coating::SubstrateOnly>()) {
+        type = SurfaceCoatingType::SubstrateOnly;
+    } else if (coating.is<Coating::OneCoating>()) {
+        type = SurfaceCoatingType::OneCoating;
+    } else if (coating.is<Coating::MultilayerCoating>()) {
+        type = SurfaceCoatingType::MultipleCoatings;
+    } else {
+        _throw("invalid coating type in behaveMirror!");
+    }
+    if (type == SurfaceCoatingType::SubstrateOnly) {
         if (material != -2) {
         constexpr int vacuum_material = -1;
         const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
@@ -165,7 +174,7 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         r.m_field = reflect_field;
         r.m_order = 0;
         }
-    } else if (coating.m_type == SurfaceCoatingType::OneCoating) {
+    } else if (type == SurfaceCoatingType::OneCoating) {
         Coating::OneCoating oneCoating = variant::get<Coating::OneCoating>(coating.m_coating);
 
         constexpr int vacuum_material = -1;
@@ -190,7 +199,7 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
         const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
         r.m_field = polmat * r.m_field;
         r.m_order = 0;
-    } else if (coating.m_type == SurfaceCoatingType::MultipleCoatings) {
+    } else if (type == SurfaceCoatingType::MultipleCoatings) {
         Coating::MultilayerCoating mlCoating = variant::get<Coating::MultilayerCoating>(coating.m_coating);
         constexpr int vacuum_material = -1;
         const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);

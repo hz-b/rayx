@@ -29,12 +29,17 @@ struct RAYX_API Coating{
         std::vector<OneCoating> layers;
     };
 
-    SurfaceCoatingType m_type;
-
     variant::variant<SubstrateOnly, OneCoating, MultilayerCoating> m_coating;
+
+    Coating() : Coating(SubstrateOnly{}) {}
 
     template<typename T>
     Coating(T t) : m_coating(t) {}
+
+    template <typename T>
+    bool is() const {
+        return variant::holds_alternative<T>(m_coating);
+    }
 };
 
 } // namespace RAYX

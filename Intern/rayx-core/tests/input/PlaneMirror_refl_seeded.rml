@@ -2,7 +2,6 @@
 <lab>
 <version>1.12</version>
 <beamline>
-
   <object name="Matrix Source" type="Matrix Source">
     <param id="numberRays" enabled="T">200</param>
     <param id="sourceWidth" enabled="T">0.065000000000000002</param>
@@ -59,7 +58,7 @@
     <param id="reflectivitySenkrecht" enabled="T">0.716391</param>
     <param id="reflectivityParallel" enabled="T">0.674078</param>
     <param id="reflectivityPhase" enabled="T">-7.72232</param>
-    <param id="elementSubstrate" enabled="T">Au</param>
+    <param id="materialSubstrate" enabled="T">Au</param>
     <param id="roughnessSubstrate" enabled="T">0</param>
     <param id="densitySubstrate" auto="T" enabled="T">19.300000000000001</param>
     <param id="surfaceCoating" comment="Substrate only" enabled="T">0</param>
@@ -148,9 +147,5 @@
       <z>0.93969262078590832</z>
     </param>
   </object>
-
 </beamline>
-
-<ExtraData>
-</ExtraData>
 </lab>

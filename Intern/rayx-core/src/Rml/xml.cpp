@@ -316,16 +316,23 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
         }
     }
 
-    int numLayers = 0;
+    int definedCoatings = 0;
     for (auto* l = layersRoot->first_node("layer"); l; l = l->next_sibling("layer")) {
-        numLayers++;
+        definedCoatings++;
+    }
+
+    int numLayers = 0;
+    if (!paramInt(node, "NumberOfLayers", &numLayers)) {
+        numLayers = definedCoatings;  // if not given, use the number of defined layers.
+    }
+
+    if (numLayers <= 0) {
+        RAYX_WARN << "Number of layers must be positive.";
+        return false;
     }
 
     out->numLayers = numLayers;
-    if (numLayers <= 0) {
-        RAYX_WARN << "Invalid number of layers: " << numLayers << ". Must be greater than 0.";
-        return false;
-    }
+
     out->layers.resize(numLayers);
     int i = 0;
     for (auto* layerNode = layersRoot->first_node("layer"); layerNode; layerNode = layerNode->next_sibling("layer"), ++i) {
@@ -356,6 +363,14 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
             return false;
         }
     }
+
+    //fill layer information if defined coatings is less than number of required layers
+    if (definedCoatings < numLayers) {
+        for (int j = definedCoatings; j < numLayers; ++j) {
+            out->layers[j] = out->layers[definedCoatings - 1];  // copy last defined layer
+        }
+    }
+
     return true;
 }
 
@@ -478,7 +493,7 @@ bool paramMaterial(const rapidxml::xml_node<>* node, Material* out) {
 
     const char* str;
 
-    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "crystalMaterial", &str) &&
+    if (!paramStr(node, "materialSubstrate", &str) && !paramStr(node, "elementSubstrate", &str) && !paramStr(node, "crystalMaterial", &str) &&
         !paramStr(node, "materialCoating", &str)) {
         return false;
     }
