@@ -207,12 +207,10 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
 
         const int n = mlCoating.numLayers;
         complex::Complex iors[1002];
-        double thickness[1000];
 
         iors[0] = vacuum_ior;
         for (int i = 0; i < n; ++i) {
-            iors[i + 1] = getRefractiveIndex(r.m_energy, mlCoating.layers[i].material, materialIndices, materialTable);
-            thickness[i] = mlCoating.layers[i].thickness;
+            iors[i + 1] = getRefractiveIndex(r.m_energy, mlCoating.material[i], materialIndices, materialTable);
         }
         iors[n + 1] = substrate_ior;
 
@@ -221,7 +219,7 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
 
         const double wavelength = energyToWaveLength(r.m_energy);
 
-        const auto amplitude = computeMultilayerReflectance(incidentAngle, wavelength, n, thickness, iors);
+        const auto amplitude = computeMultilayerReflectance(incidentAngle, wavelength, n, mlCoating.thickness, iors);
 
         const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
         r.m_field = polmat * r.m_field;

@@ -322,7 +322,7 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
     }
 
     int numLayers = 0;
-    if (!paramInt(node, "NumberOfLayers", &numLayers)) {
+    if (!paramInt(node, "NumberOfLayer", &numLayers)) {
         numLayers = definedCoatings;  // if not given, use the number of defined layers.
     }
 
@@ -333,10 +333,8 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
 
     out->numLayers = numLayers;
 
-    out->layers.resize(numLayers);
     int i = 0;
     for (auto* layerNode = layersRoot->first_node("layer"); layerNode; layerNode = layerNode->next_sibling("layer"), ++i) {
-        Coating::OneCoating& layer = out->layers[i];
 
         const char* materialStr = nullptr;
         if (auto* m = layerNode->first_attribute("material")) {
@@ -347,27 +345,28 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
         }
         Material material;
         materialFromString(materialStr, &material);
-        layer.material = static_cast<int>(material);
+        out->material[i] = static_cast<int>(material);
 
         if (auto* t = layerNode->first_attribute("thickness")) {
-            layer.thickness = std::stod(t->value());
+            out->thickness[i] = std::stod(t->value());
         } else {
             RAYX_WARN << "Missing thickness for layer " << (i + 1);
             return false;
         }
 
         if (auto* r = layerNode->first_attribute("roughness")) {
-            layer.roughness = std::stod(r->value());
+            out->roughness[i] = std::stod(r->value());
         } else {
             RAYX_WARN << "Missing roughness for layer " << (i + 1);
             return false;
         }
     }
 
-    //fill layer information if defined coatings is less than number of required layers
     if (definedCoatings < numLayers) {
         for (int j = definedCoatings; j < numLayers; ++j) {
-            out->layers[j] = out->layers[definedCoatings - 1];  // copy last defined layer
+            out->material[j] = out->material[j % definedCoatings];
+            out->thickness[j] = out->thickness[j % definedCoatings];
+            out->roughness[j] = out->roughness[j % definedCoatings];
         }
     }
 

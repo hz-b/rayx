@@ -26,7 +26,9 @@ struct RAYX_API Coating{
 
     struct RAYX_API MultilayerCoating {
         int numLayers;
-        std::vector<OneCoating> layers;
+        int material[1000];
+        double thickness[1000];
+        double roughness[1000];
     };
 
     variant::variant<SubstrateOnly, OneCoating, MultilayerCoating> m_coating;

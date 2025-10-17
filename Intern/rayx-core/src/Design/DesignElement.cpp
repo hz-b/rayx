@@ -513,12 +513,11 @@ SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_eleme
 void DesignElement::setMultilayerCoating(const Coating::MultilayerCoating& coating) {
     m_elementParameters["numLayers"] = coating.numLayers;
     m_elementParameters["coating"] = Map();
-    for (size_t i = 0; i < coating.layers.size(); ++i) {
-        const auto& layer = coating.layers[i];
+    for (size_t i = 0; i < coating.numLayers; ++i) {
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)] = Map();
-        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = layer.material;
-        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = layer.thickness;
-        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"] = layer.roughness;
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = coating.material[i];
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = coating.thickness[i];
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"] = coating.roughness[i];
     }
 }
 
@@ -537,17 +536,15 @@ Coating DesignElement::getCoating() const { // 0 = substrate only, 1 = one coati
         mlCoating.numLayers = m_elementParameters["numLayers"].as_int();
         for (int i = 0; i < mlCoating.numLayers; ++i) {
             std::string layerKey = "layer" + std::to_string(i + 1);
-            try{
-                Coating::OneCoating layer;
-                layer.material = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"].as_int();
-                layer.thickness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"].as_double();
-                layer.roughness = m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"].as_double();
-                mlCoating.layers.push_back(layer);
+            try {
+                mlCoating.material[i] = m_elementParameters["coating"][layerKey]["material"].as_int();
+                mlCoating.thickness[i] = m_elementParameters["coating"][layerKey]["thickness"].as_double();
+                mlCoating.roughness[i] = m_elementParameters["coating"][layerKey]["roughness"].as_double();
             } catch (const std::exception& e) {
                 std::cerr << "Error deserializing layer " << layerKey << ": " << e.what() << std::endl;
             }
         }
-        if (mlCoating.layers.empty()) {
+        if (0 > mlCoating.material[0] || mlCoating.material[0] > 97) {
             std::cerr << "Warning: No coating layers found in DesignElement." << std::endl;
             return Coating::SubstrateOnly{}; // Default case if no layers are found
         }
