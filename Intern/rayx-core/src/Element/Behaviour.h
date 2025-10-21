@@ -75,6 +75,7 @@ struct Behaviour {
     Behaviour(T t) : m_behaviour(t) {}
 
     template <typename T>
+    RAYX_FN_ACC
     bool is() const {
         return variant::holds_alternative<T>(m_behaviour);
     }

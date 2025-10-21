@@ -39,6 +39,7 @@ struct RAYX_API Coating{
     Coating(T t) : m_coating(t) {}
 
     template <typename T>
+    RAYX_FN_ACC
     bool is() const {
         return variant::holds_alternative<T>(m_coating);
     }
