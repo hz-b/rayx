@@ -513,7 +513,7 @@ SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_eleme
 void DesignElement::setMultilayerCoating(const Coating::MultilayerCoating& coating) {
     m_elementParameters["numLayers"] = coating.numLayers;
     m_elementParameters["coating"] = Map();
-    for (size_t i = 0; i < coating.numLayers; ++i) {
+    for (int i = 0; i < coating.numLayers; ++i) {
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)] = Map();
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = coating.material[i];
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = coating.thickness[i];
