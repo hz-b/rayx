@@ -2,6 +2,7 @@
 
 #include "ElectricField.h"
 #include "Rand.h"
+#include "Constants.h"
 
 namespace RAYX {
 
