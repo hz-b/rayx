@@ -32,7 +32,7 @@ void dynamicElements(const int gid, const InvState& inv, OutputEvents& outputEve
         ray = rayMatrixMult(element.m_inTrans, ray);
 
         // Calculate interaction(reflection,material, absorption etc.) of ray with detected next element
-        const auto behaviour = element.m_behaviour;
+        //const auto behaviour = element.m_behaviour;
         const auto coating = element.m_coating;
 
         ray.m_pathLength += glm::length(ray.m_position - col.hitpoint);
