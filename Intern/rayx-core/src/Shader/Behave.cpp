@@ -156,14 +156,14 @@ Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int ma
     
     if (coating.is<Coating::SubstrateOnly>()) {
         if (material != -2) {
-        constexpr int vacuum_material = -1;
-        const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
-        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+            constexpr int vacuum_material = -1;
+            const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+            const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
-        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, vacuum_ior, substrate_ior);
+            const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, vacuum_ior, substrate_ior);
 
-        r.m_field = reflect_field;
-        r.m_order = 0;
+            r.m_field = reflect_field;
+            r.m_order = 0;
         }
     } else if (coating.is<Coating::OneCoating>()) {
         Coating::OneCoating oneCoating = variant::get<Coating::OneCoating>(coating.m_coating);

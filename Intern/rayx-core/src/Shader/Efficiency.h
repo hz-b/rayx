@@ -171,7 +171,7 @@ inline ComplexFresnelCoeffs computeSingleCoatingReflectance(
     auto r12 = calcReflectAmplitude(theta1, theta2, iorC, iorS);
 
     // Phasenverschiebung im Film
-    const auto delta = (2.0 * M_PI / wavelength) * iorC * complex::cos(theta1) * thickness;
+    const auto delta = (2.0 * PI / wavelength) * iorC * complex::cos(theta1) * thickness;
     const auto phase = complex::exp(complex::Complex(0.0, 2.0) * delta);
 
     // Interferenzformel (Parratt für 1 Schicht)
@@ -205,7 +205,7 @@ inline ComplexFresnelCoeffs computeMultilayerReflectance(
 
     // Parratt-Rekursion von unten nach oben
     for (int j = numLayers - 1; j >= 0; --j) {
-        const auto delta = (2.0 * M_PI / wavelength) * iors[j + 1] * complex::cos(thetas[j + 1]) * thicknesses[j];
+        const auto delta = (2.0 * PI / wavelength) * iors[j + 1] * complex::cos(thetas[j + 1]) * thicknesses[j];
         const auto phase = complex::exp(complex::Complex(0.0, 2.0) * delta);
 
         const auto r_j = calcReflectAmplitude(thetas[j], thetas[j + 1], iors[j], iors[j + 1]);
