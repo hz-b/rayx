@@ -276,6 +276,8 @@ void DesignElement::setExpertsCubic(Surface value) {
     m_elementParameters["expertsParams"]["B23"] = cub.m_b23;
     m_elementParameters["expertsParams"]["B31"] = cub.m_b31;
     m_elementParameters["expertsParams"]["B32"] = cub.m_b32;
+
+    m_elementParameters["expertsParams"]["psi"] = cub.m_psi;
 }
 
 Surface DesignElement::getExpertsCubic() const {
@@ -298,6 +300,7 @@ Surface DesignElement::getExpertsCubic() const {
     cub.m_b31 = m_elementParameters["expertsParams"]["B31"].as_double();
     cub.m_b32 = m_elementParameters["expertsParams"]["B32"].as_double();
 
+    cub.m_psi = m_elementParameters["expertsParams"]["psi"].as_double();
     return Surface::Cubic{cub};
 }
 
