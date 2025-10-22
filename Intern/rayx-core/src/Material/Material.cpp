@@ -9,6 +9,7 @@
 #include "Debug/Debug.h"
 #include "NffTable.h"
 #include "PalikTable.h"
+#include "CromerTable.h"
 
 namespace rayx {
 
@@ -88,6 +89,24 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
                 out.materials.push_back(x.m_energy);
                 out.materials.push_back(x.m_f1);
                 out.materials.push_back(x.m_f2);
+            }
+        }
+    }
+
+    // add cromer table content
+    for (size_t i = 0; i < mats.size(); i++) {
+        out.indices.push_back(out.materials.size());
+        if (relevantMaterials[i]) {
+            CromerTable t;
+
+            if (!CromerTable::load(getMaterialName(mats[i]), &t)) {
+                RAYX_EXIT << "could not load CromerTable!";
+            }
+
+            for (auto x : t.m_Lines) {
+                out.materials.push_back(x.m_energy);
+                out.materials.push_back(x.m_n);
+                out.materials.push_back(x.m_k);
             }
         }
     }

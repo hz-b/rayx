@@ -41,6 +41,16 @@ int RAYX_API getNffEntryCount(const int material, const int* materialIndices) {
     // the offset of 92 (== number of materials), skips the palik table and
     // reaches into the nff table. the rest of the logic is as above.
     return (materialIndices[92 + m + 1] - materialIndices[92 + m]) / 3;
+
+}
+
+/// The number of cromer entries we currently store for this material.
+RAYX_FN_ACC
+int RAYX_API getCromerEntryCount(const int material, const int* materialIndices) {
+    int m = material - 1;  // in [0, 91]
+    // the offset of 184 (== number of materials * 2), skips the palik table and
+    // reaches into the cromer table. the rest of the logic is as above.
+    return (materialIndices[184 + m + 1] - materialIndices[184 + m]) / 3;
 }
 
 // Indexes into the palik table of a particular material at a given index.
@@ -70,6 +80,21 @@ NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict mat
     e.m_energy = materialTable[i];
     e.m_f1     = materialTable[i + 1];
     e.m_f2     = materialTable[i + 2];
+
+    return e;
+}
+
+RAYX_FN_ACC
+CromerEntry RAYX_API getCromerEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
+    int m = material - 1;  // in [0, 91]
+    // materialIndices[184+m] is the start of the Cromer table of material m.
+    // 3*index skips 'index'-many entries.
+    int i = materialIndices[184 + m] + 3 * index;
+
+    CromerEntry e;
+    e.m_energy = materialTable[i];
+    e.m_n = materialTable[i + 1];
+    e.m_k = materialTable[i + 2];
 
     return e;
 }
@@ -140,6 +165,26 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
         double k       = (415.252 * rho * entry.m_f2) / (e * e * mass);
 
         return complex::Complex(n, k);
+    }
+
+    // get refractive index with Cromer table
+    if (getCromerEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
+        int low = 0;                                                 // <= energy
+        int high = getCromerEntryCount(material, materialIndices) - 1;  // >= energy
+
+        // binary search
+        while (high - low > 1) {
+            int center = (low + high) / 2;
+            CromerEntry center_entry = getCromerEntry(center, material, materialIndices, materialTable);
+            if (energy < center_entry.m_energy) {
+                high = center;
+            } else {
+                low = center;
+            }
+        }
+
+        CromerEntry entry = getCromerEntry(low, material, materialIndices, materialTable);
+        return complex::Complex(entry.m_n, entry.m_k);
     }
 
     _throw("getRefractiveIndex: no matching entry found!");
