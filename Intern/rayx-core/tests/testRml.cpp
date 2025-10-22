@@ -252,3 +252,4 @@ TEST_F(TestSuite, groupTransform2) {
     CHECK_EQ(orientationCorrect, orientationResult);
     CHECK_EQ(positionCorrect, positionResult);
 }
+

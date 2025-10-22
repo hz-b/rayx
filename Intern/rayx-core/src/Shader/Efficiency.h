@@ -2,6 +2,7 @@
 
 #include "ElectricField.h"
 #include "Rand.h"
+#include "Constants.h"
 
 namespace RAYX {
 
@@ -149,6 +150,71 @@ inline cmat3 calcReflectPolarizationMatrixAtNormalIncidence(const ComplexFresnel
     return {
         amplitude.s, 0, 0, 0, amplitude.s, 0, 0, 0, amplitude.s,
     };
+}
+
+// Berechnet die komplexe Reflexionsamplitude für eine einzelne dünne Schicht (ohne Rauigkeit)
+RAYX_FN_ACC
+inline ComplexFresnelCoeffs computeSingleCoatingReflectance(
+    const complex::Complex incidentAngle,
+    const double wavelength,
+    const double thickness,
+    const complex::Complex iorI,   // n0: z. B. Vakuum
+    const complex::Complex iorC,   // n1: Beschichtung
+    const complex::Complex iorS    // n2: Substrat
+) {
+    // Winkel in der Beschichtung und im Substrat
+    const auto theta1 = calcRefractAngle(incidentAngle, iorI, iorC);
+    const auto theta2 = calcRefractAngle(theta1, iorC, iorS);
+
+    // Fresnel‑Reflexion an beiden Grenzflächen
+    auto r01 = calcReflectAmplitude(incidentAngle, theta1, iorI, iorC);
+    auto r12 = calcReflectAmplitude(theta1, theta2, iorC, iorS);
+
+    // Phasenverschiebung im Film
+    const auto delta = (2.0 * PI / wavelength) * iorC * complex::cos(theta1) * thickness;
+    const auto phase = complex::exp(complex::Complex(0.0, 2.0) * delta);
+
+    // Interferenzformel (Parratt für 1 Schicht)
+    const auto r_s = (r01.s + r12.s * phase) / (complex::Complex(1.0) + r01.s * r12.s * phase);
+    const auto r_p = (r01.p + r12.p * phase) / (complex::Complex(1.0) + r01.p * r12.p * phase);
+
+    return {r_s, r_p};
+}
+
+
+RAYX_FN_ACC
+inline ComplexFresnelCoeffs computeMultilayerReflectance(
+    const complex::Complex incidentAngle,
+    const double wavelength,
+    int numLayers,
+    const double* __restrict thicknesses,          // Längen: numLayers
+    const complex::Complex* __restrict iors        // Längen: numLayers + 2 (Vakuum + Schichten + Substrat)
+) {
+    constexpr int MAX_ANGLES = 18;  // unterstützt bis zu 16 Schichten
+    complex::Complex thetas[MAX_ANGLES];
+
+    // Einfallswinkel in den einzelnen Schichten
+    thetas[0] = incidentAngle;
+    for (int i = 1; i <= numLayers + 1; ++i) {
+        thetas[i] = calcRefractAngle(thetas[i - 1], iors[i - 1], iors[i]);
+    }
+
+    // Startwert: Reflexion an Substratgrenze
+    ComplexFresnelCoeffs r = calcReflectAmplitude(thetas[numLayers], thetas[numLayers + 1],
+                                                  iors[numLayers], iors[numLayers + 1]);
+
+    // Parratt-Rekursion von unten nach oben
+    for (int j = numLayers - 1; j >= 0; --j) {
+        const auto delta = (2.0 * PI / wavelength) * iors[j + 1] * complex::cos(thetas[j + 1]) * thicknesses[j];
+        const auto phase = complex::exp(complex::Complex(0.0, 2.0) * delta);
+
+        const auto r_j = calcReflectAmplitude(thetas[j], thetas[j + 1], iors[j], iors[j + 1]);
+
+        r.s = (r_j.s + r.s * phase) / (complex::Complex(1.0) + r_j.s * r.s * phase);
+        r.p = (r_j.p + r.p * phase) / (complex::Complex(1.0) + r_j.p * r.p * phase);
+    }
+
+    return r;
 }
 
 RAYX_FN_ACC

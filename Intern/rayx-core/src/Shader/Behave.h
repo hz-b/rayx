@@ -21,7 +21,7 @@ RAYX_FN_ACC Ray behaveCrystal(Ray r, const Behaviour::Crystal crystal, Collision
 RAYX_FN_ACC Ray behaveSlit(Ray r, const Behaviour::Slit slit, Rand& rand);
 RAYX_FN_ACC Ray behaveRZP(Ray r, const Behaviour::RZP rzp, Collision col, Rand& rand);
 RAYX_FN_ACC Ray behaveGrating(Ray r, const Behaviour::Grating grating, Collision col);
-RAYX_FN_ACC Ray behaveMirror(Ray r, const Collision col, int material, const int* materialIndices, const double* materialTable);
+RAYX_FN_ACC Ray behaveMirror(Ray r, const Collision col, const Coating coating, int material, const int* materialIndices, const double* materialTable);
 RAYX_FN_ACC Ray behaveImagePlane(Ray r);
 RAYX_FN_ACC Ray behaveFoil(Ray r, const Behaviour::Foil foil, Collision col, int material, const int* materialIndices, const double* materialTable);
 

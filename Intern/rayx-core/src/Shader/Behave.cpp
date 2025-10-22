@@ -59,7 +59,6 @@ Ray behaveCrystal(Ray r, const Behaviour::Crystal crystal, [[maybe_unused]] Coll
 // Implementation based on dynamical diffraction theory from:
 // Batterman, B. W., & Cole, H. (1964). "Dynamical Diffraction of X Rays by Perfect Crystals".
 // Reviews of Modern Physics, 36(3), 681-717. https://doi.org/10.1103/RevModPhys.36.681
-
 RAYX_FN_ACC
 Ray behaveSlit(Ray r, const Behaviour::Slit slit, Rand& __restrict rand) {
     // slit lies in x-y plane instead of x-z plane as other elements
@@ -149,21 +148,75 @@ Ray behaveGrating(Ray r, const Behaviour::Grating grating, const Collision col) 
 }
 
 RAYX_FN_ACC
-Ray behaveMirror(Ray r, const Collision col, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
+Ray behaveMirror(Ray r, const Collision col, const Coating coating, const int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     // calculate the new direction after the reflection
     const auto incident_vec = r.m_direction;
     const auto reflect_vec = glm::reflect(incident_vec, col.normal);
     r.m_direction = reflect_vec;
+    
+    if (coating.is<Coating::SubstrateOnly>()) {
+        if (material != -2) {
+            constexpr int vacuum_material = -1;
+            const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+            const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
-    if (material != -2) {
+            const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, vacuum_ior, substrate_ior);
+
+            r.m_field = reflect_field;
+            r.m_order = 0;
+        }
+    } else if (coating.is<Coating::OneCoating>()) {
+        Coating::OneCoating oneCoating = variant::get<Coating::OneCoating>(coating.m_coating);
+
         constexpr int vacuum_material = -1;
-        const auto ior_i = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
-        const auto ior_t = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+        const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+        const auto coating_ior = getRefractiveIndex(r.m_energy, oneCoating.material, materialIndices, materialTable);
+        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
 
-        const auto reflect_field = interceptReflect(r.m_field, incident_vec, reflect_vec, col.normal, ior_i, ior_t);
+        const auto angle = angleBetweenUnitVectors(-incident_vec, col.normal);
+        const auto incidentAngle = complex::Complex(angle == 0.0 ? 1e-8 : angle, 0.0);
 
-        r.m_field = reflect_field;
+        const double wavelength = energyToWaveLength(r.m_energy);
+
+        const auto amplitude = computeSingleCoatingReflectance(
+            incidentAngle,
+            wavelength,
+            oneCoating.thickness,
+            vacuum_ior,
+            coating_ior,
+            substrate_ior
+        );
+
+        const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
+        r.m_field = polmat * r.m_field;
         r.m_order = 0;
+    } else if (coating.is<Coating::MultilayerCoating>()) {
+        Coating::MultilayerCoating mlCoating = variant::get<Coating::MultilayerCoating>(coating.m_coating);
+        constexpr int vacuum_material = -1;
+        const auto vacuum_ior = getRefractiveIndex(r.m_energy, vacuum_material, materialIndices, materialTable);
+        const auto substrate_ior = getRefractiveIndex(r.m_energy, material, materialIndices, materialTable);
+
+        const int n = mlCoating.numLayers;
+        complex::Complex iors[1002];
+
+        iors[0] = vacuum_ior;
+        for (int i = 0; i < n; ++i) {
+            iors[i + 1] = getRefractiveIndex(r.m_energy, mlCoating.material[i], materialIndices, materialTable);
+        }
+        iors[n + 1] = substrate_ior;
+
+        const auto angle = angleBetweenUnitVectors(-incident_vec, col.normal);
+        const auto incidentAngle = complex::Complex(angle == 0.0 ? 1e-8 : angle, 0.0);
+
+        const double wavelength = energyToWaveLength(r.m_energy);
+
+        const auto amplitude = computeMultilayerReflectance(incidentAngle, wavelength, n, mlCoating.thickness, iors);
+
+        const auto polmat = calcPolaririzationMatrix(incident_vec, reflect_vec, col.normal, amplitude);
+        r.m_field = polmat * r.m_field;
+        r.m_order = 0;
+    } else {
+        _throw("encountered Mirror with unsupported Coating type!");
     }
 
     return r;

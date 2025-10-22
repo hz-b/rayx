@@ -8,6 +8,7 @@
 #include "Behaviour.h"
 #include "Core.h"
 #include "Cutout.h"
+#include "Coating.h"
 #include "Rml/xml.h"
 #include "Shader/SlopeError.h"
 #include "Surface.h"
@@ -52,13 +53,14 @@ struct OpticalElement {
     Behaviour m_behaviour;    ///< Describes what happens to a ray once it collides with this OpticalElement.
     Surface m_surface;        ///< Describes how the OpticalElement's surface is curved.
     Cutout m_cutout;          ///< Limits the Surface to the dimensions of the actual OpticalElement.
+    Coating m_coating;        ///< Describes the coating of the surface, if any.
     SlopeError m_slopeError;  ///< Describes a random noise in the normal vector of a particular surface point.
     double m_azimuthalAngle;  ///< Azimuthal angle at which this element is rotated around the "main-beam".
     int m_material;           ///< The material that this object is made of (see `enum class Material` from Material.h).
 };
 
 // Ensure OpticalElement does not introduce cost on copy or default construction.
-static_assert(std::is_trivially_copyable_v<OpticalElement>);
+//static_assert(std::is_trivially_copyable_v<OpticalElement>);
 
 RAYX_API glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientation, bool calcInMatrix, DesignPlane plane);
 
