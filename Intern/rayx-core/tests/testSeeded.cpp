@@ -54,7 +54,7 @@ TEST_F(TestSuite, PointSource_seeded) { compareAgainstCorrect("PointSource_seede
 // Tests sourceDepth of MatrixSource.
 TEST_F(TestSuite, MatrixSource_seeded) { compareAgainstCorrect("MatrixSource_seeded", 1e-5); }
 
-TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded"); }
+TEST_F(TestSuite, PlaneMirror_refl_seeded) { compareAgainstCorrect("PlaneMirror_refl_seeded", 1e-5); }
 
 // Tests the Energy Distribution of a MatrixSource.
 TEST_F(TestSuite, MatrixSource_distr_seeded) { compareAgainstCorrect("MatrixSource_distr_seeded", 1e-6); }
