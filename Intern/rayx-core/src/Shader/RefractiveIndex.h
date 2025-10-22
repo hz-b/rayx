@@ -25,13 +25,24 @@ struct NffEntry {
     double m_f2;
 };
 
+/// This struct represents one line of a .f12 file from the cromer materialtables.
+struct CromerEntry {
+    double m_energy;
+    double m_n;
+    double m_k;
+};
+
 RAYX_FN_ACC int RAYX_API getPalikEntryCount(int material, const int* materialIndices);
 
 RAYX_FN_ACC int RAYX_API getNffEntryCount(int material, const int* materialIndices);
 
+RAYX_FN_ACC int RAYX_API getCromerEntryCount(int material, const int* materialIndices);
+
 RAYX_FN_ACC PalikEntry RAYX_API getPalikEntry(int index, int material, const int* materialIndices, const double* materialTable);
 
 RAYX_FN_ACC NffEntry RAYX_API getNffEntry(int index, int material, const int* materialIndices, const double* materialTable);
+
+RAYX_FN_ACC CromerEntry RAYX_API getCromerEntry(int index, int material, const int* materialIndices, const double* materialTable);
 
 // returns dvec2 to represent a complex number
 RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* materialIndices, const double* materialTable);
