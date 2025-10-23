@@ -53,8 +53,8 @@ PalikEntry RAYX_API getPalikEntry(int index, int material, const int* __restrict
 
     PalikEntry e;
     e.m_energy = materialTable[i];
-    e.m_n = materialTable[i + 1];
-    e.m_k = materialTable[i + 2];
+    e.m_n      = materialTable[i + 1];
+    e.m_k      = materialTable[i + 2];
 
     return e;
 }
@@ -68,8 +68,8 @@ NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict mat
 
     NffEntry e;
     e.m_energy = materialTable[i];
-    e.m_f1 = materialTable[i + 1];
-    e.m_f2 = materialTable[i + 2];
+    e.m_f1     = materialTable[i + 1];
+    e.m_f2     = materialTable[i + 2];
 
     return e;
 }
@@ -90,16 +90,16 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
 
     // try to get refractive index using Palik table
     if (getPalikEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
-        int low = 0;                                                   // <= energy
+        int low  = 0;                                                  // <= energy
         int high = getPalikEntryCount(material, materialIndices) - 1;  // >= energy
 
-        PalikEntry low_entry = getPalikEntry(low, material, materialIndices, materialTable);
+        PalikEntry low_entry  = getPalikEntry(low, material, materialIndices, materialTable);
         PalikEntry high_entry = getPalikEntry(high, material, materialIndices, materialTable);
 
         if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {  // if 'energy' is in range of tha PalikTable
             // binary search
             while (high - low > 1) {
-                int center = (low + high) / 2;
+                int center              = (low + high) / 2;
                 PalikEntry center_entry = getPalikEntry(center, material, materialIndices, materialTable);
                 if (energy < center_entry.m_energy) {
                     high = center;
@@ -115,12 +115,12 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
 
     // get refractive index with Nff table
     if (getNffEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
-        int low = 0;                                                 // <= energy
+        int low  = 0;                                                // <= energy
         int high = getNffEntryCount(material, materialIndices) - 1;  // >= energy
 
         // binary search
         while (high - low > 1) {
-            int center = (low + high) / 2;
+            int center            = (low + high) / 2;
             NffEntry center_entry = getNffEntry(center, material, materialIndices, materialTable);
             if (energy < center_entry.m_energy) {
                 high = center;
@@ -131,13 +131,13 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
 
         // compute n, k from the Nff data.
         glm::dvec2 massAndRho = getAtomicMassAndRho(material);
-        double mass = massAndRho.x;
-        double rho = massAndRho.y;
+        double mass           = massAndRho.x;
+        double rho            = massAndRho.y;
 
         NffEntry entry = getNffEntry(low, material, materialIndices, materialTable);
-        double e = entry.m_energy;
-        double n = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
-        double k = (415.252 * rho * entry.m_f2) / (e * e * mass);
+        double e       = entry.m_energy;
+        double n       = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
+        double k       = (415.252 * rho * entry.m_f2) / (e * e * mass);
 
         return complex::Complex(n, k);
     }

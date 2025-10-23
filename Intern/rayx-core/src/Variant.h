@@ -39,60 +39,55 @@ class Variant : public Base {
     Variant() = default;
 
     Variant(const Variant&) = default;
-    Variant(Variant&&) = default;
+    Variant(Variant&&)      = default;
 
     Variant& operator=(const Variant&) = default;
-    Variant& operator=(Variant&&) = default;
+    Variant& operator=(Variant&&)      = default;
 
     template <typename T>
-    requires (std::is_constructible_v<variant::variant<Ts...>, T>)
+        requires(std::is_constructible_v<variant::variant<Ts...>, T>)
     Variant(const T& value) : m_variant(value) {}
 
     template <typename T>
-    requires (std::is_constructible_v<variant::variant<Ts...>, T>)
+        requires(std::is_constructible_v<variant::variant<Ts...>, T>)
     Variant(T&& value) : m_variant(std::move(value)) {}
 
     template <typename T>
-    requires (std::is_assignable_v<variant::variant<Ts...>&, const T&>)
+        requires(std::is_assignable_v<variant::variant<Ts...>&, const T&>)
     Variant& operator=(const T& other) {
         m_variant = other;
         return *this;
     }
 
     template <typename T>
-    requires (std::is_assignable_v<variant::variant<Ts...>&, T>)
+        requires(std::is_assignable_v<variant::variant<Ts...>&, T>)
     Variant& operator=(T&& value) {
         m_variant = std::move(value);
         return *this;
     }
 
     template <typename T>
-    RAYX_FN_ACC
-    bool is() const {
+    RAYX_FN_ACC bool is() const {
         return variant::holds_alternative<T>(m_variant);
     }
 
     template <typename T>
-    RAYX_FN_ACC
-    T& get() {
+    RAYX_FN_ACC T& get() {
         return variant::get<T>(m_variant);
     }
 
     template <typename T>
-    RAYX_FN_ACC
-    const T& get() const {
+    RAYX_FN_ACC const T& get() const {
         return variant::get<T>(m_variant);
     }
 
     template <typename Visitor>
-    RAYX_FN_ACC
-    decltype(auto) visit(const Visitor& visitor) const {
+    RAYX_FN_ACC decltype(auto) visit(const Visitor& visitor) const {
         return variant::visit(visitor, m_variant);
     }
 
     template <typename Visitor>
-    RAYX_FN_ACC
-    decltype(auto) visit(Visitor&& visitor) const {
+    RAYX_FN_ACC decltype(auto) visit(Visitor&& visitor) const {
         return variant::visit(std::forward<Visitor>(visitor), m_variant);
     }
 

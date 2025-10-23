@@ -5,14 +5,12 @@
 #include "gtest/gtest.h"
 #include "setupTests.h"
 
-int GLOBAL_ARGC = 0;
+int GLOBAL_ARGC    = 0;
 char** GLOBAL_ARGV = nullptr;
 
 int main(int argc, char** argv) {
     std::filesystem::path outputDir = canonicalizeRepositoryPath("Intern/rayx-core/tests/output");
-    if (!std::filesystem::is_directory(outputDir) || !std::filesystem::exists(outputDir)) {
-        std::filesystem::create_directory(outputDir);
-    }
+    if (!std::filesystem::is_directory(outputDir) || !std::filesystem::exists(outputDir)) { std::filesystem::create_directory(outputDir); }
 
     testing::InitGoogleTest(&argc, argv);
 

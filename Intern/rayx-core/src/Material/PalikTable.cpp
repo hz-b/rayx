@@ -16,22 +16,16 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     RAYX_VERB << "Loading PalikTable from " << f;
     std::ifstream s(f);
 
-    if (s.fail()) {
-        return false;
-    }
+    if (s.fail()) { return false; }
 
     std::string line;
 
     // ignore first three lines
-    for (int i = 0; i < 3; i++) {
-        std::getline(s, line);
-    }
+    for (int i = 0; i < 3; i++) { std::getline(s, line); }
 
     // line 4..EOF
     for (uint32_t lineidx = 4; std::getline(s, line); lineidx++) {
-        if (line.empty()) {
-            continue;
-        }
+        if (line.empty()) { continue; }
 
         PalikEntry e{};
 #if defined(WIN32)

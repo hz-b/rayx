@@ -14,24 +14,24 @@
 #error macro 'X' must not be defined at this point
 #endif
 
-#define RAYX_X_MACRO_RAY_ATTR_PATH_ID X(int32_t, path_id, PathId)
-#define RAYX_X_MACRO_RAY_ATTR_PATH_EVENT_ID X(int32_t, path_event_id, PathEventId)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_X X(double, position_x, PositionX)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_Y X(double, position_y, PositionY)
-#define RAYX_X_MACRO_RAY_ATTR_POSITION_Z X(double, position_z, PositionZ)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X X(double, direction_x, DirectionX)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y X(double, direction_y, DirectionY)
-#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z X(double, direction_z, DirectionZ)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X X(complex::Complex, electric_field_x, ElectricFieldX)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y X(complex::Complex, electric_field_y, ElectricFieldY)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z X(complex::Complex, electric_field_z, ElectricFieldZ)
+#define RAYX_X_MACRO_RAY_ATTR_PATH_ID             X(int32_t, path_id, PathId)
+#define RAYX_X_MACRO_RAY_ATTR_PATH_EVENT_ID       X(int32_t, path_event_id, PathEventId)
+#define RAYX_X_MACRO_RAY_ATTR_POSITION_X          X(double, position_x, PositionX)
+#define RAYX_X_MACRO_RAY_ATTR_POSITION_Y          X(double, position_y, PositionY)
+#define RAYX_X_MACRO_RAY_ATTR_POSITION_Z          X(double, position_z, PositionZ)
+#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X         X(double, direction_x, DirectionX)
+#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y         X(double, direction_y, DirectionY)
+#define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z         X(double, direction_z, DirectionZ)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(complex::Complex, electric_field_x, ElectricFieldX)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(complex::Complex, electric_field_y, ElectricFieldY)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(complex::Complex, electric_field_z, ElectricFieldZ)
 #define RAYX_X_MACRO_RAY_ATTR_OPTICAL_PATH_LENGTH X(double, optical_path_length, OpticalPathLength)
-#define RAYX_X_MACRO_RAY_ATTR_ENERGY X(double, energy, Energy)
-#define RAYX_X_MACRO_RAY_ATTR_ORDER X(int32_t, order, Order)
-#define RAYX_X_MACRO_RAY_ATTR_OBJECT_ID X(int32_t, object_id, ObjectId)
-#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID X(int32_t, source_id, SourceId)
-#define RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE X(EventType, event_type, EventType)
-#define RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER X(RandCounter, rand_counter, RandCounter)
+#define RAYX_X_MACRO_RAY_ATTR_ENERGY              X(double, energy, Energy)
+#define RAYX_X_MACRO_RAY_ATTR_ORDER               X(int32_t, order, Order)
+#define RAYX_X_MACRO_RAY_ATTR_OBJECT_ID           X(int32_t, object_id, ObjectId)
+#define RAYX_X_MACRO_RAY_ATTR_SOURCE_ID           X(int32_t, source_id, SourceId)
+#define RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          X(EventType, event_type, EventType)
+#define RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER        X(RandCounter, rand_counter, RandCounter)
 
 #define RAYX_X_MACRO_RAY_ATTR                 \
     RAYX_X_MACRO_RAY_ATTR_PATH_ID             \
@@ -65,32 +65,32 @@ RAYX_X_MACRO_RAY_ATTR
  * It is used to represent the various attributes that can be recorded for rays during ray tracing.
  */
 enum class RAYX_API RayAttrMask : uint32_t {
-    PathId = 1 << 0,
-    PathEventId = 1 << 1,
-    PositionX = 1 << 2,
-    PositionY = 1 << 3,
-    PositionZ = 1 << 4,
-    DirectionX = 1 << 5,
-    DirectionY = 1 << 6,
-    DirectionZ = 1 << 7,
-    ElectricFieldX = 1 << 8,
-    ElectricFieldY = 1 << 9,
-    ElectricFieldZ = 1 << 10,
+    PathId            = 1 << 0,
+    PathEventId       = 1 << 1,
+    PositionX         = 1 << 2,
+    PositionY         = 1 << 3,
+    PositionZ         = 1 << 4,
+    DirectionX        = 1 << 5,
+    DirectionY        = 1 << 6,
+    DirectionZ        = 1 << 7,
+    ElectricFieldX    = 1 << 8,
+    ElectricFieldY    = 1 << 9,
+    ElectricFieldZ    = 1 << 10,
     OpticalPathLength = 1 << 11,
-    Energy = 1 << 12,
-    Order = 1 << 13,
-    ObjectId = 1 << 14,
-    SourceId = 1 << 15,
-    EventType = 1 << 16,
-    RandCounter = 1 << 17,
-    RayAttrMaskCount = 18,
+    Energy            = 1 << 12,
+    Order             = 1 << 13,
+    ObjectId          = 1 << 14,
+    SourceId          = 1 << 15,
+    EventType         = 1 << 16,
+    RandCounter       = 1 << 17,
+    RayAttrMaskCount  = 18,
 
-    Position = PositionX | PositionY | PositionZ,
-    Direction = DirectionX | DirectionY | DirectionZ,
+    Position      = PositionX | PositionY | PositionZ,
+    Direction     = DirectionX | DirectionY | DirectionZ,
     ElectricField = ElectricFieldX | ElectricFieldY | ElectricFieldZ,
 
     None = 0,
-    All = (1 << RayAttrMaskCount) - 1,
+    All  = (1 << RayAttrMaskCount) - 1,
 };
 
 RAYX_API RAYX_FN_ACC constexpr inline RayAttrMask operator|(const RayAttrMask lhs, const RayAttrMask rhs) {

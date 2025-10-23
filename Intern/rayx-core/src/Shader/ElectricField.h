@@ -5,8 +5,8 @@
 
 namespace RAYX {
 
-using Stokes = glm::dvec4;
-using ElectricField = cvec3;
+using Stokes             = glm::dvec4;
+using ElectricField      = cvec3;
 using LocalElectricField = cvec2;
 
 static_assert(std::is_default_constructible_v<ElectricField>);
@@ -83,21 +83,21 @@ inline RotationBase forwardVectorToBaseConvention(const glm::dvec3 forward) {
 
     // if the forward vector is not close to being vertical, we initialize the up vector to (0, 1, 0)
     if (!close_to_vertical) {
-        up = glm::dvec3(0, 1, 0);
+        up    = glm::dvec3(0, 1, 0);
         right = glm::normalize(glm::cross(up, forward));
-        up = glm::normalize(glm::cross(forward, right));
+        up    = glm::normalize(glm::cross(forward, right));
     }
 
     // otherwise initialize the right vector to (1, 0, 0)
     else {
         right = glm::dvec3(1, 0, 0);
-        up = glm::normalize(glm::cross(forward, right));
+        up    = glm::normalize(glm::cross(forward, right));
         right = glm::normalize(glm::cross(up, forward));
     }
 
     return RotationBase{
-        .right = right,
-        .up = up,
+        .right   = right,
+        .up      = up,
         .forward = forward,
     };
 }
@@ -153,7 +153,7 @@ inline LocalElectricField globalToLocalElectricField(const ElectricField field, 
 
 RAYX_FN_ACC
 inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
-    const auto mag = complex::abs(field);
+    const auto mag   = complex::abs(field);
     const auto theta = complex::arg(field);
 
     return Stokes(mag.x * mag.x + mag.y * mag.y, mag.x * mag.x - mag.y * mag.y, 2.0 * mag.x * mag.y * glm::cos(theta.x - theta.y),
@@ -162,10 +162,10 @@ inline Stokes localElectricFieldToStokes(const LocalElectricField field) {
 
 RAYX_FN_ACC
 inline LocalElectricField stokesToLocalElectricField(const Stokes stokes) {
-    const auto x_real = glm::sqrt((stokes.x + stokes.y) / 2.0);
-    const auto y_mag = glm::sqrt((stokes.x - stokes.y) / 2.0);
+    const auto x_real  = glm::sqrt((stokes.x + stokes.y) / 2.0);
+    const auto y_mag   = glm::sqrt((stokes.x - stokes.y) / 2.0);
     const auto y_theta = -1.0 * glm::atan(stokes.w, stokes.z);
-    const auto y = complex::polar(y_mag, y_theta);
+    const auto y       = complex::polar(y_mag, y_theta);
     return LocalElectricField({x_real, 0}, y);
 }
 

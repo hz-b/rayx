@@ -48,7 +48,7 @@ ElementType DesignSource::getType() const { return m_elementParameters["type"].a
 void DesignSource::setType(ElementType s) { m_elementParameters["type"] = s; }
 
 void DesignSource::setPosition(glm::dvec4 p) {
-    m_elementParameters["position"] = Map();
+    m_elementParameters["position"]      = Map();
     m_elementParameters["position"]["x"] = p.x;
     m_elementParameters["position"]["y"] = p.y;
     m_elementParameters["position"]["z"] = p.z;
@@ -65,19 +65,19 @@ glm::dvec4 DesignSource::getPosition() const {
 }
 
 void DesignSource::setOrientation(glm::dmat4x4 orientation) {
-    m_elementParameters["xDirection"] = Map();
+    m_elementParameters["xDirection"]      = Map();
     m_elementParameters["xDirection"]["x"] = orientation[0][0];
     m_elementParameters["xDirection"]["y"] = orientation[0][1];
     m_elementParameters["xDirection"]["z"] = orientation[0][2];
     m_elementParameters["xDirection"]["w"] = orientation[0][3];
 
-    m_elementParameters["yDirection"] = Map();
+    m_elementParameters["yDirection"]      = Map();
     m_elementParameters["yDirection"]["x"] = orientation[1][0];
     m_elementParameters["yDirection"]["y"] = orientation[1][1];
     m_elementParameters["yDirection"]["z"] = orientation[1][2];
     m_elementParameters["yDirection"]["w"] = orientation[1][3];
 
-    m_elementParameters["zDirection"] = Map();
+    m_elementParameters["zDirection"]      = Map();
     m_elementParameters["zDirection"]["x"] = orientation[2][0];
     m_elementParameters["zDirection"]["y"] = orientation[2][1];
     m_elementParameters["zDirection"]["z"] = orientation[2][2];
@@ -204,7 +204,7 @@ double DesignSource::getPhotonFlux() const { return m_elementParameters["photonF
 
 EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
     EnergyDistributionVariant en;
-    SpreadType spreadType = m_elementParameters["energyDistribution"].as_energySpreadType();
+    SpreadType spreadType                         = m_elementParameters["energyDistribution"].as_energySpreadType();
     EnergyDistributionType energyDistributionType = m_elementParameters["energyDistributionType"].as_energyDistributionType();
 
     if (energyDistributionType == EnergyDistributionType::File) {
@@ -214,15 +214,13 @@ EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
         DatFile::load(filename, &df);
 
         df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
-        en = EnergyDistributionVariant(df);
+        en              = EnergyDistributionVariant(df);
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy = m_elementParameters["energy"].as_double();
         double energySpread = m_elementParameters["energySpread"].as_double();
 
         if (spreadType == SpreadType::SoftEdge) {
-            if (energySpread == 0) {
-                energySpread = 1;
-            }
+            if (energySpread == 0) { energySpread = 1; }
             en = EnergyDistributionVariant(SoftEdge(photonEnergy, energySpread));
         } else if (spreadType == SpreadType::SeparateEnergies) {
             int numOfEnergies;
@@ -232,7 +230,7 @@ EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
                 numOfEnergies = m_elementParameters["SeparateEnergies"].as_int();
             }
             numOfEnergies = abs(numOfEnergies);
-            en = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
+            en            = EnergyDistributionVariant(SeparateEnergies(photonEnergy, energySpread, numOfEnergies));
         } else if (spreadType == SpreadType::HardEdge) {
             en = EnergyDistributionVariant(HardEdge(photonEnergy, energySpread));
         } else {

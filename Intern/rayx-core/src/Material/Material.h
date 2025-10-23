@@ -16,7 +16,7 @@ namespace RAYX {
  **/
 enum class Material {
     REFLECTIVE = -2,
-    VACUUM = -1,
+    VACUUM     = -1,
 
 // Material = 0 is not used yet
 

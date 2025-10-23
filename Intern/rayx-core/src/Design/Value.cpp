@@ -10,9 +10,7 @@ DesignMap DesignMap::clone() const {
     if (std::holds_alternative<Map>(m_variant)) {
         Map newMap;
         const Map& oldMap = std::get<Map>(m_variant);
-        for (const auto& [key, ptr] : oldMap) {
-            newMap[key] = std::make_shared<DesignMap>(ptr->clone());
-        }
+        for (const auto& [key, ptr] : oldMap) { newMap[key] = std::make_shared<DesignMap>(ptr->clone()); }
         copy.m_variant = newMap;
     } else if (std::holds_alternative<std::shared_ptr<Rays>>(m_variant)) {
         copy.m_variant = std::make_shared<Rays>(std::get<std::shared_ptr<Rays>>(m_variant)->copy());
@@ -206,18 +204,14 @@ std::shared_ptr<Rays> DesignMap::as_rayList() const {
 }
 
 bool DesignMap::hasKey(const std::string& s) const {
-    if (auto* m = std::get_if<Map>(&m_variant)) {
-        return m->find(s) != m->end();
-    }
+    if (auto* m = std::get_if<Map>(&m_variant)) { return m->find(s) != m->end(); }
     return false;
 }
 
 const DesignMap& DesignMap::operator[](const std::string& s) const {
     if (auto* m = std::get_if<Map>(&m_variant)) {
         auto it = m->find(s);
-        if (it == m->end()) {
-            throw std::runtime_error("Indexing into non-map at: " + s);
-        }
+        if (it == m->end()) { throw std::runtime_error("Indexing into non-map at: " + s); }
         return *(it->second);
     }
     throw std::runtime_error("Indexing into non-map at: " + s);
@@ -225,9 +219,7 @@ const DesignMap& DesignMap::operator[](const std::string& s) const {
 
 DesignMap& DesignMap::operator[](const std::string& s) {
     if (auto* m = std::get_if<Map>(&m_variant)) {
-        if (m->find(s) == m->end()) {
-            (*m)[s] = std::make_shared<DesignMap>();
-        }
+        if (m->find(s) == m->end()) { (*m)[s] = std::make_shared<DesignMap>(); }
         return *((*m)[s]);
     }
     throw std::runtime_error("Indexing into non-map!");

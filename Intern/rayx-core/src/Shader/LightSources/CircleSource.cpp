@@ -9,13 +9,13 @@ namespace RAYX {
 CircleSource::CircleSource(const DesignSource& dSource) : LightSourceBase(dSource) {
     m_pol = dSource.getStokes();
 
-    m_sourceDepth = dSource.getSourceDepth();
+    m_sourceDepth  = dSource.getSourceDepth();
     m_sourceHeight = dSource.getSourceHeight();
-    m_sourceWidth = dSource.getSourceWidth();
+    m_sourceWidth  = dSource.getSourceWidth();
 
-    m_numOfCircles = dSource.getNumOfCircles();
-    m_maxOpeningAngle = dSource.getMaxOpeningAngle();
-    m_minOpeningAngle = dSource.getMinOpeningAngle();
+    m_numOfCircles      = dSource.getNumOfCircles();
+    m_maxOpeningAngle   = dSource.getMaxOpeningAngle();
+    m_minOpeningAngle   = dSource.getMinOpeningAngle();
     m_deltaOpeningAngle = dSource.getDeltaOpeningAngle();
 }
 
@@ -47,18 +47,18 @@ detail::Ray CircleSource::genRay(const int rayPathIndex, const int sourceId, con
     const auto electricField = stokesToElectricField(m_pol, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
 
     return detail::Ray{
-        .position = position,
-        .direction = direction,
-        .energy = en,
+        .position            = position,
+        .direction           = direction,
+        .energy              = en,
         .optical_path_length = 0.0,
-        .electric_field = electricField,
-        .rand = std::move(rand),
-        .path_id = rayPathIndex,
-        .path_event_id = -1,
-        .order = 0,
-        .object_id = sourceId,
-        .source_id = sourceId,
-        .event_type = EventType::Emitted,
+        .electric_field      = electricField,
+        .rand                = std::move(rand),
+        .path_id             = rayPathIndex,
+        .path_event_id       = -1,
+        .order               = 0,
+        .object_id           = sourceId,
+        .source_id           = sourceId,
+        .event_type          = EventType::Emitted,
     };
 }
 
@@ -69,23 +69,23 @@ detail::Ray CircleSource::genRay(const int rayPathIndex, const int sourceId, con
 RAYX_FN_ACC
 glm::dvec3 CircleSource::getDirection(Rand& __restrict rand) const {
     double angle = rand.randomDouble() * 2.0 * PI;
-    int circle = rand.randomIntInRange(1, m_numOfCircles) - 1;
+    int circle   = rand.randomIntInRange(1, m_numOfCircles) - 1;
 
     double thetabetweencircles = (m_maxOpeningAngle.rad - m_minOpeningAngle.rad) / (m_numOfCircles - 1.0);
-    double theta = thetabetweencircles * circle;
-    theta = theta + (rand.randomDouble() - 0.5) * m_deltaOpeningAngle.rad + m_minOpeningAngle.rad;
+    double theta               = thetabetweencircles * circle;
+    theta                      = theta + (rand.randomDouble() - 0.5) * m_deltaOpeningAngle.rad + m_minOpeningAngle.rad;
 
     double al = cos(angle);
-    al = al + sin(angle);
-    al = al * sin(theta);
-    al = al + cos(theta);
+    al        = al + sin(angle);
+    al        = al * sin(theta);
+    al        = al + cos(theta);
 
     double am = -cos(theta);
-    am = am + sin(angle) * sin(theta);
+    am        = am + sin(angle) * sin(theta);
 
     double an = -cos(angle) * sin(theta);
-    an = an + cos(theta);
-    an = an + sin(angle) * sin(theta);
+    an        = an + cos(theta);
+    an        = an + sin(angle) * sin(theta);
 
     return glm::dvec3(al, am, an);
 }

@@ -25,9 +25,9 @@ glm::dvec3 RAYX_API normalCartesian(glm::dvec3 normal, double x_rad, double z_ra
 
     // put in matrix mult?
     double FY2 = FY * cosz + FZ * sinz;
-    normal[0] = FX * cosx + FY2 * sinx;
-    normal[1] = FY2 * cosx - FX * sinx;
-    normal[2] = FZ * cosz - FY * sinz;
+    normal[0]  = FX * cosx + FY2 * sinx;
+    normal[1]  = FY2 * cosx - FX * sinx;
+    normal[2]  = FZ * cosz - FY * sinz;
 
     return normal;
 }
@@ -41,10 +41,10 @@ returns modified normal vector
 */
 RAYX_FN_ACC
 glm::dvec3 RAYX_API normalCylindrical(glm::dvec3 normal, double x_rad, double z_rad) {
-    double normFXFY = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
+    double normFXFY   = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
     double arcTanFXFY = glm::atan(normal[1], normal[0]);
-    double sinz = glm::sin(z_rad);
-    double cosz = glm::cos(z_rad);
+    double sinz       = glm::sin(z_rad);
+    double cosz       = glm::cos(z_rad);
 
     normal[0] = glm::cos(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);
     normal[1] = glm::sin(x_rad + arcTanFXFY) * (normFXFY * cosz + normal[2] * sinz);

@@ -30,11 +30,11 @@ Surface makeSurface(const DesignElement& dele) {
 Surface makePlane() { return Surface::Plane{}; }
 
 Surface makeCylinder(const DesignElement& dele) {
-    auto cyl_direction = dele.getRadiusDirection();
-    auto radius = dele.getRadius();
-    auto incidence = dele.getGrazingIncAngle();
+    auto cyl_direction     = dele.getRadiusDirection();
+    auto radius            = dele.getRadius();
+    auto incidence         = dele.getGrazingIncAngle();
     auto entranceArmLength = dele.getEntranceArmLength();
-    auto exitArmLength = dele.getExitArmLength();
+    auto exitArmLength     = dele.getExitArmLength();
 
     double a11 = 0, a33 = 0, a24 = 0;
     if (cyl_direction == CylinderDirection::LongRadiusR) {  // X-DIR
@@ -62,47 +62,47 @@ Surface makeCylinder(const DesignElement& dele) {
 
     return Surface::Quadric{
         .m_icurv = icurv,
-        .m_a11 = a11,
-        .m_a12 = 0,
-        .m_a13 = 0,
-        .m_a14 = 0,
-        .m_a22 = 1,
-        .m_a23 = 0,
-        .m_a24 = a24,
-        .m_a33 = a33,
-        .m_a34 = 0,
-        .m_a44 = 0,
+        .m_a11   = a11,
+        .m_a12   = 0,
+        .m_a13   = 0,
+        .m_a14   = 0,
+        .m_a22   = 1,
+        .m_a23   = 0,
+        .m_a24   = a24,
+        .m_a33   = a33,
+        .m_a34   = 0,
+        .m_a44   = 0,
     };
 }
 
 Surface makeCone(const DesignElement& dele) {
-    RAYX::Rad incidence = dele.getGrazingIncAngle();
+    RAYX::Rad incidence      = dele.getGrazingIncAngle();
     double entranceArmLength = dele.getEntranceArmLength();
-    double exitArmLength = dele.getExitArmLength();
+    double exitArmLength     = dele.getExitArmLength();
 
     double zl = dele.getTotalLength();
 
     double ra = entranceArmLength;
     double rb = exitArmLength;
 
-    double zl2 = pow(zl / 2, 2);
-    double sth = incidence.sin();
-    double cth = incidence.cos();
-    double rmax1 = sqrt(zl2 + pow(ra, 2) - zl * ra * cth);
-    double rmax2 = sqrt(zl2 + pow(rb, 2) + zl * rb * cth);
-    double rmin1 = sqrt(zl2 + pow(ra, 2) + zl * ra * cth);
-    double rmin2 = sqrt(zl2 + pow(rb, 2) - zl * rb * cth);
-    double thmax = asin(ra * sth / rmax1);
-    double thmin = asin(ra * sth / rmin1);
+    double zl2    = pow(zl / 2, 2);
+    double sth    = incidence.sin();
+    double cth    = incidence.cos();
+    double rmax1  = sqrt(zl2 + pow(ra, 2) - zl * ra * cth);
+    double rmax2  = sqrt(zl2 + pow(rb, 2) + zl * rb * cth);
+    double rmin1  = sqrt(zl2 + pow(ra, 2) + zl * ra * cth);
+    double rmin2  = sqrt(zl2 + pow(rb, 2) - zl * rb * cth);
+    double thmax  = asin(ra * sth / rmax1);
+    double thmin  = asin(ra * sth / rmin1);
     double sthmax = sin(thmax);
     double sthmin = sin(thmin);
 
-    double upstreamRadius_R = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
+    double upstreamRadius_R     = 2 * sthmax / (1 / rmax1 + 1 / rmax2);
     double downstreamRadius_rho = 2 * sthmin / (1 / rmin1 + 1 / rmin2);
 
     auto cm = pow((upstreamRadius_R - downstreamRadius_rho) / zl, 2);
 
-    int icurv = 0;
+    int icurv  = 0;
     double a11 = 1 - cm;
     double a22 = 1 - 2 * cm;
     double a23 = sqrt(cm - cm * cm);
@@ -117,25 +117,25 @@ Surface makeCone(const DesignElement& dele) {
 
     return Surface::Quadric{
         .m_icurv = icurv,
-        .m_a11 = a11,
-        .m_a12 = 0,
-        .m_a13 = 0,
-        .m_a14 = 0,
-        .m_a22 = a22,
-        .m_a23 = a23,
-        .m_a24 = a24,
-        .m_a33 = 0,
-        .m_a34 = 0,
-        .m_a44 = 0,
+        .m_a11   = a11,
+        .m_a12   = 0,
+        .m_a13   = 0,
+        .m_a14   = 0,
+        .m_a22   = a22,
+        .m_a23   = a23,
+        .m_a24   = a24,
+        .m_a33   = 0,
+        .m_a34   = 0,
+        .m_a44   = 0,
     };
 }
 
 Surface makeEllipsoid(const DesignElement& dele) {
     auto entranceArmLength = dele.getEntranceArmLength();
-    auto exitArmLength = dele.getExitArmLength();
+    auto exitArmLength     = dele.getExitArmLength();
 
-    auto shortHalfAxisB = dele.getShortHalfAxisB();
-    auto longHalfAxisA = dele.getLongHalfAxisA();
+    auto shortHalfAxisB     = dele.getShortHalfAxisB();
+    auto longHalfAxisA      = dele.getLongHalfAxisA();
     auto designGrazingAngle = dele.getDesignGrazingIncAngle();
 
     // if design angle not given, take incidenceAngle
@@ -163,9 +163,7 @@ Surface makeEllipsoid(const DesignElement& dele) {
 
     // calc mt
     double mt = 0;  // tangent slope
-    if (longHalfAxisA > 0.0 && y0 < 0.0) {
-        mt = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 / y0;
-    }
+    if (longHalfAxisA > 0.0 && y0 < 0.0) { mt = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 / y0; }
 
     auto figureRotation = dele.getFigureRotation();
 
@@ -181,8 +179,8 @@ Surface makeEllipsoid(const DesignElement& dele) {
     // a11 from rml file
 
     auto tangentAngle = Rad(atan(mt));
-    auto a22 = pow(tangentAngle.cos(), 2) + pow(shortHalfAxisB * tangentAngle.sin() / longHalfAxisA, 2);
-    auto a23 = (pow(shortHalfAxisB, 2) - pow(longHalfAxisA, 2)) * tangentAngle.cos() * tangentAngle.sin() / pow(longHalfAxisA, 2);
+    auto a22          = pow(tangentAngle.cos(), 2) + pow(shortHalfAxisB * tangentAngle.sin() / longHalfAxisA, 2);
+    auto a23          = (pow(shortHalfAxisB, 2) - pow(longHalfAxisA, 2)) * tangentAngle.cos() * tangentAngle.sin() / pow(longHalfAxisA, 2);
 
     auto a24 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.sin() + y0 * tangentAngle.cos();
     auto a33 = pow(tangentAngle.sin(), 2) + pow(shortHalfAxisB * tangentAngle.cos() / longHalfAxisA, 2);
@@ -191,50 +189,50 @@ Surface makeEllipsoid(const DesignElement& dele) {
 
     return Surface::Quadric{
         .m_icurv = 1,
-        .m_a11 = a11,
-        .m_a12 = 0,
-        .m_a13 = 0,
-        .m_a14 = 0,
-        .m_a22 = a22,
-        .m_a23 = a23,
-        .m_a24 = a24,
-        .m_a33 = a33,
-        .m_a34 = a34,
-        .m_a44 = a44,
+        .m_a11   = a11,
+        .m_a12   = 0,
+        .m_a13   = 0,
+        .m_a14   = 0,
+        .m_a22   = a22,
+        .m_a23   = a23,
+        .m_a24   = a24,
+        .m_a33   = a33,
+        .m_a34   = a34,
+        .m_a44   = a44,
     };
 }
 
 Surface makeSphere(double radius) {
     return Surface::Quadric{
         .m_icurv = 1,
-        .m_a11 = 1,
-        .m_a12 = 0,
-        .m_a13 = 0,
-        .m_a14 = 0,
-        .m_a22 = 1,
-        .m_a23 = 0,
-        .m_a24 = -radius,
-        .m_a33 = 1,
-        .m_a34 = 0,
-        .m_a44 = 0,
+        .m_a11   = 1,
+        .m_a12   = 0,
+        .m_a13   = 0,
+        .m_a14   = 0,
+        .m_a22   = 1,
+        .m_a23   = 0,
+        .m_a24   = -radius,
+        .m_a33   = 1,
+        .m_a34   = 0,
+        .m_a44   = 0,
     };
 }
 
 Surface makeToroid(const DesignElement& dele) {
     return Surface::Toroid{
-        .m_longRadius = dele.getLongRadius(),
+        .m_longRadius  = dele.getLongRadius(),
         .m_shortRadius = dele.getShortRadius(),
-        .m_toroidType = ToroidType::Concave,
+        .m_toroidType  = ToroidType::Concave,
     };
 }
 
 Surface makeParaboloid(const DesignElement& dele) {
-    auto ArmLength = dele.getArmLength();
-    auto parameterP = dele.getParameterP();
+    auto ArmLength      = dele.getArmLength();
+    auto parameterP     = dele.getParameterP();
     auto parameterPType = dele.getParameterPType();
 
     auto grazingIncAngle = dele.getGrazingIncAngle();
-    auto a11 = dele.getParameterA11();
+    auto a11             = dele.getParameterA11();
 
     double a24, a34, a44, y0, z0;
     //---------- Calculation will be outsourced ----------------
@@ -252,16 +250,16 @@ Surface makeParaboloid(const DesignElement& dele) {
     //---------------------------- Serialization -------------------------------
     return Surface::Quadric{
         .m_icurv = 1,
-        .m_a11 = a11,
-        .m_a12 = 0,
-        .m_a13 = 0,
-        .m_a14 = 0,
-        .m_a22 = 1.0,
-        .m_a23 = 0,
-        .m_a24 = a24,
-        .m_a33 = 0,
-        .m_a34 = a34,
-        .m_a44 = a44,
+        .m_a11   = a11,
+        .m_a12   = 0,
+        .m_a13   = 0,
+        .m_a14   = 0,
+        .m_a22   = 1.0,
+        .m_a23   = 0,
+        .m_a24   = a24,
+        .m_a33   = 0,
+        .m_a34   = a34,
+        .m_a44   = a44,
     };
 }
 

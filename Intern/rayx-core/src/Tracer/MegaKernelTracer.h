@@ -15,7 +15,7 @@
 namespace RAYX {
 namespace {
 
-constexpr int WARP_SIZE = 32;
+constexpr int WARP_SIZE            = 32;
 constexpr int GRID_STRIDE_MULTIPLE = WARP_SIZE;
 
 struct TraceSequentialKernel {
@@ -44,7 +44,7 @@ struct ScatterCompactKernel {
 
         if (gid < n && flags[gid]) {
             const auto index = prefix[gid];
-            dst[index] = src[gid];
+            dst[index]       = src[gid];
         }
     }
 };
@@ -95,14 +95,14 @@ struct Resources {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
-        const auto devHost = alpaka::getDevByIdx(platformHost, 0);
+        const auto devHost      = alpaka::getDevByIdx(platformHost, 0);
 
         // material data
-        const auto materialTables = group.calcMinimalMaterialTables();
-        const auto& materialIndices = materialTables.indices;
-        const auto& materialTable = materialTables.materials;
+        const auto materialTables     = group.calcMinimalMaterialTables();
+        const auto& materialIndices   = materialTables.indices;
+        const auto& materialTable     = materialTables.materials;
         const auto numMaterialIndices = static_cast<int>(materialIndices.size());
-        const auto materialTableSize = static_cast<int>(materialTable.size());
+        const auto materialTableSize  = static_cast<int>(materialTable.size());
         allocBuf(q, d_materialIndices, materialIndices.size());
         allocBuf(q, d_materialTable, materialTable.size());
         alpaka::memcpy(q, *d_materialIndices, alpaka::createView(devHost, materialIndices, numMaterialIndices));
@@ -111,14 +111,14 @@ struct Resources {
         // beamline elements
         // TODO: this should be two arrays, one of elements, one for transforms
         const auto elementsAndTransforms = group.compileElements();
-        auto elements = std::vector<OpticalElement>(elementsAndTransforms.size());
+        auto elements                    = std::vector<OpticalElement>(elementsAndTransforms.size());
         std::transform(elementsAndTransforms.begin(), elementsAndTransforms.end(), elements.begin(),
                        [](const OpticalElementAndTransform& e) { return e.element; });
         const auto numElements = static_cast<int>(elements.size());
         allocBuf(q, d_elements, numElements);
         alpaka::memcpy(q, *d_elements, alpaka::createView(devHost, elements, numElements));
 
-        const auto sources = group.getSources();
+        const auto sources    = group.getSources();
         const auto numSources = static_cast<int>(sources.size());
         const auto numObjects = numSources + numElements;
 
@@ -128,7 +128,7 @@ struct Resources {
         std::transform(sources.begin(), sources.end(), h_objectTransforms.begin(), [](const DesignSource* designSource) {
             return ObjectTransform{
                 // TODO: make sure to do this DesignPlane:XZ thing correctly
-                .m_inTrans = calcTransformationMatrices(designSource->getPosition(), designSource->getOrientation(), true, DesignPlane::XZ),
+                .m_inTrans  = calcTransformationMatrices(designSource->getPosition(), designSource->getOrientation(), true, DesignPlane::XZ),
                 .m_outTrans = calcTransformationMatrices(designSource->getPosition(), designSource->getOrientation(), false, DesignPlane::XZ),
             };
         });
@@ -140,12 +140,10 @@ struct Resources {
         // object record mask
         allocBuf(q, d_objectRecordMask, numObjects);
         auto h_objectRecordMask = std::make_unique<bool[]>(numObjects);
-        for (int i = 0; i < numObjects; ++i) {
-            h_objectRecordMask[i] = objectRecordMask.shouldRecordObject(i);
-        }
+        for (int i = 0; i < numObjects; ++i) { h_objectRecordMask[i] = objectRecordMask.shouldRecordObject(i); }
         alpaka::memcpy(q, *d_objectRecordMask, alpaka::createView(devHost, h_objectRecordMask.get(), numObjects));
 
-        const auto numEventsBatchAtMost = numRaysBatchAtMost * maxEvents;
+        const auto numEventsBatchAtMost                     = numRaysBatchAtMost * maxEvents;
         const auto numEventsBatchAtMostAccountForGridStride = nextMultiple(numRaysBatchAtMost, GRID_STRIDE_MULTIPLE) * maxEvents;
 
         // output events and compacted output events
@@ -157,7 +155,7 @@ struct Resources {
         allocBuf(q, d_eventStoreFlagsPrefixSum, numEventsBatchAtMostAccountForGridStride);
 
         return {
-            .numSources = numSources,
+            .numSources  = numSources,
             .numElements = numElements,
         };
     }
@@ -187,10 +185,10 @@ template <typename AccTag>
 class MegaKernelTracer : public DeviceTracer {
   public:
     explicit MegaKernelTracer(int deviceIndex) : m_deviceIndex(deviceIndex) {}
-    MegaKernelTracer(const MegaKernelTracer&) = delete;
-    MegaKernelTracer(MegaKernelTracer&&) = default;
+    MegaKernelTracer(const MegaKernelTracer&)            = delete;
+    MegaKernelTracer(MegaKernelTracer&&)                 = default;
     MegaKernelTracer& operator=(const MegaKernelTracer&) = delete;
-    MegaKernelTracer& operator=(MegaKernelTracer&&) = default;
+    MegaKernelTracer& operator=(MegaKernelTracer&&)      = default;
 
   private:
     using Dim = alpaka::DimInt<1>;
@@ -209,16 +207,16 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto maxEventsSources = 1;
-        const auto maxEvents = maxEventsSources + maxEventsElements;
+        const auto maxEvents        = maxEventsSources + maxEventsElements;
 
         const auto platformHost = alpaka::PlatformCpu{};
-        const auto devHost = alpaka::getDevByIdx(platformHost, 0);
-        const auto platformAcc = alpaka::Platform<Acc>{};
-        const auto devAcc = alpaka::getDevByIdx(platformAcc, m_deviceIndex);
-        using Queue = alpaka::Queue<Acc, alpaka::Blocking>;
-        auto q = Queue(devAcc);
+        const auto devHost      = alpaka::getDevByIdx(platformHost, 0);
+        const auto platformAcc  = alpaka::Platform<Acc>{};
+        const auto devAcc       = alpaka::getDevByIdx(platformAcc, m_deviceIndex);
+        using Queue             = alpaka::Queue<Acc, alpaka::Blocking>;
+        auto q                  = Queue(devAcc);
 
-        const auto sourceConf = m_genRaysResources.update(q, beamline, maxBatchSize);
+        const auto sourceConf   = m_genRaysResources.update(q, beamline, maxBatchSize);
         const auto beamlineConf = m_resources.update(q, beamline, maxEvents, sourceConf.numRaysBatchAtMost, objectRecordMask, attrRecordMask);
 
         RAYX_VERB << "trace beamline:";
@@ -237,12 +235,12 @@ class MegaKernelTracer : public DeviceTracer {
         RAYX_VERB << "\t- device name: " << alpaka::getName(devAcc);
         RAYX_VERB << "\t- host device name: " << alpaka::getName(devHost);
 
-        const auto numRaysBatchAtMostAccountForGridStride = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE);
+        const auto numRaysBatchAtMostAccountForGridStride   = nextMultiple(sourceConf.numRaysBatchAtMost, GRID_STRIDE_MULTIPLE);
         const auto numEventsBatchAtMostAccountForGridStride = numRaysBatchAtMostAccountForGridStride * maxEvents;
-        auto h_compactEventsBatches = std::vector<Rays>(sourceConf.numBatches);
-        auto h_eventStoreFlags = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
-        auto h_eventStoreFlagsPrefixSum = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
-        auto numEventsTotal = 0;
+        auto h_compactEventsBatches                         = std::vector<Rays>(sourceConf.numBatches);
+        auto h_eventStoreFlags                              = std::make_unique<bool[]>(numEventsBatchAtMostAccountForGridStride);
+        auto h_eventStoreFlagsPrefixSum                     = std::vector<int>(numEventsBatchAtMostAccountForGridStride);
+        auto numEventsTotal                                 = 0;
 
         for (int batchIndex = 0; batchIndex < sourceConf.numBatches; ++batchIndex) {
             RAYX_VERB << "processing batch (" << (batchIndex + 1) << "/" << sourceConf.numBatches << ")";
@@ -250,7 +248,7 @@ class MegaKernelTracer : public DeviceTracer {
             // generate input rays for batch
             auto batchConf = m_genRaysResources.genRaysBatch(devAcc, q, batchIndex);
 
-            const auto numRaysBatchAccountForGridStride = nextMultiple(batchConf.numRaysBatch, GRID_STRIDE_MULTIPLE);
+            const auto numRaysBatchAccountForGridStride   = nextMultiple(batchConf.numRaysBatch, GRID_STRIDE_MULTIPLE);
             const auto numEventsBatchAccountForGridStride = numRaysBatchAccountForGridStride * maxEvents;
 
             // clear buffers
@@ -300,25 +298,25 @@ class MegaKernelTracer : public DeviceTracer {
 
         const auto constState = ConstState{
             // constants
-            .maxEvents = maxEvents,
-            .sequential = sequential,
-            .numSources = numSources,
-            .numElements = numElements,
+            .maxEvents              = maxEvents,
+            .sequential             = sequential,
+            .numSources             = numSources,
+            .numElements            = numElements,
             .outputEventsGridStride = numRaysBatchAccountForGridStride,
 
             // buffers
             .objectTransforms = alpaka::getPtrNative(*m_resources.d_objectTransforms),
-            .elements = alpaka::getPtrNative(*m_resources.d_elements),
-            .materialIndices = alpaka::getPtrNative(*m_resources.d_materialIndices),
-            .materialTable = alpaka::getPtrNative(*m_resources.d_materialTable),
+            .elements         = alpaka::getPtrNative(*m_resources.d_elements),
+            .materialIndices  = alpaka::getPtrNative(*m_resources.d_materialIndices),
+            .materialTable    = alpaka::getPtrNative(*m_resources.d_materialTable),
             .objectRecordMask = alpaka::getPtrNative(*m_resources.d_objectRecordMask),
-            .attrRecordMask = attrRecordMask,
-            .rays = raysBufToRaysPtr(batchConf.d_rays),
+            .attrRecordMask   = attrRecordMask,
+            .rays             = raysBufToRaysPtr(batchConf.d_rays),
         };
 
         const auto mutableState = MutableState{
             // buffers
-            .events = raysBufToRaysPtr(m_resources.d_eventsBatch),
+            .events      = raysBufToRaysPtr(m_resources.d_eventsBatch),
             .storedFlags = alpaka::getPtrNative(*m_resources.d_eventStoreFlags),
         };
 

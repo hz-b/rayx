@@ -54,7 +54,7 @@ inline int nextMultiple(const int value, const int divisor) {
 /// beamlines one after the other)
 template <typename Queue, typename Buf>
 inline void allocBuf(Queue q, std::optional<Buf>& buf, const int size) {
-    using Idx = alpaka::Idx<Buf>;
+    using Idx  = alpaka::Idx<Buf>;
     using Elem = alpaka::Elem<Buf>;
 
     const auto shouldAlloc = !buf || alpaka::getExtents(*buf)[0] < size;
@@ -100,8 +100,8 @@ template <typename Acc, typename DevAcc, typename Queue, typename Kernel, typena
 inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, BlockSizeConstraint::Variant blockSizeConstraint,
                                  const Kernel& kernel, Args&&... args) {
     const auto conf = alpaka::KernelCfg<Acc>{
-        .gridElemExtent = numElements,
-        .threadElemExtent = 1,
+        .gridElemExtent                        = numElements,
+        .threadElemExtent                      = 1,
         .blockThreadMustDivideGridThreadExtent = false,
     };
 
@@ -111,13 +111,13 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
             if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::Exact>) {
                 assert(workDiv.m_blockThreadExtent[0] <= constraint.value && "BlockSizeConstraint::Exact exceeds the capabilities this device");
                 workDiv.m_blockThreadExtent = constraint.value;
-                workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+                workDiv.m_gridBlockExtent   = ceilIntDivision(numElements, constraint.value);
             }
 
             if constexpr (std::is_same_v<BlockSizeConstraintType, BlockSizeConstraint::AtMost>) {
                 if (constraint.value < workDiv.m_blockThreadExtent[0]) {
                     workDiv.m_blockThreadExtent = constraint.value;
-                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.value);
+                    workDiv.m_gridBlockExtent   = ceilIntDivision(numElements, constraint.value);
                 }
             }
 
@@ -129,7 +129,7 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
                 assert(constraint.atLeast <= workDiv.m_blockThreadExtent[0] && "BlockSizeConstraint::InRange exceeds capabilities of this device");
                 if (constraint.atMost < workDiv.m_blockThreadExtent[0]) {
                     workDiv.m_blockThreadExtent = constraint.atMost;
-                    workDiv.m_gridBlockExtent = ceilIntDivision(numElements, constraint.atMost);
+                    workDiv.m_gridBlockExtent   = ceilIntDivision(numElements, constraint.atMost);
                 }
             }
         },

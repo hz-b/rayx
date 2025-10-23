@@ -29,7 +29,7 @@ TEST_F(TestSuite, groupTransform) {
     RAYX::Beamline bl = loadBeamline("groupTransform");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
-    auto m = bl.compileElements()[0].transform.m_inTrans;
+    auto m               = bl.compileElements()[0].transform.m_inTrans;
     glm::dmat4x4 correct = {
         1,   0,     0,  0,  //
         0,   1,     0,  0,  //
@@ -74,7 +74,7 @@ TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
     OpticalElement para = beamline.compileElements()[0].element;
-    auto parabo = para.m_surface.get<Surface::Quadric>();
+    auto parabo         = para.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(1, parabo.m_a11);
     CHECK_EQ(0, parabo.m_a12);
@@ -90,9 +90,9 @@ TEST_F(TestSuite, testParaboloidQuad) {
 }
 
 TEST_F(TestSuite, testSphereQuad) {
-    auto beamline = loadBeamline("SphereMirrorDefault");
+    auto beamline      = loadBeamline("SphereMirrorDefault");
     OpticalElement sph = beamline.compileElements()[0].element;
-    auto sphere = sph.m_surface.get<Surface::Quadric>();
+    auto sphere        = sph.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(1, sphere.m_a11);
     CHECK_EQ(0, sphere.m_a12);
@@ -108,9 +108,9 @@ TEST_F(TestSuite, testSphereQuad) {
 }
 
 TEST_F(TestSuite, testEllipsoidQuad) {
-    auto beamline = loadBeamline("Ellipsoid");
+    auto beamline       = loadBeamline("Ellipsoid");
     OpticalElement elli = beamline.compileElements()[0].element;
-    auto ellips = elli.m_surface.get<Surface::Quadric>();
+    auto ellips         = elli.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(1, ellips.m_a11);
     CHECK_EQ(0, ellips.m_a12);
@@ -126,9 +126,9 @@ TEST_F(TestSuite, testEllipsoidQuad) {
 }
 
 TEST_F(TestSuite, testCylinderQuad) {
-    auto beamline = loadBeamline("CylinderDefault");
+    auto beamline       = loadBeamline("CylinderDefault");
     OpticalElement cyli = beamline.compileElements()[0].element;
-    auto cylinder = cyli.m_surface.get<Surface::Quadric>();
+    auto cylinder       = cyli.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(0, cylinder.m_a11);
     CHECK_EQ(0, cylinder.m_a12);
@@ -144,9 +144,9 @@ TEST_F(TestSuite, testCylinderQuad) {
 }
 
 TEST_F(TestSuite, testConeQuad) {
-    auto beamline = loadBeamline("Cone");
+    auto beamline      = loadBeamline("Cone");
     OpticalElement con = beamline.compileElements()[0].element;
-    auto cone = con.m_surface.get<Surface::Quadric>();
+    auto cone          = con.m_surface.get<Surface::Quadric>();
 
     CHECK_EQ(0.903353, cone.m_a11, 0.001);
     CHECK_EQ(0, cone.m_a12);
@@ -162,9 +162,9 @@ TEST_F(TestSuite, testConeQuad) {
 }
 
 TEST_F(TestSuite, test_Toroid) {
-    auto beamline = loadBeamline("toroid");
+    auto beamline       = loadBeamline("toroid");
     OpticalElement trid = beamline.compileElements()[0].element;
-    auto toroid = trid.m_surface.get<Surface::Toroid>();
+    auto toroid         = trid.m_surface.get<Surface::Toroid>();
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
@@ -172,9 +172,9 @@ TEST_F(TestSuite, test_Toroid) {
 }
 
 TEST_F(TestSuite, testExpertsOptic) {
-    auto beamline = loadBeamline("toroid");
+    auto beamline       = loadBeamline("toroid");
     OpticalElement trid = beamline.compileElements()[0].element;
-    auto toroid = trid.m_surface.get<Surface::Toroid>();
+    auto toroid         = trid.m_surface.get<Surface::Toroid>();
 
     CHECK_EQ(10470.4917, toroid.m_longRadius, 0.001);
     CHECK_EQ(315.723959, toroid.m_shortRadius, 0.001);
@@ -214,23 +214,23 @@ TEST_F(TestSuite, groupTransform2) {
         0, 0.985, -0.174, 0,              //
         0, 0.174, 0.985, 0,               //
         0, 0, 0, 1);                      //
-    glm::dvec4 groupPos = glm::dvec4(42, 2, 4, 0);
+    glm::dvec4 groupPos  = glm::dvec4(42, 2, 4, 0);
 
     glm::dmat4x4 elementOr = glm::dmat4x4(  //
         1, 0, 0, 0,                         //
         0, 1, 0, 0,                         //
         0, 0, 1, 0,                         //
         0, 0, 0, 1);                        //
-    glm::dvec4 elementPos = glm::dvec4(0, 0, 1000, 1);
+    glm::dvec4 elementPos  = glm::dvec4(0, 0, 1000, 1);
 
     glm::dmat4x4 orientationCorrect = groupOr * elementOr;
-    glm::dvec4 positionCorrect = groupPos + (groupOr * elementPos);
+    glm::dvec4 positionCorrect      = groupPos + (groupOr * elementPos);
 
-    glm::dmat4x4 inTrans = bl.compileElements()[0].transform.m_inTrans * yz_swap;
+    glm::dmat4x4 inTrans  = bl.compileElements()[0].transform.m_inTrans * yz_swap;
     glm::dmat4x4 outTrans = bl.compileElements()[0].transform.m_outTrans * yz_swap;
 
     glm::dmat4x4 orientationResult = glm::dmat4x4(glm::dmat3x3(inTrans));
-    glm::dvec4 positionResult = outTrans * glm::dvec4(0, 0, 0, 1);
+    glm::dvec4 positionResult      = outTrans * glm::dvec4(0, 0, 0, 1);
 
     CHECK_EQ(orientationCorrect, orientationResult);
     CHECK_EQ(positionCorrect, positionResult);

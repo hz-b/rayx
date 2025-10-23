@@ -39,9 +39,9 @@ void traceSequential(const int gid, const ConstState& __restrict constState, Mut
         const auto col_optical_distance = glm::length(ray.position - col->hitpoint);
         ray.optical_path_length += col_optical_distance;
         ray.electric_field = advanceElectricField(ray.electric_field, energyToWaveLength(ray.energy), col_optical_distance);
-        ray.position = col->hitpoint;
-        ray.object_id = constState.numSources + elementIndex;
-        ray.event_type = EventType::HitElement;
+        ray.position       = col->hitpoint;
+        ray.object_id      = constState.numSources + elementIndex;
+        ray.event_type     = EventType::HitElement;
 
         behave(ray, *col, element, constState.materialIndices, constState.materialTable);
 
@@ -84,9 +84,9 @@ void traceNonSequential(const int gid, const ConstState& __restrict constState, 
         const auto col_optical_distance = glm::length(ray.position - col->point.hitpoint);
         ray.optical_path_length += col_optical_distance;
         ray.electric_field = advanceElectricField(ray.electric_field, energyToWaveLength(ray.energy), col_optical_distance);
-        ray.position = col->point.hitpoint;
-        ray.object_id = constState.numSources + col->elementIndex;
-        ray.event_type = EventType::HitElement;
+        ray.position       = col->point.hitpoint;
+        ray.object_id      = constState.numSources + col->elementIndex;
+        ray.event_type     = EventType::HitElement;
 
         behave(ray, col->point, element, constState.materialIndices, constState.materialTable);
 

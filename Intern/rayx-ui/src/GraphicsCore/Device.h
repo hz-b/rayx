@@ -15,7 +15,7 @@ struct QueueFamilyIndices {
     uint32_t graphicsFamily;
     uint32_t presentFamily;
     bool graphicsFamilyHasValue = false;
-    bool presentFamilyHasValue = false;
+    bool presentFamilyHasValue  = false;
     bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 };
 
@@ -31,10 +31,10 @@ class Device {
     ~Device();
 
     // Not copyable or movable
-    Device(const Device&) = delete;
+    Device(const Device&)         = delete;
     void operator=(const Device&) = delete;
-    Device(Device&&) = delete;
-    Device& operator=(Device&&) = delete;
+    Device(Device&&)              = delete;
+    Device& operator=(Device&&)   = delete;
 
     VkCommandPool getCommandPool() const { return m_CommandPool; }
     VkDevice device() const { return m_Device; }

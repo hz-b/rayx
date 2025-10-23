@@ -35,7 +35,7 @@ extern char** GLOBAL_ARGV;
     CHECK_EQ(A, B);        // with default tolerance
 */
 
-constexpr int PREC = 17;
+constexpr int PREC                 = 17;
 constexpr double DEFAULT_TOLERANCE = 1e-10;
 
 /// this is the underlying implementation of the CHECK_EQ macro.
@@ -66,9 +66,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     int counter = 0;  // stores the number of elements in the stringstream
     std::stringstream s;
     for (size_t i = 0; i < vl.size(); i++) {
-        if (counter != 0) {
-            s << " ";
-        }
+        if (counter != 0) { s << " "; }
         if (abs(vl[i] - vr[i]) <= tolerance) {
             s << std::setprecision(PREC) << vl[i] << "|" << vr[i];
         } else {
@@ -82,9 +80,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
             s = std::stringstream();
         }
     }
-    if (counter > 0) {
-        Warn(filename, line) << s.str();
-    }
+    if (counter > 0) { Warn(filename, line) << s.str(); }
     ADD_FAILURE();
 }
 
@@ -100,9 +96,7 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
         auto t = tolerance;
 
         // integer tolerance for integer values.
-        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/) {
-            t = 0.5;
-        }
+        if (i == 3 /*eventType*/ || i == 14 /*lastElem*/) { t = 0.5; }
 
         checkEq(filename, line, l + names[i], r + names[i], vl[i], vr[i], {vl[i]}, {vr[i]}, t);
     }
@@ -119,25 +113,19 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
     }
 
 /// assert that x holds, and give a fancy print otherwise.
-#define CHECK(x)                                       \
-    {                                                  \
-        if (!(x)) {                                    \
-            RAYX_EXIT << "CHECK(" << #x << ") failed"; \
-        }                                              \
+#define CHECK(x)                                                 \
+    {                                                            \
+        if (!(x)) { RAYX_EXIT << "CHECK(" << #x << ") failed"; } \
     }
 
 /// check whether low <= expr <= high
-#define CHECK_IN(expr, low, high)                                                                  \
-    {                                                                                              \
-        auto expr_check_in = expr;                                                                 \
-        auto low_check_in = low;                                                                   \
-        if (expr_check_in < low_check_in) {                                                        \
-            RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low;  \
-        }                                                                                          \
-        auto high_check_in = high;                                                                 \
-        if (expr_check_in > high_check_in) {                                                       \
-            RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high; \
-        }                                                                                          \
+#define CHECK_IN(expr, low, high)                                                                                                     \
+    {                                                                                                                                 \
+        auto expr_check_in = expr;                                                                                                    \
+        auto low_check_in  = low;                                                                                                     \
+        if (expr_check_in < low_check_in) { RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") < " << #low; }   \
+        auto high_check_in = high;                                                                                                    \
+        if (expr_check_in > high_check_in) { RAYX_EXIT << "CHECK_IN failed: " << #expr << " (" << expr_check_in << ") > " << #high; } \
     }
 
 template <typename T>
@@ -253,9 +241,9 @@ class TestSuite : public testing::Test {
         }
 
         // Choose Hardware
-        using DeviceType = DeviceConfig::DeviceType;
+        using DeviceType      = DeviceConfig::DeviceType;
         const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
-        tracer = std::make_unique<Tracer>(DeviceConfig(deviceType).enableBestDevice());
+        tracer                = std::make_unique<Tracer>(DeviceConfig(deviceType).enableBestDevice());
     }
 
     // called before every test invocation.

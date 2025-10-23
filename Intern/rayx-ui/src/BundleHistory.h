@@ -19,7 +19,7 @@ struct Ray {
 static_assert(std::is_trivially_copyable_v<Ray>);
 static_assert(std::is_default_constructible_v<Ray>);
 
-using RayHistory = std::vector<Ray>;
+using RayHistory    = std::vector<Ray>;
 using BundleHistory = std::vector<RayHistory>;
 
 BundleHistory convertRaysToBundleHistory(RAYX::Rays rays, const int numSources);

@@ -36,9 +36,7 @@ void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& dis
         // Convert the logarithmic value back to the actual number of rays
         amountOfRays = static_cast<int>(std::exp(logValue));
     }
-    if (displayRays && renderAllRays) {
-        ImGui::EndDisabled();
-    }
+    if (displayRays && renderAllRays) { ImGui::EndDisabled(); }
 
     // Display the actual number of rays next to the slider
     ImGui::SameLine();
@@ -51,9 +49,7 @@ void displayFilterSlider(size_t& amountOfRays, size_t maxAmountOfRays, bool& dis
 
 size_t getMaxEvents(const BundleHistory& bundleHist) {
     size_t maxEvents = 0;
-    for (const auto& ray : bundleHist) {
-        maxEvents = std::max(maxEvents, ray.size());
-    }
+    for (const auto& ray : bundleHist) { maxEvents = std::max(maxEvents, ray.size()); }
     return maxEvents;
 }
 
@@ -62,15 +58,14 @@ size_t getMaxEvents(const BundleHistory& bundleHist) {
  * Depending on the event type associated with the ray, the function produces visual lines that represent
  * ray segments, colored based on the event type.
  */
-std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction,
-                          uint32_t amountOfRays) {
+std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction, uint32_t amountOfRays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
 
     // Apply the filter function to get the indices of the rays to be rendered
-    amountOfRays = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
+    amountOfRays                   = (uint32_t)std::min(amountOfRays, uint32_t(rayCache.size()));
     std::vector<size_t> rayIndices = filterFunction(rayCache, amountOfRays);
-    size_t maxRayIndex = rayCache.size();
+    size_t maxRayIndex             = rayCache.size();
 
     // compile all elements
     auto compiledElements = beamline.compileElements();
@@ -95,12 +90,12 @@ std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& b
             }
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].transform.m_outTrans * glm::vec4(event.m_position, 1.0f);
             glm::vec4 originColor = (event.m_eventType == RAYX::EventType::HitElement) ? YELLOW : WHITE;
-            glm::vec4 pointColor = (event.m_eventType == RAYX::EventType::HitElement) ? ORANGE
-                                   : (event.m_eventType == RAYX::EventType::Absorbed) ? RED
-                                                                                      : WHITE;
+            glm::vec4 pointColor  = (event.m_eventType == RAYX::EventType::HitElement) ? ORANGE
+                                    : (event.m_eventType == RAYX::EventType::Absorbed) ? RED
+                                                                                       : WHITE;
 
             ColorVertex origin = {rayLastPos, originColor};
-            ColorVertex point = {worldPos, pointColor};
+            ColorVertex point  = {worldPos, pointColor};
             rays.push_back(Line(origin, point));
             rayLastPos = point.pos;
         }
@@ -116,9 +111,7 @@ void sortRaysByElement(const BundleHistory& rays, std::vector<std::vector<Ray>>&
     // Iterate over all rays in the bundle history
     for (const auto& rayBundle : rays) {
         for (const auto& ray : rayBundle) {
-            if (ray.m_lastElement >= static_cast<int>(numElements)) {
-                continue;
-            }
+            if (ray.m_lastElement >= static_cast<int>(numElements)) { continue; }
             if (ray.m_lastElement < 0) RAYX_EXIT << "encountered event with element id: " << ray.m_lastElement;
             sortedRays[static_cast<size_t>(ray.m_lastElement)].push_back(ray);
         }
@@ -147,14 +140,12 @@ std::vector<size_t> findMostCentralRays(const std::vector<std::vector<float>>& f
 
     for (size_t i = 0; i < features.size(); ++i) {
         size_t clusterIdx = clusterAssignments[i];
-        float distance = 0.0f;  // Calculate the distance between features[i] and centroids[clusterIdx]
-        for (size_t j = 0; j < features[i].size(); ++j) {
-            distance += (float)std::pow(features[i][j] - centroids[clusterIdx][j], 2);
-        }
+        float distance    = 0.0f;  // Calculate the distance between features[i] and centroids[clusterIdx]
+        for (size_t j = 0; j < features[i].size(); ++j) { distance += (float)std::pow(features[i][j] - centroids[clusterIdx][j], 2); }
         distance = std::sqrt(distance);
 
         if (distance < minDistances[clusterIdx]) {
-            minDistances[clusterIdx] = distance;
+            minDistances[clusterIdx]       = distance;
             centralRaysIndices[clusterIdx] = i;
         }
     }
@@ -179,10 +170,10 @@ std::vector<size_t> kMeansFilter(const BundleHistory& rayCache, size_t k) {
         }
 
         if (!filteredRays.empty()) {
-            auto features = extractFeatures(filteredRays, j);
-            k = std::min(k, features.size());
+            auto features                        = extractFeatures(filteredRays, j);
+            k                                    = std::min(k, features.size());
             auto [clusterAssignments, centroids] = kMeansClustering(features, k);
-            auto centralRaysIndices = findMostCentralRays(features, clusterAssignments, centroids, k);
+            auto centralRaysIndices              = findMostCentralRays(features, clusterAssignments, centroids, k);
             for (auto& idx : centralRaysIndices) {
                 selectedRays.push_back(indexMap[idx]);  // Map back to original index
             }
@@ -199,9 +190,7 @@ std::vector<size_t> kMeansFilter(const BundleHistory& rayCache, size_t k) {
 
 std::vector<size_t> noFilter(const BundleHistory& bundleHist, [[maybe_unused]] size_t k) {
     std::vector<size_t> selectedRays;
-    for (size_t i = 0; i < bundleHist.size(); ++i) {
-        selectedRays.push_back(i);
-    }
+    for (size_t i = 0; i < bundleHist.size(); ++i) { selectedRays.push_back(i); }
 
     return selectedRays;
 }
@@ -209,9 +198,7 @@ std::vector<size_t> noFilter(const BundleHistory& bundleHist, [[maybe_unused]] s
 // Function to calculate Euclidean distance between two feature vectors
 float euclideanDistance(const std::vector<float>& a, const std::vector<float>& b) {
     float distance = 0.0f;
-    for (size_t i = 0; i < a.size(); ++i) {
-        distance += (a[i] - b[i]) * (a[i] - b[i]);
-    }
+    for (size_t i = 0; i < a.size(); ++i) { distance += (a[i] - b[i]) * (a[i] - b[i]); }
     return std::sqrt(distance);
 }
 
@@ -227,31 +214,29 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
 
     // Initialize centroids to random features
     std::uniform_int_distribution<size_t> uni(0, features.size() - 1);
-    for (auto& centroid : centroids) {
-        centroid = features[uni(rng)];
-    }
+    for (auto& centroid : centroids) { centroid = features[uni(rng)]; }
 
     int maxIterations = 25;
-    int iteration = 0;
-    bool changed = true;
+    int iteration     = 0;
+    bool changed      = true;
     while (changed && iteration < maxIterations) {
         changed = false;
         iteration++;
 
         // Assign clusters
         for (size_t i = 0; i < features.size(); ++i) {
-            float minDistance = std::numeric_limits<float>::max();
+            float minDistance   = std::numeric_limits<float>::max();
             size_t clusterIndex = 0;
             for (size_t j = 0; j < k; ++j) {
                 float distance = euclideanDistance(features[i], centroids[j]);
                 if (distance < minDistance) {
-                    minDistance = distance;
+                    minDistance  = distance;
                     clusterIndex = j;
                 }
             }
             if (clusterAssignments[i] != clusterIndex) {
                 clusterAssignments[i] = clusterIndex;
-                changed = true;
+                changed               = true;
             }
         }
 
@@ -261,9 +246,7 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
         for (size_t i = 0; i < features.size(); ++i) {
             size_t clusterIndex = clusterAssignments[i];
             counts[clusterIndex]++;
-            for (size_t j = 0; j < features[i].size(); ++j) {
-                sums[clusterIndex][j] += features[i][j];
-            }
+            for (size_t j = 0; j < features[i].size(); ++j) { sums[clusterIndex][j] += features[i][j]; }
         }
 
         // After clustering, ensure that each centroid has at least one point
@@ -273,9 +256,7 @@ std::pair<std::vector<size_t>, std::vector<std::vector<float>>> kMeansClustering
                 centroids[i] = features[uni(rng)];
             } else {
                 // Update centroids as normal
-                for (size_t j = 0; j < centroids[i].size(); ++j) {
-                    centroids[i][j] = sums[i][j] / counts[i];
-                }
+                for (size_t j = 0; j < centroids[i].size(); ++j) { centroids[i][j] = sums[i][j] / counts[i]; }
             }
         }
     }
@@ -292,9 +273,7 @@ void initializeCentroids(std::vector<std::vector<float>>& centroids, const std::
     for (size_t i = 0; i < k; ++i) {
         size_t index = uni(rng);
         // Ensure unique indices for centroid initialization
-        while (selectedIndices.find(index) != selectedIndices.end()) {
-            index = uni(rng);
-        }
+        while (selectedIndices.find(index) != selectedIndices.end()) { index = uni(rng); }
         centroids[i] = features[index];
         selectedIndices.insert(index);
     }

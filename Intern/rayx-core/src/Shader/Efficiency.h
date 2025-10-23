@@ -189,9 +189,7 @@ inline ComplexFresnelCoeffs computeMultilayerReflectance(
 
     // Einfallswinkel in den einzelnen Schichten
     thetas[0] = incidentAngle;
-    for (int i = 1; i <= numLayers + 1; ++i) {
-        thetas[i] = calcRefractAngle(thetas[i - 1], iors[i - 1], iors[i]);
-    }
+    for (int i = 1; i <= numLayers + 1; ++i) { thetas[i] = calcRefractAngle(thetas[i - 1], iors[i - 1], iors[i]); }
 
     // Startwert: Reflexion an Substratgrenze
     ComplexFresnelCoeffs r = calcReflectAmplitude(thetas[numLayers], thetas[numLayers + 1], iors[numLayers], iors[numLayers + 1]);
@@ -214,12 +212,12 @@ RAYX_FN_ACC
 inline ElectricField interceptReflect(const ElectricField incidentElectricField, const glm::dvec3 incidentVec, const glm::dvec3 reflectVec,
                                       const glm::dvec3 normalVec, const complex::Complex iorI, const complex::Complex iorT) {
     const auto incidentAngle = complex::Complex(angleBetweenUnitVectors(incidentVec, -normalVec), 0);
-    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, iorT);
+    const auto refractAngle  = calcRefractAngle(incidentAngle, iorI, iorT);
 
     const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, iorT);
 
     // TODO: make this more robust
-    const auto isNormalIncidence = incidentVec == -normalVec;
+    const auto isNormalIncidence         = incidentVec == -normalVec;
     const auto reflectPolarizationMatrix = isNormalIncidence ? calcReflectPolarizationMatrixAtNormalIncidence(reflectAmplitude)
                                                              : calcPolaririzationMatrix(incidentVec, reflectVec, normalVec, reflectAmplitude);
 

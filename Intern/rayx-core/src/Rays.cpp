@@ -125,20 +125,16 @@ Rays Rays::filterByLastEventInPath() const {
     std::unordered_map<int32_t, int> bestIndex;  // path_id -> index of max path_event_id
 
     for (int i = 0; i < n; ++i) {
-        auto pid = path_id[i];
+        auto pid   = path_id[i];
         auto pevid = path_event_id[i];
-        auto it = bestIndex.find(pid);
-        if (it == bestIndex.end() || pevid > path_event_id[it->second]) {
-            bestIndex[pid] = i;
-        }
+        auto it    = bestIndex.find(pid);
+        if (it == bestIndex.end() || pevid > path_event_id[it->second]) { bestIndex[pid] = i; }
     }
 
     // collect the selected indices
     std::vector<int> indices;
     indices.reserve(bestIndex.size());
-    for (auto& kv : bestIndex) {
-        indices.push_back(kv.second);
-    }
+    for (auto& kv : bestIndex) { indices.push_back(kv.second); }
 
     // build result Rays using selected indices
     const auto attr = attrMask();
@@ -155,7 +151,7 @@ Rays Rays::filterByLastEventInPath() const {
 
 bool Rays::isValid() const {
     const auto attr = attrMask();
-    const auto sz = size();
+    const auto sz   = size();
 
 #define X(type, name, flag) \
     if (RAYX::contains(attr, RayAttrMask::flag) && static_cast<int>(name.size()) != sz) return false;

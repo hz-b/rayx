@@ -53,10 +53,10 @@ RAYX_FN_ACC detail::Ray PointSource::genRay(const int rayPathIndex, const int so
                                             const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
-    auto x = getCoord(m_widthDist, m_sourceWidth, rand);
-    auto y = getCoord(m_heightDist, m_sourceHeight, rand);
-    auto z = (rand.randomDouble() - 0.5) * m_sourceDepth;
-    const auto en = selectEnergy(energyDistribution, rand);
+    auto x              = getCoord(m_widthDist, m_sourceWidth, rand);
+    auto y              = getCoord(m_heightDist, m_sourceHeight, rand);
+    auto z              = (rand.randomDouble() - 0.5) * m_sourceDepth;
+    const auto en       = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     // get random deviation from main ray based on distribution
@@ -69,18 +69,18 @@ RAYX_FN_ACC detail::Ray PointSource::genRay(const int rayPathIndex, const int so
     const auto electricField = stokesToElectricField(m_pol, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
 
     return detail::Ray{
-        .position = position,
-        .direction = direction,
-        .energy = en,
+        .position            = position,
+        .direction           = direction,
+        .energy              = en,
         .optical_path_length = 0.0,
-        .electric_field = electricField,
-        .rand = std::move(rand),
-        .path_id = rayPathIndex,
-        .path_event_id = -1,
-        .order = 0,
-        .object_id = sourceId,
-        .source_id = sourceId,
-        .event_type = EventType::Emitted,
+        .electric_field      = electricField,
+        .rand                = std::move(rand),
+        .path_id             = rayPathIndex,
+        .path_event_id       = -1,
+        .order               = 0,
+        .object_id           = sourceId,
+        .source_id           = sourceId,
+        .event_type          = EventType::Emitted,
     };
 }
 

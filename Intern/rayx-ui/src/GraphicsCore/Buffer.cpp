@@ -16,7 +16,7 @@ Buffer::Buffer(const Device& device, const std::string& name, VkDeviceSize insta
       m_UsageFlags{usageFlags},
       m_MemoryPropertyFlags{memoryPropertyFlags} {
     m_AlignmentSize = getAlignment(instanceSize, minOffsetAlignment);
-    m_BufferSize = m_AlignmentSize * instanceCount;
+    m_BufferSize    = m_AlignmentSize * instanceCount;
     device.createBuffer(m_BufferSize, usageFlags, memoryPropertyFlags, m_Buffer, m_Memory);
 }
 
@@ -27,9 +27,7 @@ Buffer::~Buffer() {
 }
 
 VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
-    if (minOffsetAlignment > 0) {
-        return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
-    }
+    if (minOffsetAlignment > 0) { return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1); }
     return instanceSize;
 }
 
@@ -72,19 +70,19 @@ void Buffer::writeToBuffer(const void* data, VkDeviceSize size, VkDeviceSize off
 
 VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset) {
     VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = m_Memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
+    mappedRange.sType               = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory              = m_Memory;
+    mappedRange.offset              = offset;
+    mappedRange.size                = size;
     return vkFlushMappedMemoryRanges(m_Device.device(), 1, &mappedRange);
 }
 
 VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
     VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = m_Memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
+    mappedRange.sType               = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory              = m_Memory;
+    mappedRange.offset              = offset;
+    mappedRange.size                = size;
     return vkInvalidateMappedMemoryRanges(m_Device.device(), 1, &mappedRange);
 }
 

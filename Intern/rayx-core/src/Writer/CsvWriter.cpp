@@ -18,9 +18,9 @@ constexpr int PADDING = 0;  // extra spaces on the left side in each cell for be
 // see https://stackoverflow.com/questions/1701055/what-is-the-maximum-length-in-chars-needed-to-represent-any-double-value
 // constexpr int MAX_CELL_SIZE_FLOAT  = 16 + PADDING;
 constexpr int MAX_CELL_SIZE_DOUBLE = 24 + PADDING;
-constexpr int MAX_CELL_SIZE_INT = 11 + PADDING;
+constexpr int MAX_CELL_SIZE_INT    = 11 + PADDING;
 constexpr int MAX_CELL_SIZE_UINT64 = 20 + PADDING;
-constexpr char DELIMITER = ',';
+constexpr char DELIMITER           = ',';
 
 std::string trimWhitespaces(std::string s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
@@ -96,7 +96,7 @@ std::string formatAsCell(const T v, const int size) {
 
 void writeCsvHeader(std::ostream& os, const RayAttrMask attr, const std::vector<int>& cellSizes) {
     const auto numAttr = countSetBits(attr);
-    int attrCount = 0;
+    int attrCount      = 0;
 
     auto writeCell = [&]<typename T>(const std::string& name, const RayAttrMask flag) {
         if constexpr (std::is_same_v<T, complex::Complex>) {
@@ -121,7 +121,7 @@ void writeCsvHeader(std::ostream& os, const RayAttrMask attr, const std::vector<
 
 void writeCsvBodyLine(std::ostream& os, const int i, const RayAttrMask attr, const Rays& rays, const std::vector<int>& cellSizes) {
     const auto numAttr = countSetBits(attr);
-    auto attrCount = 0;
+    auto attrCount     = 0;
 
     auto writeCell = [&]<typename T>(const std::vector<T>& src, const RayAttrMask flag) {
         if constexpr (std::is_same_v<T, complex::Complex>) {
@@ -241,7 +241,7 @@ void readCsvBodyLine(Rays& rays, const std::vector<RayAttrMask>& attrs, const st
 }  // namespace
 
 void writeCsv(const fs::path& filepath, const Rays& rays) {
-    const auto attr = rays.attrMask();
+    const auto attr      = rays.attrMask();
     const auto cellSizes = calcCellSizes(attr);
 
     auto file = std::ofstream(filepath);

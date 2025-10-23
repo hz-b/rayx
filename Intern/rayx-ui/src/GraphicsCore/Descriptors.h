@@ -22,7 +22,7 @@ class DescriptorSetLayout {
 
     DescriptorSetLayout(Device& Device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
     ~DescriptorSetLayout();
-    DescriptorSetLayout(const DescriptorSetLayout&) = delete;
+    DescriptorSetLayout(const DescriptorSetLayout&)            = delete;
     DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
 
     VkDescriptorSetLayout getDescriptorSetLayout() const { return m_DescriptorSetLayout; }
@@ -49,13 +49,13 @@ class DescriptorPool {
       private:
         Device& m_Device;
         std::vector<VkDescriptorPoolSize> m_poolSizes{};
-        uint32_t m_maxSets = 1000;
+        uint32_t m_maxSets                      = 1000;
         VkDescriptorPoolCreateFlags m_PoolFlags = 0;
     };
 
     DescriptorPool(Device& Device, uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags, const std::vector<VkDescriptorPoolSize>& poolSizes);
     ~DescriptorPool();
-    DescriptorPool(const DescriptorPool&) = delete;
+    DescriptorPool(const DescriptorPool&)            = delete;
     DescriptorPool& operator=(const DescriptorPool&) = delete;
 
     bool allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;

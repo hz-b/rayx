@@ -51,22 +51,22 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
             return *this;
         }
 
-        m_descrSet = other.m_descrSet;
+        m_descrSet       = other.m_descrSet;
         m_descriptorPool = other.m_descriptorPool;
-        m_Texture = std::move(other.m_Texture);
-        m_modelMatrix = other.m_modelMatrix;
-        m_vertexCount = other.m_vertexCount;
-        m_indexCount = other.m_indexCount;
-        m_vertexBuffer = std::move(other.m_vertexBuffer);
-        m_indexBuffer = std::move(other.m_indexBuffer);
-        m_setLayout = other.m_setLayout;
+        m_Texture        = std::move(other.m_Texture);
+        m_modelMatrix    = other.m_modelMatrix;
+        m_vertexCount    = other.m_vertexCount;
+        m_indexCount     = other.m_indexCount;
+        m_vertexBuffer   = std::move(other.m_vertexBuffer);
+        m_indexBuffer    = std::move(other.m_indexBuffer);
+        m_setLayout      = other.m_setLayout;
     }
     return *this;
 }
 
 void RenderObject::bind(VkCommandBuffer commandBuffer) const {
     VkBuffer vertexBuffers[] = {m_vertexBuffer->getBuffer()};
-    VkDeviceSize offsets[] = {0};
+    VkDeviceSize offsets[]   = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 }
@@ -137,14 +137,10 @@ void RenderObject::createIndexBuffers(const std::vector<uint32_t>& indices) {
 void RenderObject::createDescriptorSet() {
     VkDescriptorImageInfo descrInfo = m_Texture.getDescriptorInfo();
 
-    if (m_descrSet != VK_NULL_HANDLE) {
-        vkFreeDescriptorSets(m_Device.device(), m_descriptorPool->getDescriptorPool(), 1, &m_descrSet);
-    }
+    if (m_descrSet != VK_NULL_HANDLE) { vkFreeDescriptorSets(m_Device.device(), m_descriptorPool->getDescriptorPool(), 1, &m_descrSet); }
 
     DescriptorWriter writer(*m_setLayout, *m_descriptorPool);
     writer.writeImage(0, &descrInfo);
 
-    if (!writer.build(m_descrSet)) {
-        RAYX_EXIT << "Failed to build descriptor set for texture";
-    }
+    if (!writer.build(m_descrSet)) { RAYX_EXIT << "Failed to build descriptor set for texture"; }
 }

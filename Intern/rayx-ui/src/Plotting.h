@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "Rays.h"
 #include "BundleHistory.h"
+#include "Rays.h"
 
 /**
  * @brief Creates a grid representing the footprint of rays within a specified range.

@@ -48,7 +48,7 @@ OpticalElementAndTransform DesignElement::compile(const glm::dvec4& parentPos, c
 
     // Create a temporary copy with world instead of local pos/ori
     std::unique_ptr<BeamlineNode> de = this->clone();
-    DesignElement* dePtr = static_cast<DesignElement*>(de.get());
+    DesignElement* dePtr             = static_cast<DesignElement*>(de.get());
     dePtr->setPosition(worldPos);
     dePtr->setOrientation(worldOri);
 
@@ -57,7 +57,7 @@ OpticalElementAndTransform DesignElement::compile(const glm::dvec4& parentPos, c
     if (getType() == ElementType::ExpertsMirror) {
         return makeElement(*dePtr, Behaviour::Mirror{}, makeQuadric(*dePtr), plane);
     } else {
-        Surface surface = makeSurface(*dePtr);
+        Surface surface     = makeSurface(*dePtr);
         Behaviour behaviour = makeBehaviour(*dePtr);
         if (getType() == ElementType::Slit) {
             return makeElement(*dePtr, behaviour, surface, plane, {});
@@ -76,7 +76,7 @@ ElementType DesignElement::getType() const { return m_elementParameters["type"].
 void DesignElement::setType(ElementType s) { m_elementParameters["type"] = s; }
 
 void DesignElement::setPosition(glm::dvec4 p) {
-    m_elementParameters["position"] = Map();
+    m_elementParameters["position"]      = Map();
     m_elementParameters["position"]["x"] = p.x;
     m_elementParameters["position"]["y"] = p.y;
     m_elementParameters["position"]["z"] = p.z;
@@ -93,19 +93,19 @@ glm::dvec4 DesignElement::getPosition() const {
 }
 
 void DesignElement::setOrientation(glm::dmat4x4 o) {
-    m_elementParameters["xDirection"] = Map();
+    m_elementParameters["xDirection"]      = Map();
     m_elementParameters["xDirection"]["x"] = o[0][0];
     m_elementParameters["xDirection"]["y"] = o[0][1];
     m_elementParameters["xDirection"]["z"] = o[0][2];
     m_elementParameters["xDirection"]["w"] = o[0][3];
 
-    m_elementParameters["yDirection"] = Map();
+    m_elementParameters["yDirection"]      = Map();
     m_elementParameters["yDirection"]["x"] = o[1][0];
     m_elementParameters["yDirection"]["y"] = o[1][1];
     m_elementParameters["yDirection"]["z"] = o[1][2];
     m_elementParameters["yDirection"]["w"] = o[1][3];
 
-    m_elementParameters["zDirection"] = Map();
+    m_elementParameters["zDirection"]      = Map();
     m_elementParameters["zDirection"]["x"] = o[2][0];
     m_elementParameters["zDirection"]["y"] = o[2][1];
     m_elementParameters["zDirection"]["z"] = o[2][2];
@@ -134,56 +134,54 @@ glm::dmat4x4 DesignElement::getOrientation() const {
 }
 
 void DesignElement::setSlopeError(SlopeError s) {
-    m_elementParameters["SlopeError"] = Map();
-    m_elementParameters["SlopeError"]["slopeErrorSag"] = s.m_sag;
-    m_elementParameters["SlopeError"]["slopeErrorMer"] = s.m_mer;
-    m_elementParameters["SlopeError"]["thermalDistortionAmp"] = s.m_thermalDistortionAmp;
+    m_elementParameters["SlopeError"]                            = Map();
+    m_elementParameters["SlopeError"]["slopeErrorSag"]           = s.m_sag;
+    m_elementParameters["SlopeError"]["slopeErrorMer"]           = s.m_mer;
+    m_elementParameters["SlopeError"]["thermalDistortionAmp"]    = s.m_thermalDistortionAmp;
     m_elementParameters["SlopeError"]["thermalDistortionSigmaX"] = s.m_thermalDistortionSigmaX;
     m_elementParameters["SlopeError"]["thermalDistortionSigmaZ"] = s.m_thermalDistortionSigmaZ;
-    m_elementParameters["SlopeError"]["cylindricalBowingAmp"] = s.m_cylindricalBowingAmp;
+    m_elementParameters["SlopeError"]["cylindricalBowingAmp"]    = s.m_cylindricalBowingAmp;
     m_elementParameters["SlopeError"]["cylindricalBowingRadius"] = s.m_cylindricalBowingRadius;
 }
 SlopeError DesignElement::getSlopeError() const {
     SlopeError s;
-    s.m_sag = m_elementParameters["SlopeError"]["slopeErrorSag"].as_double();
-    s.m_mer = m_elementParameters["SlopeError"]["slopeErrorMer"].as_double();
-    s.m_thermalDistortionAmp = m_elementParameters["SlopeError"]["thermalDistortionAmp"].as_double();
+    s.m_sag                     = m_elementParameters["SlopeError"]["slopeErrorSag"].as_double();
+    s.m_mer                     = m_elementParameters["SlopeError"]["slopeErrorMer"].as_double();
+    s.m_thermalDistortionAmp    = m_elementParameters["SlopeError"]["thermalDistortionAmp"].as_double();
     s.m_thermalDistortionSigmaX = m_elementParameters["SlopeError"]["thermalDistortionSigmaX"].as_double();
     s.m_thermalDistortionSigmaZ = m_elementParameters["SlopeError"]["thermalDistortionSigmaZ"].as_double();
-    s.m_cylindricalBowingAmp = m_elementParameters["SlopeError"]["cylindricalBowingAmp"].as_double();
+    s.m_cylindricalBowingAmp    = m_elementParameters["SlopeError"]["cylindricalBowingAmp"].as_double();
     s.m_cylindricalBowingRadius = m_elementParameters["SlopeError"]["cylindricalBowingRadius"].as_double();
 
     return s;
 }
 
 void DesignElement::setCutout(Cutout c) {
-    c.visit(
-        [&]<typename T>(const T& arg) {
-            if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
-                m_elementParameters["geometricalShape"] = CutoutType::Unlimited;
-            } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
-                m_elementParameters["geometricalShape"] = CutoutType::Rect;
-                m_elementParameters["CutoutWidth"] = arg.m_width;
-                m_elementParameters["CutoutLength"] = arg.m_length;
-            } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
-                m_elementParameters["geometricalShape"] = CutoutType::Elliptical;
-                m_elementParameters["CutoutDiameterX"] = arg.m_diameter_x;
-                m_elementParameters["CutoutDiameterZ"] = arg.m_diameter_z;
-            } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
-                m_elementParameters["geometricalShape"] = CutoutType::Trapezoid;
-                m_elementParameters["CutoutWidthA"] = arg.m_widthA;
-                m_elementParameters["CutoutWidthB"] = arg.m_widthB;
-                m_elementParameters["CutoutLength"] = arg.m_length;
-            }
+    c.visit([&]<typename T>(const T& arg) {
+        if constexpr (std::is_same_v<T, Cutout::Unlimited>) {
+            m_elementParameters["geometricalShape"] = CutoutType::Unlimited;
+        } else if constexpr (std::is_same_v<T, Cutout::Rect>) {
+            m_elementParameters["geometricalShape"] = CutoutType::Rect;
+            m_elementParameters["CutoutWidth"]      = arg.m_width;
+            m_elementParameters["CutoutLength"]     = arg.m_length;
+        } else if constexpr (std::is_same_v<T, Cutout::Elliptical>) {
+            m_elementParameters["geometricalShape"] = CutoutType::Elliptical;
+            m_elementParameters["CutoutDiameterX"]  = arg.m_diameter_x;
+            m_elementParameters["CutoutDiameterZ"]  = arg.m_diameter_z;
+        } else if constexpr (std::is_same_v<T, Cutout::Trapezoid>) {
+            m_elementParameters["geometricalShape"] = CutoutType::Trapezoid;
+            m_elementParameters["CutoutWidthA"]     = arg.m_widthA;
+            m_elementParameters["CutoutWidthB"]     = arg.m_widthB;
+            m_elementParameters["CutoutLength"]     = arg.m_length;
         }
-        );
+    });
 }
 Cutout DesignElement::getCutout() const {
     CutoutType type = m_elementParameters["geometricalShape"].as_openingShape();
 
     if (type == CutoutType::Rect) {  // Rectangle
         return Cutout::Rect{
-            .m_width = m_elementParameters["CutoutWidth"].as_double(),
+            .m_width  = m_elementParameters["CutoutWidth"].as_double(),
             .m_length = m_elementParameters["CutoutLength"].as_double(),
         };
     } else if (type == CutoutType::Elliptical) {  // Ellipsoid
@@ -223,41 +221,41 @@ std::array<double, 6> DesignElement::getVLSParameters() const {
 }
 
 void DesignElement::setExpertsOptics(Surface value) {
-    Surface::Quadric qua = value.get<Surface::Quadric>();
-    m_elementParameters["expertsParams"] = Map();
+    Surface::Quadric qua                                   = value.get<Surface::Quadric>();
+    m_elementParameters["expertsParams"]                   = Map();
     m_elementParameters["expertsParams"]["surfaceBending"] = qua.m_icurv;
-    m_elementParameters["expertsParams"]["A11"] = qua.m_a11;
-    m_elementParameters["expertsParams"]["A12"] = qua.m_a12;
-    m_elementParameters["expertsParams"]["A13"] = qua.m_a13;
-    m_elementParameters["expertsParams"]["A14"] = qua.m_a14;
-    m_elementParameters["expertsParams"]["A22"] = qua.m_a22;
-    m_elementParameters["expertsParams"]["A23"] = qua.m_a23;
-    m_elementParameters["expertsParams"]["A24"] = qua.m_a24;
-    m_elementParameters["expertsParams"]["A33"] = qua.m_a33;
-    m_elementParameters["expertsParams"]["A34"] = qua.m_a34;
-    m_elementParameters["expertsParams"]["A44"] = qua.m_a44;
+    m_elementParameters["expertsParams"]["A11"]            = qua.m_a11;
+    m_elementParameters["expertsParams"]["A12"]            = qua.m_a12;
+    m_elementParameters["expertsParams"]["A13"]            = qua.m_a13;
+    m_elementParameters["expertsParams"]["A14"]            = qua.m_a14;
+    m_elementParameters["expertsParams"]["A22"]            = qua.m_a22;
+    m_elementParameters["expertsParams"]["A23"]            = qua.m_a23;
+    m_elementParameters["expertsParams"]["A24"]            = qua.m_a24;
+    m_elementParameters["expertsParams"]["A33"]            = qua.m_a33;
+    m_elementParameters["expertsParams"]["A34"]            = qua.m_a34;
+    m_elementParameters["expertsParams"]["A44"]            = qua.m_a44;
 }
 
 Surface DesignElement::getExpertsOptics() const {
     Surface::Quadric qua;
     qua.m_icurv = m_elementParameters["expertsParams"]["surfaceBending"].as_int();
-    qua.m_a11 = m_elementParameters["expertsParams"]["A11"].as_double();
-    qua.m_a12 = m_elementParameters["expertsParams"]["A12"].as_double();
-    qua.m_a13 = m_elementParameters["expertsParams"]["A13"].as_double();
-    qua.m_a14 = m_elementParameters["expertsParams"]["A14"].as_double();
-    qua.m_a22 = m_elementParameters["expertsParams"]["A22"].as_double();
-    qua.m_a23 = m_elementParameters["expertsParams"]["A23"].as_double();
-    qua.m_a24 = m_elementParameters["expertsParams"]["A24"].as_double();
-    qua.m_a33 = m_elementParameters["expertsParams"]["A33"].as_double();
-    qua.m_a34 = m_elementParameters["expertsParams"]["A34"].as_double();
-    qua.m_a44 = m_elementParameters["expertsParams"]["A44"].as_double();
+    qua.m_a11   = m_elementParameters["expertsParams"]["A11"].as_double();
+    qua.m_a12   = m_elementParameters["expertsParams"]["A12"].as_double();
+    qua.m_a13   = m_elementParameters["expertsParams"]["A13"].as_double();
+    qua.m_a14   = m_elementParameters["expertsParams"]["A14"].as_double();
+    qua.m_a22   = m_elementParameters["expertsParams"]["A22"].as_double();
+    qua.m_a23   = m_elementParameters["expertsParams"]["A23"].as_double();
+    qua.m_a24   = m_elementParameters["expertsParams"]["A24"].as_double();
+    qua.m_a33   = m_elementParameters["expertsParams"]["A33"].as_double();
+    qua.m_a34   = m_elementParameters["expertsParams"]["A34"].as_double();
+    qua.m_a44   = m_elementParameters["expertsParams"]["A44"].as_double();
 
     return qua;
 }
 
 void DesignElement::setExpertsCubic(Surface value) {
-    Surface::Cubic cub = value.get<Surface::Cubic>();
-    m_elementParameters["expertsParams"] = Map();
+    Surface::Cubic cub                          = value.get<Surface::Cubic>();
+    m_elementParameters["expertsParams"]        = Map();
     m_elementParameters["expertsParams"]["A11"] = cub.m_a11;
     m_elementParameters["expertsParams"]["A12"] = cub.m_a12;
     m_elementParameters["expertsParams"]["A13"] = cub.m_a13;
@@ -513,10 +511,10 @@ SurfaceCoatingType DesignElement::getSurfaceCoatingType() const { return m_eleme
 
 void DesignElement::setMultilayerCoating(const Coating::MultilayerCoating& coating) {
     m_elementParameters["numLayers"] = coating.numLayers;
-    m_elementParameters["coating"] = Map();
+    m_elementParameters["coating"]   = Map();
     for (int i = 0; i < coating.numLayers; ++i) {
-        m_elementParameters["coating"]["layer" + std::to_string(i + 1)] = Map();
-        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"] = coating.material[i];
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]              = Map();
+        m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["material"]  = coating.material[i];
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["thickness"] = coating.thickness[i];
         m_elementParameters["coating"]["layer" + std::to_string(i + 1)]["roughness"] = coating.roughness[i];
     }
@@ -528,7 +526,7 @@ Coating DesignElement::getCoating() const {  // 0 = substrate only, 1 = one coat
         return Coating::SubstrateOnly{};
     } else if (type == SurfaceCoatingType::OneCoating) {
         Coating::OneCoating oneCoating;
-        oneCoating.material = static_cast<int>(getMaterialCoating());
+        oneCoating.material  = static_cast<int>(getMaterialCoating());
         oneCoating.thickness = getThicknessCoating();
         oneCoating.roughness = getRoughnessCoating();
         return Coating::OneCoating{oneCoating};
@@ -538,12 +536,10 @@ Coating DesignElement::getCoating() const {  // 0 = substrate only, 1 = one coat
         for (int i = 0; i < mlCoating.numLayers; ++i) {
             std::string layerKey = "layer" + std::to_string(i + 1);
             try {
-                mlCoating.material[i] = m_elementParameters["coating"][layerKey]["material"].as_int();
+                mlCoating.material[i]  = m_elementParameters["coating"][layerKey]["material"].as_int();
                 mlCoating.thickness[i] = m_elementParameters["coating"][layerKey]["thickness"].as_double();
                 mlCoating.roughness[i] = m_elementParameters["coating"][layerKey]["roughness"].as_double();
-            } catch (const std::exception& e) {
-                std::cerr << "Error deserializing layer " << layerKey << ": " << e.what() << std::endl;
-            }
+            } catch (const std::exception& e) { std::cerr << "Error deserializing layer " << layerKey << ": " << e.what() << std::endl; }
         }
         if (0 > mlCoating.material[0] || mlCoating.material[0] > 97) {
             std::cerr << "Warning: No coating layers found in DesignElement." << std::endl;

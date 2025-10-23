@@ -20,13 +20,13 @@ void RayRenderSystem::render(FrameInfo& frameInfo, const std::vector<RenderObjec
 }
 
 RenderSystem::Input RayRenderSystem::fillInput(VkRenderPass renderPass) const {
-    return RenderSystem::Input{.renderPass = renderPass,
-                               .vertShaderPath = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/ray_shader_vert.spv").string(),
-                               .fragShaderPath = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/ray_shader_frag.spv").string(),
-                               .bindingDescriptions = ColorVertex::getBindingDescriptions(),
+    return RenderSystem::Input{.renderPass            = renderPass,
+                               .vertShaderPath        = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/ray_shader_vert.spv").string(),
+                               .fragShaderPath        = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/ray_shader_frag.spv").string(),
+                               .bindingDescriptions   = ColorVertex::getBindingDescriptions(),
                                .attributeDescriptions = ColorVertex::getAttributeDescriptions(),
-                               .topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
-                               .polygonMode = VK_POLYGON_MODE_LINE,
-                               .depthCompareOp = std::nullopt,
-                               .lineWidth = 2.0f};
+                               .topology              = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+                               .polygonMode           = VK_POLYGON_MODE_LINE,
+                               .depthCompareOp        = std::nullopt,
+                               .lineWidth             = 2.0f};
 }

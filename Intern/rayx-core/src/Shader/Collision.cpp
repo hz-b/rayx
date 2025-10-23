@@ -22,9 +22,9 @@ OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, 
                                       const Surface::Quadric& __restrict q) {
     CollisionPoint col;
     col.hitpoint = glm::dvec3(0, 0, 0);
-    col.normal = glm::dvec3(0, 0, 0);
+    col.normal   = glm::dvec3(0, 0, 0);
 
-    int cs = 1;
+    int cs     = 1;
     int d_sign = q.m_icurv;
     if (glm::abs(rayDirection[1]) >= glm::abs(rayDirection[0]) && glm::abs(rayDirection[1]) >= glm::abs(rayDirection[2])) {
         cs = 2;
@@ -42,9 +42,9 @@ OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, 
     if (cs == 1) {
         double aml = rayDirection[1] / rayDirection[0];
         double anl = rayDirection[2] / rayDirection[0];
-        y = rayPosition[1] - aml * rayPosition[0];
-        z = rayPosition[2] - anl * rayPosition[0];
-        d_sign = int(glm::sign(rayDirection[0]) * q.m_icurv);
+        y          = rayPosition[1] - aml * rayPosition[0];
+        z          = rayPosition[2] - anl * rayPosition[0];
+        d_sign     = int(glm::sign(rayDirection[0]) * q.m_icurv);
 
         a = q.m_a11 + 2 * q.m_a12 * aml + q.m_a22 * aml * aml + 2 * q.m_a13 * anl + 2 * q.m_a23 * aml * anl + q.m_a33 * anl * anl;
         b = q.m_a14 + q.m_a24 * aml + q.m_a34 * anl + (q.m_a12 + q.m_a22 * aml + q.m_a23 * anl) * y + (q.m_a13 + q.m_a23 * aml + q.m_a33 * anl) * z;
@@ -65,9 +65,9 @@ OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, 
     } else if (cs == 2) {
         double alm = rayDirection[0] / rayDirection[1];
         double anm = rayDirection[2] / rayDirection[1];
-        x = rayPosition[0] - alm * rayPosition[1];
-        z = rayPosition[2] - anm * rayPosition[1];
-        d_sign = int(glm::sign(rayDirection[1]) * q.m_icurv);
+        x          = rayPosition[0] - alm * rayPosition[1];
+        z          = rayPosition[2] - anm * rayPosition[1];
+        d_sign     = int(glm::sign(rayDirection[1]) * q.m_icurv);
 
         a = q.m_a22 + 2 * q.m_a12 * alm + q.m_a11 * alm * alm + 2 * q.m_a23 * anm + 2 * q.m_a13 * alm * anm + q.m_a33 * anm * anm;
         b = q.m_a24 + q.m_a14 * alm + q.m_a34 * anm + (q.m_a12 + q.m_a11 * alm + q.m_a13 * anm) * x + (q.m_a23 + q.m_a13 * alm + q.m_a33 * anm) * z;
@@ -90,8 +90,8 @@ OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, 
         double amn = rayDirection[1] / rayDirection[2];
         // firstParam = aln;
         // secondParam = amn;
-        x = rayPosition[0] - aln * rayPosition[2];
-        y = rayPosition[1] - amn * rayPosition[2];
+        x      = rayPosition[0] - aln * rayPosition[2];
+        y      = rayPosition[1] - amn * rayPosition[2];
         d_sign = int(glm::sign(rayDirection[2]) * q.m_icurv);
 
         a = q.m_a33 + 2 * q.m_a13 * aln + q.m_a11 * aln * aln + 2 * q.m_a23 * amn + 2 * q.m_a12 * aln * amn + q.m_a22 * amn * amn;
@@ -120,9 +120,9 @@ OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict rayPosition, 
 
     col.hitpoint = glm::dvec3(x, y, z);
 
-    double fx = 2 * q.m_a14 + 2 * q.m_a11 * x + 2 * q.m_a12 * y + 2 * q.m_a13 * z;
-    double fy = 2 * q.m_a24 + 2 * q.m_a12 * x + 2 * q.m_a22 * y + 2 * q.m_a23 * z;
-    double fz = 2 * q.m_a34 + 2 * q.m_a13 * x + 2 * q.m_a23 * y + 2 * q.m_a33 * z;
+    double fx  = 2 * q.m_a14 + 2 * q.m_a11 * x + 2 * q.m_a12 * y + 2 * q.m_a13 * z;
+    double fy  = 2 * q.m_a24 + 2 * q.m_a12 * x + 2 * q.m_a22 * y + 2 * q.m_a23 * z;
+    double fz  = 2 * q.m_a34 + 2 * q.m_a13 * x + 2 * q.m_a23 * y + 2 * q.m_a33 * z;
     col.normal = normalize(glm::dvec3(fx, fy, fz));
     return col;
 }
@@ -158,22 +158,22 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
     }
 
     glm::dvec3 pos = cubicPosition(rayPosition, cu.m_psi);
-    double x = pos.x;
-    double y = pos.y;
-    double z = pos.z;
-    double x1 = 0;
-    double xx = 0;
-    double y1 = 0;
-    double yy = 0;
-    double z1 = 0;
-    double zz = 0;
+    double x       = pos.x;
+    double y       = pos.y;
+    double z       = pos.z;
+    double x1      = 0;
+    double xx      = 0;
+    double y1      = 0;
+    double yy      = 0;
+    double z1      = 0;
+    double zz      = 0;
     double counter = 0;
-    double dx = 0;
+    double dx      = 0;
 
     glm::dvec3 dir = cubicDirection(rayDirection, cu.m_psi);
-    double al = dir.x;
-    double am = dir.y;
-    double an = dir.z;
+    double al      = dir.x;
+    double am      = dir.y;
+    double an      = dir.z;
 
     if (cs == 1) {
         double aml = am / al;
@@ -217,9 +217,7 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
                                   an));
             dfunc = dfunc / pow(float(al), 3);
 
-            if (glm::abs(dfunc) < 0.001) {
-                dfunc = 0.001;
-            }
+            if (glm::abs(dfunc) < 0.001) { dfunc = 0.001; }
 
             dx = func / dfunc;
             xx = xx - dx;
@@ -276,9 +274,7 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
                                 am;
             dfunc = dfunc / pow(float(am), 3);
 
-            if (glm::abs(dfunc) < 0.001) {
-                dfunc = 0.001;
-            }
+            if (glm::abs(dfunc) < 0.001) { dfunc = 0.001; }
 
             dx = func / dfunc;
             yy = yy - dx;
@@ -330,9 +326,7 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
                              (((z1 - zz) * am - an * y1) * cu.m_b23 - an * cu.m_b32 * zz) * (am * z1 - 2 * am * zz - an * y1) * an);
             dfunc = (-dfunc) / pow(float(an), 3);
 
-            if (glm::abs(dfunc) < 0.001) {
-                dfunc = 0.001;
-            }
+            if (glm::abs(dfunc) < 0.001) { dfunc = 0.001; }
 
             dx = func / dfunc;
             zz = zz - dx;
@@ -366,7 +360,7 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
 
     return CollisionPoint{
         .hitpoint = hitpoint,
-        .normal = normal,
+        .normal   = normal,
     };
 }
 
@@ -378,10 +372,10 @@ RAYX_FN_ACC
 OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                      const Surface::Toroid& __restrict toroid, bool isTriangul) {
     // Constants
-    const double NEW_TOLERANCE = 0.0001;
+    const double NEW_TOLERANCE   = 0.0001;
     const int NEW_MAX_ITERATIONS = 50;
 
-    double longRad = toroid.m_longRadius;
+    double longRad  = toroid.m_longRadius;
     double shortRad = (toroid.m_toroidType == ToroidType::Convex) ? -toroid.m_shortRadius : toroid.m_shortRadius;
 
     // sign radius: +1 = concave, -1 = convex
@@ -390,11 +384,11 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
     // double aln = rayDirection.x / rayDirection.z;
     // double amn = rayDirection.y / rayDirection.z;
 
-    glm::dvec4 normal = glm::dvec4(0, 0, 0, 0);
-    double xx = 0.0;
-    double zz = 0.0;
-    double yy = 0.0;
-    double dz = 0.0;
+    glm::dvec4 normal         = glm::dvec4(0, 0, 0, 0);
+    double xx                 = 0.0;
+    double zz                 = 0.0;
+    double yy                 = 0.0;
+    double dz                 = 0.0;
     glm::dvec3 normalized_dir = glm::dvec3(rayDirection) / rayDirection.z;
 
     int n = 0;
@@ -403,10 +397,8 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
     do {
         zz = zz + dz;
         xx = rayPosition.x + normalized_dir.x * (zz - rayPosition.z);
-        if (xx * xx > shortRad * shortRad) {
-            xx = xx / glm::abs(xx) * 0.95 * shortRad;
-        }
-        yy = rayPosition.y + normalized_dir.y * (zz - rayPosition.z);
+        if (xx * xx > shortRad * shortRad) { xx = xx / glm::abs(xx) * 0.95 * shortRad; }
+        yy        = rayPosition.y + normalized_dir.y * (zz - rayPosition.z);
         double sq = sqrt(shortRad * shortRad - xx * xx);
         double rx = (longRad - shortRad + isigro * sq);
 
@@ -416,16 +408,14 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
         normal.z = -2 * zz;
 
         double func = -rx * rx + (yy - longRad) * (yy - longRad) + zz * zz;
-        double df = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, glm::dvec3(normal));
-        dz = func / df;
+        double df   = normalized_dir.x * normal.x + normalized_dir.y * normal.y + normal.z;  // dot(normalized_dir, glm::dvec3(normal));
+        dz          = func / df;
         n += 1;
-        if (n >= NEW_MAX_ITERATIONS) {
-            return std::nullopt;
-        }
+        if (n >= NEW_MAX_ITERATIONS) { return std::nullopt; }
     } while (glm::abs(dz) > NEW_TOLERANCE);
 
     CollisionPoint col;
-    col.normal = normalize(glm::dvec3(normal));
+    col.normal   = normalize(glm::dvec3(normal));
     col.hitpoint = glm::dvec3(xx, yy, zz);
 
     if (isTriangul)  // TODO: Hack, Triangulation sensetive to direction apparently. Actual fix or func rework is needed!
@@ -453,7 +443,7 @@ OptCollisionPoint getPlaneCollision(const glm::dvec3& __restrict rayPosition, co
     if (time < 0) return std::nullopt;
 
     CollisionPoint col;
-    col.normal = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
+    col.normal     = glm::dvec3(0, -glm::sign(rayDirection.y), 0);
     col.hitpoint.x = rayPosition.x + rayDirection.x * time;
     col.hitpoint.z = rayPosition.z + rayDirection.z * time;
     col.hitpoint.y = 0;
@@ -468,28 +458,25 @@ OptCollisionPoint getPlaneCollision(const glm::dvec3& __restrict rayPosition, co
 RAYX_FN_ACC
 OptCollisionPoint findCollisionInElementCoordsWithoutSlopeError(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                                 const Surface& __restrict surface, const Cutout& __restrict cutout, bool isTriangul) {
-    OptCollisionPoint col = surface.visit(
-        [&]<typename T>([[maybe_unused]] const T& surface) {
-            if constexpr (std::is_same_v<T, Surface::Plane>) {
-                return getPlaneCollision(rayPosition, rayDirection);
-            } else if constexpr (std::is_same_v<T, Surface::Quadric>) {
-                return getQuadricCollision(rayPosition, rayDirection, surface);
-            } else if constexpr (std::is_same_v<T, Surface::Cubic>) {
-                return getCubicCollision(rayPosition, rayDirection, surface);
-            } else if constexpr (std::is_same_v<T, Surface::Toroid>) {
-                return getToroidCollision(rayPosition, rayDirection, surface, isTriangul);
-            } else {
-                _throw("invalid surface type!");
-                return std::nullopt;
-            }
-        });
+    OptCollisionPoint col = surface.visit([&]<typename T>([[maybe_unused]] const T& surface) {
+        if constexpr (std::is_same_v<T, Surface::Plane>) {
+            return getPlaneCollision(rayPosition, rayDirection);
+        } else if constexpr (std::is_same_v<T, Surface::Quadric>) {
+            return getQuadricCollision(rayPosition, rayDirection, surface);
+        } else if constexpr (std::is_same_v<T, Surface::Cubic>) {
+            return getCubicCollision(rayPosition, rayDirection, surface);
+        } else if constexpr (std::is_same_v<T, Surface::Toroid>) {
+            return getToroidCollision(rayPosition, rayDirection, surface, isTriangul);
+        } else {
+            _throw("invalid surface type!");
+            return std::nullopt;
+        }
+    });
 
     if (!col) return std::nullopt;
 
     // cutout is applied in the XZ plane.
-    if (!inCutout(cutout, col->hitpoint.x, col->hitpoint.z)) {
-        return std::nullopt;
-    }
+    if (!inCutout(cutout, col->hitpoint.x, col->hitpoint.z)) { return std::nullopt; }
 
     // Both rayDirection and col.normal are in element coordinates.
     // The collision normal should point 'outward from the surface', meaning it should oppose the ray's direction.
@@ -497,9 +484,7 @@ OptCollisionPoint findCollisionInElementCoordsWithoutSlopeError(const glm::dvec3
     // The default normal may oppose the concave part of the overall shape
     // Depending on whether the element is hit on a concave or convex surface,
     // we flip the normal to ensure it points against the ray's direction.
-    if (dot(rayDirection, col->normal) > 0.0) {
-        col->normal *= -1.0;
-    }
+    if (dot(rayDirection, col->normal) > 0.0) { col->normal *= -1.0; }
     return col;
 }
 
@@ -513,7 +498,7 @@ OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayP
     if (!col) return std::nullopt;
 
     SlopeError sE = element.m_slopeError;
-    col->normal = applySlopeError(col->normal, sE, 0, rand);
+    col->normal   = applySlopeError(col->normal, sE, 0, rand);
 
     return col;
 }
@@ -548,8 +533,8 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
             const auto current_dist = glm::length(current_col->hitpoint - rayPosition);
 
             if (current_dist < best_dist) {
-                best_col = current_col;
-                best_dist = current_dist;
+                best_col     = current_col;
+                best_dist    = current_dist;
                 best_element = elementIndex;
             }
         }

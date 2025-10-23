@@ -39,13 +39,9 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
     while (true) {
         // Try to get the module filename
         DWORD size = GetModuleFileNameA(NULL, buffer.data(), buffer.size());
-        if (size == 0) {
-            return std::filesystem::path();
-        }
+        if (size == 0) { return std::filesystem::path(); }
         // If the buffer was large enough, we're done
-        if (size < buffer.size()) {
-            break;
-        }
+        if (size < buffer.size()) { break; }
         // Otherwise, increase buffer size and try again
         buffer.resize(buffer.size() * 2);
     }
@@ -55,9 +51,7 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
     ssize_t count;
     while (true) {
         count = readlink("/proc/self/exe", buffer.data(), buffer.size());
-        if (count == -1) {
-            return std::filesystem::path();
-        }
+        if (count == -1) { return std::filesystem::path(); }
         if (count < static_cast<ssize_t>(buffer.size())) {
             buffer[count] = '\0';  // Null-terminate
             break;
@@ -77,9 +71,7 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
     // First, check in user-defined lookup paths
     for (const auto& lookupPath : lookUpPaths) {
         std::filesystem::path path = lookupPath / baseDir / relativePath;
-        if (fileExists(path)) {
-            return path;
-        }
+        if (fileExists(path)) { return path; }
     }
 
     RAYX_VERB << "locating file: " << relativePath;
@@ -91,7 +83,7 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
 #if defined(__linux__)
     // Check next to the executable (built from source)
     std::filesystem::path execDir = getExecutablePath().parent_path();
-    std::filesystem::path path = execDir / relativePath;
+    std::filesystem::path path    = execDir / relativePath;
     RAYX_VERB << "\tlooking at " << path;
     if (fileExists(path)) return found(path);
 
@@ -108,7 +100,7 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
 #elif defined(_WIN32)
     // On Windows, only look next to the executable
     std::filesystem::path execDir = getExecutablePath().parent_path();
-    std::filesystem::path path = execDir / relativePath;
+    std::filesystem::path path    = execDir / relativePath;
     RAYX_VERB << "\tlooking at " << path;
     if (fileExists(path)) return found(path);
 

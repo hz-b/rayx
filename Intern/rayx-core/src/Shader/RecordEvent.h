@@ -11,41 +11,41 @@ inline int getRecordIndex(const int gid, const int numRecorded, const int gridSt
 RAYX_FN_ACC
 inline detail::Ray loadRay(const int i, const RaysPtr& __restrict rays) {
     return {
-        .position = rays.position(i),
-        .direction = rays.direction(i),
-        .energy = rays.energy[i],
+        .position            = rays.position(i),
+        .direction           = rays.direction(i),
+        .energy              = rays.energy[i],
         .optical_path_length = rays.optical_path_length[i],
-        .electric_field = rays.electric_field(i),
-        .rand = Rand(rays.rand_counter[i]),
-        .path_id = rays.path_id[i],
-        .path_event_id = rays.path_event_id[i],
-        .order = rays.order[i],
-        .object_id = rays.object_id[i],
-        .source_id = rays.source_id[i],
-        .event_type = rays.event_type[i],
+        .electric_field      = rays.electric_field(i),
+        .rand                = Rand(rays.rand_counter[i]),
+        .path_id             = rays.path_id[i],
+        .path_event_id       = rays.path_event_id[i],
+        .order               = rays.order[i],
+        .object_id           = rays.object_id[i],
+        .source_id           = rays.source_id[i],
+        .event_type          = rays.event_type[i],
     };
 }
 
 RAYX_FN_ACC
 inline void storeRay(const int i, RaysPtr& __restrict rays, const detail::Ray& __restrict ray) {
-    rays.path_id[i] = ray.path_id;
-    rays.path_event_id[i] = ray.path_event_id;
-    rays.position_x[i] = ray.position.x;
-    rays.position_y[i] = ray.position.y;
-    rays.position_z[i] = ray.position.z;
-    rays.event_type[i] = ray.event_type;
-    rays.direction_x[i] = ray.direction.x;
-    rays.direction_y[i] = ray.direction.y;
-    rays.direction_z[i] = ray.direction.z;
-    rays.energy[i] = ray.energy;
-    rays.electric_field_x[i] = ray.electric_field.x;
-    rays.electric_field_y[i] = ray.electric_field.y;
-    rays.electric_field_z[i] = ray.electric_field.z;
+    rays.path_id[i]             = ray.path_id;
+    rays.path_event_id[i]       = ray.path_event_id;
+    rays.position_x[i]          = ray.position.x;
+    rays.position_y[i]          = ray.position.y;
+    rays.position_z[i]          = ray.position.z;
+    rays.event_type[i]          = ray.event_type;
+    rays.direction_x[i]         = ray.direction.x;
+    rays.direction_y[i]         = ray.direction.y;
+    rays.direction_z[i]         = ray.direction.z;
+    rays.energy[i]              = ray.energy;
+    rays.electric_field_x[i]    = ray.electric_field.x;
+    rays.electric_field_y[i]    = ray.electric_field.y;
+    rays.electric_field_z[i]    = ray.electric_field.z;
     rays.optical_path_length[i] = ray.optical_path_length;
-    rays.order[i] = ray.order;
-    rays.object_id[i] = ray.object_id;
-    rays.source_id[i] = ray.source_id;
-    rays.rand_counter[i] = ray.rand.counter;
+    rays.order[i]               = ray.order;
+    rays.object_id[i]           = ray.object_id;
+    rays.source_id[i]           = ray.source_id;
+    rays.rand_counter[i]        = ray.rand.counter;
 }
 
 RAYX_FN_ACC

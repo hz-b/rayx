@@ -32,7 +32,7 @@ void CameraController::updateDirection(float deltaYaw, float deltaPitch) {
     newDirection.x = (float)(cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch)));
     newDirection.y = (float)sin(glm::radians(m_pitch));
     newDirection.z = (float)(sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch)));
-    m_direction = glm::normalize(newDirection);
+    m_direction    = glm::normalize(newDirection);
 }
 
 void CameraController::moveForward(float distance) { m_position += m_direction * distance; }
@@ -69,9 +69,7 @@ void CameraController::OrthogonalConfig::display() {
 void CameraController::displaySettings() {
     ImGui::Text("Camera:");
     bool isOrtho = m_cameraMode == CameraMode::Orthogonal;
-    if (ImGui::Checkbox("Orthographic Camera", &isOrtho)) {
-        m_cameraMode = isOrtho ? CameraMode::Orthogonal : CameraMode::Perspective;
-    }
+    if (ImGui::Checkbox("Orthographic Camera", &isOrtho)) { m_cameraMode = isOrtho ? CameraMode::Orthogonal : CameraMode::Perspective; }
 
     if (m_cameraMode == CameraMode::Perspective) {
         m_perspectiveCfg.display();
@@ -82,13 +80,9 @@ void CameraController::displaySettings() {
     ImGui::InputFloat3("Position", &m_position.x);
     ImGui::InputFloat3("Direction", &m_direction.x);
 
-    if (ImGui::Button("Save Camera")) {
-        SaveCameraControllerToFile(*this, "camera_save.txt");
-    }
+    if (ImGui::Button("Save Camera")) { SaveCameraControllerToFile(*this, "camera_save.txt"); }
     ImGui::SameLine();
-    if (ImGui::Button("Load Camera")) {
-        LoadCameraControllerFromFile(*this, "camera_save.txt");
-    }
+    if (ImGui::Button("Load Camera")) { LoadCameraControllerFromFile(*this, "camera_save.txt"); }
 }
 
 void CameraController::update(Camera& cam, float aspectRatio) {
@@ -96,18 +90,18 @@ void CameraController::update(Camera& cam, float aspectRatio) {
 
     if (m_cameraMode == CameraMode::Perspective) {
         cam.proj = glm::perspective(glm::radians(m_perspectiveCfg.m_FOV), aspectRatio, m_perspectiveCfg.m_near, m_perspectiveCfg.m_far);
-        cam.n = m_perspectiveCfg.m_near;
-        cam.f = m_perspectiveCfg.m_far;
+        cam.n    = m_perspectiveCfg.m_near;
+        cam.f    = m_perspectiveCfg.m_far;
     } else if (m_cameraMode == CameraMode::Orthogonal) {
-        float top = m_orthogonalCfg.m_frustumScale * 0.5f;
+        float top   = m_orthogonalCfg.m_frustumScale * 0.5f;
         float right = top * aspectRatio;
 
-        float left = -right;
+        float left   = -right;
         float bottom = -top;
 
         cam.proj = glm::ortho(left, right, bottom, top, m_orthogonalCfg.m_near, m_orthogonalCfg.m_far);
-        cam.n = m_orthogonalCfg.m_near;
-        cam.f = m_orthogonalCfg.m_far;
+        cam.n    = m_orthogonalCfg.m_near;
+        cam.f    = m_orthogonalCfg.m_far;
     }
     cam.proj[1][1] *= -1;  // Flip the y-axis
     cam.isOrtho = m_cameraMode == CameraMode::Orthogonal ? 1 : 0;
@@ -119,7 +113,7 @@ void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance)
 
     // Calculate the z-coordinate using Pythagoras, ensuring the camera stays at the specified distance
     float offset = std::sqrt(distance);
-    float z = targetPoint.z - offset;
+    float z      = targetPoint.z - offset;
 
     // Set the camera's y-coordinate with an offset
     float y = targetPoint.y + offset;
@@ -131,7 +125,7 @@ void CameraController::lookAtPoint(const glm::vec3& targetPoint, float distance)
 
     // Update the pitch and yaw based on the new direction
     m_pitch = glm::degrees(std::asin(m_direction.y));
-    m_yaw = glm::degrees(std::atan2(m_direction.z, m_direction.x));
+    m_yaw   = glm::degrees(std::atan2(m_direction.z, m_direction.x));
 
     updateDirection(0.0, 0.0);
 }
@@ -140,10 +134,10 @@ void CameraController::setCameraMode(CameraMode mode) {
     m_cameraMode = mode;
     if (m_cameraMode == CameraMode::Perspective) {
         m_perspectiveCfg.m_near = 0.1f;
-        m_perspectiveCfg.m_far = 10000.0f;
+        m_perspectiveCfg.m_far  = 10000.0f;
     } else if (m_cameraMode == CameraMode::Orthogonal) {
         m_perspectiveCfg.m_near = -1000.0f;
-        m_perspectiveCfg.m_far = 1000.0f;
+        m_perspectiveCfg.m_far  = 1000.0f;
     }
 }
 

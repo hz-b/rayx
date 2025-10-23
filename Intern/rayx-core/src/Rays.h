@@ -23,8 +23,8 @@ struct RAYX_API Rays {
     Rays& operator=(const Rays&) = default;
 
   public:
-    Rays() = default;
-    Rays(Rays&&) = default;
+    Rays()                  = default;
+    Rays(Rays&&)            = default;
     Rays& operator=(Rays&&) = default;
 
 #define X(type, name, flag) std::vector<type> name;
@@ -215,7 +215,7 @@ Rays Rays::sort(Compare comp) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     const auto attr = attrMask();
-    const auto n = size();
+    const auto n    = size();
 
     auto indices = std::vector<int>(n);
     std::iota(indices.begin(), indices.end(), 0);
@@ -238,7 +238,7 @@ Rays Rays::filter(Pred pred) const {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     const auto attr = attrMask();
-    const auto n = size();
+    const auto n    = size();
 
     auto indices = std::vector<int>{};
     for (int i = 0; i < n; ++i)
@@ -259,7 +259,7 @@ Rays Rays::filter(Pred pred) const {
 template <typename Pred>
 int Rays::count(Pred pred) const {
     const int sz = size();
-    int count = 0;
+    int count    = 0;
     for (int i = 0; i < sz; ++i)
         if (pred(i)) ++count;
     return count;

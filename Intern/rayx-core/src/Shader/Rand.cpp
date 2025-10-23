@@ -12,7 +12,7 @@ RAYX_FN_ACC
 RandCounter RAYX_API squares64(RandCounter& ctr) {
     RandCounter x, y, z, t;
     y = x = ctr * RNG_KEY;
-    z = y + RNG_KEY;
+    z     = y + RNG_KEY;
     ctr++;
 
     x = x * x + y;
@@ -22,13 +22,13 @@ RandCounter RAYX_API squares64(RandCounter& ctr) {
     x = x * x + y;
     x = (x >> 32) | (x << 32); /* round 3 */
     t = x = (x * x + z);
-    x = (x >> 32) | (x << 32); /* round 4 */
+    x     = (x >> 32) | (x << 32); /* round 4 */
     return t ^ ((x * x + y) >> 32);
 }
 
 RAYX_FN_ACC
 double RAYX_API squaresDoubleRNG(RandCounter& ctr) {
-    double a = double(squares64(ctr));
+    double a   = double(squares64(ctr));
     double div = double(RandCounter(0) - 1);
     return a / div;
 }

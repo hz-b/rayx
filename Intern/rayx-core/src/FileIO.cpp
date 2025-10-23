@@ -12,9 +12,7 @@ std::optional<std::vector<uint8_t>> readFile(const std::string& filename, const 
 
     file.open(filename, std::ios::in | std::ios::binary);
 
-    if (!file.is_open()) {
-        return {};
-    }
+    if (!file.is_open()) { return {}; }
 
     uint64_t read_count = count;
     if (count == 0) {
@@ -39,9 +37,7 @@ std::optional<std::vector<uint32_t>> readFileAlign32(const std::string& filename
 
     file.open(filename, std::ios::in | std::ios::binary);
 
-    if (!file.is_open()) {
-        return {};
-    }
+    if (!file.is_open()) { return {}; }
 
     uint64_t read_count = count;
     if (count == 0) {
@@ -51,9 +47,7 @@ std::optional<std::vector<uint32_t>> readFileAlign32(const std::string& filename
     }
 
     // Check, if it's even uint32_t alignable!
-    if (read_count % sizeof(uint32_t) != 0) {
-        return {};
-    }
+    if (read_count % sizeof(uint32_t) != 0) { return {}; }
 
     data.resize(static_cast<size_t>(read_count) / sizeof(uint32_t));
     file.read(reinterpret_cast<char*>(data.data()), read_count);
@@ -67,14 +61,10 @@ void writeFile(const std::vector<uint8_t>& data, const std::string& filename, co
 
     file.open(filename, std::ios::out | std::ios::binary | std::ios::trunc);
 
-    if (!file.is_open()) {
-        RAYX_EXIT << "Failed to open file: " << filename;
-    }
+    if (!file.is_open()) { RAYX_EXIT << "Failed to open file: " << filename; }
 
     uint64_t write_count = count;
-    if (count == 0) {
-        write_count = data.size();
-    }
+    if (count == 0) { write_count = data.size(); }
 
     file.write(reinterpret_cast<const char*>(data.data()), write_count);
     file.close();

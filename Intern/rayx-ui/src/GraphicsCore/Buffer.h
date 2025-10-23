@@ -101,8 +101,8 @@ class Buffer {
 
     const Device& m_Device;
     std::string m_Name;
-    void* m_mapped = nullptr;
-    VkBuffer m_Buffer = VK_NULL_HANDLE;
+    void* m_mapped          = nullptr;
+    VkBuffer m_Buffer       = VK_NULL_HANDLE;
     VkDeviceMemory m_Memory = VK_NULL_HANDLE;
 
     VkDeviceSize m_BufferSize;

@@ -10,15 +10,15 @@ RenderSystem::~RenderSystem() { vkDestroyPipelineLayout(m_Device.device(), m_Pip
 void RenderSystem::createPipelineLayout(const std::vector<VkDescriptorSetLayout>& setLayouts) {
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-    pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(PushConstantData);
+    pushConstantRange.offset     = 0;
+    pushConstantRange.size       = sizeof(PushConstantData);
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
-    pipelineLayoutInfo.pSetLayouts = setLayouts.data();
+    pipelineLayoutInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount         = static_cast<uint32_t>(setLayouts.size());
+    pipelineLayoutInfo.pSetLayouts            = setLayouts.data();
     pipelineLayoutInfo.pushConstantRangeCount = 1;  // ? Parameterize
-    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+    pipelineLayoutInfo.pPushConstantRanges    = &pushConstantRange;
     if (vkCreatePipelineLayout(m_Device.device(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
@@ -29,7 +29,7 @@ void RenderSystem::createPipeline(const Input& input) {
 
     PipelineConfigInfo pipelineConfig{};
     GraphicsPipeline::defaultPipelineConfigInfo(pipelineConfig);
-    pipelineConfig.renderPass = input.renderPass;
+    pipelineConfig.renderPass     = input.renderPass;
     pipelineConfig.pipelineLayout = m_PipelineLayout;
 
     auto setIfPresent = [&](const auto& optionalValue, auto& target) {

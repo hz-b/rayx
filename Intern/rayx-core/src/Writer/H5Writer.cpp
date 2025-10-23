@@ -58,9 +58,7 @@ Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr) {
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
-    } catch (const std::exception& e) {
-        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
-    }
+    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what(); }
 
     return rays;
 }
@@ -74,9 +72,7 @@ std::vector<std::string> readH5ObjectNames(const std::filesystem::path& filepath
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
 
         file.getDataSet("/rayx/object_names").read(object_names);
-    } catch (const std::exception& e) {
-        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
-    }
+    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what(); }
 
     return object_names;
 }
@@ -93,7 +89,7 @@ void writeH5(const std::filesystem::path& filepath, const std::vector<std::strin
 
     try {
         const auto flags = HighFive::File::ReadWrite | HighFive::File::Create | (overwrite ? HighFive::File::Truncate : HighFive::File::Excl);
-        auto file = HighFive::File(filepath.string(), flags);
+        auto file        = HighFive::File(filepath.string(), flags);
 
 #define X(type, name, flag)                                                              \
     RAYX_VERB << "write ray attribute: " #name " (" << rays.name.size() << " elements)"; \
@@ -105,9 +101,7 @@ void writeH5(const std::filesystem::path& filepath, const std::vector<std::strin
         // TODO: store RayAttrMask
         file.createDataSet("rayx/num_events", rays.size());
         file.createDataSet("rayx/object_names", object_names);
-    } catch (const std::exception& e) {
-        RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
-    }
+    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
 }
 
 void appendH5(const std::filesystem::path& filepath, const Rays& rays, const RayAttrMask attr) {
@@ -126,7 +120,7 @@ void appendH5(const std::filesystem::path& filepath, const Rays& rays, const Ray
 #define X(type, name, flag)                                                               \
     RAYX_VERB << "append ray attribute: " #name " (" << rays.name.size() << " elements)"; \
     if (contains(attr, RayAttrMask::flag)) {                                              \
-        auto dataset = file.getDataSet("rayx/events/" #name);                             \
+        auto dataset        = file.getDataSet("rayx/events/" #name);                      \
         const auto old_size = dataset.getSpace().getDimensions()[0];                      \
         dataset.resize({old_size + rays.name.size()});                                    \
         dataset.select({old_size}, {rays.name.size()}).write(rays.name);                  \
@@ -134,9 +128,7 @@ void appendH5(const std::filesystem::path& filepath, const Rays& rays, const Ray
 
         RAYX_X_MACRO_RAY_ATTR
 #undef X
-    } catch (const std::exception& e) {
-        RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what();
-    }
+    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
 }
 
 }  // namespace RAYX

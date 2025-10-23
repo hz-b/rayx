@@ -45,7 +45,7 @@
 // not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
 #ifdef _MSC_VER
 #define strncasecmp _strnicmp
-#define strcasecmp _stricmp
+#define strcasecmp  _stricmp
 #endif
 
 #ifdef RAYX_BUILD_DLL

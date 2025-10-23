@@ -28,23 +28,23 @@ RAYX_FN_ACC
 detail::Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, const EnergyDistributionDataVariant& __restrict energyDistribution,
                                  Rand& __restrict rand) const {
     // Calculate grid size
-    const int rmat = static_cast<int>(std::sqrt(m_numberOfRays));
+    const int rmat  = static_cast<int>(std::sqrt(m_numberOfRays));
     const int nGrid = rmat * rmat;
-    const int row = rayPathIndex % rmat;
-    const int col = (rayPathIndex / rmat) % rmat;
+    const int row   = rayPathIndex % rmat;
+    const int col   = (rayPathIndex / rmat) % rmat;
 
     // Count how many rays share this origin
-    int originIndex = row + rmat * col;
+    int originIndex   = row + rmat * col;
     int raysPerOrigin = m_numberOfRays / nGrid;
-    int extraRays = m_numberOfRays % nGrid;
+    int extraRays     = m_numberOfRays % nGrid;
     // The first 'extraRays' origins get one extra ray
     int nRaysThisOrigin = raysPerOrigin + (originIndex < extraRays ? 1 : 0);
 
-    double rn = rand.randomDouble();  // in [0, 1]
-    auto x = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row;
-    auto y = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col;
-    auto z = (rn - 0.5) * m_sourceDepth;
-    const auto en = selectEnergy(energyDistribution, rand);
+    double rn           = rand.randomDouble();  // in [0, 1]
+    auto x              = -0.5 * m_sourceWidth + (m_sourceWidth / (rmat - 1)) * row;
+    auto y              = -0.5 * m_sourceHeight + (m_sourceHeight / (rmat - 1)) * col;
+    auto z              = (rn - 0.5) * m_sourceDepth;
+    const auto en       = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     const auto phi = -0.5 * m_horDivergence + (m_horDivergence / (rmat - 1)) * row;
@@ -57,18 +57,18 @@ detail::Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, con
     electricField /= static_cast<double>(nRaysThisOrigin);
 
     return detail::Ray{
-        .position = position,
-        .direction = direction,
-        .energy = en,
+        .position            = position,
+        .direction           = direction,
+        .energy              = en,
         .optical_path_length = 0.0,
-        .electric_field = electricField,
-        .rand = std::move(rand),
-        .path_id = rayPathIndex,
-        .path_event_id = -1,
-        .order = 0,
-        .object_id = sourceId,
-        .source_id = sourceId,
-        .event_type = EventType::Emitted,
+        .electric_field      = electricField,
+        .rand                = std::move(rand),
+        .path_id             = rayPathIndex,
+        .path_event_id       = -1,
+        .order               = 0,
+        .object_id           = sourceId,
+        .source_id           = sourceId,
+        .event_type          = EventType::Emitted,
     };
 }
 

@@ -15,11 +15,11 @@ class RAYX_API ObjectIndexMask {
         : m_sourceMask(std::move(sourceMask)), m_elementMask(std::move(elementMask)) {}
 
   public:
-    ObjectIndexMask() = default;
-    ObjectIndexMask(const ObjectIndexMask&) = default;
-    ObjectIndexMask(ObjectIndexMask&&) = default;
+    ObjectIndexMask()                                  = default;
+    ObjectIndexMask(const ObjectIndexMask&)            = default;
+    ObjectIndexMask(ObjectIndexMask&&)                 = default;
     ObjectIndexMask& operator=(const ObjectIndexMask&) = default;
-    ObjectIndexMask& operator=(ObjectIndexMask&&) = default;
+    ObjectIndexMask& operator=(ObjectIndexMask&&)      = default;
 
     static ObjectIndexMask none(const int numSources, const int numElements) {
         return {
@@ -50,7 +50,7 @@ class RAYX_API ObjectIndexMask {
     }
 
     static ObjectIndexMask byIndices(const int numSources, const int numElements, const std::vector<int>& objectIndices) {
-        auto sourceMask = std::vector<bool>(numSources, false);
+        auto sourceMask  = std::vector<bool>(numSources, false);
         auto elementMask = std::vector<bool>(numElements, false);
 
         for (const auto i : objectIndices) {
@@ -111,10 +111,10 @@ class RAYX_API ObjectMask {
 
   public:
     ObjectMask() : m_variant(None{}) {}
-    ObjectMask(const ObjectMask&) = default;
-    ObjectMask(ObjectMask&&) = default;
+    ObjectMask(const ObjectMask&)            = default;
+    ObjectMask(ObjectMask&&)                 = default;
     ObjectMask& operator=(const ObjectMask&) = default;
-    ObjectMask& operator=(ObjectMask&&) = default;
+    ObjectMask& operator=(ObjectMask&&)      = default;
     ObjectMask(ObjectIndexMask objectIndexMask) : m_variant(std::move(objectIndexMask)) {}
 
     static ObjectMask none() { return ObjectMask(None{}); }

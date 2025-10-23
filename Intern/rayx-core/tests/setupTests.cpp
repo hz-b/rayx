@@ -24,9 +24,7 @@ double parseDouble(std::string s) {
 void parseRayUiCsvLineAndAppendEvent(Rays& rays, std::string line) {
     std::vector<double> vec;
 
-    if (line.ends_with('\n')) {
-        line.pop_back();
-    }
+    if (line.ends_with('\n')) { line.pop_back(); }
 
     while (true) {
         auto idx = line.find('\t');
@@ -51,7 +49,7 @@ void parseRayUiCsvLineAndAppendEvent(Rays& rays, std::string line) {
     rays.direction_z.push_back(vec[8]);
     rays.energy.push_back(vec[9]);
     rays.optical_path_length.push_back(vec[10]);
-    const auto stokes = glm::dvec4(vec[11], vec[12], vec[13], vec[14]);
+    const auto stokes         = glm::dvec4(vec[11], vec[12], vec[13], vec[14]);
     const auto electric_field = stokesToElectricFieldWithBaseConvention(stokes, rays.direction(rays.size() - 1));
     rays.electric_field_x.push_back(electric_field.x);
     rays.electric_field_y.push_back(electric_field.y);
@@ -84,7 +82,7 @@ Rays traceRml(std::string filename, RayAttrMask attrMask, Sequential seq) {
 
 std::pair<Beamline, Rays> loadBeamlineAndTrace(std::string filename, RayAttrMask attrMask) {
     auto beamline = loadBeamline(filename);
-    auto rays = tracer->trace(beamline, Sequential::No, ObjectMask::all(), attrMask);
+    auto rays     = tracer->trace(beamline, Sequential::No, ObjectMask::all(), attrMask);
     return std::make_pair(std::move(beamline), std::move(rays));
 }
 
@@ -98,9 +96,7 @@ Rays loadCsvRayUi(std::string filename) {
     std::string line;
 
     // discard first two lines
-    for (int i = 0; i < 2; i++) {
-        std::getline(f, line);
-    }
+    for (int i = 0; i < 2; i++) { std::getline(f, line); }
 
     Rays rays;
     int i = 0;
@@ -141,7 +137,7 @@ void compareRayUiCompatible(const Rays& a, const Rays& b, double t) { compare(a,
 
 void compareRayUiCompatible_findAtLeastOnce(const Rays& rayx, const Rays& rayui, double t) {
     const auto numEventsRayui = rayui.size();
-    const auto numEventsRayx = rayx.size();
+    const auto numEventsRayx  = rayx.size();
     for (auto i = 0; i < numEventsRayui; ++i) {
         bool found = false;
         for (auto j = 0; j < numEventsRayx; ++j) {
@@ -163,10 +159,10 @@ void compareRayUiCompatible_findAtLeastOnce(const Rays& rayx, const Rays& rayui,
 
 // returns the rayx rays converted to be ray-UI compatible.
 Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
-    const auto beamline = loadBeamline(filename);
-    const auto numSources = beamline.numSources();
+    const auto beamline    = loadBeamline(filename);
+    const auto numSources  = beamline.numSources();
     const auto numElements = beamline.numElements();
-    const auto numObjects = numSources + numElements;
+    const auto numObjects  = numSources + numElements;
 
     auto rays =
         tracer
@@ -179,10 +175,10 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
     rays = rays.filter([&](int i) { return rays.path_event_id[i] == numObjects - 1; }).sortByPathIdAndPathEventId();
 
     const auto elements = beamline.compileElements();
-    const auto size = rays.size();
+    const auto size     = rays.size();
     for (int i = 0; i < size; ++i) {
         const auto element_id = rays.object_id[i] - numSources;
-        const auto behaviour = elements[element_id].element.m_behaviour;
+        const auto behaviour  = elements[element_id].element.m_behaviour;
         if (behaviour.is<Behaviour::ImagePlane>() || behaviour.is<Behaviour::Slit>() || behaviour.is<Behaviour::Foil>()) {
             // these elements have their local z axis along the beam direction, so we need to swap y and z to match Ray-UI
             std::swap(rays.position_y[i], rays.position_z[i]);
@@ -194,7 +190,7 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
 }
 
 void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance, Sequential seq) {
-    auto rayx = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
+    auto rayx  = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
     auto rayui = loadCsvRayUi(filename);
 
     writeCsvUsingFilename(rayx, filename + ".rayx");
@@ -204,7 +200,7 @@ void traceRmlAndCompareAgainstRayUi(std::string filename, double tolerance, Sequ
 }
 
 void traceRmlAndCompareAgainstRayUi_allowMontecarloRayUi(std::string filename, double tolerance, Sequential seq) {
-    auto rayx = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
+    auto rayx  = traceRmlAndMakeCompatibleWithRayUi(filename, seq);
     auto rayui = loadCsvRayUi(filename);
 
     writeCsvUsingFilename(rayx, filename + ".rayx");
@@ -223,8 +219,6 @@ void traceRmlAndCompareAgainstCorrectResults(std::string filename, double tolera
 MaterialTables createMaterialTables(std::vector<Material> mats_vec) {
     std::array<bool, 92> mats;
     mats.fill(false);
-    for (auto m : mats_vec) {
-        mats[static_cast<int>(m) - 1] = true;
-    }
+    for (auto m : mats_vec) { mats[static_cast<int>(m) - 1] = true; }
     return loadMaterialTables(mats);
 }
