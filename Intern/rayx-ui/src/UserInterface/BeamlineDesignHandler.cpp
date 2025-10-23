@@ -22,14 +22,10 @@ void BeamlineDesignHandler::showBeamlineDesignWindow(UIBeamlineInfo& uiInfo) {
 
     if (uiInfo.selectedNode->isSource()) {
         const auto srcPtr = static_cast<RAYX::DesignSource*>(uiInfo.selectedNode);
-        if (srcPtr) {
-            showParameters(srcPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::LightSource);
-        }
+        if (srcPtr) { showParameters(srcPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::LightSource); }
     } else if (uiInfo.selectedNode->isElement()) {
         const auto elemPtr = static_cast<RAYX::DesignElement*>(uiInfo.selectedNode);
-        if (elemPtr) {
-            showParameters(elemPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::OpticalElement);
-        }
+        if (elemPtr) { showParameters(elemPtr->m_elementParameters, uiInfo.elementsChanged, SelectedType::OpticalElement); }
     } else if (uiInfo.selectedNode->isGroup()) {
         ImGui::Text("Group editing is to be implemented still...");
     } else {
@@ -53,9 +49,7 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
             }
         }
 
-        if (!isGrouped) {
-            nonGroupedKeys.push_back(key);
-        }
+        if (!isGrouped) { nonGroupedKeys.push_back(key); }
     }
 
     // Extract entries specified in the custom order
@@ -72,9 +66,7 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     // Sort remaining groups and non-grouped keys alphabetically (case-insensitive)
     std::vector<std::string> remainingGroups;
     for (const auto& group : existingGroups) {
-        if (std::find(orderedKeys.begin(), orderedKeys.end(), group.first) == orderedKeys.end()) {
-            remainingGroups.push_back(group.first);
-        }
+        if (std::find(orderedKeys.begin(), orderedKeys.end(), group.first) == orderedKeys.end()) { remainingGroups.push_back(group.first); }
     }
     std::sort(remainingGroups.begin(), remainingGroups.end(),
               [this](const std::string& a, const std::string& b) { return caseInsensitiveCompare(a, b); });
@@ -90,9 +82,7 @@ void BeamlineDesignHandler::showParameters(RAYX::DesignMap& parameters, bool& ch
     std::unordered_set<std::string> unusedKeys = {"photonFlux", "distancePreceding"};
 
     for (const auto& key : orderedKeys) {
-        if (unusedKeys.find(key) != unusedKeys.end()) {
-            continue;
-        }
+        if (unusedKeys.find(key) != unusedKeys.end()) { continue; }
         if (existingGroups.find(key) != existingGroups.end()) {
             if (ImGui::CollapsingHeader(key.c_str())) {
                 ImGui::Indent();
@@ -122,9 +112,9 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
 
     // Calculate widths for consistent layout
-    float fullWidth = ImGui::GetContentRegionAvail().x;
-    float baseInputWidth = fullWidth * 0.6f;
-    float inputWidth = baseInputWidth * float(std::pow(0.9, nestingLevel));  // Reduce by 10% for each nesting level
+    float fullWidth          = ImGui::GetContentRegionAvail().x;
+    float baseInputWidth     = fullWidth * 0.6f;
+    float inputWidth         = baseInputWidth * float(std::pow(0.9, nestingLevel));  // Reduce by 10% for each nesting level
     float rightAlignPosition = fullWidth - inputWidth;
 
     // Align label to the left
@@ -142,13 +132,11 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
 
     // type,geometricalShape and openingShape need to be a drowdown instead of a string/int input
     if (key == "type") {
-        auto currentEl = element.as_elementType();
+        auto currentEl  = element.as_elementType();
         int currentItem = int(std::distance(RAYX::ElementTypeToString.begin(), RAYX::ElementTypeToString.find(currentEl)));
 
         static bool isDisabled = true;  // TODO: Enable after SRI release has been built
-        if (true) {
-            ImGui::BeginDisabled();
-        }
+        if (true) { ImGui::BeginDisabled(); }
 
         if (ImGui::BeginCombo("##combo", currentItem >= 0 ? RAYX::ElementTypeToString.at(currentEl).c_str() : "")) {
             [[maybe_unused]] int n = 0;
@@ -158,29 +146,25 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                     element = pair.first;
                     changed = true;
                 }
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
-                }
+                if (isSelected) { ImGui::SetItemDefaultFocus(); }
                 n++;
             }
             ImGui::EndCombo();
         }
 
-        if (isDisabled) {
-            ImGui::EndDisabled();
-        }
+        if (isDisabled) { ImGui::EndDisabled(); }
     } else if (key == "geometricalShape" || key == "openingShape") {
         const char* shapesGeometrical[] = {"Rectangle", "Elliptical", "Trapezoid", "Unlimited"};
-        const char* shapesOpening[] = {"Rectangle", "Elliptical", "Unlimited"};
+        const char* shapesOpening[]     = {"Rectangle", "Elliptical", "Unlimited"};
 
         const char** shapes;
         int numShapes;
 
         if (key == "geometricalShape") {
-            shapes = shapesGeometrical;
+            shapes    = shapesGeometrical;
             numShapes = IM_ARRAYSIZE(shapesGeometrical);
         } else {  // key == "openingShape"
-            shapes = shapesOpening;
+            shapes    = shapesOpening;
             numShapes = IM_ARRAYSIZE(shapesOpening);
         }
 
@@ -193,9 +177,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                     element = double(i);
                     changed = true;
                 }
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
-                }
+                if (isSelected) { ImGui::SetItemDefaultFocus(); }
             }
             ImGui::EndCombo();
         }
@@ -244,9 +226,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::String: {
                 static bool isDisabled = true;  // TODO: Enable after SRI release has been built
-                if (true) {
-                    ImGui::BeginDisabled();
-                }
+                if (true) { ImGui::BeginDisabled(); }
 
                 std::string input = element.as_string();
                 char buffer[256];
@@ -260,20 +240,16 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                     element = std::string(buffer);
                     changed = true;
                 }
-                if (isDisabled) {
-                    ImGui::EndDisabled();
-                }
+                if (isDisabled) { ImGui::EndDisabled(); }
                 break;
             }
             case RAYX::ValueType::Dvec4: {
                 auto currentValue = element.as_dvec4();
-                double vals[4] = {currentValue.x, currentValue.y, currentValue.z, currentValue.w};
+                double vals[4]    = {currentValue.x, currentValue.y, currentValue.z, currentValue.w};
                 bool changedLocal = false;
                 for (int i = 0; i < 4; ++i) {
                     ImGui::PushID(i);
-                    if (ImGui::InputDouble("##dvec4", &vals[i], 0.0, 0.0, "%.3f", flags)) {
-                        changedLocal = true;
-                    }
+                    if (ImGui::InputDouble("##dvec4", &vals[i], 0.0, 0.0, "%.3f", flags)) { changedLocal = true; }
                     ImGui::PopID();
                     if (i < 3) ImGui::SameLine();
                 }
@@ -292,7 +268,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                         double val = currentValue[row][col];
                         if (ImGui::InputDouble("##dmat4x4", &val, 0.0, 0.0, "%.3f", flags)) {
                             currentValue[row][col] = val;
-                            changedLocal = true;
+                            changedLocal           = true;
                         }
                         ImGui::PopID();
                         if (col < 3) ImGui::SameLine();
@@ -397,7 +373,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
             }
             case RAYX::ValueType::Rad: {
                 RAYX::Rad currentValue = element.as_rad();
-                double input = currentValue.rad;
+                double input           = currentValue.rad;
                 if (ImGui::InputDouble("##rad", &input, 0.0, 0.0, "%.6f", flags)) {
                     element = RAYX::Rad(input);
                     changed = true;
@@ -488,9 +464,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                     // Create a vector of keys and sort them alphabetically (case-insensitive)
                     std::vector<std::string> keys;
                     keys.reserve(currentValue.size());
-                    for (const auto& [subKey, valuePtr] : currentValue) {
-                        keys.push_back(subKey);
-                    }
+                    for (const auto& [subKey, valuePtr] : currentValue) { keys.push_back(subKey); }
                     std::sort(keys.begin(), keys.end(), [this](const std::string& a, const std::string& b) { return caseInsensitiveCompare(a, b); });
 
                     // Iterate through the sorted keys
@@ -499,7 +473,7 @@ void BeamlineDesignHandler::createInputField(const std::string& key, RAYX::Desig
                         bool subChanged = false;
                         createInputField(subKey, *currentValue[subKey], subChanged, type, nestingLevel + 1);
                         if (subChanged) {
-                            changed = true;
+                            changed              = true;
                             currentValue[subKey] = currentValue[subKey];
                         }
                         ImGui::PopID();

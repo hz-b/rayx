@@ -82,10 +82,10 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::fil
     ElementType type = parser.type();
 
     std::unique_ptr<DesignSource> ds = std::make_unique<DesignSource>();
-    ds->m_elementParameters = Map();
+    ds->m_elementParameters          = Map();
 
     std::unique_ptr<DesignElement> de = std::make_unique<DesignElement>();
-    de->m_elementParameters = Map();
+    de->m_elementParameters           = Map();
 
     bool isSource = true;
     switch (type) {
@@ -133,9 +133,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, cons
             addBeamlineObjectFromXML(object, group, filepath);
         } else if (strcmp(object->name(), "group") == 0) {
             auto groupOpt = xml::parseGroup(object);
-            if (!groupOpt) {
-                RAYX_EXIT << "parseGroup failed!";
-            }
+            if (!groupOpt) { RAYX_EXIT << "parseGroup failed!"; }
             std::unique_ptr<Group> nestedGroup = std::make_unique<Group>(std::move(*groupOpt));
 
             // Recursively parse all objects from within the group.
@@ -160,9 +158,7 @@ Beamline importBeamline(const std::filesystem::path& filepath) {
     buffer << t.rdbuf();
     std::string test = buffer.str();
 
-    if (test.empty()) {
-        RAYX_EXIT << "error: could not open beamline file! (or it was just empty)";
-    }
+    if (test.empty()) { RAYX_EXIT << "error: could not open beamline file! (or it was just empty)"; }
 
     // load the RML string into the rapid XML parser library.
     std::vector<char> cstr(test.c_str(), test.c_str() + test.size() + 1);

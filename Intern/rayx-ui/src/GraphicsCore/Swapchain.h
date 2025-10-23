@@ -12,7 +12,7 @@ class SwapChain {
   public:
     SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous = nullptr);
     ~SwapChain();
-    SwapChain(const SwapChain&) = delete;
+    SwapChain(const SwapChain&)      = delete;
     void operator=(const SwapChain&) = delete;
 
     static constexpr int MAX_FRAMES_IN_FLIGHT = 2;

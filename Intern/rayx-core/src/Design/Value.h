@@ -186,10 +186,10 @@ class RAYX_API DesignMap {
     class Iterator {
       public:
         using iterator_category = std::forward_iterator_tag;
-        using difference_type = std::ptrdiff_t;
-        using value_type = std::pair<const std::string, std::shared_ptr<DesignMap>>;
-        using pointer = value_type*;
-        using reference = value_type&;
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = std::pair<const std::string, std::shared_ptr<DesignMap>>;
+        using pointer           = value_type*;
+        using reference         = value_type&;
 
         Iterator(Map::iterator it) : m_it(it) {}
         reference operator*() const { return *m_it; }
@@ -213,10 +213,10 @@ class RAYX_API DesignMap {
     class ConstIterator {
       public:
         using iterator_category = std::forward_iterator_tag;
-        using difference_type = std::ptrdiff_t;
-        using value_type = const std::pair<const std::string, std::shared_ptr<DesignMap>>;
-        using pointer = const value_type*;
-        using reference = const value_type&;
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = const std::pair<const std::string, std::shared_ptr<DesignMap>>;
+        using pointer           = const value_type*;
+        using reference         = const value_type&;
 
         ConstIterator(Map::const_iterator it) : m_it(it) {}
         reference operator*() const { return *m_it; }

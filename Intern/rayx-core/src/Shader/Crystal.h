@@ -47,7 +47,7 @@ inline double getTheta(const glm::dvec3& __restrict rayDirection, const glm::dve
     }
 
     double theta = complex::acos(ar) - PI / 2;
-    theta = theta + offsetAngle;
+    theta        = theta + offsetAngle;
     return theta;  // TODO Fanny check how to correct this
 }
 
@@ -58,8 +58,8 @@ inline double getTheta(const glm::dvec3& __restrict rayDirection, const glm::dve
 /// @return the bragg angle theta (rad)
 RAYX_FN_ACC
 inline double getBraggAngle(double energy, double dSpacing2) {
-    int order = 1;
-    double wavelength = energyToWaveLength(energy);
+    int order           = 1;
+    double wavelength   = energyToWaveLength(energy);
     double theta_factor = (order * wavelength) / dSpacing2;
 
     // Check for physical validity
@@ -77,7 +77,7 @@ inline double getBraggAngle(double energy, double dSpacing2) {
 /// @return Asymmetry factor b (dimensionless)
 RAYX_FN_ACC
 inline double getAsymmetryFactor(double braggAngle, double alpha) {
-    double numerator = complex::sin(braggAngle - alpha);
+    double numerator   = complex::sin(braggAngle - alpha);
     double denominator = complex::sin(braggAngle + alpha);
 
     if (denominator == 0.0) return 0.0;  // avoid division by zero
@@ -93,9 +93,7 @@ inline double getAsymmetryFactor(double braggAngle, double alpha) {
 RAYX_FN_ACC
 inline double getDiffractionPrefactor(double wavelength, double unitCellVolume) {
     // Avoid division by zero
-    if (wavelength <= 0.0 || unitCellVolume <= 0.0) {
-        return 0.0;
-    }
+    if (wavelength <= 0.0 || unitCellVolume <= 0.0) { return 0.0; }
     double result = (ELECTRON_RADIUS * wavelength * wavelength) / PI / unitCellVolume;
     return result;
 }
@@ -124,7 +122,7 @@ inline complex::Complex computeEta(double theta, double bragg, double asymmetry,
     // Calculate numerator terms
     complex::Complex top_term1 = asymmetry * (theta - bragg) * sin(2.0 * theta);
     complex::Complex top_term2 = 0.5 * gamma * complex::Complex(structureFactorReF0, structureFactorImF0) * (1.0 - asymmetry);
-    complex::Complex top = top_term1 + top_term2;
+    complex::Complex top       = top_term1 + top_term2;
 
     // Calculate denominator terms
     double bottom_term1 = gamma * polFactor;

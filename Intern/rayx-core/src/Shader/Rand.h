@@ -29,10 +29,10 @@ RAYX_FN_ACC double RAYX_API squaresNormalRNG(RandCounter& ctr, double mu, double
 struct Rand {
     Rand() noexcept {}
 
-    Rand(const Rand&) = delete;
-    Rand(Rand&&) = default;
+    Rand(const Rand&)            = delete;
+    Rand(Rand&&)                 = default;
     Rand& operator=(const Rand&) = delete;
-    Rand& operator=(Rand&&) = default;
+    Rand& operator=(Rand&&)      = default;
 
     RAYX_FN_ACC
     explicit Rand(const RandCounter ctr) noexcept : counter(ctr) {}
@@ -40,10 +40,10 @@ struct Rand {
     RAYX_FN_ACC
     explicit Rand(const int rayPathIndex, const int numRaysTotal, const double randomSeed) noexcept {
         // ray specific "seed" for random numbers -> every ray has a different starting value for the counter that creates the random number
-        const RandCounter MAX_UINT64 = ~(static_cast<RandCounter>(0));
+        const RandCounter MAX_UINT64   = ~(static_cast<RandCounter>(0));
         const double MAX_UINT64_DOUBLE = 18446744073709551616.0;
-        RandCounter workerCounterNum = MAX_UINT64 / static_cast<RandCounter>(numRaysTotal);
-        counter = rayPathIndex * workerCounterNum + static_cast<RandCounter>(randomSeed * MAX_UINT64_DOUBLE);
+        RandCounter workerCounterNum   = MAX_UINT64 / static_cast<RandCounter>(numRaysTotal);
+        counter                        = rayPathIndex * workerCounterNum + static_cast<RandCounter>(randomSeed * MAX_UINT64_DOUBLE);
 
         // TODO: replace above with below and test if it works correctly
         // constexpr auto MAX_UINT64 = std::numeric_limits<RandCounter>::max();

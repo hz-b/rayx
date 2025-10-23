@@ -39,7 +39,7 @@ class RenderObject {
      */
     RenderObject(Device& device, glm::mat4 modelMatrix, const std::vector<VertexVariant> vertices, const std::vector<uint32_t>& indices,
                  Texture&& texture, std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorPool> descriptorPool);
-    RenderObject(const RenderObject&) = delete;
+    RenderObject(const RenderObject&)            = delete;
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject(RenderObject&& other) noexcept;
     RenderObject& operator=(RenderObject&& other) noexcept;

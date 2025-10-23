@@ -31,9 +31,9 @@ struct GenRaysKernel {
 
         if (gid < n) {
             const auto rayPathIndex = startRayIndex + gid;
-            auto rand = Rand(rayPathIndex, numRaysTotal, seed);
-            const auto ray = source.genRay(rayPathIndex, sourceId, rand);
-            const auto dstIndex = startRayIndexBatch + gid;
+            auto rand               = Rand(rayPathIndex, numRaysTotal, seed);
+            const auto ray          = source.genRay(rayPathIndex, sourceId, rand);
+            const auto dstIndex     = startRayIndexBatch + gid;
             storeRay(dstIndex, dstRays, ray);
         }
     }
@@ -46,9 +46,9 @@ struct GenRaysKernel {
 
         if (gid < n) {
             const auto srcIndex = srcStartIndex + gid;
-            auto ray = loadRay(srcIndex, source.rays);
-            ray.source_id = sourceId;
-            ray.object_id = sourceId;
+            auto ray            = loadRay(srcIndex, source.rays);
+            ray.source_id       = sourceId;
+            ray.object_id       = sourceId;
             const auto dstIndex = startRayIndexBatch + gid;
             storeRay(dstIndex, dstRays, ray);
         }
@@ -63,9 +63,9 @@ struct GenRaysKernel {
 
         if (gid < n) {
             const auto rayPathIndex = startRayIndex + gid;
-            auto rand = Rand(rayPathIndex, numRaysTotal, seed);
-            const auto ray = source.genRay(rayPathIndex, sourceId, energyDistribution, rand);
-            const auto dstIndex = startRayIndexBatch + gid;
+            auto rand               = Rand(rayPathIndex, numRaysTotal, seed);
+            const auto ray          = source.genRay(rayPathIndex, sourceId, energyDistribution, rand);
+            const auto dstIndex     = startRayIndexBatch + gid;
             storeRay(dstIndex, dstRays, ray);
         }
     }
@@ -93,7 +93,7 @@ struct GenRays {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
         const auto platformHost = alpaka::PlatformCpu{};
-        const auto devHost = alpaka::getDevByIdx(platformHost, 0);
+        const auto devHost      = alpaka::getDevByIdx(platformHost, 0);
 
         m_startRayIndex = 0;
 
@@ -131,7 +131,7 @@ struct GenRays {
             }
         };
 
-        auto energyDistributionListIndex = 0;
+        auto energyDistributionListIndex     = 0;
         const auto compileEnergyDistribution = [&](const DesignSource& designSource) -> std::optional<EnergyDistributionDataVariant> {
             // special case: DipoleSource has no energy distribution
             if (designSource.getType() == ElementType::DipoleSource) return std::nullopt;
@@ -140,15 +140,9 @@ struct GenRays {
 
             return std::visit(
                 [&]<typename T>(const T& value) -> std::optional<EnergyDistributionDataVariant> {
-                    if constexpr (std::is_same_v<T, HardEdge>) {
-                        return value;
-                    }
-                    if constexpr (std::is_same_v<T, SoftEdge>) {
-                        return value;
-                    }
-                    if constexpr (std::is_same_v<T, SeparateEnergies>) {
-                        return value;
-                    }
+                    if constexpr (std::is_same_v<T, HardEdge>) { return value; }
+                    if constexpr (std::is_same_v<T, SoftEdge>) { return value; }
+                    if constexpr (std::is_same_v<T, SeparateEnergies>) { return value; }
                     if constexpr (std::is_same_v<T, DatFile>) {
                         assert(value.m_Lines.size() > 0);
                         assert(d_energyDistributionListWeights.size() == d_energyDistributionListEnergies.size());
@@ -166,7 +160,7 @@ struct GenRays {
 
                         // alloc device buffers and transfer data
                         const auto index = energyDistributionListIndex++;
-                        const auto size = static_cast<int>(value.m_Lines.size());
+                        const auto size  = static_cast<int>(value.m_Lines.size());
                         if (static_cast<int>(d_energyDistributionListWeights.size()) <= index) {
                             d_energyDistributionListWeights.emplace_back();
                             d_energyDistributionListEnergies.emplace_back();
@@ -178,10 +172,10 @@ struct GenRays {
 
                         return EnergyDistributionList{
                             .prefixWeights = alpaka::getPtrNative(*d_energyDistributionListWeights[index]),
-                            .energies = alpaka::getPtrNative(*d_energyDistributionListEnergies[index]),
-                            .weightSum = weightSum,
-                            .size = size,
-                            .continous = value.m_continuous,
+                            .energies      = alpaka::getPtrNative(*d_energyDistributionListEnergies[index]),
+                            .weightSum     = weightSum,
+                            .size          = size,
+                            .continous     = value.m_continuous,
                         };
                     }
 
@@ -191,23 +185,23 @@ struct GenRays {
                 designSource.getEnergyDistribution());
         };
 
-        m_numRaysTotal = 0;
+        m_numRaysTotal      = 0;
         auto numRaysSources = std::vector<int>();
-        auto sourceId = static_cast<int>(0);
+        auto sourceId       = static_cast<int>(0);
 
         for (const auto* designSource : beamline.getSources()) {
-            const auto source = *compileSource(*designSource);
+            const auto source             = *compileSource(*designSource);
             const auto energyDistribution = compileEnergyDistribution(*designSource);
-            const auto numRaysSource = static_cast<int>(designSource->getNumberOfRays());
+            const auto numRaysSource      = static_cast<int>(designSource->getNumberOfRays());
             m_numRaysTotal += numRaysSource;
 
             m_sourceStates.push_back(SourceState{
-                .source = source,
-                .sourceId = sourceId,
-                .energyDistribution = energyDistribution,
-                .numRaysSource = numRaysSource,
+                .source                 = source,
+                .sourceId               = sourceId,
+                .energyDistribution     = energyDistribution,
+                .numRaysSource          = numRaysSource,
                 .numRaysSourceRemaining = numRaysSource,
-                .name = designSource->getName(),
+                .name                   = designSource->getName(),
             });
 
             ++sourceId;
@@ -225,9 +219,9 @@ struct GenRays {
         m_seed = randomDouble();
 
         return {
-            .numRaysTotal = m_numRaysTotal,
+            .numRaysTotal       = m_numRaysTotal,
             .numRaysBatchAtMost = m_numRaysBatchAtMost,
-            .numBatches = numBatches,
+            .numBatches         = numBatches,
         };
     }
 
@@ -235,13 +229,13 @@ struct GenRays {
     BatchConfig genRaysBatch(DevAcc devAcc, Queue q, const int batchIndex) {
         RAYX_PROFILE_FUNCTION_STDOUT();
 
-        const auto batchStartRayIndex = batchIndex * m_numRaysBatchAtMost;
+        const auto batchStartRayIndex    = batchIndex * m_numRaysBatchAtMost;
         const auto numRaysTotalRemaining = m_numRaysTotal - batchStartRayIndex;
-        const auto numRaysBatch = std::min(numRaysTotalRemaining, m_numRaysBatchAtMost);
-        auto numRaysBatchRemaining = numRaysBatch;
+        const auto numRaysBatch          = std::min(numRaysTotalRemaining, m_numRaysBatchAtMost);
+        auto numRaysBatchRemaining       = numRaysBatch;
 
         for (auto& sourceState : m_sourceStates) {
-            const auto numRaysBatchSource = std::min(numRaysBatchRemaining, sourceState.numRaysSourceRemaining);
+            const auto numRaysBatchSource  = std::min(numRaysBatchRemaining, sourceState.numRaysSourceRemaining);
             const auto startRayIndexSource = sourceState.numRaysSource - sourceState.numRaysSourceRemaining;
 
             if (numRaysBatchSource) {
@@ -285,7 +279,7 @@ struct GenRays {
 
         return BatchConfig{
             .numRaysBatch = numRaysBatch,
-            .d_rays = d_rays,
+            .d_rays       = d_rays,
         };
     }
 

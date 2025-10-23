@@ -13,7 +13,7 @@
 
 TEST_F(TestSuite, testUniformRandom) {
     uint64_t ctr = 13;
-    double old = 0;
+    double old   = 0;
 
     for (int i = 0; i < 100; i++) {
         double d = squaresDoubleRNG(ctr);
@@ -25,7 +25,7 @@ TEST_F(TestSuite, testUniformRandom) {
 
 TEST_F(TestSuite, testNormalRandom) {
     uint64_t ctr = 13;   // seed value
-    double mu = 0.0;     // mean
+    double mu    = 0.0;  // mean
     double sigma = 1.0;  // standard deviation
 
     // Vectors to store the generated random numbers and their z-scores
@@ -42,10 +42,10 @@ TEST_F(TestSuite, testNormalRandom) {
     }
 
     // Calculate mean and standard deviation of the generated random numbers
-    double sum = std::accumulate(random_numbers.begin(), random_numbers.end(), 0.0);
+    double sum  = std::accumulate(random_numbers.begin(), random_numbers.end(), 0.0);
     double mean = sum / random_numbers.size();
 
-    double sq_sum = std::inner_product(random_numbers.begin(), random_numbers.end(), random_numbers.begin(), 0.0);
+    double sq_sum  = std::inner_product(random_numbers.begin(), random_numbers.end(), random_numbers.begin(), 0.0);
     double std_dev = std::sqrt(sq_sum / random_numbers.size() - mean * mean);
 
     // Check if mean is close to 0 and standard deviation is close to 1
@@ -64,9 +64,7 @@ TEST_F(TestSuite, testSin) {
         0.40238118899835329, 0.3078379243610454,    0.053857555519812195, 0.5128209722651722,
     };
 
-    for (auto x : args) {
-        CHECK_EQ(glm::sin(x), sin(x));
-    }
+    for (auto x : args) { CHECK_EQ(glm::sin(x), sin(x)); }
 }
 
 TEST_F(TestSuite, testCos) {
@@ -76,9 +74,7 @@ TEST_F(TestSuite, testCos) {
         0.40238118899835329, 0.3078379243610454,    0.053857555519812195, 0.5128209722651722,
     };
 
-    for (auto x : args) {
-        CHECK_EQ(glm::cos(x), cos(x));
-    }
+    for (auto x : args) { CHECK_EQ(glm::cos(x), cos(x)); }
 }
 
 TEST_F(TestSuite, testAtan) {
@@ -88,9 +84,7 @@ TEST_F(TestSuite, testAtan) {
         0.40238118899835329, 0.3078379243610454,    0.053857555519812195, 0.5128209722651722,
     };
 
-    for (auto x : args) {
-        CHECK_EQ(glm::atan(x), atan(x));
-    }
+    for (auto x : args) { CHECK_EQ(glm::atan(x), atan(x)); }
 }
 
 TEST_F(TestSuite, testExp) {
@@ -104,9 +98,7 @@ TEST_F(TestSuite, testExp) {
 // interestingly r8_log and log behave differently on input 0, namely 1 vs -inf.
 TEST_F(TestSuite, testLog) {
     std::vector<double> args = {10.0, 5.0, 2.0, 1.0, 0.5, 0.0001, 0.0000001};
-    for (auto x : args) {
-        CHECK_EQ(glm::log(x), log(x));
-    }
+    for (auto x : args) { CHECK_EQ(glm::log(x), log(x)); }
 }
 
 TEST_F(TestSuite, testNormalCartesian) {
@@ -122,25 +114,25 @@ TEST_F(TestSuite, testNormalCartesian) {
                                          .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec3(0, 1, 0),
+                                         .out       = glm::dvec3(0, 1, 0),
                                      },
                                      {
                                          .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
+                                         .out       = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                      },
                                      {
                                          .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec3(-0.90019762973551742, 0.41198224566568298, -0.14112000805986721),
+                                         .out       = glm::dvec3(-0.90019762973551742, 0.41198224566568298, -0.14112000805986721),
                                      },
                                      {
                                          .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec3(-9431.2371568647086, 4310.7269916467494, -1449.3435640204684),
+                                         .out       = glm::dvec3(-9431.2371568647086, 4310.7269916467494, -1449.3435640204684),
                                      }};
 
     for (auto p : inouts) {
@@ -162,24 +154,24 @@ TEST_F(TestSuite, testNormalCylindrical) {
                                          .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec3(0, 1, 0),
+                                         .out       = glm::dvec3(0, 1, 0),
                                      },
                                      {
                                          .in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                          .in_slopeX = 0,
                                          .in_slopeZ = 0,
-                                         .out = glm::dvec3(5.0465463027115769, 10470.451695989539, -28.532199794465537),
+                                         .out       = glm::dvec3(5.0465463027115769, 10470.451695989539, -28.532199794465537),
                                      },
                                      {
                                          .in_normal = glm::dvec3(0, 1, 0),
                                          .in_slopeX = 2,
                                          .in_slopeZ = 3,
-                                         .out = glm::dvec3(0.90019762973551742, 0.41198224566568292, -0.14112000805986721),
+                                         .out       = glm::dvec3(0.90019762973551742, 0.41198224566568292, -0.14112000805986721),
                                      },
                                      {.in_normal = glm::dvec3(5.0465463027123736, 10470.451695989539, -28.532199794465537),
                                       .in_slopeX = 2,
                                       .in_slopeZ = 3,
-                                      .out = glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144)}};
+                                      .out       = glm::dvec3(9431.2169472441783, 4310.7711493493844, -1449.3437356459144)}};
 
     for (auto p : inouts) {
         auto out = normalCylindrical(p.in_normal, p.in_slopeX, p.in_slopeZ);
@@ -200,80 +192,80 @@ TEST_F(TestSuite, testRZPLineDensityDefaulParams) {
     std::vector<InOutPair> inouts = {
         {
             .in_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
-            .in_normal = glm::dvec4(0, 1, 0, 0),
+            .in_normal   = glm::dvec4(0, 1, 0, 0),
             .in_b =
                 Behaviour::RZP{
-                    .m_imageType = 0,
-                    .m_rzpType = 0,
-                    .m_derivationMethod = 0,
-                    .m_orderOfDiffraction = -1,
-                    .m_designWavelength = 1.239852e-05 * 1e6,
-                    .m_fresnelZOffset = 0,
-                    .m_designSagittalEntranceArmLength = 100,
-                    .m_designSagittalExitArmLength = 500,
+                    .m_imageType                         = 0,
+                    .m_rzpType                           = 0,
+                    .m_derivationMethod                  = 0,
+                    .m_orderOfDiffraction                = -1,
+                    .m_designWavelength                  = 1.239852e-05 * 1e6,
+                    .m_fresnelZOffset                    = 0,
+                    .m_designSagittalEntranceArmLength   = 100,
+                    .m_designSagittalExitArmLength       = 500,
                     .m_designMeridionalEntranceArmLength = 100,
-                    .m_designMeridionalExitArmLength = 500,
-                    .m_designAlphaAngle = 0.017453292519943295,
-                    .m_designBetaAngle = 0.017453292519943295,
+                    .m_designMeridionalExitArmLength     = 500,
+                    .m_designAlphaAngle                  = 0.017453292519943295,
+                    .m_designBetaAngle                   = 0.017453292519943295,
                 },
 
             .out_DX = 3103.9106911246749,
             .out_DZ = 5.0771666330055218,
         },
         {.in_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
-         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_normal   = glm::dvec4(0, 1, 0, 0),
          .in_b =
              Behaviour::RZP{
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_orderOfDiffraction = -1,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
+                 .m_imageType                         = 0,
+                 .m_rzpType                           = 0,
+                 .m_derivationMethod                  = 0,
+                 .m_orderOfDiffraction                = -1,
+                 .m_designWavelength                  = 1.239852e-05 * 1e6,
+                 .m_fresnelZOffset                    = 0,
+                 .m_designSagittalEntranceArmLength   = 100,
+                 .m_designSagittalExitArmLength       = 500,
                  .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
+                 .m_designMeridionalExitArmLength     = 500,
+                 .m_designAlphaAngle                  = 0.017453292519943295,
+                 .m_designBetaAngle                   = 0.017453292519943295,
              },
          .out_DX = 1034.8685185321938,
          .out_DZ = -13.320120179862876},
         {.in_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
-         .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
+         .in_normal   = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
          .in_b =
              Behaviour::RZP{
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_orderOfDiffraction = -1,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
+                 .m_imageType                         = 0,
+                 .m_rzpType                           = 0,
+                 .m_derivationMethod                  = 0,
+                 .m_orderOfDiffraction                = -1,
+                 .m_designWavelength                  = 1.239852e-05 * 1e6,
+                 .m_fresnelZOffset                    = 0,
+                 .m_designSagittalEntranceArmLength   = 100,
+                 .m_designSagittalExitArmLength       = 500,
                  .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
+                 .m_designMeridionalExitArmLength     = 500,
+                 .m_designAlphaAngle                  = 0.017453292519943295,
+                 .m_designBetaAngle                   = 0.017453292519943295,
              },
          .out_DX = 4045.0989844091882,
          .out_DZ = -174.2085626048659},
         {.in_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
-         .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
+         .in_normal   = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
          .in_b =
              Behaviour::RZP{
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_orderOfDiffraction = -1,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
+                 .m_imageType                         = 0,
+                 .m_rzpType                           = 0,
+                 .m_derivationMethod                  = 0,
+                 .m_orderOfDiffraction                = -1,
+                 .m_designWavelength                  = 1.239852e-05 * 1e6,
+                 .m_fresnelZOffset                    = 0,
+                 .m_designSagittalEntranceArmLength   = 100,
+                 .m_designSagittalExitArmLength       = 500,
                  .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
+                 .m_designMeridionalExitArmLength     = 500,
+                 .m_designAlphaAngle                  = 0.017453292519943295,
+                 .m_designBetaAngle                   = 0.017453292519943295,
              },
          .out_DX = 1418.1004208892475,
          .out_DZ = 253.09836635775162},
@@ -302,80 +294,80 @@ TEST_F(TestSuite, testRZPLineDensityAstigmatic) {
 
         {
             .in_position = glm::dvec3(-5.0805095016939532, 0, 96.032788311782269),
-            .in_normal = glm::dvec4(0, 1, 0, 0),
+            .in_normal   = glm::dvec4(0, 1, 0, 0),
             .in_b =
                 {
-                    .m_imageType = 0,
-                    .m_rzpType = 0,
-                    .m_derivationMethod = 0,
-                    .m_orderOfDiffraction = -1,
-                    .m_designWavelength = 1.239852e-05 * 1e6,
-                    .m_fresnelZOffset = 0,
-                    .m_designSagittalEntranceArmLength = 100,
-                    .m_designSagittalExitArmLength = 500,
+                    .m_imageType                         = 0,
+                    .m_rzpType                           = 0,
+                    .m_derivationMethod                  = 0,
+                    .m_orderOfDiffraction                = -1,
+                    .m_designWavelength                  = 1.239852e-05 * 1e6,
+                    .m_fresnelZOffset                    = 0,
+                    .m_designSagittalEntranceArmLength   = 100,
+                    .m_designSagittalExitArmLength       = 500,
                     .m_designMeridionalEntranceArmLength = 100,
-                    .m_designMeridionalExitArmLength = 500,
-                    .m_designAlphaAngle = 0.017453292519943295,
-                    .m_designBetaAngle = 0.017453292519943295,
+                    .m_designMeridionalExitArmLength     = 500,
+                    .m_designAlphaAngle                  = 0.017453292519943295,
+                    .m_designBetaAngle                   = 0.017453292519943295,
                 },
 
             .out_DX = 3103.9106911246749,
             .out_DZ = 5.0771666330055218,
         },
         {.in_position = glm::dvec3(-1.6935030407867075, 0, 96.032777495754004),
-         .in_normal = glm::dvec4(0, 1, 0, 0),
+         .in_normal   = glm::dvec4(0, 1, 0, 0),
          .in_b =
              {
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_orderOfDiffraction = -1,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
+                 .m_imageType                         = 0,
+                 .m_rzpType                           = 0,
+                 .m_derivationMethod                  = 0,
+                 .m_orderOfDiffraction                = -1,
+                 .m_designWavelength                  = 1.239852e-05 * 1e6,
+                 .m_fresnelZOffset                    = 0,
+                 .m_designSagittalEntranceArmLength   = 100,
+                 .m_designSagittalExitArmLength       = 500,
                  .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
+                 .m_designMeridionalExitArmLength     = 500,
+                 .m_designAlphaAngle                  = 0.017453292519943295,
+                 .m_designBetaAngle                   = 0.017453292519943295,
              },
          .out_DX = 1034.8685185321938,
          .out_DZ = -13.320120179862876},
         {.in_position = glm::dvec3(-5.047050067282087, 4.4859372100394515, 29.182033770349552),
-         .in_normal = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
+         .in_normal   = glm::dvec4(0.05047050067282087, 0.95514062789960552, -0.29182033770349552, 0),
          .in_b =
              {
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_orderOfDiffraction = -1,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
+                 .m_imageType                         = 0,
+                 .m_rzpType                           = 0,
+                 .m_derivationMethod                  = 0,
+                 .m_orderOfDiffraction                = -1,
+                 .m_designWavelength                  = 1.239852e-05 * 1e6,
+                 .m_fresnelZOffset                    = 0,
+                 .m_designSagittalEntranceArmLength   = 100,
+                 .m_designSagittalExitArmLength       = 500,
                  .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
+                 .m_designMeridionalExitArmLength     = 500,
+                 .m_designAlphaAngle                  = 0.017453292519943295,
+                 .m_designBetaAngle                   = 0.017453292519943295,
              },
          .out_DX = 4045.0989844091882,
          .out_DZ = -174.2085626048659},
         {.in_position = glm::dvec3(-1.6802365843267262, 1.3759250917712356, 16.445931214643075),
-         .in_normal = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
+         .in_normal   = glm::dvec4(0.016802365843267261, 0.98624074908228765, -0.16445931214643075, 0),
          .in_b =
              {
-                 .m_imageType = 0,
-                 .m_rzpType = 0,
-                 .m_derivationMethod = 0,
-                 .m_orderOfDiffraction = -1,
-                 .m_designWavelength = 1.239852e-05 * 1e6,
-                 .m_fresnelZOffset = 0,
-                 .m_designSagittalEntranceArmLength = 100,
-                 .m_designSagittalExitArmLength = 500,
+                 .m_imageType                         = 0,
+                 .m_rzpType                           = 0,
+                 .m_derivationMethod                  = 0,
+                 .m_orderOfDiffraction                = -1,
+                 .m_designWavelength                  = 1.239852e-05 * 1e6,
+                 .m_fresnelZOffset                    = 0,
+                 .m_designSagittalEntranceArmLength   = 100,
+                 .m_designSagittalExitArmLength       = 500,
                  .m_designMeridionalEntranceArmLength = 100,
-                 .m_designMeridionalExitArmLength = 500,
-                 .m_designAlphaAngle = 0.017453292519943295,
-                 .m_designBetaAngle = 0.017453292519943295,
+                 .m_designMeridionalExitArmLength     = 500,
+                 .m_designAlphaAngle                  = 0.017453292519943295,
+                 .m_designBetaAngle                   = 0.017453292519943295,
              },
          .out_DX = 1418.1004208892475,
          .out_DZ = 253.09836635775162},
@@ -400,32 +392,32 @@ TEST_F(TestSuite, testRayMatrixMult) {
         glm::dvec3 out_direction;
     };
 
-    const auto rotate90 = glm::rotate(glm::dmat4(1), glm::radians(90.0), glm::dvec3(0, 0, 1));
+    const auto rotate90  = glm::rotate(glm::dmat4(1), glm::radians(90.0), glm::dvec3(0, 0, 1));
     const auto translate = glm::translate(glm::dmat4(1), glm::dvec3(1, 2, 3));
 
     std::vector<InOutPair> inouts = {
         // position and direction get rotated
         {
-            .in_position = glm::dvec3(1, 0, 0),
-            .in_direction = glm::dvec3(1, 0, 0),
-            .in_matrix = rotate90,
-            .out_position = glm::dvec3(0, 1, 0),
+            .in_position   = glm::dvec3(1, 0, 0),
+            .in_direction  = glm::dvec3(1, 0, 0),
+            .in_matrix     = rotate90,
+            .out_position  = glm::dvec3(0, 1, 0),
             .out_direction = glm::dvec3(0, 1, 0),
         },
         // position gets translated
         {
-            .in_position = glm::dvec3(1, 0, 0),
-            .in_direction = glm::dvec3(1, 0, 0),
-            .in_matrix = translate,
-            .out_position = glm::dvec3(2, 2, 3),
+            .in_position   = glm::dvec3(1, 0, 0),
+            .in_direction  = glm::dvec3(1, 0, 0),
+            .in_matrix     = translate,
+            .out_position  = glm::dvec3(2, 2, 3),
             .out_direction = glm::dvec3(1, 0, 0),
         },
         // position and directionget rotated, then position gets translated
         {
-            .in_position = glm::dvec3(1, 0, 0),
-            .in_direction = glm::dvec3(1, 0, 0),
-            .in_matrix = translate * rotate90,
-            .out_position = glm::dvec3(1, 3, 3),
+            .in_position   = glm::dvec3(1, 0, 0),
+            .in_direction  = glm::dvec3(1, 0, 0),
+            .in_matrix     = translate * rotate90,
+            .out_position  = glm::dvec3(1, 3, 3),
             .out_direction = glm::dvec3(0, 1, 0),
         },
     };
@@ -453,45 +445,45 @@ TEST_F(TestSuite, testRayMatrixMultWithComplexElectricField) {
         ElectricField out_electric_field;
     };
 
-    const auto rotate90 = glm::rotate(glm::dmat4(1), glm::radians(90.0), glm::dvec3(0, 0, 1));
+    const auto rotate90  = glm::rotate(glm::dmat4(1), glm::radians(90.0), glm::dvec3(0, 0, 1));
     const auto translate = glm::translate(glm::dmat4(1), glm::dvec3(1, 2, 3));
 
     std::vector<InOutPair> inouts = {
         // position, direction and electric field get rotated
         {
-            .in_position = glm::dvec3(1, 0, 0),
-            .in_direction = glm::dvec3(1, 0, 0),
-            .in_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
-            .in_matrix = rotate90,
-            .out_position = glm::dvec3(0, 1, 0),
-            .out_direction = glm::dvec3(0, 1, 0),
+            .in_position        = glm::dvec3(1, 0, 0),
+            .in_direction       = glm::dvec3(1, 0, 0),
+            .in_electric_field  = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            .in_matrix          = rotate90,
+            .out_position       = glm::dvec3(0, 1, 0),
+            .out_direction      = glm::dvec3(0, 1, 0),
             .out_electric_field = ElectricField{{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
         },
         // position gets translated
         {
-            .in_position = glm::dvec3(1, 0, 0),
-            .in_direction = glm::dvec3(1, 0, 0),
-            .in_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
-            .in_matrix = translate,
-            .out_position = glm::dvec3(2, 2, 3),
-            .out_direction = glm::dvec3(1, 0, 0),
+            .in_position        = glm::dvec3(1, 0, 0),
+            .in_direction       = glm::dvec3(1, 0, 0),
+            .in_electric_field  = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            .in_matrix          = translate,
+            .out_position       = glm::dvec3(2, 2, 3),
+            .out_direction      = glm::dvec3(1, 0, 0),
             .out_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
         },
         // position, direction and electric field get rotated, then position gets translated
         {
-            .in_position = glm::dvec3(1, 0, 0),
-            .in_direction = glm::dvec3(1, 0, 0),
-            .in_electric_field = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
-            .in_matrix = translate * rotate90,
-            .out_position = glm::dvec3(1, 3, 3),
-            .out_direction = glm::dvec3(0, 1, 0),
+            .in_position        = glm::dvec3(1, 0, 0),
+            .in_direction       = glm::dvec3(1, 0, 0),
+            .in_electric_field  = ElectricField{{1.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+            .in_matrix          = translate * rotate90,
+            .out_position       = glm::dvec3(1, 3, 3),
+            .out_direction      = glm::dvec3(0, 1, 0),
             .out_electric_field = ElectricField{{0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}},
         },
     };
 
     for (auto const& p : inouts) {
-        glm::dvec3 pos = p.in_position;
-        glm::dvec3 dir = p.in_direction;
+        glm::dvec3 pos   = p.in_position;
+        glm::dvec3 dir   = p.in_direction;
         ElectricField ef = p.in_electric_field;
 
         rayMatrixMult(p.in_matrix, pos, dir, ef);
@@ -514,92 +506,92 @@ TEST_F(TestSuite, testDPow) {
     std::vector<InOutPair> inouts = {{
                                          .in_a = 0,
                                          .in_b = 0,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = 0,
                                          .in_b = 1,
-                                         .out = 0,
+                                         .out  = 0,
                                      },
                                      {
                                          .in_a = 0,
                                          .in_b = -1,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = 2,
                                          .in_b = 0,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = 2,
                                          .in_b = 1,
-                                         .out = 2,
+                                         .out  = 2,
                                      },
                                      {
                                          .in_a = 3,
                                          .in_b = 7,
-                                         .out = 2187,
+                                         .out  = 2187,
                                      },
                                      {
                                          .in_a = 0,
                                          .in_b = 4,
-                                         .out = 0,
+                                         .out  = 0,
                                      },
                                      {
                                          .in_a = 0,
                                          .in_b = -4,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = 0,
                                          .in_b = 2,
-                                         .out = 0,
+                                         .out  = 0,
                                      },
                                      {
                                          .in_a = 0.20000000000000001,
                                          .in_b = 4,
-                                         .out = 0.0016000000000000005,
+                                         .out  = 0.0016000000000000005,
                                      },
                                      {
                                          .in_a = 9.9949999999999992,
                                          .in_b = 3,
-                                         .out = 998.50074987499977,
+                                         .out  = 998.50074987499977,
                                      },
                                      {
                                          .in_a = 3.1415926535897931,
                                          .in_b = 6,
-                                         .out = 961.38919357530415,
+                                         .out  = 961.38919357530415,
                                      },
                                      {
                                          .in_a = -1,
                                          .in_b = -4,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = -1,
                                          .in_b = 3,
-                                         .out = -1,
+                                         .out  = -1,
                                      },
                                      {
                                          .in_a = -1,
                                          .in_b = 0,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = -1,
                                          .in_b = 4,
-                                         .out = 1,
+                                         .out  = 1,
                                      },
                                      {
                                          .in_a = -1,
                                          .in_b = 5,
-                                         .out = -1,
+                                         .out  = -1,
                                      },
                                      {
                                          .in_a = -1,
                                          .in_b = 6,
-                                         .out = 1,
+                                         .out  = 1,
                                      }};
 
     for (auto p : inouts) {
@@ -617,51 +609,51 @@ TEST_F(TestSuite, testFact) {
 
     std::vector<InOutPair> inouts = {
         {
-            .in = 2,
+            .in  = 2,
             .out = 2,
         },
         {
-            .in = 1,
+            .in  = 1,
             .out = 1,
         },
         {
-            .in = 0,
+            .in  = 0,
             .out = 1,
         },
         {
-            .in = 17,
+            .in  = 17,
             .out = 355687428096000,
         },
         {
-            .in = 4,
+            .in  = 4,
             .out = 24,
         },
         {
-            .in = -1,
+            .in  = -1,
             .out = -1,
         },
         {
-            .in = -2,
+            .in  = -2,
             .out = -2,
         },
         {
-            .in = 0,
+            .in  = 0,
             .out = 1,
         },
         {
-            .in = 12,
+            .in  = 12,
             .out = 479001600,
         },
         {
-            .in = -4,
+            .in  = -4,
             .out = -4,
         },
         {
-            .in = 10,
+            .in  = 10,
             .out = 3628800,
         },
         {
-            .in = 0,
+            .in  = 0,
             .out = 1,
         },
 
@@ -682,59 +674,59 @@ TEST_F(TestSuite, testBessel1) {
 
     std::vector<InOutPair> inouts = {
         {
-            .in = 100,
+            .in  = 100,
             .out = 0,
         },
         {
-            .in = 20.100000000000001,
+            .in  = 20.100000000000001,
             .out = 0,
         },
         {
-            .in = -12.122999999999999,
+            .in  = -12.122999999999999,
             .out = 0,
         },
         {
-            .in = 23.100000000000001,
+            .in  = 23.100000000000001,
             .out = 0,
         },
         {
-            .in = 0,
+            .in  = 0,
             .out = 0,
         },
         {
-            .in = 20,
+            .in  = 20,
             .out = 0.066833545658411236,
         },
         {
-            .in = -0.10000000000000001,
+            .in  = -0.10000000000000001,
             .out = 0,
         },
         {
-            .in = 1e-08,
+            .in  = 1e-08,
             .out = 5.0000000000000001e-09,
         },
         {
-            .in = 2,
+            .in  = 2,
             .out = 0.57672480775687363,
         },
         {
-            .in = 12.122999999999999,
+            .in  = 12.122999999999999,
             .out = -0.21368198451302897,
         },
         {
-            .in = 3.1415926535897931,
+            .in  = 3.1415926535897931,
             .out = 0.28461534317975273,
         },
         {
-            .in = 10.199999999999999,
+            .in  = 10.199999999999999,
             .out = -0.0066157432977083167,
         },
         {
-            .in = 19.989999999999998,
+            .in  = 19.989999999999998,
             .out = 0.065192988349741909,
         },
         {
-            .in = 4,
+            .in  = 4,
             .out = -0.06604332802354923,
         },
 
@@ -757,15 +749,15 @@ TEST_F(TestSuite, testVlsGrating) {
 
     std::vector<InOutPair> inouts = {{
                                          .in_lineDensity = 0.01239852,
-                                         .in_z = 5.0020783775947848,
-                                         .in_vls = {0, 0, 0, 0, 0, 0},
-                                         .out = 0.01239852,
+                                         .in_z           = 5.0020783775947848,
+                                         .in_vls         = {0, 0, 0, 0, 0, 0},
+                                         .out            = 0.01239852,
                                      },
                                      {
                                          .in_lineDensity = 0.01239852,
-                                         .in_z = 5.0020783775947848,
-                                         .in_vls = {1, 2, 3, 4, 5, 6},
-                                         .out = 9497.4799596119265,
+                                         .in_z           = 5.0020783775947848,
+                                         .in_vls         = {1, 2, 3, 4, 5, 6},
+                                         .out            = 9497.4799596119265,
                                      }};
 
     for (auto p : inouts) {
@@ -817,8 +809,8 @@ TEST_F(TestSuite, testElectricFieldRotation) {
 
 TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention) {
     const auto forward = glm::dvec3(0, 0, 1);
-    const auto right = glm::dvec3(1, 0, 0);
-    const auto up = glm::dvec3(0, 1, 0);
+    const auto right   = glm::dvec3(1, 0, 0);
+    const auto up      = glm::dvec3(0, 1, 0);
 
     {
         // test if the convention uses the correct forward, up and right
@@ -837,7 +829,7 @@ TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention) {
         // in order to test if the rotation function is steadily,
         // we gradually increase the rotation angle and compare the resulting angle to the previous.
 
-        const auto steps = 100;
+        const auto steps     = 100;
         const auto stepAngle = 1.0 / steps * PI * 2.0;
 
         auto get_dir = [](double angle) { return glm::dvec3(glm::cos(angle), glm::sin(angle), 0); };
@@ -845,9 +837,9 @@ TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention) {
         auto prev_vec = get_dir(0.0f);
 
         for (int i = 1; i < steps + 1; ++i) {
-            auto angle = i / static_cast<double>(steps) * PI * 2.0;
-            auto dir = get_dir(angle);
-            auto new_vec = rotationMatrixWithBaseConvention(dir) * forward;
+            auto angle              = i / static_cast<double>(steps) * PI * 2.0;
+            auto dir                = get_dir(angle);
+            auto new_vec            = rotationMatrixWithBaseConvention(dir) * forward;
             auto angle_between_vecs = angleBetweenUnitVectors(prev_vec, new_vec);
             CHECK_EQ(angle_between_vecs, stepAngle);
             prev_vec = new_vec;
@@ -874,27 +866,27 @@ TEST_F(TestSuite, testElectricFieldRotationWithBaseConvention2) {
 
     const auto inouts = std::vector<InOutPair>{
         {
-            .in_field = {{1, 0}, {0, 0}, {0, 0}},
-            .in_forward = {0, 0, -1},
-            .in_up = {0, 1, 0},
-            .out_field = {{-1, 0}, {0, 0}, {0, 0}},
+            .in_field                    = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward                  = {0, 0, -1},
+            .in_up                       = {0, 1, 0},
+            .out_field                   = {{-1, 0}, {0, 0}, {0, 0}},
             .out_field_rotationWithoutUp = {{-1, 0}, {0, 0}, {0, 0}},
         },
         {
-            .in_field = {{1, 0}, {0, 0}, {0, 0}},
-            .in_forward = {1, 0, 0},
-            .in_up = {0, 0, 1},
-            .out_field = {{0, 0}, {1, 0}, {0, 0}},
+            .in_field                    = {{1, 0}, {0, 0}, {0, 0}},
+            .in_forward                  = {1, 0, 0},
+            .in_up                       = {0, 0, 1},
+            .out_field                   = {{0, 0}, {1, 0}, {0, 0}},
             .out_field_rotationWithoutUp = {{0, 0}, {0, 0}, {-1, 0}},
         },
     };
 
     for (const auto& p : inouts) {
         const auto rotation = rotationMatrix(p.in_forward, p.in_up);
-        const auto field = rotation * incidentElectricField;
+        const auto field    = rotation * incidentElectricField;
         CHECK_EQ(field, p.out_field);
 
-        const auto rotationWithoutUp = rotationMatrixWithBaseConvention(p.in_forward);
+        const auto rotationWithoutUp       = rotationMatrixWithBaseConvention(p.in_forward);
         const auto field_rotationWithoutUp = rotationWithoutUp * incidentElectricField;
         CHECK_EQ(field_rotationWithoutUp, p.out_field_rotationWithoutUp);
     }
@@ -927,38 +919,38 @@ TEST_F(TestSuite, testSnell) {
 
     const auto inouts = std::vector<InOutPair>{
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.0, 0),
+            .in_ior_i          = Complex(1.0, 0),
+            .in_ior_t          = Complex(1.0, 0),
             .in_incident_angle = Complex(0.5, 0.5),
             .out_refract_angle = Complex(0.5, 0.5),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.2, 0),
+            .in_ior_i          = Complex(1.0, 0),
+            .in_ior_t          = Complex(1.2, 0),
             .in_incident_angle = Complex(PI * 0.5, 0),
             .out_refract_angle = Complex(0.98511078333774571, 0),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(1.2, 0),
+            .in_ior_i          = Complex(1.0, 0),
+            .in_ior_t          = Complex(1.2, 0),
             .in_incident_angle = Complex(PI * 0.25, 0),
             .out_refract_angle = Complex(0.63013724606456445, 0),
         },
         {
-            .in_ior_i = Complex(1.2, 0),
-            .in_ior_t = Complex(1.0, 0),
+            .in_ior_i          = Complex(1.2, 0),
+            .in_ior_t          = Complex(1.0, 0),
             .in_incident_angle = Complex(0.63013724606456445, 0),
             .out_refract_angle = Complex(PI * 0.25, 0),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(0.05, 5.0),
+            .in_ior_i          = Complex(1.0, 0),
+            .in_ior_t          = Complex(0.05, 5.0),
             .in_incident_angle = Complex(PI * 0.25, 0),
             .out_refract_angle = Complex(0.0014001432455587293, -0.14094028035483516),
         },
         {
-            .in_ior_i = Complex(1.0, 0),
-            .in_ior_t = Complex(2.0, 0),
+            .in_ior_i          = Complex(1.0, 0),
+            .in_ior_t          = Complex(2.0, 0),
             .in_incident_angle = Complex(PI * 0.45, 0),
             .out_refract_angle = Complex(0.51650510236395286, 0),
         },
@@ -984,10 +976,10 @@ TEST_F(TestSuite, testFresnel) {
 
     std::vector<InOutPair> inouts = {
         {
-            .in_ior_i = Complex(0.91453807092958361, 0.035170965000031584),
-            .in_ior_t = Complex(1, 0),
+            .in_ior_i          = Complex(0.91453807092958361, 0.035170965000031584),
+            .in_ior_t          = Complex(1, 0),
             .in_incident_angle = acos(Complex(0.10897754475504851, 0.40807275584607544)),
-            .in_refract_angle = acos(Complex(0.17315572500228882, 0)),
+            .in_refract_angle  = acos(Complex(0.17315572500228882, 0)),
             .out_reflect_amplitude =
                 {
                     .s = Complex(0.57163467986230054, 0.62486367906829521),
@@ -995,10 +987,10 @@ TEST_F(TestSuite, testFresnel) {
                 },
         },
         {
-            .in_ior_i = Complex(0.91452118089946777, 0.035187568837614078),
-            .in_ior_t = Complex(1, 0),
+            .in_ior_i          = Complex(0.91452118089946777, 0.035187568837614078),
+            .in_ior_t          = Complex(1, 0),
             .in_incident_angle = acos(Complex(0.10906363669865969, 0.40789272144618016)),
-            .in_refract_angle = acos(Complex(0.1736481785774231, 0)),
+            .in_refract_angle  = acos(Complex(0.1736481785774231, 0)),
             .out_reflect_amplitude =
                 {
                     .s = Complex(0.56981824812215454, 0.62585833416785819),
@@ -1017,14 +1009,14 @@ TEST_F(TestSuite, testFresnel) {
 TEST_F(TestSuite, testPolarizationIntensity) {
     using namespace complex;
 
-    const auto iorI = Complex(1.0, 0);
-    const auto refractIor = Complex(1.5, 0);
+    const auto iorI        = Complex(1.0, 0);
+    const auto refractIor  = Complex(1.5, 0);
     const auto incidentVec = glm::dvec3(1, 0, 0);
-    const auto normalVec = glm::normalize(glm::dvec3(-1, 1, 0));
+    const auto normalVec   = glm::normalize(glm::dvec3(-1, 1, 0));
 
-    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto reflectVec    = glm::reflect(incidentVec, normalVec);
     const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
-    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
+    const auto refractAngle  = calcRefractAngle(incidentAngle, iorI, refractIor);
 
     const auto reflectAmplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
     const auto refractAmplitude = calcRefractAmplitude(incidentAngle, refractAngle, iorI, refractIor);
@@ -1038,7 +1030,7 @@ TEST_F(TestSuite, testPolarizationIntensity) {
 TEST_F(TestSuite, testPolarizingReflectionScenario) {
     using namespace complex;
 
-    const auto incidentVec = glm::normalize(glm::dvec3(-0.195, -0.195, 0.961));
+    const auto incidentVec  = glm::normalize(glm::dvec3(-0.195, -0.195, 0.961));
     const auto normal_vec_0 = glm::normalize(glm::dvec3(0, -1, -1));
 
     const auto reflect_vec_0 = glm::reflect(incidentVec, -normal_vec_0);
@@ -1068,7 +1060,7 @@ TEST_F(TestSuite, testPolarizingReflectionScenario) {
              }),
              1e-3);
 
-    const auto normal_vec_1 = glm::normalize(glm::dvec3(1, 1, 0));
+    const auto normal_vec_1  = glm::normalize(glm::dvec3(1, 1, 0));
     const auto reflect_vec_1 = glm::reflect(reflect_vec_0, -normal_vec_1);
     CHECK_EQ(reflect_vec_1, glm::normalize(glm::dvec3(0.961, 0.195, 0.195)));
 
@@ -1108,33 +1100,33 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
 
     const auto ior_pairs = std::vector<IorPair>{
         {
-            .iorI = {1.0, 0},
+            .iorI       = {1.0, 0},
             .refractIor = {1.5, 0},
         },
         {
-            .iorI = {1.5, 0},
+            .iorI       = {1.5, 0},
             .refractIor = {1.0, 0},
         },
         {
-            .iorI = {1.0, 0},
+            .iorI       = {1.0, 0},
             .refractIor = {0.05, 5.0},
         },
     };
 
     for (const auto ior_pair : ior_pairs) {
-        const auto iorI = ior_pair.iorI;
-        const auto refractIor = ior_pair.refractIor;
+        const auto iorI        = ior_pair.iorI;
+        const auto refractIor  = ior_pair.refractIor;
         const auto incidentVec = glm::dvec3(1, 0, 0);
-        const auto normalVec = glm::normalize(glm::dvec3(-1, 1, 0));
+        const auto normalVec   = glm::normalize(glm::dvec3(-1, 1, 0));
 
-        const auto reflectVec = glm::reflect(incidentVec, normalVec);
+        const auto reflectVec    = glm::reflect(incidentVec, normalVec);
         const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
-        const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
+        const auto refractAngle  = calcRefractAngle(incidentAngle, iorI, refractIor);
 
         const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
-        const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
+        const auto reflectElectricField  = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
 
-        const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+        const auto amplitude              = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
         const auto expected_reflect_field = ElectricField(
             // p polarized part
             // the value from the y component of the incident field is now carried in the x compnent, due to a 90 degrees reflection
@@ -1156,22 +1148,22 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
 TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
     using namespace complex;
 
-    const auto iorI = Complex(1.0, 0);
-    const auto refractIor = Complex(2.0, 0);
+    const auto iorI        = Complex(1.0, 0);
+    const auto refractIor  = Complex(2.0, 0);
     const auto incidentVec = glm::dvec3(1, 0, 0);
-    const auto normalVec = glm::normalize(glm::dvec3(-1, refractIor.real(), 0));
+    const auto normalVec   = glm::normalize(glm::dvec3(-1, refractIor.real(), 0));
 
-    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto reflectVec    = glm::reflect(incidentVec, normalVec);
     const auto incidentAngle = angleBetweenUnitVectors(incidentVec, -normalVec);
-    const auto refractAngle = calcRefractAngle(incidentAngle, iorI, refractIor);
+    const auto refractAngle  = calcRefractAngle(incidentAngle, iorI, refractIor);
 
     const auto brewstersAngle = calcBrewstersAngle(iorI, refractIor);
     CHECK_EQ(incidentAngle, brewstersAngle.real());
 
     const auto incidentElectricField = ElectricField({0, 0}, {1, 0}, {1, 0});
-    const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
+    const auto reflectElectricField  = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
 
-    const auto amplitude = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
+    const auto amplitude                    = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
     const auto expectedReflectElectricField = ElectricField(
         // p polarized part is lost due to a fully polarizing reflection at brewsters angle
         {0, 0},
@@ -1188,11 +1180,11 @@ TEST_F(TestSuite, testInterceptReflectFullyPolarizing) {
 TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
     using namespace complex;
 
-    const auto iorI = Complex(1.0, 0);
-    const auto refractIor = Complex(1.5, 0);
-    const auto incidentVec = glm::normalize(glm::dvec3(1, 1, 0));
-    const auto normalVec = -incidentVec;
-    const auto reflectVec = glm::reflect(incidentVec, normalVec);
+    const auto iorI                  = Complex(1.0, 0);
+    const auto refractIor            = Complex(1.5, 0);
+    const auto incidentVec           = glm::normalize(glm::dvec3(1, 1, 0));
+    const auto normalVec             = -incidentVec;
+    const auto reflectVec            = glm::reflect(incidentVec, normalVec);
     const auto incidentElectricField = ElectricField({0, 0}, {0, 0}, {1, 0});
 
     const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
@@ -1203,8 +1195,8 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
 
     // check if normal-incidence and near-normal-incidence are similar to each other
     {
-        const auto eps = 1e-3;
-        const auto normalVec = glm::normalize(-incidentVec + eps);
+        const auto eps        = 1e-3;
+        const auto normalVec  = glm::normalize(-incidentVec + eps);
         const auto reflectVec = glm::reflect(incidentVec, normalVec);
 
         const auto reflectElectricField = interceptReflect(incidentElectricField, incidentVec, reflectVec, normalVec, iorI, refractIor);
@@ -1215,10 +1207,10 @@ TEST_F(TestSuite, testInterceptReflectNonPolarizing) {
 
 // both the Cpp code as well as the shader define energyToWaveLength.
 TEST_F(TestSuite, testHvlam) {
-    double hv = 100;
+    double hv          = 100;
     double linedensity = 1000;
     double orderOfDiff = 1;
-    double a = abs(energyToWaveLength(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
+    double a           = abs(energyToWaveLength(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
     CHECK_EQ(a, 0.012398419843320024);
 
     a = abs(energyToWaveLength(hv)) * abs(linedensity) * orderOfDiff * 1e-06;
@@ -1392,54 +1384,54 @@ TEST_F(TestSuite, testComputeEta) {
         complex::Complex expected;
     };
 
-    std::vector<TestCase> testCases = {{.theta = 0.1990,
-                                        .bragg = 0.1990,
-                                        .asymmetry = -1.0,
-                                        .structureFactorReFH = 43.8496,
-                                        .structureFactorImFH = -42.1192,
+    std::vector<TestCase> testCases = {{.theta                = 0.1990,
+                                        .bragg                = 0.1990,
+                                        .asymmetry            = -1.0,
+                                        .structureFactorReFH  = 43.8496,
+                                        .structureFactorImFH  = -42.1192,
                                         .structureFactorReFHC = 42.1193,
                                         .structureFactorImFHC = 43.8496,
-                                        .structureFactorReF0 = 113.6808,
-                                        .structureFactorImF0 = 1.7304,
-                                        .polFactor = 1.0,
-                                        .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(1.8698989229058245, -0.0091710480362834079)},
-                                       {.theta = 0.1995,
-                                        .bragg = 0.1990,
-                                        .asymmetry = -1.0,
-                                        .structureFactorReFH = 43.8496,
-                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReF0  = 113.6808,
+                                        .structureFactorImF0  = 1.7304,
+                                        .polFactor            = 1.0,
+                                        .gamma                = 8.6076025188876205e-08,
+                                        .expected             = complex::Complex(1.8698989229058245, -0.0091710480362834079)},
+                                       {.theta                = 0.1995,
+                                        .bragg                = 0.1990,
+                                        .asymmetry            = -1.0,
+                                        .structureFactorReFH  = 43.8496,
+                                        .structureFactorImFH  = -42.1192,
                                         .structureFactorReFHC = 42.1193,
                                         .structureFactorImFHC = 43.8496,
-                                        .structureFactorReF0 = 113.6808,
-                                        .structureFactorImF0 = 1.7304,
-                                        .polFactor = 1.0,
-                                        .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(-35.238613144067784, 0.73773569616427415)},
-                                       {.theta = 0.1990,
-                                        .bragg = 0.1990,
-                                        .asymmetry = 0.8,
-                                        .structureFactorReFH = 43.8496,
-                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReF0  = 113.6808,
+                                        .structureFactorImF0  = 1.7304,
+                                        .polFactor            = 1.0,
+                                        .gamma                = 8.6076025188876205e-08,
+                                        .expected             = complex::Complex(-35.238613144067784, 0.73773569616427415)},
+                                       {.theta                = 0.1990,
+                                        .bragg                = 0.1990,
+                                        .asymmetry            = 0.8,
+                                        .structureFactorReFH  = 43.8496,
+                                        .structureFactorImFH  = -42.1192,
                                         .structureFactorReFHC = 42.1193,
                                         .structureFactorImFHC = 43.8496,
-                                        .structureFactorReF0 = 113.6808,
-                                        .structureFactorImF0 = 1.7304,
-                                        .polFactor = 1.0,
-                                        .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(0.20906105513355305, -0.0010253543417022822)},
-                                       {.theta = 0.1990,
-                                        .bragg = 0.1990,
-                                        .asymmetry = -1.0,
-                                        .structureFactorReFH = 43.8496,
-                                        .structureFactorImFH = -42.1192,
+                                        .structureFactorReF0  = 113.6808,
+                                        .structureFactorImF0  = 1.7304,
+                                        .polFactor            = 1.0,
+                                        .gamma                = 8.6076025188876205e-08,
+                                        .expected             = complex::Complex(0.20906105513355305, -0.0010253543417022822)},
+                                       {.theta                = 0.1990,
+                                        .bragg                = 0.1990,
+                                        .asymmetry            = -1.0,
+                                        .structureFactorReFH  = 43.8496,
+                                        .structureFactorImFH  = -42.1192,
                                         .structureFactorReFHC = 42.1193,
                                         .structureFactorImFHC = 43.8496,
-                                        .structureFactorReF0 = 113.6808,
-                                        .structureFactorImF0 = 1.7304,
-                                        .polFactor = cos(2 * 0.1990),
-                                        .gamma = 8.6076025188876205e-08,
-                                        .expected = complex::Complex(2.0284463725210271, -0.0099486549211473489)}};
+                                        .structureFactorReF0  = 113.6808,
+                                        .structureFactorImF0  = 1.7304,
+                                        .polFactor            = cos(2 * 0.1990),
+                                        .gamma                = 8.6076025188876205e-08,
+                                        .expected             = complex::Complex(2.0284463725210271, -0.0099486549211473489)}};
 
     for (const auto& tc : testCases) {
         complex::Complex eta = computeEta(tc.theta, tc.bragg, tc.asymmetry, tc.structureFactorReFH, tc.structureFactorImFH, tc.structureFactorReFHC,

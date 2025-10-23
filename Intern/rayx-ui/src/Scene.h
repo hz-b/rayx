@@ -5,10 +5,10 @@
 #include <vector>
 
 #include "Beamline/Beamline.h"
+#include "BundleHistory.h"
 #include "RenderObject.h"
 #include "Tracer/DeviceTracer.h"
 #include "UserInterface/Settings.h"
-#include "BundleHistory.h"
 
 class Scene {
   public:
@@ -40,7 +40,7 @@ class Scene {
     Device& m_Device;
 
     std::vector<RenderObject> m_ElementRObjects = {};
-    std::vector<RenderObject> m_RayRObjects = {};
-    BundleHistory m_rayCache = {};
+    std::vector<RenderObject> m_RayRObjects     = {};
+    BundleHistory m_rayCache                    = {};
     mutable std::vector<Texture::TextureInput> m_textureInputCache;  ///< Texture cache
 };

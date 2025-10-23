@@ -2,9 +2,9 @@
 
 #include <vector>
 
+#include "BundleHistory.h"
 #include "Element/Element.h"
 #include "RenderObject.h"
-#include "BundleHistory.h"
 
 /**
  * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.

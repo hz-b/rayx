@@ -37,9 +37,7 @@ RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings)
 
     auto attr = RayAttrMask::None;
 
-    for (const auto& str : strings) {
-        attr |= stringToAttr(str);
-    }
+    for (const auto& str : strings) { attr |= stringToAttr(str); }
 
     return attr;
 }

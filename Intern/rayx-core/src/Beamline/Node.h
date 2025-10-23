@@ -75,7 +75,7 @@ class RAYX_API BeamlineNode {
      */
     glm::dmat4 getWorldOrientation() const;
 
-    virtual std::string getName() const = 0;
+    virtual std::string getName() const    = 0;
     virtual void setName(std::string name) = 0;
 
     bool hasParent() const { return m_parent != nullptr; }

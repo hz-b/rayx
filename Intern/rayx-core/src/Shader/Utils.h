@@ -21,15 +21,15 @@ RAYX_FN_ACC inline double waveLengthToEnergy(const double waveLength) { return I
 
 RAYX_FN_ACC
 inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& __restrict rayPosition, glm::dvec3& __restrict rayDirection) {
-    rayPosition = glm::dvec3(m * glm::dvec4(rayPosition, 1));
+    rayPosition  = glm::dvec3(m * glm::dvec4(rayPosition, 1));
     rayDirection = glm::dvec3(m * glm::dvec4(rayDirection, 0));
 }
 
 RAYX_FN_ACC
 inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& __restrict rayPosition, glm::dvec3& __restrict rayDirection,
                                    ElectricField& __restrict rayElectricField) {
-    rayPosition = glm::dvec3(m * glm::dvec4(rayPosition, 1));
-    rayDirection = glm::dvec3(m * glm::dvec4(rayDirection, 0));
+    rayPosition      = glm::dvec3(m * glm::dvec4(rayPosition, 1));
+    rayDirection     = glm::dvec3(m * glm::dvec4(rayDirection, 0));
     rayElectricField = glm::dmat3(m) * rayElectricField;
 }
 

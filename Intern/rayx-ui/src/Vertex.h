@@ -41,8 +41,8 @@ struct TextureVertex {
      */
     static std::vector<VkVertexInputBindingDescription> getBindingDescriptions() {
         std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
-        bindingDescriptions[0].binding = 0;
-        bindingDescriptions[0].stride = sizeof(TextureVertex);
+        bindingDescriptions[0].binding   = 0;
+        bindingDescriptions[0].stride    = sizeof(TextureVertex);
         bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
         return bindingDescriptions;
     }
@@ -93,8 +93,8 @@ struct ColorVertex {
      */
     static std::vector<VkVertexInputBindingDescription> getBindingDescriptions() {
         std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
-        bindingDescriptions[0].binding = 0;
-        bindingDescriptions[0].stride = sizeof(ColorVertex);
+        bindingDescriptions[0].binding   = 0;
+        bindingDescriptions[0].stride    = sizeof(ColorVertex);
         bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
         return bindingDescriptions;
     }

@@ -7,8 +7,8 @@
 #include "Device.h"
 
 struct PipelineConfigInfo {
-    PipelineConfigInfo() = default;
-    PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+    PipelineConfigInfo()                                     = default;
+    PipelineConfigInfo(const PipelineConfigInfo&)            = delete;
     PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
     std::vector<VkVertexInputBindingDescription> bindingDescriptions{};      // Not set in default config
@@ -23,11 +23,11 @@ struct PipelineConfigInfo {
     std::vector<VkDynamicState> dynamicStateEnables;
     VkPipelineDynamicStateCreateInfo dynamicStateInfo;
 
-    VkPipelineLayout pipelineLayout = nullptr;                      // Not set in default config
-    VkRenderPass renderPass = nullptr;                              // Not set in default config
-    VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;  // Not set in default config
-    VkPolygonMode polygonMode = VK_POLYGON_MODE_MAX_ENUM;           // Not set in default config
-    uint32_t subpass = 0;                                           // Not set in default config
+    VkPipelineLayout pipelineLayout = nullptr;                         // Not set in default config
+    VkRenderPass renderPass         = nullptr;                         // Not set in default config
+    VkPrimitiveTopology topology    = VK_PRIMITIVE_TOPOLOGY_MAX_ENUM;  // Not set in default config
+    VkPolygonMode polygonMode       = VK_POLYGON_MODE_MAX_ENUM;        // Not set in default config
+    uint32_t subpass                = 0;                               // Not set in default config
 };
 
 /**
@@ -40,7 +40,7 @@ class GraphicsPipeline {
     GraphicsPipeline(Device& device, const std::string& vertFilepath, const std::string& fragFilepath, const PipelineConfigInfo& createInfo);
     ~GraphicsPipeline();
 
-    GraphicsPipeline(const GraphicsPipeline&) = delete;
+    GraphicsPipeline(const GraphicsPipeline&)            = delete;
     GraphicsPipeline& operator=(const GraphicsPipeline&) = delete;
 
     void bind(VkCommandBuffer commandBuffer);

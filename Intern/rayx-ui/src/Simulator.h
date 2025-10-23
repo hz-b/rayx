@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Beamline/Beamline.h"
+#include "BundleHistory.h"
 #include "Tracer/Tracer.h"
 #include "UserInterface/Settings.h"
-#include "BundleHistory.h"
 
 class Simulator {
   public:

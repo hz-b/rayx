@@ -53,23 +53,23 @@ double getSourceHeight(const double electronSigmaY, const double undulatorSigma)
 }  // unnamed namespace
 
 SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : LightSourceBase(dSource) {
-    const auto sigmaType = dSource.getSigmaType();
+    const auto sigmaType       = dSource.getSigmaType();
     const auto undulatorLength = dSource.getUndulatorLength();
     // const auto photonEnergy = dSource.getEnergy();
     const auto photonWaveLength = energyToWaveLength(m_photonEnergy);
-    const auto electronSigmaX = dSource.getElectronSigmaX();
-    const auto electronSigmaXs = dSource.getElectronSigmaXs();
-    const auto electronSigmaY = dSource.getElectronSigmaY();
-    const auto electronSigmaYs = dSource.getElectronSigmaYs();
-    const auto undulatorSigma = calcUndulatorSigma(sigmaType, photonWaveLength, undulatorLength);
-    const auto undulatorSigmaS = calcUndulatorSigmaS(sigmaType, photonWaveLength, undulatorLength);
+    const auto electronSigmaX   = dSource.getElectronSigmaX();
+    const auto electronSigmaXs  = dSource.getElectronSigmaXs();
+    const auto electronSigmaY   = dSource.getElectronSigmaY();
+    const auto electronSigmaYs  = dSource.getElectronSigmaYs();
+    const auto undulatorSigma   = calcUndulatorSigma(sigmaType, photonWaveLength, undulatorLength);
+    const auto undulatorSigmaS  = calcUndulatorSigmaS(sigmaType, photonWaveLength, undulatorLength);
 
-    m_sourceDepth = dSource.getSourceDepth();
-    m_pol = dSource.getStokes();
+    m_sourceDepth   = dSource.getSourceDepth();
+    m_pol           = dSource.getStokes();
     m_horDivergence = getHorDivergence(electronSigmaXs, undulatorSigmaS);
     m_verDivergence = getVerDivergence(electronSigmaYs, undulatorSigmaS);
-    m_sourceWidth = getSourceWidth(electronSigmaX, undulatorSigma);
-    m_sourceHeight = getSourceHeight(electronSigmaY, undulatorSigma);
+    m_sourceWidth   = getSourceWidth(electronSigmaX, undulatorSigma);
+    m_sourceHeight  = getSourceHeight(electronSigmaY, undulatorSigma);
 }
 
 /**
@@ -90,10 +90,10 @@ detail::Ray SimpleUndulatorSource::genRay(const int rayPathIndex, const int sour
                                           const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
-    auto x = getCoord(m_sourceWidth, rand);
-    auto y = getCoord(m_sourceHeight, rand);
-    auto z = (rand.randomDouble() - 0.5) * m_sourceDepth;
-    const auto en = selectEnergy(energyDistribution, rand);
+    auto x              = getCoord(m_sourceWidth, rand);
+    auto y              = getCoord(m_sourceHeight, rand);
+    auto z              = (rand.randomDouble() - 0.5) * m_sourceDepth;
+    const auto en       = selectEnergy(energyDistribution, rand);
     glm::dvec3 position = glm::dvec3(x, y, z);
 
     const auto phi = getCoord(m_horDivergence, rand);
@@ -105,18 +105,18 @@ detail::Ray SimpleUndulatorSource::genRay(const int rayPathIndex, const int sour
     const auto electricField = stokesToElectricField(m_pol, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
 
     return detail::Ray{
-        .position = position,
-        .direction = direction,
-        .energy = en,
+        .position            = position,
+        .direction           = direction,
+        .energy              = en,
         .optical_path_length = 0.0,
-        .electric_field = electricField,
-        .rand = std::move(rand),
-        .path_id = rayPathIndex,
-        .path_event_id = -1,
-        .order = 0,
-        .object_id = sourceId,
-        .source_id = sourceId,
-        .event_type = EventType::Emitted,
+        .electric_field      = electricField,
+        .rand                = std::move(rand),
+        .path_id             = rayPathIndex,
+        .path_event_id       = -1,
+        .order               = 0,
+        .object_id           = sourceId,
+        .source_id           = sourceId,
+        .event_type          = EventType::Emitted,
     };
 }
 

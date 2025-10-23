@@ -34,7 +34,7 @@ glm::dmat4 calcTransformationMatrices(glm::dvec4 position, glm::dmat4 orientatio
         return glm::transpose(g2e);
     } else {
         glm::dmat4x4 inv_translation = glm::dmat4x4(1, 0, 0, position[0], 0, 1, 0, position[1], 0, 0, 1, position[2], 0, 0, 0, 1);  // o
-        glm::dmat4x4 inv_rotation = glm::transpose(rotation);
+        glm::dmat4x4 inv_rotation    = glm::transpose(rotation);
         // inverse of m_inMatrix
         glm::dmat4x4 e2g = inv_rotation * inv_translation;
         if (plane == DesignPlane::XY) e2g = yz_swap * e2g;
@@ -54,30 +54,28 @@ inline int defaultMaterial(const DesignElement& dele) { return static_cast<int>(
 
 OpticalElementAndTransform makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane,
                                        std::optional<Cutout> cutout) {
-    if (!cutout) {
-        cutout = dele.getCutout();
-    }
+    if (!cutout) { cutout = dele.getCutout(); }
 
-    auto inMat = defaultInMatrix(dele, plane);
+    auto inMat  = defaultInMatrix(dele, plane);
     auto outMat = defaultOutMatrix(dele, plane);
 
     const auto element = OpticalElement{
-        .m_behaviour = behaviour,
-        .m_surface = surface,
-        .m_cutout = *cutout,
-        .m_coating = dele.getCoating(),
-        .m_slopeError = dele.getSlopeError(),
+        .m_behaviour      = behaviour,
+        .m_surface        = surface,
+        .m_cutout         = *cutout,
+        .m_coating        = dele.getCoating(),
+        .m_slopeError     = dele.getSlopeError(),
         .m_azimuthalAngle = dele.getAzimuthalAngle().rad,
-        .m_material = defaultMaterial(dele),
+        .m_material       = defaultMaterial(dele),
     };
 
     const auto transform = ObjectTransform{
-        .m_inTrans = inMat,
+        .m_inTrans  = inMat,
         .m_outTrans = outMat,
     };
 
     return OpticalElementAndTransform{
-        .element = element,
+        .element   = element,
         .transform = transform,
     };
 }

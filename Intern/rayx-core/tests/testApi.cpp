@@ -77,7 +77,7 @@ TEST_F(TestSuite, testObjectRecordMask) {
     // test record no objects
     {
         const auto objectRecordMask = ObjectMask::none();
-        const auto rays = tracer->trace(beamline, Sequential::No, objectRecordMask);
+        const auto rays             = tracer->trace(beamline, Sequential::No, objectRecordMask);
 
         auto objectIds = std::vector<int>(beamline.numObjects());
         std::iota(objectIds.begin(), objectIds.end(), 0);
@@ -87,7 +87,7 @@ TEST_F(TestSuite, testObjectRecordMask) {
     // test record all objects
     {
         const auto objectRecordMask = ObjectMask::all();
-        const auto rays = tracer->trace(beamline, Sequential::No, objectRecordMask);
+        const auto rays             = tracer->trace(beamline, Sequential::No, objectRecordMask);
 
         auto objectIds = std::vector<int>(beamline.numObjects());
         std::iota(objectIds.begin(), objectIds.end(), 0);
@@ -97,7 +97,7 @@ TEST_F(TestSuite, testObjectRecordMask) {
     // test record sources only
     {
         const auto objectRecordMask = ObjectMask::allSources();
-        const auto rays = tracer->trace(beamline, Sequential::No, objectRecordMask);
+        const auto rays             = tracer->trace(beamline, Sequential::No, objectRecordMask);
 
         auto sourceIds = std::vector<int>(beamline.numSources());
         std::iota(sourceIds.begin(), sourceIds.end(), 0);
@@ -111,7 +111,7 @@ TEST_F(TestSuite, testObjectRecordMask) {
     // test record elements only
     {
         const auto objectRecordMask = ObjectMask::allElements();
-        const auto rays = tracer->trace(beamline, Sequential::No, objectRecordMask);
+        const auto rays             = tracer->trace(beamline, Sequential::No, objectRecordMask);
 
         auto sourceIds = std::vector<int>(beamline.numSources());
         std::iota(sourceIds.begin(), sourceIds.end(), 0);
@@ -125,12 +125,12 @@ TEST_F(TestSuite, testObjectRecordMask) {
     // test record objects determined by index
     {
         const auto numObjects = beamline.numObjects();
-        auto objectIds = std::vector<int>();
+        auto objectIds        = std::vector<int>();
         objectIds.push_back(std::rand() % numObjects);
         objectIds.push_back(std::rand() % numObjects);
         objectIds.push_back(std::rand() % numObjects);
         auto objectRecordMask = ObjectMask::byIndices(objectIds);
-        const auto rays = tracer->trace(beamline, Sequential::No, objectRecordMask);
+        const auto rays       = tracer->trace(beamline, Sequential::No, objectRecordMask);
 
         expectAtLeastOnce(rays.object_id, objectIds);
 
@@ -145,8 +145,8 @@ TEST_F(TestSuite, testObjectRecordMask) {
 #ifndef NO_H5
 TEST_F(TestSuite, testH5) {
     const auto [beamline, raysOriginal] = loadBeamlineAndTrace(beamlineFilename);
-    const auto objectNamesOriginal = beamline.getObjectNames();
-    const auto h5Filepath = getBeamlineFilepath(beamlineFilename).replace_extension("testH5.h5");
+    const auto objectNamesOriginal      = beamline.getObjectNames();
+    const auto h5Filepath               = getBeamlineFilepath(beamlineFilename).replace_extension("testH5.h5");
 
     // full write and read
     {
@@ -161,7 +161,7 @@ TEST_F(TestSuite, testH5) {
     {
         const auto attrMask = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
         writeH5(h5Filepath, objectNamesOriginal, raysOriginal, attrMask);
-        const auto rays = readH5Rays(h5Filepath, attrMask);
+        const auto rays                = readH5Rays(h5Filepath, attrMask);
         const auto partialRaysOriginal = std::move(raysOriginal.copy().filterByAttrMask(attrMask));
         CHECK_EQ(rays, partialRaysOriginal);
     }
@@ -170,7 +170,7 @@ TEST_F(TestSuite, testH5) {
 
 TEST_F(TestSuite, testCsv) {
     const auto raysOriginal = traceRml(beamlineFilename);
-    const auto csvFilepath = getBeamlineFilepath(beamlineFilename).replace_extension("testCsv.csv");
+    const auto csvFilepath  = getBeamlineFilepath(beamlineFilename).replace_extension("testCsv.csv");
 
     // full write and read
     {
@@ -181,7 +181,7 @@ TEST_F(TestSuite, testCsv) {
 
     // partial write and read
     {
-        const auto attrMask = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
+        const auto attrMask            = RayAttrMask::Position | RayAttrMask::ObjectId;  // just an example
         const auto partialRaysOriginal = std::move(raysOriginal.copy().filterByAttrMask(attrMask));
         writeCsv(csvFilepath, partialRaysOriginal);
         const auto rays = readCsv(csvFilepath);

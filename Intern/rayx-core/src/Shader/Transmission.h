@@ -23,7 +23,7 @@ inline ComplexFresnelCoeffs computeTransmittance(double wavelength, complex::Com
     using complex::Complex;
 
     complex::Complex sinTheta1 = (indexVacuum / indexMaterial) * complex::sin(theta0);
-    complex::Complex theta1 = complex::asin(sinTheta1);
+    complex::Complex theta1    = complex::asin(sinTheta1);
 
     complex::Complex theta2 = theta0;  // Austritt in Vakuum, Winkel gleich theta0
 
@@ -58,14 +58,14 @@ inline ComplexFresnelCoeffs computeTransmittance(double wavelength, complex::Com
     complex::Complex phase = complex::exp(complex::Complex(0, 1) * delta);
 
     // Gesamte Transmission s
-    complex::Complex numeratorS = t01s * t12s * phase;
+    complex::Complex numeratorS   = t01s * t12s * phase;
     complex::Complex denominatorS = 1.0 + r01s * r12s * phase * phase;
-    complex::Complex ts_total = numeratorS / denominatorS;
+    complex::Complex ts_total     = numeratorS / denominatorS;
 
     // Gesamte Transmission p
-    complex::Complex numeratorP = t01p * t12p * phase;
+    complex::Complex numeratorP   = t01p * t12p * phase;
     complex::Complex denominatorP = 1.0 + r01p * r12p * phase * phase;
-    complex::Complex tp_total = numeratorP / denominatorP;
+    complex::Complex tp_total     = numeratorP / denominatorP;
 
     return {.s = ts_total, .p = tp_total};
 }

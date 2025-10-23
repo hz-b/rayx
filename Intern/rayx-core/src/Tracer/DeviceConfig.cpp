@@ -11,9 +11,9 @@
 namespace {
 
 using DeviceType = RAYX::DeviceConfig::DeviceType;
-using Device = RAYX::DeviceConfig::Device;
-using Index = Device::Index;
-using Score = Device::Score;
+using Device     = RAYX::DeviceConfig::Device;
+using Index      = Device::Index;
+using Score      = Device::Score;
 
 template <typename Platform>
 DeviceType platformToDeviceType();
@@ -41,25 +41,25 @@ template <typename AccTag>
 std::vector<Device> getAvailableDevicesProps() {
     std::vector<Device> devices;
 
-    using Dim = alpaka::DimInt<1>;
-    using Idx = int32_t;
-    using Acc = alpaka::TagToAcc<AccTag, Dim, Idx>;
+    using Dim      = alpaka::DimInt<1>;
+    using Idx      = int32_t;
+    using Acc      = alpaka::TagToAcc<AccTag, Dim, Idx>;
     using Platform = alpaka::Platform<Acc>;
 
-    const auto platform = Platform{};
+    const auto platform   = Platform{};
     const auto numDevices = alpaka::getDevCount(platform);
 
     for (size_t i = 0; i < numDevices; ++i) {
-        const auto dev = alpaka::getDevByIdx(platform, i);
+        const auto dev   = alpaka::getDevByIdx(platform, i);
         const auto props = alpaka::getAccDevProps<Acc>(dev);
         const auto index = static_cast<Index>(i);
         const auto score = static_cast<Score>(props.m_multiProcessorCount);
 
         const auto device = Device{
-            .type = platformToDeviceType<Platform>(),
-            .name = alpaka::getName(dev),
-            .index = index,
-            .score = score,
+            .type   = platformToDeviceType<Platform>(),
+            .name   = alpaka::getName(dev),
+            .index  = index,
+            .score  = score,
             .enable = false,
         };
 
@@ -176,9 +176,7 @@ DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
     // Manually filter devices by type
     std::vector<Device*> filteredDevices;
     for (auto& device : devices) {
-        if (device.type & deviceType) {
-            filteredDevices.push_back(&device);
-        }
+        if (device.type & deviceType) { filteredDevices.push_back(&device); }
     }
 
     // Use std::max_element on the filtered devices

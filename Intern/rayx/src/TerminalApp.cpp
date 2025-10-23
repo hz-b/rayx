@@ -57,9 +57,9 @@ void dumpBeamline(const fs::path& filepath) {
 void scanGroup(const HighFive::Group& group, const int depth = 0, const std::string& path = "/") {
     size_t num_objs = group.getNumberObjects();
     for (size_t i = 0; i < num_objs; ++i) {
-        std::string obj_name = group.getObjectName(i);
+        std::string obj_name  = group.getObjectName(i);
         std::string full_path = path == "/" ? "/" + obj_name : path + "/" + obj_name;
-        auto obj_type = group.getObjectType(obj_name);
+        auto obj_type         = group.getObjectType(obj_name);
 
         auto indent = [depth]() {
             for (int i = 0; i < depth; ++i) std::cout << "\t";
@@ -91,9 +91,7 @@ void dumpH5File(const fs::path& filepath) {
         auto file = HighFive::File(filepath.string(), HighFive::File::ReadOnly);
         std::cout << "\tfilesize: " << file.getFileSize() << std::endl;
         scanGroup(file.getGroup("/"), 1);
-    } catch (const std::exception& e) {
-        RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what();
-    }
+    } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to read h5 file: " << e.what(); }
 }
 #endif
 
@@ -128,16 +126,12 @@ TerminalApp::TerminalApp(int argc, char** argv) {
 TerminalApp::~TerminalApp() { RAYX_VERB << "TerminalApp deleted!"; }
 
 int TerminalApp::tracePath(const fs::path& path) {
-    if (!fs::exists(path)) {
-        RAYX_EXIT << "Trying to access file or directory " << path << " but it was not found!";
-    }
+    if (!fs::exists(path)) { RAYX_EXIT << "Trying to access file or directory " << path << " but it was not found!"; }
 
     auto rmlCounter = 0;
 
     if (fs::is_directory(path)) {
-        for (const auto& p : fs::directory_iterator(path)) {
-            rmlCounter += tracePath(p.path());
-        }
+        for (const auto& p : fs::directory_iterator(path)) { rmlCounter += tracePath(p.path()); }
     } else if (path.extension() == ".rml") {
         traceRmlAndExportRays(path);
         rmlCounter += 1;
@@ -161,17 +155,17 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
 
     const auto rays = traceBeamline(beamline, attrRecordMask);
 
-    const auto objectNames = beamline.getObjectNames();
+    const auto objectNames    = beamline.getObjectNames();
     const auto outputFilepath = exportRays(inputFilepath, objectNames, rays, attrRecordMask);
 
     // print elapsed time and output filepath
 
     using namespace std::chrono_literals;
-    const auto end_time = steady_clock::now();
+    const auto end_time     = steady_clock::now();
     const auto elapsed_time = duration_cast<milliseconds>(end_time - start_time);
-    const auto mins = duration_cast<minutes>(elapsed_time);
-    const auto secs = duration_cast<seconds>(elapsed_time % 1min);
-    const auto millis = duration_cast<milliseconds>(elapsed_time % 1s);
+    const auto mins         = duration_cast<minutes>(elapsed_time);
+    const auto secs         = duration_cast<seconds>(elapsed_time % 1min);
+    const auto millis       = duration_cast<milliseconds>(elapsed_time % 1s);
 
     std::cout << "Finished in ";
     if (mins > 0min) std::cout << mins.count() << "m ";
@@ -207,11 +201,9 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // dump beamline objects
-    if (RAYX::getDebugVerbose()) {
-        dumpBeamlineObjects(&beamline);
-    }
+    if (RAYX::getDebugVerbose()) { dumpBeamlineObjects(&beamline); }
 
-    const size_t numSources = beamline.numSources();
+    const size_t numSources  = beamline.numSources();
     const size_t numElements = beamline.numElements();
 
     // record mask for elements. determine which elements should be recorded
@@ -219,9 +211,7 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
                                 ? RAYX::ObjectIndexMask::all(numSources, numElements)
                                 : RAYX::ObjectIndexMask::byIndices(numSources, numElements, m_cliArgs.objectRecordIndices);
 
-    if (m_cliArgs.objectRecordIndices.empty()) {
-        RAYX_VERB << "Record indices is empty. Defaulting to recording all elements";
-    }
+    if (m_cliArgs.objectRecordIndices.empty()) { RAYX_VERB << "Record indices is empty. Defaulting to recording all elements"; }
 
     if (RAYX::getDebugVerbose()) {
         const auto objectNames = beamline.getObjectNames();
@@ -300,9 +290,7 @@ void TerminalApp::run() {
         return;
     }
 
-    if (m_cliArgs.verbose) {
-        RAYX::setDebugVerbose(true);
-    }
+    if (m_cliArgs.verbose) { RAYX::setDebugVerbose(true); }
 
     if (m_cliArgs.defaultSeed) {
         RAYX::fixSeed(RAYX::FIXED_SEED);

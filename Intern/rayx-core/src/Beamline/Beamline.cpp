@@ -23,21 +23,17 @@ Group::Group(std::string name) : m_name(std::move(name)) {}
 // Move constructor
 Group::Group(Group&& other) noexcept
     : m_position(std::move(other.m_position)), m_orientation(std::move(other.m_orientation)), m_children(std::move(other.m_children)) {
-    for (auto& child : m_children) {
-        child->m_parent = this;
-    }
+    for (auto& child : m_children) { child->m_parent = this; }
 }
 
 // Move assignment operator
 Group& Group::operator=(Group&& other) noexcept {
     if (this != &other) {
-        m_position = std::move(other.m_position);
+        m_position    = std::move(other.m_position);
         m_orientation = std::move(other.m_orientation);
-        m_children = std::move(other.m_children);
+        m_children    = std::move(other.m_children);
 
-        for (auto& child : m_children) {
-            child->m_parent = this;
-        }
+        for (auto& child : m_children) { child->m_parent = this; }
     }
     return *this;
 }
@@ -204,9 +200,7 @@ void Group::ctraverse(const std::function<bool(const BeamlineNode&)>& callback) 
 
     for (const auto& child : m_children) {
         if (!child) RAYX_EXIT << "m_children contains a nullptr! This should never happen.";
-        if (callback(*child)) {
-            return;
-        }
+        if (callback(*child)) { return; }
         if (child->isGroup()) {
             auto groupPtr = static_cast<Group*>(child.get());
             groupPtr->ctraverse(callback);
@@ -219,9 +213,7 @@ void Group::traverse(const std::function<bool(BeamlineNode&)>& callback) {
 
     for (auto& child : m_children) {
         if (!child) RAYX_EXIT << "m_children contains a nullptr! This should never happen.";
-        if (callback(*child)) {
-            return;
-        }
+        if (callback(*child)) { return; }
         if (child->isGroup()) {
             auto groupPtr = static_cast<Group*>(child.get());
             groupPtr->traverse(callback);
@@ -241,7 +233,7 @@ std::unique_ptr<BeamlineNode> Group::releaseNodeFromChildren(const BeamlineNode*
     for (auto it = m_children.begin(); it != m_children.end(); ++it) {
         if (it->get() == node) {
             std::unique_ptr<BeamlineNode> releasedNode = std::move(*it);
-            releasedNode->m_parent = nullptr;
+            releasedNode->m_parent                     = nullptr;
             m_children.erase(it);
             return releasedNode;
         }
@@ -254,7 +246,7 @@ std::unique_ptr<BeamlineNode> Group::releaseNodeFromTree(const BeamlineNode* nod
     for (auto it = m_children.begin(); it != m_children.end(); ++it) {
         if (it->get() == node) {
             std::unique_ptr<BeamlineNode> releasedNode = std::move(*it);
-            releasedNode->m_parent = nullptr;
+            releasedNode->m_parent                     = nullptr;
             m_children.erase(it);
             return releasedNode;
         } else if ((*it)->isGroup()) {
@@ -272,9 +264,7 @@ MaterialTables Group::calcMinimalMaterialTables() const {
     relevantMaterials.fill(false);
     for (const auto& elemPtr : elements) {
         int material = static_cast<int>(elemPtr->getMaterial());  // assuming getMaterial() exists
-        if (material >= 1 && material <= 92) {
-            relevantMaterials[material - 1] = true;
-        }
+        if (material >= 1 && material <= 92) { relevantMaterials[material - 1] = true; }
     }
     return loadMaterialTables(relevantMaterials);
 }
@@ -288,13 +278,11 @@ void Group::accumulateLightSourcesWorldPositions(const Group& group, const glm::
         assert(child && "m_children contains a nullptr!");
         if (child->isSource()) {
             DesignSource* srcPtr = static_cast<DesignSource*>(child.get());
-            glm::dvec4 worldPos = currentOri * srcPtr->getPosition() + currentPos;
+            glm::dvec4 worldPos  = currentOri * srcPtr->getPosition() + currentPos;
             positions.push_back(worldPos);
         } else if (child->isGroup()) {
             Group* grpPtr = static_cast<Group*>(child.get());
-            if (grpPtr) {
-                accumulateLightSourcesWorldPositions(*grpPtr, currentPos, currentOri, positions);
-            }
+            if (grpPtr) { accumulateLightSourcesWorldPositions(*grpPtr, currentPos, currentOri, positions); }
         }
     }
 }
@@ -326,9 +314,7 @@ std::vector<OpticalElementAndTransform> Group::compileElements() const {
 std::vector<const DesignElement*> Group::getElements() const {
     std::vector<const DesignElement*> elements;
     ctraverse([&elements](const BeamlineNode& node) -> bool {
-        if (node.isElement()) {
-            elements.push_back(static_cast<const DesignElement*>(&node));
-        }
+        if (node.isElement()) { elements.push_back(static_cast<const DesignElement*>(&node)); }
         return false;
     });
     return elements;
@@ -337,9 +323,7 @@ std::vector<const DesignElement*> Group::getElements() const {
 std::vector<const DesignSource*> Group::getSources() const {
     std::vector<const DesignSource*> sources;
     ctraverse([&sources](const BeamlineNode& node) -> bool {
-        if (node.isSource()) {
-            sources.push_back(static_cast<const DesignSource*>(&node));
-        }
+        if (node.isSource()) { sources.push_back(static_cast<const DesignSource*>(&node)); }
         return false;
     });
     return sources;
@@ -386,9 +370,7 @@ std::vector<std::string> Group::getObjectNames() const {
 size_t Group::numElements() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
-        if (node.isElement()) {
-            ++count;
-        }
+        if (node.isElement()) { ++count; }
         return false;
     });
     return count;
@@ -397,9 +379,7 @@ size_t Group::numElements() const {
 size_t Group::numSources() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
-        if (node.isSource()) {
-            ++count;
-        }
+        if (node.isSource()) { ++count; }
         return false;
     });
     return count;
@@ -408,9 +388,7 @@ size_t Group::numSources() const {
 size_t Group::numObjects() const {
     size_t count = 0;
     ctraverse([&count](const BeamlineNode& node) -> bool {
-        if (node.isSource() || node.isElement()) {
-            ++count;
-        }
+        if (node.isSource() || node.isElement()) { ++count; }
         return false;
     });
     return count;

@@ -2,6 +2,7 @@
 
 #include <future>
 
+#include "BundleHistory.h"
 #include "CommandParser.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
@@ -11,7 +12,6 @@
 #include "Scene.h"
 #include "Simulator.h"
 #include "UserInterface/UIHandler.h"
-#include "BundleHistory.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -40,7 +40,7 @@ class Application {
     Application(uint32_t width, uint32_t height, const char* name, int argc, char** argv);
     ~Application();
 
-    Application(const Application&) = delete;
+    Application(const Application&)            = delete;
     Application& operator=(const Application&) = delete;
 
     void run();
@@ -87,13 +87,13 @@ class Application {
     UIHandler m_UIHandler;             ///< UI render system
 
     // Caching, Helpers, and other stuff
-    std::filesystem::path m_RMLPath;                   ///< Path to the RML file
-    std::unique_ptr<RAYX::Beamline> m_Beamline;        ///< Beamline
+    std::filesystem::path m_RMLPath;             ///< Path to the RML file
+    std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
     BundleHistory m_rays;                        ///< All rays
     std::vector<std::vector<Ray>> m_sortedRays;  ///< Rays sorted by element
     bool m_buildElementsNeeded = true;
-    bool m_buildTextureNeeded = true;
-    VkExtent2D sceneExtent = {1920, 1080};  // TODO: why do we need this?
+    bool m_buildTextureNeeded  = true;
+    VkExtent2D sceneExtent     = {1920, 1080};  // TODO: why do we need this?
 
     // TODO: Should be in Scene
     std::future<void> m_beamlineFuture;

@@ -73,7 +73,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     app.add_option("-R,--record-indices", args.objectRecordIndices,
                    "Record events only for specific sources / elements. Use --dump to list the objects of a beamline");
 
-    auto formatAttrNames = RAYX::getRayAttrNames();
+    auto formatAttrNames    = RAYX::getRayAttrNames();
     auto formatAttrNamesStr = std::string();
     for (const auto attrName : formatAttrNames) formatAttrNamesStr += "\n\t" + attrName;
     app.add_option(
@@ -99,7 +99,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
 
     if (args.defaultSeed && args.seed) RAYX_EXIT << "Please do not provide '--default-seed' and '--seed' simultaneously'";
 
-    const bool isMoreThanOnePath = args.inputPaths.size() > 1;
+    const bool isMoreThanOnePath    = args.inputPaths.size() > 1;
     const bool isFirstPathDirectory = args.inputPaths.size() == 1 && std::filesystem::is_directory(args.inputPaths[0]);
     if (args.outputPath && (isMoreThanOnePath || isFirstPathDirectory)) {
         if (std::filesystem::is_directory(*args.outputPath)) {

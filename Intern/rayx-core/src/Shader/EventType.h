@@ -9,10 +9,10 @@ namespace RAYX {
 // TODO: doc this enum and all its members
 enum class EventType : uint32_t {
     Uninitialized = 0,
-    Emitted = 1,
-    HitElement = 2,
-    FatalError = 3,
-    Absorbed = 4,
+    Emitted       = 1,
+    HitElement    = 2,
+    FatalError    = 3,
+    Absorbed      = 4,
     BeyondHorizon = 5,
     TooManyEvents = 6,
 };
@@ -29,12 +29,12 @@ RAYX_FN_ACC inline void terminateRay(EventType& __restrict dstEventType, const E
 }
 
 enum class EventTypeMask : std::underlying_type_t<EventType> {
-    None = 0,
+    None          = 0,
     Uninitialized = 1 << static_cast<int>(EventType::Uninitialized),
-    Emitted = 1 << static_cast<int>(EventType::Emitted),
-    HitElement = 1 << static_cast<int>(EventType::HitElement),
-    FatalError = 1 << static_cast<int>(EventType::FatalError),
-    Absorbed = 1 << static_cast<int>(EventType::Absorbed),
+    Emitted       = 1 << static_cast<int>(EventType::Emitted),
+    HitElement    = 1 << static_cast<int>(EventType::HitElement),
+    FatalError    = 1 << static_cast<int>(EventType::FatalError),
+    Absorbed      = 1 << static_cast<int>(EventType::Absorbed),
     BeyondHorizon = 1 << static_cast<int>(EventType::BeyondHorizon),
     TooManyEvents = 1 << static_cast<int>(EventType::TooManyEvents),
 };

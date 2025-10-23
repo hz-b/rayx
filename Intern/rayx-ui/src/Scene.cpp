@@ -49,9 +49,7 @@ void Scene::buildRayCache(UIRayInfo& rayInfo, const BundleHistory& rays) {
 
     // Now selectedIndices contains unique indices of rays
     // Creating rayCache object from selected indices
-    for (size_t idx : selectedIndices) {
-        m_rayCache.push_back(rays[idx]);
-    }
+    for (size_t idx : selectedIndices) { m_rayCache.push_back(rays[idx]); }
 
     rayInfo.maxAmountOfRays = m_rayCache.size();
 }
@@ -60,9 +58,7 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
                              std::shared_ptr<DescriptorPool> descriptorPool) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
-    if (rayInfo.amountOfRays > rayInfo.maxAmountOfRays) {
-        rayInfo.amountOfRays = rayInfo.maxAmountOfRays;
-    }
+    if (rayInfo.amountOfRays > rayInfo.maxAmountOfRays) { rayInfo.amountOfRays = rayInfo.maxAmountOfRays; }
     if (!rayInfo.renderAllRays) {
         rays = getRays(m_rayCache, beamline, kMeansFilter, (uint32_t)rayInfo.amountOfRays);
     } else {
@@ -73,10 +69,10 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
         std::vector<VertexVariant> rayVertices(rays.size() * 2);
         std::vector<uint32_t> rayIndices(rays.size() * 2);
         for (uint32_t i = 0; i < rays.size(); ++i) {
-            rayVertices[i * 2] = VertexVariant(rays[i].v1);
+            rayVertices[i * 2]     = VertexVariant(rays[i].v1);
             rayVertices[i * 2 + 1] = VertexVariant(rays[i].v2);
-            rayIndices[i * 2] = i * 2;
-            rayIndices[i * 2 + 1] = i * 2 + 1;
+            rayIndices[i * 2]      = i * 2;
+            rayIndices[i * 2 + 1]  = i * 2 + 1;
         }
 
         if (!m_RayRObjects.empty()) {

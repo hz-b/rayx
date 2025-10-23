@@ -32,9 +32,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
         // line 3..EOF
         out->m_weightSum = 0;
         for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
-            if (line.empty()) {
-                continue;
-            }
+            if (line.empty()) { continue; }
 
             DatEntry e{};
 #if defined(WIN32)
@@ -60,9 +58,7 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     std::stringstream s;
     s << m_title << '\n';
     s << m_lineCount << ' ' << m_start << ' ' << m_end << ' ' << m_step << '\n';
-    for (auto line : m_Lines) {
-        s << line.m_energy << ' ' << line.m_weight << "\n";
-    }
+    for (auto line : m_Lines) { s << line.m_energy << ' ' << line.m_weight << "\n"; }
 
     return s.str();
 }

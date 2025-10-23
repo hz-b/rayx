@@ -25,7 +25,7 @@ void keyEventHandler(const SDL_Event* event, const UserInputContext& context) {
     if (!camController) return;
 
     // Determine movement speed; holding shift yields faster movement.
-    Uint32 mod = event->key.mod;
+    Uint32 mod  = event->key.mod;
     float speed = (mod & SDL_KMOD_SHIFT) ? 50.0f : 2.0f;
 
     if (event->type == SDL_EVENT_KEY_DOWN) {

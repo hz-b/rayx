@@ -44,9 +44,9 @@ detail::Ray PixelSource::genRay(const int rayPathIndex, const int sourceId, cons
                                 Rand& __restrict rand) const {
     // create ray with random position and divergence within the given span
     // for width, height, depth, horizontal and vertical divergence
-    auto x = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);
-    auto y = getPosInDistribution(SourceDist::Thirds, m_sourceHeight, rand);
-    auto z = getPosInDistribution(SourceDist::Uniform, m_sourceDepth, rand);
+    auto x        = getPosInDistribution(SourceDist::Thirds, m_sourceWidth, rand);
+    auto y        = getPosInDistribution(SourceDist::Thirds, m_sourceHeight, rand);
+    auto z        = getPosInDistribution(SourceDist::Uniform, m_sourceDepth, rand);
     const auto en = selectEnergy(energyDistribution, rand);
     // double z = (rn[2] - 0.5) * m_sourceDepth;
     glm::dvec3 position = glm::dvec3(x, y, z);
@@ -61,18 +61,18 @@ detail::Ray PixelSource::genRay(const int rayPathIndex, const int sourceId, cons
     const auto electricField = stokesToElectricField(m_pol, glm::dvec3(0, 0, 1), glm::dvec3(0, 1, 0));
 
     return detail::Ray{
-        .position = position,
-        .direction = direction,
-        .energy = en,
+        .position            = position,
+        .direction           = direction,
+        .energy              = en,
         .optical_path_length = 0.0,
-        .electric_field = electricField,
-        .rand = std::move(rand),
-        .path_id = rayPathIndex,
-        .path_event_id = -1,
-        .order = 0,
-        .object_id = sourceId,
-        .source_id = sourceId,
-        .event_type = EventType::Emitted,
+        .electric_field      = electricField,
+        .rand                = std::move(rand),
+        .path_id             = rayPathIndex,
+        .path_event_id       = -1,
+        .order               = 0,
+        .object_id           = sourceId,
+        .source_id           = sourceId,
+        .event_type          = EventType::Emitted,
     };
 }
 

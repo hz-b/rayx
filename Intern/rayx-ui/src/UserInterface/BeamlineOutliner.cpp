@@ -41,14 +41,10 @@ void BeamlineOutliner::renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::Beamli
         // Set tree node flags: if the node is a leaf (not a group), mark it as such.
         ImGui::SameLine();
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-        if (!child->isGroup()) {
-            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        }
+        if (!child->isGroup()) { flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; }
         bool nodeOpen = ImGui::TreeNodeEx(label.c_str(), flags, "%s", label.c_str());
 
-        if (ImGui::IsItemClicked()) {
-            selected = child.get();
-        }
+        if (ImGui::IsItemClicked()) { selected = child.get(); }
 
         // If this node is a Group and is open, recursively render its children.
         if (nodeOpen && child->isGroup()) {

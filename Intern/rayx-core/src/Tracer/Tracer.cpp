@@ -6,7 +6,7 @@
 
 namespace {
 
-using DeviceType = RAYX::DeviceConfig::DeviceType;
+using DeviceType  = RAYX::DeviceConfig::DeviceType;
 using DeviceIndex = RAYX::DeviceConfig::Device::Index;
 
 inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceType, DeviceIndex deviceIndex) {
