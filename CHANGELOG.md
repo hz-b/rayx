@@ -2,61 +2,67 @@
 
 ### Breaking Changes
 
-* For h5 files, the internal data layout has changed. rayx/rayx-ui wont be able to write/read the old format
-
 ### RAYX-CORE
-* New optical element: **Crystal** (https://github.com/hz-b/rayx/pull/380)
-    * For more information visit our [wiki](https://hz-b.github.io): https://hz-b.github.io/rayx/Model/BeamlineObjects/OpticalElements/Crystal.html
-* New optical element: **Single layer foil** (https://github.com/hz-b/rayx/pull/391)
-    * For more information visit our [wiki](https://hz-b.github.io): https://hz-b.github.io/rayx/Model/BeamlineObjects/OpticalElements/Foil.html
-* Beamlines are now represented as a tree graph (improved support for grouping of elements) (https://github.com/hz-b/rayx/pull/350)
-* For h5 files, the internal data layout has changed (https://github.com/hz-b/rayx/pull/374)
-    * Each attribute is stored separately
-    * Each attribute may or may not be stored, depending on format options set (`--format ...` flag)
-* May record events from a single element only (https://github.com/hz-b/rayx/pull/365)
-* May record specific attributes of events only (https://github.com/hz-b/rayx/pull/374)
-* Advance electric field using optical path length (https://github.com/hz-b/rayx/pull/394)
-* Rework verbose mode console output (`--verbose` flag)
-* Fix efficiency calculation
-* Updated dependency `alpaka` to version `2.0.0` (https://github.com/alpaka-group/alpaka/releases/tag/2.0.0) (https://github.com/hz-b/rayx/pull/399)
-    * Inherently, the build dependency `boost` was dropped in rayx
-* By default, rayx-core now compiles for all major cuda architectures (https://github.com/hz-b/rayx/pull/399)
+
+* New optical element: **Multi Layer Mirror**
+    * support for up to 1000 coatings
+* New source: **Ray List Source**
+    * user can provide a list of rays to be taced
+* Generate rays on selected device
+    before, rays were generated from sources on the cpu, singlethreaded
+    now, ray generation will take place on the selected device, gpu or cpu, multithreaded
+    * record generated rays, so they can be analyzed and plotted by the user
+* Changes in Ray attributes
+    * refactor `path_length` to `optical_path_length`
+        before, represented the geometrical path length
+        now, represents the optical path length
+    * refactor `element_id` to `object_id`
+        before, an event refered to an element
+        now an event may relate to generated rays from a source or element
+* Drop support for misalignment
+    * misalignment was an artifact from RAY-UI, which was incomplete in rayx, incapable of applying translational and rotational adjustments correctly. now it is removed, making space for a new design of this concept
+* Rework reading and writing rays to csv file
+    * improve readability of csv files
+        * allow scientific notation
+        * use precise number of digits for floating point numbers
+        * add ability to write integers and strings
+    * use ray attribute mask, to determine what attributes are written
+* Extend beamline tree (`class BeamlineNode`, `class Group`)
+    * add node to tree, release node from tree, reparent node, find node
+    * add bijection between sources/elements and object_id
+* Extend `struct Rays` (structure of arrays)
+* Make more types be used in type-safe manner, in preparation to make them available from rayx-python (https://github.com/hz-b/rayx/pull/415)
+* Several performance optimizations
+    * use rays in SoA fashion, including gpu kernels, allows for masking recorded attributes as early as possible
+* Fix energy distribuition type: list of weighted values for photon energy (dat file)
+* Fix single precision calculation in conversion from global to local electric field and calculation of degree of polarization. use double precision
 
 ### RAYX (cli)
 
-* Rename cli format options
-`-F,--format TEXT            Write specific Ray attributes to output H5 files. Provide a space-separated list of attributes. default value: "path_id position_x position_y position_z event_type direction_x direction_y direction_z energy electric_field_x electric_field_y electric_field_z path_length order element_id source_id "`
-* Add cli option to dump meta data of h5 and rml files
-`-D,--dump TEXT              Dump the meta data of a file (h5 or rml)`
-* Add cli option to record events from a single element only
-`-R,--record-element INT     Record events only for a specifc element`
-* Add cli option to specify output filepath of csv or h5 files (https://github.com/hz-b/rayx/pull/366)
-`-o,--output TEXT            Output path or filename`
+* Add cli option to override the number of rays in the sources of the traced beamline
+`-n,--number-of-rays INT     Override the number of rays for all sources`
+* Add cli option to sort output events by object_id. This can speed-up analysis when plotting per object
+`-O,--sort-by-object-id      Sort rays by object_id before writing to output file`
 
-### RAYX-UI
+* Enable usage of option `-o` to specify output directory of trace results for multiple rml inputs
 
-* Improve Wayland support on Linux (https://github.com/hz-b/rayx/pull/353)
-* Add flag to run in verbose mode (`--verbose` flag) (https://github.com/hz-b/rayx/pull/351)
+* rework cli parsing
+    * add capability to positional arguments
+        by default arguments will be treated as RML input
+        e.g. `./rayx my_beamline.rml my_other_beamline.rml`
+        this allows for double clicking rml files in the file manager to run rayx. just set rayx as default application for file extension `.rml`
+    * add capability to array-like arguments
+        e.g. `rayx my_beamline.rml -A position_x position_z`
+    * use `--` to terminate the list of values to an array-like argument)
+        e.g. `./rayx -A position_x position_z -- my_beamline.rml`
+
+* Rename some of the cli arguments
+* Validate output events
 
 ### Other Changes
-* Improved ease of compilation using `compile.sh` script (https://github.com/hz-b/rayx/pull/385)
-* Add CMake option to enable/disable OpenMP backend (https://github.com/hz-b/rayx/pull/357)
-* Add CMake option to build `rayx-core` as static lib (https://github.com/hz-b/rayx/pull/343)
-* Enable use of rayx as a submodule in another project (https://github.com/hz-b/rayx/pull/359)
-* Add shell.nix file, for starting a nix-shell environment, containing all dependencies required to build (https://github.com/hz-b/rayx/pull/389)
 
-## New Contributors
-* @JonasTrenkler made their first contribution (https://github.com/hz-b/rayx/pull/357)
+* Fallback to single-threaded tracing on CPU when OpenMP is not available during compilation
 
 ## Other
 
-**Full Changelog**: https://github.com/hz-b/rayx/compare/v0.21.2...v1.0.0
-
-<!-- ### Runtime Performance Comparison -->
-<!-- Runtime performance compared to the previous release (https://github.com/hz-b/rayx/tree/v0.21.2) -->
-
-## Probably coming soon
-
-* Mac support including multithreaded tracing on CPU using OpenMP (arm, x86)
-* Nix flake for reproducable dependency handling to make developing and building rayx more accessible
-* Multi layer foil
+**Full Changelog**: https://github.com/hz-b/rayx/compare/v0.1.0...v1.0.0
