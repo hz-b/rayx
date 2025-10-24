@@ -64,3 +64,4 @@
 ## Other
 
 **Full Changelog**: https://github.com/hz-b/rayx/compare/v0.1.0...v1.0.0
+
