@@ -21,8 +21,8 @@ void GridRenderSystem::render(FrameInfo& frameInfo, [[maybe_unused]] const std::
 
 RenderSystem::Input GridRenderSystem::fillInput(VkRenderPass renderPass) const {
     return RenderSystem::Input{.renderPass            = renderPass,
-                               .vertShaderPath        = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/grid_shader_vert.spv").string(),
-                               .fragShaderPath        = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/grid_shader_frag.spv").string(),
+                               .vertShaderPath        = rayx::ResourceHandler::getInstance().getResourcePath("Shaders/grid_shader_vert.spv").string(),
+                               .fragShaderPath        = rayx::ResourceHandler::getInstance().getResourcePath("Shaders/grid_shader_frag.spv").string(),
                                .bindingDescriptions   = std::vector<VkVertexInputBindingDescription>{},
                                .attributeDescriptions = std::vector<VkVertexInputAttributeDescription>{},
                                .topology              = std::nullopt,

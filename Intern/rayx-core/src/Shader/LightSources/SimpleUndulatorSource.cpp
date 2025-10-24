@@ -3,7 +3,7 @@
 #include "Design/DesignSource.h"
 #include "Shader/Utils.h"
 
-namespace RAYX {
+namespace rayx {
 namespace {
 
 double calcUndulatorSigma(const SigmaType sigmaType, const double photonWaveLength, const double undulatorLength) {
@@ -120,4 +120,4 @@ detail::Ray SimpleUndulatorSource::genRay(const int rayPathIndex, const int sour
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

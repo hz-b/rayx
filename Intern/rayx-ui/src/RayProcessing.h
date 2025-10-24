@@ -17,7 +17,7 @@ using RayFilterFunction = std::function<std::vector<size_t>(const BundleHistory&
  * @return A vector of lines, which visually represents the paths of rays in the beamline.
  */
 
-std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction, uint32_t amountOfRays);
+std::vector<Line> getRays(const BundleHistory& rayCache, const rayx::Beamline& beamline, RayFilterFunction filterFunction, uint32_t amountOfRays);
 
 void sortRaysByElement(const BundleHistory& rays, std::vector<std::vector<Ray>>& sortedRays, size_t numElements);
 

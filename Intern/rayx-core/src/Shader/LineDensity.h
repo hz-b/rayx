@@ -4,7 +4,7 @@
 #include "Element/Behaviour.h"
 #include "Ray.h"
 
-namespace RAYX {
+namespace rayx {
 
 /** variable line spacing for gratings
 @params
@@ -24,4 +24,4 @@ given direction on the grating
 RAYX_FN_ACC void RAYX_API RZPLineDensity(const glm::dvec3& __restrict position, const glm::dvec3& __restrict normal,
                                          const Behaviour::RZP& __restrict b, double& __restrict DX, double& __restrict DZ);
 
-}  // namespace RAYX
+}  // namespace rayx

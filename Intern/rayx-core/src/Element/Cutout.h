@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "Variant.h"
 
-namespace RAYX {
+namespace rayx {
 
 // Cutout types:
 // a subset of points of the XZ-plane. used to limit the potentially infinite surfaces.
@@ -73,4 +73,4 @@ struct RAYX_API CutoutTypes {
 using Cutout = Variant<detail::CutoutTypes, detail::CutoutTypes::Rect, detail::CutoutTypes::Elliptical, detail::CutoutTypes::Trapezoid,
                        detail::CutoutTypes::Unlimited>;
 
-}  // namespace RAYX
+}  // namespace rayx

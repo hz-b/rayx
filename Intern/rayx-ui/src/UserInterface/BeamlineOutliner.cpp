@@ -17,7 +17,7 @@ BeamlineOutliner::BeamlineOutliner() {}
 BeamlineOutliner::~BeamlineOutliner() {}
 
 // Recursive helper: render a Group and its children as an ImGui tree.
-void BeamlineOutliner::renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::BeamlineNode*& selected, CameraController& cam, int depth) {
+void BeamlineOutliner::renderImGuiTreeFromGroup(rayx::Group* group, rayx::BeamlineNode*& selected, CameraController& cam, int depth) {
     if (!group) return;
     int ctr = 0;
     for (auto& child : *group) {
@@ -25,9 +25,9 @@ void BeamlineOutliner::renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::Beamli
 
         // Use the node's name if possible.
         if (child->isElement()) {
-            label = static_cast<RAYX::DesignElement*>(child.get())->getName();
+            label = static_cast<rayx::DesignElement*>(child.get())->getName();
         } else if (child->isSource()) {
-            label = static_cast<RAYX::DesignSource*>(child.get())->getName();
+            label = static_cast<rayx::DesignSource*>(child.get())->getName();
         } else if (child->isGroup()) {
             label = "Group";
         }
@@ -48,7 +48,7 @@ void BeamlineOutliner::renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::Beamli
 
         // If this node is a Group and is open, recursively render its children.
         if (nodeOpen && child->isGroup()) {
-            auto* childGroupPtr = static_cast<RAYX::Group*>(child.get());
+            auto* childGroupPtr = static_cast<rayx::Group*>(child.get());
             renderImGuiTreeFromGroup(childGroupPtr, selected, cam, depth + 1);
             ImGui::TreePop();
         }

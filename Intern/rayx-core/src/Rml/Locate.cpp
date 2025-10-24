@@ -16,7 +16,7 @@
 
 #include <Debug/Debug.h>
 
-namespace RAYX {
+namespace rayx {
 
 // Adds a new lookup path where the handler will search for resources
 void ResourceHandler::addLookUpPath(const std::filesystem::path& path) {
@@ -119,4 +119,4 @@ std::filesystem::path ResourceHandler::getResourcePath(const std::filesystem::pa
 // Retrieve the full path of a font based on the platform
 std::filesystem::path ResourceHandler::getFontPath(const std::filesystem::path& relativePath) { return getFullPath(RAYX_FONTS_DIR, relativePath); }
 
-}  // namespace RAYX
+}  // namespace rayx

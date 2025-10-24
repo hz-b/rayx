@@ -4,7 +4,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 // Consider this https://en.wikipedia.org/wiki/Spherical_coordinate_system.
 // But we fix the radius r = 1, as we only care to express direction, not distance.
@@ -15,4 +15,4 @@ namespace RAYX {
 RAYX_FN_ACC void RAYX_API sphericalCoordsToDirection(double phi, double psi, glm::dvec3& out_direction);
 RAYX_FN_ACC void RAYX_API directionToSphericalCoords(glm::dvec3 direction, double& out_phi, double& out_psi);
 
-}  // namespace RAYX
+}  // namespace rayx

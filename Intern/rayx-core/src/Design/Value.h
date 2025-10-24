@@ -16,7 +16,7 @@
 #include "Material/Material.h"
 #include "Rml/xml.h"
 
-namespace RAYX {
+namespace rayx {
 
 enum class ValueType {
     Undefined,
@@ -253,4 +253,4 @@ class RAYX_API DesignMap {
     Variant m_variant;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

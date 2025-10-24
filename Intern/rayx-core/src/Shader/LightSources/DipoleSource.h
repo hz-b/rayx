@@ -5,7 +5,7 @@
 #include "LightSource.h"
 #include "Shader/Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct PsiAndStokes {
     glm::dvec4 stokes;
@@ -81,4 +81,4 @@ class RAYX_API DipoleSource : public LightSourceBase {
     double m_verDivergence;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

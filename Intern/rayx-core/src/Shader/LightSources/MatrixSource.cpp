@@ -7,7 +7,7 @@
 #include "Rml/xml.h"
 #include "Shader/Constants.h"
 
-namespace RAYX {
+namespace rayx {
 
 MatrixSource::MatrixSource(const DesignSource& dSource)
     : LightSourceBase(dSource),
@@ -72,4 +72,4 @@ detail::Ray MatrixSource::genRay(const int rayPathIndex, const int sourceId, con
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -5,7 +5,7 @@
 #include "Design/DesignElement.h"
 #include "Shader/Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 Behaviour makeBehaviour(const DesignElement& dele) {
     switch (dele.getBehaviourType()) {
@@ -158,4 +158,4 @@ Behaviour makeFoil(const DesignElement& dele) {
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

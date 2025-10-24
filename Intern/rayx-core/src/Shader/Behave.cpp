@@ -15,7 +15,7 @@
 #include "Transmission.h"
 #include "Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 RAYX_FN_ACC
 void behaveCrystal(detail::Ray& __restrict ray, const Behaviour::Crystal& __restrict crystal, const CollisionPoint& __restrict col) {
@@ -257,4 +257,4 @@ void behave(detail::Ray& __restrict ray, const CollisionPoint& __restrict col, c
     });
 }
 
-}  // namespace RAYX
+}  // namespace rayx

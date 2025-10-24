@@ -3,10 +3,10 @@
 #include "LightSource.h"
 #include "Rays.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct RAYX_API RayListSource {
     RaysPtr rays;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

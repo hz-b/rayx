@@ -5,7 +5,7 @@
 
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 
 namespace {
 std::string getUniqueUnnamedSourceName() {
@@ -14,18 +14,18 @@ std::string getUniqueUnnamedSourceName() {
 }
 }  // unnamed namespace
 
-DesignSource::DesignSource() : m_elementParameters(RAYX::Map()) {
+DesignSource::DesignSource() : m_elementParameters(rayx::Map()) {
     setName(getUniqueUnnamedSourceName());
     setPosition(glm::dvec4(0));
     setOrientation(glm::dmat4(1.0));
-    setType(RAYX::ElementType::Undefined);
+    setType(rayx::ElementType::Undefined);
 }
 
-DesignSource::DesignSource(std::string name) : m_elementParameters(RAYX::Map()) {
+DesignSource::DesignSource(std::string name) : m_elementParameters(rayx::Map()) {
     setName(std::move(name));
     setPosition(glm::dvec4(0));
     setOrientation(glm::dmat4(1.0));
-    setType(RAYX::ElementType::Undefined);
+    setType(rayx::ElementType::Undefined);
 }
 
 DesignSource::DesignSource(DesignSource&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
@@ -295,4 +295,4 @@ void DesignSource::setRayList(std::shared_ptr<Rays>& rays) { m_elementParameters
 
 std::shared_ptr<Rays> DesignSource::getRayList() const { return m_elementParameters["rayList"].as_rayList(); }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -10,7 +10,7 @@
 #include "NffTable.h"
 #include "PalikTable.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * returns the name of the material:
@@ -106,4 +106,4 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
     return out;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

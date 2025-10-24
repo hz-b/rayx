@@ -26,11 +26,11 @@ std::vector<std::vector<Ray>> createRayGrid(size_t size, double width, double le
             pos                            = glm::dvec3(x, distanceToObj, z);
             dir                            = glm::dvec3(0.0f, -1.0f, 0.0f);
             const auto stokes              = glm::dvec4(1.0f, 0.0f, 0.0f, 0.0f);
-            const auto field               = RAYX::stokesToElectricFieldWithBaseConvention(stokes, dir);
+            const auto field               = rayx::stokesToElectricFieldWithBaseConvention(stokes, dir);
 
             Ray ray = {
                 .m_position    = pos,
-                .m_eventType   = RAYX::EventType::Emitted,
+                .m_eventType   = rayx::EventType::Emitted,
                 .m_direction   = dir,
                 .m_energy      = 1.0f,
                 .m_field       = field,
@@ -51,21 +51,21 @@ std::vector<std::vector<Ray>> createRayGrid(size_t size, double width, double le
  * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
  * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
  */
-void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
-    using DeviceType = RAYX::DeviceConfig::DeviceType;
-    auto tracer      = RAYX::Tracer(RAYX::DeviceConfig(DeviceType::Cpu).enableBestDevice());
+void traceTriangulation(const rayx::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+    using DeviceType = rayx::DeviceConfig::DeviceType;
+    auto tracer      = rayx::Tracer(rayx::DeviceConfig(DeviceType::Cpu).enableBestDevice());
 
     constexpr size_t gridSize = 20;
     auto [width, length]      = getRectangularDimensions(compiled.m_cutout);
     BundleHistory rayGrid     = createRayGrid(gridSize, width, length);
 
-    std::vector<std::vector<RAYX::OptCollisionPoint>> collisionGrid(gridSize, std::vector<RAYX::OptCollisionPoint>(gridSize, std::nullopt));
+    std::vector<std::vector<rayx::OptCollisionPoint>> collisionGrid(gridSize, std::vector<rayx::OptCollisionPoint>(gridSize, std::nullopt));
 
     for (size_t i = 0; i < gridSize; ++i) {
         for (size_t j = 0; j < gridSize; ++j) {
             const auto& ray = rayGrid[i][j];
-            RAYX::OptCollisionPoint collision =
-                RAYX::findCollisionInElementCoordsWithoutSlopeError(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
+            rayx::OptCollisionPoint collision =
+                rayx::findCollisionInElementCoordsWithoutSlopeError(ray.m_position, ray.m_direction, compiled.m_surface, compiled.m_cutout, true);
             collisionGrid[i][j] = collision;
         }
     }

@@ -7,7 +7,7 @@
 #include "Debug/Debug.h"
 #include "Random.h"
 
-namespace RAYX {
+namespace rayx {
 bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     try {
         std::ifstream s(filename);
@@ -63,4 +63,4 @@ bool DatFile::load(const std::filesystem::path& filename, DatFile* out) {
     return s.str();
 }
 
-}  // namespace RAYX
+}  // namespace rayx

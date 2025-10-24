@@ -18,7 +18,7 @@
 #include "Shader/LightSources/LightSource.h"
 #include "Shader/SlopeError.h"
 
-namespace RAYX {
+namespace rayx {
 
 // forward declarations:
 class EnergyDistribution;
@@ -232,4 +232,4 @@ struct RAYX_API Parser {
 /// This superclass DesignObject could mostly keep the API of the xml::Parser, to make the transition trivial.
 using DesignObject = xml::Parser;
 
-}  // namespace RAYX
+}  // namespace rayx

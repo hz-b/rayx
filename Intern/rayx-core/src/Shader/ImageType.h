@@ -2,7 +2,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 // The ImageType is a parameter within the RZP.
 // It's different possible values are listed below.
@@ -12,4 +12,4 @@ constexpr int IT_POINT2HORIZONTAL_LINE           = 4;
 constexpr int IT_POINT2HORIZONTAL_DIVERGENT_LINE = 5;
 constexpr int IT_ASTIGMATIC2ASTIGMATIC           = 12;
 
-}  // namespace RAYX
+}  // namespace rayx

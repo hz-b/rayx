@@ -2,7 +2,7 @@
 
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
 enum class CurvatureType {
@@ -26,4 +26,4 @@ enum class FigureRotation { Yes, Plane, A11 };
 // Thus they need a bit of extra handling to convert them to the shaders XZ plane.
 enum class DesignPlane { XY, XZ };
 
-}  // namespace RAYX
+}  // namespace rayx

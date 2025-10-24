@@ -44,11 +44,11 @@ CommandParser::CommandParser(int _argc, char* const* _argv) : m_cli11{std::make_
     }
 
     if (m_args.m_verbose) {
-        RAYX::setDebugVerbose(true);
+        rayx::setDebugVerbose(true);
         RAYX_VERB << "Verbose logging enabled.";
     }
     if (m_args.m_benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
-        RAYX::BENCH_FLAG = true;
+        rayx::BENCH_FLAG = true;
     }
 }

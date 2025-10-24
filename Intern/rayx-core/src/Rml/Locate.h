@@ -6,7 +6,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 class RAYX_API ResourceHandler {
   public:
@@ -36,4 +36,4 @@ class RAYX_API ResourceHandler {
     std::vector<std::filesystem::path> lookUpPaths;  // Maintains insertion order
 };
 
-}  // namespace RAYX
+}  // namespace rayx

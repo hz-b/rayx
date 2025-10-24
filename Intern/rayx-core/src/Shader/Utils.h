@@ -3,7 +3,7 @@
 #include "Ray.h"
 #include "Throw.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * converts energy (eV) to wavelength (nm)
@@ -33,4 +33,4 @@ inline void RAYX_API rayMatrixMult(const glm::dmat4& __restrict m, glm::dvec3& _
     rayElectricField = glm::dmat3(m) * rayElectricField;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

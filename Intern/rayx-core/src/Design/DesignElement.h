@@ -4,7 +4,7 @@
 #include "Element/Element.h"
 #include "Value.h"
 
-namespace RAYX {
+namespace rayx {
 
 class RAYX_API DesignElement : public BeamlineNode {
   public:
@@ -262,4 +262,4 @@ class RAYX_API DesignElement : public BeamlineNode {
     void setRoughnessCoating(double value);
     double getRoughnessCoating() const;
 };
-}  // namespace RAYX
+}  // namespace rayx

@@ -14,16 +14,16 @@
  *
  * @return RenderObject containing the vertices and indices needed for rendering the triangulated rays.
  *
- * @note This function uses the RAYX::MegaKernelTracer for ray tracing and relies on a grid-based approach for tracing rays.
+ * @note This function uses the rayx::MegaKernelTracer for ray tracing and relies on a grid-based approach for tracing rays.
  *
  * Example usage:
  * @code{cpp}
- *   RAYX::OpticalElement element = ...;
+ *   rayx::OpticalElement element = ...;
  *   Device device = ...;
  *   RenderObject renderObj = traceTriangulation(element, device);
  * @endcode
  */
-void traceTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices);
+void traceTriangulation(const rayx::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices);
 
 // ------ Helper functions ------
 

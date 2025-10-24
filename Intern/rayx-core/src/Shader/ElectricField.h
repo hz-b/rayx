@@ -3,7 +3,7 @@
 #include "Complex.h"
 #include "Constants.h"
 
-namespace RAYX {
+namespace rayx {
 
 using Stokes             = glm::dvec4;
 using ElectricField      = cvec3;
@@ -199,4 +199,4 @@ inline ElectricField electricFieldToStokes(const ElectricField field, const glm:
     return localElectricFieldToStokes(globalToLocalElectricField(field, rotation));
 }
 
-}  // namespace RAYX
+}  // namespace rayx

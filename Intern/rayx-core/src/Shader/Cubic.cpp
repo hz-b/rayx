@@ -1,6 +1,6 @@
 #include "Cubic.h"
 
-namespace RAYX {
+namespace rayx {
 
 // rotates for the cubic collision by angle alpha (taken from RAY-UI)
 RAYX_FN_ACC
@@ -22,4 +22,4 @@ glm::dvec3 RAYX_API cubicDirection(const glm::dvec3& __restrict rayDirection, do
     return glm::dvec3(0, dy, dz);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

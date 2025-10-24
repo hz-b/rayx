@@ -3,7 +3,7 @@
 #include "Constants.h"
 #include "Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
 turn the normal vector through x_rad and z_rad
@@ -92,4 +92,4 @@ glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand
     return normal;
 }
 
-}  // namespace RAYX
+}  // namespace rayx
