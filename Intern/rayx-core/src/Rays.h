@@ -6,7 +6,7 @@
 #include "Debug/Instrumentor.h"
 #include "RayAttrMask.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * @brief A structure representing a collection of rays and their attributes.
@@ -270,4 +270,4 @@ static_assert(std::is_nothrow_move_constructible_v<Rays>);  // ensure efficient 
 bool RAYX_API operator==(const Rays& lhs, const Rays& rhs);
 bool RAYX_API operator!=(const Rays& lhs, const Rays& rhs);
 
-}  // namespace RAYX
+}  // namespace rayx

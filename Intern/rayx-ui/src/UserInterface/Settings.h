@@ -50,8 +50,8 @@ struct UISimulationInfo {
 enum class SelectedType { None = -1, LightSource = 0, OpticalElement = 1, Group = 2 };
 
 struct UIBeamlineInfo {
-    RAYX::Beamline* beamline         = nullptr;  // Beamline optional, lifetime managed by Application
-    RAYX::BeamlineNode* selectedNode = nullptr;  // Selection optional, lifetime managed by Beamline
+    rayx::Beamline* beamline         = nullptr;  // Beamline optional, lifetime managed by Application
+    rayx::BeamlineNode* selectedNode = nullptr;  // Selection optional, lifetime managed by Beamline
     bool elementsChanged             = false;
 };
 

@@ -19,7 +19,7 @@
 #include "Shader/RecordEvent.h"
 #include "Util.h"
 
-namespace RAYX {
+namespace rayx {
 namespace {
 
 struct GenRaysKernel {
@@ -312,4 +312,4 @@ struct GenRays {
     double m_seed;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

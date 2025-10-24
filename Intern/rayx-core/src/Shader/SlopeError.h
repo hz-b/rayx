@@ -1,6 +1,6 @@
 #pragma once
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * @brief Structure to represent slope error parameters.
@@ -15,4 +15,4 @@ struct SlopeError {
     double m_cylindricalBowingRadius;  ///< Radius of cylindrical bowing (unused).
 };
 
-}  // namespace RAYX
+}  // namespace rayx

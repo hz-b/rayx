@@ -10,7 +10,7 @@
 
 // It is crucial that all of our random implementations yield the same values (with a fixed seed) across all hardware, compilers and platforms!
 
-namespace RAYX {
+namespace rayx {
 
 // fixed-seed tests operate on this seed.
 const uint32_t FIXED_SEED = 42;
@@ -40,4 +40,4 @@ double RAYX_API randomDoubleInRange(double a, double b);
 // `mean` is evidently the mean of the distribution, while `stddev` is the standard deviation (often written as sigma).
 double RAYX_API randomNormal(double mean, double stddev);
 
-}  // namespace RAYX
+}  // namespace rayx

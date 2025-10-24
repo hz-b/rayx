@@ -7,7 +7,7 @@
 #include "Debug/Debug.h"
 #include "Rml/Locate.h"
 
-namespace RAYX {
+namespace rayx {
 
 bool NffTable::load(const char* element, NffTable* out) {
     std::string elementString = element;
@@ -46,4 +46,4 @@ bool NffTable::load(const char* element, NffTable* out) {
     return true;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

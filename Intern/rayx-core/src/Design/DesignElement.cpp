@@ -6,7 +6,7 @@
 #include "Debug/Debug.h"
 #include "Debug/Instrumentor.h"
 
-namespace RAYX {
+namespace rayx {
 
 namespace {
 std::string getUniqueUnnamedElementName() {
@@ -15,18 +15,18 @@ std::string getUniqueUnnamedElementName() {
 }
 }  // unnamed namespace
 
-DesignElement::DesignElement() : m_elementParameters(RAYX::Map()) {
+DesignElement::DesignElement() : m_elementParameters(rayx::Map()) {
     setName(getUniqueUnnamedElementName());
     setPosition(glm::dvec4(0));
     setOrientation(glm::dmat4(1.0));
-    setType(RAYX::ElementType::Undefined);
+    setType(rayx::ElementType::Undefined);
 }
 
-DesignElement::DesignElement(std::string name) : m_elementParameters(RAYX::Map()) {
+DesignElement::DesignElement(std::string name) : m_elementParameters(rayx::Map()) {
     setName(std::move(name));
     setPosition(glm::dvec4(0));
     setOrientation(glm::dmat4(1.0));
-    setType(RAYX::ElementType::Undefined);
+    setType(rayx::ElementType::Undefined);
 }
 
 DesignElement::DesignElement(DesignElement&& other) noexcept { m_elementParameters = std::move(other.m_elementParameters); }
@@ -561,4 +561,4 @@ double DesignElement::getThicknessCoating() const { return m_elementParameters["
 void DesignElement::setRoughnessCoating(double value) { m_elementParameters["roughnessCoating"] = value; }
 double DesignElement::getRoughnessCoating() const { return m_elementParameters["roughnessCoating"].as_double(); }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -8,7 +8,7 @@
 #include "Rays.h"
 #include "Shader/InvocationState.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * @brief DeviceTracer is an interface to a tracer implementation
@@ -22,4 +22,4 @@ class RAYX_API DeviceTracer {
                        const int maxEvents, const int maxBatchSize) = 0;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

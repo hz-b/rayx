@@ -2,7 +2,7 @@
 
 #include "Rays.h"
 
-namespace RAYX {
+namespace rayx {
 
 // this struct is analog to struct Rays. It contains pointers to the attribute arrays
 struct RaysPtr {
@@ -35,4 +35,4 @@ struct RaysPtr {
     }
 };
 
-}  // namespace RAYX
+}  // namespace rayx

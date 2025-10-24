@@ -2,7 +2,7 @@
 
 #include "Constants.h"
 
-namespace RAYX {
+namespace rayx {
 
 // double pow simple
 RAYX_FN_ACC
@@ -12,4 +12,4 @@ double RAYX_API dpow(double a, int b) {
     return res;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

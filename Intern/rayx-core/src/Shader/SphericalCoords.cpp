@@ -1,6 +1,6 @@
 #include "SphericalCoords.h"
 
-namespace RAYX {
+namespace rayx {
 
 RAYX_FN_ACC
 void RAYX_API sphericalCoordsToDirection(double phi, double psi, glm::dvec3& out_direction) {
@@ -18,4 +18,4 @@ void RAYX_API directionToSphericalCoords(glm::dvec3 direction, double& out_phi, 
     out_phi = glm::atan(direction.x, direction.y);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -6,7 +6,7 @@
 #include "EventType.h"
 #include "ImageType.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// inverse nanometer-electron volt relationship / reziprocal factor
 constexpr double INV_NM_TO_EVOLT = 1239.841984332002622;
@@ -51,4 +51,4 @@ constexpr double ELECTRIC_PERMITIVITY_MULTIPLIES_SPEED_OF_LIGHT = 2.654418727992
 constexpr double ELECTRON_RADIUS = 2.8179403205e-6;  // Classical electron radius (nm)
 // constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
 
-}  // namespace RAYX
+}  // namespace rayx

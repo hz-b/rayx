@@ -4,7 +4,7 @@
 #include "ElectricField.h"
 #include "Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct FresnelCoeffs {
     double s;
@@ -245,4 +245,4 @@ inline ElectricField interceptFoil(const ElectricField incidentElectricField, co
     return transmittElectricField;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

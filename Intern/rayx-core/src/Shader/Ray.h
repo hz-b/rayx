@@ -7,7 +7,7 @@
 #include "EventType.h"
 #include "Rand.h"
 
-namespace RAYX::detail {
+namespace rayx::detail {
 
 // this struct is for the usage inside a kernel
 // it is padded for optimal memory access on the CPU
@@ -35,4 +35,4 @@ struct Ray {
 // make sure Ray is not copy constructable/assignable to protect it from costly copies
 static_assert(!std::is_copy_constructible_v<Ray> && !std::is_copy_assignable_v<Ray>);
 
-}  // namespace RAYX::detail
+}  // namespace rayx::detail

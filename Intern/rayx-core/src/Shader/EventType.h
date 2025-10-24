@@ -4,7 +4,7 @@
 
 #include "Throw.h"
 
-namespace RAYX {
+namespace rayx {
 
 // TODO: doc this enum and all its members
 enum class EventType : uint32_t {
@@ -64,4 +64,4 @@ RAYX_FN_ACC constexpr inline EventTypeMask eventTypeToMask(const EventType event
     return static_cast<EventTypeMask>(std::underlying_type_t<EventTypeMask>(1) << static_cast<std::underlying_type_t<EventTypeMask>>(eventType));
 }
 
-}  // namespace RAYX
+}  // namespace rayx

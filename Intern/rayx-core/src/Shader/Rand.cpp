@@ -4,7 +4,7 @@
 
 #include "Constants.h"
 
-namespace RAYX {
+namespace rayx {
 
 constexpr RandCounter RNG_KEY = (RandCounter(0xc8e4fd15) << 32) | RandCounter(0x4ce32f6d);
 
@@ -53,4 +53,4 @@ double RAYX_API squaresNormalRNG(RandCounter& ctr, double mu, double sigma) {
     return Z;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

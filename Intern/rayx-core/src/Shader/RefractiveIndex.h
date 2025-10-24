@@ -3,7 +3,7 @@
 #include "Complex.h"
 #include "InvocationState.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// Both of these structs are used to effectively calculate the Refractive Index of some material when hit by a photon with a particular m_energy.
 /// The PalikEntry represents the the complex-valued refractive index directly as n + ik.
@@ -39,4 +39,4 @@ RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int mate
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
 RAYX_FN_ACC glm::dvec2 RAYX_API getAtomicMassAndRho(int material);
 
-}  // namespace RAYX
+}  // namespace rayx

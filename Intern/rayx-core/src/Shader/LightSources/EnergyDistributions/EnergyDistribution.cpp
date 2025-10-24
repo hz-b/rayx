@@ -21,7 +21,7 @@ int binarySearchPrefix(const double* __restrict prefixWeights, int size, double 
 
 }  // unnamed namespace
 
-namespace RAYX {
+namespace rayx {
 
 RAYX_FN_ACC double selectEnergy(const HardEdge& __restrict hardEdge, Rand& __restrict rand) {
     const auto a   = hardEdge.m_centerEnergy - hardEdge.m_energySpread / 2.0;
@@ -61,4 +61,4 @@ RAYX_FN_ACC double selectEnergy(const EnergyDistributionDataVariant& __restrict 
     return std::visit([&]<typename T>(const T& __restrict value) { return selectEnergy(value, rand); }, energyDistribution);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

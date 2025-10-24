@@ -4,7 +4,7 @@
 
 #include "Design/DesignElement.h"
 
-namespace RAYX {
+namespace rayx {
 
 // No additional implementation needed for now since the structs do not have member functions
 
@@ -80,4 +80,4 @@ OpticalElementAndTransform makeElement(const DesignElement& dele, Behaviour beha
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

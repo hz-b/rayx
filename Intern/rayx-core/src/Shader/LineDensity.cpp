@@ -4,7 +4,7 @@
 #include "ImageType.h"
 #include "Throw.h"
 
-namespace RAYX {
+namespace rayx {
 
 /** Computes the adjusted line density at a specific z-coordinate for variable line spacing (VLS) gratings,
  * considering both the surface orientation and polynomial VLS parameters.
@@ -198,4 +198,4 @@ void RAYX_API RZPLineDensity(const glm::dvec3& __restrict position, const glm::d
     DZ = (-bi - bm) / (WL * Ord);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

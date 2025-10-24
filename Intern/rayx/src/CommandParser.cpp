@@ -53,7 +53,7 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     app.add_flag("-a,--append", args.append, "Append to existing output file. Default: overwrite existing output file");
     app.add_flag("-S,--sequential", args.sequential, "Trace sequentially");
     app.add_option("-s,--seed", args.seed, "Specify a seed to be used for tracing");
-    app.add_flag("-f,--default-seed", args.defaultSeed, std::format("Use default seed for tracing: {}", RAYX::FIXED_SEED));
+    app.add_flag("-f,--default-seed", args.defaultSeed, std::format("Use default seed for tracing: {}", rayx::FIXED_SEED));
     app.add_flag("-x,--cpu", args.cpu,
                  "Enable CPU devices. Can be combined with --gpu. Affects --list-devices and --device-index. Default behaviour if neither --cpu and "
                  "--gpu are provided: Both will be enabled");
@@ -66,14 +66,14 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     app.add_flag("-V,--verbose", args.verbose, "Dump more information");
     app.add_option("-m,--maxevents", args.maxEvents,
                    "Maximum number of events per ray. Default: A multiple of the number of objects to record events for");
-    app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", RAYX::DEFAULT_BATCH_SIZE));
+    app.add_option("-b,--batch-size", args.batchSize, std::format("Batch size for tracing. Default: {}", rayx::DEFAULT_BATCH_SIZE));
     app.add_option("-n,--number-of-rays", args.numberOfRays, "Override the number of rays for all sources");
     app.add_flag("-B,--benchmark", args.benchmark, "Dump benchmark durations");
     app.add_flag("-O,--sort-by-object-id", args.sortByObjectId, "Sort rays by object_id before writing to output file");
     app.add_option("-R,--record-indices", args.objectRecordIndices,
                    "Record events only for specific sources / elements. Use --dump to list the objects of a beamline");
 
-    auto formatAttrNames    = RAYX::getRayAttrNames();
+    auto formatAttrNames    = rayx::getRayAttrNames();
     auto formatAttrNamesStr = std::string();
     for (const auto attrName : formatAttrNames) formatAttrNamesStr += "\n\t" + attrName;
     app.add_option(

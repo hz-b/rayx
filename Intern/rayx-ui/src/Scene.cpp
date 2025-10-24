@@ -54,7 +54,7 @@ void Scene::buildRayCache(UIRayInfo& rayInfo, const BundleHistory& rays) {
     rayInfo.maxAmountOfRays = m_rayCache.size();
 }
 
-void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo, std::shared_ptr<DescriptorSetLayout> setLayout,
+void Scene::buildRaysRObject(const rayx::Beamline& beamline, UIRayInfo& rayInfo, std::shared_ptr<DescriptorSetLayout> setLayout,
                              std::shared_ptr<DescriptorPool> descriptorPool) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
@@ -83,7 +83,7 @@ void Scene::buildRaysRObject(const RAYX::Beamline& beamline, UIRayInfo& rayInfo,
     }
 }
 
-std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const RAYX::Beamline& beamline, const std::vector<std::vector<Ray>>& sortedRays,
+std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const rayx::Beamline& beamline, const std::vector<std::vector<Ray>>& sortedRays,
                                                               bool buildTexture) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     auto elements = beamline.getElements();

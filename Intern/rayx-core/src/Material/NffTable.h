@@ -6,7 +6,7 @@
 // This file defines the NffEntry.
 #include "../Shader/RefractiveIndex.h"
 
-namespace RAYX {
+namespace rayx {
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:
@@ -27,4 +27,4 @@ struct NffTable {
     // double interpolate(double x) const;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

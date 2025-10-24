@@ -10,14 +10,14 @@
 // declare user types for HighFive
 namespace {
 inline HighFive::DataType highfive_create_type_EventType() {
-    return HighFive::EnumType<RAYX::EventType>({
-        {"HitElement", RAYX::EventType::HitElement},
-        {"TooManyEvents", RAYX::EventType::TooManyEvents},
-        {"Absorbed", RAYX::EventType::Absorbed},
-        {"Uninitialized", RAYX::EventType::Uninitialized},
-        {"BeyondHorizon", RAYX::EventType::BeyondHorizon},
-        {"FatalError", RAYX::EventType::FatalError},
-        {"Emitted", RAYX::EventType::Emitted},
+    return HighFive::EnumType<rayx::EventType>({
+        {"HitElement", rayx::EventType::HitElement},
+        {"TooManyEvents", rayx::EventType::TooManyEvents},
+        {"Absorbed", rayx::EventType::Absorbed},
+        {"Uninitialized", rayx::EventType::Uninitialized},
+        {"BeyondHorizon", rayx::EventType::BeyondHorizon},
+        {"FatalError", rayx::EventType::FatalError},
+        {"Emitted", rayx::EventType::Emitted},
     });
 }
 
@@ -28,10 +28,10 @@ inline HighFive::DataType highfive_create_type_Complex() {
     });
 }
 }  // unnamed namespace
-HIGHFIVE_REGISTER_TYPE(RAYX::EventType, highfive_create_type_EventType);
-HIGHFIVE_REGISTER_TYPE(RAYX::complex::Complex, highfive_create_type_Complex);
+HIGHFIVE_REGISTER_TYPE(rayx::EventType, highfive_create_type_EventType);
+HIGHFIVE_REGISTER_TYPE(rayx::complex::Complex, highfive_create_type_Complex);
 
-namespace RAYX {
+namespace rayx {
 
 // TODO: this function should not require, that attr is known beforehand. Mabye we should use attr only to further exclude attributes? Or provide an
 // extra attr that is repsonsible to check for existence?
@@ -131,6 +131,6 @@ void appendH5(const std::filesystem::path& filepath, const Rays& rays, const Ray
     } catch (const std::exception& e) { RAYX_EXIT << "exception caught while attempting to write h5 file: " << e.what(); }
 }
 
-}  // namespace RAYX
+}  // namespace rayx
 
 #endif

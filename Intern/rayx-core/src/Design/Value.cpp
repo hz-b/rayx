@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace RAYX {
+namespace rayx {
 
 DesignMap DesignMap::clone() const {
     DesignMap copy;
@@ -245,4 +245,4 @@ DesignMap::ConstIterator DesignMap::end() const {
     throw std::runtime_error("Calling end() on non-map!");
 }
 
-}  // namespace RAYX
+}  // namespace rayx

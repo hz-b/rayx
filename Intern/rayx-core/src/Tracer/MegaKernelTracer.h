@@ -12,7 +12,7 @@
 #include "Shader/Trace.h"
 #include "Util.h"
 
-namespace RAYX {
+namespace rayx {
 namespace {
 
 constexpr int WARP_SIZE            = 32;
@@ -376,4 +376,4 @@ class MegaKernelTracer : public DeviceTracer {
     }
 };
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -14,7 +14,7 @@
 // Which compares the current rayx the output of a previous rayx output which we deemed correct.
 
 TEST_F(TestSuite, randomNumbers) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
+    rayx::fixSeed(rayx::FIXED_SEED);
     double r;
     r = randomDouble();
     CHECK_EQ(r, 0.37454011439684315);
@@ -27,7 +27,7 @@ TEST_F(TestSuite, randomNumbers) {
 }
 
 TEST_F(TestSuite, randomNumbers_normal) {
-    RAYX::fixSeed(RAYX::FIXED_SEED);
+    rayx::fixSeed(rayx::FIXED_SEED);
     double r;
     r = randomNormal(0, 1);
     CHECK_EQ(r, 0.40402608730396244);

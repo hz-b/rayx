@@ -3,7 +3,7 @@
 #include "Element/Element.h"
 #include "RaysPtr.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// Expresses whether we force sequential tracing, or we use dynamic tracing.
 /// We prefer this over a boolean, as calling eg. the trace function with an argument of `true` has no obvious meaning.
@@ -33,4 +33,4 @@ struct RAYX_API MutableState {
     bool* __restrict storedFlags;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

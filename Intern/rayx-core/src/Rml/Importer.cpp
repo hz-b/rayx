@@ -15,9 +15,9 @@
 #include "Element/Element.h"
 #include "Rml/xml.h"
 
-using RAYX::ElementType;
+using rayx::ElementType;
 
-void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
+void parseElement(rayx::xml::Parser parser, rayx::DesignElement* de) {
     switch (parser.type()) {
         case ElementType::ImagePlane:
             getImageplane(parser, de);
@@ -75,10 +75,10 @@ void parseElement(RAYX::xml::Parser parser, RAYX::DesignElement* de) {
     }
 }
 
-namespace RAYX {
+namespace rayx {
 
 void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::filesystem::path filepath) {
-    RAYX::xml::Parser parser(node, filepath);
+    rayx::xml::Parser parser(node, filepath);
     ElementType type = parser.type();
 
     std::unique_ptr<DesignSource> ds = std::make_unique<DesignSource>();
@@ -178,4 +178,4 @@ Beamline importBeamline(const std::filesystem::path& filepath) {
     return root;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

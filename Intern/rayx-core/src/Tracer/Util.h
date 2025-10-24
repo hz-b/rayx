@@ -8,7 +8,7 @@
 #include "Shader/Rand.h"
 #include "Shader/RaysPtr.h"
 
-namespace RAYX {
+namespace rayx {
 
 template <typename Acc, typename T>
 using OptBuf = std::optional<alpaka::Buf<Acc, T, alpaka::DimInt<1>, int32_t>>;
@@ -142,4 +142,4 @@ inline void execWithValidWorkDiv(DevAcc devAcc, Queue q, const int numElements, 
     alpaka::exec<Acc>(q, workDiv, kernel, std::forward<Args>(args)...);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

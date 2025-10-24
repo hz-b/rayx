@@ -7,7 +7,7 @@
 #include "Core.h"
 #include "Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 // **********************************************************
 // Function to calculate the local normal incidence angle theta
@@ -162,4 +162,4 @@ inline complex::Complex computeR(complex::Complex eta, double structureFactorReF
     }
 }
 
-}  // namespace RAYX
+}  // namespace rayx

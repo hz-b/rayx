@@ -3,7 +3,7 @@
 #include "Throw.h"
 #include "Variant.h"
 
-namespace RAYX {
+namespace rayx {
 
 // checks whether the point (x, z) is within the cutout.
 RAYX_FN_ACC
@@ -130,4 +130,4 @@ void RAYX_API assertCutoutSubset(Cutout c1, Cutout c2) {
     }
 }
 
-}  // namespace RAYX
+}  // namespace rayx

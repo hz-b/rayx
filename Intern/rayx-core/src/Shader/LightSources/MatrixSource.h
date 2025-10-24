@@ -3,7 +3,7 @@
 #include "LightSource.h"
 #include "Shader/Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 class DesignSource;
 
@@ -24,4 +24,4 @@ class RAYX_API MatrixSource : public LightSourceBase {
     double m_sourceWidth;
 };
 
-}  // namespace RAYX
+}  // namespace rayx
