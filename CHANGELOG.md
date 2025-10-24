@@ -1,7 +1,5 @@
 ## Changelog
 
-### Breaking Changes
-
 ### RAYX-CORE
 
 * New optical element: **Multi Layer Mirror**
