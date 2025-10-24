@@ -50,15 +50,22 @@ RAYX_FN_ACC double selectEnergy(const SeparateEnergies& __restrict separateEnerg
 }
 
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionList& __restrict energyDistributionList, Rand& __restrict rand) {
-    // TODO: implement all the other stuff from DayFile::selectEnergy
-    // TODO: implement continous
     const auto r    = rand.randomDouble() * energyDistributionList.weightSum;
     const int index = binarySearchPrefix(energyDistributionList.prefixWeights, energyDistributionList.size, r);
-    return energyDistributionList.energies[index];
+
+    if (energyDistributionList.continous) {
+        const auto centerEnergy = energyDistributionList.energies[index];
+        if (index < energyDistributionList.size - 1)
+            return rand.randomDoubleInRange(centerEnergy, energyDistributionList.energies[index + 1]);
+        else
+            return centerEnergy;
+    } else {
+        return energyDistributionList.energies[index];
+    }
 }
 
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) {
-    return std::visit([&]<typename T>(const T& __restrict value) { return selectEnergy(value, rand); }, energyDistribution);
+    return energyDistribution.visit([&](const auto& __restrict value) { return selectEnergy(value, rand); });
 }
 
 }  // namespace rayx

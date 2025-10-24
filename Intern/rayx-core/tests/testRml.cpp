@@ -11,12 +11,18 @@ TEST_F(TestSuite, allBeamlineObjects) {
 TEST_F(TestSuite, loadDatFile) {
     const auto rays = traceRml("loadDatFile", RayAttrMask::Energy);
     writeCsvUsingFilename(rays, "loadDatFile.rayx");
-    expectEqualAny(rays.energy, {12.0, 15.0, 17.0});
+    using namespace testing;
+    EXPECT_THAT(rays.energy, Each(AnyOf(12, 15, 17)));
 }
 
 TEST_F(TestSuite, loadDatFile2) {
     const auto rays = traceRml("loadDatFile2", RayAttrMask::Energy);
-    expectEqualAny(rays.energy, {12.0, 15.0, 17.0});
+    writeCsvUsingFilename(rays, "loadDatFile2.rayx");
+    using namespace testing;
+    EXPECT_THAT(rays.energy, Each(AllOf(Ge(12), Le(18))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(12), Le(13))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(15), Le(16))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(17), Le(18))));
 }
 
 TEST_F(TestSuite, loadGroups) {
