@@ -88,7 +88,7 @@ class Application {
 
     // Caching, Helpers, and other stuff
     std::filesystem::path m_RMLPath;             ///< Path to the RML file
-    std::unique_ptr<RAYX::Beamline> m_Beamline;  ///< Beamline
+    std::unique_ptr<rayx::Beamline> m_Beamline;  ///< Beamline
     BundleHistory m_rays;                        ///< All rays
     std::vector<std::vector<Ray>> m_sortedRays;  ///< Rays sorted by element
     bool m_buildElementsNeeded = true;

@@ -40,7 +40,7 @@
 
 #define STRING(s) #s
 
-namespace RAYX {
+namespace rayx {
 
 /////////////////////////////////////////////////////////////////////////////
 // OSTREAM CONVERSION
@@ -139,7 +139,7 @@ struct RAYX_API Verb {
 
 // An empty implementation used in release when using "debug-only" prints like RAYX_D_LOG.
 struct RAYX_API IgnoreLog{template <typename T> IgnoreLog & operator<<(T){return *this;
-}  // namespace RAYX
+}  // namespace rayx
 }
 ;
 
@@ -150,10 +150,10 @@ extern void RAYX_API (*error_fn)();
 // Defines the actual RAYX logging macros using the structs defined above.
 // The __FILE__ and __LINE__ macros contain the current filename and linenumber.
 // They are defined for us by c++ https://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
-#define RAYX_LOG  RAYX::Log(__FILE__, __LINE__)
-#define RAYX_WARN RAYX::Warn(__FILE__, __LINE__)
-#define RAYX_EXIT RAYX::Exit(__FILE__, __LINE__)
-#define RAYX_VERB RAYX::Verb(__FILE__, __LINE__)
+#define RAYX_LOG  rayx::Log(__FILE__, __LINE__)
+#define RAYX_WARN rayx::Warn(__FILE__, __LINE__)
+#define RAYX_EXIT rayx::Exit(__FILE__, __LINE__)
+#define RAYX_VERB rayx::Verb(__FILE__, __LINE__)
 
 #ifdef RAYX_DEBUG_MODE
 // In debug mode, RAYX_D_LOG is just the same as RAYX_LOG.
@@ -164,10 +164,10 @@ extern void RAYX_API (*error_fn)();
 
 #else
 // In release mode, RAYX_D_LOG instead calls the IgnoreLog, hence discarding the print.
-#define RAYX_D_LOG  RAYX::IgnoreLog()
-#define RAYX_D_WARN RAYX::IgnoreLog()
-#define RAYX_D_ERR  RAYX::IgnoreLog()
-#define RAYX_D_VERB RAYX::IgnoreLog()
+#define RAYX_D_LOG  rayx::IgnoreLog()
+#define RAYX_D_WARN rayx::IgnoreLog()
+#define RAYX_D_ERR  rayx::IgnoreLog()
+#define RAYX_D_VERB rayx::IgnoreLog()
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -257,6 +257,6 @@ inline std::vector<double> formatAsVec(const Rays& rays) {
 
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v);
 
-#define RAYX_DBG(C) RAYX::dbg(__FILE__, __LINE__, #C, RAYX::formatAsVec(C))
+#define RAYX_DBG(C) rayx::dbg(__FILE__, __LINE__, #C, rayx::formatAsVec(C))
 
 }  // namespace RAYX

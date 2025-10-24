@@ -12,7 +12,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 extern bool RAYX_API BENCH_FLAG;
 class RAYX_API InstrumentationTimer {
@@ -49,12 +49,12 @@ class RAYX_API InstrumentationTimer {
     bool m_canPrint;
 };
 
-}  // namespace RAYX
+}  // namespace rayx
 
 // Define profiling macros
-#define RAYX_PROFILE_SCOPE(name) ::RAYX::InstrumentationTimer timer##__LINE__(name, false)
+#define RAYX_PROFILE_SCOPE(name) ::rayx::InstrumentationTimer timer##__LINE__(name, false)
 // Allows for printing of benchmarking results if BENCH_FLAG is set to true
-#define RAYX_PROFILE_SCOPE_STDOUT(name) ::RAYX::InstrumentationTimer timer##__LINE__(name, true)
+#define RAYX_PROFILE_SCOPE_STDOUT(name) ::rayx::InstrumentationTimer timer##__LINE__(name, true)
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif

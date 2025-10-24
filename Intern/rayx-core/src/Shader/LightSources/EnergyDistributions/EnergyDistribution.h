@@ -4,7 +4,7 @@
 #include "Core.h"
 #include "Shader/Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct EnergyDistributionList {
     double* __restrict prefixWeights;
@@ -23,4 +23,4 @@ RAYX_FN_ACC double selectEnergy(const SeparateEnergies& __restrict separateEnerg
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionList& __restrict energyDistributionList, Rand& __restrict rand);
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand);
 
-}  // namespace RAYX
+}  // namespace rayx

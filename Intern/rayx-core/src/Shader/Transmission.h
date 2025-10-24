@@ -2,7 +2,7 @@
 #include "Efficiency.h"
 #include "Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * @brief Calculates the transmission through a single thin film layer using Fresnel equations.
@@ -70,4 +70,4 @@ inline ComplexFresnelCoeffs computeTransmittance(double wavelength, complex::Com
     return {.s = ts_total, .p = tp_total};
 }
 
-}  // namespace RAYX
+}  // namespace rayx

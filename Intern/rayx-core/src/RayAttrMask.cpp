@@ -2,7 +2,7 @@
 
 #include <bitset>
 
-namespace RAYX {
+namespace rayx {
 
 int countSetBits(const RayAttrMask mask) {
     return std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(
@@ -42,4 +42,4 @@ RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings)
     return attr;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -4,7 +4,7 @@
 
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 
 template <typename Acc>
 constexpr inline auto getBlockSize() {
@@ -49,4 +49,4 @@ inline auto getWorkDivForAcc(alpaka::Idx<Acc> numElements) {
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -6,7 +6,7 @@
 #include "Ray.h"
 #include "Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
 calculates refracted ray
@@ -27,4 +27,4 @@ RAYX_FN_ACC void refrac2D(detail::Ray& __restrict ray, glm::dvec3 normal, double
  */
 RAYX_FN_ACC glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta);
 
-}  // namespace RAYX
+}  // namespace rayx

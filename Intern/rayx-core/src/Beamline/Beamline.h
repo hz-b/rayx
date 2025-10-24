@@ -11,7 +11,7 @@
 #include "Design/DesignSource.h"
 #include "Node.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * A beamline group that can contain child nodes (elements, sources, or other groups).
@@ -180,4 +180,4 @@ class RAYX_API Group : public BeamlineNode {
 
 using Beamline = Group;  // Conceptually, a Beamline is a Group
 
-}  // namespace RAYX
+}  // namespace rayx

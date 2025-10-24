@@ -6,7 +6,7 @@
 #include "Debug/Debug.h"
 #include "Rml/Locate.h"
 
-namespace RAYX {
+namespace rayx {
 
 bool PalikTable::load(const char* element, PalikTable* out) {
     std::string elementString = element;
@@ -44,4 +44,4 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     return true;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

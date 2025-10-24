@@ -7,7 +7,7 @@
 
 static std::mt19937 RNG;
 
-namespace RAYX {
+namespace rayx {
 
 void fixSeed(uint32_t seed) { RNG.seed(seed); }
 
@@ -50,4 +50,4 @@ double randomNormal(double mu, double sigma) {
     return z0;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

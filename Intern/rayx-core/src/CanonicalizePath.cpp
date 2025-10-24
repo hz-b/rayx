@@ -5,7 +5,7 @@
 
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// this function assumes that `base` is already an absolute path
 std::filesystem::path canonicalize(const std::filesystem::path& relPath, const std::filesystem::path& base) {
@@ -22,4 +22,4 @@ std::filesystem::path canonicalizeRepositoryPath(const std::filesystem::path& re
 
 std::filesystem::path canonicalizeUserPath(const std::filesystem::path& relPath) { return canonicalize(relPath, std::filesystem::current_path()); }
 
-}  // namespace RAYX
+}  // namespace rayx

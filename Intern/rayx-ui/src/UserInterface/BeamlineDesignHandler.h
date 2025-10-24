@@ -8,8 +8,8 @@ class BeamlineDesignHandler {
     void showBeamlineDesignWindow(UIBeamlineInfo& uiBeamlineInfo);
 
   private:
-    void showParameters(RAYX::DesignMap& parameters, bool& changed, SelectedType type);
-    void createInputField(const std::string& key, RAYX::DesignMap& element, bool& changed, SelectedType type, int nestingLevel);
+    void showParameters(rayx::DesignMap& parameters, bool& changed, SelectedType type);
+    void createInputField(const std::string& key, rayx::DesignMap& element, bool& changed, SelectedType type, int nestingLevel);
 
     bool caseInsensitiveCompare(const std::string& a, const std::string& b);
 

@@ -6,7 +6,7 @@
 #include "Core.h"
 #include "FileIO.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// `relPath` is a path relative to the root of the RAY-X git repository (i.e.
 /// where .git lies). canonicalizeRepositoryPath(relPath) yields an absolute
@@ -31,4 +31,4 @@ std::filesystem::path RAYX_API canonicalizeRepositoryPath(const std::filesystem:
 /// `./TerminalApp -i <relPath>`
 std::filesystem::path RAYX_API canonicalizeUserPath(const std::filesystem::path& relPath);
 
-}  // namespace RAYX
+}  // namespace rayx

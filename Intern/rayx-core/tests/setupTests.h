@@ -23,7 +23,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-using namespace RAYX;
+using namespace rayx;
 
 extern int GLOBAL_ARGC;
 extern char** GLOBAL_ARGV;

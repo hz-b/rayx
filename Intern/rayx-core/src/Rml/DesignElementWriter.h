@@ -11,7 +11,7 @@
 #include "Core.h"
 #include "Element/Cutout.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * Set all Parameters for each optical Element a RML file can define.
@@ -278,4 +278,4 @@ void getFoil(xml::Parser parser, DesignElement* de) {
     de->setRoughnessSubstrate(parser.parseRoughnessSubstrate());
 }
 
-}  // namespace RAYX
+}  // namespace rayx

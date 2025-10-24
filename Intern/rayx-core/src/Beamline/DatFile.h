@@ -7,7 +7,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 /** This struct represents one line of a .DAT file.  */
 struct DatEntry {
     double m_energy;
@@ -34,4 +34,4 @@ struct DatFile {
     /** creates a valid .DAT file from this struct (may be used for testing) */
     [[maybe_unused]] std::string dump();
 };
-}  // namespace RAYX
+}  // namespace rayx

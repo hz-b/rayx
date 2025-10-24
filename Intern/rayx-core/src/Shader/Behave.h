@@ -5,7 +5,7 @@
 #include "InvocationState.h"
 #include "Ray.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// Each `behave*` function gets a `Ray ray` (in element-coords), the element itself, a randomness counter and the `Collision col`.
 /// `col.hitpoint` expresses where the given ray will hit the element (in element-coords).
@@ -29,4 +29,4 @@ RAYX_FN_ACC void behaveImagePlane(detail::Ray& __restrict ray);
 RAYX_FN_ACC void behave(detail::Ray& __restrict ray, const CollisionPoint& __restrict col, const OpticalElement& __restrict element,
                         const int* __restrict materialIndices, const double* __restrict materialTable);
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -6,7 +6,7 @@
 #include "Core.h"
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 
 class RAYX_API ObjectIndexMask {
     ObjectIndexMask(const std::vector<bool>& sourceMask, const std::vector<bool>& elementMask)
@@ -144,4 +144,4 @@ class RAYX_API ObjectMask {
     Variant m_variant;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

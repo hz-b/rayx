@@ -2,7 +2,7 @@
 
 #include "Throw.h"
 
-namespace RAYX {
+namespace rayx {
 
 // The materialTable table consists of all the entries from the Palik & Nff tables for all materials that were loaded into the shader.
 // Thus, when you want to get some concrete palik entry for a particular element, you need the materialIndices table to "know where to look" in
@@ -163,4 +163,4 @@ glm::dvec2 RAYX_API getAtomicMassAndRho(int material) {
     return glm::dvec2(0.0, 0.0);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

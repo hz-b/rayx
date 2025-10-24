@@ -8,7 +8,7 @@
 #include "Rand.h"
 #include "Ray.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct RAYX_API CollisionPoint {
     glm::dvec3 hitpoint;
@@ -45,4 +45,4 @@ RAYX_FN_ACC OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosi
                                                               const OpticalElement* __restrict elements, const ObjectTransform* __restrict,
                                                               const int numSources, const int numElements, Rand& __restrict rand);
 
-}  // namespace RAYX
+}  // namespace rayx

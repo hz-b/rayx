@@ -5,7 +5,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * This enum class is the c++ perspective on the Materials stored in
@@ -39,4 +39,4 @@ struct RAYX_API MaterialTables {
 // the tables will later be written to the mat and matIdx buffers of shader.comp
 MaterialTables RAYX_API loadMaterialTables(std::array<bool, 92> relevantMaterials);
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -321,16 +321,16 @@ void Application::loadRays(const std::filesystem::path& rmlPath, const size_t nu
     RAYX_PROFILE_FUNCTION_STDOUT();
 #ifndef NO_H5
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".h5";
-    m_rays                  = convertRaysToBundleHistory(RAYX::readH5Rays(rayFilePath), static_cast<int>(numSources));
+    m_rays                  = convertRaysToBundleHistory(rayx::readH5Rays(rayFilePath), static_cast<int>(numSources));
 
 #else
     std::string rayFilePath = rmlPath.string().substr(0, rmlPath.string().size() - 4) + ".csv";
-    m_rays                  = convertRaysToBundleHistory(RAYX::readCsv(rayFilePath), static_cast<int>(numSources));
+    m_rays                  = convertRaysToBundleHistory(rayx::readCsv(rayFilePath), static_cast<int>(numSources));
 #endif
     sortRaysByElement(m_rays, m_sortedRays, numElements);
 }
 
 void Application::loadBeamline(const std::filesystem::path& rmlPath) {
-    m_Beamline                          = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(rmlPath));
-    m_UIParams.simulationInfo.maxEvents = RAYX::defaultMaxEvents(m_Beamline->numObjects());
+    m_Beamline                          = std::make_unique<rayx::Beamline>(rayx::importBeamline(rmlPath));
+    m_UIParams.simulationInfo.maxEvents = rayx::defaultMaxEvents(m_Beamline->numObjects());
 }

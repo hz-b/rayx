@@ -5,7 +5,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct RAYX_API DeviceConfig {
     enum RAYX_API DeviceType {
@@ -52,4 +52,4 @@ struct RAYX_API DeviceConfig {
     DeviceType m_fetchedDeviceType;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

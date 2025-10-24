@@ -61,11 +61,11 @@ double absoluteAngle(const Point2D& p1, const Point2D& p2) { return atan2(p2.x -
 
 VertexType toVertexType(const Point2D& prev, const Point2D& current, const Point2D& next) {
     double angle = atan2(next.x - current.x, next.y - current.y) - atan2(prev.x - current.x, prev.y - current.y);
-    if (angle < 0) { angle += RAYX::PI * 2; }
+    if (angle < 0) { angle += rayx::PI * 2; }
     if (prev < current && next < current) {
-        return angle < RAYX::PI ? Start : Split;
+        return angle < rayx::PI ? Start : Split;
     } else if (prev > current && next > current) {
-        return angle < RAYX::PI ? End : Merge;
+        return angle < rayx::PI ? End : Merge;
     } else {
         return Regular;
     }
@@ -356,18 +356,18 @@ void triangulate(const PolygonComplex& poly, std::vector<TextureVertex>& points,
 
 // Cutout to Outline conversion
 // Holes are represented by polygons in clockwise order
-PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector<TextureVertex>& vertices, bool clockwise = false) {
+PolygonSimple calculateOutlineFromCutout(const rayx::Cutout& cutout, std::vector<TextureVertex>& vertices, bool clockwise = false) {
     constexpr double defWidthHeight = 50.0f;
     Outline outline;
 
     cutout.visit([&]<typename T>(const T& cutout_type) {
-        if constexpr (std::is_same_v<T, RAYX::Cutout::Trapezoid>) {
+        if constexpr (std::is_same_v<T, rayx::Cutout::Trapezoid>) {
             outline.calculateForQuadrilateral(cutout_type.m_widthA, cutout_type.m_widthB, cutout_type.m_length, cutout_type.m_length);
-        } else if constexpr (std::is_same_v<T, RAYX::Cutout::Rect>) {
+        } else if constexpr (std::is_same_v<T, rayx::Cutout::Rect>) {
             outline.calculateForQuadrilateral(cutout_type.m_width, cutout_type.m_width, cutout_type.m_length, cutout_type.m_length);
-        } else if constexpr (std::is_same_v<T, RAYX::Cutout::Elliptical>) {
+        } else if constexpr (std::is_same_v<T, rayx::Cutout::Elliptical>) {
             outline.calculateForElliptical(cutout_type.m_diameter_x, cutout_type.m_diameter_z);
-        } else if constexpr (std::is_same_v<T, RAYX::Cutout::Unlimited>) {
+        } else if constexpr (std::is_same_v<T, rayx::Cutout::Unlimited>) {
             outline.calculateForQuadrilateral(defWidthHeight, defWidthHeight, defWidthHeight, defWidthHeight);
         } else {
             RAYX_EXIT << "Unknown cutout opening shape!";
@@ -390,11 +390,11 @@ PolygonSimple calculateOutlineFromCutout(const RAYX::Cutout& cutout, std::vector
     return indices;
 }
 
-void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void planarTriangulation(const rayx::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
     PolygonComplex poly;
     compiled.m_behaviour.visit([&]<typename T>(const T& behaviour) {
-        if constexpr (std::is_same_v<T, RAYX::Behaviour::Slit>) {
+        if constexpr (std::is_same_v<T, rayx::Behaviour::Slit>) {
             poly.push_back(calculateOutlineFromCutout(behaviour.m_beamstopCutout, vertices));
             poly.push_back(calculateOutlineFromCutout(compiled.m_cutout, vertices));
             poly.push_back(calculateOutlineFromCutout(behaviour.m_openingCutout, vertices, true));  // Hole -> Clockwise order
@@ -405,7 +405,7 @@ void planarTriangulation(const RAYX::OpticalElement compiled, std::vector<Textur
     triangulate(poly, vertices, indices);
 }
 
-bool isPlanar(const RAYX::Surface::Quadric& q) {
+bool isPlanar(const rayx::Surface::Quadric& q) {
     return (q.m_a11 == 0 && q.m_a22 == 0 && q.m_a33 == 0) && (q.m_a14 != 0 || q.m_a24 != 0 || q.m_a34 != 0);
 }
 
@@ -414,18 +414,18 @@ bool isPlanar(const RAYX::Surface::Quadric& q) {
 /**
  * This function takes optical elements and categorizes them for efficient triangulation.
  */
-void triangulateObject(const RAYX::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
+void triangulateObject(const rayx::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     compiled.m_surface.visit([&]<typename T>(const T& surface) {
-        if constexpr (std::is_same_v<T, RAYX::Surface::Plane>) {
+        if constexpr (std::is_same_v<T, rayx::Surface::Plane>) {
             planarTriangulation(compiled, vertices, indices);
-        } else if constexpr (std::is_same_v<T, RAYX::Surface::Quadric>) {
+        } else if constexpr (std::is_same_v<T, rayx::Surface::Quadric>) {
             if (isPlanar(surface)) {
                 planarTriangulation(compiled, vertices, indices);
             } else {
                 traceTriangulation(compiled, vertices, indices);
             }
-        } else if constexpr (std::is_same_v<T, RAYX::Surface::Toroid>) {
+        } else if constexpr (std::is_same_v<T, rayx::Surface::Toroid>) {
             traceTriangulation(compiled, vertices, indices);
         } else {
             RAYX_EXIT << "Unknown element type: " << typeid(T).name();

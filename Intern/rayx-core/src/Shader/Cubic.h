@@ -3,11 +3,11 @@
 #include "Core.h"
 #include "Ray.h"
 
-namespace RAYX {
+namespace rayx {
 
 // TODO: doku
 RAYX_FN_ACC glm::dvec3 RAYX_API cubicPosition(const glm::dvec3& __restrict rayPosition, const double alpha);
 
 RAYX_FN_ACC glm::dvec3 RAYX_API cubicDirection(const glm::dvec3& __restrict rayDirection, double alph);
 
-}  // namespace RAYX
+}  // namespace rayx

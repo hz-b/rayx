@@ -24,13 +24,13 @@ namespace fs = std::filesystem;
 
 namespace {
 
-void dumpBeamlineObjects(const RAYX::Beamline* beamline) {
+void dumpBeamlineObjects(const rayx::Beamline* beamline) {
     const auto sources = beamline->getSources();
     std::cout << "\tsources (" << sources.size() << "):" << std::endl;
 
     int objectIndex = 0;
     for (const auto* source : sources) {
-        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << RAYX::ElementTypeToString.at(source->getType())
+        std::cout << "\t- [" << objectIndex << "] '" << source->getName() << "' \t(type: " << rayx::ElementTypeToString.at(source->getType())
                   << ", number of rays: " << source->getNumberOfRays() << ")" << std::endl;
         ++objectIndex;
     }
@@ -39,8 +39,8 @@ void dumpBeamlineObjects(const RAYX::Beamline* beamline) {
     std::cout << "\telements (" << elements.size() << "):" << std::endl;
 
     for (const auto& element : elements) {
-        const auto curvature = RAYX::CurvatureTypeToString.at(element->getCurvatureType());
-        const auto behaviour = RAYX::BehaviourTypeToString.at(element->getBehaviourType());
+        const auto curvature = rayx::CurvatureTypeToString.at(element->getCurvatureType());
+        const auto behaviour = rayx::BehaviourTypeToString.at(element->getBehaviourType());
         std::cout << "\t- [" << objectIndex << "] '" << element->getName() << "' \t(curvature: " << curvature << ", behviour: " << behaviour << ")"
                   << std::endl;
         ++objectIndex;
@@ -49,7 +49,7 @@ void dumpBeamlineObjects(const RAYX::Beamline* beamline) {
 
 void dumpBeamline(const fs::path& filepath) {
     std::cout << "dumping beamline meta data from: " << filepath << std::endl;
-    const auto beamline = std::make_unique<RAYX::Beamline>(RAYX::importBeamline(filepath.string()));
+    const auto beamline = std::make_unique<rayx::Beamline>(rayx::importBeamline(filepath.string()));
     dumpBeamlineObjects(beamline.get());
 }
 
@@ -149,7 +149,7 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
     std::cout << "Processing: " << inputFilepath << std::endl;
 
     // record mask for attributes. determine which ray attributes should be recorded
-    const auto attrRecordMask = RAYX::rayAttrStringsToRayAttrMask(m_cliArgs.attrRecordMask);
+    const auto attrRecordMask = rayx::rayAttrStringsToRayAttrMask(m_cliArgs.attrRecordMask);
 
     const auto beamline = loadBeamline(inputFilepath);
 
@@ -178,16 +178,16 @@ void TerminalApp::traceRmlAndExportRays(const fs::path& inputFilepath) {
         std::cout << " Exported rays to: " << fs::absolute(outputFilepath) << std::endl;
 }
 
-RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
+rayx::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
-    auto beamline = RAYX::importBeamline(filepath);
+    auto beamline = rayx::importBeamline(filepath);
 
     // override number of rays for all sources
     if (m_cliArgs.numberOfRays) {
-        beamline.traverse([n = *m_cliArgs.numberOfRays](RAYX::BeamlineNode& node) -> bool {
+        beamline.traverse([n = *m_cliArgs.numberOfRays](rayx::BeamlineNode& node) -> bool {
             if (node.isSource()) {
-                auto* source = static_cast<RAYX::DesignSource*>(&node);
+                auto* source = static_cast<rayx::DesignSource*>(&node);
                 source->setNumberOfRays(n);
             }
             return false;
@@ -197,23 +197,23 @@ RAYX::Beamline TerminalApp::loadBeamline(const fs::path& filepath) {
     return beamline;
 }
 
-RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attrRecordMask) {
+rayx::Rays TerminalApp::traceBeamline(const rayx::Beamline& beamline, const rayx::RayAttrMask attrRecordMask) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     // dump beamline objects
-    if (RAYX::getDebugVerbose()) { dumpBeamlineObjects(&beamline); }
+    if (rayx::getDebugVerbose()) { dumpBeamlineObjects(&beamline); }
 
     const size_t numSources  = beamline.numSources();
     const size_t numElements = beamline.numElements();
 
     // record mask for elements. determine which elements should be recorded
     auto objectRecordMask = m_cliArgs.objectRecordIndices.empty()
-                                ? RAYX::ObjectIndexMask::all(numSources, numElements)
-                                : RAYX::ObjectIndexMask::byIndices(numSources, numElements, m_cliArgs.objectRecordIndices);
+                                ? rayx::ObjectIndexMask::all(numSources, numElements)
+                                : rayx::ObjectIndexMask::byIndices(numSources, numElements, m_cliArgs.objectRecordIndices);
 
     if (m_cliArgs.objectRecordIndices.empty()) { RAYX_VERB << "Record indices is empty. Defaulting to recording all elements"; }
 
-    if (RAYX::getDebugVerbose()) {
+    if (rayx::getDebugVerbose()) {
         const auto objectNames = beamline.getObjectNames();
         RAYX_VERB << "Recording objects:";
         for (int i = 0; i < objectRecordMask.numObjects(); ++i) {
@@ -223,7 +223,7 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     }
 
     // sequential / non-sequential tracing
-    RAYX::Sequential sequential = m_cliArgs.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+    rayx::Sequential sequential = m_cliArgs.sequential ? rayx::Sequential::Yes : rayx::Sequential::No;
 
     // max events to record per ray path
     const auto maxEvents = m_cliArgs.maxEvents;
@@ -232,13 +232,13 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     const auto maxBatchSize = m_cliArgs.batchSize;
 
     // in order to validate the events later, we always want to get the event types
-    const auto attrRecordMaskTrace = attrRecordMask | RAYX::RayAttrMask::EventType;
+    const auto attrRecordMaskTrace = attrRecordMask | rayx::RayAttrMask::EventType;
 
     // do the trace
     auto rays = m_tracer->trace(beamline, sequential, objectRecordMask, attrRecordMaskTrace, maxEvents, maxBatchSize);
 
     if (m_cliArgs.sortByObjectId) {
-        if (!(attrRecordMask & RAYX::RayAttrMask::ObjectId))
+        if (!(attrRecordMask & rayx::RayAttrMask::ObjectId))
             RAYX_WARN << "Cannot sort by object_id, because object_id is not recorded. Please add object_id to the attribute record mask.";
 
         rays = rays.sortByObjectId();
@@ -253,18 +253,18 @@ RAYX::Rays TerminalApp::traceBeamline(const RAYX::Beamline& beamline, const RAYX
     return rays;
 }
 
-void TerminalApp::validateEvents(const RAYX::Rays& rays) {
+void TerminalApp::validateEvents(const rayx::Rays& rays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     const auto eventTypes =
-        std::ranges::fold_left(rays.event_type.begin(), rays.event_type.end(), RAYX::EventTypeMask::None,
-                               [](RAYX::EventTypeMask acc, const RAYX::EventType eventType) { return acc | RAYX::eventTypeToMask(eventType); });
+        std::ranges::fold_left(rays.event_type.begin(), rays.event_type.end(), rayx::EventTypeMask::None,
+                               [](rayx::EventTypeMask acc, const rayx::EventType eventType) { return acc | rayx::eventTypeToMask(eventType); });
 
-    if (!!(eventTypes & RAYX::EventTypeMask::Uninitialized)) std::cout << "warning: one or more events in output are uninitialized" << std::endl;
-    if (!!(eventTypes & RAYX::EventTypeMask::FatalError)) std::cout << "warning: fatal error detected for one or more events" << std::endl;
-    if (!!(eventTypes & RAYX::EventTypeMask::BeyondHorizon))
+    if (!!(eventTypes & rayx::EventTypeMask::Uninitialized)) std::cout << "warning: one or more events in output are uninitialized" << std::endl;
+    if (!!(eventTypes & rayx::EventTypeMask::FatalError)) std::cout << "warning: fatal error detected for one or more events" << std::endl;
+    if (!!(eventTypes & rayx::EventTypeMask::BeyondHorizon))
         std::cout << "warning: one or more events in output have gone beyond the horizon while refracting" << std::endl;
-    if (!!(eventTypes & RAYX::EventTypeMask::TooManyEvents))
+    if (!!(eventTypes & rayx::EventTypeMask::TooManyEvents))
         std::cout << "warning: capacity of events exceeded. could not record all events! consider increasing max events." << std::endl;
 }
 
@@ -290,23 +290,23 @@ void TerminalApp::run() {
         return;
     }
 
-    if (m_cliArgs.verbose) { RAYX::setDebugVerbose(true); }
+    if (m_cliArgs.verbose) { rayx::setDebugVerbose(true); }
 
     if (m_cliArgs.defaultSeed) {
-        RAYX::fixSeed(RAYX::FIXED_SEED);
+        rayx::fixSeed(rayx::FIXED_SEED);
     } else if (m_cliArgs.seed) {
-        RAYX::fixSeed(*m_cliArgs.seed);
+        rayx::fixSeed(*m_cliArgs.seed);
     } else {
-        RAYX::randomSeed();
+        rayx::randomSeed();
     }
 
     if (m_cliArgs.benchmark) {
         RAYX_VERB << "Starting in Benchmark Mode.\n";
-        RAYX::BENCH_FLAG = true;
+        rayx::BENCH_FLAG = true;
     }
 
     auto argToDeviceType = [&] {
-        using DeviceType = RAYX::DeviceConfig::DeviceType;
+        using DeviceType = rayx::DeviceConfig::DeviceType;
         if (m_cliArgs.cpu == m_cliArgs.gpu) return DeviceType::All;
         return m_cliArgs.cpu ? DeviceType::Cpu : DeviceType::Gpu;
     };
@@ -314,19 +314,19 @@ void TerminalApp::run() {
     auto deviceType = argToDeviceType();
 
     if (m_cliArgs.listDevices) {
-        RAYX::DeviceConfig(deviceType).dumpDevices();
+        rayx::DeviceConfig(deviceType).dumpDevices();
         exit(0);
     }
 
     // Choose Hardware
     auto getDevice = [&] {
         if (m_cliArgs.deviceId) {
-            return RAYX::DeviceConfig(deviceType).enableDeviceByIndex(*m_cliArgs.deviceId);
+            return rayx::DeviceConfig(deviceType).enableDeviceByIndex(*m_cliArgs.deviceId);
         } else {
-            return RAYX::DeviceConfig(deviceType).enableBestDevice();
+            return rayx::DeviceConfig(deviceType).enableBestDevice();
         }
     };
-    m_tracer = std::make_unique<RAYX::Tracer>(getDevice());
+    m_tracer = std::make_unique<rayx::Tracer>(getDevice());
 
     if (!m_cliArgs.inputPaths.size()) RAYX_EXIT << "Please provide an input RML file or directory. Use --help for more information";
 
@@ -337,8 +337,8 @@ void TerminalApp::run() {
     std::cout << "Done. Processed " << rmlCounter << " RML file(s)" << std::endl;
 }
 
-fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vector<std::string>& objectNames, const RAYX::Rays& rays,
-                                 const RAYX::RayAttrMask attrRecordMask) {
+fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vector<std::string>& objectNames, const rayx::Rays& rays,
+                                 const rayx::RayAttrMask attrRecordMask) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     if (rays.empty()) return {};
@@ -359,17 +359,17 @@ fs::path TerminalApp::exportRays(const fs::path& inputFilepath, const std::vecto
     }
 
     if (m_cliArgs.csv) {
-        RAYX::writeCsv(outputFilepath, rays);
-        const auto rays2 = RAYX::readCsv(outputFilepath);
+        rayx::writeCsv(outputFilepath, rays);
+        const auto rays2 = rayx::readCsv(outputFilepath);
         std::cout << (rays == rays2) << std::endl;
     } else {
 #ifdef NO_H5
         RAYX_EXIT << "writeH5 called during NO_H5 (HDF5 disabled during build)";
 #else
         if (m_cliArgs.append)
-            RAYX::appendH5(outputFilepath, rays, attrRecordMask);
+            rayx::appendH5(outputFilepath, rays, attrRecordMask);
         else
-            RAYX::writeH5(outputFilepath, objectNames, rays, attrRecordMask);
+            rayx::writeH5(outputFilepath, objectNames, rays, attrRecordMask);
 #endif
     }
 

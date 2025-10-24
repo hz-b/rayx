@@ -5,7 +5,7 @@
 #include "Beamline/EnergyDistribution.h"
 #include "Design/DesignSource.h"
 
-namespace RAYX {
+namespace rayx {
 LightSourceBase::LightSourceBase(const DesignSource& dSource) : m_numberOfRays(static_cast<uint32_t>(dSource.getNumberOfRays())) {}
 
 // needed for many of the light sources, from two angles to one direction vector
@@ -17,4 +17,4 @@ glm::dvec3 LightSourceBase::getDirectionFromAngles(const double phi, const doubl
     return {al, am, an};
 }
 
-}  // namespace RAYX
+}  // namespace rayx

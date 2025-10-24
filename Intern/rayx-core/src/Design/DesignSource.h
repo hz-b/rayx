@@ -3,7 +3,7 @@
 #include "Beamline/Node.h"
 #include "Value.h"
 
-namespace RAYX {
+namespace rayx {
 
 class RAYX_API DesignSource : public BeamlineNode {
   public:
@@ -146,4 +146,4 @@ class RAYX_API DesignSource : public BeamlineNode {
     std::shared_ptr<Rays> getRayList() const;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

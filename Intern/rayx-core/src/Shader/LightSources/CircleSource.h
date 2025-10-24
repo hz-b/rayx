@@ -3,7 +3,7 @@
 #include "LightSource.h"
 #include "Shader/Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 class RAYX_API CircleSource : public LightSourceBase {
   public:
@@ -31,4 +31,4 @@ class RAYX_API CircleSource : public LightSourceBase {
     // std::vector<SOURCE_LENGTH> m_source_lengths;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

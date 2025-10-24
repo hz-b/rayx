@@ -4,7 +4,7 @@
 
 #include "Rays.h"
 
-namespace RAYX {
+namespace rayx {
 
 #ifndef NO_H5
 RAYX_API Rays readH5Rays(const std::filesystem::path& filepath, const RayAttrMask attr = RayAttrMask::All);
@@ -15,4 +15,4 @@ RAYX_API void writeH5(const std::filesystem::path& filepath, const std::vector<s
 RAYX_API void appendH5(const std::filesystem::path& filepath, const Rays& rays, const RayAttrMask attr = RayAttrMask::All);
 #endif
 
-}  // namespace RAYX
+}  // namespace rayx

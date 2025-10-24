@@ -14,7 +14,7 @@ namespace variant = cuda::std;
 namespace variant = std;
 #endif
 
-namespace RAYX {
+namespace rayx {
 
 /**
  * @brief A variant class that extends a base class and holds a variant of types Ts.
@@ -26,9 +26,9 @@ namespace RAYX {
  *     struct TypeA { int a; };
  *     struct TypeB { double b; };
  * };
- * using MyVariant = RAYX::Variant<MyTypes, MyTypes::TypeA, MyTypes::TypeB>;
+ * using MyVariant = rayx::Variant<MyTypes, MyTypes::TypeA, MyTypes::TypeB>;
  * // or if you want to extend functionality
- * struct ExtendedBase : public RAYX::Variant<MyTypes, MyTypes::TypeA, MyTypes::TypeB> {
+ * struct ExtendedBase : public rayx::Variant<MyTypes, MyTypes::TypeA, MyTypes::TypeB> {
  *    // Additional functionality
  * };
  * ```
@@ -95,4 +95,4 @@ class Variant : public Base {
     variant::variant<Ts...> m_variant;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -12,7 +12,7 @@ namespace {
 constexpr double COLLISION_EPSILON = 1e-6;
 }  // unnamed namespace
 
-namespace RAYX {
+namespace rayx {
 
 /**************************************************************
  *                    Quadric collision
@@ -546,4 +546,4 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
     return CollisionWithElement{.point = *best_col, .elementIndex = best_element};
 }
 
-}  // namespace RAYX
+}  // namespace rayx

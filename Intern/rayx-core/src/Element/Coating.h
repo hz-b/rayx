@@ -5,7 +5,7 @@
 #include "Core.h"
 #include "Variant.h"
 
-namespace RAYX {
+namespace rayx {
 
 enum class SurfaceCoatingType {
     SubstrateOnly,    // No coating, only substrate
@@ -37,4 +37,4 @@ struct CoatingTypes {
 using Coating =
     Variant<detail::CoatingTypes, detail::CoatingTypes::SubstrateOnly, detail::CoatingTypes::OneCoating, detail::CoatingTypes::MultilayerCoating>;
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -6,7 +6,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 // The readFile functions return {} if an error occured while opening the file.
 // We prefered this over an exception, as you typically forget to handle them.
@@ -18,4 +18,4 @@ std::optional<std::vector<uint32_t>> readFileAlign32(const std::string& filename
 
 void RAYX_API writeFile(const std::vector<uint8_t>& data, const std::string& filename, const uint32_t count = 0);
 
-}  // namespace RAYX
+}  // namespace rayx

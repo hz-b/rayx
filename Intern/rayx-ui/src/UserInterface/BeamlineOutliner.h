@@ -19,5 +19,5 @@ class BeamlineOutliner {
 
   private:
     // Recursive helper that renders the tree starting at a given Group.
-    void renderImGuiTreeFromGroup(RAYX::Group* group, RAYX::BeamlineNode*& selected, CameraController& cam, int depth = 0);
+    void renderImGuiTreeFromGroup(rayx::Group* group, rayx::BeamlineNode*& selected, CameraController& cam, int depth = 0);
 };

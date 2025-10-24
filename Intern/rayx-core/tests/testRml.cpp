@@ -1,7 +1,7 @@
 #include "setupTests.h"
 
 TEST_F(TestSuite, allBeamlineObjects) {
-    RAYX::Beamline bl = loadBeamline("allBeamlineObjects");
+    rayx::Beamline bl = loadBeamline("allBeamlineObjects");
     // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
     CHECK_EQ(bl.numSources(), 6);
     // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating, sphere mirror, rzp, image plane
@@ -20,13 +20,13 @@ TEST_F(TestSuite, loadDatFile2) {
 }
 
 TEST_F(TestSuite, loadGroups) {
-    RAYX::Beamline bl = loadBeamline("loadGroups");
+    rayx::Beamline bl = loadBeamline("loadGroups");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 4);
 }
 
 TEST_F(TestSuite, groupTransform) {
-    RAYX::Beamline bl = loadBeamline("groupTransform");
+    rayx::Beamline bl = loadBeamline("groupTransform");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
     auto m               = bl.compileElements()[0].transform.m_inTrans;
@@ -201,7 +201,7 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
 }
 
 TEST_F(TestSuite, groupTransform2) {
-    RAYX::Beamline bl = loadBeamline("groupTransform2");
+    rayx::Beamline bl = loadBeamline("groupTransform2");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
 

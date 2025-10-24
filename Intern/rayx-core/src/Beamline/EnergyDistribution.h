@@ -5,7 +5,7 @@
 #include "Core.h"
 #include "DatFile.h"
 
-namespace RAYX {
+namespace rayx {
 
 enum class SpreadType { HardEdge, SoftEdge, SeparateEnergies };    // default WhiteBand
 enum class EnergyDistributionType { File, Values, Total, Param };  // default ET_VALUES
@@ -48,4 +48,4 @@ struct RAYX_API SeparateEnergies {
 
 using EnergyDistributionVariant = std::variant<DatFile, HardEdge, SoftEdge, SeparateEnergies>;
 
-}  // namespace RAYX
+}  // namespace rayx

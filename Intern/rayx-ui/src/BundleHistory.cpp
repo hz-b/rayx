@@ -1,6 +1,6 @@
 #include "BundleHistory.h"
 
-BundleHistory convertRaysToBundleHistory(RAYX::Rays rays, const int numSources) {
+BundleHistory convertRaysToBundleHistory(rayx::Rays rays, const int numSources) {
     RAYX_PROFILE_FUNCTION_STDOUT();
 
     rays            = rays.sortByPathIdAndPathEventId();
