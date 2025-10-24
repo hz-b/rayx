@@ -35,7 +35,7 @@ struct RAYX_API MaterialTables {
     std::vector<int> indices;
 };
 
-// the following function loads the Palik & Nff tables.
+// the following function loads the Palik, Nff, and Cromer tables.
 // the tables will later be written to the mat and matIdx buffers of shader.comp
 MaterialTables RAYX_API loadMaterialTables(std::array<bool, 92> relevantMaterials);
 
