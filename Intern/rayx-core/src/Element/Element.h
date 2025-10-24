@@ -13,7 +13,7 @@
 #include "Shader/SlopeError.h"
 #include "Surface.h"
 
-namespace RAYX {
+namespace rayx {
 
 class DesignElement;
 
@@ -77,4 +77,4 @@ struct OpticalElementAndTransform {
 OpticalElementAndTransform makeElement(const DesignElement& dele, Behaviour behaviour, Surface surface, DesignPlane plane = DesignPlane::XZ,
                                        std::optional<Cutout> cutout = {});
 
-}  // namespace RAYX
+}  // namespace rayx

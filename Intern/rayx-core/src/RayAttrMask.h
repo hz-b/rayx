@@ -53,7 +53,7 @@
     RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          \
     RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER
 
-namespace RAYX {
+namespace rayx {
 
 #define X(type, name, flag) static_assert(std::is_nothrow_move_constructible_v<type>);  // ensure efficient moves
 RAYX_X_MACRO_RAY_ATTR
@@ -150,4 +150,4 @@ RAYX_API std::vector<std::string> getRayAttrNames();
  */
 RAYX_API RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings);
 
-}  // namespace RAYX
+}  // namespace rayx

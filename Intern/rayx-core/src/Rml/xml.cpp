@@ -13,7 +13,7 @@
 #include "Element/Element.h"
 #include "Shader/Constants.h"
 
-namespace RAYX::xml {
+namespace rayx::xml {
 
 // general scope functions:
 
@@ -542,4 +542,4 @@ double Parser::parseAdditionalOrder() const {
     return additionalZeroOrder;
 }
 
-}  // namespace RAYX::xml
+}  // namespace rayx::xml

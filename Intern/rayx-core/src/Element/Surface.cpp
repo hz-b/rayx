@@ -3,7 +3,7 @@
 #include "Beamline/Beamline.h"
 #include "Design/DesignElement.h"
 
-namespace RAYX {
+namespace rayx {
 
 Surface makeSurface(const DesignElement& dele) {
     switch (dele.getCurvatureType()) {
@@ -76,7 +76,7 @@ Surface makeCylinder(const DesignElement& dele) {
 }
 
 Surface makeCone(const DesignElement& dele) {
-    RAYX::Rad incidence      = dele.getGrazingIncAngle();
+    rayx::Rad incidence      = dele.getGrazingIncAngle();
     double entranceArmLength = dele.getEntranceArmLength();
     double exitArmLength     = dele.getExitArmLength();
 
@@ -267,4 +267,4 @@ Surface makeQuadric(const DesignElement& dele) { return dele.getExpertsOptics();
 
 Surface makeCubic(const DesignElement& dele) { return dele.getExpertsCubic(); }
 
-}  // namespace RAYX
+}  // namespace rayx

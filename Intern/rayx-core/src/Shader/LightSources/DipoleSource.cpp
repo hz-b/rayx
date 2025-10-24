@@ -11,7 +11,7 @@
 #include "Shader/EventType.h"
 #include "Shader/Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 // TODO: why does this source get seeded with randomDouble in the constructor?
 // TODO: do we only use schwinger log?
@@ -499,4 +499,4 @@ PsiAndStokes DipoleSource::getPsiandStokes(double en, Rand& __restrict rand) con
     return psiandstokes;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

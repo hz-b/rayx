@@ -4,7 +4,7 @@
 #include "Constants.h"
 #include "Rand.h"
 
-namespace RAYX {
+namespace rayx {
 
 RAYX_FN_ACC
 double RAYX_API fact(int a) {
@@ -98,4 +98,4 @@ void fraun_diff(double dim, double wl, double& __restrict dAngle, Rand& __restri
     }
 }
 
-}  // namespace RAYX
+}  // namespace rayx

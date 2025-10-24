@@ -20,15 +20,15 @@ class TerminalApp {
   private:
     int tracePath(const std::filesystem::path& path);
     void traceRmlAndExportRays(const std::filesystem::path& path);
-    RAYX::Beamline loadBeamline(const std::filesystem::path& filepath);
-    RAYX::Rays traceBeamline(const RAYX::Beamline& beamline, const RAYX::RayAttrMask attr);
-    void validateEvents(const RAYX::Rays& rays);
+    rayx::Beamline loadBeamline(const std::filesystem::path& filepath);
+    rayx::Rays traceBeamline(const rayx::Beamline& beamline, const rayx::RayAttrMask attr);
+    void validateEvents(const rayx::Rays& rays);
 
     /// write rays to file
     /// @returns the output filename (either .csv or .h5)
-    std::filesystem::path exportRays(const std::filesystem::path& filepath, const std::vector<std::string>& objectNames, const RAYX::Rays& rays,
-                                     const RAYX::RayAttrMask attr);
+    std::filesystem::path exportRays(const std::filesystem::path& filepath, const std::vector<std::string>& objectNames, const rayx::Rays& rays,
+                                     const rayx::RayAttrMask attr);
 
-    std::unique_ptr<RAYX::Tracer> m_tracer;
+    std::unique_ptr<rayx::Tracer> m_tracer;
     CliArgs m_cliArgs;
 };

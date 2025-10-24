@@ -6,7 +6,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct Rad;
 
@@ -33,4 +33,4 @@ struct RAYX_API Rad {
     double rad;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -6,21 +6,21 @@
 
 namespace {
 
-using DeviceType  = RAYX::DeviceConfig::DeviceType;
-using DeviceIndex = RAYX::DeviceConfig::Device::Index;
+using DeviceType  = rayx::DeviceConfig::DeviceType;
+using DeviceIndex = rayx::DeviceConfig::Device::Index;
 
-inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceType, DeviceIndex deviceIndex) {
+inline std::shared_ptr<rayx::DeviceTracer> createDeviceTracer(DeviceType deviceType, DeviceIndex deviceIndex) {
     switch (deviceType) {
         case DeviceType::GpuCuda:
 #if defined(RAYX_CUDA_ENABLED)
-            return std::make_shared<RAYX::MegaKernelTracer<alpaka::TagGpuCudaRt>>(deviceIndex);
+            return std::make_shared<rayx::MegaKernelTracer<alpaka::TagGpuCudaRt>>(deviceIndex);
 #else
             RAYX_EXIT << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
             return nullptr;
 #endif
         case DeviceType::GpuHip:
 #if defined(RAYX_HIP_ENABLED)
-            eturn std::make_shared<RAYX::MegaKernelTracer<alpaka::TagGpuHipRt>>(deviceIndex);
+            eturn std::make_shared<rayx::MegaKernelTracer<alpaka::TagGpuHipRt>>(deviceIndex);
 #else
             RAYX_EXIT << "Failed to create Tracer with Hip device. Hip was disabled during build.";
             return nullptr;
@@ -32,15 +32,15 @@ inline std::shared_ptr<RAYX::DeviceTracer> createDeviceTracer(DeviceType deviceT
             RAYX_WARN << "warning: rayx-core was compiled without OpenMP. The CPU tracer will run in a single thread.";
             using TagCpu = alpaka::TagCpuSerial;
 #endif
-            return std::make_shared<RAYX::MegaKernelTracer<TagCpu>>(deviceIndex);
+            return std::make_shared<rayx::MegaKernelTracer<TagCpu>>(deviceIndex);
     }
 }
 
-int defaultNonSequentialMaxEvents(const int numObjects) { return RAYX::defaultMaxEvents(numObjects); }
+int defaultNonSequentialMaxEvents(const int numObjects) { return rayx::defaultMaxEvents(numObjects); }
 
 }  // unnamed namespace
 
-namespace RAYX {
+namespace rayx {
 
 Tracer::Tracer(const DeviceConfig& deviceConfig) {
     if (deviceConfig.enabledDevicesCount() != 1) RAYX_EXIT << "The number of selected devices must be exactly 1!";
@@ -71,4 +71,4 @@ Rays Tracer::trace(const Group& group, const Sequential sequential, const Object
     return rays;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

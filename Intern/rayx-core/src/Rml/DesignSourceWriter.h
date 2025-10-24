@@ -9,7 +9,7 @@
 #include "Core.h"
 #include "Element/Cutout.h"
 
-namespace RAYX {
+namespace rayx {
 
 void setAllMandatory(xml::Parser parser, DesignSource* ds) {
     ds->setName(parser.name());
@@ -125,4 +125,4 @@ void setSimpleUndulatorSource(xml::Parser parser, DesignSource* ds) {
     ds->setElectronSigmaYs(parser.parseElectronSigmaYs());
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -10,7 +10,7 @@
 #include "Rays.h"
 
 // Abstract Tracer base class.
-namespace RAYX {
+namespace rayx {
 
 // this value is picked in a 'good' way if it can divide number of rays without rest. for a number of rays picked by humans, this
 // value is probably good. though, if it could be power of two, the shader would benefit
@@ -48,4 +48,4 @@ class RAYX_API Tracer {
     std::shared_ptr<DeviceTracer> m_deviceTracer;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

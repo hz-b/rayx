@@ -7,7 +7,7 @@
 #include "Random.h"
 #include "Shader/Constants.h"
 
-namespace RAYX {
+namespace rayx {
 namespace {
 
 /**
@@ -84,4 +84,4 @@ RAYX_FN_ACC detail::Ray PointSource::genRay(const int rayPathIndex, const int so
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

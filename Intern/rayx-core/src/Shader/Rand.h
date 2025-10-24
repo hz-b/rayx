@@ -4,7 +4,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 /// Internal type for the random counter-based RNG
 using RandCounter = uint64_t;
@@ -74,4 +74,4 @@ struct Rand {
     RandCounter counter;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -58,7 +58,7 @@ size_t getMaxEvents(const BundleHistory& bundleHist) {
  * Depending on the event type associated with the ray, the function produces visual lines that represent
  * ray segments, colored based on the event type.
  */
-std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& beamline, RayFilterFunction filterFunction, uint32_t amountOfRays) {
+std::vector<Line> getRays(const BundleHistory& rayCache, const rayx::Beamline& beamline, RayFilterFunction filterFunction, uint32_t amountOfRays) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     std::vector<Line> rays;
 
@@ -70,7 +70,7 @@ std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& b
     // compile all elements
     auto compiledElements = beamline.compileElements();
     std::vector<glm::dvec4> sourceWorldPositions;
-    RAYX::Group::accumulateLightSourcesWorldPositions(beamline, glm::dvec4(0, 0, 0, 1), glm::dmat4(1), sourceWorldPositions);
+    rayx::Group::accumulateLightSourcesWorldPositions(beamline, glm::dvec4(0, 0, 0, 1), glm::dmat4(1), sourceWorldPositions);
 
     for (size_t i : rayIndices) {
         if (i >= maxRayIndex) {
@@ -89,9 +89,9 @@ std::vector<Line> getRays(const BundleHistory& rayCache, const RAYX::Beamline& b
                 RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
             glm::vec4 worldPos = compiledElements[static_cast<size_t>(event.m_lastElement)].transform.m_outTrans * glm::vec4(event.m_position, 1.0f);
-            glm::vec4 originColor = (event.m_eventType == RAYX::EventType::HitElement) ? YELLOW : WHITE;
-            glm::vec4 pointColor  = (event.m_eventType == RAYX::EventType::HitElement) ? ORANGE
-                                    : (event.m_eventType == RAYX::EventType::Absorbed) ? RED
+            glm::vec4 originColor = (event.m_eventType == rayx::EventType::HitElement) ? YELLOW : WHITE;
+            glm::vec4 pointColor  = (event.m_eventType == rayx::EventType::HitElement) ? ORANGE
+                                    : (event.m_eventType == rayx::EventType::Absorbed) ? RED
                                                                                        : WHITE;
 
             ColorVertex origin = {rayLastPos, originColor};

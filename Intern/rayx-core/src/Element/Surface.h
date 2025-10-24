@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "Variant.h"
 
-namespace RAYX {
+namespace rayx {
 
 enum class ToroidType {
     Convex,
@@ -81,4 +81,4 @@ Surface makeSphere(double radius);                  //< creates a sphere from th
 Surface makePlane();                                //< creates a plane surface
 Surface makeParaboloid(const DesignElement& dele);  //< creates a Paraboloid from the parameters given in ` dele`.
 
-}  // namespace RAYX
+}  // namespace rayx

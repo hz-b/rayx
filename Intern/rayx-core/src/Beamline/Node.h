@@ -6,7 +6,7 @@
 
 #include "Core.h"
 
-namespace RAYX {
+namespace rayx {
 
 class Group;
 class DesignSource;
@@ -117,4 +117,4 @@ class RAYX_API BeamlineNode {
     BeamlineNode* m_parent = nullptr;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

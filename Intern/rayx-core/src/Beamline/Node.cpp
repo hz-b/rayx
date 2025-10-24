@@ -4,7 +4,7 @@
 
 #include "Beamline.h"
 
-namespace RAYX {
+namespace rayx {
 
 namespace {
 std::string getNodeTypeString(const BeamlineNode* node) {
@@ -107,4 +107,4 @@ DesignElement* BeamlineNode::asElement() {
     return static_cast<DesignElement*>(this);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -2,7 +2,7 @@
 
 #include "Ray.h"
 
-namespace RAYX {
+namespace rayx {
 
 /**
 calculates refracted ray
@@ -59,4 +59,4 @@ glm::dvec3 refract_dvec3(glm::dvec3 I, glm::dvec3 N, double eta) {
     return eta * I + (eta * cosi - sqrt(cost2)) * N;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

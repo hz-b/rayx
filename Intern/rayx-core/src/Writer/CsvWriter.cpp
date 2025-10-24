@@ -7,7 +7,7 @@
 #include "Beamline/StringConversion.h"
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 
 namespace fs = std::filesystem;
 
@@ -269,4 +269,4 @@ Rays readCsv(const fs::path& filepath) {
     return rays;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

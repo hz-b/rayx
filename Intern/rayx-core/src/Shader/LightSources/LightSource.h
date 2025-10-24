@@ -11,7 +11,7 @@
 #include "Rml/xml.h"
 #include "Shader/Ray.h"
 
-namespace RAYX {
+namespace rayx {
 
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };  // SourceDist::Thirds represents PixelSource Footprint
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
@@ -32,4 +32,4 @@ class RAYX_API LightSourceBase {
     int32_t m_numberOfRays;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

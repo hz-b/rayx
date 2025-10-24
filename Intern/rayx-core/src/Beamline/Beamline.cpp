@@ -8,7 +8,7 @@
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
 
-namespace RAYX {
+namespace rayx {
 
 namespace {
 std::string getUniqueUnnamedGroupName() {
@@ -481,4 +481,4 @@ BeamlineNode* Group::findNodeByObjectId(const size_t objectId) {
     return const_cast<BeamlineNode*>(constSelf->findNodeByObjectId(objectId));
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -4,7 +4,7 @@
 #include "Design/DesignSource.h"
 #include "Shader/Constants.h"
 
-namespace RAYX {
+namespace rayx {
 
 PixelSource::PixelSource(const DesignSource& deso)
     : LightSourceBase(deso),
@@ -76,4 +76,4 @@ detail::Ray PixelSource::genRay(const int rayPathIndex, const int sourceId, cons
     };
 }
 
-}  // namespace RAYX
+}  // namespace rayx

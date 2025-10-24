@@ -3,7 +3,7 @@
 #include "CanonicalizePath.h"
 #include "Debug/Debug.h"
 
-namespace RAYX {
+namespace rayx {
 
 std::optional<std::vector<uint8_t>> readFile(const std::string& filename, const uint32_t count) {
     std::vector<uint8_t> data;
@@ -70,4 +70,4 @@ void writeFile(const std::vector<uint8_t>& data, const std::string& filename, co
     file.close();
 }
 
-}  // namespace RAYX
+}  // namespace rayx

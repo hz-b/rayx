@@ -4,7 +4,7 @@
 #include "Cutout.h"
 #include "Variant.h"
 
-namespace RAYX {
+namespace rayx {
 
 #undef m_private_serialization_params
 
@@ -85,4 +85,4 @@ Behaviour makeSlit(const DesignElement& dele);
 Behaviour makeRZPBehaviour(const DesignElement& dele);
 Behaviour makeFoil(const DesignElement& dele);
 
-}  // namespace RAYX
+}  // namespace rayx

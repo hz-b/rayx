@@ -6,7 +6,7 @@
 
 #include "Shader/LightSources/LightSource.h"
 
-namespace RAYX {
+namespace rayx {
 
 // String conversion functions
 
@@ -210,4 +210,4 @@ inline std::ostream& operator<<(std::ostream& os, const ElementType v) { return 
 inline std::ostream& operator<<(std::ostream& os, const EventType v) { return streamEnum(os, v, EventTypeToString); }
 inline std::ostream& operator<<(std::ostream& os, const CutoutType v) { return streamEnum(os, v, CutoutTypeToString); }
 
-}  // namespace RAYX
+}  // namespace rayx

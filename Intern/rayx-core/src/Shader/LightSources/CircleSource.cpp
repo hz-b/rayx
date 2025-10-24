@@ -4,7 +4,7 @@
 #include "Design/DesignSource.h"
 #include "Shader/Constants.h"
 
-namespace RAYX {
+namespace rayx {
 
 CircleSource::CircleSource(const DesignSource& dSource) : LightSourceBase(dSource) {
     m_pol = dSource.getStokes();
@@ -90,4 +90,4 @@ glm::dvec3 CircleSource::getDirection(Rand& __restrict rand) const {
     return glm::dvec3(al, am, an);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

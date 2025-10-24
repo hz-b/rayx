@@ -19,7 +19,7 @@
 #include "Shader/RecordEvent.h"
 #include "Util.h"
 
-namespace RAYX {
+namespace rayx {
 namespace {
 
 struct GenRaysKernel {
@@ -154,6 +154,7 @@ struct GenRays {
                             weights.push_back(entry.m_weight);
                             energies.push_back(entry.m_energy);
                         }
+
                         std::vector<double> prefixWeights(weights.size());
                         std::inclusive_scan(weights.begin(), weights.end(), prefixWeights.begin());
                         const auto weightSum = weights.back() + prefixWeights.back();
@@ -312,4 +313,4 @@ struct GenRays {
     double m_seed;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

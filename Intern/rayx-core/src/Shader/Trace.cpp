@@ -5,7 +5,7 @@
 #include "RecordEvent.h"
 #include "Utils.h"
 
-namespace RAYX {
+namespace rayx {
 
 #define assertObjectIdInBounds(object_id, numObjects) \
     _debug_assert(0 <= object_id && object_id < numObjects, "error: ray object id '%d' is out of bounds [0, %d)", object_id, numObjects);
@@ -109,4 +109,4 @@ void traceNonSequential(const int gid, const ConstState& __restrict constState, 
     }
 }
 
-}  // namespace RAYX
+}  // namespace rayx

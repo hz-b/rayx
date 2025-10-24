@@ -1,7 +1,7 @@
 #include "setupTests.h"
 
 TEST_F(TestSuite, allBeamlineObjects) {
-    RAYX::Beamline bl = loadBeamline("allBeamlineObjects");
+    rayx::Beamline bl = loadBeamline("allBeamlineObjects");
     // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
     CHECK_EQ(bl.numSources(), 6);
     // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating, sphere mirror, rzp, image plane
@@ -11,22 +11,28 @@ TEST_F(TestSuite, allBeamlineObjects) {
 TEST_F(TestSuite, loadDatFile) {
     const auto rays = traceRml("loadDatFile", RayAttrMask::Energy);
     writeCsvUsingFilename(rays, "loadDatFile.rayx");
-    expectEqualAny(rays.energy, {12.0, 15.0, 17.0});
+    using namespace testing;
+    EXPECT_THAT(rays.energy, Each(AnyOf(12, 15, 17)));
 }
 
 TEST_F(TestSuite, loadDatFile2) {
     const auto rays = traceRml("loadDatFile2", RayAttrMask::Energy);
-    expectEqualAny(rays.energy, {12.0, 15.0, 17.0});
+    writeCsvUsingFilename(rays, "loadDatFile2.rayx");
+    using namespace testing;
+    EXPECT_THAT(rays.energy, Each(AllOf(Ge(12), Le(18))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(12), Le(13))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(15), Le(16))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(17), Le(18))));
 }
 
 TEST_F(TestSuite, loadGroups) {
-    RAYX::Beamline bl = loadBeamline("loadGroups");
+    rayx::Beamline bl = loadBeamline("loadGroups");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 4);
 }
 
 TEST_F(TestSuite, groupTransform) {
-    RAYX::Beamline bl = loadBeamline("groupTransform");
+    rayx::Beamline bl = loadBeamline("groupTransform");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
     auto m               = bl.compileElements()[0].transform.m_inTrans;
@@ -201,7 +207,7 @@ TEST_F(TestSuite, testTwoSourcesInOneRML) {
 }
 
 TEST_F(TestSuite, groupTransform2) {
-    RAYX::Beamline bl = loadBeamline("groupTransform2");
+    rayx::Beamline bl = loadBeamline("groupTransform2");
     CHECK_EQ(bl.numSources(), 1);
     CHECK_EQ(bl.numElements(), 1);
 

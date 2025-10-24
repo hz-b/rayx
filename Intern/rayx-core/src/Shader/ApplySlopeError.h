@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "InvocationState.h"
 
-namespace RAYX {
+namespace rayx {
 
 struct Rand;
 
@@ -36,4 +36,4 @@ slope error in either x or z direction or the unmodified normal otherwise.
 */
 RAYX_FN_ACC glm::dvec3 applySlopeError(glm::dvec3 normal, SlopeError error, int O_type, Rand& __restrict rand);
 
-}  // namespace RAYX
+}  // namespace rayx

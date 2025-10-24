@@ -32,8 +32,8 @@ void ObjectRenderSystem::render(FrameInfo& frameInfo, const std::vector<RenderOb
 
 RenderSystem::Input ObjectRenderSystem::fillInput(VkRenderPass renderPass) const {
     return RenderSystem::Input{.renderPass            = renderPass,
-                               .vertShaderPath        = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/shader_vert.spv").string(),
-                               .fragShaderPath        = RAYX::ResourceHandler::getInstance().getResourcePath("Shaders/shader_frag.spv").string(),
+                               .vertShaderPath        = rayx::ResourceHandler::getInstance().getResourcePath("Shaders/shader_vert.spv").string(),
+                               .fragShaderPath        = rayx::ResourceHandler::getInstance().getResourcePath("Shaders/shader_frag.spv").string(),
                                .bindingDescriptions   = TextureVertex::getBindingDescriptions(),
                                .attributeDescriptions = TextureVertex::getAttributeDescriptions(),
                                .topology              = std::nullopt,

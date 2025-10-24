@@ -3,7 +3,7 @@
 #include "Ray.h"
 #include "RaysPtr.h"
 
-namespace RAYX {
+namespace rayx {
 
 RAYX_FN_ACC
 inline int getRecordIndex(const int gid, const int numRecorded, const int gridStride) { return gid + numRecorded * gridStride; }
@@ -81,4 +81,4 @@ inline bool storeRay(const int i, bool* __restrict storedFlags, RaysPtr& __restr
     return true;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -18,7 +18,7 @@ Texture::Texture(const Device& device)
       m_layout{VK_IMAGE_LAYOUT_UNDEFINED},
       m_usageFlags{VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT},
       m_aspectFlags{VK_IMAGE_ASPECT_COLOR_BIT} {
-    std::vector<uint8_t> data = dataFromPath(RAYX::ResourceHandler::getInstance().getResourcePath("Textures/default.png"));
+    std::vector<uint8_t> data = dataFromPath(rayx::ResourceHandler::getInstance().getResourcePath("Textures/default.png"));
     createImage(VK_IMAGE_TILING_OPTIMAL, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     createImageView();
     createSampler();

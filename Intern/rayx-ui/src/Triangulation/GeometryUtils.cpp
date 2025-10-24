@@ -10,18 +10,18 @@
  * Given a Cutout object, this function calculates and returns the width and
  * length depending on the cutout's type (rectangle, ellipse, trapezoid, etc.).
  */
-std::pair<double, double> getRectangularDimensions(const RAYX::Cutout& cutout) {
+std::pair<double, double> getRectangularDimensions(const rayx::Cutout& cutout) {
     double width  = 0.0;
     double length = 0.0;
 
     cutout.visit([&]<typename T>(const T& arg) {
-        if constexpr (std::is_same_v<T, RAYX::Cutout::Rect>) {
+        if constexpr (std::is_same_v<T, rayx::Cutout::Rect>) {
             width  = arg.m_width;
             length = arg.m_length;
-        } else if constexpr (std::is_same_v<T, RAYX::Cutout::Elliptical>) {
+        } else if constexpr (std::is_same_v<T, rayx::Cutout::Elliptical>) {
             width  = arg.m_diameter_x;
             length = arg.m_diameter_z;
-        } else if constexpr (std::is_same_v<T, RAYX::Cutout::Trapezoid>) {
+        } else if constexpr (std::is_same_v<T, rayx::Cutout::Trapezoid>) {
             width  = std::max(arg.m_widthA, arg.m_widthB);
             length = arg.m_length;
         } else {
@@ -52,7 +52,7 @@ void Outline::calculateForElliptical(double diameterA, double diameterB) {
 
     // Calculate vertices
     for (uint32_t i = 0; i < numVertices; i++) {
-        double angle  = 2.0f * RAYX::PI * i / numVertices;
+        double angle  = 2.0f * rayx::PI * i / numVertices;
         glm::vec4 pos = {-diameterA * cos(angle) / 2.0f, 0, diameterB * sin(angle) / 2.0f, 1.0f};
         vertices.emplace_back(pos, OPT_ELEMENT_COLOR);
     }

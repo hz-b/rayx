@@ -3,7 +3,7 @@
 #include <sstream>
 #include <utility>
 
-namespace RAYX {
+namespace rayx {
 
 // The length of filename and line number is 30 characters.
 // If it doesn't find, we insert "...".
@@ -87,7 +87,7 @@ const int PREC = 17;  // precision
 // the implementation of RAYX_DBG.
 // the std::vector<double> v contains the data of the object we intend to log.
 void dbg(const std::string& filename, int line, std::string name, std::vector<double> v) {
-    RAYX::Log(filename, line) << std::move(name) << ":";
+    rayx::Log(filename, line) << std::move(name) << ":";
 
     int counter = 0;  // stores the number of elements in the stringstream
     std::stringstream s;
@@ -98,11 +98,11 @@ void dbg(const std::string& filename, int line, std::string name, std::vector<do
         counter++;
         if (counter == 4 && v.size() == 16) {  // 4x4 things should be written in 4 rows
             counter = 0;
-            RAYX::Log(filename, line) << s.str();
+            rayx::Log(filename, line) << s.str();
             s = std::stringstream();
         }
     }
-    if (counter > 0) { RAYX::Log(filename, line) << s.str(); }
+    if (counter > 0) { rayx::Log(filename, line) << s.str(); }
 }
 
 // The verbose flag used for RAYX_VERB printing.
@@ -110,4 +110,4 @@ static bool VERBOSE = false;
 void setDebugVerbose(bool b) { VERBOSE = b; }
 bool getDebugVerbose() { return VERBOSE; }
 
-}  // namespace RAYX
+}  // namespace rayx

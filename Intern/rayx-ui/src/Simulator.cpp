@@ -5,7 +5,7 @@
 #include "Writer/H5Writer.h"
 
 // constructor
-Simulator::Simulator() { m_seq = RAYX::Sequential::No; }
+Simulator::Simulator() { m_seq = rayx::Sequential::No; }
 
 void Simulator::runSimulation() {
     if (!m_readyForSimulation) {
@@ -13,9 +13,9 @@ void Simulator::runSimulation() {
         return;
     }
     // Run rayx core
-    if (!m_maxEvents) { m_maxEvents = RAYX::defaultMaxEvents(m_Beamline.numObjects()); }
+    if (!m_maxEvents) { m_maxEvents = rayx::defaultMaxEvents(m_Beamline.numObjects()); }
 
-    const auto rays       = m_Tracer->trace(m_Beamline, m_seq, RAYX::ObjectMask::allElements(), RAYX::RayAttrMask::All, static_cast<int>(m_maxEvents),
+    const auto rays       = m_Tracer->trace(m_Beamline, m_seq, rayx::ObjectMask::allElements(), rayx::RayAttrMask::All, static_cast<int>(m_maxEvents),
                                             static_cast<int>(m_max_batch_size));
     const auto bundleHist = convertRaysToBundleHistory(rays.copy(), m_Beamline.numSources());
 
@@ -23,7 +23,7 @@ void Simulator::runSimulation() {
 
     for (auto& ray : bundleHist) {
         for (auto& event : ray) {
-            if (event.m_eventType == RAYX::EventType::TooManyEvents) { notEnoughEvents = true; }
+            if (event.m_eventType == rayx::EventType::TooManyEvents) { notEnoughEvents = true; }
         }
     }
 
@@ -39,38 +39,38 @@ void Simulator::runSimulation() {
 
     path += ".h5";
 #ifndef NO_H5
-    RAYX::writeH5(path, m_Beamline.getObjectNames(), rays);
+    rayx::writeH5(path, m_Beamline.getObjectNames(), rays);
 #else
-    RAYX::writeCsv(path, rays);
+    rayx::writeCsv(path, rays);
 #endif
 }
 
-void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, const RAYX::Beamline& beamline,
+void Simulator::setSimulationParameters(const std::filesystem::path& RMLPath, const rayx::Beamline& beamline,
                                         const UISimulationInfo& simulationInfo) {
     const auto deviceAlreadyEnabled = m_deviceConfig.devices[simulationInfo.deviceIndex].enable;
     if (!deviceAlreadyEnabled) {
         m_deviceConfig.disableAllDevices().enableDeviceByIndex(simulationInfo.deviceIndex);
-        m_Tracer = std::make_unique<RAYX::Tracer>(m_deviceConfig);
+        m_Tracer = std::make_unique<rayx::Tracer>(m_deviceConfig);
     }
 
     m_RMLPath        = RMLPath;
-    m_Beamline       = std::move(*static_cast<RAYX::Beamline*>(beamline.clone().get()));
+    m_Beamline       = std::move(*static_cast<rayx::Beamline*>(beamline.clone().get()));
     m_max_batch_size = simulationInfo.maxBatchSize;
-    m_seq            = simulationInfo.sequential ? RAYX::Sequential::Yes : RAYX::Sequential::No;
+    m_seq            = simulationInfo.sequential ? rayx::Sequential::Yes : rayx::Sequential::No;
     m_maxEvents      = simulationInfo.maxEvents;
     if (simulationInfo.fixedSeed) {
         if (simulationInfo.seed != -1) {
-            RAYX::fixSeed(simulationInfo.seed);
+            rayx::fixSeed(simulationInfo.seed);
         } else
-            RAYX::fixSeed(RAYX::FIXED_SEED);
+            rayx::fixSeed(rayx::FIXED_SEED);
     } else {
-        RAYX::randomSeed();
+        rayx::randomSeed();
     }
     m_readyForSimulation = true;
 }
 
 std::vector<std::string> Simulator::getAvailableDevices() {
     auto deviceNames = std::vector<std::string>();
-    for (const RAYX::DeviceConfig::Device& device : m_deviceConfig.devices) deviceNames.push_back(device.name);
+    for (const rayx::DeviceConfig::Device& device : m_deviceConfig.devices) deviceNames.push_back(device.name);
     return deviceNames;
 }
