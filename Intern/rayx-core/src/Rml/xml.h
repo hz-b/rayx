@@ -208,9 +208,11 @@ struct RAYX_API Parser {
     inline double parseRoughnessSubstrate() const { return parseDouble("roughnessSubstrate"); }
     inline double parseDensitySubstrate() const { return parseDouble("densitySubstrate"); }
 
-    inline SurfaceCoatingType parseSurfaceCoatingType() const {
-        return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));
-    }  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+    inline SurfaceCoatingType parseSurfaceCoatingType() const { 
+        if (parseInt("surfaceCoating") == 3) {
+            return SurfaceCoatingType::MultipleCoatings;
+        }
+        return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));}  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
     inline double parseThicknessCoating() const { return parseDouble("thicknessCoating"); }
     inline double parseRoughnessCoating() const { return parseDouble("roughnessCoating"); }
 

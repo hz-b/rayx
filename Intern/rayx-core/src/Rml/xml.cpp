@@ -215,6 +215,60 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
+bool paramRAYUICoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
+    if (!node || !out) { return false; }
+
+    // Root für die Layer bestimmen: entweder 'node' selbst oder <param id="Coating">
+
+    int numberLayer = 0;
+    if (!paramInt(node, "numberLayer", &numberLayer)) {
+        return false;
+    }
+    out->numLayers = numberLayer;
+
+    for (int i = 0; i < numberLayer; ++i) {
+        std::string materialParam   = "materialCoating" + std::to_string(i + 1);
+        std::string thicknessParam  = "thicknessCoating" + std::to_string(i + 1);
+        std::string roughnessParam  = "roughnessCoating" + std::to_string(i + 1);
+        const char* materialStr     = nullptr;
+        if (!paramStr(node, materialParam.c_str(), &materialStr)) {
+            RAYX_VERB << "Layer " << i + 1 << " is missing a <material> element.";
+            return false;
+        }
+        Material material;
+        materialFromString(materialStr, &material);
+        out->material[i] = static_cast<int>(material);
+
+        if (!paramDouble(node, thicknessParam.c_str(), &out->thickness[i])) {
+            RAYX_VERB << "Missing thickness for layer " << (i + 1);
+            return false;
+        }
+
+        if (!paramDouble(node, roughnessParam.c_str(), &out->roughness[i])) {
+            RAYX_VERB << "Missing roughness for layer " << (i + 1);
+            return false;
+        }
+    }
+
+    const char* materialStr = nullptr;
+    if (paramStr(node, "materialTopLayer", &materialStr)) {
+        Material material;
+        materialFromString(materialStr, &material);
+        out->material[numberLayer] = static_cast<int>(material);
+
+        if (!paramDouble(node, "thicknessTopLayer", &out->thickness[numberLayer])) {
+            RAYX_VERB << "Missing thickness for toplayer ";
+            return false;
+        }
+
+        if (!paramDouble(node, "roughnessTopLayer", &out->roughness[numberLayer])) {
+            RAYX_VERB << "Missing roughness for toplayer ";
+            return false;
+        }
+        out->numLayers += 1;
+    }
+}
+
 // multilayer coating
 bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
     if (!node || !out) { return false; }
@@ -225,7 +279,7 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
         layersRoot = const_cast<rapidxml::xml_node<>*>(node);
     } else {
         if (!param(node, "Coating", &layersRoot)) {
-            RAYX_WARN << "Missing <param id='Coating'> for multilayer";
+            RAYX_VERB << "Missing <param id='Coating'> for multilayer";
             return false;
         }
     }
@@ -239,7 +293,7 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
     }
 
     if (numLayers <= 0) {
-        RAYX_WARN << "Number of layers must be positive.";
+        RAYX_VERB << "Number of layers must be positive.";
         return false;
     }
 
@@ -251,7 +305,7 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
         if (auto* m = layerNode->first_attribute("material")) {
             materialStr = m->value();
         } else {
-            RAYX_WARN << "Layer " << i + 1 << " is missing a <material> element.";
+            RAYX_VERB << "Layer " << i + 1 << " is missing a <material> element.";
             return false;
         }
         Material material;
@@ -261,14 +315,14 @@ bool paramCoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* 
         if (auto* t = layerNode->first_attribute("thickness")) {
             out->thickness[i] = std::stod(t->value());
         } else {
-            RAYX_WARN << "Missing thickness for layer " << (i + 1);
+            RAYX_VERB << "Missing thickness for layer " << (i + 1);
             return false;
         }
 
         if (auto* r = layerNode->first_attribute("roughness")) {
             out->roughness[i] = std::stod(r->value());
         } else {
-            RAYX_WARN << "Missing roughness for layer " << (i + 1);
+            RAYX_VERB << "Missing roughness for layer " << (i + 1);
             return false;
         }
     }
@@ -412,9 +466,9 @@ Material Parser::parseMaterial() const {
 
 Coating::MultilayerCoating Parser::parseCoating() const {
     Coating::MultilayerCoating m;
-    // get children from param Cotaing
+    // get children from param Coating
 
-    if (!paramCoating(node, &m)) { RAYX_EXIT << "parseCoating failed"; }
+    if (!paramCoating(node, &m) && !paramRAYUICoating(node, &m)) { RAYX_EXIT << "parseCoating failed"; }
     return m;
 }
 
