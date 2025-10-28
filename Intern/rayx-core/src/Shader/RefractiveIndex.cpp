@@ -113,32 +113,7 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
         return complex::Complex(-1.0, -1.0);
     }
 
-    // try to get refractive index using Palik table
-    if (getPalikEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
-        int low = 0;                                                   // <= energy
-        int high = getPalikEntryCount(material, materialIndices) - 1;  // >= energy
-
-        PalikEntry low_entry = getPalikEntry(low, material, materialIndices, materialTable);
-        PalikEntry high_entry = getPalikEntry(high, material, materialIndices, materialTable);
-
-        if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {  // if 'energy' is in range of tha PalikTable
-            // binary search
-            while (high - low > 1) {
-                int center = (low + high) / 2;
-                PalikEntry center_entry = getPalikEntry(center, material, materialIndices, materialTable);
-                if (energy < center_entry.m_energy) {
-                    high = center;
-                } else {
-                    low = center;
-                }
-            }
-
-            PalikEntry entry = getPalikEntry(low, material, materialIndices, materialTable);
-            return complex::Complex(entry.m_n, entry.m_k);
-        }
-    }
-
-    // get refractive index with Nff table
+        // get refractive index with Nff table
     if (getNffEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
         int low = 0;                                                 // <= energy
         int high = getNffEntryCount(material, materialIndices) - 1;  // >= energy
@@ -166,6 +141,32 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
 
         return complex::Complex(n, k);
     }
+
+    // try to get refractive index using Palik table
+    if (getPalikEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
+        int low = 0;                                                   // <= energy
+        int high = getPalikEntryCount(material, materialIndices) - 1;  // >= energy
+
+        PalikEntry low_entry = getPalikEntry(low, material, materialIndices, materialTable);
+        PalikEntry high_entry = getPalikEntry(high, material, materialIndices, materialTable);
+
+        if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {  // if 'energy' is in range of tha PalikTable
+            // binary search
+            while (high - low > 1) {
+                int center = (low + high) / 2;
+                PalikEntry center_entry = getPalikEntry(center, material, materialIndices, materialTable);
+                if (energy < center_entry.m_energy) {
+                    high = center;
+                } else {
+                    low = center;
+                }
+            }
+
+            PalikEntry entry = getPalikEntry(low, material, materialIndices, materialTable);
+            return complex::Complex(entry.m_n, entry.m_k);
+        }
+    }
+
 
     // get refractive index with Cromer table
     if (getCromerEntryCount(material, materialIndices) > 0) {           // don't try binary search if there are 0 entries!
