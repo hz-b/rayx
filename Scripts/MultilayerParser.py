@@ -47,6 +47,11 @@ for obj in root.findall(".//object"):
             "roughness": rough_top.text
         })
 
+    for param in obj.findall("param"):
+        if any(x in (param.get("id") or "") for x in
+               ["surfaceCoating"]):
+            obj.remove(param)
+
     if coatings:
         # Neue Coating-Struktur einfügen
         coating_param = ET.Element("param", {"id": "Coating", "enabled": "T"})
@@ -56,17 +61,17 @@ for obj in root.findall(".//object"):
                 "thickness": c["thickness"],
                 "roughness": c["roughness"]
             })
-            layer.text = f"layer{idx}"
+            layer.text = f"layer{idx}" if f"layer{idx}" else ""
         obj.append(coating_param)
 
         num_layers = str(len(coatings))
 
-        surface_param = ET.Element("param", {
-            "id": "surfaceCoating",
-            "comment": "Multilayer Coating",
-            "enabled": "T"
-        })
-        surface_param.text = "2"
+        #surface_param = ET.Element("param", {
+        #    "id": "surfaceCoating",
+        #    "comment": "Multilayer Coating",
+        #    "enabled": "T"
+        #})
+        #surface_param.text = "2"
 
         num_param = ET.Element("param", {
             "id": "NumberOfLayer",
@@ -74,7 +79,7 @@ for obj in root.findall(".//object"):
         })
         num_param.text = num_layers
 
-        obj.append(surface_param)
+        #obj.append(surface_param)
         obj.append(num_param)
 
 def indent(elem, level=0):
