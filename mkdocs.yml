@@ -19,13 +19,13 @@ plugins:
       # debug: False
       # ignore-errors: False
       projects:
-        rayx-core:
+        rayxCore: # using rayx-core as project name resulted in errors when using snippets
           src-dirs: Intern/rayx-core/src
           full-doc: True
-          doxy-cfg-file: Intern/rayx-core/doc/doxyfile
+          # doxy-cfg-file: Intern/rayx-core/doc/doxyfile
           doxy-cfg:
-            # FILE_PATTERNS: "*.h"
-            # RECURSIVE: True
+            FILE_PATTERNS: "*.h"
+            RECURSIVE: True
             GENERATE_XML: True  # needed by mkdoxy, otherwise the build will crash
   - mike:
       canonical_version: latest

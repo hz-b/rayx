@@ -51,12 +51,12 @@ This is especially helpful in the above example of a class method. Here the meth
 
 === "Invalid Method Tag"
     ```yaml
-    ::: doxy.rayx-core.class.method
+    ::: doxy.rayxCore.class.method
     name: RAYX::BeamlineNode
     method: glm::mat4 getOrientation()
-    ``` 
+    ```
 === "Resulting Snippet"
-::: doxy.rayx-core.Class.Method
+::: doxy.rayxCore.Class.Method
 name: RAYX::BeamlineNode
 method: mat4 getOrientation()
 indent_level: 4 
