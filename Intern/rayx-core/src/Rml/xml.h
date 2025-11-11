@@ -114,6 +114,8 @@ struct RAYX_API Parser {
     Rad parseAzimuthalAngle() const;
     std::filesystem::path parseEnergyDistributionFile() const;
     Coating::MultilayerCoating parseCoating() const;
+    double parseThicknessCoating() const;
+    double parseRoughnessCoating() const;
 
     // Parsers for trivial derived parameters
     // this allows for convenient type-safe access to the corresponding parameters.
@@ -223,9 +225,9 @@ struct RAYX_API Parser {
         if (parseInt("surfaceCoating") == 3) {
             return SurfaceCoatingType::MultipleCoatings;
         }
-        return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));}  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
-    inline double parseThicknessCoating() const { return parseDouble("thicknessCoating"); }
-    inline double parseRoughnessCoating() const { return parseDouble("roughnessCoating"); }
+        return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));
+    }  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
+    
 
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;

@@ -8,13 +8,13 @@ namespace RAYX {
 // Thus, when you want to get some concrete palik entry for a particular element, you need the materialIndices table to "know where to look" in
 // materialTable:
 // * materialIndices[i] is the beginning of the Palik Table in materialTable for the element with atomic number i+1, for i in [0, 91].
-// * materialIndices[i+92] is the beginning of the Nff Table in materialTable for the element with atomic number i+1, for i in [0, 91].
+// * materialIndices[i+99] is the beginning of the Nff Table in materialTable for the element with atomic number i+1, for i in [0, 91].
 // The `i+1` is necessary as atomic numbers start at 1 (Hydrogen), while array indices start at 0.
 // See InvocationState.cpp for more information about these tables.
 
-// If you will, the materialTable table is a "sparse" 4d-datastructure of shape (2, 92, N, 3).
+// If you will, the materialTable table is a "sparse" 4d-datastructure of shape (2, 99, N, 3).
 // - 2 because we store a Palik-table, and an Nff-table
-// - 92, because we support 92 elements of the periodic table (from Hydrogen to Uranium)
+// - 99, because we support 99 elements of the periodic table (from Hydrogen to Uranium)
 // - N is the number of entries in a given Palik/Nff table (this number depends on the periodic element)
 // - 3 because each Palik / Nff entry consists of three doubles.
 // - It is a "sparse" data structure as most of the entries are actually missing, we only load the actually "used" materials into the shader, not all
@@ -38,9 +38,9 @@ int RAYX_API getPalikEntryCount(const int material, const int* materialIndices) 
 RAYX_FN_ACC
 int RAYX_API getNffEntryCount(const int material, const int* materialIndices) {
     int m = material - 1;  // in [0, 91]
-    // the offset of 92 (== number of materials), skips the palik table and
+    // the offset of 99 (== number of materials), skips the palik table and
     // reaches into the nff table. the rest of the logic is as above.
-    return (materialIndices[92 + m + 1] - materialIndices[92 + m]) / 3;
+    return (materialIndices[99 + m + 1] - materialIndices[99 + m]) / 3;
 
 }
 
@@ -72,9 +72,9 @@ PalikEntry RAYX_API getPalikEntry(int index, int material, const int* __restrict
 RAYX_FN_ACC
 NffEntry RAYX_API getNffEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     int m = material - 1;  // in [0, 91]
-    // materialIndices[92+m] is the start of the Nff table of material m.
+    // materialIndices[99+m] is the start of the Nff table of material m.
     // 3*index skips 'index'-many entries.
-    int i = materialIndices[92 + m] + 3 * index;
+    int i = materialIndices[99 + m] + 3 * index;
 
     NffEntry e;
     e.m_energy = materialTable[i];
@@ -108,7 +108,7 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
     }
 
     // out of range check
-    if (material < 1 || material > 92) {
+    if (material < 1 || material > 99) {
         _throw("getRefractiveIndex material out of range!");
         return complex::Complex(-1.0, -1.0);
     }

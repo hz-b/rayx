@@ -55,11 +55,11 @@ bool materialFromString(const char* matname, Material* out) {
     return false;
 }
 
-MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
+MaterialTables loadMaterialTables(std::array<bool, 99> relevantMaterials) {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
-    if (mats.size() != 92) {
+    if (mats.size() != 99) {
         RAYX_EXIT << "unexpected number of materials. this is a bug.";
     }
 
@@ -106,7 +106,8 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
             CromerTable t;
 
             if (!CromerTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_EXIT << "could not load CromerTable!";
+                RAYX_VERB << "could not load CromerTable!";
+                continue;
             }
 
             for (auto x : t.m_Lines) {

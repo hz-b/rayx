@@ -95,3 +95,17 @@ X(Ac, 89, 227.0278, 10.05)
 X(Th, 90, 232.0381, 11.70)
 X(Pa, 91, 231.0359, 15.34)
 X(U, 92, 238.0289, 18.92)
+// Pseudo-Element für Al2O3
+X(AL2O3, 93, 101.96, 3.97)
+// Pseudo-Element für B4C
+X(B4C, 94, 55.25, 2.52)
+// Pseudo-Element für Diamant
+X(DIAMOND, 95, 12.011, 3.51)
+//weitere elemente aus molec
+X(MgF2, 96, 62.304, 3.15)
+// Pseudo-Element für Si8O26Al4Li2P (Glas/Glaskeramik)
+X(Si8O26Al4Li2P, 97, 793.44, 2.40)
+// Pseudo-Element für SiC
+X(SiC, 98, 40.10, 3.21)
+// Pseudo-Element für SiO2 (Quarz)
+X(SiO2, 99, 60.08, 2.65)

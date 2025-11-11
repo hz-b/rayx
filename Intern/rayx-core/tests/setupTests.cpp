@@ -257,7 +257,7 @@ void compareAgainstCorrect(std::string filename, double tolerance) {
 }
 
 MaterialTables createMaterialTables(std::vector<Material> mats_vec) {
-    std::array<bool, 92> mats;
+    std::array<bool, 99> mats;
     mats.fill(false);
     for (auto m : mats_vec) {
         mats[static_cast<int>(m) - 1] = true;
