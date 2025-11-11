@@ -38,7 +38,6 @@ bool NffTable::load(const char* element, NffTable* out) {
             RAYX_WARN << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
-        out->m_Lines.push_back(e);
     }
 
     out->m_element = element;

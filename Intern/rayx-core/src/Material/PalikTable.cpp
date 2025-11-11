@@ -13,7 +13,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
 
     std::filesystem::path f = ResourceHandler::getInstance().getResourcePath(std::filesystem::path("Data") / "PALIK" / (elementString + ".NKP"));
-    RAYX_VERB << "Loading PalikTable from " << f;
+    RAYX_VERB << "Loading PalikTable for " << elementString << " from " << f;
     std::ifstream s(f);
 
     if (s.fail()) { return false; }
@@ -27,7 +27,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
     for (uint32_t lineidx = 4; std::getline(s, line); lineidx++) {
         if (line.empty()) { continue; }
 
-        PalikEntry e{};
+        NKEntry e{};
 #if defined(WIN32)
         if (sscanf_s(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
 #else

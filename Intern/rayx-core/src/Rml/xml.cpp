@@ -215,6 +215,22 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
+
+double Parser::parseThicknessCoating() const { 
+    if(!xml::paramDouble(node, "thicknessCoating", nullptr)) {
+        return Parser::parseDouble("thicknessCoating1"); 
+    }
+    return Parser::parseDouble("thicknessCoating"); 
+}
+
+double Parser::parseRoughnessCoating() const { 
+    if(!xml::paramDouble(node, "roughnessCoating", nullptr)) {
+        return Parser::parseDouble("roughnessCoating1"); 
+    }
+    return Parser::parseDouble("roughnessCoating"); 
+}
+
+
 bool paramRAYUICoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
     if (!node || !out) { return false; }
 
@@ -250,10 +266,10 @@ bool paramRAYUICoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoat
         }
     }
 
-    const char* materialStr = nullptr;
-    if (paramStr(node, "materialTopLayer", &materialStr)) {
+    const char* materialTopLayer = nullptr;
+    if (!paramStr(node, "materialTopLayer", &materialTopLayer)) {
         Material material;
-        materialFromString(materialStr, &material);
+        materialFromString(materialTopLayer, &material);
         out->material[numberLayer] = static_cast<int>(material);
 
         if (!paramDouble(node, "thicknessTopLayer", &out->thickness[numberLayer])) {
@@ -267,6 +283,7 @@ bool paramRAYUICoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoat
         }
         out->numLayers += 1;
     }
+    return true;
 }
 
 // multilayer coating

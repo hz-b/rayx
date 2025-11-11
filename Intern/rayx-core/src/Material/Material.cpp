@@ -10,6 +10,7 @@
 #include "NffTable.h"
 #include "PalikTable.h"
 #include "CromerTable.h"
+#include "MolecTable.h"
 
 namespace rayx {
 
@@ -34,6 +35,22 @@ const char* getMaterialName(Material m) {
     return nullptr;
 }
 
+int getMaterialAtomicNumber(Material m) {
+    switch (m) {
+        case Material::VACUUM:
+            return -1;
+        case Material::REFLECTIVE:
+            return -2;
+#define X(e, z, a, rho) \
+    case Material::e:   \
+        return z;
+#include "materials.xmacro"
+#undef X
+    }
+    RAYX_EXIT << "unknown material in getMaterialAtomicNumber()!";
+    return -1;
+}
+
 // std::vector over all materials
 std::vector<Material> allNormalMaterials() {
     std::vector<Material> mats;
@@ -55,11 +72,13 @@ bool materialFromString(const char* matname, Material* out) {
     return false;
 }
 
-MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
+MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
-    if (mats.size() != 92) { RAYX_EXIT << "unexpected number of materials. this is a bug."; }
+    if (mats.size() != 133) {
+        RAYX_EXIT << "unexpected number of materials. this is a bug.";
+    }
 
     // add palik table content
     for (size_t i = 0; i < mats.size(); i++) {
@@ -67,7 +86,9 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
         if (relevantMaterials[i]) {
             PalikTable t;
 
-            if (!PalikTable::load(getMaterialName(mats[i]), &t)) { RAYX_EXIT << "could not load PalikTable!"; }
+            if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
+                RAYX_VERB << "could not load PalikTable!";
+            }
 
             for (auto x : t.m_Lines) {
                 out.materials.push_back(x.m_energy);
@@ -80,15 +101,29 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
     // add nff table content
     for (size_t i = 0; i < mats.size(); i++) {
         out.indices.push_back(out.materials.size());
+        Material mat = mats[i];
         if (relevantMaterials[i]) {
             NffTable t;
 
-            if (!NffTable::load(getMaterialName(mats[i]), &t)) { RAYX_EXIT << "could not load NffTable!"; }
+            if (!NffTable::load(getMaterialName(mat), &t)) {
+                RAYX_VERB << "could not load NffTable!";
+            }
+
+            glm::dvec2 massAndRho = getAtomicMassAndRho(getMaterialAtomicNumber(mat));
+            double mass = massAndRho.x;
+            double rho = massAndRho.y;
 
             for (auto x : t.m_Lines) {
-                out.materials.push_back(x.m_energy);
-                out.materials.push_back(x.m_f1);
-                out.materials.push_back(x.m_f2);
+                double en = x.m_energy;
+                double n = 1 - (415.252 * rho * x.m_f1) / (en * en * mass);
+                double k = (415.252 * rho * x.m_f2) / (en * en * mass);
+                NKEntry nk;
+                nk.m_energy = en;
+                nk.m_n = n;
+                nk.m_k = k;
+                out.materials.push_back(nk.m_energy);
+                out.materials.push_back(nk.m_n);
+                out.materials.push_back(nk.m_k);
             }
         }
     }
@@ -100,7 +135,38 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
             CromerTable t;
 
             if (!CromerTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_EXIT << "could not load CromerTable!";
+                RAYX_VERB << "could not load CromerTable!";
+                continue;
+            }
+
+            glm::dvec2 massAndRho = getAtomicMassAndRho(i);
+            double mass = massAndRho.x;
+            double rho = massAndRho.y;
+
+            for (auto x : t.m_Lines) {
+                double en = x.m_energy;
+                double n = 1 - (415.252 * rho * x.m_f1) / (en * en * mass);
+                double k = (415.252 * rho * x.m_f2) / (en * en * mass);
+                NKEntry nk;
+                nk.m_energy = en;
+                nk.m_n = n;
+                nk.m_k = k;
+                out.materials.push_back(nk.m_energy);
+                out.materials.push_back(nk.m_n);
+                out.materials.push_back(nk.m_k);
+            }
+        }
+    }
+    
+    
+    // add molec table content now
+    for (size_t i = 0; i < mats.size(); i++) {
+        out.indices.push_back(out.materials.size());
+        if(relevantMaterials[i]) {   
+            MolecTable t;
+            if (!MolecTable::load(getMaterialName(mats[i]), &t)) {
+                RAYX_VERB << "could not load MolecTable!";
+                continue;
             }
 
             for (auto x : t.m_Lines) {
@@ -125,4 +191,21 @@ MaterialTables loadMaterialTables(std::array<bool, 92> relevantMaterials) {
     return out;
 }
 
-}  // namespace rayx
+// returns dvec2(atomic mass, density) extracted from materials.xmacro
+glm::dvec2 getAtomicMassAndRho(int material) {
+    // This is an "X-Macro", see https://en.wikipedia.org/wiki/X_macro
+    // It allows us to generate a `case` for each material in the materials.xmacro file.
+    // The `case` matches upon the atomic number of the element, and returns the atomic mass and density as specified in the materials.xmacro file.
+    switch (material) {
+#define X(e, z, a, rho) \
+    case z:             \
+        return glm::dvec2(a, rho);
+#include "../Material/materials.xmacro"
+#undef X
+    }
+    RAYX_VERB << "invalid material index " << material;
+    _throw("invalid material in getAtomicMassAndRho");
+    return glm::dvec2(0.0, 0.0);
+}
+
+}  // namespace RAYX

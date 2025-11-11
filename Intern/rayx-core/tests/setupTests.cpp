@@ -217,7 +217,7 @@ void traceRmlAndCompareAgainstCorrectResults(std::string filename, double tolera
 }
 
 MaterialTables createMaterialTables(std::vector<Material> mats_vec) {
-    std::array<bool, 92> mats;
+    std::array<bool, 133> mats;
     mats.fill(false);
     for (auto m : mats_vec) { mats[static_cast<int>(m) - 1] = true; }
     return loadMaterialTables(mats);

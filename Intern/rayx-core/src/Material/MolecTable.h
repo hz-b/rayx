@@ -3,27 +3,27 @@
 #include <string>
 #include <vector>
 
-// This file defines the PalikEntry.
+// This file defines the MolecEntry.
 #include "../Shader/RefractiveIndex.h"
 
-namespace rayx {
+namespace RAYX {
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:
  *
- * PalikTable cu;
- * bool success = PalikTable::load("CU", &cu); // the palik table for copper!
+ * Molec SiC2;
+ * bool success = MolecTable::load("SiC2", &csic2); // the refractive index
+ * table for this molecule!
  *
  */
-struct PalikTable {
+struct MolecTable {
     std::string m_element;
     std::vector<NKEntry> m_Lines;
 
     /** loads the .NKP file of the element `element` and writes it's contents to
      * `out` */
-    static bool load(const char* element, PalikTable* out);
-
+    static bool load(const char* element, MolecTable* out);
     // double interpolate(double x) const;
 };
 
-}  // namespace rayx
+}  // namespace RAYX
