@@ -11,6 +11,10 @@ set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 # ------------------
 
+# --- Prevent CMake from using absolute paths in RPATH. Use relative paths instead ---
+set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
+# ------------------
+
 # ---- Options ----
 option(RAYX_WERROR "add -Werror option. Warning will be treated as errors." OFF) # inactive per default
 if (RAYX_WERROR)

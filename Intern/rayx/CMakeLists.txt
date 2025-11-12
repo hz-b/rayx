@@ -6,8 +6,14 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # ---- Project ----
 project(rayx VERSION ${RAYX_VERSION})
+
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    BUILD_RPATH "$ORIGIN;$ORIGIN/lib;$ORIGIN/../lib"
+    INSTALL_RPATH "$ORIGIN;$ORIGIN/lib;$ORIGIN/../lib" # TODO: review if this is necessary
+)
 # ------------------
 
 
