@@ -1,27 +1,6 @@
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 include(CheckLanguage)
 
-set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
-
-add_subdirectory(googletest)
-
-# support version in CMakeLists.txt of portable-file-dialogs was removed from cmake. thus we include the header only library by hand
-add_library(portable_file_dialogs INTERFACE)
-target_include_directories(portable_file_dialogs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/portable-file-dialogs)
-
-# --- CLI11 ---
-set(CLI11_SANITIZERS OFF)
-set(CLI11_BUILD_DOCS OFF)
-set(CLI11_BUILD_TESTS OFF)
-set(CLI11_BUILD_EXAMPLES OFF)
-set(CLI11_BUILD_EXAMPLES_JSON OFF)
-set(CLI11_SINGLE_FILE_TESTS OFF)
-set(CLI11_INSTALL OFF)
-set(CLI11_FORCE_LIBCXX OFF)
-set(CLI11_CUDA_TESTS OFF)
-set(CLI11_CLANG_TIDY OFF)
-add_subdirectory(CLI11)
-
 # --- alpaka ---
 
 # alpaka openmp backend
@@ -97,5 +76,32 @@ if(RAYX_ENABLE_H5)
     endif()
 endif()
 
+if (RAYX_BUILD_TESTS)
+    set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
+
+    add_subdirectory(googletest)
+endif()
+
+# --- CLI11 ---
+if (RAYX_BUILD_RAYX_CLI)
+    set(CLI11_SANITIZERS OFF)
+    set(CLI11_BUILD_DOCS OFF)
+    set(CLI11_BUILD_TESTS OFF)
+    set(CLI11_BUILD_EXAMPLES OFF)
+    set(CLI11_BUILD_EXAMPLES_JSON OFF)
+    set(CLI11_SINGLE_FILE_TESTS OFF)
+    set(CLI11_INSTALL OFF)
+    set(CLI11_FORCE_LIBCXX OFF)
+    set(CLI11_CUDA_TESTS OFF)
+    set(CLI11_CLANG_TIDY OFF)
+    add_subdirectory(CLI11)
+endif()
+
 # --- SDL ---
-add_subdirectory(SDL EXCLUDE_FROM_ALL)
+if(RAYX_BUILD_RAYX_UI)
+    # support version in CMakeLists.txt of portable-file-dialogs was removed from cmake. thus we include the header only library by hand
+    add_library(portable_file_dialogs INTERFACE)
+    target_include_directories(portable_file_dialogs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/portable-file-dialogs)
+
+    add_subdirectory(SDL EXCLUDE_FROM_ALL)
+endif()
