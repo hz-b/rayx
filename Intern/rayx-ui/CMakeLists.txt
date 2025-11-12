@@ -19,6 +19,11 @@ if(Vulkan_FOUND)
 
     add_executable(${PROJECT_NAME} WIN32 ${SOURCE} ${IMGUI_SOURCES})
 
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        BUILD_RPATH "$ORIGIN;$ORIGIN/lib;$ORIGIN/../lib"
+        INSTALL_RPATH "$ORIGIN;$ORIGIN/lib;$ORIGIN/../lib" # TODO: review if this is necessary
+    )
+
     if(MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE /W4)
         if(RAYX_WERROR)
