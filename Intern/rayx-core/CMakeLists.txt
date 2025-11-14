@@ -54,7 +54,6 @@ endif()
 
 # ---- Project ----
 project(rayx-core VERSION ${RAYX_VERSION})
-
 file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE ALPAKA_SOURCE
     ${PROJECT_SOURCE_DIR}/src/Shader/*.cpp
