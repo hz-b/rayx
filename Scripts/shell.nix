@@ -21,6 +21,9 @@ pkgs.mkShell {
     gdb
     cmake
     ninja
+    cudaPackages.cuda_cudart
+    cudaPackages.cuda_nvcc
+    cudaPackages.cuda_cccl
 
     # rayx-core dependencies
     hdf5
@@ -30,6 +33,7 @@ pkgs.mkShell {
     vulkan-headers
     vulkan-loader
     vulkan-validation-layers
+    vulkan-extension-layer
     vulkan-tools
     vulkan-tools-lunarg
     vulkan-utility-libraries
@@ -52,7 +56,9 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    export CMAKE_PREFIX_PATH=${pkgs.boost}:${pkgs.hdf5}:${pkgs.cmake}:${pkgs.pkg-config};
+    export CMAKE_PREFIX_PATH=${pkgs.hdf5}:${pkgs.cmake}:${pkgs.pkg-config}:${pkgs.cudaPackages.cuda_cudart}:${pkgs.vulkan-headers}:${pkgs.vulkan-loader}:${pkgs.vulkan-validation-layers}:${pkgs.vulkan-extension-layer}:${pkgs.vulkan-tools}:${pkgs.vulkan-tools-lunarg}:${pkgs.vulkan-utility-libraries}:${pkgs.cudaPackages.cuda_cccl};
     export VK_LAYER_PATH="${pkgs.vulkan-validation-layers}/share/vulkan/explicit_layer.d";
+    echo ${pkgs.cudaPackages.cuda_cudart}
+    echo ${pkgs.cudaPackages.cuda_nvcc}
   '';
 }
