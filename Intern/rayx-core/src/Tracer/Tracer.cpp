@@ -18,13 +18,6 @@ inline std::shared_ptr<rayx::DeviceTracer> createDeviceTracer(DeviceType deviceT
             RAYX_EXIT << "Failed to create Tracer with Cuda device. Cuda was disabled during build.";
             return nullptr;
 #endif
-        case DeviceType::GpuHip:
-#if defined(RAYX_HIP_ENABLED)
-            eturn std::make_shared<rayx::MegaKernelTracer<alpaka::TagGpuHipRt>>(deviceIndex);
-#else
-            RAYX_EXIT << "Failed to create Tracer with Hip device. Hip was disabled during build.";
-            return nullptr;
-#endif
         default:  // case DeviceType::Cpu
 #if defined(RAYX_OPENMP_ENABLED)
             using TagCpu = alpaka::TagCpuOmp2Blocks;
