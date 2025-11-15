@@ -13,9 +13,7 @@ endif()
 add_subdirectory(rayx-core)
 
 if(RAYX_BUILD_RAYX_CLI)
-    if(NOT RAYX_CMD STREQUAL "NO")
-        add_subdirectory(rayx)
-    endif()
+    add_subdirectory(rayx)
 endif()
 
 if(RAYX_BUILD_RAYX_UI)

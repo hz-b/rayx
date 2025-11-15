@@ -46,7 +46,7 @@ endif()
 # -----------------------
 
 # ---- Add tests ----
-if(RAYX_BUILD_TESTS)
+if(RAYX_BUILD_RAYX_TESTS)
     add_subdirectory(tests)
 endif()
 
