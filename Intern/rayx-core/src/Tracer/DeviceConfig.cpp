@@ -20,20 +20,17 @@ DeviceType platformToDeviceType();
 
 template <>
 DeviceType platformToDeviceType<alpaka::PlatformCpu>() {
-    return DeviceType::Cpu;
+#if defined(RAYX_OPENMP_ENABLED)
+    return DeviceType::CpuParallel;
+#else
+    return DeviceType::CpuSerial;
+#endif
 }
 
 #if defined(RAYX_CUDA_ENABLED)
 template <>
 DeviceType platformToDeviceType<alpaka::PlatformCudaRt>() {
     return DeviceType::GpuCuda;
-}
-#endif
-
-#if defined(RAYX_HIP_ENABLED)
-template <>
-DeviceType platformToDeviceType<alpaka::PlatformHipRt>() {
-    return DeviceType::GpuHip;
 }
 #endif
 
@@ -80,18 +77,13 @@ std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All)
     };
 
 #if defined(RAYX_OPENMP_ENABLED)
-    using TagCpu = alpaka::TagCpuOmp2Blocks;
+    if (deviceType & DeviceType::CpuParallel) append(alpaka::TagCpuOmp2Blocks{});
 #else
-    using TagCpu = alpaka::TagCpuSerial;
+    if (deviceType & DeviceType::CpuSerial) append(alpaka::TagCpuSerial{});
 #endif
-    if (deviceType & DeviceType::Cpu) append(TagCpu{});
 
 #if defined(RAYX_CUDA_ENABLED)
     if (deviceType & DeviceType::GpuCuda) append(alpaka::TagGpuCudaRt{});
-#endif
-
-#if defined(RAYX_HIP_ENABLED)
-    if (deviceType & DeviceType::GpuHip) append(alpaka::TagGpuHipRt{});
 #endif
 
     return devices;
@@ -100,11 +92,11 @@ std::vector<Device> getAvailableDevices(DeviceType deviceType = DeviceType::All)
 std::string deviceTypeToString(DeviceType deviceType) {
     std::vector<const char*> names;
 
-    if (deviceType & DeviceType::Cpu) names.push_back("Cpu");
+    if (deviceType & DeviceType::CpuSerial) names.push_back("CpuSerial");
+    if (deviceType & DeviceType::CpuParallel) names.push_back("CpuParallel");
     if (deviceType & DeviceType::GpuCuda) names.push_back("GpuCuda");
-    if (deviceType & DeviceType::GpuHip) names.push_back("GpuHip");
 
-    if (names.empty()) names.push_back("Unsupported");
+    if (names.empty()) names.push_back("None");
 
     std::stringstream ss;
 
@@ -131,9 +123,8 @@ void DeviceConfig::dumpDevices() const {
         RAYX_LOG << "Device - index: " << i << ", type: " << deviceTypeToString(device.type) << ", name: " << device.name;
     }
 
-#if !defined(RAYX_CUDA_ENABLED) && !defined(RAYX_HIP_ENABLED)
-    if (m_fetchedDeviceType != DeviceType::Cpu)
-        RAYX_WARN << "No GPU support was compiled in this build.";
+#if !defined(RAYX_CUDA_ENABLED)
+    if (!(m_fetchedDeviceType & DeviceType::Cpu)) RAYX_WARN << "GPU support is not enabled in this build.";
 #endif
 }
 
@@ -195,6 +186,22 @@ DeviceConfig& DeviceConfig::enableBestDevice(DeviceType deviceType) {
 
     (*bestIt)->enable = true;
     return *this;
+}
+
+DeviceConfig::DeviceType DeviceConfig::availableDeviceTypes() {
+    DeviceType deviceType = DeviceType::None;
+
+#if defined(RAYX_OPENMP_ENABLED)
+    deviceType = static_cast<DeviceType>(deviceType | DeviceType::CpuParallel);
+#else
+    deviceType = static_cast<DeviceType>(deviceType | DeviceType::CpuSerial);
+#endif
+
+#if defined(RAYX_CUDA_ENABLED)
+    deviceType = static_cast<DeviceType>(deviceType | DeviceType::GpuCuda);
+#endif
+
+    return deviceType;
 }
 
 }  // namespace rayx
