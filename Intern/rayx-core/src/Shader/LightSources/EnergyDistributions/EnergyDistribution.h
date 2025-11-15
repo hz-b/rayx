@@ -16,13 +16,14 @@ struct EnergyDistributionList {
 };
 
 struct EnergyDistributionDataBase {
-    using HardEdge        = rayx::HardEdge;
-    using SoftEdge        = rayx::SoftEdge;
-    using SeparateEnergies = rayx::SeparateEnergies;
+    using HardEdge               = rayx::HardEdge;
+    using SoftEdge               = rayx::SoftEdge;
+    using SeparateEnergies       = rayx::SeparateEnergies;
     using EnergyDistributionList = rayx::EnergyDistributionList;
 };
 
-using EnergyDistributionDataVariant = Variant<EnergyDistributionDataBase, EnergyDistributionDataBase::HardEdge, EnergyDistributionDataBase::SoftEdge, SeparateEnergies, EnergyDistributionDataBase::EnergyDistributionList>;
+using EnergyDistributionDataVariant = Variant<EnergyDistributionDataBase, EnergyDistributionDataBase::HardEdge, EnergyDistributionDataBase::SoftEdge,
+                                              SeparateEnergies, EnergyDistributionDataBase::EnergyDistributionList>;
 
 RAYX_FN_ACC double selectEnergy(const HardEdge& __restrict hardEdge, Rand& __restrict rand);
 RAYX_FN_ACC double selectEnergy(const SoftEdge& __restrict softEdge, Rand& __restrict rand);

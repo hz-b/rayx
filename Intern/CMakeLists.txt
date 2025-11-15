@@ -12,13 +12,15 @@ endif()
 # ---- Subdirectories ----
 add_subdirectory(rayx-core)
 
-if(NOT RAYX_CMD STREQUAL "NO")
+if(RAYX_BUILD_RAYX_CLI)
     add_subdirectory(rayx)
 endif()
 
-# Don't build rayx-ui without Vulkan
-if(NOT VULKAN STREQUAL "NO")
-    add_subdirectory(rayx-ui)
+if(RAYX_BUILD_RAYX_UI)
+    # Don't build rayx-ui without Vulkan
+    if(NOT VULKAN STREQUAL "NO")
+        add_subdirectory(rayx-ui)
+    endif()
 endif()
 
 # ------------------------

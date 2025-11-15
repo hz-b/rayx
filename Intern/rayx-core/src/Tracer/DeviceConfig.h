@@ -9,11 +9,12 @@ namespace rayx {
 
 struct RAYX_API DeviceConfig {
     enum RAYX_API DeviceType {
-        Unsupported = 0,
-        Cpu         = 1 << 0,
-        GpuCuda     = 1 << 1,
-        GpuHip      = 1 << 2,
-        Gpu         = GpuCuda | GpuHip,
+        None        = 0,
+        CpuSerial   = 1 << 0,
+        CpuParallel = 1 << 1,
+        Cpu         = CpuSerial | CpuParallel,
+        GpuCuda     = 1 << 2,
+        Gpu         = GpuCuda,
         All         = Cpu | Gpu,
     };
 
@@ -45,6 +46,8 @@ struct RAYX_API DeviceConfig {
     DeviceConfig& enableDeviceByIndex(const Device::Index deviceIndex);
 
     DeviceConfig& enableBestDevice(DeviceType deviceType = DeviceType::All);
+
+    static DeviceType availableDeviceTypes();
 
     std::vector<Device> devices;
 
