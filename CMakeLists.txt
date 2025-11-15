@@ -26,6 +26,7 @@ option(RAYX_REQUIRE_H5 "If option 'RAYX_ENABLE_H5' is ON, this option will add t
 option(RAYX_BUILD_TESTS "This option builds the RAYX test suite." ON)
 option(RAYX_BUILD_RAYX_CLI "This option builds the RAYX command line interface." ON)
 option(RAYX_BUILD_RAYX_UI "This option builds the RAYX graphical user interface." ON)
+option(RAYX_BUILD_RAYX_TESTS "This option builds the RAYX test suite." ON)
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
 # ------------------
 

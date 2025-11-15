@@ -131,11 +131,10 @@ void DeviceConfig::dumpDevices() const {
         RAYX_LOG << "Device - index: " << i << ", type: " << deviceTypeToString(device.type) << ", name: " << device.name;
     }
 
-    if (m_fetchedDeviceType != DeviceType::Cpu) {
 #if !defined(RAYX_CUDA_ENABLED) && !defined(RAYX_HIP_ENABLED)
+    if (m_fetchedDeviceType != DeviceType::Cpu)
         RAYX_WARN << "No GPU support was compiled in this build.";
 #endif
-    }
 }
 
 size_t DeviceConfig::enabledDevicesCount() const {
