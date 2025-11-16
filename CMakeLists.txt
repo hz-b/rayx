@@ -23,7 +23,6 @@ option(RAYX_ENABLE_OPENMP "This option enables the search for OPENMP. Project wi
 option(RAYX_REQUIRE_OPENMP "If option 'RAYX_ENABLE_OPENMP' is ON, this option will add the requirement that openmp must be found." OFF)
 option(RAYX_ENABLE_H5 "This option enables the search for HDF5. Project will be compiled without HDF5 if not found." ON)
 option(RAYX_REQUIRE_H5 "If option 'RAYX_ENABLE_H5' is ON, this option will add the requirement that HDF5 must be found." OFF)
-option(RAYX_BUILD_TESTS "This option builds the RAYX test suite." ON)
 option(RAYX_BUILD_RAYX_CLI "This option builds the RAYX command line interface." ON)
 option(RAYX_BUILD_RAYX_UI "This option builds the RAYX graphical user interface." ON)
 option(RAYX_BUILD_RAYX_TESTS "This option builds the RAYX test suite." ON)
