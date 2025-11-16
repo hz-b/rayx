@@ -1,16 +1,5 @@
 #pragma once
 
-// Memory leak detection (RAYX_NEW instead of new allows leaks to be detected)
-#ifdef RAYX_DEBUG_MODE
-#ifdef RAYX_PLATFORM_MSVC
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#endif
-#define RAYX_NEW new (_NORMAL_BLOCK, __FILE__, __LINE__)
-#else
-#define RAYX_NEW new
-#endif
-
 /**
  *  Defining the RAYX_API macro, which helps with
  *  building the library (context based import/export of code).
@@ -39,13 +28,6 @@
 #else
 #define RAYX_API
 #endif
-#endif
-
-// make string comparison available for msvc compiler
-// not #if defined(_WIN32) || defined(_WIN64) because we have strncasecmp in mingw
-#ifdef _MSC_VER
-#define strncasecmp _strnicmp
-#define strcasecmp  _stricmp
 #endif
 
 #ifdef RAYX_BUILD_DLL
