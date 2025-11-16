@@ -21,6 +21,7 @@ pkgs.mkShell {
     gdb
     cmake
     ninja
+    llvmPackages.openmp
     # cudaPackages.cuda_cudart
     # cudaPackages.cuda_nvcc
     # cudaPackages.cuda_cccl
