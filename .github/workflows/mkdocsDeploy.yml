@@ -30,7 +30,8 @@ jobs:
           enable-cache: true
 
       - name: Install docs dependencies
-          # TODO: --locked asserts that the lockfile remains unchanged should this use --frozen instead?
+          # --locked asserts that the uv lockfile remains unchanged compared to the pyproject toml
+          # and will not update the dependencies
         run: |
           uv sync --group docs --locked
           sudo apt-get update
