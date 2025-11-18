@@ -14,13 +14,13 @@ jobs:
 
     steps:
 
-      - uses: action/checkout@v5 # normally fetches only the triggering commit
+      - uses: actions/checkout@v5 # normally fetches only the triggering commit
         with:
           fetch-depth: 0 # fetches all commits and tags for all branches
           # TODO: this is probably way too much, only needs the current commit with tags and gh-pages branch for mike version.info
 
       - name: Set up Python # according to the uv documentation this is faster that letting uv manage python
-        uses: action/setup-python@v5
+        uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
 
