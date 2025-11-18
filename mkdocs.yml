@@ -36,6 +36,7 @@ extra:
 
 theme:
   name: material
+  logo: res/rayx-logo.png
   features:
     - content.code.copy
     - content.code.annotate
