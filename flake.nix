@@ -1,5 +1,20 @@
+# this flake is for building, running and developing rayx
+#
+# usage (from repo root):
+# `nix build`     # build rayx (NOTE: write permission to /nix/store is required)
+# `nix run`       # run rayx
+# `nix develop`   # development environment
+# `nix shell`     # production environment
+#
+# usage (without repo)
+# `nix build github:hz-b/rayx`   # build rayx (NOTE: write permission to /nix/store is required)
+# `nix run github:hz-b/rayx`     # run rayx
+# `nix shell github:hz-b/rayx`   # production environment
+#
+# NOTE: if you want cuda support, append `path/to/rayx#rayx-cuda` to the commands above
+
 {
-  description = "RAYX simulation tool with CUDA, OpenMP, valgrind, and Ninja build";
+  description = "RAYX TODO"; # TODO: write description
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -10,17 +25,18 @@
       version = "1.1.0";
       supportedSystems = [ "x86_64-linux" ]; # TODO: add support for "x86_64-darwin" "aarch64-linux" "aarch64-darwin"
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; config.allowUnfree = true; });
+      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
+      unfreeNixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; config.allowUnfree = true; });
     in {
 
       # build rayx
       # usage:
-      # nix build github:hz-b/rayx#rayx
-      # nix build github:hz-b/rayx#rayx-cuda
-      # you may need to have write access to /store
+      # nix build
+      # nix build .#rayx-cuda
       packages = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
+          unfreePkgs = unfreeNixpkgsFor.${system};
 
           src = pkgs.fetchgit {
             url = "https://github.com/hz-b/rayx";
@@ -60,11 +76,8 @@
             inherit version;
             inherit src;
 
-            nativeBuildInputs = with pkgs; [
-            ] ++ commonNativeBuildInputs;
-
-            buildInputs = with pkgs; [
-            ] ++ commonBuildInputs;
+            nativeBuildInputs = with pkgs; [] ++ commonNativeBuildInputs;
+            buildInputs = with pkgs; [] ++ commonBuildInputs;
 
             configurePhase = ''
               mkdir build
@@ -95,12 +108,12 @@
             inherit version;
             inherit src;
 
-            nativeBuildInputs = with pkgs; [
+            nativeBuildInputs = with unfreePkgs; [
               cudaPackages.cuda_nvcc
               cudaPackages.cuda_cccl
             ] ++ commonNativeBuildInputs;
 
-            buildInputs = with pkgs; [
+            buildInputs = with unfreePkgs; [
               cudaPackages.cuda_cudart
             ] ++ commonBuildInputs;
 
@@ -133,12 +146,9 @@
       );
 
       # usage:
-      # nix run github:hz-b/rayx#rayx
-      # nix run github:hz-b/rayx#rayx-cuda
+      # nix run
+      # nix run .#rayx-cuda
       apps = forAllSystems (system:
-        let
-          pkgs = nixpkgsFor.${system};
-        in
         {
           # running rayx works out of the box, but for rayx-cuda we need to specialize the command,
           # because nix run tries to run the file rayx-cuda, but we want to run the file rayx instead
@@ -151,31 +161,21 @@
 
       # virtual environments
       # usage:
-      # nix develop github:hz-b/rayx#rayx
-      # nix develop github:hz-b/rayx#rayx-cuda
+      # nix develop
+      # nix develop .#rayx-cuda
       devShells = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
         in
         {
           rayx = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              self.packages.${system}.rayx
-            ];
-
-            shellHook = ''
-              echo "Development shell for rayx. Run 'rayx --help' for more information"
-            '';
+            buildInputs = self.packages.${system}.rayx.buildInputs;
+            nativeBuildInputs = self.packages.${system}.rayx.nativeBuildInputs;
           };
 
           rayx-cuda = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              self.packages.${system}.rayx-cuda
-            ];
-
-            shellHook = ''
-              echo "Development shell for rayx. Run 'rayx --help' for more information"
-            '';
+            buildInputs = self.packages.${system}.rayx-cuda.buildInputs;
+            nativeBuildInputs = self.packages.${system}.rayx-cuda.nativeBuildInputs;
           };
 
           default = self.devShells.${system}.rayx;
