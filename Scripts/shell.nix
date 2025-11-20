@@ -57,7 +57,7 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    export CMAKE_PREFIX_PATH=${pkgs.hdf5}:${pkgs.cmake}:${pkgs.pkg-config}:${pkgs.vulkan-headers}:${pkgs.vulkan-loader}:${pkgs.vulkan-validation-layers}:${pkgs.vulkan-extension-layer}:${pkgs.vulkan-tools}:${pkgs.vulkan-tools-lunarg}:${pkgs.vulkan-utility-libraries};
+    export CMAKE_PREFIX_PATH=${pkgs.hdf5}:${pkgs.cmake}:${pkgs.pkg-config}:${pkgs.vulkan-headers}:${pkgs.vulkan-loader}:${pkgs.vulkan-validation-layers}:${pkgs.vulkan-extension-layer}:${pkgs.vulkan-tools}:${pkgs.vulkan-tools-lunarg}:${pkgs.vulkan-utility-libraries}:${llvmPackages.openmp};
     export VK_LAYER_PATH="${pkgs.vulkan-validation-layers}/share/vulkan/explicit_layer.d";
   '';
 }
