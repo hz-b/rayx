@@ -12,10 +12,15 @@
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; config.allowUnfree = true; });
     in {
+
+      # build rayx
+      # usage:
+      # nix build github:hz-b/rayx#rayx
+      # nix build github:hz-b/rayx#rayx-cuda
+      # you may need to have write access to /store
       packages = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
-          pkgsUnfree = nixpkgsFor.${system};
 
           src = pkgs.fetchgit {
             url = "https://github.com/hz-b/rayx";
@@ -115,7 +120,6 @@
               mkdir -p $out/bin
               cp -r bin/release/Data $out/bin
               cp -r bin/release/rayx $out/bin
-              mv $out/bin/rayx $out/bin/rayx-cuda
 
               mkdir -p $out/lib
               cp -r lib/release/* $out/lib
@@ -125,6 +129,56 @@
           };
 
           default = self.packages.${system}.rayx;
+        }
+      );
+
+      # usage:
+      # nix run github:hz-b/rayx#rayx
+      # nix run github:hz-b/rayx#rayx-cuda
+      apps = forAllSystems (system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
+          # running rayx works out of the box, but for rayx-cuda we need to specialize the command,
+          # because nix run tries to run the file rayx-cuda, but we want to run the file rayx instead
+          rayx-cuda = {
+            type = "app";
+            program = "${self.packages.${system}.rayx-cuda}/bin/rayx";
+          };
+        }
+      );
+
+      # virtual environments
+      # usage:
+      # nix develop github:hz-b/rayx#rayx
+      # nix develop github:hz-b/rayx#rayx-cuda
+      devShells = forAllSystems (system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
+          rayx = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              self.packages.${system}.rayx
+            ];
+
+            shellHook = ''
+              echo "Development shell for rayx. Run 'rayx --help' for more information"
+            '';
+          };
+
+          rayx-cuda = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              self.packages.${system}.rayx-cuda
+            ];
+
+            shellHook = ''
+              echo "Development shell for rayx. Run 'rayx --help' for more information"
+            '';
+          };
+
+          default = self.devShells.${system}.rayx;
         }
       );
     };
