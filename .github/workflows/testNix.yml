@@ -10,9 +10,15 @@ on:
     branches:
       - '**'     # Run for all pull requests
 
+env:
+  rml: Intern/rayx-core/tests/input/METRIX_U41_G1_H1_318eV_PS_MLearn_v114.rml
+
 jobs:
   nix-run:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [rayx, rayx-cuda]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,10 +31,16 @@ jobs:
           mkdir -p ~/.config/nix
           echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 
-      - name: install dependencies and build rayx
-        run: nix build
-
-      - name: run rayx
+      - name: nix build
         run: |
-          export RML=Intern/rayx-core/tests/input/METRIX_U41_G1_H1_318eV_PS_MLearn_v114.rml
-          ./result/bin/rayx -x -c -V -i $RML
+          nix build .#${{ matrix.target }}
+          ./result/bin/${{ matrix.target }} -x -c -V -i ${{env.rml}}
+
+      - name: nix run
+        run: |
+          nix run .#${{ matrix.target }} -- -x -c -V -i ${{env.rml}}
+
+      - name: nix shell
+        run: |
+          nix shell .#${{ matrix.target }}
+          ${{ matrix.target }} -x -c -V -i ${{env.rml}}
