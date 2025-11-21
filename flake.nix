@@ -1,23 +1,30 @@
 # this flake is for building, running and developing rayx
 #
-# usage (from repo root):
-# `nix build`     # build rayx (NOTE: write permission to /nix/store is required)
-# `nix run`       # run rayx
-# `nix develop`   # development environment
-# `nix shell`     # production environment
+# overview of commands:
+# `nix build`     # build rayx from source and put result in ./result (symlink to nix store)
+# `nix run`       # run rayx (run `nix build` if necessary)
+# `nix develop`   # development environment (provides build tools and dependencies)
+# `nix shell`     # production environment (provides rayx binary)
 #
-# you can also build docker images
+# usage (local):
+# nix (build|run|shell|develop) [path/to/rayx[#target]]
+# e.g.:
+# `nix run`                   # run rayx from current directory
+# `nix run .#rayx-cuda`       # run rayx with cuda support from current directory
+# `nix run path/to/rayx`      # run rayx from path/to/rayx
+#
+# usage (remote)
+# `nix (build|run|shell|develop) git+https://github.com/hz-b/rayx[?ref=(branchname|commithash)][#target]`
+# e.g.:
+# `nix run git+https://github.com/hz-b/rayx`                        # run the latest main development branch
+# `nix run git+https://github.com/hz-b/rayx?ref=v1.2.0`             # run specific tagged release
+# `nix run git+https://github.com/hz-b/rayx?ref=v1.2.0#rayx-cuda`   # run specific tagged release with cuda support
+#
+# you can also build docker images for rayx:
 # `nix build .#rayx-docker`               # build rayx docker image
 # `nix build .#rayx-cuda-docker`          # build rayx-cuda docker image
 # `docker load < result`                  # load the built image into docker
 # `docker run -it rayx-docker [ARG...]`   # run rayx docker image with args going to rayx
-#
-# usage (without repo)
-# `nix build github:hz-b/rayx`   # build rayx (NOTE: write permission to /nix/store is required)
-# `nix run github:hz-b/rayx`     # run rayx
-# `nix shell github:hz-b/rayx`   # production environment
-#
-# NOTE: if you want cuda support, append `path/to/rayx#rayx-cuda` to the commands above
 
 {
   description = "RAYX TODO"; # TODO: write description
