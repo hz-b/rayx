@@ -74,7 +74,7 @@
             -DRAYX_ENABLE_H5=ON \
             -DRAYX_REQUIRE_H5=ON \
             -DRAYX_WERROR=OFF \
-            -DRAYX_BUILD_TESTS=OFF \
+            -DRAYX_BUILD_RAYX_TESTS=OFF \
             -DRAYX_BUILD_RAYX_CLI=ON \
             -DRAYX_BUILD_RAYX_UI=OFF
           '';
@@ -149,7 +149,7 @@
             '';
 
             buildPhase = ''
-              ninja -v rayx
+              cmake --build build --target rayx --verbose
             '';
 
             installPhase = ''
@@ -219,9 +219,10 @@
         let
           pkgs = nixpkgsFor.${system};
 
-          mkDevShell = { rayxPackage }:
+          mkDevShell = { rayxPackage, extraBuildInputs }:
             pkgs.mkShell rec {
               buildInputs = with pkgs; [
+                rayxPackage
                 cmake
                 gdb
                 gcc
@@ -235,7 +236,7 @@
                 python313Packages.numpy
                 python313Packages.h5py
                 python313Packages.matplotlib
-              ] ++ rayxPackage.buildInputs;
+              ] ++ rayxPackage.buildInputs ++ (extraBuildInputs or []);
               shellHook = ''
                 echo "Development shell for rayx"
                 echo "Provided packages:"
@@ -245,7 +246,12 @@
         in
         {
           rayx = mkDevShell { rayxPackage = self.packages.${system}.rayx; };
-          rayx-cuda = mkDevShell { rayxPackage = self.packages.${system}.rayx-cuda; };
+          rayx-cuda = mkDevShell {
+            rayxPackage = self.packages.${system}.rayx-cuda;
+            extraBuildInputs = with pkgs; [
+              unfreePkgs.cudaPackages.cuda_cudagdb
+            ];
+          };
           default = self.devShells.${system}.rayx;
         }
       );
