@@ -54,7 +54,7 @@
               # this way `nix run github:hz-b/rayx` works as expected, providing the latest release
               # TODO: this needs to be updated in every new release
               url = "https://github.com/hz-b/rayx";
-              rev = "9da96500cbcb0f887b00dcbec610b81a9c645833"; # git commit hash for desired version
+              rev = "60a8a57643b1e03771df02b8eb259e895bcdee0f"; # git commit hash for desired version
               sha256 = "sha256-lZ52ZkscNqaE2PxvT7rV+B76jCOE/FKshwI3BgP8hn0="; # fill after build failure
               fetchSubmodules = true;
             };
