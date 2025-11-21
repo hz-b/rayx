@@ -35,7 +35,6 @@
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
       unfreeNixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; config.allowUnfree = true; });
     in {
-
       # build rayx
       # usage:
       # nix build
@@ -45,19 +44,7 @@
           pkgs = nixpkgsFor.${system};
           unfreePkgs = unfreeNixpkgsFor.${system};
 
-          src = if builtins.pathExists ./.
-            then
-              # if we are building locally, use the local repo
-              ./.
-            else pkgs.fetchgit {
-              # if we are building remotely, we use the latest release
-              # this way `nix run github:hz-b/rayx` works as expected, providing the latest release
-              # TODO: this needs to be updated in every new release
-              url = "https://github.com/hz-b/rayx";
-              rev = "60a8a57643b1e03771df02b8eb259e895bcdee0f"; # git commit hash for desired version
-              sha256 = "sha256-lZ52ZkscNqaE2PxvT7rV+B76jCOE/FKshwI3BgP8hn0="; # fill after build failure
-              fetchSubmodules = true;
-            };
+          src = self; # ./.
 
           commonNativeBuildInputs = with pkgs; [
             git
