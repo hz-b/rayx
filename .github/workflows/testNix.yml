@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [rayx, rayx-cuda]
+        target: [rayx, rayx-cuda, rayx-tests]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,16 +33,24 @@ jobs:
           echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 
       - name: nix build
+        if: matrix.target != 'rayx-tests'
         run: |
           nix build .#${{ matrix.target }}
           ./result/bin/rayx -V ${{ env.rml }}
 
-      - name: nix run
+      - name: run rayx
+        if: matrix.target != 'rayx-tests'
         run: |
           nix run .#${{ matrix.target }} -- -V ${{ env.rml }}
+
+      - name: run tests
+        if: matrix.target == 'rayx-tests'
+        run: |
+          nix build .#rayx-tests
+          cat ./result/rayx-core-tst.log
 
       # - name: nix shell
       #   run: |
       #     nix shell .#${{ matrix.target }}
-      #     rayx -V ${{ env.rml }}
+      #     valgrind --error-exitcode=42 rayx -V ${{ env.rml }}
       #     exit # exit the nix shell

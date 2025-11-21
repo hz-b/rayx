@@ -67,15 +67,12 @@
 
           commonCmakeConfigureFlags = ''
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_SKIP_BUILD_RPATH=ON \
             -DRAYX_REQUIRE_CUDA=ON \
             -DRAYX_ENABLE_OPENMP=ON \
             -DRAYX_REQUIRE_OPENMP=ON \
             -DRAYX_ENABLE_H5=ON \
             -DRAYX_REQUIRE_H5=ON \
             -DRAYX_WERROR=OFF \
-            -DRAYX_BUILD_RAYX_TESTS=OFF \
-            -DRAYX_BUILD_RAYX_CLI=ON \
             -DRAYX_BUILD_RAYX_UI=OFF
           '';
 
@@ -106,6 +103,9 @@
             configurePhase = ''
               cmake -S . -B build -G "Ninja" \
                 -DRAYX_ENABLE_CUDA=OFF \
+                -DRAYX_BUILD_RAYX_CLI=ON \
+                -DRAYX_BUILD_RAYX_TESTS=OFF \
+                -DCMAKE_SKIP_BUILD_RPATH=ON \
                 ${commonCmakeConfigureFlags}
             '';
 
@@ -145,6 +145,9 @@
             configurePhase = ''
               cmake -S . -B build -G "Ninja" \
                 -DRAYX_ENABLE_CUDA=OFF \
+                -DRAYX_BUILD_RAYX_CLI=ON \
+                -DRAYX_BUILD_RAYX_TESTS=OFF \
+                -DCMAKE_SKIP_BUILD_RPATH=ON \
                 ${commonCmakeConfigureFlags}
             '';
 
@@ -160,6 +163,41 @@
               cp -r build/bin/release/Data $out/bin/
               cp build/bin/release/rayx $out/bin/
               cp -r build/lib/release/* $out/lib/
+
+              runHook postInstall
+            '';
+
+            meta.description = "TODO"; # TODO: write description
+          };
+
+          # TODO: do this as a check
+          rayx-tests = pkgs.stdenv.mkDerivation {
+            pname = "rayx";
+            inherit version;
+            inherit src;
+
+            nativeBuildInputs = commonNativeBuildInputs;
+            buildInputs = commonBuildInputs;
+
+            configurePhase = ''
+              cmake -S . -B build -G "Ninja" \
+                -DRAYX_ENABLE_CUDA=OFF \
+                -DRAYX_BUILD_RAYX_CLI=OFF \
+                -DRAYX_BUILD_RAYX_TESTS=ON \
+                ${commonCmakeConfigureFlags}
+            '';
+
+            buildPhase = ''
+              cmake --build build --target rayx-core-tst --verbose
+            '';
+
+            installPhase = ''
+              runHook preInstall
+
+              mkdir -p $out
+
+              # run tests during install phase, because they require access to the source files
+              build/bin/release/rayx-core-tst -x > $out/rayx-core-tst.log
 
               runHook postInstall
             '';
