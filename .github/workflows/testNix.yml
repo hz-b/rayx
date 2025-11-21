@@ -1,0 +1,34 @@
+name: testNix
+
+on:
+  push:
+    branches:
+      - '**'     # Run on all branches
+    tags-ignore:
+      - 'v*'     # Ignore tag pushes matching 'v*'
+  pull_request:
+    branches:
+      - '**'     # Run for all pull requests
+
+jobs:
+  nix-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Enable Nix flakes
+        run: |
+          mkdir -p ~/.config/nix
+          echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+
+      - name: install dependencies and build rayx
+        run: nix build
+
+      - name: run rayx
+        run: |
+          export RML=Intern/rayx-core/tests/input/METRIX_U41_G1_H1_318eV_PS_MLearn_v114.rml
+          ./result/bin/rayx -x -c -V -i $RML
