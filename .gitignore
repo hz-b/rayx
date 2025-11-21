@@ -34,3 +34,6 @@ results.json
 
 # Vim Tags
 /tags
+
+# nix flake output
+/result

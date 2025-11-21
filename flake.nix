@@ -6,6 +6,12 @@
 # `nix develop`   # development environment
 # `nix shell`     # production environment
 #
+# you can also build docker images
+# `nix build .#rayx-docker`               # build rayx docker image
+# `nix build .#rayx-cuda-docker`          # build rayx-cuda docker image
+# `docker load < result`                  # load the built image into docker
+# `docker run -it rayx-docker [ARG...]`   # run rayx docker image with args going to rayx
+#
 # usage (without repo)
 # `nix build github:hz-b/rayx`   # build rayx (NOTE: write permission to /nix/store is required)
 # `nix run github:hz-b/rayx`     # run rayx
@@ -18,6 +24,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    self.submodules = true;
   };
 
   outputs = { self, nixpkgs }:
@@ -38,22 +45,30 @@
           pkgs = nixpkgsFor.${system};
           unfreePkgs = unfreeNixpkgsFor.${system};
 
-          src = pkgs.fetchgit {
-            url = "https://github.com/hz-b/rayx";
-            rev = "5694a0117e7d8e58a1b19f35202891270dc5ee91"; # git commit hash for desired version
-            sha256 = "sha256-clfHvQK9JI/TWDmpXiTtBie4q++F9+F37uzTvLqvMlc="; # fill after build failure
-            fetchSubmodules = true;
-          };
+          src = if builtins.pathExists ./.
+            then
+              # if we are building locally, use the local repo
+              ./.
+            else pkgs.fetchgit {
+              # if we are building remotely, we use the latest release
+              # this way `nix run github:hz-b/rayx` works as expected, providing the latest release
+              # TODO: this needs to be updated in every new release
+              url = "https://github.com/hz-b/rayx";
+              rev = "9da96500cbcb0f887b00dcbec610b81a9c645833"; # git commit hash for desired version
+              sha256 = "sha256-lZ52ZkscNqaE2PxvT7rV+B76jCOE/FKshwI3BgP8hn0="; # fill after build failure
+              fetchSubmodules = true;
+            };
 
           commonNativeBuildInputs = with pkgs; [
+            git
             cmake
             gcc
-            llvmPackages.openmp
             ninja
           ];
 
           commonBuildInputs = with pkgs; [
             hdf5
+            llvmPackages.openmp
           ];
 
           commonCmakeConfigureFlags = ''
@@ -69,6 +84,21 @@
             -DRAYX_BUILD_RAYX_CLI=ON \
             -DRAYX_BUILD_RAYX_UI=OFF
           '';
+
+          commonDockerImageContents = [
+            pkgs.bash
+            pkgs.coreutils # cat mv, rm, cp, ls, etc.
+            pkgs.gnugrep # grep
+          ];
+
+          mkDockerImage = { name, tag, rayxPackage }:
+            pkgs.dockerTools.buildLayeredImage {
+              inherit name tag;
+              contents = [ rayxPackage ] ++ commonDockerImageContents;
+              config = {
+                Entrypoint = [ "${rayxPackage}/bin/rayx" ];
+              };
+            };
         in
         {
           rayx = pkgs.stdenv.mkDerivation {
@@ -76,28 +106,29 @@
             inherit version;
             inherit src;
 
-            nativeBuildInputs = with pkgs; [] ++ commonNativeBuildInputs;
-            buildInputs = with pkgs; [] ++ commonBuildInputs;
+            nativeBuildInputs = commonNativeBuildInputs;
+            buildInputs = commonBuildInputs;
 
             configurePhase = ''
-              mkdir build
-              cd build
-              cmake -G Ninja .. \
+              cmake -S . -B build -G "Ninja" \
                 -DRAYX_ENABLE_CUDA=OFF \
                 ${commonCmakeConfigureFlags}
             '';
 
             buildPhase = ''
-              ninja -v rayx
+              cmake --build build --target rayx --verbose
             '';
 
             installPhase = ''
-              mkdir -p $out/bin
-              cp -r bin/release/Data $out/bin
-              cp -r bin/release/rayx $out/bin/
+              runHook preInstall
 
-              mkdir -p $out/lib
-              cp -r lib/release/* $out/lib
+              mkdir -p $out/bin $out/lib
+
+              cp -r build/bin/release/Data $out/bin/
+              cp build/bin/release/rayx $out/bin/
+              cp -r build/lib/release/* $out/lib/
+
+              runHook postInstall
             '';
 
             meta.description = "TODO"; # TODO: write description
@@ -109,19 +140,17 @@
             inherit src;
 
             nativeBuildInputs = with unfreePkgs; [
-              cudaPackages.cuda_nvcc
-              cudaPackages.cuda_cccl
             ] ++ commonNativeBuildInputs;
 
             buildInputs = with unfreePkgs; [
               cudaPackages.cuda_cudart
+              cudaPackages.cuda_nvcc
+              cudaPackages.cuda_cccl
             ] ++ commonBuildInputs;
 
             configurePhase = ''
-              mkdir build
-              cd build
-              cmake -G Ninja .. \
-                -DRAYX_ENABLE_CUDA=ON \
+              cmake -S . -B build -G "Ninja" \
+                -DRAYX_ENABLE_CUDA=OFF \
                 ${commonCmakeConfigureFlags}
             '';
 
@@ -130,15 +159,42 @@
             '';
 
             installPhase = ''
-              mkdir -p $out/bin
-              cp -r bin/release/Data $out/bin
-              cp -r bin/release/rayx $out/bin
+              runHook preInstall
 
-              mkdir -p $out/lib
-              cp -r lib/release/* $out/lib
+              mkdir -p $out/bin $out/lib
+
+              cp -r build/bin/release/Data $out/bin/
+              cp build/bin/release/rayx $out/bin/
+              cp -r build/lib/release/* $out/lib/
+
+              runHook postInstall
             '';
 
             meta.description = "TODO"; # TODO: write description
+          };
+
+          rayx-docker = mkDockerImage {
+            name = "rayx-docker";
+            tag = "latest";
+            rayxPackage = self.packages.${system}.rayx;
+          };
+
+          rayx-docker-versioned = mkDockerImage {
+            name = "rayx-docker";
+            tag = version;
+            rayxPackage = self.packages.${system}.rayx;
+          };
+
+          rayx-cuda-docker = mkDockerImage {
+            name = "rayx-cuda-docker";
+            tag = "latest";
+            rayxPackage = self.packages.${system}.rayx-cuda;
+          };
+
+          rayx-cuda-docker-versioned = mkDockerImage {
+            name = "rayx-cuda-docker";
+            tag = version;
+            rayxPackage = self.packages.${system}.rayx-cuda;
           };
 
           default = self.packages.${system}.rayx;
@@ -163,21 +219,39 @@
       # usage:
       # nix develop
       # nix develop .#rayx-cuda
+      # TODO: configuring rayx with cuda in dev shell does not work
+      # TODO: put this into shell.nix and reference it here, to get more compatibility with nix-direnv
       devShells = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
+
+          mkDevShell = { rayxPackage }:
+            pkgs.mkShell rec {
+              buildInputs = with pkgs; [
+                cmake
+                gdb
+                gcc
+                ninja
+                git
+                llvmPackages.clang-tools # clangd for format.sh
+                docker
+                valgrind
+                python313
+                python313Packages.pip
+                python313Packages.numpy
+                python313Packages.h5py
+                python313Packages.matplotlib
+              ] ++ rayxPackage.buildInputs;
+              shellHook = ''
+                echo "Development shell for rayx"
+                echo "Provided packages:"
+                echo "${toString buildInputs}"
+              '';
+            };
         in
         {
-          rayx = pkgs.mkShell {
-            buildInputs = self.packages.${system}.rayx.buildInputs;
-            nativeBuildInputs = self.packages.${system}.rayx.nativeBuildInputs;
-          };
-
-          rayx-cuda = pkgs.mkShell {
-            buildInputs = self.packages.${system}.rayx-cuda.buildInputs;
-            nativeBuildInputs = self.packages.${system}.rayx-cuda.nativeBuildInputs;
-          };
-
+          rayx = mkDevShell { rayxPackage = self.packages.${system}.rayx; };
+          rayx-cuda = mkDevShell { rayxPackage = self.packages.${system}.rayx-cuda; };
           default = self.devShells.${system}.rayx;
         }
       );
