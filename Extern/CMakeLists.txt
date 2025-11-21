@@ -76,7 +76,7 @@ if(RAYX_ENABLE_H5)
     endif()
 endif()
 
-if (RAYX_BUILD_TESTS)
+if (RAYX_BUILD_RAYX_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 
     add_subdirectory(googletest)
