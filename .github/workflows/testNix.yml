@@ -35,13 +35,14 @@ jobs:
       - name: nix build
         run: |
           nix build .#${{ matrix.target }}
-          ./result/bin/${{ matrix.target }} -V ${{env.rml}}
+          ./result/bin/${{ matrix.target }} -V ${{ env.rml }}
 
       - name: nix run
         run: |
-          nix run .#${{ matrix.target }} -- -V ${{env.rml}}
+          nix run .#${{ matrix.target }} -- -V ${{ env.rml }}
 
       - name: nix shell
         run: |
           nix shell .#${{ matrix.target }}
-          rayx -V ${{env.rml}}
+          rayx -V ${{ env.rml }}
+          exit # exit the nix shell
