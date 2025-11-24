@@ -340,7 +340,7 @@
                 ninja
                 git
                 llvmPackages.clang-tools # clangd for format.sh
-                docker
+                # docker # docker is disabled because it does not work on ubuntu
                 valgrind
                 python313
                 python313Packages.pip

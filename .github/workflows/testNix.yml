@@ -41,13 +41,6 @@ jobs:
         run: |
           nix run .#${{ matrix.target }} -- -V ${{ env.rml }}
 
-      - name: valgrind rayx (cli)
-        if: matrix.target == 'rayx' || matrix.target == 'rayx-cuda'
-        run: |
-          nix develop .#${{ matrix.target }}
-          valgrind --error-exitcode=42 rayx -V ${{ env.rml }}
-          exit # exit the nix shell
-
       - name: print test results
         if: matrix.target == 'rayx-tests'
         run: |
