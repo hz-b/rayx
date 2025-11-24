@@ -328,6 +328,7 @@
       devShells = forAllSystems (system:
         let
           pkgs = nixpkgsFor.${system};
+          unfreePkgs = unfreeNixpkgsFor.${system};
 
           mkDevShell = { rayxPackage, extraBuildInputs }:
             pkgs.mkShell rec {
@@ -346,7 +347,7 @@
                 python313Packages.numpy
                 python313Packages.h5py
                 python313Packages.matplotlib
-              ] ++ rayxPackage.buildInputs ++ (extraBuildInputs or []);
+              ] ++ rayxPackage.buildInputs ++ extraBuildInputs;
               shellHook = ''
                 echo "Development shell for rayx"
                 echo "Provided packages:"
@@ -355,12 +356,23 @@
             };
         in
         {
-          rayx = mkDevShell { rayxPackage = self.packages.${system}.rayx; };
+          rayx = mkDevShell {
+            rayxPackage = self.packages.${system}.rayx;
+            extraBuildInputs = [];
+          };
           rayx-cuda = mkDevShell {
             rayxPackage = self.packages.${system}.rayx-cuda;
-            extraBuildInputs = with pkgs; [
-              unfreePkgs.cudaPackages.cuda_cudagdb
+            extraBuildInputs = with unfreePkgs; [
+              cudaPackages.cuda_gdb
             ];
+          };
+          rayx-ui = mkDevShell {
+            rayxPackage = self.packages.${system}.rayx-ui;
+            extraBuildInputs = with unfreePkgs; [];
+          };
+          rayx-tests = mkDevShell {
+            rayxPackage = self.packages.${system}.rayx-tests;
+            extraBuildInputs = [];
           };
           default = self.devShells.${system}.rayx;
         }
