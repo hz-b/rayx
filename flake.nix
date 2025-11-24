@@ -72,8 +72,7 @@
             -DRAYX_REQUIRE_OPENMP=ON \
             -DRAYX_ENABLE_H5=ON \
             -DRAYX_REQUIRE_H5=ON \
-            -DRAYX_WERROR=OFF \
-            -DRAYX_BUILD_RAYX_UI=OFF
+            -DRAYX_WERROR=OFF
           '';
 
           commonDockerImageContents = [
@@ -105,6 +104,7 @@
                 -DRAYX_ENABLE_CUDA=OFF \
                 -DRAYX_BUILD_RAYX_CLI=ON \
                 -DRAYX_BUILD_RAYX_TESTS=OFF \
+                -DRAYX_BUILD_RAYX_UI=OFF \
                 -DCMAKE_SKIP_BUILD_RPATH=ON \
                 ${commonCmakeConfigureFlags}
             '';
@@ -147,6 +147,7 @@
                 -DRAYX_ENABLE_CUDA=OFF \
                 -DRAYX_BUILD_RAYX_CLI=ON \
                 -DRAYX_BUILD_RAYX_TESTS=OFF \
+                -DRAYX_BUILD_RAYX_UI=OFF \
                 -DCMAKE_SKIP_BUILD_RPATH=ON \
                 ${commonCmakeConfigureFlags}
             '';
@@ -170,6 +171,67 @@
             meta.description = "TODO"; # TODO: write description
           };
 
+          rayx-ui = pkgs.stdenv.mkDerivation {
+            pname = "rayx-ui";
+            inherit version;
+            inherit src;
+
+            nativeBuildInputs = with unfreePkgs; [
+            ] ++ commonNativeBuildInputs;
+
+            # TODO: check which of these are actually needed, probably move some to nativeBuildInputs
+            buildInputs = with unfreePkgs; [
+              dbus
+              mesa
+              libdrm
+              vulkan-headers
+              vulkan-loader
+              vulkan-validation-layers
+              shaderc
+              shaderc.bin
+              shaderc.dev
+              shaderc.lib
+              glslang
+              xorg.libX11
+              xorg.libXext
+              xorg.libXcursor
+              xorg.libXinerama
+              xorg.libXrandr
+              xorg.libXi
+              xorg.libxcb
+              wayland
+              wayland-protocols
+            ] ++ commonBuildInputs;
+
+            configurePhase = ''
+              cmake -S . -B build -G "Ninja" \
+                -DRAYX_ENABLE_CUDA=OFF \
+                -DRAYX_BUILD_RAYX_CLI=OFF \
+                -DRAYX_BUILD_RAYX_TESTS=OFF \
+                -DRAYX_BUILD_RAYX_UI=ON \
+                -DCMAKE_SKIP_BUILD_RPATH=ON \
+                ${commonCmakeConfigureFlags}
+            '';
+
+            buildPhase = ''
+              cmake --build build --target rayx-ui --verbose
+            '';
+
+            installPhase = ''
+              runHook preInstall
+
+              mkdir -p $out/bin $out/lib
+
+              cp -r build/bin/release/Data $out/bin/
+              cp build/bin/release/rayx-ui $out/bin/
+              cp -r build/lib/release/* $out/lib/
+
+              runHook postInstall
+            '';
+
+            meta.description = "TODO"; # TODO: write description
+          };
+
           # TODO: do this as a check
           rayx-tests = pkgs.stdenv.mkDerivation {
             pname = "rayx";
@@ -184,6 +246,7 @@
                 -DRAYX_ENABLE_CUDA=OFF \
                 -DRAYX_BUILD_RAYX_CLI=OFF \
                 -DRAYX_BUILD_RAYX_TESTS=ON \
+                -DRAYX_BUILD_RAYX_UI=OFF \
                 ${commonCmakeConfigureFlags}
             '';
 
@@ -237,12 +300,21 @@
       # nix run
       # nix run .#rayx-cuda
       apps = forAllSystems (system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
         {
           # running rayx works out of the box, but for rayx-cuda we need to specialize the command,
           # because nix run tries to run the file rayx-cuda, but we want to run the file rayx instead
           rayx-cuda = {
             type = "app";
             program = "${self.packages.${system}.rayx-cuda}/bin/rayx";
+          };
+
+          # same as above, but for rayx-ui
+          rayx-ui = {
+            type = "app";
+            program = "${self.packages.${system}.rayx-ui}/bin/rayx-ui";
           };
         }
       );
