@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [rayx, rayx-cuda, rayx-tests]
+        target: [rayx, rayx-cuda, rayx-tests, rayx-ui]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,21 +32,18 @@ jobs:
           mkdir -p ~/.config/nix
           echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 
-      - name: nix build
-        if: matrix.target != 'rayx-tests'
+      - name: build
         run: |
           nix build .#${{ matrix.target }}
-          ./result/bin/rayx -V ${{ env.rml }}
 
-      - name: run rayx
-        if: matrix.target != 'rayx-tests'
+      - name: run rayx (cli)
+        if: matrix.target == 'rayx' || matrix.target == 'rayx-cuda'
         run: |
           nix run .#${{ matrix.target }} -- -V ${{ env.rml }}
 
-      - name: run tests
+      - name: print test results
         if: matrix.target == 'rayx-tests'
         run: |
-          nix build .#rayx-tests
           cat ./result/rayx-core-tst.log
 
       # - name: nix shell
