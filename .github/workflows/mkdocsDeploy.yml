@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - master
-    tags:
-      - v*
+  # not limited to the docs directory, because code changes might change the API docs
+  # not using the push tag (tags: v*), because it triggers the workflow twice
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -46,15 +46,23 @@ jobs:
 
       - name: Build and deploy dev documentation
         # overwrites dev version and includes the git hash in the display name
+        # this run on every push, even for a tagged version release, so dev is updated too
         # --push defaults to gh-pages branch
-        run: uv run mike deploy --push dev --title="dev ($(git rev-parse --short HEAD))"
+        run: uv run mike deploy --push --ignore-remote-status dev --title="dev ($(git rev-parse --short HEAD))"
+
+      - name: Check and set version tag
+        # done manually instead of with the version tag to prevent triggering the workflow twice
+        run: |
+          git_tag=$(git describe --tags --exact-match 2> /dev/null)
+
+          if [[ ${git_tag} =~ ^v[0-9] ]]; then
+            echo "VERSION_TAG=$git_tag" >> "$GITHUB_ENV"
+          fi
 
       - name: Build and deploy release documentation
+        if: ${{ env.VERSION_TAG }} # commit is a tagged release v*
         # Build / overwrite one version per major (tagged) version of RAYX with the full version as title and alias "latest"
-        # Pushing tag v.1.2.3 will overwrite the current v.1 and will be displayed as v.1.2.3 and becomes the default version
-        # Pushing tag v.2.0.0 will not overwrite the v.1, but will become the default "latest"
-        if: startsWith(github.ref, 'refs/tags/v') # commit is a tagged release v*
-        env:
-          VERSION: ${{ github.ref_name }} # this should be the tag name, e.g "v6.6.6"
+        # Pushing tag v1.2.3 will overwrite the current v1 and will be displayed as v1.2.3 and becomes the default version
+        # Pushing tag v2.0.0 will not overwrite the v1, but will become the default "latest" and add v2 version
         run: |
-          uv run mike deploy --push --update-aliases ${VERSION/.*} --title=$VERSION latest
+          uv run mike deploy --push --ignore-remote-status --update-aliases ${env.VERSION_TAG/.*} --title=$VERSION_TAG latest
