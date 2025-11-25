@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>How to Build - RAYX Wiki</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item affix "><a href="../index.html">README</a></li><li class="chapter-item expanded "><a href="../Introduction/01-Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../Introduction/02-How-to-build.html" class="active"><strong aria-hidden="true">1.1.</strong> How to Build</a></li><li class="chapter-item "><a href="../Introduction/02-How-to-install.html"><strong aria-hidden="true">1.2.</strong> How to Install</a></li><li class="chapter-item "><a href="../Introduction/03-Getting-Started.html"><strong aria-hidden="true">1.3.</strong> Getting Started</a></li><li class="chapter-item "><a href="../Introduction/04-How-to-use-rayx-ui.html"><strong aria-hidden="true">1.4.</strong> How to use RAYX-UI</a></li><li class="chapter-item "><a href="../Introduction/05-How-to-use-rayx.html"><strong aria-hidden="true">1.5.</strong> RAYX Commands</a></li><li class="chapter-item "><a href="../Introduction/06-Literature.html"><strong aria-hidden="true">1.6.</strong> Literature</a></li><li class="chapter-item "><a href="../Introduction/07-Style-Guide.html"><strong aria-hidden="true">1.7.</strong> Style Guide</a></li></ol></li><li class="chapter-item "><a href="../Model/Model.html"><strong aria-hidden="true">2.</strong> Model</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../Model/BeamlineObjects/BeamlineObjects.html"><strong aria-hidden="true">2.1.</strong> Beamline Objects</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/OpticalElements.html"><strong aria-hidden="true">2.1.1.</strong> Optical Elements</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Cone-Mirror.html"><strong aria-hidden="true">2.1.1.1.</strong> Cone Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Crystal.html"><strong aria-hidden="true">2.1.1.2.</strong> Crystal</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Cylinder-Mirror.html"><strong aria-hidden="true">2.1.1.3.</strong> Cylinder Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Ellipsoid-Mirror.html"><strong aria-hidden="true">2.1.1.4.</strong> Ellipsoid Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Foil.html"><strong aria-hidden="true">2.1.1.5.</strong> Foil</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Image-Plane.html"><strong aria-hidden="true">2.1.1.6.</strong> Image Plane</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Paraboloid-Mirror.html"><strong aria-hidden="true">2.1.1.7.</strong> Paraboloid Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Plane-Mirror.html"><strong aria-hidden="true">2.1.1.8.</strong> Plane Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Plane-Grating.html"><strong aria-hidden="true">2.1.1.9.</strong> Plane Grating</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Sphere-Mirror.html"><strong aria-hidden="true">2.1.1.10.</strong> Sphere Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Sphere-Grating.html"><strong aria-hidden="true">2.1.1.11.</strong> Sphere Grating</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Slit.html"><strong aria-hidden="true">2.1.1.12.</strong> Slit</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Toroid-Mirror.html"><strong aria-hidden="true">2.1.1.13.</strong> Toroid Mirror</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/Toroid-Grating.html"><strong aria-hidden="true">2.1.1.14.</strong> Toroid Grating</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/OpticalElements/RZP.html"><strong aria-hidden="true">2.1.1.15.</strong> Reflection Zone Plate (RZP)</a></li></ol></li><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/LightSources.html"><strong aria-hidden="true">2.1.2.</strong> Light Sources</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/Circle-Source.html"><strong aria-hidden="true">2.1.2.1.</strong> Circle Source</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/DipoleSource.html"><strong aria-hidden="true">2.1.2.2.</strong> Dipole Source</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/Matrix-Source.html"><strong aria-hidden="true">2.1.2.3.</strong> Matrix Source</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/Pixel-Source.html"><strong aria-hidden="true">2.1.2.4.</strong> Pixel Source</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/Point-Source.html"><strong aria-hidden="true">2.1.2.5.</strong> Point Source</a></li><li class="chapter-item "><a href="../Model/BeamlineObjects/LightSources/SimpleUndulatorSource.html"><strong aria-hidden="true">2.1.2.6.</strong> Simple Undulator Source</a></li></ol></li><li class="chapter-item "><a href="../Model/BeamlineObjects/BeamlineParameter/Beamline-Parameter.html"><strong aria-hidden="true">2.1.3.</strong> Beamline Parameter</a></li></ol></li><li class="chapter-item "><a href="../Model/User-vs-Model-Parameter.html"><strong aria-hidden="true">2.2.</strong> User vs Model Parameter</a></li><li class="chapter-item "><a href="../Model/Ray-generation.html"><strong aria-hidden="true">2.3.</strong> Ray generation</a></li><li class="chapter-item "><a href="../Model/PRNGs-on-the-GPU.html"><strong aria-hidden="true">2.4.</strong> PRNGs on the GPU</a></li><li class="chapter-item "><a href="../Model/Transformation-between-coordinate-systems.html"><strong aria-hidden="true">2.5.</strong> Transformation between coordinate systems</a></li><li class="chapter-item "><a href="../Model/Quad(ric)-function.html"><strong aria-hidden="true">2.6.</strong> Quad(ric) Function</a></li><li class="chapter-item "><a href="../Model/Efficiency.html"><strong aria-hidden="true">2.7.</strong> Efficiency calculations</a></li><li class="chapter-item "><a href="../Model/Events.html"><strong aria-hidden="true">2.8.</strong> Events</a></li></ol></li><li class="chapter-item "><a href="../Tools/Tools.html"><strong aria-hidden="true">3.</strong> Tools</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../Tools/Code-Coverage.html"><strong aria-hidden="true">3.1.</strong> Code Coverage</a></li><li class="chapter-item "><a href="../Tools/Debugging.html"><strong aria-hidden="true">3.2.</strong> Debugging</a></li><li class="chapter-item "><a href="../Tools/How-to-use-Doxygen.html"><strong aria-hidden="true">3.3.</strong> How to use Doxygen</a></li><li class="chapter-item "><a href="../Tools/How-to-use-our-formatter.html"><strong aria-hidden="true">3.4.</strong> How to use our Formatter</a></li><li class="chapter-item "><a href="../Tools/Testing.html"><strong aria-hidden="true">3.5.</strong> Testing</a></li><li class="chapter-item "><a href="../Tools/RAYX-Profiling.html"><strong aria-hidden="true">3.6.</strong> RAYX Profiling</a></li></ol></li><li class="chapter-item "><a href="../Vulkan/Vulkan.html"><strong aria-hidden="true">4.</strong> Vulkan</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../Vulkan/VulkanTracer.html"><strong aria-hidden="true">4.1.</strong> Vulkan Tracer (rayx)</a></li><li class="chapter-item "><a href="../Vulkan/Vulkan-Shader-Split.html"><strong aria-hidden="true">4.2.</strong> Vulkan Shader Split</a></li><li class="chapter-item "><a href="../Vulkan/Vulkan-Beyond.html"><strong aria-hidden="true">4.3.</strong> Vulkan Beyond</a></li></ol></li><li class="chapter-item "><a href="../RAYX-UI/RAYX-UI.html"><strong aria-hidden="true">5.</strong> RAYX-UI</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../RAYX-UI/Triangulation.html"><strong aria-hidden="true">5.1.</strong> Triangulation</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">RAYX Wiki</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>#How to Build</p>
+<p>For building and running the project, we recommend using <a href="https://code.visualstudio.com/">Visual Studio Code</a> (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the <code>compile.sh</code> script can be used for compilation (see <a href="#using-compile.sh">using compile.sh</a>).</p>
+<h2 id="cmake-options"><a class="header" href="#cmake-options">CMake Options:</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>CMake Option</th><th>Default value</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>RAYX_ENABLE_OPENMP:BOOL</code></td><td><code>ON</code></td><td>enable search for OpenMP on your system. If found, build with OpenMP for tracing on CPU</td></tr>
+<tr><td><code>RAYX_REQUIRES_OPENMP:BOOL</code></td><td><code>OFF</code></td><td>require OpenMP to be found on your system. Otherwise throw an error</td></tr>
+<tr><td><code>RAYX_ENABLE_CUDA:BOOL</code></td><td><code>ON</code></td><td>enable search for Cuda on your system. If found, build with Cuda for tracing on GPU</td></tr>
+<tr><td><code>RAYX_REQUIRES_CUDA:BOOL</code></td><td><code>OFF</code></td><td>require Cuda to be found on your system. Otherwise throw an error</td></tr>
+<tr><td><code>RAYX_ENABLE_H5:BOOL</code></td><td><code>ON</code></td><td>enable search for HDF5 on your system. If found, build with HDF5 for H5 file format support</td></tr>
+<tr><td><code>RAYX_REQUIRES_H5:BOOL</code></td><td><code>OFF</code></td><td>require HDF5 to be found on your system. Otherwise throw an error</td></tr>
+<tr><td><code>RAYX_STATIC_LIB:BOOL</code></td><td><code>OFF</code></td><td>this option builds 'rayx-core' as a static library</td></tr>
+<tr><td><code>CMAKE_CUDA_ARCHITECTURES:STRING</code></td><td><code>all-major</code></td><td>set the cuda device architectures to build for. by default, build for all major architectures</td></tr>
+</tbody></table>
+</div>
+<h2 id="cloning-the-repository"><a class="header" href="#cloning-the-repository">Cloning the Repository</a></h2>
+<p>Clone the git repository by running one of the following commands:</p>
+<ul>
+<li>Using SSH:</li>
+</ul>
+<p><code>git clone --recurse-submodules git@github.com:hz-b/rayx.git</code></p>
+<ul>
+<li>Using HTTPS:</li>
+</ul>
+<p><code>git clone --recurse-submodules https://github.com/hz-b/rayx.git</code></p>
+<h2 id="on-windows"><a class="header" href="#on-windows">On Windows</a></h2>
+<h3 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h3>
+<ul>
+<li>Install <a href="https://cmake.org/download/">CMake</a>.</li>
+<li>Install the <a href="https://vulkan.lunarg.com/sdk/home#windows">Vulkan SDK</a> for Windows (at least version 1.3 or newer).</li>
+<li>Install the <a href="https://www.hdfgroup.org/downloads/hdf5/">HDF5</a> library.</li>
+<li>Install Python3, python3-dev, and python3-matplotlib.</li>
+<li>We recommend using the MSVC compiler for Windows, available through <a href="https://visualstudio.microsoft.com/downloads/">Visual Studio</a> (2019 or newer).</li>
+<li>Optional (required for Tracing on the GPU):
+<ul>
+<li>Install <a href="https://developer.nvidia.com/Cuda-downloads?target_os=Windows">Cuda</a>.
+Tested with Cuda version 12.5.1</li>
+<li>Add Cuda to your PATH.</li>
+</ul>
+</li>
+</ul>
+<h3 id="known-issues"><a class="header" href="#known-issues">Known Issues</a></h3>
+<ul>
+<li>Installing the VulkanSDK at the root directory of your drive may cause issues. If you encounter problems with the VulkanSDK, consider installing it in a different directory.</li>
+</ul>
+<h3 id="building-with-vscode"><a class="header" href="#building-with-vscode">Building with VSCode</a></h3>
+<ul>
+<li>Open the project in VSCode. You will be prompted to select a build kit (e.g., gcc).</li>
+<li>Allow the CMake Extension to configure the project.</li>
+<li>You can then build the project using the build button in the bottom panel.</li>
+</ul>
+<p>To use a custom generator for CMake, such as Ninja for faster builds, you can set it in the <code>.vscode/settings.json</code> file. The following is an example configuration for the generator in VSCode:
+<img src="../res/vscode_ninja_config.png" alt="" /></p>
+<h3 id="building-with-visual-studio"><a class="header" href="#building-with-visual-studio">Building with Visual Studio</a></h3>
+<ul>
+<li>Open a terminal in the project folder.</li>
+<li>Run the following command, replacing it with your version of Visual Studio:</li>
+</ul>
+<p><code>cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release</code></p>
+<p>see: <a href="#cmake-options">Cmake Options</a></p>
+<h2 id="on-linux"><a class="header" href="#on-linux">On Linux</a></h2>
+<h3 id="prerequisites-1"><a class="header" href="#prerequisites-1">Prerequisites</a></h3>
+<ul>
+<li>Ensure cmake, gcc, gdb, and make are installed and up to date.</li>
+<li>Install the Vulkan SDK from <a href="https://vulkan.lunarg.com/sdk/home">here</a>. Select a version under Linux -&gt; Ubuntu Packages.</li>
+<li>Install Python3, python3-dev, and python3-matplotlib.</li>
+<li>The project leverages <a href="https://github.com/BlueBrain/HighFive">libhdf5</a> for data management and incorporates various other libraries for graphical user interfaces, linear algebra computations, and handling different aspects of the X11 window system. Install the necessary libraries with the following command:</li>
+<li>Optional (required for Tracing on the GPU):
+<ul>
+<li>Install Cuda</li>
+<li>see <a href="#determining-cuda-and-compiler-version">Determining Cuda and compiler version</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="ubuntu"><a class="header" href="#ubuntu">Ubuntu</a></h3>
+<p><code>apt update &amp;&amp; apt -y install libblas-dev liblapack-dev libhdf5-dev libgtk-3-dev pkg-config libxi-dev libxcursor-dev libxinerama-dev libxrandr-dev</code></p>
+<ul>
+<li>Ensure the libraries are installed at <code>/usr/include/hdf5/serial</code> and <code>/usr/lib/x86_64-linux-gnu/hdf5/serial</code>.</li>
+</ul>
+<h3 id="arch-linux"><a class="header" href="#arch-linux">Arch Linux</a></h3>
+<p>Arch Linux users can obtain all necessary packages through pacman, yay, or other package managers. Specific instructions will be provided later.</p>
+<h3 id="fedora"><a class="header" href="#fedora">Fedora</a></h3>
+<p>To install the required packages on Fedora, run the following command:</p>
+<p><code>sudo dnf install cmake gcc gdb vulkan vulkan-tools vulkan-validation-layers hdf5-devel ninja-build gcc-c++ vulkan-loader-devel glslc blas-devel lapack-devel gtk3-devel pkg-config libXi-devel libXcursor-devel libXinerama-devel libXrandr-devel boost</code></p>
+<h3 id="determining-cuda-and-compiler-version"><a class="header" href="#determining-cuda-and-compiler-version">Determining Cuda and compiler version</a></h3>
+<ul>
+<li>GCC: Depending on the Cuda version, different versions of GCC may be supported.
+This projects is tested with Cuda version 12.4.1 and GCC version 13.3
+Please take a look at the supported versions of GCC for your Cuda installation:
+<ul>
+<li><a href="https://stackoverflow.com/questions/6622454/Cuda-incompatible-with-my-gcc-version">https://stackoverflow.com/questions/6622454/Cuda-incompatible-with-my-gcc-version</a></li>
+<li><a href="https://gist.github.com/ax3l/9489132">https://gist.github.com/ax3l/9489132</a></li>
+</ul>
+</li>
+<li>Clang: Using clang as Cuda compiler is currently not supported.</li>
+</ul>
+<h3 id="using-compilesh"><a class="header" href="#using-compilesh">Using compile.sh</a></h3>
+<p>usage: <code>./compile.sh</code></p>
+<h4 id="options"><a class="header" href="#options">Options:</a></h4>
+<ul>
+<li><code>--release</code> build in release mode (default: build in debug mode)</li>
+<li><code>--cuda</code> enable compilation with Cuda (default: build without Cuda)<br />
+see <a href="#determining-cuda-and-compiler-version">Determining Cuda and compiler version</a> <br />
+example usage: <code>CXX=g++-13 ./compile.sh --cuda</code></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../Introduction/01-Introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../Introduction/02-How-to-install.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../Introduction/01-Introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../Introduction/02-How-to-install.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
