@@ -56,11 +56,11 @@ jobs:
       - name: Check and set version tag
         # done manually instead of with the version tag to prevent triggering the workflow twice
         run: |
-          git_tag=$(git describe --tags --exact-match 2> /dev/null)
-
+          git_tag=$(git describe --tags --exact-match 2> /dev/null) &&
           if [[ ${git_tag} =~ ^v[0-9] ]]; then
             echo "VERSION_TAG=$git_tag" >> "$GITHUB_ENV"
           fi
+        continue-on-error: true
 
       - name: Build and deploy release documentation
         if: ${{ env.VERSION_TAG }} # commit is a tagged release v*
