@@ -28,8 +28,8 @@ struct NffEntry {
 /// This struct represents one line of a .f12 file from the cromer materialtables.
 struct CromerEntry {
     double m_energy;
-    double m_n;
-    double m_k;
+    double m_f1;
+    double m_f2;
 };
 
 RAYX_FN_ACC int RAYX_API getPalikEntryCount(int material, const int* materialIndices);

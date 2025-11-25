@@ -1299,23 +1299,23 @@ TEST_F(TestSuite, testCromer) {
     CHECK_EQ(getCromerEntryCount(Cu, mat.indices.data()), 450);
 
     auto Cu0 = getCromerEntry(0, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu0.m_n, 28.455647403258698);
-    CHECK_EQ(Cu0.m_k, 1.3255343263698971);
+    CHECK_EQ(Cu0.m_f1, 28.455647403258698);
+    CHECK_EQ(Cu0.m_f2, 1.3255343263698971);
 
     auto Cu10 = getCromerEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_n, 28.125870077993461);
-    CHECK_EQ(Cu10.m_k, 0.96636626222754107);
+    CHECK_EQ(Cu10.m_f1, 28.125870077993461);
+    CHECK_EQ(Cu10.m_f2, 0.96636626222754107);
 
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 450);
 
     auto Au0 = getCromerEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_n, 75.80310173166059);
-    CHECK_EQ(Au0.m_k, 14.68569867739777);
+    CHECK_EQ(Au0.m_f1, 75.80310173166059);
+    CHECK_EQ(Au0.m_f2, 14.68569867739777);
 
     auto Au10 = getCromerEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_n, 76.187030489298166);
-    CHECK_EQ(Au10.m_k, 11.20875960827477);
+    CHECK_EQ(Au10.m_f1, 76.187030489298166);
+    CHECK_EQ(Au10.m_f2, 11.20875960827477);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {

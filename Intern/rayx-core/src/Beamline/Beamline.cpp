@@ -81,25 +81,25 @@ void Group::addChild(std::unique_ptr<BeamlineNode> child) {
 
 MaterialTables Group::calcMinimalMaterialTables() const {
     auto elements = getElements();
-    std::array<bool, 99> relevantMaterials{};
+    std::array<bool, 133> relevantMaterials{};
     relevantMaterials.fill(false);
     for (const auto& elemPtr : elements) {
         auto coating = elemPtr->getCoating();
         if (coating.is<Coating::OneCoating>()) {
             int materialcoating = static_cast<int>(elemPtr->getMaterialCoating());
-            if (materialcoating >= 1 && materialcoating <= 99) {
+            if (materialcoating >= 1 && materialcoating <= 133) {
                 relevantMaterials[materialcoating - 1] = true;
             }
         } else if (coating.is<Coating::MultilayerCoating>()) {
             auto mlCoating = variant::get<Coating::MultilayerCoating>(coating.m_coating);
             for (const auto& mat : mlCoating.material) {
-                if (mat >= 1 && mat <= 99) {
+                if (mat >= 1 && mat <= 133) {
                     relevantMaterials[mat - 1] = true;
                 }
             }
         }
         int material = static_cast<int>(elemPtr->getMaterial());  // assuming getMaterial() exists
-        if (material >= 1 && material <= 99) {
+        if (material >= 1 && material <= 133) {
             relevantMaterials[material - 1] = true;
         }
     }

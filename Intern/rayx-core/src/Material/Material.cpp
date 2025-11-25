@@ -55,11 +55,11 @@ bool materialFromString(const char* matname, Material* out) {
     return false;
 }
 
-MaterialTables loadMaterialTables(std::array<bool, 99> relevantMaterials) {
+MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
-    if (mats.size() != 99) {
+    if (mats.size() != 133) {
         RAYX_EXIT << "unexpected number of materials. this is a bug.";
     }
 
@@ -112,8 +112,8 @@ MaterialTables loadMaterialTables(std::array<bool, 99> relevantMaterials) {
 
             for (auto x : t.m_Lines) {
                 out.materials.push_back(x.m_energy);
-                out.materials.push_back(x.m_n);
-                out.materials.push_back(x.m_k);
+                out.materials.push_back(x.m_f1);
+                out.materials.push_back(x.m_f2);
             }
         }
     }
@@ -131,5 +131,4 @@ MaterialTables loadMaterialTables(std::array<bool, 99> relevantMaterials) {
 
     return out;
 }
-
 }  // namespace RAYX
