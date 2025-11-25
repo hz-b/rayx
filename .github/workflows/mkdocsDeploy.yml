@@ -64,8 +64,10 @@ jobs:
 
       - name: Build and deploy release documentation
         if: ${{ env.VERSION_TAG }} # commit is a tagged release v*
+        env:
+          VERSION_TAG: ${{ env.VERSION_TAG }} # can't use bash string substitution directly on context variables
         # Build / overwrite one version per major (tagged) version of RAYX with the full version as title and alias "latest"
         # Pushing tag v1.2.3 will overwrite the current v1 and will be displayed as v1.2.3 and becomes the default version
         # Pushing tag v2.0.0 will not overwrite the v1, but will become the default "latest" and add v2 version
         run: |
-          uv run mike deploy --push --update-aliases ${env.VERSION_TAG/.*} --title=$VERSION_TAG latest
+          uv run mike deploy --push --update-aliases ${VERSION_TAG/.*} --title=$VERSION_TAG latest
