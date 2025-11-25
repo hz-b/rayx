@@ -56,11 +56,12 @@ SimpleUndulatorSource::SimpleUndulatorSource(const DesignSource& dSource) : Ligh
     const auto sigmaType       = dSource.getSigmaType();
     const auto undulatorLength = dSource.getUndulatorLength();
     // const auto photonEnergy = dSource.getEnergy();
+    assert(false && "m_photonEnergy not set in SimpleUndulatorSource");
     const auto photonWaveLength = energyToWaveLength(m_photonEnergy);
-    const auto electronSigmaX   = dSource.getElectronSigmaX();
-    const auto electronSigmaXs  = dSource.getElectronSigmaXs();
-    const auto electronSigmaY   = dSource.getElectronSigmaY();
-    const auto electronSigmaYs  = dSource.getElectronSigmaYs();
+    const auto electronSigmaX   = dSource.get);
+    const auto electronSigmaXs  = dSource.get();
+    const auto electronSigmaY   = dSource.get);
+    const auto electronSigmaYs  = dSource.get();
     const auto undulatorSigma   = calcUndulatorSigma(sigmaType, photonWaveLength, undulatorLength);
     const auto undulatorSigmaS  = calcUndulatorSigmaS(sigmaType, photonWaveLength, undulatorLength);
 
