@@ -9,7 +9,7 @@
 namespace rayx {
 
 /// inverse nanometer-electron volt relationship / reziprocal factor
-constexpr double INV_NM_TO_EVOLT = 1239.841984332002622;
+constexpr double INV_NM_TO_EVOLT = 1239.84194332002622;
 
 constexpr double PI = 3.14159265358979323846264338327950;
 // 141592653589793238462643383279502884197169399

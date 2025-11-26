@@ -333,7 +333,6 @@
           mkDevShell = { rayxPackage, extraBuildInputs }:
             pkgs.mkShell rec {
               buildInputs = with pkgs; [
-                rayxPackage
                 cmake
                 gdb
                 gcc

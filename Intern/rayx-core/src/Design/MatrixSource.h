@@ -6,54 +6,21 @@
 #include <string>
 #include <variant>
 
-#include "Beamline/Node.h"
 #include "Beamline/EnergyDistribution.h"
+#include "Beamline/Node.h"
 #include "Shader/ElectricField.h"
 
-struct WaveLength {
-    double value;  // in nanometers
-};
+namespace defaults {
+constexpr int numRays = 100000;
+}
 
-struct ElectroVolt {
-    double value;  // in eV
-};
+/*
+ * TODO: remove all of this
+ */
 
-using PhotonEnergy = std::variant<WaveLength, ElectroVolt>;
-
-namespace EnergyDistributions {
-
-struct WhiteNoise {
-    PhotonEnergy centerEnergy;
-    PhotonEnergy energySpread;
-};
-
-struct ContinousGaussian {
-    PhotonEnergy centerEnergy;
-    double sigma;
-};
-
-struct DiscreteWhiteNoise {
-    PhotonEnergy centerEnergy;
-    PhotonEnergy energySpread;
-    int numberOfEnergies;
-};
-
-struct List {
-    std::vector<PhotonEnergy> energies;
-    std::optional<std::vector<double>> weights;
-    bool continuous;
-};
-
-}  // namespace EnergyDistributions
-
-using EnergyDistribution = std::variant<EnergyDistributions::ContinousWhiteNoise, EnergyDistributions::ContinousGaussian,
-                                         EnergyDistributions::DiscreteWhiteNoise, EnergyDistributions::List>;
-
-using Polarization = std::variant<ElectricField, Stokes>;
-
-enum class SourceDist { Uniform, Gaussian, Thirds, Circle };  // SourceDist::Thirds represents PixelSource Footprint
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
-enum class SigmaType { ST_STANDARD, ST_ACCURATE };
+enum class UndulatorSigmaType { Standard, Accurate };
+
 enum class SourceType {
     MatrixSource,
     PointSource,
@@ -64,163 +31,366 @@ enum class SourceType {
     InputSource,
 };
 
-std::map<SourceType, std::string> SourceTypeToString = {
-    {SourceType::MatrixSource, "MatrixSource"},
-    {SourceType::PointSource, "PointSource"},
-    {SourceType::CircleSource, "CircleSource"},
-    {SourceType::SimpleUndulatorSource, "SimpleUndulatorSource"},
-    {SourceType::PixelSource, "PixelSource"},
-    {SourceType::DipoleSource, "DipoleSource"},
+/*
+ * photon energy: wavelength in nm, energy in eV
+ */
+
+struct WaveLength {
+    double value;  // in nanometers
 };
 
-std::map<std::string, SourceType> StringToSourceType = {
-    {"MatrixSource", SourceType::MatrixSource},
-    {"PointSource", SourceType::PointSource},
-    {"CircleSource", SourceType::CircleSource},
-    {"SimpleUndulatorSource", SourceType::SimpleUndulatorSource},
-    {"PixelSource", SourceType::PixelSource},
-    {"DipoleSource", SourceType::DipoleSource},
+struct ElectronVolt {
+    double value;  // in eV
 };
 
-std::string getUniqueSourceName(const SourceType sourceType) {
-    static size_t counter = 0;
-    return std::format("<{}_{}>", SourceTypeToString.at(sourceType), counter++);
+WaveLength toWaveLength(const WaveLength wavelength) { return wavelength; }
+
+WaveLength toWaveLength(const ElectronVolt energy) { return WaveLength{INV_NM_TO_EVOLT / energy.value}; }
+
+WaveLength toWaveLength(const PhotonEnergy energy) {
+    return std::visit([](auto&& arg) { return toWaveLength(arg); }, energy);
 }
 
-class SourceBase : public BeamlineNode {
-  public:
-    SourceBase(const SourceType sourceType) : BeamlineNode(getUniqueSourceName(sourceType)) {}
+ElectronVolt toElectronVolt(const ElectronVolt energy) { return energy; }
+
+ElectronVolt toElectronVolt(const WaveLength wavelength) { return ElectronVolt{INV_NM_TO_EVOLT / wavelength.value}; }
+
+ElectronVolt toElectronVolt(const PhotonEnergy energy) {
+    return std::visit([](auto&& arg) { return toElectronVolt(arg); }, energy);
+}
+
+using PhotonEnergy       = std::variant<WaveLength, ElectronVolt>;
+using PhotonEnergyVector = std::variant<std::vector<WaveLength>, std::vector<ElectronVolt>>;
+
+/*
+ * angle: degrees, radians
+ */
+
+struct Degrees {
+    double value;  // in degrees
+};
+
+struct Radians {
+    double value;  // in radians
+};
+
+using Angle = std::variant<Degrees, Radians>;
+
+Radians toRadians(const Radians angle) { return angle; }
+
+Radians toRadians(const Degrees angle) { return Radians{angle.value * glm::pi<double>() / 180.0}; }
+
+Radians toRadians(const Angle angle) {
+    return std::visit([](auto&& arg) { return toRadians(arg); }, angle);
+}
+
+Degrees toDegrees(const Degrees angle) { return angle; }
+
+Degrees toDegrees(const Radians angle) { return Degrees{angle.value * 180.0 / glm::pi<double>()}; }
+
+Degrees toDegrees(const Angle angle) {
+    return std::visit([](auto&& arg) { return toDegrees(arg); }, angle);
+}
+
+/*
+ * distribution: uniform, gaussian, baked
+ */
+
+template <typename T>
+struct RangeSampler {
+    T halfRange                   = T();
+    std::optional<int> numSamples = std::nullopt;
+};
+
+template <typename T>
+struct UniformDistribution {
+    T center = T();
+    RangeSampler sampler;
+};
+
+template <typename T>
+struct BrownianDistribution {
+    T center            = T();
+    T standardDeviation = T();
+    RangeSampler sampler;
+};
+
+template <typename T>
+struct GaussianDistriubution {
+    PhotonEnergy mean;
+    PhotonEnergy standardDeviation;
+    std::optional<RangeSampler> sampler;
+};
+
+template <typename T>
+struct BakedDistribution {
+    PhotonEnergyVector samples;
+    std::optional<std::vector<double>> weights;
+    bool interpolate = false;
+};
+
+template <typename T>
+using Distribution        = std::variant<UniformDistribution<T>, BrownianDistribution<T>, GaussianDistribution<T>, BakedDistribution<T>>;
+using ScalarDistribution  = Distribution<double>;
+using AngularDistribution = Distribution<Angle>;
+
+namespace defaults {
+constexpr ScalarDistribution energy = UniformDistribution<double>{.center = 1.0 /* infrared */};
+}
+
+template <typename T>
+struct CircularDistribution {
+    Distribution<T> radiusDistribution;
+};
+using ScalarCircularDistribution  = CircularDistribution<double>;
+using AngularCircularDistribution = CircularDistribution<Angle>;
+
+template <typename T>
+struct RectangularDistribution {
+    Distribution<T> widthDistribution;
+    Distribution<T> heightDistribution;
+};
+using ScalarRectangularDistribution  = RectangularDistribution<double>;
+using AngularRectangularDistribution = RectangularDistribution<Angle>;
+
+template <typename T>
+using AreaDistribution        = std::variant<CircularDistribution<T>, RectangularDistribution<T>>;
+using AreaScalarDistribution  = AreaDistribution<double>;
+using AreaAngularDistribution = AreaDistribution<Angle>;
+
+template <typename T>
+struct SphericalDistribution {
+    Distribution<T> radiusDistribution;
+};
+using ScalarSphericalDistribution = SphericalDistribution<double>;
+
+template <typename T>
+struct CylindricalDistribution {
+    Distribution<T> radiusDistribution;
+    Distribution<T> depthDistribution;
+};
+using ScalarCylindricalDistribution = CylindricalDistribution<double>;
+
+template <typename T>
+struct CuboidalDistribution {
+    Distribution<T> widthDistribution;
+    Distribution<T> heightDistribution;
+    Distribution<T> depthDistribution;
+};
+using ScalarCuboidalDistribution = CuboidalDistribution<double>;
+
+template <typename T>
+using VolumetricDistribution       = std::variant<CuboidalDistribution<T>, CylindricalDistribution<T>, SphericalDistribution<T>>;
+using VolumetricScalarDistribution = VolumetricDistribution<double>;
+
+/*
+ * divergence: collimated, individual
+ */
+
+// ray direction is proportional to ray origin
+struct CollimatedAngularDivergence {
+    Angle horDivergence;
+    Angle verDivergence;
+};
+
+struct IndividualAngularDivergence {
+    AreaAngularDistribution distribution;
+};
+
+using AngularDivergence = std::variant<CollimatedAngularDivergence, IndividualAngularDivergence>;
+
+/*
+ * polarization: stokes, electric field
+ */
+
+using Polarization = std::variant<Stokes, ElectricField>;
+
+namespace defaults {
+constexpr Polarization polarization = Stokes{1.0, 0.0, 0.0, 0.0};
+}
+
+/*
+ * rotation: matrix, base convention, axis-angle
+ */
+
+// essentially a quaternion rotation (glm::dquat)
+struct RotationAroundAxis {
+    Angle angle;
+    glm::dvec3 axis;
+};
+
+struct RotationBase {
+    glm::dvec3 right;
+    glm::dvec3 up;
+    glm::dvec3 forward;
+};
+
+using Rotation = std::variant<glm::dmat3, RotationBase, RotationAroundAxis>;
+
+RotationAroundAxis toRotationAroundAxis(const RotationAroundAxis& rotation) { return rotation; }
+
+RotationAroundAxis toRotationAroundAxis(const RotationBase& rotation) {
+    const auto quat = glm::quat_cast(glm::dmat3(rotation.right, rotation.up, rotation.forward));
+    return RotationAroundAxis{
+        .angle = Radians{glm::angle(quat)},
+        .axis  = glm::axis(quat),
+    };
+}
+
+RotationAroundAxis toRotationAroundAxis(const glm::dmat3& rotation) {
+    const auto quat = glm::quat_cast(rotation);
+    return RotationAroundAxis{
+        .angle = Radians{glm::angle(quat)},
+        .axis  = glm::axis(quat),
+    };
+}
+
+RotationAroundAxis toRotationAroundAxis(const Rotation& rotation) {
+    return std::visit([](auto&& arg) { return toRotationAroundAxis(arg); }, rotation);
+}
+
+RotationBase toRotationBase(const RotationBase& rotation) { return rotation; }
+
+RotationBase toRotationBase(const RotationAroundAxis& rotation) {
+    const auto quat = glm::angleAxis(toRadians(rotation.angle).value, rotation.axis);
+    const auto mat  = glm::mat3_cast(quat);
+    return RotationBase{
+        .right   = mat[0],
+        .up      = mat[1],
+        .forward = mat[2],
+    };
+}
+
+RotationBase toRotationBase(const glm::dmat3& rotation) {
+    return RotationBase{
+        .right   = rotation[0],
+        .up      = rotation[1],
+        .forward = rotation[2],
+    };
+}
+
+RotationBase toRotationBase(const Rotation& rotation) {
+    return std::visit([](auto&& arg) { return toRotationBase(arg); }, rotation);
+}
+
+glm::dmat3 toRotationMatrix(const glm::dmat3& rotation) { return rotation; }
+
+glm::dmat3 toRotationMatrix(const RotationBase& rotation) { return glm::dmat3(rotation.right, rotation.up, rotation.forward); }
+
+glm::dmat3 toRotationMatrix(const RotationAroundAxis& rotation) {
+    const auto quat = glm::angleAxis(toRadians(rotation.angle).value, rotation.axis);
+    return glm::mat3_cast(quat);
+}
+
+glm::dmat3 toRotationMatrix(const Rotation& rotation) {
+    return std::visit([](auto&& arg) { return toRotationMatrix(arg); }, rotation);
+}
+
+struct BeamlineNode {
+    BeamlineNode(std::string name)
+        : name(std::move(name)), position(0.0), rotation(RotationBase{glm::dvec3(1, 0, 0), glm::dvec3(0, 1, 0), glm::dvec3(0, 0, 1)}) {}
+
+    std::string name;
+    glm::dvec3 position;
+    Rotation rotation;
+};
+
+/*
+ * sources
+ */
+
+struct PointSource {
+    using SourceType = SourceType::PointSource;
+    int numRays = defaults::numRays;
+    VolumetricScalarDistribution origin;
+    AngularDivergence direction;
+    Polarization polarization = defaults::polarization;
+    ScalarDistribution energy = defaults::energy;
+};
+
+// TODO: sensible defaults
+struct CircleSource {
+    using SourceType = SourceType::CircleSource;
+    int numRays    = defaults::numRays;
+    int numCircles = 1;
+    Angle maxOpeningAngle;
+    Angle minOpeningAngle;
+    Angle deltaOpeningAngle;
+    double width              = 0.0;
+    double height             = 0.0;
+    double depth              = 0.0;
+    Polarization polarization = defaults::polarization;
+    Distribution energy       = defaults::energy;
+};
+
+// TODO: sensible defaults
+struct SimpleUndulatorSource {
+    using SourceType = SourceType::SimpleUndulatorSource;
+    int numRays                  = defaults::numRays;
+    UndulatorSigmaType sigmaType = UndulatorSigmaType::Standard;
+    double undulatorLength       = 1.0;
+    double electronSigmaX        = 0.0;
+    double electronSigmaXs       = 0.0;
+    double electronSigmaY        = 0.0;
+    double electronSigmaYs       = 0.0;
+    double depth                 = 0.0;
+    Polarization polarization    = defaults::polarization;
+    PhotonEnergy photonEnergy    = 1.0;  // TODO: this is weird, because PhotonEnergy is potentially redundant to energy
+    Distribution energy          = defaults::energy;
+};
+
+// TODO: sensible defaults
+struct PixelSource {
+    using SourceType = SourceType::PixelSource;
+    int numRays = defaults::numRays;
+    // TODO: change to AngularDivergence ? depends on how PixelSource works
+    double horizontalDivergenc = 0.0;
+    double verticalDivergence  = 0.0;
+    // TODO: change to VolumetricScalarDistribution ? depends on how PixelSource works
+    double width              = 0.0;
+    double height             = 0.0;
+    double depth              = 0.0;
+    Polarization polarization = defaults::polarization;
+    Distribution energy       = defaults::energy;
+};
+
+// TODO: sensible defaults
+struct DipoleSource {
+    using SourceType = SourceType::DipoleSource;
+    int numRays                                         = defaults::numRays;
+    double bendingRadius                                = 1.0;
+    ElectronEnergyOrientation electronEnergyOrientation = ElectronEnergyOrientation::Clockwise;
+    double width                                        = 0.0;
+    double height                                       = 0.0;
+    ElectronVolt electronEnergy                         = ElectronVolt{3e3};   // in eV
+    ElectronVolt criticalEnergy                         = ElectronVolt{10.0};  // in eV
+    PhotonEnergy photonEnergy                           = WaveLength{1.24};    // in nm
+    double verticalElectronBeamDivergence               = 0.0;
+    double energySpread                                 = 0.0;
+    double horizontalDivergence                         = 0.0;
+};
+
+struct InputSource {
+    using SourceType = SourceType::InputSource;
+    Rays rays;
+    std::optional<VolumetricScalarDistribution> origin;
+    std::optional<AngularDivergence> direction;
+    std::optional<Polarization> polarization;
+    std::optional<ScalarDistribution> energy;
+    // TODO: specify which other attributes should be used from the input rays
+};
+
+using Source = std::variant<PointSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
+
+struct SourceNode : BeamlineNode {
+    SourceBase() : BeamlineNode(createUniqueSourceName()) {}
     SourceBase(std::string name) : BeamlineNode(std::move(name)) {}
     ~SourceBase() = default;
 
     bool isSource() const override { return true; }
-    std::unique_ptr<BeamlineNode> clone() const override; // TODO
+    Source source;
 
-    // TODO: these should be implemented in BeamlineNode
-    void setName(std::string s) override;
-    std::string getName() const override;
-    void setPosition(glm::dvec4 p);
-    glm::dvec4 getPosition() const override;
-    void setOrientation(glm::dmat4x4 o);
-    glm::dmat4x4 getOrientation() const override;
-
-  private:
+    SourceType sourceType() const {
+        return std::visit([]<typename T>(auto&& arg) { return typename T::SourceType; }, source);
+    }
 };
-
-class MatrixSource : public SourceBase {
-  public:
-    MatrixSource() : SourceBase(SourceType::MatrixSource) {}
-    MatrixSource(std::string name) : SourceBase(std::move(name)) {}
-    ~MatrixSource() = default;
-
-    int numberOfRays;
-    double horizontalDivergence;
-    double verticalDivergence;
-    double width;
-    double height;
-    double depth;
-    Polarization polarization;
-};
-
-class PointSource : public SourceBase {
-  public:
-    PointSource() : SourceBase(SourceType::PointSource) {}
-    PointSource(std::string name) : SourceBase(std::move(name)) {}
-    ~PointSource() = default;
-
-    int numberOfRays;
-    double horizontalDivergence;
-    double verticalDivergence;
-    double width;
-    double height;
-    double depth;
-    SourceDist horizontalDistribution;
-    SourceDist verticalDistribution;
-    SourceDist widthDistribution;
-    SourceDist heightDistribution;
-    Polarization polarization;
-    EnergyDistribution energyDistribution;
-};
-
-class CircleSource : public SourceBase {
-  public:
-    CircleSource() : SourceBase(SourceType::CircleSource) {}
-    CircleSource(std::string name) : SourceBase(std::move(name)) {}
-    ~CircleSource() = default;
-
-    int numberOfRays;
-    int numberOfCircles;
-    Rad maxOpeningAngle;
-    Rad minOpeningAngle;
-    Rad deltaOpeningAngle;
-    double width;
-    double height;
-    double depth;
-    Polarization polarization;
-    EnergyDistribution energyDistribution;
-};
-
-class SimpleUndulatorSource : public SourceBase {
-  public:
-    SimpleUndulatorSource() : SourceBase(SourceType::SimpleUndulatorSource) {}
-    SimpleUndulatorSource(std::string name) : SourceBase(std::move(name)) {}
-    ~SimpleUndulatorSource() = default;
-
-    int numberOfRays;
-    SigmaType sigmaType;
-    double undulatorLength;
-    double electronSigmaX;
-    double electronSigmaXs;
-    double electronSigmaY;
-    double electronSigmaYs;
-    double depth;
-    Polarization polarization;
-    PhotonEnergy photonEnergy; // this is weird
-    EnergyDistribution energyDistribution;
-};
-
-class PixelSource : public SourceBase {
-  public:
-    PixelSource() : SourceBase(SourceType::PixelSource) {}
-    PixelSource(std::string name) : SourceBase(std::move(name)) {}
-    ~PixelSource() = default;
-
-    int numberOfRays;
-    double horizontalDivergence;
-    double verticalDivergence;
-    double width;
-    double height;
-    double depth;
-    Polarization polarization;
-    EnergyDistribution energyDistribution;
-};
-
-class DipoleSource : public SourceBase {
-  public:
-    DipoleSource() : SourceBase(SourceType::DipoleSource) {}
-    DipoleSource(std::string name) : SourceBase(std::move(name)) {}
-    ~DipoleSource() = default;
-
-    int numberOfRays;
-    double bendingRadius;
-    ElectronEnergyOrientation electronEnergyOrientation;
-    double width;
-    double height;
-    ElectroVolt electronEnergy;
-    ElectroVolt criticalEnergy;
-    PhotonEnergy photonEnergy;
-    double verticalElectronBeamDivergence;
-    double energySpread;
-    double horizontalDivergence;
-};
-
-class InputSource : public SourceBase {
-  public:
-    InputSource() : SourceBase(SourceType::InputSource) {}
-    InputSource(std::string name) : SourceBase(std::move(name)) {}
-    ~InputSource() = default;
-
-    Rays rays;
-};
-
-using Source = std::variant<MatrixSource, PointSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
