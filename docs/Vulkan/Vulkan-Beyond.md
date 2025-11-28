@@ -49,7 +49,7 @@ If the code to be executed has if clauses then some threads inside the warp have
 ## vkDispatch()
 The current RAYX Tracer uses 1 Vulkan Pipeline consisting of 1 Shader Module. The Shader module is dispatched once with the amount of needed threads (Rays) through 1 Compute Queue and the GPU would handle the rest. 
 
-![image0](/docs/src/res/vulkan-beyond0.png)
+![image0](../res/vulkan-beyond0.png)
 
 The fence shows that we are waiting for the GPU to become idle.
 
@@ -79,7 +79,7 @@ Nvidia Nsight Graphics is a developer profiling tool that can run GPU Traces (An
 Well, not good stuff.. 
 Below are the Metrics, recorded from a run of 1.5 million Rays:
 
-![image1](/docs/src/res/vulkan-beyond1.png)
+![image1](../res/vulkan-beyond1.png)
 
 Notice:
 - High "CS Warp Can't Launch -  Register Limited"
@@ -88,7 +88,7 @@ Notice:
 
 The timeline shows more detailed information about the execution:
 
-![image2](/docs/src/res/vulkan-beyond2.png)
+![image2](../res/vulkan-beyond2.png)
 
 Notice the bottlneck in the Compute Warps, stopping at almost 25% and the constant CS Warp Can't launch.
 
@@ -107,14 +107,14 @@ It's however worth mentioning that this is one of the most common SM-occupancy l
 To solve this we use the queue in vulkan and send as many small known commands as possible with smaller shader codes instead of one big block of GLSL. We use multiple Compute Queues if needed and let the Warp Scheduler control the rest. We obviously need  a few synchronization points as we are now out of the global scope i.e we need to wait until rays intersect before reflecting, to send more specific commands. This is getting closer an async ompute model! For each stage/compute step we dedicate a vkPipeline preloaded with the shader and all what's left is to correctly bind the Descriptor Sets and push the command at the right time into the Queue.
 
 The new Compute Pipeline Pass:
-![image3](/docs/src/res/vulkan-beyond3.png)
+![image3](../res/vulkan-beyond3.png)
 
 A look into a standard usage of queues:
-![image4](/docs/src/res/vulkan-beyond4.png)
+![image4](../res/vulkan-beyond4.png)
 
 One issue remains to be solved (or mainly discussed) is as now we are sending commands per Object and per run. We need to know what type of object the ray intersects to feed it the correct shader module. For that we propose these solutions:
 
-![image5](/docs/src/res/vulkan-beyond5.png)
+![image5](../res/vulkan-beyond5.png)
 
 The solutions are straight-forward. Solution 2 and 5 are the top-picks as they rely on on async compute the most.
 
