@@ -30,11 +30,18 @@ plugins:
             RECURSIVE: True
             GENERATE_XML: True  # needed by mkdoxy, otherwise the build will crash
   - mike:
-      canonical_version: latest
+      canonical_version: latest # version to point search engines to
 
 extra:
   version:
     provider: mike
+
+validation:
+  omitted_files: info # mkdoxy api docs are linked on pages but not included in nav
+  absolute_links: warn
+  unrecognized_links: warn
+  not_found: warn
+  anchors: warn
 
 theme:
   name: material

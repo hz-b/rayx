@@ -9,6 +9,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# dont automatically update the uv lockfile (equivalent to --locked),
+# manage dependencies explicitly with: uv lock --upgrade
+env:
+  UV_LOCKED: true
+
 jobs:
   deploy-docs:
     name: Build and publish documentation
@@ -35,10 +40,8 @@ jobs:
           enable-cache: true
 
       - name: Install docs dependencies
-          # --locked asserts that the uv lockfile remains unchanged compared to the pyproject toml
-          # and will not update the dependencies
         run: |
-          uv sync --group docs --locked
+          uv sync --group docs
           sudo apt-get update
           sudo apt-get install --yes doxygen
 
