@@ -6,6 +6,13 @@
 
 #include "Core.h"
 
+namespace {
+std::string getUniqueNodeName() {
+    static size_t counter = 0;
+    return std::format("<some_node_{}>", counter++);
+}
+}  // unnamed namespace
+
 namespace rayx {
 
 class Group;
@@ -23,6 +30,16 @@ class DesignElement;
 class RAYX_API BeamlineNode {
     friend class Group;  // Needed so group can access m_parent for BeamlineNodes
   public:
+    BeamlineNode() : name(createUniqueNodeName()) {}
+    BeamlineNode(std::string name)
+        : name(std::move(name)) {}
+
+    BeamlineNode(const BeamlineNode&) = delete;
+    BeamlineNode& operator=(const BeamlineNode&) = delete;
+
+    BeamlineNode(BeamlineNode&&) noexcept = default;
+    BeamlineNode& operator=(BeamlineNode&&) noexcept = default;
+
     /**
      * Ensures proper cleanup of derived classes when deleting through a pointer
      * to BeamlineNode.
@@ -37,46 +54,25 @@ class RAYX_API BeamlineNode {
      */
     virtual std::unique_ptr<BeamlineNode> clone() const = 0;
 
-    virtual bool isGroup() const { return false; }    // Overridden in Group
-    virtual bool isElement() const { return false; }  // Overridden in Element
-    virtual bool isSource() const { return false; }   // Overridden in Source
+    /**
+     * @brief Computes and returns the world-space position of this node.
+     *
+     * This method combines the local position of this node with the transformations
+     * of all its parent nodes up to the root to compute the absolute position in world space.
+     *
+     * @return The world-space position as a glm::dvec3.
+     */
+    glm::dvec3 getWorldSpacePosition() const;
 
     /**
-     * @brief Gets the local position of this node.
+     * @brief Computes and returns the world-space rotation of this node.
      *
-     * Each node may have its own transform relative to its parent.
-     * @return A 4D vector (dvec4) representing the local position.
-     */
-    virtual glm::dvec4 getPosition() const = 0;
-
-    /**
-     * @brief Gets the local orientation (rotation/transform) of this node.
+     * This method combines the local rotation of this node with the rotations
+     * of all its parent nodes up to the root to compute the absolute rotation in world space.
      *
-     * Each node may have its own transform relative to its parent.
-     * @return A 4x4 matrix (dmat4) representing the local orientation.
+     * @return The world-space rotation as a Rotation object.
      */
-    virtual glm::dmat4 getOrientation() const = 0;
-
-    /**
-     * @brief Computes the absolute/world position of this node.
-     *
-     * Recursively applies parent transformations until the root of the hierarchy
-     * is reached. If there is no parent, the local position is already in world space.
-     * @return A 4D vector (dvec4) representing the position in world coordinates.
-     */
-    glm::dvec4 getWorldPosition() const;
-
-    /**
-     * @brief Computes the absolute/world orientation of this node.
-     *
-     * Recursively multiplies the parent's world orientation by the node's local orientation.
-     * If there is no parent, the local orientation is already in world space.
-     * @return A 4x4 matrix (dmat4) representing the orientation in world coordinates.
-     */
-    glm::dmat4 getWorldOrientation() const;
-
-    virtual std::string getName() const    = 0;
-    virtual void setName(std::string name) = 0;
+    Rotation getWorldSpaceRotation() const;
 
     bool hasParent() const { return m_parent != nullptr; }
 
@@ -88,24 +84,19 @@ class RAYX_API BeamlineNode {
 
     int getObjectId() const;
 
-    // declarative fashion api
-    // the index operators are declared in BeamlineNode but only work when the BeamlineNode is a group. defined here so they can be called without
-    // casting an object to Group
-
-    virtual const BeamlineNode* operator[](size_t index) const;
-    virtual BeamlineNode* operator[](size_t index);
-
-    virtual const BeamlineNode* operator[](const std::string& name) const;
-    virtual BeamlineNode* operator[](const std::string& name);
-
+    virtual bool isGroup() const { return false; }    // Overridden in Group
+    virtual bool isElement() const { return false; }  // Overridden in Element
+    virtual bool isSource() const { return false; }   // Overridden in Source
     const Group* asGroup() const;
     Group* asGroup();
-
     const DesignSource* asSource() const;
     DesignSource* asSource();
-
     const DesignElement* asElement() const;
     DesignElement* asElement();
+
+    std::string name;
+    glm::dvec3 position;
+    Rotation rotation;
 
   private:
     /**

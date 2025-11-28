@@ -1,35 +1,8 @@
 #pragma once
 
-#include <format>
-#include <map>
-#include <memory>
-#include <string>
-#include <variant>
+#include <glm/glm.hpp>
 
-#include "Beamline/EnergyDistribution.h"
-#include "Beamline/Node.h"
-#include "Shader/ElectricField.h"
-
-namespace defaults {
-constexpr int numRays = 100000;
-}
-
-/*
- * TODO: remove all of this
- */
-
-enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
-enum class UndulatorSigmaType { Standard, Accurate };
-
-enum class SourceType {
-    MatrixSource,
-    PointSource,
-    CircleSource,
-    SimpleUndulatorSource,
-    PixelSource,
-    DipoleSource,
-    InputSource,
-};
+namespace rayx {
 
 /*
  * photon energy: wavelength in nm, energy in eV
@@ -210,7 +183,7 @@ constexpr Polarization polarization = Stokes{1.0, 0.0, 0.0, 0.0};
 }
 
 /*
- * rotation: matrix, base convention, axis-angle
+ * rotation: matrix, base, axis-angle
  */
 
 // essentially a quaternion rotation (glm::dquat)
@@ -225,7 +198,7 @@ struct RotationBase {
     glm::dvec3 forward;
 };
 
-using Rotation = std::variant<glm::dmat3, RotationBase, RotationAroundAxis>;
+using Rotation = std::variant<RotationAroundAxis, RotationBase, glm::dmat3>;
 
 RotationAroundAxis toRotationAroundAxis(const RotationAroundAxis& rotation) { return rotation; }
 
@@ -286,111 +259,4 @@ glm::dmat3 toRotationMatrix(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationMatrix(arg); }, rotation);
 }
 
-struct BeamlineNode {
-    BeamlineNode(std::string name)
-        : name(std::move(name)), position(0.0), rotation(RotationBase{glm::dvec3(1, 0, 0), glm::dvec3(0, 1, 0), glm::dvec3(0, 0, 1)}) {}
-
-    std::string name;
-    glm::dvec3 position;
-    Rotation rotation;
-};
-
-/*
- * sources
- */
-
-struct PointSource {
-    using SourceType = SourceType::PointSource;
-    int numRays = defaults::numRays;
-    VolumetricScalarDistribution origin;
-    AngularDivergence direction;
-    Polarization polarization = defaults::polarization;
-    ScalarDistribution energy = defaults::energy;
-};
-
-// TODO: sensible defaults
-struct CircleSource {
-    using SourceType = SourceType::CircleSource;
-    int numRays    = defaults::numRays;
-    int numCircles = 1;
-    Angle maxOpeningAngle;
-    Angle minOpeningAngle;
-    Angle deltaOpeningAngle;
-    double width              = 0.0;
-    double height             = 0.0;
-    double depth              = 0.0;
-    Polarization polarization = defaults::polarization;
-    Distribution energy       = defaults::energy;
-};
-
-// TODO: sensible defaults
-struct SimpleUndulatorSource {
-    using SourceType = SourceType::SimpleUndulatorSource;
-    int numRays                  = defaults::numRays;
-    UndulatorSigmaType sigmaType = UndulatorSigmaType::Standard;
-    double undulatorLength       = 1.0;
-    double electronSigmaX        = 0.0;
-    double electronSigmaXs       = 0.0;
-    double electronSigmaY        = 0.0;
-    double electronSigmaYs       = 0.0;
-    double depth                 = 0.0;
-    Polarization polarization    = defaults::polarization;
-    PhotonEnergy photonEnergy    = 1.0;  // TODO: this is weird, because PhotonEnergy is potentially redundant to energy
-    Distribution energy          = defaults::energy;
-};
-
-// TODO: sensible defaults
-struct PixelSource {
-    using SourceType = SourceType::PixelSource;
-    int numRays = defaults::numRays;
-    // TODO: change to AngularDivergence ? depends on how PixelSource works
-    double horizontalDivergenc = 0.0;
-    double verticalDivergence  = 0.0;
-    // TODO: change to VolumetricScalarDistribution ? depends on how PixelSource works
-    double width              = 0.0;
-    double height             = 0.0;
-    double depth              = 0.0;
-    Polarization polarization = defaults::polarization;
-    Distribution energy       = defaults::energy;
-};
-
-// TODO: sensible defaults
-struct DipoleSource {
-    using SourceType = SourceType::DipoleSource;
-    int numRays                                         = defaults::numRays;
-    double bendingRadius                                = 1.0;
-    ElectronEnergyOrientation electronEnergyOrientation = ElectronEnergyOrientation::Clockwise;
-    double width                                        = 0.0;
-    double height                                       = 0.0;
-    ElectronVolt electronEnergy                         = ElectronVolt{3e3};   // in eV
-    ElectronVolt criticalEnergy                         = ElectronVolt{10.0};  // in eV
-    PhotonEnergy photonEnergy                           = WaveLength{1.24};    // in nm
-    double verticalElectronBeamDivergence               = 0.0;
-    double energySpread                                 = 0.0;
-    double horizontalDivergence                         = 0.0;
-};
-
-struct InputSource {
-    using SourceType = SourceType::InputSource;
-    Rays rays;
-    std::optional<VolumetricScalarDistribution> origin;
-    std::optional<AngularDivergence> direction;
-    std::optional<Polarization> polarization;
-    std::optional<ScalarDistribution> energy;
-    // TODO: specify which other attributes should be used from the input rays
-};
-
-using Source = std::variant<PointSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
-
-struct SourceNode : BeamlineNode {
-    SourceBase() : BeamlineNode(createUniqueSourceName()) {}
-    SourceBase(std::string name) : BeamlineNode(std::move(name)) {}
-    ~SourceBase() = default;
-
-    bool isSource() const override { return true; }
-    Source source;
-
-    SourceType sourceType() const {
-        return std::visit([]<typename T>(auto&& arg) { return typename T::SourceType; }, source);
-    }
-};
+}  // namespace rayx
