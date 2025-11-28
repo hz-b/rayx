@@ -16,28 +16,14 @@ std::string getNodeTypeString(const BeamlineNode* node) {
 }
 }  // namespace
 
-glm::dvec4 BeamlineNode::getWorldPosition() const {
-    glm::dvec4 localPos = getPosition();
-
-    if (!m_parent) return localPos;
-
-    assert(m_parent->isGroup() && "Parent must be a Group!");
-    const Group* parentGroup = static_cast<const Group*>(m_parent);
-
-    glm::dmat4 parentOri = parentGroup->getWorldOrientation();
-    glm::dvec4 parentPos = parentGroup->getWorldPosition();
-    return parentOri * localPos + parentPos;
+glm::dvec3 BeamlineNode::getWorldSpacePosition() const {
+    if (!m_parent) return position;
+    return toRotationMatrix(m_parent->asGroup().rotation) * position + m_parent->asGroup().position;
 }
 
-glm::dmat4 BeamlineNode::getWorldOrientation() const {
-    glm::dmat4 ori = getOrientation();
-
-    if (!m_parent) return ori;
-
-    assert(m_parent->isGroup() && "Parent must be a Group!");
-    const Group* parentGroup = static_cast<const Group*>(m_parent);
-
-    return parentGroup->getWorldOrientation() * ori;
+Rotation BeamlineNode::getWorldSpaceRotation() const {
+    if (!m_parent) return toRotationMatrix(rotation);
+    return toRotationMatrix(parent->asGroup()->getWorldSpaceRotation()) * toRotationMatrix(rotation);
 }
 
 const BeamlineNode* BeamlineNode::getRoot() const {
@@ -55,22 +41,6 @@ BeamlineNode* BeamlineNode::getRoot() {
 int BeamlineNode::getObjectId() const {
     if (!m_parent) return 0;
     return getRoot()->asGroup()->findObjectIdByNode(this);
-}
-
-const BeamlineNode* BeamlineNode::operator[](size_t) const {
-    throw std::runtime_error(std::format("BeamlineNode of type '{}' cannot be indexed. Only type 'Group' can", getNodeTypeString(this)));
-}
-
-BeamlineNode* BeamlineNode::operator[](size_t) {
-    throw std::runtime_error(std::format("BeamlineNode of type '{}' cannot be indexed. Only type 'Group' can", getNodeTypeString(this)));
-}
-
-const BeamlineNode* BeamlineNode::operator[](const std::string&) const {
-    throw std::runtime_error(std::format("BeamlineNode of type '{}' cannot be indexed. Only type 'Group' can", getNodeTypeString(this)));
-}
-
-BeamlineNode* BeamlineNode::operator[](const std::string&) {
-    throw std::runtime_error(std::format("BeamlineNode of type '{}' cannot be indexed. Only type 'Group' can", getNodeTypeString(this)));
 }
 
 const Group* BeamlineNode::asGroup() const {

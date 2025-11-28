@@ -6,6 +6,229 @@
 
 namespace rayx {
 
+/*
+ * material
+ */
+
+using Material = std::string; // TODO: make material be a string? Convenient way to support molecules
+
+// materials expressed as strings, to allow combination into mollecules/alloys
+namespace Materials {
+    constexpr Material Absorb = "Absorb";
+    constexpr Material Vacuum = "Vacuum";
+    constexpr Material Au     = "Au";
+    constexpr Material Si     = "Si";
+    constexpr Material Pt     = "Pt";
+    constexpr Material C      = "C";
+    // TODO: add more materials
+    // TODO: find a way to generate this list
+    std::array<Material, 5> allMaterials = {Absorb, Vacuum, Au, Si, Pt};
+}  // namespace Materials
+};
+
+/*
+ * area, aperture
+ */
+
+struct UnlimitedArea {};
+
+struct RectangularArea {
+    double width = 1.0;
+    double length = 1.0;
+};
+
+struct EllipticalArea {
+    double diameterX = 0.0;
+    double diameterZ = 0.0;
+};
+
+struct TrapezoidalArea {
+    double topWidth    = 0.0;
+    double bottomWidth = 0.0;
+    double height      = 0.0;
+};
+
+struct ConvexArea {
+    std::vector<glm::dvec2> points;
+};
+
+using Area = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexArea, UnlimitedArea>;
+using ApertureArea = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexArea>;
+using DiffractiveApertureArea = std::variant<RectangularArea, EllipticalArea>;
+
+struct Aperture {
+    std::variant<ApertureArea, DiffractiveApertureArea> area;
+    std::optional<ApertureArea> beamstopArea; // uses material of the element
+};
+
+/*
+ * curvature
+ */
+
+struct QuadricCurvature {
+    int m_icurv;
+    double m_a11;
+    double m_a12;
+    double m_a13;
+    double m_a14;
+    double m_a22;
+    double m_a23;
+    double m_a24;
+    double m_a33;
+    double m_a34;
+    double m_a44;
+};
+
+struct ToroidialCurvature {
+    double m_longRadius;
+    double m_shortRadius;
+    ToroidType m_toroidType;
+};
+
+struct CubicCurvature {
+    // int m_icurv;
+    double m_a11;
+    double m_a12;
+    double m_a13;
+    double m_a14;
+    double m_a22;
+    double m_a23;
+    double m_a24;
+    double m_a33;
+    double m_a34;
+    double m_a44;
+
+    double m_b12;
+    double m_b13;
+    double m_b21;
+    double m_b23;
+    double m_b31;
+    double m_b32;
+
+    double m_psi;
+};
+
+struct EllipticalCurvature {
+    double radiusX = 0.0;
+    double radiusZ = 0.0;
+};
+
+struct ConicalCurvature {
+    double radius = 0.0;
+};
+
+struct CylindricalCurvature {
+    double radius = 0.0;
+    CylinderDirection direction = CylinderDirection::LongRadiusR;
+};
+
+struct SphericalCurvature {
+    double radius = 0.0;
+};
+
+struct ParabolicCurvature {
+    double focalLength = 0.0;
+};
+
+using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature, EllipticalCurvature, ConicalCurvature, CylindricalCurvature,
+                               SphericalCurvature, ParabolicCurvature>;
+
+/*
+ * coating
+ */
+
+struct SingleLayerCoating {
+    Material material = Material::Au;
+    double thickness = 0.0;
+    double roughness = 0.0;
+};
+
+struct RepeatedCoating {
+    std::vector<SingleLayerCoating> layers = { SingleLayerCoating() };
+    int numInstances = 1;
+};
+
+using Coating = std::vector<RepeatedCoating>;
+
+/*
+ * behaviour
+ */
+
+struct AbsorbBehaviour {};
+struct ReflectBehaviour {
+    Material substrate = Materials::Au;
+    std::optional<Coating> coating;
+};
+struct TransmitBehaviour {} {
+    Material substrate = Materials::Au;
+    double substrateThickness = 0.1;
+    double substrateRoughness = 0.0;
+    std::optional<Coating> coating;
+}
+struct ReflectTransmitBehaviour {
+    Material substrate = Materials::Au;
+    double substrateThickness = 0.1;
+    double substrateRoughness = 0.0;
+    std::optional<Coating> coating;
+};
+struct GratingBehaviour {
+    Material substrate = Materials::Au;
+    std::array<double, 6> vls = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};      // VLS coefficients
+    double lineDensity 0.0;             // lines per mm
+    int orderOfDiffraction = 1;         // the diffraction order, usually 1
+};
+struct RzpBehaviour {
+    Material substrate = Materials::Au;
+    int imageType = 0;
+    int rzpType = 0;
+    int derivationMethod = 0;
+    int designOrderOfDiffraction = 1;
+    int orderOfDiffraction = 1;
+    int additionalOrder = 0;
+    double designWavelength = 0.0;
+    double fresnelZOffset = 0.0;
+    double designSagittalEntranceArmLength = 0.0;
+    double designSagittalExitArmLength = 0.0;
+    double designMeridionalEntranceArmLength = 0.0;
+    double designMeridionalExitArmLength = 0.0;
+    double designAlphaAngle = 0.0;
+    double designBetaAngle = 0.0;
+};
+struct DetectorBehaviour {};
+struct CrystalBehaviour {
+    double dSpacing2 = 0.0;
+    double unitCellVolume = 0.0;
+    double offsetAngle = 0.0;
+
+    double structureFactorReF0 = 0.0;
+    double structureFactorImF0 = 0.0;
+    double structureFactorReFH = 0.0;
+    double structureFactorImFH = 0.0;
+    double structureFactorReFHC = 0.0;
+    double structureFactorImFHC = 0.0;
+};
+
+using Behaviour = std::variant<AbsorbBehaviour, ReflectBehaviour, TransmitBehaviour, ReflectTransmitBehaviour, GratingBehaviour, RzpBehaviour, DetectorBehaviour, CrystalBehaviour>;
+
+/*
+ * surface element
+ */
+
+struct Object {
+    std::string name = createUniqueObjectName();
+    glm::dvec3 position;
+    Rotation rotation;
+    DesignPlane designPlane = DesignPlane::XZ; // TODO: rethink
+};
+
+struct SurfaceElement : Object {
+    Area area;
+    Behaviour behaviour;
+    std::optional<Curvature> curvature;
+    std::optional<SlopeError> slopeError;
+    std::optional<Aperture> aperture;
+};
+
 class RAYX_API DesignElement : public BeamlineNode {
   public:
     DesignElement();
