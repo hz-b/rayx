@@ -37,7 +37,7 @@ A passive rotation leaves the position of the vector unchanged and rotates the a
 The relation between axes and the position of the point are the same after each of the rotations: After the passive rotation the basis vectors are different and the vector coordinates stay the same whereas after the active rotation the vector coordinates are different but the basis vectors are the same.
 
 Example for active (left) and passive (right) rotation through \\(\alpha=25^\circ\\): 
-![active_passive](/docs/src/uploads/7eb17510a7f200d4ce89ed337e0a4eda/rotation_active_vs_passive.PNG)
+![active_passive](../res/rotation_active_vs_passive.PNG)
  The relative position of the vector to the axes is the same after each rotation. 
 See also [active vs passive transformation](https://en.wikipedia.org/wiki/Active_and_passive_transformation)
 
