@@ -1,15 +1,13 @@
 #pragma once
 
+#include <variant>
+#include <optional>
+#include <string>
+#include <memory>
+
 #include "BeamlineNode.h"
-#include "Types.h"
-
-// TODO: what are these
-enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
-enum class UndulatorSigmaType { Standard, Accurate };
-
-/*
- * sources
- */
+#include "Distributions.h"
+#include "Rays.h"
 
 namespace defaults {
 constexpr int numRays = 100000;
@@ -24,13 +22,12 @@ enum class SourceType {
     InputSource,
 };
 
-struct PointSource {
-    static constexpr SourceType sourceType = SourceType::PointSource;
+struct ArtificialSource {
     int numRays = defaults::numRays;
-    VolumetricScalarDistribution origin;
-    AngularDivergence direction;
-    Polarization polarization = defaults::polarization;
-    ScalarDistribution energy = defaults::energy;
+    VolumetricScalarDistribution rayOrigin;
+    AngularDivergence rayDirection;
+    PhotonEnergyDistribution rayEnergy = defaults::photonEnergy;
+    Polarization rayPolarization = defaults::polarization;
 };
 
 // TODO: sensible defaults
@@ -47,6 +44,8 @@ struct CircleSource {
     Polarization polarization = defaults::polarization;
     Distribution energy       = defaults::energy;
 };
+
+enum class UndulatorSigmaType { Standard, Accurate };
 
 // TODO: sensible defaults
 struct SimpleUndulatorSource {
@@ -78,6 +77,8 @@ struct PixelSource {
     Polarization polarization = defaults::polarization;
     Distribution energy       = defaults::energy;
 };
+
+enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 
 // TODO: sensible defaults
 struct DipoleSource {
