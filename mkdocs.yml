@@ -78,6 +78,8 @@ theme:
         name: Switch to system preference
 
 markdown_extensions:
+  - toc:
+      permalink: true
   - attr_list
   - md_in_html
   - pymdownx.blocks.caption:
