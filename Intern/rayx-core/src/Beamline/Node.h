@@ -6,18 +6,18 @@
 
 #include "Core.h"
 
-namespace {
-std::string getUniqueNodeName() {
-    static size_t counter = 0;
-    return std::format("<some_node_{}>", counter++);
-}
-}  // unnamed namespace
-
 namespace rayx {
 
 class Group;
 class DesignSource;
 class DesignElement;
+
+namespace detail {
+std::string createUniqueNodeName() {
+    static size_t counter = 0;
+    return std::format("<some_node_{}>", counter++);
+}
+}  // namespace detail
 
 /**
  * @class BeamlineNode
@@ -28,11 +28,11 @@ class DesignElement;
  * for position/orientation and potential child relationships.
  */
 class RAYX_API BeamlineNode {
-    friend class Group;  // Needed so group can access m_parent for BeamlineNodes
+    friend class Group;  // Needed so only group can access m_parent for BeamlineNodes
+
   public:
-    BeamlineNode() : name(createUniqueNodeName()) {}
-    BeamlineNode(std::string name)
-        : name(std::move(name)) {}
+    BeamlineNode();
+    BeamlineNode(std::string name);
 
     BeamlineNode(const BeamlineNode&) = delete;
     BeamlineNode& operator=(const BeamlineNode&) = delete;
@@ -94,9 +94,9 @@ class RAYX_API BeamlineNode {
     const DesignElement* asElement() const;
     DesignElement* asElement();
 
-    std::string name;
+    std::string name = createUniqueNodeName();
     glm::dvec3 position;
-    Rotation rotation;
+    Rotation rotation = RotationAroundAxis{Degrees{0.0}, {0.0, 0.0, 1.0}};
 
   private:
     /**

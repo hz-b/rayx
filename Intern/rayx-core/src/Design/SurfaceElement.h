@@ -2,7 +2,6 @@
 
 #include <optional>
 
-#include "Object.h"
 #include "Area.h"
 #include "Behaviour.h"
 #include "Curvature.h"
@@ -11,12 +10,14 @@
 
 namespace rayx {
 
-struct SurfaceElement : Object {
+struct SurfaceElement {
     Area area;
     Behaviour behaviour;
     std::optional<Curvature> curvature;
     std::optional<Aperture> aperture;
     std::optional<SlopeError> slopeError;
 };
+
+using Element = SurfaceElement;
 
 }  // namespace rayx

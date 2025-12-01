@@ -95,9 +95,6 @@ class RAYX_API Group : public BeamlineNode {
      */
     std::unique_ptr<BeamlineNode> clone() const override;
 
-    std::string getName() const override;
-    void setName(std::string name) override;
-
     /**
      * @brief Recursively traverse the model/scene graph down from this node.
      *
@@ -157,12 +154,6 @@ class RAYX_API Group : public BeamlineNode {
     std::vector<const DesignElement*> getElements() const;
     std::vector<const DesignSource*> getSources() const;
 
-    glm::dvec4 getPosition() const override { return m_position; }
-    void setPosition(const glm::dvec4& pos) { m_position = pos; }
-
-    glm::dmat4 getOrientation() const override { return m_orientation; }
-    void setOrientation(const glm::dmat4& orientation) { m_orientation = orientation; }
-
     const std::vector<std::unique_ptr<BeamlineNode>>& getChildren() const { return m_children; }
 
     size_t findObjectIdByNode(const BeamlineNode* node) const;
@@ -170,12 +161,8 @@ class RAYX_API Group : public BeamlineNode {
     BeamlineNode* findNodeByObjectId(const size_t objectId);
 
   private:
-    // Position and orientation could in theory be put into one transform matrix but this follows the rml style
-    glm::dvec4 m_position    = glm::dvec4(0, 0, 0, 1);
-    glm::dmat4 m_orientation = glm::dmat4(1);
     // m_children vec is not checked for dangling or nullptrs anywhere, changes to the Group interface/implementation are to be made with care
     std::vector<std::unique_ptr<BeamlineNode>> m_children;
-    std::string m_name;
 };
 
 using Beamline = Group;  // Conceptually, a Beamline is a Group

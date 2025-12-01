@@ -14,7 +14,7 @@ struct CollimatedAngularDivergence {
 };
 
 struct IndividualAngularDivergence {
-    AreaAngularDistribution distribution;
+    AngularAreaDistribution distribution;
 };
 
 using AngularDivergence = std::variant<CollimatedAngularDivergence, IndividualAngularDivergence>;

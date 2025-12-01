@@ -13,18 +13,9 @@ namespace defaults {
 constexpr int numRays = 100000;
 }
 
-enum class SourceType {
-    PointSource,
-    CircleSource,
-    SimpleUndulatorSource,
-    PixelSource,
-    DipoleSource,
-    InputSource,
-};
-
 struct ArtificialSource {
     int numRays = defaults::numRays;
-    VolumetricScalarDistribution rayOrigin;
+    ScalarVolumetricDistribution rayOrigin;
     AngularDivergence rayDirection;
     PhotonEnergyDistribution rayEnergy = defaults::photonEnergy;
     Polarization rayPolarization = defaults::polarization;
@@ -32,7 +23,6 @@ struct ArtificialSource {
 
 // TODO: sensible defaults
 struct CircleSource {
-    static constexpr SourceType sourceType = SourceType::CircleSource;
     int numRays    = defaults::numRays;
     int numCircles = 1;
     Angle maxOpeningAngle;
@@ -49,7 +39,6 @@ enum class UndulatorSigmaType { Standard, Accurate };
 
 // TODO: sensible defaults
 struct SimpleUndulatorSource {
-    static constexpr SourceType sourceType = SourceType::SimpleUndulatorSource;
     int numRays                  = defaults::numRays;
     UndulatorSigmaType sigmaType = UndulatorSigmaType::Standard;
     double undulatorLength       = 1.0;
@@ -65,7 +54,6 @@ struct SimpleUndulatorSource {
 
 // TODO: sensible defaults
 struct PixelSource {
-    static constexpr SourceType sourceType = SourceType::PixelSource;
     int numRays = defaults::numRays;
     // TODO: change to AngularDivergence ? depends on how PixelSource works
     double horizontalDivergenc = 0.0;
@@ -82,7 +70,6 @@ enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 
 // TODO: sensible defaults
 struct DipoleSource {
-    static constexpr SourceType sourceType = SourceType::DipoleSource;
     int numRays                                         = defaults::numRays;
     double bendingRadius                                = 1.0;
     ElectronEnergyOrientation electronEnergyOrientation = ElectronEnergyOrientation::Clockwise;
@@ -97,9 +84,8 @@ struct DipoleSource {
 };
 
 struct InputSource {
-    static constexpr SourceType sourceType = SourceType::InputSource;
     Rays rays;
-    std::optional<VolumetricScalarDistribution> origin;
+    std::optional<ScalarVolumetricDistribution> origin;
     std::optional<AngularDivergence> direction;
     std::optional<Polarization> polarization;
     std::optional<ScalarDistribution> energy;
@@ -107,23 +93,3 @@ struct InputSource {
 };
 
 using Source = std::variant<PointSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
-
-struct SourceNode : BeamlineNode {
-    SourceBase() : BeamlineNode(createUniqueSourceName()) {}
-    SourceBase(std::string name) : BeamlineNode(std::move(name)) {}
-    ~SourceBase() = default;
-
-    bool isSource() const override { return true; }
-
-    std::unique_ptr<BeamlineNode> clone() const override {
-        SourceNode clone;
-        clone.source = std::visit([](auto&& arg) -> Source { return arg; }, source);
-        return std::make_unique<SourceNode>(std::move(clone));
-    }
-
-    SourceType sourceType() const {
-        return std::visit([]<typename T>(auto&& arg) { return typename T::SourceType; }, source);
-    }
-
-    Source source;
-};

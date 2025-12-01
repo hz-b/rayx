@@ -47,9 +47,6 @@ std::unique_ptr<BeamlineNode> Group::clone() const {
     return copy;
 }
 
-std::string Group::getName() const { return m_name; }
-void Group::setName(std::string name) { m_name = std::move(name); }
-
 const BeamlineNode* Group::findNodeByName(const std::string& name) const {
     const BeamlineNode* result = nullptr;
     ctraverse([&](const BeamlineNode& node) {
