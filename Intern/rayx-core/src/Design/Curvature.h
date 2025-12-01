@@ -56,6 +56,8 @@ struct ConicalCurvature {
     double radius = 0.0;
 };
 
+enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
+
 struct CylindricalCurvature {
     double radius = 0.0;
     CylinderDirection direction = CylinderDirection::LongRadiusR;
@@ -71,5 +73,7 @@ struct ParabolicCurvature {
 
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature, EllipticalCurvature, ConicalCurvature, CylindricalCurvature,
                                SphericalCurvature, ParabolicCurvature>;
+
+
 
 } // namespace rayx
