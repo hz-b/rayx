@@ -5,75 +5,97 @@
 namespace rayx {
 
 struct QuadricCurvature {
-    int m_icurv;
-    double m_a11;
-    double m_a12;
-    double m_a13;
-    double m_a14;
-    double m_a22;
-    double m_a23;
-    double m_a24;
-    double m_a33;
-    double m_a34;
-    double m_a44;
+    int icurv;
+    double a11;
+    double a12;
+    double a13;
+    double a14;
+    double a22;
+    double a23;
+    double a24;
+    double a33;
+    double a34;
+    double a44;
+};
+
+enum class ToroidType {
+    Convex,
+    Concave,
 };
 
 struct ToroidialCurvature {
-    double m_longRadius;
-    double m_shortRadius;
-    ToroidType m_toroidType;
+    double longRadius;
+    double shortRadius;
+    ToroidType toroidType;
 };
 
 struct CubicCurvature {
-    // int m_icurv;
-    double m_a11;
-    double m_a12;
-    double m_a13;
-    double m_a14;
-    double m_a22;
-    double m_a23;
-    double m_a24;
-    double m_a33;
-    double m_a34;
-    double m_a44;
+    // int icurv;
+    double a11;
+    double a12;
+    double a13;
+    double a14;
+    double a22;
+    double a23;
+    double a24;
+    double a33;
+    double a34;
+    double a44;
 
-    double m_b12;
-    double m_b13;
-    double m_b21;
-    double m_b23;
-    double m_b31;
-    double m_b32;
+    double b12;
+    double b13;
+    double b21;
+    double b23;
+    double b31;
+    double b32;
 
-    double m_psi;
+    double psi;
 };
 
+enum class FigureRotation { No, Yes, Plane };
+
 struct EllipticalCurvature {
-    double radiusX = 0.0;
-    double radiusZ = 0.0;
+    double shortHalfAxisB = 0.0;
+    double longHalfAxisA = 0.0;
+    double entranceArmLength = 0.0;
+    double exitArmLength = 0.0;
+    rayx::Rad designGrazingIncAngle = 0.0;
+    FigureRotation figureRotation = FigureRotation::No;
+    double parameterA11 = 1.0;
 };
 
 struct ConicalCurvature {
-    double radius = 0.0;
+    rayx::Rad grazingIncAngle = 0.0;
+    double entranceArmLength = 0.0;
+    double exitArmLength = 0.0;
+    double totalLength = 0.0;
 };
 
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 
 struct CylindricalCurvature {
-    double radius = 0.0;
     CylinderDirection direction = CylinderDirection::LongRadiusR;
+    double radius = 0.0;
+    double grazingIncidenceAngle = 0.0;
+    double entranceArmLength = 0.0;
+    double exitArmLength = 0.0;
 };
 
 struct SphericalCurvature {
     double radius = 0.0;
 };
 
+enum class ParabolicCurvatureType { Collimate, Focussing };
+
 struct ParabolicCurvature {
-    double focalLength = 0.0;
+    double armLength = 0.0;
+    double parameterP = 0.0;
+    ParabolicCurvatureType parameterPType = ParabolicCurvatureType::Collimate;
+    double grazingIncAngle = 0.0;
+    double parameterA11 = 1.0;
 };
 
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature, EllipticalCurvature, ConicalCurvature, CylindricalCurvature,
                                SphericalCurvature, ParabolicCurvature>;
-
-
 
 } // namespace rayx
