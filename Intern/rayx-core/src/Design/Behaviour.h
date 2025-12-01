@@ -18,13 +18,15 @@ struct ReflectBehaviour {
     std::optional<Coating> coating;
 };
 
-struct TransmitBehaviour {} {
+struct TransmitBehaviour  {
     Material substrate = materials::Au;
-    bool efficiency = true;
+    bool perfectEfficiency = false;
     double substrateThickness = 0.1;
     double substrateRoughness = 0.0;
     std::optional<Coating> coating;
 };
+
+// TODO: add ReflectTransmitBehaviour to support beam splitters
 
 struct GratingBehaviour {
     std::array<double, 6> vls = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};      // VLS coefficients

@@ -2,6 +2,8 @@
 
 #include "Debug/Debug.h"
 
+// TODO: remove this file later, when all enums are moved to their respective files
+
 namespace rayx {
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };

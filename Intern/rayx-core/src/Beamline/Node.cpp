@@ -14,7 +14,11 @@ std::string getNodeTypeString(const BeamlineNode* node) {
     RAYX_EXIT << "error: unimpemented BeamlineNode type";
     return "<unimplemented>";
 }
-}  // namespace
+}  // unnamed namespace
+
+BeamlineNode::BeamlineNode() : name(createUniqueNodeName()) {}
+
+BeamlineNode(std::string name) : name(std::move(name)) {}
 
 glm::dvec3 BeamlineNode::getWorldSpacePosition() const {
     if (!m_parent) return position;

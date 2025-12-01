@@ -9,7 +9,7 @@ namespace rayx {
 // essentially a quaternion rotation (glm::dquat)
 struct RotationAroundAxis {
     Angle angle;
-    glm::dvec3 axis;
+    glm::dvec3 axis = {0.0, 0.0, 1.0};
 };
 
 struct RotationBase {
