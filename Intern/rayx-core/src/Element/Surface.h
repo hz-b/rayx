@@ -69,7 +69,6 @@ using Surface = Variant<detail::SurfaceTypes, detail::SurfaceTypes::Plane, detai
                         detail::SurfaceTypes::Cubic>;
 
 class DesignElement;
-enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 Surface makeSurface(const DesignElement& dele);
 Surface makeToroid(const DesignElement& dele);      //< creates a toroid from the parameters given in ` dele`.
 Surface makeQuadric(const DesignElement& dele);     //< creates a quadric from the parameters given in ` dele`.

@@ -9,16 +9,16 @@
 
 namespace rayx {
 
-struct DetectorBehaviour {};
+struct DetectorBehavior {};
 
-struct AbsorbBehaviour {};
+struct AbsorbBehavior {};
 
-struct ReflectBehaviour {
+struct ReflectBehavior {
     std::optional<Material> substrate = materials::Au;
     std::optional<Coating> coating;
 };
 
-struct TransmitBehaviour  {
+struct TransmitBehavior  {
     Material substrate = materials::Au;
     bool perfectEfficiency = false;
     double substrateThickness = 0.1;
@@ -26,15 +26,15 @@ struct TransmitBehaviour  {
     std::optional<Coating> coating;
 };
 
-// TODO: add ReflectTransmitBehaviour to support beam splitters
+// TODO: add ReflectTransmitBehavior to support beam splitters
 
-struct GratingBehaviour {
+struct GratingBehavior {
     std::array<double, 6> vls = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};      // VLS coefficients
     double lineDensity 0.0;             // lines per mm
     int orderOfDiffraction = 1;         // the diffraction order, usually 1
 };
 
-struct RzpBehaviour {
+struct RzpBehavior {
     int imageType = 0;
     int rzpType = 0;
     int derivationMethod = 0;
@@ -51,7 +51,7 @@ struct RzpBehaviour {
     double designBetaAngle = 0.0;
 };
 
-struct CrystalBehaviour {
+struct CrystalBehavior {
     double dSpacing2 = 0.0;
     double unitCellVolume = 0.0;
     double offsetAngle = 0.0;
@@ -64,6 +64,6 @@ struct CrystalBehaviour {
     double structureFactorImFHC = 0.0;
 };
 
-using Behaviour = std::variant<DetectorBehaviour, AbsorbBehaviour, ReflectBehaviour, TransmitBehaviour, GratingBehaviour, RzpBehaviour, CrystalBehaviour>;
+using Behavior = std::variant<DetectorBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
 
 } // namespace rayx
