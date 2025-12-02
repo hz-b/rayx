@@ -2,6 +2,7 @@
 
 Optical elements are a central part of the tracing process. They define how light is guided through the beamline - where it is focused, redirected, or scattered.
 In the context of RAYX a beamline consists of two types of elements:
+
 - LightSources, to create the rays, and
 - OpticalElements, to be hit by and manipulate these rays
 
@@ -10,6 +11,7 @@ In this section, you can read up on the design choices we made when implementing
 ## Behavior, Cutout, Surface, Coating
 
 Next to its position and orientation, an OpticalElement is classified by three parts: The Behaviour, Surface and Cutout.
+
 - The Behavior defines how the element interacts with a ray (eg. reflecting, absorbing, redirecting)
 - The Surface expresses the curvature of an OpticalElement
 - The cutout defines the boundaries of the OpticalElement. In other words it "cuts" a finite shape out of the large Surface.
@@ -32,6 +34,7 @@ Optical elements are often subtly curved; to the human eye, they might appear in
 
 There are two ways to describe the reflectivity of the Surface. The User can choose between reflectivity Type '100%' and 'derived by material'.
 If you want the second option you need to specify the following parameter:
+
 - Material Substrate
 - Roughness Substrate
 - Density Substrate
@@ -122,4 +125,4 @@ Therefore, we use the `icurv` parameter to determine whether the quadric is conc
 This suffices since we calculate all intersection points with elements.
 When two intersections occur, the `icurv` parameter informs us which intersection point to select.
 
-![image](../../res/wastebox.png)
+![image](../../../res/wastebox.png)

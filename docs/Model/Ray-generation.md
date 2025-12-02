@@ -5,7 +5,7 @@ The origin are described with a three dimensional vector. However, the direction
 See also [documentation](https://it-ed-git.basisit.de/RAY/RAY/-/wikis/uploads/bdcf4515e03b2fccf462c5f0d76052c3/Paper_Schaefers_RAY_Springer_2007.pdf) p.18,19.
 
 \\[
-    ray = \begin{bmatrix}
+    \text{ray} = \begin{bmatrix}
     x_s \\\\ y_s \\\\ z_s
     \end{bmatrix} + t 
     \begin{bmatrix}
@@ -15,7 +15,7 @@ See also [documentation](https://it-ed-git.basisit.de/RAY/RAY/-/wikis/uploads/bd
     x_s \\\\ y_s \\\\ z_s
     \end{bmatrix} + t 
     \begin{bmatrix}
-    sin \phi_S \cdot cos \psi_S \\\\ cos \psi_S \\\\ cos \psi_S \cdot cos \phi_S
+    \sin \phi_S \cdot \cos \psi_S \\\\ \cos \psi_S \\\\ \cos \psi_S \cdot \cos \phi_S
     \end{bmatrix}
 \\]
 

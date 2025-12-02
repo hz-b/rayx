@@ -1,6 +1,6 @@
-#How to Build
+# How to Build
 
-For building and running the project, we recommend using [Visual Studio Code](https://code.visualstudio.com/) (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the `compile.sh` script can be used for compilation (see [using compile.sh](#using-compile.sh)).
+For building and running the project, we recommend using [Visual Studio Code](https://code.visualstudio.com/) (VSCode) as your IDE, along with the C/C++ and CMake Tools extensions. These extensions significantly simplify the building process. However, you are free to use any IDE of your choice. If you are on a UNIX-like system, the `compile.sh` script can be used for compilation (see [using compile.sh](#using-compilesh)).
 
 ## CMake Options:
 
@@ -91,8 +91,11 @@ Please take a look at the supported versions of GCC for your Cuda installation:
 - Clang: Using clang as Cuda compiler is currently not supported.
 
 ### Using compile.sh
+
 usage: `./compile.sh`
+
 #### Options:
+
 - `--release` build in release mode (default: build in debug mode)
 - `--cuda` enable compilation with Cuda (default: build without Cuda)\
 see [Determining Cuda and compiler version](#determining-cuda-and-compiler-version) \
