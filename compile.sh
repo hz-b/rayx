@@ -65,6 +65,13 @@ if [ "$list_targets" -eq 1 ]; then
     if [ -d "$build" ]; then
         echo "Available targets in $build:"
         cmake --build "$build" --target help
+
+        echo
+        echo "Pseudo targets:"
+        echo "'rayx'"
+        echo "'rayx-core-tst'"
+        echo "'rayx-ui'"
+        echo "'all'"
     else
         echo "No build directory found. Run a configure first."
     fi
@@ -83,6 +90,21 @@ if [ "$enable_openmp" -eq 0 ]; then
 else
     conf_args+=" -DRAYX_ENABLE_OPENMP=ON"
 fi
+
+if [ "$selected_target" == "rayx" ]; then
+    echo "building target rayx"
+    conf_args+=" -DRAYX_BUILD_RAYX_CLI=ON -DRAYX_BUILD_RAYX_TESTS=OFF -DRAYX_BUILD_RAYX_UI=OFF"
+elif [ "$selected_target" == "rayx-core-tst" ]; then
+    echo "building target rayx-core-tst"
+    conf_args+=" -DRAYX_BUILD_RAYX_CLI=OFF -DRAYX_BUILD_RAYX_TESTS=ON -DRAYX_BUILD_RAYX_UI=OFF"
+elif [ "$selected_target" == "rayx-ui" ]; then
+    echo "building target rayx-ui"
+    conf_args+=" -DRAYX_BUILD_RAYX_CLI=OFF -DRAYX_BUILD_RAYX_TESTS=OFF -DRAYX_BUILD_RAYX_UI=ON"
+else # all
+    conf_args+=" -DRAYX_BUILD_RAYX_CLI=ON -DRAYX_BUILD_RAYX_TESTS=ON -DRAYX_BUILD_RAYX_UI=ON"
+fi
+
+echo "CMake configuration arguments: $conf_args"
 
 # update git submodules
 echo "Updating git submodules ..."
