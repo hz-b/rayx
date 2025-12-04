@@ -1,9 +1,9 @@
 #pragma once
 
-#include <variant>
+#include <memory>
 #include <optional>
 #include <string>
-#include <memory>
+#include <variant>
 
 #include "BeamlineNode.h"
 #include "Distributions.h"
@@ -18,21 +18,24 @@ struct ArtificialSource {
     ScalarVolumetricDistribution rayOrigin;
     AngularDivergence rayDirection;
     PhotonEnergyDistribution rayEnergy = defaults::photonEnergy;
+    Polarization rayPolarization       = defaults::polarization;
+};
+
+struct PointSourceParameters {
+    int numRays = defaults::numRays;
+    double pointSize = 0.0;
+    PhotonEnergy rayEnergy = defaults::photonEnergy;
     Polarization rayPolarization = defaults::polarization;
 };
 
-// TODO: sensible defaults
-struct CircleSource {
+struct ProjectorSource {
     int numRays    = defaults::numRays;
-    int numCircles = 1;
-    Angle maxOpeningAngle;
-    Angle minOpeningAngle;
-    Angle deltaOpeningAngle;
-    double width              = 0.0;
-    double height             = 0.0;
-    double depth              = 0.0;
-    Polarization polarization = defaults::polarization;
-    Distribution energy       = defaults::energy;
+    int numCircles = 10;
+    ScalarVolumetricDistribution rayOrigin;
+    Area projectionArea;
+    std::optional<Curvature> projectionAreaCurvature;
+    PhotonEnergyDistribution rayEnergy = defaults::photonEnergy;
+    Polarization rayPolarization       = defaults::polarization;
 };
 
 enum class UndulatorSigmaType { Standard, Accurate };
@@ -92,4 +95,4 @@ struct InputSource {
     // TODO: specify which other attributes should be used from the input rays
 };
 
-using Source = std::variant<PointSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
+using Source = std::variant<ArtificialSource, ProjectorSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;

@@ -30,18 +30,14 @@ ElectronVolt toElectronVolt(const PhotonEnergy energy) {
     return std::visit([](auto&& arg) { return toElectronVolt(arg); }, energy);
 }
 
-using PhotonEnergy       = std::variant<WaveLength, ElectronVolt>;
+using PhotonEnergy = std::variant<WaveLength, ElectronVolt>;
 
 namespace literals {
 
-WaveLength operator"" _nm(long double value) {
-    return WaveLength{static_cast<double>(value)};
-}
+WaveLength operator"" _nm(long double value) { return WaveLength{static_cast<double>(value)}; }
 
-ElectronVolt operator"" _eV(long double value) {
-    return ElectronVolt{static_cast<double>(value)};
-}
+ElectronVolt operator"" _eV(long double value) { return ElectronVolt{static_cast<double>(value)}; }
 
-} // namespace literals
+}  // namespace literals
 
-} // namespace rayx
+}  // namespace rayx

@@ -8,15 +8,15 @@ namespace rayx {
 
 struct SingleLayerCoating {
     Material material = Material::Au;
-    double thickness = 0.0;
-    double roughness = 0.0;
+    double thickness  = 0.0;
+    double roughness  = 0.0;
 };
 
 struct RepeatedCoating {
-    std::vector<SingleLayerCoating> layers = { SingleLayerCoating() };
-    int numInstances = 1;
+    std::vector<SingleLayerCoating> layers = {SingleLayerCoating()};
+    int numInstances                       = 1;
 };
 
 using Coating = std::vector<RepeatedCoating>;
 
-} // namespace rayx
+}  // namespace rayx

@@ -8,4 +8,4 @@ using CompiledCurvature = std::variant<QuadricCurvature, ToroidialCurvature, Cub
 
 CompiledCurvature compileCurvature(const Curvature& curvature);
 
-} // namespace rayx::detail
+}  // namespace rayx::detail

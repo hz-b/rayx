@@ -1,8 +1,7 @@
 #pragma once
 
-#include <variant>
-
 #include <glm/glm.hpp>
+#include <variant>
 
 namespace rayx {
 
@@ -34,14 +33,10 @@ Degrees toDegrees(const Angle angle) {
 
 namespace literals {
 
-Degrees operator"" _deg(long double value) {
-    return Degrees{static_cast<double>(value)};
-}
+Degrees operator"" _deg(long double value) { return Degrees{static_cast<double>(value)}; }
 
-Radians operator"" _rad(long double value) {
-    return Radians{static_cast<double>(value)};
-}
+Radians operator"" _rad(long double value) { return Radians{static_cast<double>(value)}; }
 
 }  // namespace literals
 
-} // namespace rayx
+}  // namespace rayx
