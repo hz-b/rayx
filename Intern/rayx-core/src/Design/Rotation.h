@@ -1,8 +1,8 @@
 #pragma once
 
-#include <variant>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <variant>
 
 namespace rayx {
 

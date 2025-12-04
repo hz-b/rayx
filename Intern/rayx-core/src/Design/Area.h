@@ -1,14 +1,13 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <variant>
 #include <vector>
-
-#include <glm/glm.hpp>
 
 namespace rayx {
 
 struct RectangularArea {
-    double width = 1.0;
+    double width  = 1.0;
     double length = 1.0;
 };
 
@@ -31,4 +30,4 @@ struct UnlimitedArea {};
 
 using Area = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea, UnlimitedArea>;
 
-} // namespace rayx
+}  // namespace rayx

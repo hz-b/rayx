@@ -15,4 +15,4 @@ struct ElementNode : BeamlineNode {
     Element element;
 };
 
-}
+}  // namespace rayx

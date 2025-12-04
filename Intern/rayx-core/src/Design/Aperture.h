@@ -1,25 +1,25 @@
 #pragma once
 
-#include <variant>
 #include <optional>
+#include <variant>
 
 #include "Area.h"
 
 namespace rayx {
 
-using ApertureArea = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea>;
+using ApertureArea            = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea>;
 using DiffractiveApertureArea = std::variant<RectangularArea, EllipticalArea>;
 
 struct NonDiffractiveAperture {
     ApertureArea area;
-    std::optional<ApertureArea> beamstopArea; // uses material of the element
+    std::optional<ApertureArea> beamstopArea;  // uses material of the element
 };
 
 struct DiffractiveAperture {
     DiffractiveApertureArea area;
-    std::optional<ApertureArea> beamstopArea; // uses material of the element
+    std::optional<ApertureArea> beamstopArea;  // uses material of the element
 };
 
 using Aperture = std::variant<NonDiffractiveAperture, DiffractiveAperture>;
 
-} // namespace rayx
+}  // namespace rayx

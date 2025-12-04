@@ -34,10 +34,10 @@ class RAYX_API BeamlineNode {
     BeamlineNode();
     BeamlineNode(std::string name);
 
-    BeamlineNode(const BeamlineNode&) = delete;
+    BeamlineNode(const BeamlineNode&)            = delete;
     BeamlineNode& operator=(const BeamlineNode&) = delete;
 
-    BeamlineNode(BeamlineNode&&) noexcept = default;
+    BeamlineNode(BeamlineNode&&) noexcept            = default;
     BeamlineNode& operator=(BeamlineNode&&) noexcept = default;
 
     /**

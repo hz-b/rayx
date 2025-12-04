@@ -55,30 +55,30 @@ struct CubicCurvature {
 enum class FigureRotation { No, Yes, Plane };
 
 struct EllipticalCurvature {
-    double shortHalfAxisB = 0.0;
-    double longHalfAxisA = 0.0;
-    double entranceArmLength = 0.0;
-    double exitArmLength = 0.0;
+    double shortHalfAxisB           = 0.0;
+    double longHalfAxisA            = 0.0;
+    double entranceArmLength        = 0.0;
+    double exitArmLength            = 0.0;
     rayx::Rad designGrazingIncAngle = 0.0;
-    FigureRotation figureRotation = FigureRotation::No;
-    double parameterA11 = 1.0;
+    FigureRotation figureRotation   = FigureRotation::No;
+    double parameterA11             = 1.0;
 };
 
 struct ConicalCurvature {
     rayx::Rad grazingIncAngle = 0.0;
-    double entranceArmLength = 0.0;
-    double exitArmLength = 0.0;
-    double totalLength = 0.0;
+    double entranceArmLength  = 0.0;
+    double exitArmLength      = 0.0;
+    double totalLength        = 0.0;
 };
 
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 
 struct CylindricalCurvature {
-    CylinderDirection direction = CylinderDirection::LongRadiusR;
-    double radius = 0.0;
+    CylinderDirection direction  = CylinderDirection::LongRadiusR;
+    double radius                = 0.0;
     double grazingIncidenceAngle = 0.0;
-    double entranceArmLength = 0.0;
-    double exitArmLength = 0.0;
+    double entranceArmLength     = 0.0;
+    double exitArmLength         = 0.0;
 };
 
 struct SphericalCurvature {
@@ -88,14 +88,14 @@ struct SphericalCurvature {
 enum class ParabolicCurvatureType { Collimate, Focussing };
 
 struct ParabolicCurvature {
-    double armLength = 0.0;
-    double parameterP = 0.0;
+    double armLength                      = 0.0;
+    double parameterP                     = 0.0;
     ParabolicCurvatureType parameterPType = ParabolicCurvatureType::Collimate;
-    double grazingIncAngle = 0.0;
-    double parameterA11 = 1.0;
+    double grazingIncAngle                = 0.0;
+    double parameterA11                   = 1.0;
 };
 
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature, EllipticalCurvature, ConicalCurvature, CylindricalCurvature,
                                SphericalCurvature, ParabolicCurvature>;
 
-} // namespace rayx
+}  // namespace rayx

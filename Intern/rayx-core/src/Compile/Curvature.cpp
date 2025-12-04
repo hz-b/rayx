@@ -228,40 +228,24 @@ QuadricCurvature toQuadric(const EllipticalCurvature& curvature) {
     };
 }
 
-CompiledCurvature compileCurvature(const QuadraticCurvature& curvature) {
-    return curvature;
-}
+CompiledCurvature compileCurvature(const QuadraticCurvature& curvature) { return curvature; }
 
-CompiledCurvature compileCurvature(const ToroidialCurvature& curvature) {
-    return curvature;
-}
+CompiledCurvature compileCurvature(const ToroidialCurvature& curvature) { return curvature; }
 
-CompiledCurvature compileCurvature(const CubicCurvature& curvature) {
-    return curvature;
-}
+CompiledCurvature compileCurvature(const CubicCurvature& curvature) { return curvature; }
 
-CompiledCurvature compileCurvature(const CylindricalCurvature& curvature) {
-    return toQuadric(curvature);
-}
+CompiledCurvature compileCurvature(const CylindricalCurvature& curvature) { return toQuadric(curvature); }
 
-CompiledCurvature compileCurvature(const SphericalCurvature& curvature) {
-    return toQuadric(curvature);
-}
+CompiledCurvature compileCurvature(const SphericalCurvature& curvature) { return toQuadric(curvature); }
 
-CompiledCurvature compileCurvature(const ParabolicCurvature& curvature) {
-    return toQuadric(curvature);
-}
+CompiledCurvature compileCurvature(const ParabolicCurvature& curvature) { return toQuadric(curvature); }
 
-CompiledCurvature compileCurvature(const ConicalCurvature& curvature) {
-    return toQuadric(curvature);
-}
+CompiledCurvature compileCurvature(const ConicalCurvature& curvature) { return toQuadric(curvature); }
 
-CompiledCurvature compileCurvature(const EllipticalCurvature& curvature) {
-    return toQuadric(curvature);
-}
+CompiledCurvature compileCurvature(const EllipticalCurvature& curvature) { return toQuadric(curvature); }
 
 CompiledCurvature compileCurvature(const Curvature& curvature) {
     return std::visit([](const auto& curv) { return compileCurvature(curv); }, curvature);
 }
 
-} // namespace rayx::detail
+}  // namespace rayx::detail
