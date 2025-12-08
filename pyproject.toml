@@ -1,0 +1,14 @@
+[project]
+name = "rayx"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+[dependency-groups]
+docs = [
+    "mike==2.*",
+    "mkdocs-awesome-nav==3.*",
+    "mkdocs-material==9.*",
+    "mkdoxy==1.*",
+]

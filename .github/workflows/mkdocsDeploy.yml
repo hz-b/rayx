@@ -1,0 +1,76 @@
+name: Deploy Documentation
+on:
+  push:
+    branches:
+      - master
+  # not limited to the docs directory, because code changes might change the API docs
+  # not using the push tag (tags: v*), because it triggers the workflow twice
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# dont automatically update the uv lockfile (equivalent to --locked),
+# manage dependencies explicitly with: uv lock --upgrade
+env:
+  UV_LOCKED: true
+
+jobs:
+  deploy-docs:
+    name: Build and publish documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-pages # mike needs the gh-pages branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Checkout current branch
+        uses: actions/checkout@v5 # fetches only the triggering commit
+
+      - name: Set up Python # according to the uv documentation this is faster that letting uv manage python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install uv # use the same dependencies locally and in the CI
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install docs dependencies
+        run: |
+          uv sync --group docs
+          sudo apt-get update
+          sudo apt-get install --yes doxygen
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "CI Deploy (Mike)"
+          git config --global user.email "bot@example.com"
+
+      - name: Build and deploy dev documentation
+        # overwrites dev version and includes the git hash in the display name
+        # this run on every push, even for a tagged version release, so dev is updated too
+        # --push defaults to gh-pages branch
+        run: uv run mike deploy --push dev --title="dev ($(git rev-parse --short HEAD))"
+
+      - name: Check and set version tag
+        # done manually instead of with the version tag to prevent triggering the workflow twice
+        run: |
+          git_tag=$(git describe --tags --exact-match 2> /dev/null) &&
+          if [[ ${git_tag} =~ ^v[0-9] ]]; then
+            echo "VERSION_TAG=$git_tag" >> "$GITHUB_ENV"
+          fi
+        continue-on-error: true
+
+      - name: Build and deploy release documentation
+        if: ${{ env.VERSION_TAG }} # commit is a tagged release v*
+        env:
+          VERSION_TAG: ${{ env.VERSION_TAG }} # can't use bash string substitution directly on context variables
+        # Build / overwrite one version per major (tagged) version of RAYX with the full version as title and alias "latest"
+        # Pushing tag v1.2.3 will overwrite the current v1 and will be displayed as v1.2.3 and becomes the default version
+        # Pushing tag v2.0.0 will not overwrite the v1, but will become the default "latest" and add v2 version
+        run: |
+          uv run mike deploy --push --update-aliases ${VERSION_TAG/.*} --title=$VERSION_TAG latest

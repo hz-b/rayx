@@ -1,0 +1,5 @@
+# Literature
+
+
+## Bachelor's Thesis'
+[Extending_and_Accelerating_a_GPU_Ray_Tracing_Algorithm_for_Photon_Simulation_in_Beamlines_ohne.pdf](../res/Extending_and_Accelerating_a_GPU_Ray_Tracing_Algorithm_for_Photon_Simulation_in_Beamlines_ohne.pdf)

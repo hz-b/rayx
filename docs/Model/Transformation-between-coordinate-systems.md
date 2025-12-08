@@ -6,8 +6,6 @@ This explains how to get world coordinates (global position and orientation of a
 
 First a small introduction to rotation matrices which is not super relevant for the transformations but might help to visualize the rotations and understand why some angles are positive and others negative.
  
-<details><summary>Rotation Matrices</summary>
-
 ### Rotation matrices
 
 A rotation through an angle \\(\theta\\) can either be active or passive.
@@ -39,20 +37,20 @@ A passive rotation leaves the position of the vector unchanged and rotates the a
 The relation between axes and the position of the point are the same after each of the rotations: After the passive rotation the basis vectors are different and the vector coordinates stay the same whereas after the active rotation the vector coordinates are different but the basis vectors are the same.
 
 Example for active (left) and passive (right) rotation through \\(\alpha=25^\circ\\): 
-![active_passive](/docs/src/uploads/7eb17510a7f200d4ce89ed337e0a4eda/rotation_active_vs_passive.PNG)
+![active_passive](../res/rotation_active_vs_passive.PNG)
  The relative position of the vector to the axes is the same after each rotation. 
 See also [active vs passive transformation](https://en.wikipedia.org/wiki/Active_and_passive_transformation)
 
 However, active and passive are in our case only an *interpretation* of the rotations that makes sense when looking at the beamline from a global point of view. Globally seen, the local coordinate system of each optical element is rotated and translated differently with respect to a global coordinate system whereas the vectors (the rays) only change by e.g. reflection when interacting with an element.
 Thus, we have coordinate systems for optical elements, that are identical for each element in the sense that the y-axis is the normal and the x-z-plane is the tangent plane of the surface at the origin, and for rays where the center ray is the z-axis and a global system. The transformation between the systems is implemented by rotating and translating the vectors within the same coordinate system.
 \\(\rightarrow\\) In the implementation only the vectors are transformed by active transformations and the axes of the coordinate system stay the same, although in the "real world", the beams remain unchanged and only the coordinate system is rotated around them.
-</details>
+
 
 The following sections describe how to calculate the transformation matrices from beam coordinates to element coordinates and again to (new) beam coordinates based on the given distance and angles in the sequential setup.
 This is relevant for RAYX if you need to calculate the world coordinates from the user parameters that describe the sequential setup yourself and cannot directly use the world coordinates from the rml file: 
 
 
-<details><summary>Positioning of elements in sequential setup</summary>
+### Positioning of elements in sequential setup
 
 In the RAY-UI rays are represented in a beam coordinate system. In that system the main ray always points from the origin towards the z-axis wheras the individual rays have slight deviations in their direction and origin.
 
@@ -74,20 +72,18 @@ In order to calculate the intersection point with the "quad" function, we first 
     \end{bmatrix}
 \\]
 
-<details><summary>Side note</summary>
-Side note for visualization: An example for this rotation interpreted as an [active](/docs/src/uploads/33a69b81f3f7c491842bcdeda4ca97b7/incidence_angle_active.PNG) and as a [passive](/docs/src/uploads/5ab2555382dc2b2ef10a9864aaee0224/incidence_angle_passive.PNG) rotation of the main ray (z-axis) and a ray \\(v\\) through the grazing incidence angle \\(\alpha=25°\\). The first coordinate system shows the incoming ray in the ray-coordinate system. In the second one the rays/the axes are rotated through \\(\alpha\\) such that the rays lie in the element-coordinate system. In the third image the reflection is calculated. Finally, in the last image, the reflected ray/the axes are rotated to the new ray-coordinate system.
-Since we are using a right-handed coordinate system, the x-axis points into the image and the rotations that appear to be clockwise are actually counter-clockwise around the x-axis.
-</details>
+??? note "Side note"
+    Side note for visualization: An example for this rotation interpreted as an [active](../res/incidence_angle_active.PNG) and as a [passive](../res/incidence_angle_passive.PNG) rotation of the main ray (z-axis) and a ray \\(v\\) through the grazing incidence angle \\(\alpha=25°\\). The first coordinate system shows the incoming ray in the ray-coordinate system. In the second one the rays/the axes are rotated through \\(\alpha\\) such that the rays lie in the element-coordinate system. In the third image the reflection is calculated. Finally, in the last image, the reflected ray/the axes are rotated to the new ray-coordinate system.
+    Since we are using a right-handed coordinate system, the x-axis points into the image and the rotations that appear to be clockwise are actually counter-clockwise around the x-axis.
 
 3. The second rotation through angle \\(\chi\\) around the z-axis tilts the optical element such that the ray is not reflected upwards (\\(\chi=0°\\)) but to the right (\\(\chi=90°\\)), downwards (\\(\chi=180°\\)) or to the left (\\(\chi=270°\\)). This is a clockwise rotation. Thus, we rotate through \\(-\chi\\) when \\(\chi\\) is given.
 
 After tracing we need to transform the ray back to the beam coordinate system. Therefore we rotate back around \\(\chi\\) and then rotate around the exit angle \\(\beta\\) All these parameters are given as "user" parameters. The following section describes how to calculate beam-element and element-beam transformation matrices.
-</details>
 
+### Calculating transformation matrices between elements in sequential setup
 
-<details><summary>Calculating transformation matrices between elements in sequential setup</summary>
+#### Beam to Element
 
-##### Beam to Element
 1. Translation by \\(z_0\\) in z direction = distance to preceeding element
 
 2. Rotation by azimuthal angle \\(\chi\\) around z-axis. 
@@ -122,7 +118,8 @@ Putting it all together this is an affine transformation and can be written in h
 \end{align*}
 \\]
 
-##### Element to Beam
+#### Element to Beam
+
 After the interaction with the element, the reflected ray \\(x_R\\) is transformed back to a beam coordinate system. The rotations around the axes are applied in reverse order.
 
 1. Rotation through gracing exit angle \\(\beta\\) around x-axis. We do not need to rotate back through \\(\alpha\\) but keep rotating in the same direction since the new z-axis should point in the direction of the reflected and not of the incoming main ray. E.g. \\(\beta\\) is the same as \\(\alpha\\) for mirrors.<br>
@@ -158,6 +155,7 @@ In homogeneous coordinates:
 (Since there is no translation a 3x3 matrix would suffice)
 
 ### Misalignment
+
 Misalignment is used when the optical element does not lie exactly where it should after applying the beam to element matrix. Therefore some rotation or translation might be necessary before the intersection point can be calculated.
 
 The misalignment transformation matrix \\(M_{mis}\\) is simply derived from the user parameters \\(d_x\\), \\(d_y\\), \\(d_z\\), \\(d_{\phi}\\), \\(d_{\psi}\\), \\(d_{\chi}\\). It can be calculated by spliting into a transformation matrix (from \\(d_x\\), \\(d_y\\), \\(d_z\\)) and multiplying with a rotation matrix (from \\(d_{\phi}\\), \\(-d_{\psi}\\), \\(d_{\chi}\\)):
@@ -191,11 +189,10 @@ The inverse misalignment matrix is then calculated as follows:
 Since rotation matrices are orthogonal, the inverse of \\((R^x_{-\psi} R^y_{\phi} R^z_{\chi})\\) is the same as the transpose. The inverse of the translation matrix is the same but with negative offsets.
 
 \\(M_{mis}\\), \\(M_{mis}^{-1}\\) are multiplied with \\(M_{b/g2e}\\) and \\(M_{e2g/b}\\), respectively, to form the final transformation matrices which could be given to the shader if we would still use the sequential approach in RAYX. However, we use a global coordinate system instead of the beam coordinate system but don't worry you didn't just read all of that for nothing, it will be important in the derivation of the transformation from global to element coordinates and back.
-</details>
 
 The next section describes how to replace the beam coordinate system that is used in the sequential approach with the global coordinate system and how to calculate the position and orientation.
 
-<details><summary>Sequential to world coordinates</summary>
+### Sequential to world coordinates
 
 As explained in the previous sections, there is no global coordinate system in the sequential implementation but instead rays are transformed from beam coordinate system to element coordinate system and back to a different beam coordinate system such that the z-axis of the beam coordinate system always follows the main ray, which means that the main ray with \\(pos=(0,0,0)\\), \\(dir=(0,0,1)\\) in beam coordinates is always the same after each interaction with an optical element.
 
