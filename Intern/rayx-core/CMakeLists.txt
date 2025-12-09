@@ -172,7 +172,7 @@ target_compile_definitions(${PROJECT_NAME}
 # Inform about the cuda and hip config of alpaka
 if(alpaka_ACC_GPU_CUDA_ENABLE OR alpaka_ACC_GPU_HIP_ENABLE)
     if(alpaka_ACC_GPU_CUDA_ENABLE)
-        target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+        target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}/cccl)
         target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CUDA_ENABLED)
     endif()
     if(alpaka_ACC_GPU_HIP_ENABLE)
