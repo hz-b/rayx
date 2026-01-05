@@ -10,32 +10,36 @@
 #include "Rays.h"
 
 namespace defaults {
-constexpr int numRays = 100000;
-}
+constexpr int numRays                                             = 100000;
+constexpr Cube<UniformDistribution<double>> matrixSourceRayOrigin = {{0.0, 2.0, 100}, {0.0, 2.0, 100}, {0.0, 0.0, 1}};
+constexpr SeparateValues<double> circleSourceRadius               = {.center = 0.0, .range = 1.0, .numValues = 10};
+}  // namespace defaults
 
-struct ArtificialSource {
+struct PointSource {
     int numRays = defaults::numRays;
-    ScalarVolumetricDistribution rayOrigin;
-    AngularDivergence rayDirection;
-    PhotonEnergyDistribution rayEnergy = defaults::photonEnergy;
-    Polarization rayPolarization       = defaults::polarization;
+    Cube<Distribution<double>> rayOrigin;
+    Rect<Distribution<Angle>> rayAngle;
+    Distribution<PhotonEnergy> rayEnergy = defaults::photonEnergy;
+    Polarization rayPolarization         = defaults::polarization;
 };
 
-struct PointSourceParameters {
+struct MatrixSource {
     int numRays = defaults::numRays;
-    double pointSize = 0.0;
-    PhotonEnergy rayEnergy = defaults::photonEnergy;
-    Polarization rayPolarization = defaults::polarization;
+    // bool multipleRaysPerOrigin = true;
+    double width                         = 2.0;
+    double height                        = 2.0;
+    double horizontalDivergence          = 0.0;
+    double verticalDivergence            = 0.0;
+    Distribution<PhotonEnergy> rayEnergy = defaults::photonEnergy;
+    Polarization rayPolarization         = defaults::polarization;
 };
 
-struct ProjectorSource {
-    int numRays    = defaults::numRays;
-    int numCircles = 10;
-    ScalarVolumetricDistribution rayOrigin;
-    Area projectionArea;
-    std::optional<Curvature> projectionAreaCurvature;
-    PhotonEnergyDistribution rayEnergy = defaults::photonEnergy;
-    Polarization rayPolarization       = defaults::polarization;
+struct CircleSource {
+    int numRays                   = defaults::numRays;
+    SeparateValues<double> radius = defaults::circleSourceRadius;
+    Rect<Distribution<Angle>> rayAngle;
+    Distribution<PhotonEnergy> rayEnergy = defaults::photonEnergy;
+    Polarization rayPolarization         = defaults::polarization;
 };
 
 enum class UndulatorSigmaType { Standard, Accurate };
@@ -88,11 +92,10 @@ struct DipoleSource {
 
 struct InputSource {
     Rays rays;
-    std::optional<ScalarVolumetricDistribution> origin;
-    std::optional<AngularDivergence> direction;
-    std::optional<Polarization> polarization;
-    std::optional<ScalarDistribution> energy;
-    // TODO: specify which other attributes should be used from the input rays
+    std::optional<Cube<Distribution<double>>> rayOrigin;
+    std::optional<Rect<Distribution<Angle>>> rayAngle;
+    std::optional<Distribution<PhotonEnergy>> rayEnergy;
+    std::optional<Polarization> rayPolarization;
 };
 
-using Source = std::variant<ArtificialSource, ProjectorSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
+using Source = std::variant<PointSource, MatrixSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;

@@ -7,16 +7,38 @@
 #include "Coating.h"
 #include "Material.h"
 
-namespace rayx {
+namespace rayx::design {
 
 struct DetectorBehavior {};
 
-struct AbsorbBehavior {};
+struct AbsorbBehavior {
+    float transmittance = 0.0f;
+};
 
 struct ReflectBehavior {
     std::optional<Material> substrate = materials::Au;
     std::optional<Coating> coating;
 };
+
+void from_json(const nlohmann::json& j, std::optional<Material>& material) {
+    if (j.is_null()) {
+        material = std::nullopt;
+    } else {
+        material = j.get<Material>();
+    }
+}
+
+void from_json(const nlohmann::json& j, ReflectBehavior& behavior) {
+    if (j.contains("substrate")) behavior.substrate = j.at("substrate").get<Material>();
+    if (j.contains("coating")) behavior.coating = j.at("coating").get<Coating>();
+}
+
+nlohmann::json to_json(const ReflectBehavior& behavior) {
+    nlohmann::json j;
+    if (behavior.substrate.has_value()) j["substrate"] = behavior.substrate.value();
+    if (behavior.coating.has_value()) j["coating"] = behavior.coating.value();
+    return j;
+}
 
 struct TransmitBehavior {
     Material substrate        = materials::Au;
@@ -30,7 +52,7 @@ struct TransmitBehavior {
 
 struct GratingBehavior {
     std::array<double, 6> vls = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  // VLS coefficients
-    double lineDensity 0.0;                                      // lines per mm
+    double lineDensity = 0.0;                                    // lines per mm
     int orderOfDiffraction = 1;                                  // the diffraction order, usually 1
 };
 

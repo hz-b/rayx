@@ -32,6 +32,9 @@ ElectronVolt toElectronVolt(const PhotonEnergy energy) {
 
 using PhotonEnergy = std::variant<WaveLength, ElectronVolt>;
 
+template <typename T>
+concept PhotonEnergy_c = std::is_same_v<T, WaveLength> || std::is_same_v<T, ElectronVolt>;
+
 namespace literals {
 
 WaveLength operator"" _nm(long double value) { return WaveLength{static_cast<double>(value)}; }

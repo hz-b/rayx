@@ -80,14 +80,6 @@ class RAYX_API Group : public BeamlineNode {
     const DesignElement* findElement(const std::function<bool(const DesignElement&)>& pred) const;
     DesignElement* findElement(const std::function<bool(const DesignElement&)>& pred);
 
-    // declarative fashion api
-
-    const BeamlineNode* operator[](size_t index) const override;
-    BeamlineNode* operator[](size_t index) override;
-
-    const BeamlineNode* operator[](const std::string& name) const override;
-    BeamlineNode* operator[](const std::string& name) override;
-
     /**
      * @brief Creates a deep copy of this group and its children.
      *
