@@ -8,16 +8,15 @@
 #include "Curvature.h"
 #include "SlopeError.h"
 
-namespace rayx {
+namespace rayx::design {
 
 struct SurfaceElement {
     Area area;
-    Behavior behavior;
+    Behavior frontBehavior;
+    Behavior backBehavior;
     std::optional<Curvature> curvature;
     std::optional<Aperture> aperture;
     std::optional<SlopeError> slopeError;
 };
-
-using Element = SurfaceElement;
 
 }  // namespace rayx

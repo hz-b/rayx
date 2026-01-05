@@ -10,7 +10,7 @@ namespace rayx {
 using ApertureArea            = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea>;
 using DiffractiveApertureArea = std::variant<RectangularArea, EllipticalArea>;
 
-struct NonDiffractiveAperture {
+struct Aperture {
     ApertureArea area;
     std::optional<ApertureArea> beamstopArea;  // uses material of the element
 };
@@ -20,6 +20,6 @@ struct DiffractiveAperture {
     std::optional<ApertureArea> beamstopArea;  // uses material of the element
 };
 
-using Aperture = std::variant<NonDiffractiveAperture, DiffractiveAperture>;
+using Aperture = std::variant<Aperture, DiffractiveAperture>;
 
 }  // namespace rayx

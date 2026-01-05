@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <variant>
 
-namespace rayx {
+namespace rayx::design {
 
 struct Degrees {
     double value;  // in degrees
@@ -39,4 +39,4 @@ Radians operator"" _rad(long double value) { return Radians{static_cast<double>(
 
 }  // namespace literals
 
-}  // namespace rayx
+}  // namespace rayx::design

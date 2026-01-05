@@ -7,7 +7,7 @@
 namespace rayx {
 
 struct SingleLayerCoating {
-    Material material = Material::Au;
+    Material material = materials::Au;
     double thickness  = 0.0;
     double roughness  = 0.0;
 };

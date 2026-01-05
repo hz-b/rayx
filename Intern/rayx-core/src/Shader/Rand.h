@@ -53,6 +53,15 @@ struct Rand {
         // counter = rayPathIndex * workerCounterNum + randomPhase;
     }
 
+    template <typename TAcc>
+    RAYX_FN_ACC
+    explicit Rand(const TAcc& __restrict acc, const uint64_t seed) noexcept {
+        const uint64_t gid      = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
+        const uint64_t gridSize = alpaka::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc)[0];
+        const uint64_t workerCounterNum = UINT64_MAX / gridSize;
+        counter                        = gid * workerCounterNum + seed;
+    }
+
     RAYX_FN_ACC
     uint64_t randomInt() { return squares64(counter); }
 
