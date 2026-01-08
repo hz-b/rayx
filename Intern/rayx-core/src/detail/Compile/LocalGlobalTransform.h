@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rayx {
+namespace rayx::detail::designToHost {
 
 struct RAYX_API LocalGlobalTransform {
     glm::dmat4 globalToLocal;

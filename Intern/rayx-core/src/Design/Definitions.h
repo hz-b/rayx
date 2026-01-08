@@ -4,7 +4,7 @@
 
 // TODO: remove this file later, when all enums are moved to their respective files
 
-namespace rayx {
+namespace rayx::design {
 enum class GratingMount { Deviation, Incidence };
 enum class ParaboloidType { Focussing, Collimate };
 enum class CurvatureType {
@@ -28,4 +28,4 @@ enum class FigureRotation { Yes, Plane, A11 };
 // Thus they need a bit of extra handling to convert them to the shaders XZ plane.
 enum class DesignPlane { XY, XZ };
 
-}  // namespace rayx
+}  // namespace rayx::design

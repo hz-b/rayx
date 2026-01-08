@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rayx {
+namespace rayx::design {
 
 template <typename T>
 struct SeparateValues {
@@ -49,4 +49,4 @@ struct Rect {
     T y = T();
 };
 
-}  // namespace rayx
+}  // namespace rayx::design

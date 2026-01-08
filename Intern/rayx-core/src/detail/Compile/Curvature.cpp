@@ -1,6 +1,6 @@
 #include "Curvature.h"
 
-namespace rayx::detail {
+namespace rayx::detail::designToHost {
 
 QuadraticCurvature toQuadric(const CylindricalCurvature& curvature) {
     auto cyl_direction     = curvature.direction;

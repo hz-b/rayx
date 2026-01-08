@@ -4,7 +4,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <variant>
 
-namespace rayx {
+namespace rayx::design {
 
 // essentially a quaternion rotation (glm::dquat)
 struct RotationAroundAxis {
@@ -16,6 +16,13 @@ struct RotationBase {
     glm::dvec3 right;
     glm::dvec3 up;
     glm::dvec3 forward;
+};
+
+struct Rotation : std::variant<RotationAroundAxis, RotationBase, glm::dmat3> {
+    using std::variant<RotationAroundAxis, RotationBase, glm::dmat3>::variant;
+
+    std::variant<RotationAroundAxis, RotationBase, glm::dmat3> toVariant() { return *this; }
+    RotationAroundAxis toRotationAroundAxis() const;
 };
 
 using Rotation = std::variant<RotationAroundAxis, RotationBase, glm::dmat3>;
@@ -79,4 +86,4 @@ glm::dmat3 toRotationMatrix(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationMatrix(arg); }, rotation);
 }
 
-}  // namespace rayx
+}  // namespace rayx::design

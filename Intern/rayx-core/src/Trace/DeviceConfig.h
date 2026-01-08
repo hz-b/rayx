@@ -5,7 +5,7 @@
 
 #include "Core.h"
 
-namespace rayx {
+namespace rayx::trace {
 
 struct RAYX_API DeviceConfig {
     enum RAYX_API DeviceType {

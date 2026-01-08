@@ -5,7 +5,7 @@
 
 #include "Area.h"
 
-namespace rayx {
+namespace rayx::design {
 
 using ApertureArea            = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea>;
 using DiffractiveApertureArea = std::variant<RectangularArea, EllipticalArea>;
@@ -22,4 +22,4 @@ struct DiffractiveAperture {
 
 using Aperture = std::variant<Aperture, DiffractiveAperture>;
 
-}  // namespace rayx
+}  // namespace rayx::design

@@ -5,7 +5,7 @@
 #include <ranges>
 #include <sstream>
 
-#include "Debug/Debug.h"
+#include "IO/Debug.h"
 #include "Debug/Instrumentor.h"
 
 namespace {
@@ -111,7 +111,7 @@ std::string deviceTypeToString(DeviceType deviceType) {
 
 }  // unnamed namespace
 
-namespace rayx {
+namespace rayx::trace {
 
 DeviceConfig::DeviceConfig(DeviceType fetchedDeviceType) : devices(getAvailableDevices(fetchedDeviceType)), m_fetchedDeviceType(fetchedDeviceType) {}
 

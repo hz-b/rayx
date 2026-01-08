@@ -16,6 +16,7 @@ constexpr SeparateValues<double> circleSourceRadius               = {.center = 0
 }  // namespace defaults
 
 struct PointSource {
+    std::optional<std::string> name;
     int numRays = defaults::numRays;
     Cube<Distribution<double>> rayOrigin;
     Rect<Distribution<Angle>> rayAngle;
@@ -24,6 +25,7 @@ struct PointSource {
 };
 
 struct MatrixSource {
+    std::optional<std::string> name;
     int numRays = defaults::numRays;
     // bool multipleRaysPerOrigin = true;
     double width                         = 2.0;
@@ -35,6 +37,7 @@ struct MatrixSource {
 };
 
 struct CircleSource {
+    std::optional<std::string> name;
     int numRays                   = defaults::numRays;
     SeparateValues<double> radius = defaults::circleSourceRadius;
     Rect<Distribution<Angle>> rayAngle;
@@ -46,6 +49,7 @@ enum class UndulatorSigmaType { Standard, Accurate };
 
 // TODO: sensible defaults
 struct SimpleUndulatorSource {
+    std::optional<std::string> name;
     int numRays                  = defaults::numRays;
     UndulatorSigmaType sigmaType = UndulatorSigmaType::Standard;
     double undulatorLength       = 1.0;
@@ -61,6 +65,7 @@ struct SimpleUndulatorSource {
 
 // TODO: sensible defaults
 struct PixelSource {
+    std::optional<std::string> name;
     int numRays = defaults::numRays;
     // TODO: change to AngularDivergence ? depends on how PixelSource works
     double horizontalDivergenc = 0.0;
@@ -77,6 +82,7 @@ enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 
 // TODO: sensible defaults
 struct DipoleSource {
+    std::optional<std::string> name;
     int numRays                                         = defaults::numRays;
     double bendingRadius                                = 1.0;
     ElectronEnergyOrientation electronEnergyOrientation = ElectronEnergyOrientation::Clockwise;
@@ -91,6 +97,7 @@ struct DipoleSource {
 };
 
 struct InputSource {
+    std::optional<std::string> name;
     Rays rays;
     std::optional<Cube<Distribution<double>>> rayOrigin;
     std::optional<Rect<Distribution<Angle>>> rayAngle;

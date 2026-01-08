@@ -8,7 +8,7 @@
 #include "Rays.h"
 #include "Shader/InvocationState.h"
 
-namespace rayx {
+namespace rayx::trace::detail {
 
 /**
  * @brief DeviceTracer is an interface to a tracer implementation

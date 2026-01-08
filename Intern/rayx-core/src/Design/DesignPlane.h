@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rayx {
+namespace rayx::design {
 
 enum class RAYX_API DesignPlane {
     XY,
@@ -10,7 +10,7 @@ enum class RAYX_API DesignPlane {
 namespace detail {
 
 /**
- * @brief Metafunction to determine the design plane of a given type.
+ * @brief Type trait to determine the design plane of a given type.
  * This is specialized for different source and behavior types.
  * Unspecialized types will result in a compilation error.
  */
@@ -43,8 +43,12 @@ RAYX_API DesignPlane getDesignPlane(const Source& source) {
     return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, source);
 }
 
-RAYX_API DesignPlane getDesignPlane(const SurfaceElement& element) {
-    return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, element.behavior);
+RAYX_API DesignPlane getDesignPlane(const Behavior& behavior) {
+    return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, behavior);
 }
 
-}  // namespace rayx
+RAYX_API DesignPlane getDesignPlane(const SurfaceElement& element) {
+    return getDesignPlane(element.behavior);
+}
+
+}  // namespace rayx::design

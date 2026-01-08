@@ -4,7 +4,7 @@
 
 #include "Material.h"
 
-namespace rayx {
+namespace rayx::design {
 
 struct SingleLayerCoating {
     Material material = materials::Au;
@@ -19,4 +19,4 @@ struct RepeatedCoating {
 
 using Coating = std::vector<RepeatedCoating>;
 
-}  // namespace rayx
+}  // namespace rayx::design

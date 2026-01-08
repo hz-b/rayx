@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 
-namespace rayx {
+namespace rayx::design {
 
 using AtomicNumber    = int;
 using ChemicalFormula = std::string;
@@ -22,4 +22,4 @@ namespace materials {
 
 using Material = std::variant<AtomicNumber, ChemicalFormula>;
 
-}  // namespace rayx
+}  // namespace rayx::design
