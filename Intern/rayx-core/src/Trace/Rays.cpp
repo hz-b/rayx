@@ -6,7 +6,7 @@
 
 #include "Debug/Instrumentor.h"
 
-namespace rayx {
+namespace rayx::trace {
 
 Rays Rays::copy() const {
     RAYX_PROFILE_FUNCTION_STDOUT();

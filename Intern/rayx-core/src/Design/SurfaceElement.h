@@ -11,12 +11,12 @@
 namespace rayx::design {
 
 struct SurfaceElement {
+    std::optional<std::string> name;
     Area area;
-    Behavior frontBehavior;
-    Behavior backBehavior;
+    Behavior behavior;
     std::optional<Curvature> curvature;
     std::optional<Aperture> aperture;
     std::optional<SlopeError> slopeError;
 };
 
-}  // namespace rayx
+}  // namespace rayx::design

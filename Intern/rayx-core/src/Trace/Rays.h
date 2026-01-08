@@ -6,7 +6,7 @@
 #include "Debug/Instrumentor.h"
 #include "RayAttrMask.h"
 
-namespace rayx {
+namespace rayx::trace {
 
 /**
  * @brief A structure representing a collection of rays and their attributes.

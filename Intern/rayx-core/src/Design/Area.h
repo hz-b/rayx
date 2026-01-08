@@ -4,7 +4,7 @@
 #include <variant>
 #include <vector>
 
-namespace rayx {
+namespace rayx::design {
 
 struct RectangularArea {
     double width  = 1.0;
@@ -30,4 +30,4 @@ struct UnlimitedArea {};
 
 using Area = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea, UnlimitedArea>;
 
-}  // namespace rayx
+}  // namespace rayx::design

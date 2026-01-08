@@ -2,7 +2,7 @@
 
 #include "Design/Curvature.h"
 
-namespace rayx::detail {
+namespace rayx::detail::designToHost {
 
 using CompiledCurvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
 

@@ -1,5 +1,23 @@
 #pragma once
 
+namespace rayx::design {
+
+struct BeamlineNode {
+    std::optional<std::string> name;
+    Transform transform;
+    std::vector<std:variant<std::shared_ptr<BeamlineNode>, std::shared_ptr<Object>>> children;
+};
+
+struct Beamline {
+    std::optional<std::string> name;
+    BeamlineNode root;
+
+    std::tuple<int, std::shared_ptr<BeamlineNode>> findNodeByName(const std::string& name) const;
+    std::tuple<int, std::shared_ptr<Object>> findObjectByName(const std::string& name) const;
+};
+
+} // namespace rayx::design
+
 /*
  * Declare Beamline tree all at once
  */

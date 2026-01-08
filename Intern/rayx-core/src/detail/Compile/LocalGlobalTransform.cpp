@@ -3,7 +3,7 @@
 #include "Design/DesignElement.h"
 #include "Element.h"
 
-namespace rayx {
+namespace rayx::detail::designToHost {
 
 LocalGlobalTransform getLocalGlobalTransform(const glm::dvec3& position, const Rotation& rotation, const DesignPlane plane) {
     const auto translationLocalToGlobal = glm::translate(glm::dmat4(1.0), position);

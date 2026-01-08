@@ -2,7 +2,7 @@
 
 #include <variant>
 
-namespace rayx {
+namespace rayx::design {
 
 struct QuadricCurvature {
     int icurv;
@@ -98,4 +98,4 @@ struct ParabolicCurvature {
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature, EllipticalCurvature, ConicalCurvature, CylindricalCurvature,
                                SphericalCurvature, ParabolicCurvature>;
 
-}  // namespace rayx
+}  // namespace rayx::design

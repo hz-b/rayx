@@ -4,7 +4,7 @@
 
 #include "Constants.h"
 
-namespace rayx {
+namespace rayx::design {
 
 struct WaveLength {
     double value;  // in nanometers
@@ -43,4 +43,4 @@ ElectronVolt operator"" _eV(long double value) { return ElectronVolt{static_cast
 
 }  // namespace literals
 
-}  // namespace rayx
+}  // namespace rayx::design
