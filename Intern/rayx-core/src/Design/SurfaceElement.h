@@ -19,4 +19,6 @@ struct SurfaceElement {
     std::optional<SlopeError> slopeError;
 };
 
+using ElementPtr = std::variant<std::shared_ptr<SurfaceElement>>;
+
 }  // namespace rayx::design

@@ -192,7 +192,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    ${PROJECT_SOURCE_DIR}/../../Extern/glm/glm/
+    ${PROJECT_SOURCE_DIR}/../../Extern/glm/
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     ${PROJECT_SOURCE_DIR}/../../Extern/alpaka/include/
 )

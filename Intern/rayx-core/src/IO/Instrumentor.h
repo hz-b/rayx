@@ -15,6 +15,7 @@
 namespace rayx {
 
 extern bool RAYX_API BENCH_FLAG;
+
 class RAYX_API InstrumentationTimer {
   public:
     InstrumentationTimer(const char* name, bool canPrint) : m_Name(name), m_isStopped(false), m_canPrint(canPrint) {

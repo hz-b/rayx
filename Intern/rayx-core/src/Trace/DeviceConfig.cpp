@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "IO/Debug.h"
-#include "Debug/Instrumentor.h"
+#include "IO/Instrumentor.h"
 
 namespace {
 

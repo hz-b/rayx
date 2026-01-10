@@ -4,7 +4,7 @@
 #include <bitset>
 #include <unordered_map>
 
-#include "Debug/Instrumentor.h"
+#include "IO/Instrumentor.h"
 
 namespace rayx::trace {
 

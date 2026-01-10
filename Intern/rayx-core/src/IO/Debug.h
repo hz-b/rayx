@@ -26,8 +26,7 @@
 #include <vector>
 
 // This include is necessary, as Debug implements a special formatting for Ray.
-#include "Rays.h"
-#include "Shader/Ray.h"
+#include "Trace/Rays.h"
 
 // Debug only code; use it as: DEBUG(<statement>);
 #ifdef RAYX_DEBUG_MODE

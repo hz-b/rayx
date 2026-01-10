@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Core.h"
-#include "Shader/Ray.h"
 #include "Tracer/Tracer.h"
 
 namespace rayx {
