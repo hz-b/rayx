@@ -3,7 +3,7 @@
 #include <numeric>
 #include <vector>
 
-#include "Debug/Instrumentor.h"
+#include "IO/Instrumentor.h"
 #include "RayAttrMask.h"
 
 namespace rayx::trace {

@@ -1,9 +1,6 @@
 #include <algorithm>
 
-#include "Design/DesignElement.h"
-#include "Element.h"
-
-namespace rayx::detail::designToHost {
+namespace rayx::detail::host {
 
 LocalGlobalTransform getLocalGlobalTransform(const glm::dvec3& position, const Rotation& rotation, const DesignPlane plane) {
     const auto translationLocalToGlobal = glm::translate(glm::dmat4(1.0), position);
@@ -28,7 +25,7 @@ LocalGlobalTransform getLocalGlobalTransform(const glm::dvec3& position, const R
     };
 }
 
-LocalGlobalTransform getLocalGlobalTransform(const BeamlineNode& node) {
+LocalGlobalTransform getLocalGlobalTransform(const Beamline& beamline, const BeamlineNode& node) {
     DesignPlane designPlane;
 
     if (node.isSource())

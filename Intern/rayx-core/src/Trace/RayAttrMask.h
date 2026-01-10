@@ -3,9 +3,11 @@
 #include <vector>
 
 #include "Core.h"
-#include "Shader/ElectricField.h"
-#include "Shader/EventType.h"
-#include "Shader/Rand.h"
+#include "Math/ElectricField.h"
+#include "EventType.h"
+
+// TODO
+using RandCounter = uint64_t;
 
 // TODO: all this macros should be invisible to the user
 // TODO: implement template based solution instead of macros
@@ -22,9 +24,9 @@
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X         X(double, direction_x, DirectionX)
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y         X(double, direction_y, DirectionY)
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z         X(double, direction_z, DirectionZ)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(complex::Complex, electric_field_x, ElectricFieldX)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(complex::Complex, electric_field_y, ElectricFieldY)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(complex::Complex, electric_field_z, ElectricFieldZ)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(math::complex, electric_field_x, ElectricFieldX)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(math::complex, electric_field_y, ElectricFieldY)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(math::complex, electric_field_z, ElectricFieldZ)
 #define RAYX_X_MACRO_RAY_ATTR_OPTICAL_PATH_LENGTH X(double, optical_path_length, OpticalPathLength)
 #define RAYX_X_MACRO_RAY_ATTR_ENERGY              X(double, energy, Energy)
 #define RAYX_X_MACRO_RAY_ATTR_ORDER               X(int32_t, order, Order)

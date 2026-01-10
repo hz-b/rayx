@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include "Rays.h"
+#include "Trace/Rays.h"
 
 namespace rayx {
 

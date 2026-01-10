@@ -1,7 +1,7 @@
 #include <fstream>
 
 #include "CanonicalizePath.h"
-#include "Debug/Debug.h"
+#include "IO/Debug.h"
 
 namespace rayx {
 

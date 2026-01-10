@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <random>
 
-#include "Misc/Constants.h"
+#include "Math/Constants.h"
 
 static std::mt19937 RNG;
 
@@ -36,7 +36,7 @@ double randomDoubleInRange(double a, double b) {
 // `mu` is the mean, `sigma` is the standard deviation.
 double randomNormal(double mu, double sigma) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    const double two_pi      = 2.0 * PI;
+    const double two_pi      = 2.0 * math::constants::pi;
 
     // create two random numbers, make sure u1 is greater than epsilon
     double u1, u2;

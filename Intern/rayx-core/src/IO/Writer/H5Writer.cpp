@@ -4,8 +4,8 @@
 
 #include <highfive/highfive.hpp>
 
-#include "Debug/Debug.h"
-#include "Debug/Instrumentor.h"
+#include "IO/Debug.h"
+#include "IO/Instrumentor.h"
 
 // declare user types for HighFive
 namespace {

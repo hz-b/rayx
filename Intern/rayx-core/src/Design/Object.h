@@ -3,14 +3,16 @@
 #include <variant>
 #include <memory>
 
-#include "SurfaceElement.h"
 #include "Source.h"
+#include "SurfaceElement.h"
 
-struct Element;
-struct Source;
-struct Tree;
-using TreePtr = std::shared_ptr<Tree>;
-
-struct Object {
-    std::varant<Element, Source, Tree> value;
-};
+using ObjectPtr = std::variant<
+    std::shared_ptr<PointSource>,
+    std::shared_ptr<MatrixSource>,
+    std::shared_ptr<CircleSource>,
+    std::shared_ptr<SimpleUndulatorSource>,
+    std::shared_ptr<PixelSource>,
+    std::shared_ptr<DipoleSource>,
+    std::shared_ptr<InputSource>,
+    std::shared_ptr<SurfaceElement>,
+>;

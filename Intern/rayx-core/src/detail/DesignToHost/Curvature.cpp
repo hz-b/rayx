@@ -1,8 +1,8 @@
 #include "Curvature.h"
 
-namespace rayx::detail::designToHost {
+namespace rayx::detail::host {
 
-QuadraticCurvature toQuadric(const CylindricalCurvature& curvature) {
+QuadricCurvature toQuadric(const design::CylindricalCurvature& curvature) {
     auto cyl_direction     = curvature.direction;
     auto radius            = curvature.radius;
     auto incidence         = curvature.grazingIncAngle;
@@ -33,7 +33,7 @@ QuadraticCurvature toQuadric(const CylindricalCurvature& curvature) {
         }
     }
 
-    return Surface::Quadric{
+    return QuadricCurvature{
         .icurv = icurv,
         .a11   = a11,
         .a12   = 0,
@@ -48,7 +48,7 @@ QuadraticCurvature toQuadric(const CylindricalCurvature& curvature) {
     };
 }
 
-QuadricCurvature toQuadric(const SphericalCurvature& curvature) {
+QuadricCurvature toQuadric(const design::SphericalCurvature& curvature) {
     return QuadricCurvature{
         .icurv = 1,
         .a11   = 1,
@@ -64,7 +64,7 @@ QuadricCurvature toQuadric(const SphericalCurvature& curvature) {
     };
 }
 
-QuadricCurvature toQuadric(const ParabolicCurvature& curvature) {
+QuadricCurvature toQuadric(const design::ParabolicCurvature& curvature) {
     auto ArmLength      = curvature.armLength;
     auto parameterP     = curvature.parameterP;
     auto parameterPType = curvature.parameterPType;
@@ -86,7 +86,7 @@ QuadricCurvature toQuadric(const ParabolicCurvature& curvature) {
     a34 = -parameterP;
     a44 = pow(y0, 2) - 2 * parameterP * z0 - pow(parameterP, 2);
     //---------------------------- Serialization -------------------------------
-    return Surface::Quadric{
+    return QuadricCurvature{
         .icurv = 1,
         .a11   = a11,
         .a12   = 0,
@@ -101,7 +101,7 @@ QuadricCurvature toQuadric(const ParabolicCurvature& curvature) {
     };
 }
 
-QuadricCurvature toQuadric(const ConicalCurvature& curvature) {
+QuadricCurvature toQuadric(const design::ConicalCurvature& curvature) {
     rayx::Rad incidence      = curvature.grazingIncAngle;
     double entranceArmLength = curvature.entranceArmLength;
     double exitArmLength     = curvature.exitArmLength;
@@ -141,7 +141,7 @@ QuadricCurvature toQuadric(const ConicalCurvature& curvature) {
         a24 = -upstreamRadius_R;
     }
 
-    return Surface::Quadric{
+    return QuadricCurvature{
         .icurv = icurv,
         .a11   = a11,
         .a12   = 0,
@@ -156,7 +156,7 @@ QuadricCurvature toQuadric(const ConicalCurvature& curvature) {
     };
 }
 
-QuadricCurvature toQuadric(const EllipticalCurvature& curvature) {
+QuadricCurvature toQuadric(const design::EllipticalCurvature& curvature) {
     auto entranceArmLength = curvature.entranceArmLength;
     auto exitArmLength     = curvature.exitArmLength;
 
@@ -213,7 +213,7 @@ QuadricCurvature toQuadric(const EllipticalCurvature& curvature) {
     auto a34 = pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * tangentAngle.cos() - y0 * tangentAngle.sin();
     auto a44 = -pow(shortHalfAxisB, 2) + pow(y0, 2) + pow(z0 * shortHalfAxisB / longHalfAxisA, 2);
 
-    return Surface::Quadric{
+    return QuadricCurvature{
         .icurv = 1,
         .a11   = a11,
         .a12   = 0,
@@ -228,24 +228,16 @@ QuadricCurvature toQuadric(const EllipticalCurvature& curvature) {
     };
 }
 
-CompiledCurvature compileCurvature(const QuadraticCurvature& curvature) { return curvature; }
-
-CompiledCurvature compileCurvature(const ToroidialCurvature& curvature) { return curvature; }
-
-CompiledCurvature compileCurvature(const CubicCurvature& curvature) { return curvature; }
-
-CompiledCurvature compileCurvature(const CylindricalCurvature& curvature) { return toQuadric(curvature); }
-
-CompiledCurvature compileCurvature(const SphericalCurvature& curvature) { return toQuadric(curvature); }
-
-CompiledCurvature compileCurvature(const ParabolicCurvature& curvature) { return toQuadric(curvature); }
-
-CompiledCurvature compileCurvature(const ConicalCurvature& curvature) { return toQuadric(curvature); }
-
-CompiledCurvature compileCurvature(const EllipticalCurvature& curvature) { return toQuadric(curvature); }
-
-CompiledCurvature compileCurvature(const Curvature& curvature) {
-    return std::visit([](const auto& curv) { return compileCurvature(curv); }, curvature);
+Curvature toHost(const design::QuadricCurvature& curvature) { return curvature; }
+Curvature toHost(const design::ToroidialCurvature& curvature) { return curvature; }
+Curvature toHost(const design::CubicCurvature& curvature) { return curvature; }
+Curvature toHost(const design::CylindricalCurvature& curvature) { return toQuadric(curvature); }
+Curvature toHost(const design::SphericalCurvature& curvature) { return toQuadric(curvature); }
+Curvature toHost(const design::ParabolicCurvature& curvature) { return toQuadric(curvature); }
+Curvature toHost(const design::ConicalCurvature& curvature) { return toQuadric(curvature); }
+Curvature toHost(const design::EllipticalCurvature& curvature) { return toQuadric(curvature); }
+Curvature toHost(const design::Curvature& curvature) {
+    return std::visit([](const auto& curv) { return toHost(curv); }, curvature);
 }
 
-}  // namespace rayx::detail
+}  // namespace rayx::detail::host

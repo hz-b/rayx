@@ -4,8 +4,8 @@
 #include <fstream>
 #include <queue>
 
-#include "Beamline/StringConversion.h"
-#include "Debug/Debug.h"
+#include "Misc/StringConversion.h"
+#include "IO/Debug.h"
 
 namespace rayx {
 

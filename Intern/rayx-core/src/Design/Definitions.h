@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Debug/Debug.h"
+#include "IO/Debug.h"
 
 // TODO: remove this file later, when all enums are moved to their respective files
 
