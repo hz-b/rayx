@@ -6,6 +6,6 @@
 
 namespace rayx::math::constants {
 
-constexpr double pi = std::numbers::pi_v<double>;
+// constexpr double pi = std::numbers::pi;
 
 }
