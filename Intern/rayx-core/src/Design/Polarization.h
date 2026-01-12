@@ -2,15 +2,14 @@
 
 #include <variant>
 
-#include "ElectricField.h"
-#include "Stokes.h"
+#include "Math/ElectricField.h"
 
 namespace rayx::design {
 
-using Polarization = std::variant<Stokes, LocalElectricField>;
+using Polarization = std::variant<math::Stokes, math::LocalElectricField>;
 
 namespace defaults {
-constexpr Polarization polarization = Stokes{1.0, 1.0, 0.0, 0.0};
+constexpr Polarization polarization = math::Stokes{1.0, 1.0, 0.0, 0.0};
 }
 
 }  // namespace rayx::design

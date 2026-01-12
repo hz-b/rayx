@@ -5,21 +5,12 @@
 
 namespace rayx::design {
 
-using AtomicNumber    = int;
-using ChemicalFormula = std::string;
+// TODO: add strings for materials consisting of multiple atomic elements
 
-namespace materials {
-
-#define X(elementName, atomicNumber, atomicWeight, density) static constexpr AtomicNumber elementName = atomicNumber;
-#include "AtomicElements.xmacro"
+enum class Material {
+#define X(elementName, atomicNumber, atomicWeight, density) elementName,
+#include "materials.xmacro"
 #undef X
-
-#define X(chemicalFormula) static constexpr ChemicalFormula chemicalFormula = #chemicalFormula;
-#include "Molecules.xmacro"
-#undef X
-
-}  // namespace materials
-
-using Material = std::variant<AtomicNumber, ChemicalFormula>;
+};
 
 }  // namespace rayx::design

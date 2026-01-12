@@ -6,17 +6,26 @@
 
 namespace rayx::design {
 
-struct SingleLayerCoating {
-    Material material = materials::Au;
+struct CoatingLayer {
+    Material material = Material::Au;
     double thickness  = 0.0;
     double roughness  = 0.0;
 };
 
-struct RepeatedCoating {
-    std::vector<SingleLayerCoating> layers = {SingleLayerCoating()};
-    int numInstances                       = 1;
+struct PeriodicCoating {
+    std::vector<CoatingLayer> layers = {CoatingLayer()};
+    int numPeriods                 = 1;
 };
 
-using Coating = std::vector<RepeatedCoating>;
+struct Coating {
+    PeriodicCoating periodicCoating;
+
+    /// Optional bottom layer (e.g., adhesion layer)
+    std::optional<CoatingLayer> bottomLayer;
+    /// Optional top layer (e.g., protective layer)
+    std::optional<CoatingLayer> topLayer;
+};
+
+// TODO: consider implementing depth-graded coatings (distributions: power-law, linear, exponential)
 
 }  // namespace rayx::design

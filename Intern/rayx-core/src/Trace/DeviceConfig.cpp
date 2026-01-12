@@ -10,8 +10,8 @@
 
 namespace {
 
-using DeviceType = rayx::DeviceConfig::DeviceType;
-using Device     = rayx::DeviceConfig::Device;
+using DeviceType = rayx::trace::DeviceConfig::DeviceType;
+using Device     = rayx::trace::DeviceConfig::Device;
 using Index      = Device::Index;
 using Score      = Device::Score;
 

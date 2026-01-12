@@ -5,6 +5,7 @@
 
 #include "IO/Instrumentor.h"
 #include "RayAttrMask.h"
+#include "Math/ElectricField.h"
 
 namespace rayx::trace {
 
@@ -46,8 +47,8 @@ struct RAYX_API Rays {
         direction_z[i] = direction.z;
     }
 
-    ElectricField electric_field(const int i) const { return ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]); }
-    void electric_field(const int i, const ElectricField electric_field) {
+    math::ElectricField electric_field(const int i) const { return math::ElectricField(electric_field_x[i], electric_field_y[i], electric_field_z[i]); }
+    void electric_field(const int i, const math::ElectricField electric_field) {
         electric_field_x[i] = electric_field.x;
         electric_field_y[i] = electric_field.y;
         electric_field_z[i] = electric_field.z;

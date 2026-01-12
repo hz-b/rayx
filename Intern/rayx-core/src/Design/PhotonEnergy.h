@@ -2,7 +2,7 @@
 
 #include <variant>
 
-#include "Constants.h"
+#include "Math/Constants.h"
 
 namespace rayx::design {
 
@@ -14,9 +14,11 @@ struct ElectronVolt {
     double value;  // in eV
 };
 
+using PhotonEnergy = std::variant<WaveLength, ElectronVolt>;
+
 WaveLength toWaveLength(const WaveLength wavelength) { return wavelength; }
 
-WaveLength toWaveLength(const ElectronVolt energy) { return WaveLength{INV_NM_TO_EVOLT / energy.value}; }
+WaveLength toWaveLength(const ElectronVolt energy) { return WaveLength{math::constants::inv_nm_to_evolt / energy.value}; }
 
 WaveLength toWaveLength(const PhotonEnergy energy) {
     return std::visit([](auto&& arg) { return toWaveLength(arg); }, energy);
@@ -24,16 +26,11 @@ WaveLength toWaveLength(const PhotonEnergy energy) {
 
 ElectronVolt toElectronVolt(const ElectronVolt energy) { return energy; }
 
-ElectronVolt toElectronVolt(const WaveLength wavelength) { return ElectronVolt{INV_NM_TO_EVOLT / wavelength.value}; }
+ElectronVolt toElectronVolt(const WaveLength wavelength) { return ElectronVolt{math::constants::inv_nm_to_evolt / wavelength.value}; }
 
 ElectronVolt toElectronVolt(const PhotonEnergy energy) {
     return std::visit([](auto&& arg) { return toElectronVolt(arg); }, energy);
 }
-
-using PhotonEnergy = std::variant<WaveLength, ElectronVolt>;
-
-template <typename T>
-concept PhotonEnergy_c = std::is_same_v<T, WaveLength> || std::is_same_v<T, ElectronVolt>;
 
 namespace literals {
 

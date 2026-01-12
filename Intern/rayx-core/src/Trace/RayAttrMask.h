@@ -24,9 +24,9 @@ using RandCounter = uint64_t;
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_X         X(double, direction_x, DirectionX)
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Y         X(double, direction_y, DirectionY)
 #define RAYX_X_MACRO_RAY_ATTR_DIRECTION_Z         X(double, direction_z, DirectionZ)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(math::complex, electric_field_x, ElectricFieldX)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(math::complex, electric_field_y, ElectricFieldY)
-#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(math::complex, electric_field_z, ElectricFieldZ)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_X    X(math::Complex, electric_field_x, ElectricFieldX)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Y    X(math::Complex, electric_field_y, ElectricFieldY)
+#define RAYX_X_MACRO_RAY_ATTR_ELECTRIC_FIELD_Z    X(math::Complex, electric_field_z, ElectricFieldZ)
 #define RAYX_X_MACRO_RAY_ATTR_OPTICAL_PATH_LENGTH X(double, optical_path_length, OpticalPathLength)
 #define RAYX_X_MACRO_RAY_ATTR_ENERGY              X(double, energy, Energy)
 #define RAYX_X_MACRO_RAY_ATTR_ORDER               X(int32_t, order, Order)
@@ -55,7 +55,7 @@ using RandCounter = uint64_t;
     RAYX_X_MACRO_RAY_ATTR_EVENT_TYPE          \
     RAYX_X_MACRO_RAY_ATTR_RAND_COUNTER
 
-namespace rayx {
+namespace rayx::trace {
 
 #define X(type, name, flag) static_assert(std::is_nothrow_move_constructible_v<type>);  // ensure efficient moves
 RAYX_X_MACRO_RAY_ATTR
@@ -152,4 +152,4 @@ RAYX_API std::vector<std::string> getRayAttrNames();
  */
 RAYX_API RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings);
 
-}  // namespace rayx
+}  // namespace rayx::trace
