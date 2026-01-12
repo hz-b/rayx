@@ -2,6 +2,8 @@
 
 #include <variant>
 
+#include "Angle.h"
+
 namespace rayx::design {
 
 struct QuadricCurvature {
@@ -55,17 +57,17 @@ struct CubicCurvature {
 enum class FigureRotation { No, Yes, Plane };
 
 struct EllipticalCurvature {
-    double shortHalfAxisB           = 0.0;
-    double longHalfAxisA            = 0.0;
-    double entranceArmLength        = 0.0;
-    double exitArmLength            = 0.0;
-    rayx::Rad designGrazingIncAngle = 0.0;
-    FigureRotation figureRotation   = FigureRotation::No;
-    double parameterA11             = 1.0;
+    double shortHalfAxisB         = 0.0;
+    double longHalfAxisA          = 0.0;
+    double entranceArmLength      = 0.0;
+    double exitArmLength          = 0.0;
+    Angle designGrazingIncAngle   = Radians(0.0);
+    FigureRotation figureRotation = FigureRotation::No;
+    double parameterA11           = 1.0;
 };
 
 struct ConicalCurvature {
-    rayx::Rad grazingIncAngle = 0.0;
+    Angle grazingIncAngle     = Radians(0.0);
     double entranceArmLength  = 0.0;
     double exitArmLength      = 0.0;
     double totalLength        = 0.0;
@@ -76,7 +78,7 @@ enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 struct CylindricalCurvature {
     CylinderDirection direction  = CylinderDirection::LongRadiusR;
     double radius                = 0.0;
-    double grazingIncidenceAngle = 0.0;
+    Angle grazingIncAngle        = Radians(0.0);
     double entranceArmLength     = 0.0;
     double exitArmLength         = 0.0;
 };
@@ -91,7 +93,7 @@ struct ParabolicCurvature {
     double armLength                      = 0.0;
     double parameterP                     = 0.0;
     ParabolicCurvatureType parameterPType = ParabolicCurvatureType::Collimate;
-    double grazingIncAngle                = 0.0;
+    Angle grazingIncAngle                 = Radians(0.0);
     double parameterA11                   = 1.0;
 };
 

@@ -6,8 +6,9 @@ namespace rayx::detail::host {
 
 using QuadricCurvature   = design::QuadricCurvature;
 using ToroidialCurvature = design::ToroidialCurvature;
+using ToroidType         = design::ToroidType;
 using CubicCurvature     = design::CubicCurvature;
-using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
+using Curvature          = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
 
 Curvature toHost(const design::Curvature& curvature);
 

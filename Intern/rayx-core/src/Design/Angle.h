@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <variant>
+#include <numbers>
 
 namespace rayx::design {
 
@@ -17,7 +17,7 @@ using Angle = std::variant<Degrees, Radians>;
 
 Radians toRadians(const Radians angle) { return angle; }
 
-Radians toRadians(const Degrees angle) { return Radians{angle.value * glm::pi<double>() / 180.0}; }
+Radians toRadians(const Degrees angle) { return Radians{angle.value * std::numbers::pi / 180.0}; }
 
 Radians toRadians(const Angle angle) {
     return std::visit([](auto&& arg) { return toRadians(arg); }, angle);
@@ -25,11 +25,16 @@ Radians toRadians(const Angle angle) {
 
 Degrees toDegrees(const Degrees angle) { return angle; }
 
-Degrees toDegrees(const Radians angle) { return Degrees{angle.value * 180.0 / glm::pi<double>()}; }
+Degrees toDegrees(const Radians angle) { return Degrees{angle.value * 180.0 / std::numbers::pi}; }
 
 Degrees toDegrees(const Angle angle) {
     return std::visit([](auto&& arg) { return toDegrees(arg); }, angle);
 }
+
+// TODO: write ostream operators and compatibility for std::format/std::print
+// std::ostream operator<<(std::ostream& os, const Degrees& angle) {
+//     return os << angle.value << "(deg)";
+// }
 
 namespace literals {
 
