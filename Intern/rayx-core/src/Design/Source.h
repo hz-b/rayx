@@ -105,6 +105,16 @@ struct InputSource {
     std::optional<Polarization> rayPolarization;
 };
 
+using Source = std::variant<
+    PointSource,
+    MatrixSource,
+    CircleSource,
+    SimpleUndulatorSource,
+    PixelSource,
+    DipoleSource,
+    InputSource
+>;
+
 using SourcePtr = std::variant<
     std::shared_ptr<PointSource>,
     std::shared_ptr<MatrixSource>,
