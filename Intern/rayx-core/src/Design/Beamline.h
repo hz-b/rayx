@@ -1,235 +1,19 @@
 #pragma once
 
+#include <glm/glm.hpp>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <variant>
+#include <vector>
+
+#include "Source.h"
+#include "SurfaceElement.h"
+#include "Translation.h"
+#include "Rotation.h"
+
 namespace rayx::design {
-
-////////////////////////////////////////////////////////////
-// nodes
-////////////////////////////////////////////////////////////
-
-struct AbsoluteNode;
-struct RelativeNode;
-struct AlongBeamNode;
-struct ObjectNode;
-
-using PreceedingNodePtr = std::variant<
-    std::shared_ptr<AbsoluteNode>,
-    std::shared_ptr<RelativeNode>,
-    std::shared_ptr<AlongBeamNode>
->;
-
-using NodePtr = std::variant<
-    std::shared_ptr<AbsoluteNode>,
-    std::shared_ptr<RelativeNode>,
-    std::shared_ptr<AlongBeamNode>,
-    std::shared_ptr<ObjectNode>
->;
-
-struct AbsoluteNode {
-    std::optional<std::string> name;
-    std::optional<Transform> transform;
-};
-
-struct RelativeNode {
-    std::optional<std::string> name;
-    std::optional<Transform> transform;
-
-    // relative position
-    preceedingNodePtr preceedingNode;
-};
-
-struct AlongBeamNode {
-    std::optional<std::string> name;
-    std::optional<Transform> transform;
-
-    // relative position
-    SourcePtr beamSource;
-    PreceedingNodePtr preceedingNode;
-    double distanceToPreceedingNode = 0.0;
-};
-
-struct ObjectNode {
-    std::string name;
-    ObjectPtr object;
-    PreceedingNodePtr preceedingNode;
-};
-
-std::optional<std::string> getName(const Node& node) {
-    std::visit([] (const auto& alt) { return alt.name; }, node);
-}
-std::optional<Transform> getTransform(const Node& node) {
-    std::visit([] (const auto& alt) { return alt.transform; }, node);
-}
-std::shared_ptr<Object> getObject(const Node& node) {
-    std::visit([] (const auto& alt) { return alt.object; }, node);
-}
-
-////////////////////////////////////////////////////////////
-// scene
-////////////////////////////////////////////////////////////
-
-class Scene {
-public:
-    Scene() = default;
-    Scene(const Scene&) = default;
-    Scene(Scene&&) = default;
-    Scene& operator=(const Scene&) = default;
-    Scene& operator=(Scene&&) = default;
-
-    // general accessors
-    bool hasCircularDependencies() const;
-    bool hasObjectNames() const;
-    bool isValid() const;
-
-    // node accessors
-    NodePtr getNode(std::string_view nodeName) const;
-    Transform getNodeAbsoluteTransform(const std::string_view nodeName) const;
-    Transform getNodeAbsoluteTransform(const NodePtr& node) const;
-
-    // object node accessors
-    std::shared_ptr<ObjectNode> getObjectNode(std::string_view objectNodeName) const;
-    int getObjectNodeId(const std::string_view objectNodeName) const;
-    std::map<std::string, int> getObjectNodeIds() const;
-
-    // object accessors
-    ObjectPtr getObject(std::string_view objectName) const;
-
-    // node modifiers
-    void addNode(NodePtr node); // add node and all preceeding nodes if not already present
-    void removeNode(std::string_view nodeName); // remove node and all its descendant nodes
-    void removeNode(NodePtr node);
-
-    // copy
-    Scene copyNodes() const;
-    Scene copyNodesAndObjects() const;
-    Scene copyNodesAndObjectsAndResources() const;
-
-protected:
-    std::vector<NodePtr> m_nodes;
-    // std::vector<std::shared_ptr<ObjectNode>> m_objects;
-};
-
-////////////////////////////////////////////////////////////
-// beamline
-////////////////////////////////////////////////////////////
-
-class BeamlineBuilder {
-public:
-    BeamlineBuilder(
-        std::string_view beamSourceName,
-        SourcePtr beamSource, // not null
-        std::optional<Transform> transform = std::nullopt
-    ) : m_scene(std::make_shared<Scene>()), m_beamSource(beamSource) {
-        if (variantPtrIsNull(beamSource))
-            throw std::runtime_exception("beamSource cannot be null!");
-
-        auto root = std::make_shared<AbsoluteNode>(AbsoluteNode{
-            .name = "root",
-            .transform = transform,
-        });
-
-        auto source = std::make_shared<ObjectNode>(ObjectNode{
-            .name = name,
-            .object = beamSource,
-        });
-
-        m_scene.addNode(root);
-        m_scene.addNode(source);
-
-        m_head = root;
-    }
-
-    BeamlineBuilder(const BeamlineBuilder&) = default;
-    BeamlineBuilder(BeamlineBuilder&&) = default;
-    BeamlineBuilder& operator(const BeamlineBuilder&) = default;
-    BeamlineBuilder& operator(BeamlineBuilder&&) = default;
-
-    struct Func {
-        std::optional<std::string> name;
-        std::function<Transform(Transform)> func;
-        std::optional<BeamlineBuilder> inputTransform;
-    };
-
-    struct AbsolutePosition {
-        std::optional<std::string> name;
-        Transform transform;
-    };
-
-    struct AbsoluteRotation {
-        std::optional<std::string> name;
-        Transform transform;
-    };
-
-    struct Translate {
-        std::optional<std::string> name;
-        Translation translation;
-    };
-
-    struct Rotate {
-        std::optional<std::string> name;
-        Rotation rotation;
-    };
-
-    struct AlongBeam {
-        std::optional<std::string> name;
-        double distanceToPreceeding = 1;
-    };
-
-    BeamlineBuilder next(const Absolute conf) {
-        auto node = std::make_shared<AbsoluteNode>(AbsoluteNode{
-            .name = conf.name,
-            .transform = conf.transform,
-        });
-        m_head = m_nodes.back();
-        m_scene->addNode(node);
-        return *this;
-    }
-
-    BeamlineBuilder next(const Relative conf) {
-        auto node = std::make_shared<RelativeNode>(RelativeNode{
-            .name = conf.name,
-            .transform = conf.transform,
-            .preceeding = m_head,
-        });
-        m_head = m_nodes.back();
-        m_scene-addNode(node);
-        return *this;
-    }
-
-    BeamlineBuilder next(const AlongBeam conf) {
-        auto node = std::make_shared<AlongBeamNode>(AlongBeamNode{
-            .name = conf.name,
-            .transform = conf.transform,
-            .preceeding = m_head,
-            .distanceToPreceeding = conf.distanceToPreceeding,
-            .beamSource = m_beamSource,
-        });
-        m_head = node;
-        m_scene->addNode(node);
-        return *this;
-    }
-
-    BeamlineBuilder attachObject(std::string name, ObjectPtr object) {
-        if (variantPtrIsNull(object)) throw std::runtime_exception("object cannot be null!");
-
-        auto node = std::make_shared<ObjectNode>(ObjectNode{
-            .name = name,
-            .object = object,
-            .parent = m_head,
-        });
-        m_scene.addNode(node);
-        return *this;
-    }
-
-    Scene createScene() const {
-        return m_scene->copyNodesAndObjects();
-    }
-
-private:
-    std::shared_ptr<Scene> m_scene;
-    SourcePtr m_beamSource;
-    PreceedingNodePtr m_head;
-};
-
 
 struct SourceNode;
 struct ElementNode;
@@ -324,3 +108,5 @@ struct Beamline : NodeBase {
     int getNodeElementId(std::string_view name) const;
     int getNodeObjectId(std::string_view name) const;
 };
+
+}  // namespace rayx::design
