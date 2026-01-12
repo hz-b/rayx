@@ -221,365 +221,106 @@ public:
     }
 
     Scene createScene() const {
-        return *m_scene;
+        return m_scene->copyNodesAndObjects();
     }
 
 private:
     std::shared_ptr<Scene> m_scene;
     SourcePtr m_beamSource;
-    NodePtr m_head;
+    PreceedingNodePtr m_head;
 };
 
-auto beamline = BeamlineBuilder(
-    "mainSource", std::make_shared<PointSource>{
-        .numRays = 1<<20,
-    }
-)
-    .next(BeamlineBuilder::Relative{
-        .transform = {
-            .translation = glm::dvec3(0, 0, 100),
-        },
-    })
-    // TODO: a Relative node cannot be the ancestor of an AlongBeam node
-    .next(BeamlineBuilder::AlongBeam{
-        .name = "pgm"
-    })
 
-;
+struct SourceNode;
+struct ElementNode;
+struct TranslateNode;
+struct RotateNode;
 
+using NodePtr = std::variant<
+    std::shared_ptr<SourceNode>,
+    std::shared_ptr<ElementNode>,
+    std::shared_ptr<TranslateNode>,
+    std::shared_ptr<RotateNode>
+>;
 
-auto beamline = BeamlineBuilder({
-    .name = "beamline",
-})
-    .nextAbsolute({
-        .name = "point_source",
-        .source = PointSource {
-            .numRays = 100000,
-            .rayAngle {
-                .x = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-                .y = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-            },
-            .rayEnergy = 300.0_eV,
-            .rayPolarization = Stokes {1.0, 1.0, 0.0, 0.0},
-        },
-    })
-    .nextRelative({
-        .name = "flat_mirror",
-        .transform = Transform {
-            .position = glm::dvec3 {0.0, 0.0, 1000.0},
-            .rotation = RotationAroundAxis {
-                .angle = 10.0_deg,
-                .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-            },
-        },
-        .object = SurfaceElement {
-            .area = RectangularArea { .width = 50.0, .height = 50.0 },
-            .behavior = ReflectBehavior { .substrate = materials::Si },
-        },
-    })
-    .nextAlongBeam({
-        .name = "detector",
-        .transform = Transform {
-            .position = glm::dvec3 {0.0, 0.0, 2000.0},
-        },
-        .object = SurfaceElement {
-            .area = RectangularArea { .width = 100.0, .height = 100.0 },
-            .behavior = AbsorbBehavior {},
-        },
-        .source = std::dynamic_pointer_cast<Source>(beamline->getObjectByName("point_source")),
-        .distance = 1000.0,
-    })
-    .beamline;
+struct NodeBase {
+    std::string name;
+    std::vector<NodePtr> children;
 
-} // namespace rayx::design
+    std::shared_ptr<SourceNode> append(std::shared_ptr<SourceNode> node);
+    std::shared_ptr<ElementNode> append(std::shared_ptr<ElementNode> node);
+    std::shared_ptr<TranslateNode> append(std::shared_ptr<TranslateNode> node);
+    std::shared_ptr<RotateNode> append(std::shared_ptr<RotateNode> node);
+    NodePtr append(NodePtr node);
 
-/*
- * beamline mockup
- */
+    std::shared_ptr<SourceNode> append(std::string_view name, Source source);
+    std::shared_ptr<SourceNode> append(std::string_view name, SourcePtr source);
 
-// auto beamline = Node {
-//     .name = "beamline",
-//     .children = {
-//         SourceNode {
-//             .name = "point_source",
-//             .source = PointSource {
-//                 .numRays = 100000,
-//                 .rayAngle {
-//                     .x = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-//                     .y = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-//                 },
-//                 .rayEnergy = 300.0_eV,
-//                 .rayPolarization = Stokes {1.0, 1.0, 0.0, 0.0},
-//             }
-//             .children = {
-//                 ElementNode {
-//                     .name = "flat_mirror",
-//                     .transform = Transform {
-//                         .position = glm::dvec3 {0.0, 0.0, 1000.0},
-//                         .rotation = RotationAroundAxis {
-//                             .angle = 10.0_deg,
-//                             .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//                         },
-//                     },
-//                     .element = SurfaceElement {
-//                         .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//                         .behavior = ReflectBehavior { .substrate = materials::Si },
-//                     },
-//                     .children = {
-//                         ElementNode {
-//                             .name = "detector",
-//                             .transform = Transform {
-//                                 .position = glm::dvec3 {0.0, 0.0, 2000.0},
-//                             },
-//                             .element = SurfaceElement {
-//                                 .area = RectangularArea { .width = 100.0, .height = 100.0 },
-//                                 .behavior = AbsorbBehavior {},
-//                             },
-//                         }
-//                     },
-//                 },
-//             },
-//         },
-//     },
-// };
-//
-// /*
-//  * Declare Beamline tree step by step. NOTE: this allows cyclic references! Not recommended.
-//  */
-//
-// auto pointSource = PointSource {
-//     .name = "point_source",
-//     .numRays = 100000,
-//     .rayAngle {
-//         .x = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-//         .y = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-//     },
-//     .rayEnergy = 300.0_eV,
-//     .rayPolarization = Stokes {1.0, 1.0, 0.0, 0.0},
-// };
-//
-// auto flatMirror = SurfaceElement {
-//     .name = "flat_mirror",
-//     .transform = RelativeTransform {
-//         .relativeTo = "point_source",
-//         .position   = glm::dvec3 {0.0, 0.0, 1000.0},
-//         .rotation   = RotationAroundAxis {
-//             .angle = 10.0_deg,
-//             .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//         },
-//     },
-//     .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//     .behavior = ReflectBehavior { .substrate = materials::Si },
-// };
-//
-// auto pgm = EmptyNode {
-//     .name = "pgm",
-//     .transform = AlongBeamTransform {
-//         .relativeTo         = "flat_mirror",
-//         .distance           = 1000.0,
-//         .angleAroundBeam    = 0.0_deg,
-//     },
-// };
-//
-// auto pgmMirrorAxis = EmptyNode {
-//     .name = "pgm_mirror_axis",
-//     .transform = RotationAroundBeamTransform {
-//         .relativeTo      = "flat_mirror",
-//         .angleAroundBeam = 0.0_deg,
-//     },
-// };
-//
-// auto pgmMirror = SurfaceElement {
-//     .name = "pgm_mirror",
-//     .transform = RelativeTransform {
-//         .relativeTo = "pgm_mirror_axis",
-//         .position   = glm::dvec3 {0.0, 0.0, 0.0},
-//         .rotation   = RotationAroundAxis {
-//             .angle = 5.0_deg,
-//             .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//         },
-//     },
-//     .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//     .behavior = ReflectBehavior { .substrate = materials::Si },
-// };
-//
-// auto pgm_grating = SurfaceElement {
-//     .name = "pgm_grating",
-//     .transform = RelativeTransform {
-//         .relativeTo = "pgm",
-//         .position   = glm::dvec3 {0.0, 0.0, 0.0},
-//         .rotation   = RotationAroundAxis {
-//             .angle = -5.0_deg,
-//             .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//         },
-//     },
-//     .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//     .behavior = GratingBehavior {
-//         .lineDensity         = 1200.0,  // lines per mm
-//         .orderOfDiffraction  = 1,
-//     },
-// };
-//
-// auto detector = SurfaceElement {
-//     .name = "detector",
-//     .transform = AlongBeamTransform {
-//         .relativeTo         = "pgm",
-//         .distance           = 1000.0,
-//         .angleAroundBeam    = 90.0_deg,
-//         // NOTE: order of diffraction is inherited from behavior of previous element
-//     },
-//     .area = RectangularArea { .width = 100.0, .height = 100.0 },
-//     .behavior = AbsorbBehavior {},
-// };
-//
-// using BeamlineNode = std::variant<EmptyNode, SourceNode, ElementNode>;
-//
-// auto beamline = Beamline {
-//     .name = "beamline",
-//     .nodes = {
-//         pointSource,
-//         flatMirror,
-//         pgm,
-//         pgmMirrorAxis,
-//         pgmMirror,
-//         pgm_grating,
-//         detector,
-//     },
-// };
-//
-// /*
-//  * Use trees but also allow placment of trees along beam
-//  */
-//
-// auto pointSource = PointSource {
-//     .numRays = 100000,
-//     .rayAngle {
-//         .x = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-//         .y = WhiteNoiseDistribution<Angle> { .center = 0.0_deg, .range = 0.1_deg },
-//     },
-//     .rayEnergy = 300.0_eV,
-//     .rayPolarization = Stokes {1.0, 1.0, 0.0, 0.0},
-// };
-//
-// auto flatMirror = SurfaceElement {
-//     .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//     .behavior = ReflectBehavior { .substrate = materials::Si },
-// };
-//
-// auto pgmMirror = SurfaceElement {
-//     .transform = RelativeTransform {
-//         .relativeTo = "pgm_mirror_axis",
-//         .position   = glm::dvec3 {0.0, 0.0, 0.0},
-//         .rotation   = RotationAroundAxis {
-//             .angle = 5.0_deg,
-//             .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//         },
-//     },
-//     .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//     .behavior = ReflectBehavior { .substrate = materials::Si },
-// };
-//
-// auto pgmGrating = SurfaceElement {
-//     .transform = RelativeTransform {
-//         .relativeTo = "pgm",
-//         .position   = glm::dvec3 {0.0, 0.0, 0.0},
-//         .rotation   = RotationAroundAxis {
-//             .angle = -5.0_deg,
-//             .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//         },
-//     },
-//     .area = RectangularArea { .width = 50.0, .height = 50.0 },
-//     .behavior = GratingBehavior {
-//         .lineDensity         = 1200.0,  // lines per mm
-//         .orderOfDiffraction  = 1,
-//     },
-// };
-//
-// auto detector = SurfaceElement {
-//     .transform = AlongBeamTransform {
-//         .relativeTo         = "pgm",
-//         .distance           = 1000.0,
-//         .angleAroundBeam    = 90.0_deg,
-//         // NOTE: order of diffraction is inherited from behavior of previous element
-//     },
-//     .area = RectangularArea { .width = 100.0, .height = 100.0 },
-//     .behavior = AbsorbBehavior {},
-// };
-//
-// auto pgm = Tree {
-//     .properties = {
-//         Property<Angle> {
-//             .name  = "pimpale_angle",
-//             .value = 10_deg,
-//         },
-//     },
-//     .nodes = {
-//         TreeNode {
-//             .transform = Transform {
-//                 .position = glm::dvec3 {0.0, 0.0, 1000.0},
-//                 .rotation = RotationAroundAxis {
-//                     .angle = PropertyReference<Angle> { .name = "pimpale_angle" },
-//                     .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//                 },
-//             },
-//             .nodes = {
-//                 TreeNode {
-//                     .transform = Transform {
-//                         // transform of the mirror within the pgm
-//                     },
-//                     .nodes = {
-//                         pgmMirror,
-//                     },
-//                 },
-//             },
-//         },
-//         TreeNode {
-//             .transform = Transform {
-//                 .position = glm::dvec3 {0.0, 10.0, 0.0},
-//                 .rotation = RotationAroundAxis {
-//                     .angle = 180.0_deg,
-//                     .axis  = glm::dvec3 {1.0, 0.0, 0.0},
-//                 },
-//             },
-//             .nodes = {
-//                 pgmGrating,
-//             },
-//         },
-//     },
-// };
-//
-// auto beamline = Beamline {
-//     .name = "beamline",
-//     .objects = {
-//         ObjectNode {
-//             .transform = AbsoluteTransform {
-//                 .position = glm::dvec3 {0.0, 0.0, 0.0},
-//                 .rotation = glm::dmat3(1.0),
-//             },
-//             .name = "point_source",
-//             .object = pointSource,
-//         },
-//         ObjectNode {
-//             .transform = AlongBeamTransform {
-//                 .relativeTo         = "point_source",
-//                 .source             = "point_source",
-//                 .distance           = 1000.0,
-//                 .angleAroundBeam    = 0.0_deg,
-//             },
-//             .name = "flat_mirror",
-//             .object = flatMirror,
-//         },
-//         ObjectNode {
-//             .transform = AlongBeamTransform {
-//                 .relativeTo         = "flat_mirror",
-//                 .source             = "point_source",
-//                 .distance           = 1000.0,
-//                 .angleAroundBeam    = 0.0_deg,
-//             },
-//             .name = "pgm",
-//             .object = pgm,
-//         },
-//         pgm,
-//         detector,
-//     },
-// };
+    std::shared_ptr<ElementNode> append(std::string_view name, Element element);
+    std::shared_ptr<ElementNode> append(std::string_view name, ElementPtr element);
+
+    std::shared_ptr<TranslateNode> append(Translation translation);
+    std::shared_ptr<TranslateNode> append(std::string_view name, Translation translation);
+
+    std::shared_ptr<RotateNode> append(Rotation rotation);
+    std::shared_ptr<RotateNode> append(std::string_view name, Rotation rotation);
+
+    NodePtr getNode(std::string_view name) const;
+    std::shared_ptr<SourceNode> getNodeSource(std::string_view name) const;
+    std::shared_ptr<ElementNode> getNodeElement(std::string_view name) const;
+    std::shared_ptr<TranslateNode> getNodeTranslate(std::string_view name) const;
+    std::shared_ptr<RotateNode> getNodeRotate(std::string_view name) const;
+
+    void removeNode(NodePtr node);
+};
+
+struct SourceNode : NodeBase {
+    SourcePtr source;
+
+    // TODO: distance to preceeding source or element based on the beam coords.
+    // NOTE: beam coords = direction and rotation around direction
+    //
+    // this can be done by tracing a single ray and figuring the beam coords after the last source / element.
+    // effectively the successive node will be in beam coords.
+    // -> we have to respect the rotation around the beam, that can change on every hit or when the source is rotateed
+    // does this only make sense if the last node was a source or element?
+    // -> a translation or rotation could make sense, when applyed to the beam coords. might be confusing though
+    //
+    // doing this requires a source that emits the ray from its coordinates. options to pick the source
+    // -> when going up the tree, use first encountered source
+    // -> when going up the tree, use last encountered source
+    // -> use a specific source (most versatile approach). to simplifiy the api, the beamline building process could assume/enforce a source as root node and then use that unless specified explicitly
+    //
+    // there are two potentially useful implementations. i think both have their use cases, so maybe we want to implement both
+    /// convert local beam coordinates to relative rotation -> append rotate node
+    /// this way, future mutations that would affect the beam coords, DO NOT affect the relative rotation
+    /// error detection can occur immediately
+    // RotateNode& appendRotateToBeamCoordsImmediate(std::string_view name = {});
+    /// evaluate local beam coordinates just before tracing, and convert to relative rotation that is only used in the tracer
+    /// this way, future mutations that would affect the beam coords, DO affect the relative rotation
+    /// error detection can occur when trying to trace
+    // RotateToBeamCoordsNode& appendRotateToBeamCoordsDeferred(std::string_view name = {);
+};
+
+struct ElementNode : NodeBase {
+    ElementPtr element;
+};
+
+struct TranslateNode : NodeBase {
+    Translation translation;
+};
+
+struct RotateNode : NodeBase {
+    Rotation rotation;
+};
+
+struct Beamline : NodeBase {
+    Beamline() : NodeBase({.name = "root"}) {}
+
+    glm::dvec3 getNodeAbsolutePosition(std::string_view name) const;
+    RotationAroundAxis getNodeAbsoluteRotation(std::string_view name) const;
+    std::vector<std::tuple<int, std::string>> getObjectIds() const;
+    int getNodeSourceId(std::string_view name) const;
+    int getNodeElementId(std::string_view name) const;
+    int getNodeObjectId(std::string_view name) const;
+};
