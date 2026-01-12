@@ -5,14 +5,18 @@
 #include <string>
 #include <variant>
 
-#include "BeamlineNode.h"
-#include "Distributions.h"
-#include "Rays.h"
+#include "Distribution.h"
+#include "Angle.h"
+#include "Trace/Rays.h"
+#include "PhotonEnergy.h"
+#include "Polarization.h"
+
+namespace rayx::design {
 
 namespace defaults {
 constexpr int numRays                                             = 100000;
-constexpr Cube<UniformDistribution<double>> matrixSourceRayOrigin = {{0.0, 2.0, 100}, {0.0, 2.0, 100}, {0.0, 0.0, 1}};
 constexpr SeparateValues<double> circleSourceRadius               = {.center = 0.0, .range = 1.0, .numValues = 10};
+constexpr PhotonEnergy photonEnergy                 = ElectronVolt{300.0};
 }  // namespace defaults
 
 struct PointSource {
@@ -59,8 +63,8 @@ struct SimpleUndulatorSource {
     double electronSigmaYs       = 0.0;
     double depth                 = 0.0;
     Polarization polarization    = defaults::polarization;
-    PhotonEnergy photonEnergy    = 1.0;  // TODO: this is weird, because PhotonEnergy is potentially redundant to energy
-    Distribution energy          = defaults::energy;
+    PhotonEnergy photonEnergy    = defaults::photonEnergy;  // TODO: this is weird, because PhotonEnergy is potentially redundant to energy
+    Distribution<PhotonEnergy> energy          = defaults::photonEnergy;
 };
 
 // TODO: sensible defaults
@@ -75,7 +79,7 @@ struct PixelSource {
     double height             = 0.0;
     double depth              = 0.0;
     Polarization polarization = defaults::polarization;
-    Distribution energy       = defaults::energy;
+    Distribution<PhotonEnergy> energy       = defaults::photonEnergy;
 };
 
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
@@ -98,7 +102,7 @@ struct DipoleSource {
 
 struct InputSource {
     std::optional<std::string> name;
-    Rays rays;
+    trace::Rays rays;
     std::optional<Cube<Distribution<double>>> rayOrigin;
     std::optional<Rect<Distribution<Angle>>> rayAngle;
     std::optional<Distribution<PhotonEnergy>> rayEnergy;
@@ -124,3 +128,5 @@ using SourcePtr = std::variant<
     std::shared_ptr<DipoleSource>,
     std::shared_ptr<InputSource>
 >;
+
+}  // namespace rayx::design

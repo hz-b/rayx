@@ -2,7 +2,7 @@
 
 #include <bitset>
 
-namespace rayx {
+namespace rayx::trace {
 
 int countSetBits(const RayAttrMask mask) {
     return std::bitset<static_cast<std::underlying_type_t<RayAttrMask>>(RayAttrMask::RayAttrMaskCount)>(

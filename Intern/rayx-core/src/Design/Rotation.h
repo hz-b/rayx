@@ -18,18 +18,11 @@ struct RotationBase {
     glm::dvec3 forward;
 };
 
-struct Rotation : std::variant<RotationAroundAxis, RotationBase, glm::dmat3> {
-    using std::variant<RotationAroundAxis, RotationBase, glm::dmat3>::variant;
-
-    std::variant<RotationAroundAxis, RotationBase, glm::dmat3> toVariant() { return *this; }
-    RotationAroundAxis toRotationAroundAxis() const;
-};
-
 using Rotation = std::variant<RotationAroundAxis, RotationBase, glm::dmat3>;
 
-RotationAroundAxis toRotationAroundAxis(const RotationAroundAxis& rotation) { return rotation; }
+inline RotationAroundAxis toRotationAroundAxis(const RotationAroundAxis& rotation) { return rotation; }
 
-RotationAroundAxis toRotationAroundAxis(const RotationBase& rotation) {
+inline RotationAroundAxis toRotationAroundAxis(const RotationBase& rotation) {
     const auto quat = glm::quat_cast(glm::dmat3(rotation.right, rotation.up, rotation.forward));
     return RotationAroundAxis{
         .angle = Radians{glm::angle(quat)},
@@ -37,7 +30,7 @@ RotationAroundAxis toRotationAroundAxis(const RotationBase& rotation) {
     };
 }
 
-RotationAroundAxis toRotationAroundAxis(const glm::dmat3& rotation) {
+inline RotationAroundAxis toRotationAroundAxis(const glm::dmat3& rotation) {
     const auto quat = glm::quat_cast(rotation);
     return RotationAroundAxis{
         .angle = Radians{glm::angle(quat)},
@@ -45,13 +38,13 @@ RotationAroundAxis toRotationAroundAxis(const glm::dmat3& rotation) {
     };
 }
 
-RotationAroundAxis toRotationAroundAxis(const Rotation& rotation) {
+inline RotationAroundAxis toRotationAroundAxis(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationAroundAxis(arg); }, rotation);
 }
 
-RotationBase toRotationBase(const RotationBase& rotation) { return rotation; }
+inline RotationBase toRotationBase(const RotationBase& rotation) { return rotation; }
 
-RotationBase toRotationBase(const RotationAroundAxis& rotation) {
+inline RotationBase toRotationBase(const RotationAroundAxis& rotation) {
     const auto quat = glm::angleAxis(toRadians(rotation.angle).value, rotation.axis);
     const auto mat  = glm::mat3_cast(quat);
     return RotationBase{
@@ -61,7 +54,7 @@ RotationBase toRotationBase(const RotationAroundAxis& rotation) {
     };
 }
 
-RotationBase toRotationBase(const glm::dmat3& rotation) {
+inline RotationBase toRotationBase(const glm::dmat3& rotation) {
     return RotationBase{
         .right   = rotation[0],
         .up      = rotation[1],
@@ -69,20 +62,20 @@ RotationBase toRotationBase(const glm::dmat3& rotation) {
     };
 }
 
-RotationBase toRotationBase(const Rotation& rotation) {
+inline RotationBase toRotationBase(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationBase(arg); }, rotation);
 }
 
-glm::dmat3 toRotationMatrix(const glm::dmat3& rotation) { return rotation; }
+inline glm::dmat3 toRotationMatrix(const glm::dmat3& rotation) { return rotation; }
 
-glm::dmat3 toRotationMatrix(const RotationBase& rotation) { return glm::dmat3(rotation.right, rotation.up, rotation.forward); }
+inline glm::dmat3 toRotationMatrix(const RotationBase& rotation) { return glm::dmat3(rotation.right, rotation.up, rotation.forward); }
 
-glm::dmat3 toRotationMatrix(const RotationAroundAxis& rotation) {
+inline glm::dmat3 toRotationMatrix(const RotationAroundAxis& rotation) {
     const auto quat = glm::angleAxis(toRadians(rotation.angle).value, rotation.axis);
     return glm::mat3_cast(quat);
 }
 
-glm::dmat3 toRotationMatrix(const Rotation& rotation) {
+inline glm::dmat3 toRotationMatrix(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationMatrix(arg); }, rotation);
 }
 

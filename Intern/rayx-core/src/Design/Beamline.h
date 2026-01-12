@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Source.h"
-#include "SurfaceElement.h"
+#include "Element.h"
 #include "Translation.h"
 #include "Rotation.h"
 
@@ -27,9 +27,11 @@ using NodePtr = std::variant<
     std::shared_ptr<RotateNode>
 >;
 
+namespace detail {
+
 struct NodeBase {
     std::string name;
-    std::vector<NodePtr> children;
+    std::vector<NodePtr> children = {};
 
     std::shared_ptr<SourceNode> append(std::shared_ptr<SourceNode> node);
     std::shared_ptr<ElementNode> append(std::shared_ptr<ElementNode> node);
@@ -58,8 +60,10 @@ struct NodeBase {
     void removeNode(NodePtr node);
 };
 
-struct SourceNode : NodeBase {
-    SourcePtr source;
+}  // namespace detail
+
+struct SourceNode : detail::NodeBase {
+    SourcePtr source; // TODO: do we want this to be a pointer or value?
 
     // TODO: distance to preceeding source or element based on the beam coords.
     // NOTE: beam coords = direction and rotation around direction
@@ -86,20 +90,20 @@ struct SourceNode : NodeBase {
     // RotateToBeamCoordsNode& appendRotateToBeamCoordsDeferred(std::string_view name = {);
 };
 
-struct ElementNode : NodeBase {
-    ElementPtr element;
+struct ElementNode : detail::NodeBase {
+    ElementPtr element; // TODO: do we want this to be a pointer or value?
 };
 
-struct TranslateNode : NodeBase {
+struct TranslateNode : detail::NodeBase {
     Translation translation;
 };
 
-struct RotateNode : NodeBase {
+struct RotateNode : detail::NodeBase {
     Rotation rotation;
 };
 
-struct Beamline : NodeBase {
-    Beamline() : NodeBase({.name = "root"}) {}
+struct Beamline : detail::NodeBase {
+    Beamline() : detail::NodeBase({.name = "root"}) {}
 
     glm::dvec3 getNodeAbsolutePosition(std::string_view name) const;
     RotationAroundAxis getNodeAbsoluteRotation(std::string_view name) const;

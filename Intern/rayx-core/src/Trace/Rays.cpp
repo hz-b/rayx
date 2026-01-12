@@ -4,8 +4,6 @@
 #include <bitset>
 #include <unordered_map>
 
-#include "IO/Instrumentor.h"
-
 namespace rayx::trace {
 
 Rays Rays::copy() const {
@@ -140,7 +138,7 @@ Rays Rays::filterByLastEventInPath() const {
     const auto attr = attrMask();
     Rays result;
 #define X(type, name, flag)                                                                                           \
-    if (rayx::contains(attr, RayAttrMask::flag)) {                                                                    \
+    if (trace::contains(attr, RayAttrMask::flag)) {                                                                    \
         result.name.resize(indices.size());                                                                           \
         std::transform(indices.begin(), indices.end(), result.name.begin(), [this](const int i) { return name[i]; }); \
     }
@@ -154,7 +152,7 @@ bool Rays::isValid() const {
     const auto sz   = size();
 
 #define X(type, name, flag) \
-    if (rayx::contains(attr, RayAttrMask::flag) && static_cast<int>(name.size()) != sz) return false;
+    if (trace::contains(attr, RayAttrMask::flag) && static_cast<int>(name.size()) != sz) return false;
     RAYX_X_MACRO_RAY_ATTR
 #undef X
     return true;

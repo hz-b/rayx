@@ -1,9 +1,13 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include "Complex.h"
 
 namespace rayx::math {
 
-using ElectricField = int;
+using Stokes = glm::dvec4;
 
-}  // namespace rayx
+using LocalElectricField = glm::tvec2<Complex>;
+using ElectricField = glm::tvec3<Complex>;
+
+}  // namespace rayx::math

@@ -23,20 +23,19 @@ struct GaussianDistribution {
 
 template <typename T>
 struct BakedDistribution {
-    shared_ref<DataSet<T>> values;
-    std::optional<shared_ref<DataSet<double>>> weights;
+    std::vector<T> values = std::make_shared<std::vector<T>>();
+    std::optional<std::vector<T>> weights;
     bool interpolate = false;
 };
 
 template <typename T>
-using Distribution = std::variant<T, SeparateValues<T>, WhiteNoiseDistribution<T>, GaussianDistribution<T>, BakedDistribution<T>>;
-
-template <typename T>
-struct Cube {
-    T x = T();
-    T y = T();
-    T z = T();
-};
+using Distribution = std::variant<
+    T,
+    SeparateValues<T>,
+    WhiteNoiseDistribution<T>,
+    GaussianDistribution<T>,
+    std::shared_ptr<BakedDistribution<T>>
+>;
 
 template <typename T>
 struct Sphere {
@@ -47,6 +46,13 @@ template <typename T>
 struct Rect {
     T x = T();
     T y = T();
+};
+
+template <typename T>
+struct Cube {
+    T x = T();
+    T y = T();
+    T z = T();
 };
 
 }  // namespace rayx::design

@@ -9,17 +9,21 @@
 
 namespace rayx::design {
 
-struct DetectorBehavior {};
+/// Ray does not interact with the element, but records detection.
+struct DetectBehavior {};
+
+/// Ray does not interact with the element.
+struct IgnoreBehavior {};
 
 struct AbsorbBehavior {};
 
 struct ReflectBehavior {
-    Material substrate = materials::Au;
+    Material substrate = Material::Si;
     std::optional<Coating> coating;
 };
 
 struct TransmitBehavior {
-    Material substrate        = materials::Au;
+    Material substrate        = Material::C;
     double substrateThickness = 0.1;
     double substrateRoughness = 0.0;
     std::optional<Coating> coating;
@@ -61,6 +65,6 @@ struct CrystalBehavior {
     double structureFactorImFHC = 0.0;
 };
 
-using Behavior = std::variant<DetectorBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
+using Behavior = std::variant<DetectBehavior, IgnoreBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
 
 }  // namespace rayx::design
