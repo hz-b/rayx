@@ -6,7 +6,7 @@
 #include "Debug/Debug.h"
 #include "Rml/Locate.h"
 
-namespace RAYX {
+namespace rayx {
 
 bool CromerTable::load(const char* element, CromerTable* out) {
     std::string elementString = element;

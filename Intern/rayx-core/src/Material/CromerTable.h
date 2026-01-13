@@ -6,7 +6,7 @@
 // This file defines the CromerEntry.
 #include "../Shader/RefractiveIndex.h"
 
-namespace RAYX {
+namespace rayx {
 /** This struct represents the contents of a .f12 file.
  *
  * Example usage:

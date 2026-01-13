@@ -7,7 +7,7 @@
 #include "Debug/Debug.h"
 #include "Rml/Locate.h"
 
-namespace RAYX {
+namespace rayx {
 
 bool MolecTable::load(const char* element, MolecTable* out) {
     std::string elementString = element;
@@ -51,4 +51,4 @@ bool MolecTable::load(const char* element, MolecTable* out) {
     return true;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

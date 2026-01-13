@@ -6,7 +6,7 @@
 // This file defines the MolecEntry.
 #include "../Shader/RefractiveIndex.h"
 
-namespace RAYX {
+namespace rayx {
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:
@@ -26,4 +26,4 @@ struct MolecTable {
     // double interpolate(double x) const;
 };
 
-}  // namespace RAYX
+}  // namespace rayx
