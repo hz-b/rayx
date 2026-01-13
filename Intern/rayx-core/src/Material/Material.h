@@ -47,7 +47,7 @@ struct RAYX_API MaterialTables {
 MaterialTables RAYX_API loadMaterialTables(std::array<bool, 133> relevantMaterials);
 
 // returns dvec2(atomic mass, density) extracted from materials.xmacro
-glm::dvec2 RAYX_API getAtomicMassAndRho(int material);
+glm::dvec2 getAtomicMassAndRho(int material);
 
 void MaterialToNameMap();
 }  // namespace rayx

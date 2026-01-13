@@ -50,7 +50,7 @@ RAYX_FN_ACC PalikEntry RAYX_API getPalikEntry(int index, int material, const int
 
 RAYX_FN_ACC NKEntry RAYX_API getNffEntry(int index, int material, const int* materialIndices, const double* materialTable);
 
-RAYX_FN_ACC CromerEntry RAYX_API getCromerEntry(int index, int material, const int* materialIndices, const double* materialTable);
+RAYX_FN_ACC NKEntry RAYX_API getCromerEntry(int index, int material, const int* materialIndices, const double* materialTable);
 
 RAYX_FN_ACC NKEntry RAYX_API getMolecEntry(int index, int material, const int* materialIndices, const double* materialTable);
 

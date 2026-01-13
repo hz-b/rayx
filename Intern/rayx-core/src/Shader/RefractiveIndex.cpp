@@ -94,16 +94,16 @@ NKEntry RAYX_API getNffEntry(int index, int material, const int* __restrict mate
 }
 
 RAYX_FN_ACC
-CromerEntry RAYX_API getCromerEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
+NKEntry RAYX_API getCromerEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     int m = material - 1;  // in [0, 132]
     // materialIndices[266+m] is the start of the Cromer table of material m.
     // 3*index skips 'index'-many entries.
     int i = materialIndices[266 + m] + 3 * index;
 
-    CromerEntry e;
+    NKEntry e;
     e.m_energy = materialTable[i];
-    e.m_f1 = materialTable[i + 1];
-    e.m_f2 = materialTable[i + 2];
+    e.m_n = materialTable[i + 1];
+    e.m_k = materialTable[i + 2];
 
     return e;
 }
@@ -196,25 +196,15 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
             // binary search
             while (high - low > 1) {
                 int center = (low + high) / 2;
-                CromerEntry center_entry = getCromerEntry(center, material, materialIndices, materialTable);
+                NKEntry center_entry = getCromerEntry(center, material, materialIndices, materialTable);
                 if (energy < center_entry.m_energy) {
                     high = center;
                 } else {
                     low = center;
                 }
             }
-
-            // compute n, k from the Cromer data.
-            glm::dvec2 massAndRho = getAtomicMassAndRho(material);
-            double mass = massAndRho.x;
-            double rho = massAndRho.y;
-
-            CromerEntry entry = getCromerEntry(low, material, materialIndices, materialTable);
-            double e = entry.m_energy;
-            double n = 1 - (415.252 * rho * entry.m_f1) / (e * e * mass);
-            double k = (415.252 * rho * entry.m_f2) / (e * e * mass);
-            //RAYX_VERB << "Using CromerEntry: energy=" << entry.m_energy << " f1=" << entry.m_f1 << " f2=" << entry.m_f2;
-            return complex::Complex(n, k);
+            auto entry = getCromerEntry(low, material, materialIndices, materialTable);
+            return complex::Complex(entry.m_n, entry.m_k);
         }    
     } else if (material > 92 && material <= 140) {
         //molecules are not supported yet
