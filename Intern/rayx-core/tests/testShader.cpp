@@ -1264,31 +1264,31 @@ TEST_F(TestSuite, testNff) {
     auto mat = createMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 504);
+    CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 0);
 
     auto Cu0 = getNffEntry(0, Cu, mat.indices.data(), mat.materials.data());
 
-    CHECK_EQ(Cu0.m_energy, 10.0);
-    CHECK_EQ(Cu0.m_f1, -9999.0);
-    CHECK_EQ(Cu0.m_f2, 1.30088);
+    CHECK_EQ(Cu0.m_energy, 5100.0);
+    CHECK_EQ(Cu0.m_n, 0.99993129425779392);
+    CHECK_EQ(Cu0.m_k, 3.2004831386280501e-06);
 
     auto Cu10 = getNffEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_energy, 11.7404);
-    CHECK_EQ(Cu10.m_f1, -9999.0);
-    CHECK_EQ(Cu10.m_f2, 1.66946);
+    CHECK_EQ(Cu10.m_energy, 6100);
+    CHECK_EQ(Cu10.m_n, 0.99995253087645009);
+    CHECK_EQ(Cu10.m_k, 1.6309738816600895e-06);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getNffEntryCount(Au, mat.indices.data()), 506);
+    CHECK_EQ(getNffEntryCount(Au, mat.indices.data()), 0);
 
     auto Au0 = getNffEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_energy, 10.0);
-    CHECK_EQ(Au0.m_f1, -9999.0);
-    CHECK_EQ(Au0.m_f2, 1.73645);
+    CHECK_EQ(Au0.m_energy, 5100.0);
+    CHECK_EQ(Au0.m_n, 0.99993129425779392);
+    CHECK_EQ(Au0.m_k, 3.2004831386280501e-06);
 
     auto Au10 = getNffEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_energy, 11.7404);
-    CHECK_EQ(Au10.m_f1, -9999.0);
-    CHECK_EQ(Au10.m_f2, 2.67227);
+    CHECK_EQ(Au10.m_energy, 6100);
+    CHECK_EQ(Au10.m_n, 0.99995253087645009);
+    CHECK_EQ(Au10.m_k, 1.6309738816600895e-06);
 }
 
 // test cromer tables 
@@ -1299,23 +1299,51 @@ TEST_F(TestSuite, testCromer) {
     CHECK_EQ(getCromerEntryCount(Cu, mat.indices.data()), 450);
 
     auto Cu0 = getCromerEntry(0, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu0.m_f1, 28.455647403258698);
-    CHECK_EQ(Cu0.m_f2, 1.3255343263698971);
+    CHECK_EQ(Cu0.m_f1, 0.99993129425779392);
+    CHECK_EQ(Cu0.m_f2, 3.2004831386280501e-06);
 
     auto Cu10 = getCromerEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_f1, 28.125870077993461);
-    CHECK_EQ(Cu10.m_f2, 0.96636626222754107);
+    CHECK_EQ(Cu10.m_f1, 0.99995253087645009);
+    CHECK_EQ(Cu10.m_f2, 1.6309738816600895e-06);
 
     int Au = static_cast<int>(Material::Au);
     CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 450);
 
     auto Au0 = getCromerEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_f1, 75.80310173166059);
-    CHECK_EQ(Au0.m_f2, 14.68569867739777);
+    CHECK_EQ(Au0.m_f1,  0.9998671803664767);
+    CHECK_EQ(Au0.m_f2, 2.5731785003604815e-05);
 
     auto Au10 = getCromerEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_f1, 76.187030489298166);
-    CHECK_EQ(Au10.m_f2, 11.20875960827477);
+    CHECK_EQ(Au10.m_f1, 0.99990668810059347);
+    CHECK_EQ(Au10.m_f2, 1.3728198124046697e-05);
+}
+
+
+// test molec tables 
+TEST_F(TestSuite, testMolec) {
+    auto mat = createMaterialTables({Material::B4C, Material::SiC});
+
+    int B4C = static_cast<int>(Material::B4C);
+    CHECK_EQ(getMolecEntryCount(B4C, mat.indices.data()), 750);
+
+    auto B4C0 = getMolecEntry(0, B4C, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(B4C0.m_n, 55.250999999999998);
+    CHECK_EQ(B4C0.m_k, 2.52);
+
+    auto B4C10 = getMolecEntry(10, B4C, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(B4C10.m_n, 0.098400000000000001);
+    CHECK_EQ(B4C10.m_k, 33.341799629999997);
+
+    int SiC = static_cast<int>(Material::SiC);
+    CHECK_EQ(getMolecEntryCount(SiC, mat.indices.data()), 124);
+
+    auto SiC0 = getMolecEntry(0, SiC, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(SiC0.m_n,  40.096499999999999);
+    CHECK_EQ(SiC0.m_k, 3.2200000000000002);
+
+    auto SiC10 = getMolecEntry(10, SiC, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(SiC10.m_n, 0.46400000000000002);
+    CHECK_EQ(SiC10.m_k, 5.7999999999999998);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {

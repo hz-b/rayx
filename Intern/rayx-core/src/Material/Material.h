@@ -2,6 +2,7 @@
 
 #include <array>
 #include <vector>
+#include <glm.hpp>
 
 #include "Core.h"
 
@@ -30,6 +31,12 @@ enum class Material {
  **/
 bool materialFromString(const char* matname, Material* out);
 
+struct Materials {
+    int material;
+};
+
+std::vector<Material> RAYX_API allNormalMaterials();
+
 struct RAYX_API MaterialTables {
     std::vector<double> materials;
     std::vector<int> indices;
@@ -39,4 +46,9 @@ struct RAYX_API MaterialTables {
 // the tables will later be written to the mat and matIdx buffers of shader.comp
 MaterialTables RAYX_API loadMaterialTables(std::array<bool, 133> relevantMaterials);
 
-}  // namespace RAYX
+// returns dvec2(atomic mass, density) extracted from materials.xmacro
+glm::dvec2 RAYX_API getAtomicMassAndRho(int material);
+
+void MaterialToNameMap();
+
+}// namespace RAYX

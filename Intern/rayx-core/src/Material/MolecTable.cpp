@@ -1,4 +1,5 @@
-#include "PalikTable.h"
+
+#include "MolecTable.h"
 
 #include <algorithm>
 #include <fstream>
@@ -8,12 +9,13 @@
 
 namespace RAYX {
 
-bool PalikTable::load(const char* element, PalikTable* out) {
+bool MolecTable::load(const char* element, MolecTable* out) {
     std::string elementString = element;
+
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
 
-    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath(std::filesystem::path("Data") / "PALIK" / (elementString + ".NKP"));
-    RAYX_VERB << "Loading PalikTable for " << elementString << " from " << f;
+    std::filesystem::path f = ResourceHandler::getInstance().getResourcePath(std::filesystem::path("Data") / "MOLEC" / (elementString + ".NKM"));
+    RAYX_VERB << "Loading MolecTable from " << f << "." << elementString << " from " << std::filesystem::path("Data") << "MOLEC" << (elementString + ".NKM");
     std::ifstream s(f);
 
     if (s.fail()) {
@@ -22,13 +24,12 @@ bool PalikTable::load(const char* element, PalikTable* out) {
 
     std::string line;
 
-    // ignore first three lines
-    for (int i = 0; i < 3; i++) {
-        std::getline(s, line);
-    }
+    // ignore first line
+    std::getline(s, line);
+    std::getline(s, line);
 
-    // line 4..EOF
-    for (uint32_t lineidx = 4; std::getline(s, line); lineidx++) {
+    // line 2..EOF
+    for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
         if (line.empty()) {
             continue;
         }
@@ -39,7 +40,7 @@ bool PalikTable::load(const char* element, PalikTable* out) {
 #else
         if (sscanf(line.c_str(), "%le %le %le", &e.m_energy, &e.m_n, &e.m_k) != 3) {
 #endif
-            RAYX_WARN << "Failed to parse PalikTable \"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
+            RAYX_WARN << "Failed to parse MolecTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
         out->m_Lines.push_back(e);

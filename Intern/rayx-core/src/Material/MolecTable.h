@@ -3,27 +3,26 @@
 #include <string>
 #include <vector>
 
-// This file defines the NffEntry.
+// This file defines the MolecEntry.
 #include "../Shader/RefractiveIndex.h"
-#include "Material.h"
 
 namespace RAYX {
 /** This struct represents the contents of a .NKP file.
  *
  * Example usage:
  *
- * NffTable cu;
- * bool success = NffTable::load("CU", &cu); // the refractive index
- * table for copper!
+ * Molec SiC2;
+ * bool success = MolecTable::load("SiC2", &csic2); // the refractive index
+ * table for this molecule!
  *
  */
-struct NffTable {
+struct MolecTable {
     std::string m_element;
-    std::vector<NffEntry> m_Lines;
+    std::vector<NKEntry> m_Lines;
 
     /** loads the .NKP file of the element `element` and writes it's contents to
      * `out` */
-    static bool load(const char* element, NffTable* out);
+    static bool load(const char* element, MolecTable* out);
     // double interpolate(double x) const;
 };
 

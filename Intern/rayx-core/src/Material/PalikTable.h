@@ -17,7 +17,7 @@ namespace RAYX {
  */
 struct PalikTable {
     std::string m_element;
-    std::vector<PalikEntry> m_Lines;
+    std::vector<NKEntry> m_Lines;
 
     /** loads the .NKP file of the element `element` and writes it's contents to
      * `out` */
