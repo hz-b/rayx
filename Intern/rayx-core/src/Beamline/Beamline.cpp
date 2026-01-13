@@ -264,13 +264,14 @@ MaterialTables Group::calcMinimalMaterialTables() const {
     relevantMaterials.fill(false);
     for (const auto& elemPtr : elements) {
         auto coating = elemPtr->getCoating();
-        if (coating.is<Coating::OneCoating>()) {
+        std::cout << "Element " << elemPtr->getName() << " coating type: " << "\n";
+        if (coating.is<detail::CoatingTypes::OneCoating>()) {
             int materialcoating = static_cast<int>(elemPtr->getMaterialCoating());
             if (materialcoating >= 1 && materialcoating <= 133) {
                 relevantMaterials[materialcoating - 1] = true;
             }
-        } else if (coating.is<Coating::MultilayerCoating>()) {
-            auto mlCoating = variant::get<Coating::MultilayerCoating>(coating.m_coating);
+        } else if (coating.is<detail::CoatingTypes::MultilayerCoating>()) {
+            auto mlCoating = coating.get<detail::CoatingTypes::MultilayerCoating>();
             for (const auto& mat : mlCoating.material) {
                 if (mat >= 1 && mat <= 133) {
                     relevantMaterials[mat - 1] = true;
