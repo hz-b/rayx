@@ -15,7 +15,7 @@ bool MolecTable::load(const char* element, MolecTable* out) {
     std::transform(elementString.begin(), elementString.end(), elementString.begin(), [](unsigned char c) { return std::toupper(c); });
 
     std::filesystem::path f = ResourceHandler::getInstance().getResourcePath(std::filesystem::path("Data") / "MOLEC" / (elementString + ".NKM"));
-    RAYX_VERB << "Loading MolecTable from " << f << "." << elementString << " from " << std::filesystem::path("Data") << "MOLEC" << (elementString + ".NKM");
+    RAYX_VERB << "Loading MolecTable from " << f;
     std::ifstream s(f);
 
     if (s.fail()) {

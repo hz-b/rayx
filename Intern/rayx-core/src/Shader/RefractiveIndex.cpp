@@ -58,7 +58,7 @@ int RAYX_API getMolecEntryCount(const int material, const int* materialIndices) 
     int m = material - 1;  // in [0, 132]
     // the offset of 266 (== number of materials * 2), skips the palik and nff tables and
     // reaches into the cromer table. the rest of the logic is as above.
-    RAYX_VERB << "Getting MolecEntryCount for material " << material << materialIndices[399 + m + 1] << " - " << materialIndices[399 + m];
+    //RAYX_VERB << "Getting MolecEntryCount for material " << material << materialIndices[399 + m + 1] << " - " << materialIndices[399 + m];
     return (materialIndices[399 + m + 1] - materialIndices[399 + m]) / 4;
 }
 
@@ -128,7 +128,7 @@ RAYX_FN_ACC
 complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* __restrict materialIndices,
                                              const double* __restrict materialTable) {
     
-    RAYX_VERB << "Getting refractive index for material " << material << " at energy " << energy;
+    //RAYX_VERB << "Getting refractive index for material " << material << " at energy " << energy;
 
     if (material == -1) {  // vacuum
         return complex::Complex(1., 0.);
