@@ -218,7 +218,6 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
         }    
     } else if (material > 92 && material <= 140) {
         //molecules are not supported yet
-        RAYX_VERB << "checking for molecule refractive index table for material " << material;
         if(getMolecEntryCount(material, materialIndices) > 0) {
             int low = 0;                                                    // <= energy
             int high = getMolecEntryCount(material, materialIndices) - 1;  // >= energy
