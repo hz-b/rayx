@@ -32,7 +32,7 @@ struct ComplexOf<alpaka::deviceKind::nvidiaGpu> {
 
 template <alpaka::concepts::DeviceKind T_DeviceKind>
 using Complex_t = typename ComplexOf<T_DeviceKind>::type;
-using Complex = Complex_t<alpaka::deviceKind::cpu>;
+using Complex   = Complex_t<alpaka::deviceKind::cpu>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // LocalElectricField
@@ -45,7 +45,6 @@ template <>
 struct LocalElectricFieldOf<alpaka::deviceKind::cpu> {
     using type = math::LocalElectricField;
 }
-
 #ifdef RAYX_CUDA_ENABLED
 template <>
 struct LocalElectricFieldOf<alpaka::deviceKind::nvidiaGpu> {
@@ -55,7 +54,7 @@ struct LocalElectricFieldOf<alpaka::deviceKind::nvidiaGpu> {
 
 template <alpaka::concepts::DeviceKind T_DeviceKind>
 using LocalElectricField_t = typename LocalElectricFieldOf<T_DeviceKind>::type;
-using LocalElectricField = LocalElectricField_t<alpaka::deviceKind::cpu>;
+using LocalElectricField   = LocalElectricField_t<alpaka::deviceKind::cpu>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // ElectricField
@@ -68,7 +67,6 @@ template <>
 struct ElectricFieldOf<alpaka::deviceKind::cpu> {
     using type = math::ElectricField;
 }
-
 #ifdef RAYX_CUDA_ENABLED
 template <>
 struct ElectricFieldOf<alpaka::deviceKind::nvidiaGpu> {

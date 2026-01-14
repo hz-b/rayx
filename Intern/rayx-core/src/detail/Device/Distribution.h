@@ -26,19 +26,16 @@ BakedDistribution toDevice(const host::BakedDistribution<T>& distribution) {
  * device layer functions
  */
 
-ALPAKA_FN_ACC inline
-double process(const SeparateValuesDistribution& distribution, const RandCounter rand) {
+ALPAKA_FN_ACC inline double process(const SeparateValuesDistribution& distribution, const RandCounter rand) {
     return distribution.center - distribution.range * 0.5 +
            randomIntInRange(0, distribution.numValues) / static_cast<double>(distribution.numValues - 1) * distribution.range;
 }
 
-ALPAKA_FN_ACC inline
-double process(const WhiteNoiseDistribution& distribution, const RandCounter rand) {
+ALPAKA_FN_ACC inline double process(const WhiteNoiseDistribution& distribution, const RandCounter rand) {
     return distribution.center + 0.5 * rand.randomDoubleInRange(-distribution.range, distribution.range);
 }
 
-ALPAKA_FN_ACC inline
-double process(const GaussianDistribution& distribution, const RandCounter rand) {
+ALPAKA_FN_ACC inline double process(const GaussianDistribution& distribution, const RandCounter rand) {
     return rand.randomDoubleNormalDistributed(distribution.mean, distribution.standardDeviation);
 }
 
@@ -54,7 +51,8 @@ double process(const GaussianDistribution& distribution, const RandCounter rand)
 // https://stackoverflow.com/questions/24476287/cuda-shared-memory-for-random-number-generation
 // but it needs to be adapted to alpaka
 // also consider vectorization on cpu
-// see e.g. https://developer.arm.com/documentation/100069/0610/Using-SIMD-instructions/Using-SIMD-instructions-in-C-and-C++/Vectorization-in-C-and-C++-code
+// see e.g.
+// https://developer.arm.com/documentation/100069/0610/Using-SIMD-instructions/Using-SIMD-instructions-in-C-and-C++/Vectorization-in-C-and-C++-code
 // for cpu we can use e.g. glm::vec4 or glm::dvec4 for vectorization
 // for gpu we can use e.g. float4 or double4
 // this needs to be tested and benchmarked
@@ -74,16 +72,16 @@ struct SeparateValuesDistributionKernel {
     static constexpr int numElementsPerThread = numElementsPerThread;
 
     ALPAKA_FN_ACC
-    void operator()(const auto& __restrict acc, double* __restrict dst, const SeparateValuesDistribution distribution, const uint64_t seed, const int n) const {
+    void operator()(const auto& __restrict acc, double* __restrict dst, const SeparateValuesDistribution distribution, const uint64_t seed,
+                    const int n) const {
         const int gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-        auto rand = Rand(acc, seed);
+        auto rand     = Rand(acc, seed);
 
-        if (n <= gid * numElementsPerThread)
-            return;
+        if (n <= gid * numElementsPerThread) return;
 
         for (int i = 0; i < numElementsPerThread; ++i) {
             const int idx = gid * numElementsPerThread + i;
-            dst[idx] = process(distribution, rand);
+            dst[idx]      = process(distribution, rand);
         }
     }
 };
@@ -93,16 +91,16 @@ struct WhiteNoiseDistributionKernel {
     static constexpr int numElementsPerThread = numElementsPerThread;
 
     ALPAKA_FN_ACC
-    void operator()(const auto& __restrict acc, double* __restrict dst, const WhiteNoiseDistribution distribution, const uint64_t seed, const int n) const {
+    void operator()(const auto& __restrict acc, double* __restrict dst, const WhiteNoiseDistribution distribution, const uint64_t seed,
+                    const int n) const {
         const int gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-        auto rand = Rand(acc, seed);
+        auto rand     = Rand(acc, seed);
 
-        if (n <= gid * numElementsPerThread)
-            return;
+        if (n <= gid * numElementsPerThread) return;
 
         for (int i = 0; i < numElementsPerThread; ++i) {
             const int idx = gid * numElementsPerThread + i;
-            dst[idx] = process(distribution, rand);
+            dst[idx]      = process(distribution, rand);
         }
     }
 };
@@ -112,16 +110,16 @@ struct GaussianDistributionKernel {
     static constexpr int numElementsPerThread = numElementsPerThread;
 
     ALPAKA_FN_ACC
-    void operator()(const auto& __restrict acc, double* __restrict dst, const GaussianDistribution distribution, const uint64_t seed, const int n) const {
+    void operator()(const auto& __restrict acc, double* __restrict dst, const GaussianDistribution distribution, const uint64_t seed,
+                    const int n) const {
         const int gid = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0];
-        auto rand = Rand(acc, seed);
+        auto rand     = Rand(acc, seed);
 
-        if (n <= gid * numElementsPerThread)
-            return;
+        if (n <= gid * numElementsPerThread) return;
 
         for (int i = 0; i < numElementsPerThread; ++i) {
             const int idx = gid * numElementsPerThread + i;
-            dst[idx] = process(distribution, rand);
+            dst[idx]      = process(distribution, rand);
         }
     }
 };

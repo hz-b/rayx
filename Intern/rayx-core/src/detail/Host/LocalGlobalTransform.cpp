@@ -44,4 +44,4 @@ namespace rayx::detail::host {
 //     return getLocalGlobalTransform(node.getWorldSpacePosition(), node.getWorldSpaceRotation(), designPlane);
 // }
 
-}  // namespace rayx
+}  // namespace rayx::detail::host

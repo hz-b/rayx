@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Design/Design.h"
 #include "Rays.h"
 #include "Tracer.h"
-#include "Design/Design.h"
+
+namespace rayx::trace {}

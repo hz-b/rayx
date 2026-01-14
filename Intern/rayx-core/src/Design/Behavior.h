@@ -9,17 +9,29 @@
 
 namespace rayx::design {
 
+enum class BehindRayBehavior {
+    Ignore,
+    Absorb,
+};
+
 /// Ray does not interact with the element, but records detection.
-struct DetectBehavior {};
+struct DetectBehavior {
+    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
+};
 
-/// Ray does not interact with the element.
-struct IgnoreBehavior {};
+// /// Ray does not interact with the element.
+// struct IgnoreBehavior {};
 
-struct AbsorbBehavior {};
+struct AbsorbBehavior {
+    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
+};
 
 struct ReflectBehavior {
     Material substrate = Material::Si;
+    // double substrateRoughness = 0.0; // TODO: currently not supported
     std::optional<Coating> coating;
+    bool ignoreRaysFromBehind           = false;
+    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
 struct TransmitBehavior {
@@ -27,12 +39,14 @@ struct TransmitBehavior {
     double substrateThickness = 0.1;
     double substrateRoughness = 0.0;
     std::optional<Coating> coating;
+    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
 struct GratingBehavior {
-    std::array<double, 6> vls = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  // VLS coefficients
-    double lineDensity = 0.0;                                    // lines per mm
-    int orderOfDiffraction = 1;                                  // the diffraction order, usually 1
+    std::array<double, 6> vls           = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  // VLS coefficients
+    double lineDensity                  = 0.0;                             // lines per mm
+    int orderOfDiffraction              = 1;                               // the diffraction order, usually 1
+    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
 struct RzpBehavior {
@@ -50,21 +64,23 @@ struct RzpBehavior {
     double designMeridionalExitArmLength     = 0.0;
     double designAlphaAngle                  = 0.0;
     double designBetaAngle                   = 0.0;
+    BehindRayBehavior behindRayBehavior      = BehindRayBehavior::Absorb;
 };
 
 struct CrystalBehavior {
-    double dSpacing2      = 0.0;
-    double unitCellVolume = 0.0;
-    double offsetAngle    = 0.0;
-
-    double structureFactorReF0  = 0.0;
-    double structureFactorImF0  = 0.0;
-    double structureFactorReFH  = 0.0;
-    double structureFactorImFH  = 0.0;
-    double structureFactorReFHC = 0.0;
-    double structureFactorImFHC = 0.0;
+    double dSpacing2                    = 0.0;
+    double unitCellVolume               = 0.0;
+    double offsetAngle                  = 0.0;
+    double structureFactorReF0          = 0.0;
+    double structureFactorImF0          = 0.0;
+    double structureFactorReFH          = 0.0;
+    double structureFactorImFH          = 0.0;
+    double structureFactorReFHC         = 0.0;
+    double structureFactorImFHC         = 0.0;
+    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
-using Behavior = std::variant<DetectBehavior, IgnoreBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
+using Behavior =
+    std::variant<DetectBehavior, IgnoreBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
 
 }  // namespace rayx::design

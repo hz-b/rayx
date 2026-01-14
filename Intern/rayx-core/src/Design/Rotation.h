@@ -66,17 +66,17 @@ inline RotationBase toRotationBase(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationBase(arg); }, rotation);
 }
 
-inline glm::dmat3 toRotationMatrix(const glm::dmat3& rotation) { return rotation; }
+inline glm::dmat3 toMatrix(const glm::dmat3& rotation) { return rotation; }
 
-inline glm::dmat3 toRotationMatrix(const RotationBase& rotation) { return glm::dmat3(rotation.right, rotation.up, rotation.forward); }
+inline glm::dmat3 toMatrix(const RotationBase& rotation) { return glm::dmat3(rotation.right, rotation.up, rotation.forward); }
 
-inline glm::dmat3 toRotationMatrix(const RotationAroundAxis& rotation) {
+inline glm::dmat3 toMatrix(const RotationAroundAxis& rotation) {
     const auto quat = glm::angleAxis(toRadians(rotation.angle).value, rotation.axis);
     return glm::mat3_cast(quat);
 }
 
-inline glm::dmat3 toRotationMatrix(const Rotation& rotation) {
-    return std::visit([](auto&& arg) { return toRotationMatrix(arg); }, rotation);
+inline glm::dmat3 toMatrix(const Rotation& rotation) {
+    return std::visit([](auto&& arg) { return toMatrix(arg); }, rotation);
 }
 
 }  // namespace rayx::design

@@ -3,13 +3,14 @@
 namespace rayx::design {
 
 struct SlopeError {
-    double m_sag;                      ///< Slope error in the sagittal direction, aka `slopeErrorX`.
-    double m_mer;                      ///< Slope error in the meridional direction, aka `slopeErrorZ`.
-    double m_thermalDistortionAmp;     ///< Amplitude of thermal distortion (unused).
-    double m_thermalDistortionSigmaX;  ///< Sigma of thermal distortion in X direction (unused).
-    double m_thermalDistortionSigmaZ;  ///< Sigma of thermal distortion in Z direction (unused).
-    double m_cylindricalBowingAmp;     ///< Amplitude of cylindrical bowing (unused).
-    double m_cylindricalBowingRadius;  ///< Radius of cylindrical bowing (unused).
+    double saggital;    ///< Slope error in the sagittal direction, aka `slopeErrorX`.
+    double meridional;  ///< Slope error in the meridional direction, aka `slopeErrorZ`.
+    // TODO: implement these features in the future
+    // double thermalDistortionAmp;     ///< Amplitude of thermal distortion (unused).
+    // double thermalDistortionSigmaX;  ///< Sigma of thermal distortion in X direction (unused).
+    // double thermalDistortionSigmaZ;  ///< Sigma of thermal distortion in Z direction (unused).
+    // double cylindricalBowingAmp;     ///< Amplitude of cylindrical bowing (unused).
+    // double cylindricalBowingRadius;  ///< Radius of cylindrical bowing (unused).
 };
 
 }  // namespace rayx::design

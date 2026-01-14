@@ -67,4 +67,4 @@ RAYX_FN_ACC inline void terminateRay(EventType& __restrict dstEventType, const E
 //     return static_cast<EventTypeMask>(std::underlying_type_t<EventTypeMask>(1) << static_cast<std::underlying_type_t<EventTypeMask>>(eventType));
 // }
 
-}  // namespace rayx
+}  // namespace rayx::trace

@@ -104,7 +104,7 @@ QuadricCurvature toQuadric(const design::ParabolicCurvature& curvature) {
 }
 
 QuadricCurvature toQuadric(const design::ConicalCurvature& curvature) {
-    double incidence      = design::toRadians(curvature.grazingIncAngle).value;
+    double incidence         = design::toRadians(curvature.grazingIncAngle).value;
     double entranceArmLength = curvature.entranceArmLength;
     double exitArmLength     = curvature.exitArmLength;
 
@@ -171,7 +171,8 @@ QuadricCurvature toQuadric(const design::EllipticalCurvature& curvature) {
     double y0 = 0.0;
     if (longHalfAxisA > shortHalfAxisB) {
         if (designGrazingAngle > 0) {
-            y0 = -std::pow(shortHalfAxisB, 2) * 1 / std::tan(designGrazingAngle) / std::sqrt(std::pow(longHalfAxisA, 2) - std::pow(shortHalfAxisB, 2));
+            y0 =
+                -std::pow(shortHalfAxisB, 2) * 1 / std::tan(designGrazingAngle) / std::sqrt(std::pow(longHalfAxisA, 2) - std::pow(shortHalfAxisB, 2));
         } else {
             y0 = -shortHalfAxisB;
         }
@@ -208,7 +209,8 @@ QuadricCurvature toQuadric(const design::EllipticalCurvature& curvature) {
 
     auto tangentAngle = std::atan(mt);
     auto a22          = std::pow(std::cos(tangentAngle), 2) + std::pow(shortHalfAxisB * std::sin(tangentAngle) / longHalfAxisA, 2);
-    auto a23          = (std::pow(shortHalfAxisB, 2) - std::pow(longHalfAxisA, 2)) * std::cos(tangentAngle) * std::sin(tangentAngle) / std::pow(longHalfAxisA, 2);
+    auto a23 =
+        (std::pow(shortHalfAxisB, 2) - std::pow(longHalfAxisA, 2)) * std::cos(tangentAngle) * std::sin(tangentAngle) / std::pow(longHalfAxisA, 2);
 
     auto a24 = std::pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * std::sin(tangentAngle) + y0 * std::cos(tangentAngle);
     auto a33 = std::pow(std::sin(tangentAngle), 2) + std::pow(shortHalfAxisB * std::cos(tangentAngle) / longHalfAxisA, 2);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <variant>
 #include <numbers>
+#include <variant>
 
 namespace rayx::design {
 
@@ -47,18 +47,12 @@ inline Radians operator"" _rad(long double value) { return Radians{static_cast<d
 
 #include <ostream>
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::design::Degrees degrees) {
-    return os << degrees.value << "(deg)";
-}
+inline std::ostream& operator<<(std::ostream& os, const rayx::design::Degrees degrees) { return os << degrees.value << "(deg)"; }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::design::Radians radians) {
-    return os << radians.value << "(rad)";
-}
+inline std::ostream& operator<<(std::ostream& os, const rayx::design::Radians radians) { return os << radians.value << "(rad)"; }
 
 inline std::ostream& operator<<(std::ostream& os, const rayx::design::Angle angle) {
-    return std::visit([&os](const auto& arg) -> std::ostream& {
-        return os << arg;
-    }, angle);
+    return std::visit([&os](const auto& arg) -> std::ostream& { return os << arg; }, angle);
 }
 
 ////////////////////////////////////////////////////////////
@@ -86,14 +80,16 @@ struct std::formatter<rayx::design::Radians> : std::formatter<double> {
 template <>
 struct std::formatter<rayx::design::Angle> : std::formatter<double> {
     auto format(const rayx::design::Angle angle, auto& ctx) const {
-        return std::visit([&]<typename T>(const T arg) {
-            auto out = std::formatter<double>::format(arg.value, ctx);
+        return std::visit(
+            [&]<typename T>(const T arg) {
+                auto out = std::formatter<double>::format(arg.value, ctx);
 
-            if constexpr (std::is_same_v<T, rayx::design::Degrees>) {
-                 return std::format_to(out, "(deg)");
-            } else {
-                 return std::format_to(out, "(rad)");
-            }
-        }, angle);
+                if constexpr (std::is_same_v<T, rayx::design::Degrees>) {
+                    return std::format_to(out, "(deg)");
+                } else {
+                    return std::format_to(out, "(rad)");
+                }
+            },
+            angle);
     }
 };

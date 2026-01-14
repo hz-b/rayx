@@ -1,5 +1,3 @@
 #include "Tracer.h"
 
-namespace rayx::trace {
-
-}  // namespace rayx
+namespace rayx::trace {}  // namespace rayx::trace

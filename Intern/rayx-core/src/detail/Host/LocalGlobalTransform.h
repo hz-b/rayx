@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Core.h"
 #include <glm/glm.hpp>
+
+#include "Core.h"
 #include "Design/Beamline.h"
 
 namespace rayx::detail::host {
@@ -36,4 +37,4 @@ struct RAYX_API LocalGlobalTransform {
 //  */
 // RAYX_API LocalGlobalTransform getLocalGlobalTransform(const Beamline& node);
 
-}  // namespace rayx
+}  // namespace rayx::detail::host

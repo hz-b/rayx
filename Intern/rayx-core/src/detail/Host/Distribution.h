@@ -50,11 +50,11 @@ GaussianDistribution toDevice(TCtx&, const design::GaussianDistribution<T>& dist
 template <Ctx_c TCtx, typename T>
 BakedDistribution<TCtx> toDevice(TCtx& ctx, const design::BakedDistribution<T>& distribution) {
     assert(distribution.values.size() > 0 && "BakedDistribution must have at least one value");
-    assert(!distribution.weights || distribution.weights->size() == distribution.values.size()
-           && "BakedDistribution weights size must match values size");
+    assert(!distribution.weights ||
+           distribution.weights->size() == distribution.values.size() && "BakedDistribution weights size must match values size");
 
-    const int size = static_cast<int>(distribution.values.size());
-    const auto d_values = ctx.alloc<double>(size);
+    const int size       = static_cast<int>(distribution.values.size());
+    const auto d_values  = ctx.alloc<double>(size);
     const auto d_weights = ctx.alloc<double>(size);
 
     alpaka::memcpy(ctx.accDev(), alpaka::getPtrNative(d_values), alpaka::createView(ctx.hostDev(), distribution.values.data(), size), size);

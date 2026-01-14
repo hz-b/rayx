@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "Core.h"
-#include "Math/ElectricField.h"
 #include "EventType.h"
+#include "Math/ElectricField.h"
 
 // TODO
 using RandCounter = uint64_t;
