@@ -1,46 +1,20 @@
 #pragma once
 
-#include "Translation.h"
 #include "Rotation.h"
+#include "Translation.h"
 
 namespace rayx::design {
 
-struct Transform {
-    Translation translation;
-    Rotation rotation;
-};
+glm::dmat4 operator*(const glm::dmat4& mat, const Translation& translation);
+glm::dmat4 operator*(const Translation& translation, const glm::dmat4& mat);
+glm::dmat4 operator*(const glm::dmat4& mat, const Rotation& rotation);
+glm::dmat4 operator*(const Rotation& rotation, const glm::dmat4& mat);
+glm::dmat4 operator*(const Translation& t1, const Translation& t2);
+glm::dmat4 operator*(const Rotation& r1, const Rotation& r2);
+glm::dmat4 operator*(const Translation& translation, const Rotation& rotation);
+glm::dmat4 operator*(const Rotation& rotation, const Translation& translation);
 
-// struct TranslationRotation {
-//     Translation translation;
-//     Rotation rotation;
-// };
-//
-// using Transform = std::variant<TranslationRotaiton, glm::dmat4>;
-//
-// TranslationRotation toTranslationRotation(const TranslationRotation& translationRotation) {
-//     return translationRotation;
-// }
-//
-// TranslationRotation toTranslationRotation(const glm::dmat4 mat) {
-//     // TODO
-// }
-//
-// TranslationRotation toTranslationRotation(const Transform& transform) {
-//     return std::visit([] (const auto& alt) { return toTranslationRotation(alt); }, transform);
-// }
-//
-// glm::dmat4 toMatrix(const TranslationRotation& translationRotation) {
-//     const auto translation = glm::translate(glm::dmat4(1.0f), translationRotation.translation);
-//     const auto rotation = translationRotation.rotation;
-//     return translation * rotation;
-// }
-//
-// glm::dmat4 toMatrix(const glm::dmat4& mat) {
-//     return mat;
-// }
-//
-// glm::dmat4 toMatrix(const Transform& transform) {
-//     return std::visit([] (const auto& alt) { return toMatrix(alt); }, transform);
-// }
+glm::dvec4 operator*(const Translation& translation, const glm::dvec4& vec);
+glm::dvec4 operator*(const Translation& Rotation, const glm::dvec4& vec);
 
 }  // namespace rayx::design

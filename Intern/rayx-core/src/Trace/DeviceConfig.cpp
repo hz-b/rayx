@@ -204,4 +204,4 @@ DeviceConfig::DeviceType DeviceConfig::availableDeviceTypes() {
     return deviceType;
 }
 
-}  // namespace rayx
+}  // namespace rayx::trace

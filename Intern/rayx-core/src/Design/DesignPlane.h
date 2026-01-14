@@ -47,8 +47,6 @@ RAYX_API DesignPlane getDesignPlane(const Behavior& behavior) {
     return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, behavior);
 }
 
-RAYX_API DesignPlane getDesignPlane(const SurfaceElement& element) {
-    return getDesignPlane(element.behavior);
-}
+RAYX_API DesignPlane getDesignPlane(const SurfaceElement& element) { return getDesignPlane(element.behavior); }
 
 }  // namespace rayx::design

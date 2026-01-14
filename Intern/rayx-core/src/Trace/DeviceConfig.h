@@ -55,4 +55,4 @@ struct RAYX_API DeviceConfig {
     DeviceType m_fetchedDeviceType;
 };
 
-}  // namespace rayx
+}  // namespace rayx::trace

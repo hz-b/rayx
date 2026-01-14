@@ -138,7 +138,7 @@ Rays Rays::filterByLastEventInPath() const {
     const auto attr = attrMask();
     Rays result;
 #define X(type, name, flag)                                                                                           \
-    if (trace::contains(attr, RayAttrMask::flag)) {                                                                    \
+    if (trace::contains(attr, RayAttrMask::flag)) {                                                                   \
         result.name.resize(indices.size());                                                                           \
         std::transform(indices.begin(), indices.end(), result.name.begin(), [this](const int i) { return name[i]; }); \
     }
@@ -168,4 +168,4 @@ bool operator==(const Rays& lhs, const Rays& rhs) {
 
 bool operator!=(const Rays& lhs, const Rays& rhs) { return !(lhs == rhs); }
 
-}  // namespace rayx
+}  // namespace rayx::trace

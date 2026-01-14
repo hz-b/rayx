@@ -14,7 +14,7 @@ struct CoatingLayer {
 
 struct PeriodicCoating {
     std::vector<CoatingLayer> layers = {CoatingLayer()};
-    int numPeriods                 = 1;
+    int numPeriods                   = 1;
 };
 
 struct Coating {

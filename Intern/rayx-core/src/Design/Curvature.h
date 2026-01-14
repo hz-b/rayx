@@ -67,20 +67,20 @@ struct EllipticalCurvature {
 };
 
 struct ConicalCurvature {
-    Angle grazingIncAngle     = Radians(0.0);
-    double entranceArmLength  = 0.0;
-    double exitArmLength      = 0.0;
-    double totalLength        = 0.0;
+    Angle grazingIncAngle    = Radians(0.0);
+    double entranceArmLength = 0.0;
+    double exitArmLength     = 0.0;
+    double totalLength       = 0.0;
 };
 
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 
 struct CylindricalCurvature {
-    CylinderDirection direction  = CylinderDirection::LongRadiusR;
-    double radius                = 0.0;
-    Angle grazingIncAngle        = Radians(0.0);
-    double entranceArmLength     = 0.0;
-    double exitArmLength         = 0.0;
+    CylinderDirection direction = CylinderDirection::LongRadiusR;
+    double radius               = 0.0;
+    Angle grazingIncAngle       = Radians(0.0);
+    double entranceArmLength    = 0.0;
+    double exitArmLength        = 0.0;
 };
 
 struct SphericalCurvature {

@@ -8,36 +8,95 @@
 #include <variant>
 #include <vector>
 
-#include "Source.h"
 #include "Element.h"
-#include "Translation.h"
 #include "Rotation.h"
+#include "Source.h"
+#include "Translation.h"
 
 namespace rayx::design {
 
+struct EmptyNode;
 struct SourceNode;
 struct ElementNode;
 struct TranslateNode;
 struct RotateNode;
+struct Beamline;
 
-using NodePtr = std::variant<
-    std::shared_ptr<SourceNode>,
-    std::shared_ptr<ElementNode>,
-    std::shared_ptr<TranslateNode>,
-    std::shared_ptr<RotateNode>
->;
+using NodePtr = std::variant<std::shared_ptr<EmptyNode>, std::shared_ptr<SourceNode>, std::shared_ptr<ElementNode>, std::shared_ptr<TranslateNode>, std::shared_ptr<RotateNode>>;
 
-namespace detail {
+enum class SubBeamlineBehavior {
+    Reference,
+    CopyNodes,
+    CopyNodesSourcesElements,
+};
+
+// TODO: consider polymorphic approach instead of variant + visit
+struct NodeAdapter {
+    NodePtr node;
+
+    ////////////////////////////////////////////////////////////
+    // accessors
+    ////////////////////////////////////////////////////////////
+
+    NodeAdapter getNode(std::string_view name) const { return std::visit([&](auto&& arg) { return arg.getNode(name); }, node); }
+    NodeAdapter operator[](std::string_view name) const;
+
+    SourcePtr getSource(std::string_view name) const;
+    ElementPtr getElement(std::string_view name) const;
+    std::shared_ptr<Rotation> getRotation(std::string_view name) const;
+    std::shared_ptr<Translation> getTranslation(std::string_view name) const;
+
+    ////////////////////////////////////////////////////////////
+    // modifiers
+    ////////////////////////////////////////////////////////////
+
+    std::shared_ptr<EmptyNode> append(std::string_view name, Beamline beamline, SubBeamlineBehavior behavior = SubBeamlineBehavior::Reference);
+
+    std::shared_ptr<SourceNode> append(std::string_view name, Source source);
+    std::shared_ptr<SourceNode> append(std::string_view name, SourcePtr source);
+
+    std::shared_ptr<ElementNode> append(std::string_view name, Element element);
+    std::shared_ptr<ElementNode> append(std::string_view name, ElementPtr element);
+
+    std::shared_ptr<TranslateNode> append(Translation translation);
+    std::shared_ptr<TranslateNode> append(std::shared_ptr<Translation> translation);
+    std::shared_ptr<TranslateNode> append(std::string_view name, Translation translation);
+    std::shared_ptr<TranslateNode> append(std::string_view name, std::shared_ptr<Translation> translation);
+
+    std::shared_ptr<RotateNode> append(Rotation rotation);
+    std::shared_ptr<RotateNode> append(std::shared_ptr<Rotation> rotation);
+    std::shared_ptr<RotateNode> append(std::string_view name, Rotation rotation);
+    std::shared_ptr<RotateNode> append(std::string_view name, std::shared_ptr<Rotation> rotation);
+
+    void remove(std::string_view name);
+    void remove(NodePtr node);
+};
 
 struct NodeBase {
     std::string name;
     std::vector<NodePtr> children = {};
 
-    std::shared_ptr<SourceNode> append(std::shared_ptr<SourceNode> node);
-    std::shared_ptr<ElementNode> append(std::shared_ptr<ElementNode> node);
-    std::shared_ptr<TranslateNode> append(std::shared_ptr<TranslateNode> node);
-    std::shared_ptr<RotateNode> append(std::shared_ptr<RotateNode> node);
-    NodePtr append(NodePtr node);
+    ////////////////////////////////////////////////////////////
+    // accessors
+    ////////////////////////////////////////////////////////////
+
+    const NodeAdapter getNode(std::string_view name);
+    NodeAdapter getNode(std::string_view name) const;
+    NodeAdapter operator[](std::string_view name) const;
+
+    SourcePtr getSource(std::string_view name) const;
+    ElementPtr getElement(std::string_view name) const;
+    std::shared_ptr<Rotation> getRotation(std::string_view name) const;
+    std::shared_ptr<Translation> getTranslation(std::string_view name) const;
+
+    NodeAdapter copy() const;
+    NodeAdapter copy(std::string_view name) const;
+
+    ////////////////////////////////////////////////////////////
+    // modifiers
+    ////////////////////////////////////////////////////////////
+
+    std::shared_ptr<EmptyNode> append(std::string_view name, Beamline beamline);
 
     std::shared_ptr<SourceNode> append(std::string_view name, Source source);
     std::shared_ptr<SourceNode> append(std::string_view name, SourcePtr source);
@@ -51,19 +110,13 @@ struct NodeBase {
     std::shared_ptr<RotateNode> append(Rotation rotation);
     std::shared_ptr<RotateNode> append(std::string_view name, Rotation rotation);
 
-    NodePtr getNode(std::string_view name) const;
-    std::shared_ptr<SourceNode> getNodeSource(std::string_view name) const;
-    std::shared_ptr<ElementNode> getNodeElement(std::string_view name) const;
-    std::shared_ptr<TranslateNode> getNodeTranslate(std::string_view name) const;
-    std::shared_ptr<RotateNode> getNodeRotate(std::string_view name) const;
-
-    void removeNode(NodePtr node);
+    void remove(std::string_view name);
 };
 
-}  // namespace detail
+struct EmptyNode : NodeBase {};
 
-struct SourceNode : detail::NodeBase {
-    SourcePtr source; // TODO: do we want this to be a pointer or value?
+struct SourceNode : NodeBase {
+    SourcePtr source;
 
     // TODO: distance to preceeding source or element based on the beam coords.
     // NOTE: beam coords = direction and rotation around direction
@@ -77,33 +130,36 @@ struct SourceNode : detail::NodeBase {
     // doing this requires a source that emits the ray from its coordinates. options to pick the source
     // -> when going up the tree, use first encountered source
     // -> when going up the tree, use last encountered source
-    // -> use a specific source (most versatile approach). to simplifiy the api, the beamline building process could assume/enforce a source as root node and then use that unless specified explicitly
+    // -> use a specific source (most versatile approach). to simplifiy the api, the beamline building process could assume/enforce a source as root
+    // node and then use that unless specified explicitly
     //
     // there are two potentially useful implementations. i think both have their use cases, so maybe we want to implement both
     /// convert local beam coordinates to relative rotation -> append rotate node
     /// this way, future mutations that would affect the beam coords, DO NOT affect the relative rotation
     /// error detection can occur immediately
-    // RotateNode& appendRotateToBeamCoordsImmediate(std::string_view name = {});
+    // RotateNode& appendRotateToBeAlongBeamCoordsImmediate(std::string_view name = {});
     /// evaluate local beam coordinates just before tracing, and convert to relative rotation that is only used in the tracer
     /// this way, future mutations that would affect the beam coords, DO affect the relative rotation
     /// error detection can occur when trying to trace
     // RotateToBeamCoordsNode& appendRotateToBeamCoordsDeferred(std::string_view name = {);
 };
 
-struct ElementNode : detail::NodeBase {
-    ElementPtr element; // TODO: do we want this to be a pointer or value?
+struct ElementNode : NodeBase {
+    ElementPtr element;
 };
 
-struct TranslateNode : detail::NodeBase {
-    Translation translation;
+struct TranslateNode : NodeBase {
+    std::shared_ptr<Translation> translation;
+    bool inverse = false;
 };
 
-struct RotateNode : detail::NodeBase {
-    Rotation rotation;
+struct RotateNode : NodeBase {
+    std::shared_ptr<Rotation> rotation;
+    bool inverse = false;
 };
 
-struct Beamline : detail::NodeBase {
-    Beamline() : detail::NodeBase({.name = "root"}) {}
+struct Beamline : NodeBase {
+    Beamline(std::string_view name) : NodeBase({.name = name}) {}
 
     glm::dvec3 getNodeAbsolutePosition(std::string_view name) const;
     RotationAroundAxis getNodeAbsoluteRotation(std::string_view name) const;
@@ -111,6 +167,8 @@ struct Beamline : detail::NodeBase {
     int getNodeSourceId(std::string_view name) const;
     int getNodeElementId(std::string_view name) const;
     int getNodeObjectId(std::string_view name) const;
+
+    Beamline copy(std::string_view name) const;
 };
 
 }  // namespace rayx::design

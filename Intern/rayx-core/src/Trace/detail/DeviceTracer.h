@@ -22,4 +22,4 @@ class RAYX_API DeviceTracer {
                        const int maxEvents, const int maxBatchSize) = 0;
 };
 
-}  // namespace rayx
+}  // namespace rayx::trace::detail

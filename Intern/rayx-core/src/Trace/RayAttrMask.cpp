@@ -42,4 +42,4 @@ RayAttrMask rayAttrStringsToRayAttrMask(const std::vector<std::string>& strings)
     return attr;
 }
 
-}  // namespace rayx
+}  // namespace rayx::trace

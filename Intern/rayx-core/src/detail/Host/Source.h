@@ -54,7 +54,6 @@ struct SimpleDistributionKernel {
 Allocation<double> process(const auto& devAcc, const auto& q, const SimpleDistribution& distribution, Allocator& allocator, const int n,
                            RandCounter* randCounters) {}
 
-
 template <Ctx_c TCtx>
 Buf_t<TCtx, double> process(TCtx& ctx, Que_c auto& que, const design::Distribution<double>& distribution, RandCounter* randCounters, int n) {
     return std::visit([&](const auto& dist) { return process(ctx, que, toHost(dist), randCounters, n); }, distribution);

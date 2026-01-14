@@ -29,13 +29,7 @@ struct BakedDistribution {
 };
 
 template <typename T>
-using Distribution = std::variant<
-    T,
-    SeparateValues<T>,
-    WhiteNoiseDistribution<T>,
-    GaussianDistribution<T>,
-    std::shared_ptr<BakedDistribution<T>>
->;
+using Distribution = std::variant<T, SeparateValues<T>, WhiteNoiseDistribution<T>, GaussianDistribution<T>, std::shared_ptr<BakedDistribution<T>>>;
 
 template <typename T>
 struct Sphere {

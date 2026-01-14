@@ -5,12 +5,11 @@
 ////////////////////////////////////////////////////////////
 
 #include "Core.h"
-
 #include "Design/Design.h"
-#include "Trace/Trace.h"
-#include "Math/Math.h"
 #include "IO/IO.h"
+#include "Math/Math.h"
 #include "Misc/Misc.h"
+#include "Trace/Trace.h"
 
 ////////////////////////////////////////////////////////////
 // namespace aggregation
@@ -27,11 +26,11 @@ using namespace misc;
 
 // re-export literals
 namespace literals {
-    using namespace design::literals;
-    using namespace tracer::literals;
-    using namespace math::literals;
-    using namespace io::literals;
-    using namespace misc::literals;
-}
+using namespace design::literals;
+using namespace tracer::literals;
+using namespace math::literals;
+using namespace io::literals;
+using namespace misc::literals;
+}  // namespace literals
 
-} // namespace rayx
+}  // namespace rayx

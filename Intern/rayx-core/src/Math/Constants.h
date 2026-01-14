@@ -1,6 +1,7 @@
 #pragma once
 
 #include <numbers>
+
 #include "Core.h"
 
 namespace rayx::math::constants {
@@ -48,4 +49,4 @@ constexpr double electric_permitivity_multiplies_speed_of_light = 2.654418727992
 constexpr double electron_radius = 2.8179403205e-6;  // classical electron radius (nm)
 // constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical electron radius in nm
 
-}  // namespace rayx
+}  // namespace rayx::math::constants

@@ -5,17 +5,17 @@
 #include <string>
 #include <variant>
 
-#include "Distribution.h"
 #include "Angle.h"
-#include "Trace/Rays.h"
+#include "Distribution.h"
 #include "PhotonEnergy.h"
 #include "Polarization.h"
+#include "Trace/Rays.h"
 
 namespace rayx::design {
 
 namespace defaults {
-constexpr int numRays                                             = 100000;
-constexpr SeparateValues<double> circleSourceRadius               = {.center = 0.0, .range = 1.0, .numValues = 10};
+constexpr int numRays                               = 100000;
+constexpr SeparateValues<double> circleSourceRadius = {.center = 0.0, .range = 1.0, .numValues = 10};
 constexpr PhotonEnergy photonEnergy                 = ElectronVolt{300.0};
 }  // namespace defaults
 
@@ -54,17 +54,17 @@ enum class UndulatorSigmaType { Standard, Accurate };
 // TODO: sensible defaults
 struct SimpleUndulatorSource {
     std::optional<std::string> name;
-    int numRays                  = defaults::numRays;
-    UndulatorSigmaType sigmaType = UndulatorSigmaType::Standard;
-    double undulatorLength       = 1.0;
-    double electronSigmaX        = 0.0;
-    double electronSigmaXs       = 0.0;
-    double electronSigmaY        = 0.0;
-    double electronSigmaYs       = 0.0;
-    double depth                 = 0.0;
-    Polarization polarization    = defaults::polarization;
-    PhotonEnergy photonEnergy    = defaults::photonEnergy;  // TODO: this is weird, because PhotonEnergy is potentially redundant to energy
-    Distribution<PhotonEnergy> energy          = defaults::photonEnergy;
+    int numRays                       = defaults::numRays;
+    UndulatorSigmaType sigmaType      = UndulatorSigmaType::Standard;
+    double undulatorLength            = 1.0;
+    double electronSigmaX             = 0.0;
+    double electronSigmaXs            = 0.0;
+    double electronSigmaY             = 0.0;
+    double electronSigmaYs            = 0.0;
+    double depth                      = 0.0;
+    Polarization polarization         = defaults::polarization;
+    PhotonEnergy photonEnergy         = defaults::photonEnergy;  // TODO: this is weird, because PhotonEnergy is potentially redundant to energy
+    Distribution<PhotonEnergy> energy = defaults::photonEnergy;
 };
 
 // TODO: sensible defaults
@@ -75,11 +75,11 @@ struct PixelSource {
     double horizontalDivergenc = 0.0;
     double verticalDivergence  = 0.0;
     // TODO: change to VolumetricScalarDistribution ? depends on how PixelSource works
-    double width              = 0.0;
-    double height             = 0.0;
-    double depth              = 0.0;
-    Polarization polarization = defaults::polarization;
-    Distribution<PhotonEnergy> energy       = defaults::photonEnergy;
+    double width                      = 0.0;
+    double height                     = 0.0;
+    double depth                      = 0.0;
+    Polarization polarization         = defaults::polarization;
+    Distribution<PhotonEnergy> energy = defaults::photonEnergy;
 };
 
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
@@ -109,24 +109,10 @@ struct InputSource {
     std::optional<Polarization> rayPolarization;
 };
 
-using Source = std::variant<
-    PointSource,
-    MatrixSource,
-    CircleSource,
-    SimpleUndulatorSource,
-    PixelSource,
-    DipoleSource,
-    InputSource
->;
+using Source = std::variant<PointSource, MatrixSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
 
-using SourcePtr = std::variant<
-    std::shared_ptr<PointSource>,
-    std::shared_ptr<MatrixSource>,
-    std::shared_ptr<CircleSource>,
-    std::shared_ptr<SimpleUndulatorSource>,
-    std::shared_ptr<PixelSource>,
-    std::shared_ptr<DipoleSource>,
-    std::shared_ptr<InputSource>
->;
+using SourcePtr =
+    std::variant<std::shared_ptr<PointSource>, std::shared_ptr<MatrixSource>, std::shared_ptr<CircleSource>, std::shared_ptr<SimpleUndulatorSource>,
+                 std::shared_ptr<PixelSource>, std::shared_ptr<DipoleSource>, std::shared_ptr<InputSource>>;
 
 }  // namespace rayx::design
