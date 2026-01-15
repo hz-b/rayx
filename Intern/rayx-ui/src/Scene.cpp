@@ -99,7 +99,8 @@ std::vector<Scene::RenderObjectInput> Scene::getRObjectInputs(const rayx::Beamli
             triangulateObject(compiled[i].element, vertices, indices);
         } catch (const std::exception& ex) {
             RAYX_WARN << ex.what() << ". Object \"" << elements[i]->getName()
-                      << "\" can't be rendered due to triangulation issues. Make sure it is defined correctly in the RML file.";
+                      << "\" can't be rendered due to triangulation issues. Make sure it is defined correctly in the "
+                         "RML file.";
             continue;  // Input is not generated --> Object won't be built/rendered
         }
 

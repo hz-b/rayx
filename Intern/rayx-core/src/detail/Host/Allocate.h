@@ -29,7 +29,8 @@ class Allocation {
     T* m_p;
 };
 
-// Simple memory allocator that reuses freed blocks. Can be replaced by a Red-Black tree or similar for better performance.
+// Simple memory allocator that reuses freed blocks. Can be replaced by a Red-Black tree or similar for better
+// performance.
 class Allocator {
   public:
     template <typename T>

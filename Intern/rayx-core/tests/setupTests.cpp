@@ -180,7 +180,8 @@ Rays traceRmlAndMakeCompatibleWithRayUi(std::string filename, Sequential seq) {
         const auto element_id = rays.object_id[i] - numSources;
         const auto behaviour  = elements[element_id].element.m_behaviour;
         if (behaviour.is<Behaviour::ImagePlane>() || behaviour.is<Behaviour::Slit>() || behaviour.is<Behaviour::Foil>()) {
-            // these elements have their local z axis along the beam direction, so we need to swap y and z to match Ray-UI
+            // these elements have their local z axis along the beam direction, so we need to swap y and z to match
+            // Ray-UI
             std::swap(rays.position_y[i], rays.position_z[i]);
             std::swap(rays.direction_y[i], rays.direction_z[i]);
         }

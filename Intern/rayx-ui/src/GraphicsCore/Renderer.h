@@ -13,7 +13,8 @@
 class Texture;
 
 /**
- * @brief The Renderer class manages the rendering process, including the swapchain, command buffers, and ImGui integration.
+ * @brief The Renderer class manages the rendering process, including the swapchain, command buffers, and ImGui
+ * integration.
  */
 class Renderer {
   public:

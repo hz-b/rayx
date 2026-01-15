@@ -18,7 +18,8 @@ TEST_F(TestSuite, SphereGrating) { traceRmlAndCompareAgainstRayUi("SphereGrating
 TEST_F(TestSuite, ToroidGrating) { traceRmlAndCompareAgainstRayUi("ToroidGrating", 1e-12, Sequential::Yes); }
 
 // In these tests the ray would hit the ImagePlane before the PlaneGrating, if we trace dynamically.
-// This prevents comparing the results to Ray-UI, and hence we do sequential tracing here to allow for such a comparison.
+// This prevents comparing the results to Ray-UI, and hence we do sequential tracing here to allow for such a
+// comparison.
 TEST_F(TestSuite, PlaneGratingDeviationDefault) { traceRmlAndCompareAgainstRayUi("PlaneGratingDeviationDefault", 1e-12, Sequential::Yes); }
 TEST_F(TestSuite, PlaneGratingDeviationAz) { traceRmlAndCompareAgainstRayUi("PlaneGratingDeviationAz", 1e-9, Sequential::Yes); }
 TEST_F(TestSuite, PlaneGratingDeviationAzMis) { traceRmlAndCompareAgainstRayUi("PlaneGratingDeviationAzMis", 1e-12, Sequential::Yes); }
@@ -37,7 +38,8 @@ TEST_F(TestSuite, ReflectionZonePlateDefault200) { traceRmlAndCompareAgainstRayU
 
 // TODO re-enable this test:
 // It seems to be caused by imprecision in the current toroid collision being larger than the COLLISION_EPSILON.
-// TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) { traceRmlAndCompareAgainstRayUi("ReflectionZonePlateDefault200Toroid", 1e-7); }
+// TEST_F(TestSuite, ReflectionZonePlateDefault200Toroid) {
+// traceRmlAndCompareAgainstRayUi("ReflectionZonePlateDefault200Toroid", 1e-7); }
 
 TEST_F(TestSuite, ReflectionZonePlateMis) { traceRmlAndCompareAgainstRayUi("ReflectionZonePlateMis", 1e-7); }
 

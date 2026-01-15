@@ -12,8 +12,8 @@ namespace rayx::trace {
 /**
  * @brief A structure representing a collection of rays and their attributes.
  * Each attribute is stored as a vector, allowing for efficient storage and manipulation of multiple rays.
- * The Rays structure supports move semantics for efficient transfers, but disables copy semantics to prevent accidental costly copies.
- * Use the `copy()` method to create an explicit copy when needed.
+ * The Rays structure supports move semantics for efficient transfers, but disables copy semantics to prevent accidental
+ * costly copies. Use the `copy()` method to create an explicit copy when needed.
  * @note Ensure that all attribute vectors are of the same length to maintain data integrity.
  */
 struct RAYX_API Rays {
@@ -59,7 +59,8 @@ struct RAYX_API Rays {
     /**
      * @brief Create a copy of the Rays instance.
      * This function is an explicit copy of the Rays instance to avoid accidental costly copies.
-     * If you want to return a Rays instance from a function, you should make use of RVO/NRVO optimizations, instead of using this function.
+     * If you want to return a Rays instance from a function, you should make use of RVO/NRVO optimizations, instead of
+     * using this function.
      * @return A new Rays instance that is a copy of the current instance.
      */
     [[nodiscard]] Rays copy() const;
@@ -74,7 +75,8 @@ struct RAYX_API Rays {
      * @brief Check if a specific attribute is recorded in this Rays instance.
      * @param attr The RayAttrMask attribute to check.
      * @return True if the attribute is recorded, false otherwise.
-     * @note When repeatedly checking on the same Rays instance, the free function contains(haystack, needle) should be preferred over this method.
+     * @note When repeatedly checking on the same Rays instance, the free function contains(haystack, needle) should be
+     * preferred over this method.
      */
     bool contains(const RayAttrMask attr) const;
 
@@ -121,19 +123,20 @@ struct RAYX_API Rays {
     [[nodiscard]] Rays sortByObjectId() const;
 
     /**
-     * @brief Sort rays by path_id and then by path_event_id, so that rays belonging to the same path are grouped together,
-     * and within each path, rays are ordered by their event sequence.
+     * @brief Sort rays by path_id and then by path_event_id, so that rays belonging to the same path are grouped
+     * together, and within each path, rays are ordered by their event sequence.
      * @return A new Rays instance with rays sorted by path_id and path_event_id.
      * @note Requires that path_id and path_event_id are recorded.
-     * @note Every event is uniquely identified by the combination of path_id and path_event_id. Thus, sorting by these two attributes
-     * ensures that rays are in a well-defined order. This enables equality comparisons between different Rays instances.
+     * @note Every event is uniquely identified by the combination of path_id and path_event_id. Thus, sorting by these
+     * two attributes ensures that rays are in a well-defined order. This enables equality comparisons between different
+     * Rays instances.
      */
     [[nodiscard]] Rays sortByPathIdAndPathEventId() const;
 
     /**
      * @brief Sort rays using a custom comparison function.
-     * The comparison function should take two indices (int) and return true if the first index should come before the second.
-     * This method can be used to implement custom sorting logic, such as sorting by multiple attributes.
+     * The comparison function should take two indices (int) and return true if the first index should come before the
+     * second. This method can be used to implement custom sorting logic, such as sorting by multiple attributes.
      * @tparam Compare A callable type that defines the comparison function.
      * @param comp The comparison function to use for sorting. Must satisfy the requirements of Compare, see
      * https://en.cppreference.com/w/cpp/named_req/Compare. This is the same as for std::sort.
@@ -144,8 +147,8 @@ struct RAYX_API Rays {
      * // sort by path_id.
      * rays = rays.sort([&](int lhs, int rhs) { return rays.path_id[lhs] < rays.path_id[rhs]; });
      * // sort by path_id and then by path_event_id.
-     * rays = rays.sort([&](int lhs, int rhs) { if (rays.path_id[lhs] == rays.path_id[rhs]) return rays.path_id[lhs] < rays.path_id[rhs]; else return
-     * rays.path_event_id[lhs] < rays.path_event_id[rhs]; });
+     * rays = rays.sort([&](int lhs, int rhs) { if (rays.path_id[lhs] == rays.path_id[rhs]) return rays.path_id[lhs] <
+     * rays.path_id[rhs]; else return rays.path_event_id[lhs] < rays.path_event_id[rhs]; });
      * ```
      */
     template <typename Compare>
@@ -177,7 +180,8 @@ struct RAYX_API Rays {
     /**
      * @brief Filter the rays using a custom predicate function.
      * The predicate function should take an index (int) and return true if the ray at that index should be included.
-     * This method can be used to implement custom filtering logic, such as filtering by multiple attributes or complex conditions.
+     * This method can be used to implement custom filtering logic, such as filtering by multiple attributes or complex
+     * conditions.
      * @tparam Pred A callable type that defines the predicate function.
      * @param pred The predicate function to use for filtering.
      * @return A new Rays instance containing only rays for which the predicate returns true.
@@ -192,7 +196,8 @@ struct RAYX_API Rays {
 
     /**
      * @brief Count the number of rays that satisfy a given predicate function.
-     * The predicate function should take an index (int) and return true if the ray at that index satisfies the condition.
+     * The predicate function should take an index (int) and return true if the ray at that index satisfies the
+     * condition.
      * @tparam Pred A callable type that defines the predicate function.
      * @param pred The predicate function to use for counting.
      * @return The number of rays for which the predicate returns true.

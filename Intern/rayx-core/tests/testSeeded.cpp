@@ -4,7 +4,8 @@
 // This module tests beamlines with randomness.
 // As it's hard to check strict properties for a randomly generated output, we choose a fixed seed approach.
 //
-// in this module tests mostly compare rayx's output with an older "correct" output from rayx, which was manually checked by a physicist.
+// in this module tests mostly compare rayx's output with an older "correct" output from rayx, which was manually
+// checked by a physicist.
 //
 // Whenever something in the randomness changes, the test will fail and needs to be manually reevaluated.
 // In that case, also the corresponding .csv file needs to be updated.

@@ -6,11 +6,13 @@ namespace rayx::detail::host {
 
 // TODO: implement using TranslateNode and RotateNode
 
-// LocalGlobalTransform getLocalGlobalTransform(const glm::dvec3& position, const Rotation& rotation, const DesignPlane plane) {
+// LocalGlobalTransform getLocalGlobalTransform(const glm::dvec3& position, const Rotation& rotation, const DesignPlane
+// plane) {
 //     const auto translationLocalToGlobal = glm::translate(glm::dmat4(1.0), position);
 //     const auto translationGlobalToLocal = glm::translate(glm::dmat4(1.0), -position);
 //     const auto rotationLocalToGlobal    = glm::dmat4(toRotationMatrix(rotation));
-//     const auto rotationGlobalToLocal    = glm::transpose(rotationLocalToGlobal);  // inverse of rotation matrix is its transpose
+//     const auto rotationGlobalToLocal    = glm::transpose(rotationLocalToGlobal);  // inverse of rotation matrix is
+//     its transpose
 //
 //     auto globalToLocal = rotationGlobalToLocal * translationGlobalToLocal;
 //     auto localToGlobal = rotationLocalToGlobal * translationLocalToGlobal;

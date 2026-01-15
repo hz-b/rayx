@@ -8,7 +8,8 @@
 // Otherwise set-seeding tests will not work.
 // The seed for the shader should also be generated from this module.
 
-// It is crucial that all of our random implementations yield the same values (with a fixed seed) across all hardware, compilers and platforms!
+// It is crucial that all of our random implementations yield the same values (with a fixed seed) across all hardware,
+// compilers and platforms!
 
 namespace rayx {
 
@@ -16,9 +17,9 @@ namespace rayx {
 const uint32_t FIXED_SEED = 42;
 
 // Sets the current `seed` to `x`.
-// This resets the internal RNG state, so any future values returned by this random generator are deterministic - only based on the seed x.
-// In order to make your function RNG-deterministic, you need to call fixSeed once at the beginning of your function.
-// This function is used for fixed-seed testing.
+// This resets the internal RNG state, so any future values returned by this random generator are deterministic - only
+// based on the seed x. In order to make your function RNG-deterministic, you need to call fixSeed once at the beginning
+// of your function. This function is used for fixed-seed testing.
 void RAYX_API fixSeed(uint32_t x);
 
 // sets the seed "randomly", depending on system time.
