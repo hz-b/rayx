@@ -20,6 +20,8 @@ namespace rayx {
 
 // Adds a new lookup path where the handler will search for resources
 void ResourceHandler::addLookUpPath(const std::filesystem::path& path) {
+    std::unique_lock lock(m_lookUpPathsMutex);
+
     // Check if the path is already in the lookUpPaths
     auto it = std::find(lookUpPaths.begin(), lookUpPaths.end(), path);
     if (it == lookUpPaths.end()) {
@@ -75,11 +77,14 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
         return path;
     };
 
-    // First, check in user-defined lookup paths
-    for (const auto& lookupPath : lookUpPaths) {
-        std::filesystem::path path = lookupPath / baseDir / relativePath;
-        RAYX_VERB << "\tlooking at " << path;
-        if (fileExists(path)) { return found(path); }
+    {
+        std::shared_lock lock(m_lookUpPathsMutex); // lock lookUpPaths
+        // First, check in user-defined lookup paths
+        for (const auto& lookupPath : lookUpPaths) {
+            std::filesystem::path path = lookupPath / baseDir / relativePath;
+            RAYX_VERB << "\tlooking at " << path;
+            if (fileExists(path)) { return found(path); }
+        }
     }
 
 #if defined(__linux__)

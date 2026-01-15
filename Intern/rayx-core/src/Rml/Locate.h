@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <shared_mutex>
+#include <mutex>
 
 #include "Core.h"
 
@@ -11,7 +13,7 @@ namespace rayx {
 class RAYX_API ResourceHandler {
   public:
     static ResourceHandler& getInstance() {
-        thread_local ResourceHandler instance;
+        static ResourceHandler instance;
         return instance;
     }
 
@@ -34,6 +36,7 @@ class RAYX_API ResourceHandler {
     std::filesystem::path getFullPath(const std::filesystem::path& baseDir, const std::filesystem::path& relativePath);
 
     std::vector<std::filesystem::path> lookUpPaths;  // Maintains insertion order
+    mutable std::shared_mutex m_lookUpPathsMutex;
 };
 
 }  // namespace rayx
