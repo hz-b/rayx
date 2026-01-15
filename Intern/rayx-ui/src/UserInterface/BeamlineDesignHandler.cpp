@@ -94,7 +94,8 @@ void BeamlineDesignHandler::showParameters(rayx::DesignMap& parameters, bool& ch
 
                 for (const auto& groupKey : sortedGroupKeys) {
                     rayx::DesignMap& element = parameters[groupKey];
-                    createInputField(groupKey, element, changed, type, 1);  // Start with nesting level 1 for grouped items
+                    createInputField(groupKey, element, changed, type,
+                                     1);  // Start with nesting level 1 for grouped items
                 }
 
                 ImGui::Unindent();

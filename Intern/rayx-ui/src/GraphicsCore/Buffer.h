@@ -65,8 +65,8 @@ class Buffer {
      */
     VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
     /**
-     * @brief Invalidates a specified range of mapped buffer memory to ensure that the host's view of the memory reflects any changes made by the
-     * device.
+     * @brief Invalidates a specified range of mapped buffer memory to ensure that the host's view of the memory
+     * reflects any changes made by the device.
      * @param size Size of the memory range to invalidate, or VK_WHOLE_SIZE to invalidate the entire buffer.
      * @param offset Offset in the buffer where the invalidation starts.
      * @return VkResult Status of the memory invalidation operation.

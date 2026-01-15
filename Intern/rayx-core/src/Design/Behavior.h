@@ -29,16 +29,15 @@ struct AbsorbBehavior {
 struct ReflectBehavior {
     Material substrate = Material::Si;
     // double substrateRoughness = 0.0; // TODO: currently not supported
-    std::optional<Coating> coating;
-    bool ignoreRaysFromBehind           = false;
+    std::optional<Coating> coating      = std::nullopt;
     BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
 struct TransmitBehavior {
-    Material substrate        = Material::C;
-    double substrateThickness = 0.1;
-    double substrateRoughness = 0.0;
-    std::optional<Coating> coating;
+    Material substrate                  = Material::C;
+    double substrateThickness           = 0.1;
+    double substrateRoughness           = 0.0;
+    std::optional<Coating> coating      = std::nullopt;
     BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
@@ -80,7 +79,6 @@ struct CrystalBehavior {
     BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
 };
 
-using Behavior =
-    std::variant<DetectBehavior, IgnoreBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
+using Behavior = std::variant<DetectBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
 
 }  // namespace rayx::design

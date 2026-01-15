@@ -104,7 +104,8 @@ inline void checkEq(std::string filename, int line, std::string l, std::string r
 
 /// check that L and R contain the same doubles.
 // within CHECK_EQ: the __VA_ARGS__ argument is either `double tolerance` or nothing.
-// all variables declared within CHECK_EQ end with `_check_eq` distinguish them from the variables that the user might write.
+// all variables declared within CHECK_EQ end with `_check_eq` distinguish them from the variables that the user might
+// write.
 #define CHECK_EQ(L, R, ...)                                                                                                           \
     {                                                                                                                                 \
         const auto& l_check_eq = L;                                                                                                   \

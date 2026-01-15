@@ -78,7 +78,8 @@ void Application::init() {
         uboBuffer->map();
     }
 
-    // ? Should render systems handle their own descriptors?  Pool, set layout and sets are not really used outside apart from registering textures
+    // ? Should render systems handle their own descriptors?  Pool, set layout and sets are not really used outside
+    // apart from registering textures
     m_globalSetLayout = DescriptorSetLayout::Builder(m_Device)
                             .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)  //
                             .build();
@@ -188,7 +189,8 @@ void Application::run() {
                         }
 
                         RAYX_VERB << "Loaded H5 file: " << m_RMLPath.string().substr(0, m_RMLPath.string().size() - 4) + ".h5";
-                        // We do not need to check the future state here as the loop will not come back here until user interacts with UI again
+                        // We do not need to check the future state here as the loop will not come back here until user
+                        // interacts with UI again
                         m_buildRayCacheFuture =
                             std::async(std::launch::async, &Scene::buildRayCache, m_Scene.get(), std::ref(m_UIParams.rayInfo), std::ref(m_rays));
                         m_State = State::BuildingRays;

@@ -12,13 +12,12 @@
 namespace rayx::design {
 
 struct SurfaceElement {
-    std::optional<std::string> name;
     Area area;
-    Behavior behavior = DetectBehavior{};
-    std::optional<Curvature> curvature;
+    Behavior behavior                  = DetectBehavior{};
+    std::optional<Curvature> curvature = std::nullopt;
     // TODO: should a slits aperture work from behind? maybe we need frontAperture and backAperture here
-    std::optional<Aperture> aperture;
-    std::optional<SlopeError> slopeError;
+    std::optional<Aperture> aperture     = std::nullopt;
+    std::optional<SlopeError> slopeError = std::nullopt;
 };
 
 using Element    = std::variant<SurfaceElement>;

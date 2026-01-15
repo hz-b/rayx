@@ -11,13 +11,13 @@ using ApertureArea            = std::variant<RectangularArea, EllipticalArea, Tr
 using DiffractiveApertureArea = std::variant<RectangularArea, EllipticalArea>;
 
 struct NonDiffractiveAperture {
-    ApertureArea area;
-    std::optional<ApertureArea> beamstopArea;  // uses material of the element
+    ApertureArea area                        = ApertureArea{};
+    std::optional<ApertureArea> beamstopArea = std::nullopt;  // uses material of the element
 };
 
 struct DiffractiveAperture {
-    DiffractiveApertureArea area;
-    std::optional<ApertureArea> beamstopArea;  // uses material of the element
+    DiffractiveApertureArea area             = DiffractiveApertureArea{};
+    std::optional<ApertureArea> beamstopArea = std::nullopt;  // uses material of the element
 };
 
 using Aperture = std::variant<NonDiffractiveAperture, DiffractiveAperture>;

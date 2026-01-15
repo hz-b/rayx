@@ -48,19 +48,22 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     // tracing related options
     app.add_option("-i,--input", args.inputPaths, "Input RML files or directories (recursive search for RML files)");
     app.add_option("-o,--output", args.outputPath,
-                   "Output filepath. Can only be used if a single input is provided, that directs to an RML file. Default: put the output file "
+                   "Output filepath. Can only be used if a single input is provided, that directs to an RML file. "
+                   "Default: put the output file "
                    "next to the RML");
     app.add_flag("-a,--append", args.append, "Append to existing output file. Default: overwrite existing output file");
     app.add_flag("-S,--sequential", args.sequential, "Trace sequentially");
     app.add_option("-s,--seed", args.seed, "Specify a seed to be used for tracing");
     app.add_flag("-f,--default-seed", args.defaultSeed, std::format("Use default seed for tracing: {}", rayx::FIXED_SEED));
     app.add_flag("-x,--cpu", args.cpu,
-                 "Enable CPU devices. Can be combined with --gpu. Affects --list-devices and --device-index. Default behaviour if neither --cpu and "
+                 "Enable CPU devices. Can be combined with --gpu. Affects --list-devices and --device-index. Default "
+                 "behaviour if neither --cpu and "
                  "--gpu are provided: Both will be enabled");
     app.add_flag("-X,--gpu", args.gpu, "Same as --cpu, but for GPU instead of CPU");
     app.add_flag("-l,--list-devices", args.listDevices, "List devices available for tracing. Affected by --cpu and --gpu")->group(groupPrograms);
     app.add_option("-d,--device-index", args.deviceId,
-                   "Pick device via device index. Available devices are determined by --cpu and --gpu. Default: the best device will be picked "
+                   "Pick device via device index. Available devices are determined by --cpu and --gpu. Default: the "
+                   "best device will be picked "
                    "automatically. Use --list-devices to see the available devices");
     app.add_flag("-c,--csv", args.csv, "Output stored as csv instead of H5 file");
     app.add_flag("-V,--verbose", args.verbose, "Dump more information");
@@ -103,15 +106,18 @@ CliArgs parseCliArgs(const int argc, char const* const* const argv) {
     const bool isFirstPathDirectory = args.inputPaths.size() == 1 && std::filesystem::is_directory(args.inputPaths[0]);
     if (args.outputPath && (isMoreThanOnePath || isFirstPathDirectory)) {
         if (std::filesystem::is_directory(*args.outputPath)) {
-            std::cout << "warning: specifying multiple input files and an output directory can lead to name collisions between output filenames"
+            std::cout << "warning: specifying multiple input files and an output directory can lead to name collisions "
+                         "between output filenames"
                       << std::endl;
 
             if (!args.objectRecordIndices.empty())
-                std::cout << "warning: you specified --record-indices, but different input files may have different beamline objects, so the "
+                std::cout << "warning: you specified --record-indices, but different input files may have different "
+                             "beamline objects, so the "
                              "recorded objects may differ between files"
                           << std::endl;
         } else {
-            RAYX_EXIT << "error: the output path must be a directory, when multiple input files or an input directory is specified";
+            RAYX_EXIT << "error: the output path must be a directory, when multiple input files or an input directory "
+                         "is specified";
         }
     }
 

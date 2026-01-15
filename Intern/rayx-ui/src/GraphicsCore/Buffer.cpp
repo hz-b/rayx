@@ -41,8 +41,8 @@ VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset) {
 }
 
 /**
- * This function unmaps the previously mapped buffer memory, making it inaccessible from the application's address space.
- * It ensures that the unmapping only happens if the memory was actually mapped (`m_mapped` is not nullptr).
+ * This function unmaps the previously mapped buffer memory, making it inaccessible from the application's address
+ * space. It ensures that the unmapping only happens if the memory was actually mapped (`m_mapped` is not nullptr).
  *
  * Note: After the buffer memory has been unmapped, any pointer to it becomes invalid.
  *       Also, it's important to ensure that the host writes or device reads that were made to this memory

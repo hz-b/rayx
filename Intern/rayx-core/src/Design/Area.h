@@ -8,7 +8,7 @@ namespace rayx::design {
 
 struct RectangularArea {
     double width  = 1.0;
-    double length = 1.0;
+    double height = 1.0;
 };
 
 struct EllipticalArea {

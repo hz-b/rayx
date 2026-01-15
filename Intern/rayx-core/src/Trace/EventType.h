@@ -25,7 +25,8 @@ RAYX_FN_ACC inline bool isRayTerminated(const EventType eventType) {
 RAYX_FN_ACC inline void terminateRay(EventType& __restrict dstEventType, const EventType srcEventType) {
     // TODO: enable
     // _debug_warn(!isRayTerminated(dstEventType), "ray about to be terminated, but ray is already terminated!");
-    // _debug_assert(isRayTerminated(srcEventType), "ray about to be terminated, but provided event type (%d) is not a valid termination event type!",
+    // _debug_assert(isRayTerminated(srcEventType), "ray about to be terminated, but provided event type (%d) is not a
+    // valid termination event type!",
     //               static_cast<int>(srcEventType));
     dstEventType = srcEventType;
 }
@@ -59,12 +60,14 @@ RAYX_FN_ACC inline void terminateRay(EventType& __restrict dstEventType, const E
 // }
 // RAYX_FN_ACC constexpr inline bool operator!(const EventTypeMask lhs) { return lhs == EventTypeMask::None; }
 //
-// RAYX_FN_ACC constexpr inline EventTypeMask operator|=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs | rhs; }
-// RAYX_FN_ACC constexpr inline EventTypeMask operator&=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs & rhs; }
-// RAYX_FN_ACC constexpr inline EventTypeMask operator^=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs ^ rhs; }
+// RAYX_FN_ACC constexpr inline EventTypeMask operator|=(EventTypeMask& lhs, const EventTypeMask rhs) { return lhs = lhs
+// | rhs; } RAYX_FN_ACC constexpr inline EventTypeMask operator&=(EventTypeMask& lhs, const EventTypeMask rhs) { return
+// lhs = lhs & rhs; } RAYX_FN_ACC constexpr inline EventTypeMask operator^=(EventTypeMask& lhs, const EventTypeMask rhs)
+// { return lhs = lhs ^ rhs; }
 //
 // RAYX_FN_ACC constexpr inline EventTypeMask eventTypeToMask(const EventType eventType) {
-//     return static_cast<EventTypeMask>(std::underlying_type_t<EventTypeMask>(1) << static_cast<std::underlying_type_t<EventTypeMask>>(eventType));
+//     return static_cast<EventTypeMask>(std::underlying_type_t<EventTypeMask>(1) <<
+//     static_cast<std::underlying_type_t<EventTypeMask>>(eventType));
 // }
 
 }  // namespace rayx::trace

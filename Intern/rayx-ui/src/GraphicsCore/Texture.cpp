@@ -88,7 +88,8 @@ void Texture::updateFromData(const unsigned char* data, uint32_t width, uint32_t
     m_extent.height = height;
 
     // Create staging buffer
-    // TODO: parameterize required format of load (STBI_grey, STBI_grey_alpha, STBI_rgb, STBI_rgb_alpha, STBI_rgb_hdr, STBI_rgba_hdr)
+    // TODO: parameterize required format of load (STBI_grey, STBI_grey_alpha, STBI_rgb, STBI_rgb_alpha, STBI_rgb_hdr,
+    // STBI_rgba_hdr)
     Buffer buff(m_Device, "textureStagingBuffer", STBI_rgb_alpha, width * height, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     buff.map();
