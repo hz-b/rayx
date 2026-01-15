@@ -25,6 +25,7 @@ void ResourceHandler::addLookUpPath(const std::filesystem::path& path) {
     if (it == lookUpPaths.end()) {
         // Insert at the beginning to prioritize newly added paths
         lookUpPaths.insert(lookUpPaths.begin(), path);
+        RAYX_VERB << "adding lookup path for resources " << path;
     }
 }
 
@@ -68,17 +69,18 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
 
 // General method to get the full path based on the base directory (e.g., data or font directory)
 std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& baseDir, const std::filesystem::path& relativePath) {
-    // First, check in user-defined lookup paths
-    for (const auto& lookupPath : lookUpPaths) {
-        std::filesystem::path path = lookupPath / baseDir / relativePath;
-        if (fileExists(path)) { return path; }
-    }
-
     RAYX_VERB << "locating file: " << relativePath;
     auto found = [](std::filesystem::path path) {
         RAYX_VERB << "\t\tfound!";
         return path;
     };
+
+    // First, check in user-defined lookup paths
+    for (const auto& lookupPath : lookUpPaths) {
+        std::filesystem::path path = lookupPath / baseDir / relativePath;
+        RAYX_VERB << "\tlooking at " << path;
+        if (fileExists(path)) { return found(path); }
+    }
 
 #if defined(__linux__)
     // Check next to the executable (built from source)
