@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace rayx::detail::host {
+namespace rayx::host::detail {
 
 QuadricCurvature toQuadric(const design::CylindricalCurvature& curvature) {
     auto cyl_direction     = curvature.direction;

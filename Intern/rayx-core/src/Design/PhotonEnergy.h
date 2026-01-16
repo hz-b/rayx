@@ -40,4 +40,10 @@ inline ElectronVolt operator"" _eV(long double value) { return ElectronVolt{stat
 
 }  // namespace literals
 
+namespace defaults {
+
+constexpr PhotonEnergy photonEnergy = ElectronVolt{1000.0};  // 1 keV
+
+} // namespace defaults
+
 }  // namespace rayx::design

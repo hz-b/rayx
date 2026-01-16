@@ -4,7 +4,7 @@
 
 #include "Core.h"
 #include "EventType.h"
-#include "Math/ElectricField.h"
+#include "Math/Polarization.h"
 
 // TODO
 using RandCounter = uint64_t;

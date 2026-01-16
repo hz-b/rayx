@@ -16,13 +16,12 @@ namespace rayx::design {
 namespace defaults {
 constexpr int numRays                               = 100000;
 constexpr SeparateValues<double> circleSourceRadius = {.center = 0.0, .range = 1.0, .numValues = 10};
-constexpr PhotonEnergy photonEnergy                 = ElectronVolt{300.0};
 }  // namespace defaults
 
 struct PointSource {
     int numRays = defaults::numRays;
-    Cube<Distribution<double>> rayOrigin;
-    Rect<Distribution<Angle>> rayAngle;
+    Distribution3D<double> rayOrigin;
+    Distribution2D<Angle> rayAngle;
     Distribution<PhotonEnergy> rayPhotonEnergy = defaults::photonEnergy;
     Polarization rayPolarization               = defaults::polarization;
 };
@@ -41,7 +40,7 @@ struct MatrixSource {
 struct CircleSource {
     int numRays                   = defaults::numRays;
     SeparateValues<double> radius = defaults::circleSourceRadius;
-    Rect<Distribution<Angle>> rayAngle;
+    Distribution2D<Angle> rayAngle;
     Distribution<PhotonEnergy> rayPhotonEnergy = defaults::photonEnergy;
     Polarization rayPolarization               = defaults::polarization;
 };
@@ -96,8 +95,8 @@ struct DipoleSource {
 
 struct InputSource {
     trace::Rays rays;
-    std::optional<Cube<Distribution<double>>> rayOrigin;
-    std::optional<Rect<Distribution<Angle>>> rayAngle;
+    std::optional<Distribution3D<double>> rayOrigin;
+    std::optional<Distribution2D<Angle>> rayAngle;
     std::optional<Distribution<PhotonEnergy>> rayPhotonEnergy;
     std::optional<Polarization> rayPolarization;
 };
