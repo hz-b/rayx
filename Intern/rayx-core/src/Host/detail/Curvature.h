@@ -2,7 +2,7 @@
 
 #include "Design/Curvature.h"
 
-namespace rayx::detail::host {
+namespace rayx::host::detail {
 
 using QuadricCurvature   = design::QuadricCurvature;
 using ToroidialCurvature = design::ToroidialCurvature;
@@ -12,4 +12,4 @@ using Curvature          = std::variant<QuadricCurvature, ToroidialCurvature, Cu
 
 Curvature toHost(const design::Curvature& curvature);
 
-}  // namespace rayx::detail::host
+}

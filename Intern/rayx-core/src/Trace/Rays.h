@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "IO/Instrumentor.h"
-#include "Math/ElectricField.h"
 #include "RayAttrMask.h"
 
 namespace rayx::trace {

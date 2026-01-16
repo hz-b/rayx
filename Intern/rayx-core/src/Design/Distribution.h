@@ -32,21 +32,16 @@ template <typename T>
 using Distribution = std::variant<T, SeparateValues<T>, WhiteNoiseDistribution<T>, GaussianDistribution<T>, std::shared_ptr<BakedDistribution<T>>>;
 
 template <typename T>
-struct Sphere {
-    T radius = T();
+struct Distribution2D {
+    Distribution<T> x;
+    Distribution<T> y;
 };
 
 template <typename T>
-struct Rect {
-    T x = T();
-    T y = T();
-};
-
-template <typename T>
-struct Cube {
-    T x = T();
-    T y = T();
-    T z = T();
+struct Distribution3D {
+    Distribution<T> x;
+    Distribution<T> y;
+    Distribution<T> z;
 };
 
 }  // namespace rayx::design
