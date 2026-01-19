@@ -2,1434 +2,1434 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hz-b.github.io/rayx/latest/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/how-to-use-mkdocs/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/01-Introduction/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/02-How-to-build/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/02-How-to-install/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/03-Getting-Started/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/04-How-to-use-rayx-ui/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/05-How-to-use-rayx/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/06-Literature/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Introduction/07-Style-Guide/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/Efficiency/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/Events/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/Model/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/PRNGs-on-the-GPU/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/Quad%28ric%29-function/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/Ray-generation/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/Transformation-between-coordinate-systems/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/User-vs-Model-Parameter/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/Beamline-Parameter/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/Circle-Source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/DipoleSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/LightSources/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/Matrix-Source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/Pixel-Source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/Point-Source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/LightSources/SimpleUndulatorSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Cone-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Crystal/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Cylinder-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Ellipsoid-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Foil/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Image-Plane/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/OpticalElements/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Paraboloid-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Plane-Grating/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Plane-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/RZP/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Slit/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Sphere-Grating/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Sphere-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Toroid-Grating/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/OpticalElements/Toroid-Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/RAYX-UI/RAYX-UI/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/RAYX-UI/Triangulation/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/Code-Coverage/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/Debugging/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/How-to-use-Doxygen/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/How-to-use-our-formatter/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/RAYX-Profiling/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/Testing/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Tools/Tools/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Vulkan/Vulkan-Beyond/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Vulkan/Vulkan-Shader-Split/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Vulkan/Vulkan/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/Vulkan/VulkanTracer/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/annotated/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/files/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespaceglm/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1BeamlineNode/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx_1_1BlockSizeConstraint/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1BlockSizeConstraint_1_1AtLeast/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1BlockSizeConstraint_1_1AtMost/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1BlockSizeConstraint_1_1Exact/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1BlockSizeConstraint_1_1InRange/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1BlockSizeConstraint_1_1None/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1CircleSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1CollisionPoint/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1CollisionWithElement/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ComplexFresnelCoeffs/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ConstState/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1DatEntry/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1DatFile/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Deg/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DesignElement/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DesignMap/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DesignMap_1_1ConstIterator/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DesignMap_1_1Iterator/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DesignSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1DeviceConfig/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1DeviceConfig_1_1Device/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DeviceTracer/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1DipoleSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1EnergyDistributionDataBase/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1EnergyDistributionList/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Exit/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1FresnelCoeffs/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1GenRays/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1GenRays_1_1BatchConfig/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1GenRays_1_1SourceConfig/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1Group/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1HardEdge/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1IgnoreLog/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1InstrumentationTimer/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1LightSourceBase/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Log/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1MaterialTables/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1MatrixSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1MegaKernelTracer/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1MutableState/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1NffEntry/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1NffTable/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1ObjectIndexMask/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1ObjectMask/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ObjectTransform/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1OpticalElement/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1OpticalElementAndTransform/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1PalikEntry/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1PalikTable/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1PixelSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1PointSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1PsiAndStokes/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Rad/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Rand/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1RayListSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Rays/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1RaysBuf/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1RaysPtr/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1ResourceHandler/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Resources/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Resources_1_1BeamlineConfig/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1RotationBase/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1SeparateEnergies/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1SimpleUndulatorSource/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1SlopeError/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1SoftEdge/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1Tracer/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1Undefined/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classrayx_1_1Variant/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Verb/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1Warn/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx_1_1complex/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx_1_1detail/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1Crystal/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1Foil/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1Grating/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1ImagePlane/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1Mirror/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1RZP/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1BehaviourTypes_1_1Slit/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CoatingTypes/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CoatingTypes_1_1MultilayerCoating/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CoatingTypes_1_1OneCoating/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CoatingTypes_1_1SubstrateOnly/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CutoutTypes/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CutoutTypes_1_1Elliptical/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CutoutTypes_1_1Rect/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CutoutTypes_1_1Trapezoid/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1CutoutTypes_1_1Unlimited/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1Ray/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1SurfaceTypes/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1SurfaceTypes_1_1Cubic/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1SurfaceTypes_1_1Plane/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1SurfaceTypes_1_1Quadric/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1detail_1_1SurfaceTypes_1_1Toroid/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx_1_1xml/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1xml_1_1Parser/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx_1_1_0d72/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespacerayx_1_1_0d73/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1GenRays_1_1SourceState/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ObjectMask_1_1All/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ObjectMask_1_1AllElements/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ObjectMask_1_1AllSources/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ObjectMask_1_1ByIndices/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/structrayx_1_1ObjectMask_1_1None/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_8e65f0892f9f577e6bce143ffec865cf/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_9c5641573f5bc288e3f5d23894df6f8c/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_d67825566018768a2928984140c8671c/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Angle_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Angle_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CanonicalizePath_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CanonicalizePath_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Core_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Core_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/FileIO_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/FileIO_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_ed6f3ce0d94a0c810099b50a779e73a9/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Beamline_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Beamline_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DatFile_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DatFile_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Definitions_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Definitions_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Beamline_2EnergyDistribution_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Beamline_2EnergyDistribution_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Node_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Node_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/StringConversion_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/StringConversion_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_eb5348a1178842cfc1221d70dc43cea9/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Debug_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Debug_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Instrumentor_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Instrumentor_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_603eb215cde9b420eb11b725e93865f2/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignElement_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignElement_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Value_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Value_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_3aac88a0ca6da04f1fbf5fc0eadcf8cd/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Behaviour_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Behaviour_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Coating_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Coating_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Cutout_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Cutout_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Element_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Element_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Surface_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Surface_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_af3431b45235e77f76be56c52f909c7b/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Material_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Material_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/NffTable_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/NffTable_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/PalikTable_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/PalikTable_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_b0f1a6165fb17224e128354cc7d7bccf/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignElementWriter_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignElementWriter_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignSourceWriter_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DesignSourceWriter_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Importer_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Importer_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Locate_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Locate_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/xml_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/xml_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_956ee0b8d0170a9bc6fd4fec1af269d0/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ApplySlopeError_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ApplySlopeError_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Approx_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Approx_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Behave_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Behave_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Collision_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Collision_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Complex_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Complex_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Constants_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Constants_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Crystal_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Crystal_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Cubic_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Cubic_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CutoutFns_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CutoutFns_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Diffraction_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Diffraction_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Efficiency_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Efficiency_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ElectricField_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ElectricField_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/EventType_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/EventType_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ImageType_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ImageType_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_cb81b8b75f2631c43a24c900d3ef53db/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CircleSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CircleSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DipoleSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DipoleSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_3f2a90e89ce1c1a61675040d0f20e2d8/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Shader_2LightSources_2EnergyDistributions_2EnergyDistribution_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Shader_2LightSources_2EnergyDistributions_2EnergyDistribution_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/LightSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/LightSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/MatrixSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/MatrixSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/PixelSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/PixelSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/PointSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/PointSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RayListSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RayListSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/SimpleUndulatorSource_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/SimpleUndulatorSource_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/InvocationState_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/InvocationState_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/LineDensity_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/LineDensity_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Rand_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Rand_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Ray_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Ray_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RaysPtr_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RaysPtr_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RecordEvent_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RecordEvent_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Refrac_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Refrac_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RefractiveIndex_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RefractiveIndex_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/SlopeError_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/SlopeError_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/SphericalCoords_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/SphericalCoords_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Throw_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Throw_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Trace_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Trace_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Transmission_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Transmission_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Utils_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Utils_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_81c0cd68398be7a84e5cb6bea27ed875/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Accelerator_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Accelerator_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DeviceConfig_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DeviceConfig_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DeviceTracer_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/DeviceTracer_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/GenRays_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/GenRays_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/MegaKernelTracer_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/MegaKernelTracer_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Tracer_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Tracer_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Util_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Util_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/dir_d1c815520a7617c58c603daf30348a97/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CsvWriter_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/CsvWriter_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/H5Writer_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/H5Writer_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ObjectMask_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/ObjectMask_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Random_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Random_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RayAttrMask_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/RayAttrMask_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Rays_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Rays_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Variant_8h/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/Variant_8h_source/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespaces/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/classes/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/hierarchy/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/modules/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/pages/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/class_members/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/class_member_functions/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/class_member_variables/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/class_member_typedefs/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/class_member_enums/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespace_members/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespace_member_functions/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespace_member_variables/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespace_member_typedefs/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/namespace_member_enums/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/functions/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/macros/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/variables/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
     <url>
          <loc>https://hz-b.github.io/rayx/latest/rayxCore/links/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2026-01-19</lastmod>
     </url>
 </urlset>
