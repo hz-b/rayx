@@ -269,26 +269,14 @@
           };
 
           rayx-docker = mkDockerImage {
-            name = "rayx-docker";
-            tag = "latest";
-            rayxPackage = self.packages.${system}.rayx;
-          };
-
-          rayx-docker-versioned = mkDockerImage {
-            name = "rayx-docker";
-            tag = version;
+            name = "rayx";
+            tag = "untagged";
             rayxPackage = self.packages.${system}.rayx;
           };
 
           rayx-cuda-docker = mkDockerImage {
-            name = "rayx-cuda-docker";
-            tag = "latest";
-            rayxPackage = self.packages.${system}.rayx-cuda;
-          };
-
-          rayx-cuda-docker-versioned = mkDockerImage {
-            name = "rayx-cuda-docker";
-            tag = version;
+            name = "rayx-cuda";
+            tag = "untagged";
             rayxPackage = self.packages.${system}.rayx-cuda;
           };
 

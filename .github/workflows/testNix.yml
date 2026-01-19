@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [rayx, rayx-cuda, rayx-tests, rayx-ui]
+        target: [rayx, rayx-cuda, rayx-tests, rayx-ui, rayx-docker, rayx-cuda-docker]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,3 +45,11 @@ jobs:
         if: matrix.target == 'rayx-tests'
         run: |
           cat ./result/rayx-core-tst.log
+
+      - name: tag docker images
+        if: matrix.target == 'rayx-docker' || matrix.target == 'rayx-cuda-docker'
+        run: |
+          docker load < result
+          image_name=${{ matrix.target }}
+          image_name=${x%-docker}
+          docker image tag "${image_name}:untagged" "rayx:${{ github.sha }}"
