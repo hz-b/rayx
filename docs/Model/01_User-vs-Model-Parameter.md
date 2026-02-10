@@ -2,6 +2,7 @@
 
 In RAYX we intend to work on better modularity and readability in our code. In our opinion, one step to achieve this, to reevaluate and restructure the parameters of RAY-UI. Since a lot of the parameters had dependencies on each other, we decided that a distinction between them was needed. This is where our definition of User and Model Parameters comes into play. 
 
+
 ## Model Parameter
 
 A Model Parameter is any parameter that is directly influencing the calculations of the tracer. Further, a Model Parameter can also be a parameter, which is required for the fundamental definition of our model. 

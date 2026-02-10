@@ -6,7 +6,7 @@ repo_name: hz-b/rayx
 edit_uri: edit/master/docs/
 site_author: Helmholtz-Zentrum Berlin für Materialien und Energie (HZB)
 site_description: RAYX is a powerful, multi-component simulation platform designed to streamline the design and optimization of beamlines in synchrotron light source facilities.
-copyright: ©HZB 2025
+copyright: ©HZB 2026
 
 # nav entry overwritten by awesome-nav plugin which allows folders and provides globs, see: .nav.yml
 

@@ -1,4 +1,4 @@
-# What is Code Coverage:
+# What is Code Coverage
 Analyzing your code Coverage is a necessary step in devloping complex big projects.
 
 Getting the code's coverage is simply generating a summary of how much a piece of code is executed and "covered".

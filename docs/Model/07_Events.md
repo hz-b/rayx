@@ -7,12 +7,22 @@ This allows us to fully understand what happened to each ray, and potentially wh
 Each of these events contains a "snapshot" of the ray at that point in time,
 and information about what happened at this point (encoded as an "EventType").
 
-Some typical events include (for more, see the Doxygen documentation):
-- Just hit: The ray did just intersect with an element.
-- Fly off: The ray did not hit any more elements and instead it will now fly in the same direction forever.
+The Events are:
+
+- Uninitialized: The ray was not jet initialized.
+- Emitted: The ray just got emmited by the light source.
+- HitElement: The ray did just intersect with an element.
+- FatalError: An Error which is Fatal
 - Absorbed: The ray was absorbed by the element.
+- BeyondHorizon: The Ray did not hit any more elements and instead it will now fly in the same direction forever.
+- TooManyEvents: The Event Limit is reached and no more Events for this ray got traced. 
+
 
 Some EventTypes "finalize" the corresponding ray, preventing it from being processed further.
 Examples for this are "Fly Off" and "Absorbed".
+
+
+
+ 
 
 For more details see the Shared/EventType.h file.

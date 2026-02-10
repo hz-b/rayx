@@ -31,9 +31,16 @@ RAYX offers several advanced features, including:
 
 ## Installing or Building RAYX
 
-[![testUbuntu](https://github.com/hz-b/rayx/actions/workflows/testUbuntu.yml/badge.svg?branch=master)](https://github.com/hz-b/rayx/actions/workflows/testUbuntu.yml) [![testWindows](https://github.com/hz-b/rayx/actions/workflows/testWindows.yml/badge.svg?branch=master)](https://github.com/hz-b/rayx/actions/workflows/testWindows.yml) [![testUbuntuClang](https://github.com/hz-b/rayx/actions/workflows/testUbuntuClang.yml/badge.svg?branch=master)](https://github.com/hz-b/rayx/actions/workflows/testUbuntuClang.yml) [![MDBookDeploy](https://github.com/hz-b/rayx/actions/workflows/mdBookDeploy.yml/badge.svg)](https://github.com/hz-b/rayx/actions/workflows/mdBookDeploy.yml)
+[![testUbuntu](https://github.com/hz-b/rayx/actions/workflows/testUbuntu.yml/badge.svg?branch=master)](https://github.com/hz-b/rayx/actions/workflows/testUbuntu.yml) [![testWindows](https://github.com/hz-b/rayx/actions/workflows/testWindows.yml/badge.svg?branch=master)](https://github.com/hz-b/rayx/actions/workflows/testWindows.yml) [![testUbuntuClang](https://github.com/hz-b/rayx/actions/workflows/testUbuntuClang.yml/badge.svg?branch=master)](https://github.com/hz-b/rayx/actions/workflows/testUbuntuClang.yml) [![MKDocsDeploy](https://github.com/hz-b/rayx/actions/workflows/mkdocsDeploy.yml/badge.svg)](https://github.com/hz-b/rayx/actions/workflows/mkdocsDeploy.yml)
 
-For additional information, please visit our [Wiki](https://hz-b.github.io/rayx/) and read our latest [paper](https://pubs.aip.org/aip/rsi/article/96/6/061302/3348292/RAYX-An-optics-simulation-software-for-synchrotron), that introduces RAYX to the scientific community. We are committed to delivering stable releases, which can be found [here](https://github.com/hz-b/rayx/releases). Please note that the `master` branch and other branches might be unstable, and building RAYX from the source could lead to unstable software. We recommend this only for developers and experienced users. If you experience issues with our distributed binaries or API, do not hesitate to [open an issue](https://github.com/hz-b/rayx/issues/new/choose). We are keen to provide assistance and develop features as the need arises.
+
+For additional information, please visit our [Wiki](https://hz-b.github.io/rayx/) and read our latest [paper](https://pubs.aip.org/aip/rsi/article/96/6/061302/3348292/RAYX-An-optics-simulation-software-for-synchrotron), that introduces RAYX to the scientific community. We are committed to delivering stable releases, which can be found [here](https://github.com/hz-b/rayx/releases). Please note that the `master` branch and other branches might be unstable, and building RAYX from the source could lead to unstable software. We recommend this only for developers and experienced users. If you experience issues with our distributed binaries or API, do not hesitate to [open an issue](https://github.com/hz-b/rayx/issues/new/choose) or contact us directly at [rayx-support@helmholtz-berlin.de](mailto:rayx-support@helmholtz-berlin.de). We are keen to provide assistance and develop features as the need arises.
+
+## **RAYX** Python Bindings
+
+The Python bindings for **RAYX** are available for easy download at [rayx](https://pypi.org/project/rayx/). And further information in the GitHub at ([rayx-python](https://github.com/hz-b/rayx-python/tree/main)).
+This library enables straightforward beamline scripting and automation of ray tracing. It uses the **RAYX** Version v.1.1.0 .
+For a first reference use this [Jupyter Notebook](https://github.com/hz-b/rayx-python/blob/main/examples/metrix.ipynb). Be advised that this library still undergoes changes. Please do not hesitste to [open an issue](https://github.com/hz-b/rayx-python/issues/new), or contact us directly. 
 
 ## Relevant Publications
 
@@ -47,3 +54,20 @@ DOI: [10.1063/5.0253857](https://doi.org/10.1063/5.0253857)
 > We present RAYX, an advanced optics simulation software for synchrotron applications and the successor to RAY/RAY-UI \[Schäfers, in *Modern Developments in X-Ray and Neutron Optics*, Springer, 2008]. RAYX offers a modern, versatile platform designed to accelerate beamline design, optimization, and data analysis, including machine learning workflows. It supports accurate and efficient simulations across a wide spectral range and optical elements, tailored for current and next-generation synchrotron facilities.
 
 This publication provides an overview of the software's architecture and capabilities, including GPU acceleration, Python bindings, and GUI support.
+
+**RAY-UI**
+Further relevant publications include work on RAY and RAY-UI.
+These frameworks serve as benchmarks for the accuracy of the numerical simulations and provide valuable insight into the underlying simulation concepts.
+
+**The BESSY raytrace program RAY.**
+Franz Schäfers 
+Springer Berlin Heidelberg, 2008. 9-41.
+[Modern Developments in X-Ray and Neutron Optics.](https://www.helmholtz-berlin.de/media/media/forschung/wi/optik-strahlrohre/alt/optische_syst/publications/2008/paper_schaefers_ray_springer_2007.pdf)
+
+
+**RAY-UI: A powerful and extensible user interface for RAY.**
+Peter Baumgärtel, Marco Witt, Jerome Baensch, Marcus Fabarius, Alexei Erko, Franz Schäfers, Hartmut Schirmacher
+AIP Conf. Proc. 27 July 2016, 1741
+DOI: [10.1063/1.4952888](https://pubs.aip.org/aip/acp/article/1741/1/040016/821512/RAY-UI-A-powerful-and-extensible-user-interface)
+
+
