@@ -4,30 +4,49 @@
 #include <variant>
 #include <vector>
 
-namespace rayx::design {
+#include "Property.h"
+
+namespace rayx {
 
 struct RectangularArea {
-    double width  = 1.0;
-    double height = 1.0;
+    RectangularArea(double width, double height) {
+        this->width(width);
+        this->height(height);
+    }
+
+    RAYX_VALIDATED_PROPERTY(RectangularArea, double, width, detail::validateGreaterZero);
+    RAYX_VALIDATED_PROPERTY(RectangularArea, double, height, detail::validateGreaterZero);
 };
 
 struct EllipticalArea {
-    double diameterX = 0.0;
-    double diameterZ = 0.0;
+    EllipticalArea(double horizontalDiameter, double verticalDiameter) {
+        this->horizontalDiameter(horizontalDiameter);
+        this->verticalDiameter(verticalDiameter);
+    }
+
+    RAYX_VALIDATED_PROPERTY(EllipticalArea, double, horizontalDiameter, detail::validateGreaterZero);
+    RAYX_VALIDATED_PROPERTY(EllipticalArea, double, verticalDiameter, detail::validateGreaterZero);
 };
 
 struct TrapezoidalArea {
-    double topWidth    = 0.0;
-    double bottomWidth = 0.0;
-    double height      = 0.0;
+    TrapezoidalArea(double topWidth, double bottomWidth, double height) {
+        this->topWidth(topWidth);
+        this->bottomWidth(bottomWidth);
+        this->height(height);
+    }
+
+    RAYX_VALIDATED_PROPERTY(TrapezoidalArea, double, topWidth, detail::validateGreaterZero);
+    RAYX_VALIDATED_PROPERTY(TrapezoidalArea, double, bottomWidth, detail::validateGreaterZero);
+    RAYX_VALIDATED_PROPERTY(TrapezoidalArea, double, height, detail::validateGreaterZero);
 };
 
-struct ConvexPolygonalArea {
-    std::vector<glm::dvec2> points;
-};
+// TODO: implement
+// struct ConvexPolygonalArea {
+//     std::vector<glm::dvec2> points;
+// };
 
 struct UnlimitedArea {};
 
-using Area = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, ConvexPolygonalArea, UnlimitedArea>;
+using Area = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, UnlimitedArea>;
 
-}  // namespace rayx::design
+}  // namespace rayx

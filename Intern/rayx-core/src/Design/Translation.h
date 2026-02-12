@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rayx::design {
+namespace rayx {
 
 using Translation = glm::dvec3;
 
@@ -12,4 +12,4 @@ inline glm::dmat4 toMatrix(const Translation& translation) {
     return mat;
 }
 
-}  // namespace rayx::design
+}  // namespace rayx

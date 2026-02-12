@@ -4,16 +4,10 @@
 
 namespace rayx::host::detail {
 
-double toHost(const design::Degrees degrees) {
-    return design::toRadians(degrees).value;
-}
+double toHost(const design::Deg degrees) { return design::toRad(degrees).value; }
 
-double toHost(const design::Radians radians) {
-    return design::toRadians(radians).value;
-}
+double toHost(const design::Rad radians) { return design::toRad(radians).value; }
 
-double toHost(const design::Angle angle) {
-    return design::toRadians(angle).value;
-}
+double toHost(const design::Angle angle) { return design::toRad(angle).value; }
 
-}
+}  // namespace rayx::host::detail

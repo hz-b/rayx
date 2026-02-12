@@ -2,14 +2,56 @@
 
 #include "Design/Curvature.h"
 
-namespace rayx::host::detail {
+namespace rayx::detail {
 
-using QuadricCurvature   = design::QuadricCurvature;
-using ToroidialCurvature = design::ToroidialCurvature;
-using ToroidType         = design::ToroidType;
-using CubicCurvature     = design::CubicCurvature;
-using Curvature          = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
+namespace device {
 
-Curvature toHost(const design::Curvature& curvature);
+struct QuadricCurvature {
+    int icurv;
+    double a11;
+    double a12;
+    double a13;
+    double a14;
+    double a22;
+    double a23;
+    double a24;
+    double a33;
+    double a34;
+    double a44;
+};
 
-}
+struct ToroidialCurvature {
+    double longRadius;
+    double shortRadius;
+    ToroidType toroidType;
+};
+
+struct CubicCurvature {
+    double a11;
+    double a12;
+    double a13;
+    double a14;
+    double a22;
+    double a23;
+    double a24;
+    double a33;
+    double a34;
+    double a44;
+
+    double b12;
+    double b13;
+    double b21;
+    double b23;
+    double b31;
+    double b32;
+
+    double psi;
+};
+
+using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
+
+}  // namespace device
+
+device::Curvature toDevice(const Curvature& curvature);
+
+}  // namespace rayx::detail

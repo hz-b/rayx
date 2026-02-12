@@ -4,20 +4,25 @@
 
 #include "Angle.h"
 
-namespace rayx::design {
+namespace rayx {
+
+// TODO: find sensible defaults for all curvature types
+// TODO: sensible validation for all curvature types
+// TODO: find alternative representation for curvature types
+// TODO: require mandatory arguments in constructors
 
 struct QuadricCurvature {
-    int icurv;
-    double a11;
-    double a12;
-    double a13;
-    double a14;
-    double a22;
-    double a23;
-    double a24;
-    double a33;
-    double a34;
-    double a44;
+    RAYX_PROPERTY(QuadricCurvature, int, icurv);
+    RAYX_PROPERTY(QuadricCurvature, double, a11);
+    RAYX_PROPERTY(QuadricCurvature, double, a12);
+    RAYX_PROPERTY(QuadricCurvature, double, a13);
+    RAYX_PROPERTY(QuadricCurvature, double, a14);
+    RAYX_PROPERTY(QuadricCurvature, double, a22);
+    RAYX_PROPERTY(QuadricCurvature, double, a23);
+    RAYX_PROPERTY(QuadricCurvature, double, a24);
+    RAYX_PROPERTY(QuadricCurvature, double, a33);
+    RAYX_PROPERTY(QuadricCurvature, double, a34);
+    RAYX_PROPERTY(QuadricCurvature, double, a44);
 };
 
 enum class ToroidType {
@@ -26,78 +31,78 @@ enum class ToroidType {
 };
 
 struct ToroidialCurvature {
-    double longRadius;
-    double shortRadius;
-    ToroidType toroidType;
+    RAYX_PROPERTY(ToroidialCurvature, double, longRadius);
+    RAYX_PROPERTY(ToroidialCurvature, double, shortRadius);
+    RAYX_PROPERTY(ToroidialCurvature, ToroidType, toroidType);
 };
 
 struct CubicCurvature {
-    // int icurv;
-    double a11;
-    double a12;
-    double a13;
-    double a14;
-    double a22;
-    double a23;
-    double a24;
-    double a33;
-    double a34;
-    double a44;
+    // RAYX_PROPERTY(CubicCurvature, int, icurv);
+    RAYX_PROPERTY(CubicCurvature, double, a11);
+    RAYX_PROPERTY(CubicCurvature, double, a12);
+    RAYX_PROPERTY(CubicCurvature, double, a13);
+    RAYX_PROPERTY(CubicCurvature, double, a14);
+    RAYX_PROPERTY(CubicCurvature, double, a22);
+    RAYX_PROPERTY(CubicCurvature, double, a23);
+    RAYX_PROPERTY(CubicCurvature, double, a24);
+    RAYX_PROPERTY(CubicCurvature, double, a33);
+    RAYX_PROPERTY(CubicCurvature, double, a34);
+    RAYX_PROPERTY(CubicCurvature, double, a44);
 
-    double b12;
-    double b13;
-    double b21;
-    double b23;
-    double b31;
-    double b32;
+    RAYX_PROPERTY(CubicCurvature, double, b12);
+    RAYX_PROPERTY(CubicCurvature, double, b13);
+    RAYX_PROPERTY(CubicCurvature, double, b21);
+    RAYX_PROPERTY(CubicCurvature, double, b23);
+    RAYX_PROPERTY(CubicCurvature, double, b31);
+    RAYX_PROPERTY(CubicCurvature, double, b32);
 
-    double psi;
+    RAYX_PROPERTY(CubicCurvature, double, psi);
 };
 
 enum class FigureRotation { No, Yes, Plane };
 
 struct EllipticalCurvature {
-    double shortHalfAxisB         = 0.0;
-    double longHalfAxisA          = 0.0;
-    double entranceArmLength      = 0.0;
-    double exitArmLength          = 0.0;
-    Angle designGrazingIncAngle   = Radians(0.0);
-    FigureRotation figureRotation = FigureRotation::No;
-    double parameterA11           = 1.0;
+    RAYX_PROPERTY(EllipticalCurvature, double, shortHalfAxisB)              = 0.0;
+    RAYX_PROPERTY(EllipticalCurvature, double, longHalfAxisA)               = 0.0;
+    RAYX_PROPERTY(EllipticalCurvature, double, entranceArmLength)           = 0.0;
+    RAYX_PROPERTY(EllipticalCurvature, double, exitArmLength)               = 0.0;
+    RAYX_NESTED_PROPERTY(EllipticalCurvature, Angle, designGrazingIncAngle) = Rad(0.0);
+    RAYX_PROPERTY(EllipticalCurvature, FigureRotation, figureRotation)      = FigureRotation::No;
+    RAYX_PROPERTY(EllipticalCurvature, double, parameterA11)                = 1.0;
 };
 
 struct ConicalCurvature {
-    Angle grazingIncAngle    = Radians(0.0);
-    double entranceArmLength = 0.0;
-    double exitArmLength     = 0.0;
-    double totalLength       = 0.0;
+    RAYX_NESTED_PROPERTY(ConicalCurvature, Angle, grazingIncAngle) = Rad(0.0);
+    RAYX_PROPERTY(ConicalCurvature, double, entranceArmLength)     = 0.0;
+    RAYX_PROPERTY(ConicalCurvature, double, exitArmLength)         = 0.0;
+    RAYX_PROPERTY(ConicalCurvature, double, totalLength)           = 0.0;
 };
 
 enum class CylinderDirection { LongRadiusR, ShortRadiusRho };
 
 struct CylindricalCurvature {
-    CylinderDirection direction = CylinderDirection::LongRadiusR;
-    double radius               = 0.0;
-    Angle grazingIncAngle       = Radians(0.0);
-    double entranceArmLength    = 0.0;
-    double exitArmLength        = 0.0;
+    RAYX_PROPERTY(CylindricalCurvature, CylinderDirection, direction)  = CylinderDirection::LongRadiusR;
+    RAYX_PROPERTY(CylindricalCurvature, double, radius)                = 0.0;
+    RAYX_NESTED_PROPERTY(CylindricalCurvature, Angle, grazingIncAngle) = Rad(0.0);
+    RAYX_PROPERTY(CylindricalCurvature, double, entranceArmLength)     = 0.0;
+    RAYX_PROPERTY(CylindricalCurvature, double, exitArmLength)         = 0.0;
 };
 
 struct SphericalCurvature {
-    double radius = 0.0;
+    RAYX_PROPERTY(SphericalCurvature, double, radius) = 0.0;
 };
 
 enum class ParabolicCurvatureType { Collimate, Focussing };
 
 struct ParabolicCurvature {
-    double armLength                      = 0.0;
-    double parameterP                     = 0.0;
-    ParabolicCurvatureType parameterPType = ParabolicCurvatureType::Collimate;
-    Angle grazingIncAngle                 = Radians(0.0);
-    double parameterA11                   = 1.0;
+    RAYX_PROPERTY(ParabolicCurvature, double, armLength)                      = 0.0;
+    RAYX_PROPERTY(ParabolicCurvature, double, parameterP)                     = 0.0;
+    RAYX_PROPERTY(ParabolicCurvature, ParabolicCurvatureType, parameterPType) = ParabolicCurvatureType::Collimate;
+    RAYX_NESTED_PROPERTY(ParabolicCurvature, Angle, grazingIncAngle)          = Rad(0.0);
+    RAYX_PROPERTY(ParabolicCurvature, double, parameterA11)                   = 1.0;
 };
 
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature, EllipticalCurvature, ConicalCurvature, CylindricalCurvature,
                                SphericalCurvature, ParabolicCurvature>;
 
-}  // namespace rayx::design
+}  // namespace rayx

@@ -27,9 +27,9 @@ concept QueueGpuCuda = AccGpuCuda<typename alpaka::acc<alpaka::Queue<Acc, T>>::t
 
 double toDouble(double value) { return value; }
 
-double toDouble(Degrees degrees) { return degreesToRadians(degrees.value); }
+double toDouble(Deg degrees) { return degreesToRad(degrees.value); }
 
-double toDouble(Radians radians) { return radians.value; }
+double toDouble(Rad radians) { return radians.value; }
 
 double toDouble(Angle angle) {
     return std::visit([](auto angle) { return toDouble(angle); });

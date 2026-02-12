@@ -9,18 +9,20 @@
 #include "Curvature.h"
 #include "SlopeError.h"
 
-namespace rayx::design {
+namespace rayx {
 
 struct SurfaceElement {
-    Area area;
-    Behavior behavior                  = DetectBehavior{};
-    std::optional<Curvature> curvature = std::nullopt;
-    // TODO: should a slits aperture work from behind? maybe we need frontAperture and backAperture here
-    std::optional<Aperture> aperture     = std::nullopt;
-    std::optional<SlopeError> slopeError = std::nullopt;
+    SurfaceElement(Area area, Behavior behavior) : m_area(area), m_behavior(behavior) {}
+
+    RAYX_NESTED_PROPERTY(SurfaceElement, Area, area);
+    RAYX_NESTED_PROPERTY(SurfaceElement, Behavior, behavior);
+    RAYX_NESTED_PROPERTY(SurfaceElement, std::optional<Curvature>, curvature);
+    RAYX_NESTED_PROPERTY(SurfaceElement, std::optional<Aperture>, aperture);
+    RAYX_NESTED_PROPERTY(SurfaceElement, std::optional<SlopeError>, slopeError);
+    RAYX_PROPERTY(SurfaceElement, BackFaceBehavior, backFaceBehavior) = BackFaceBehavior::Absorb;
 };
 
 using Element    = std::variant<SurfaceElement>;
 using ElementPtr = std::variant<std::shared_ptr<SurfaceElement>>;
 
-}  // namespace rayx::design
+}  // namespace rayx

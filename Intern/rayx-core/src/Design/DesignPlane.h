@@ -1,8 +1,8 @@
 #pragma once
 
-namespace rayx::design {
+namespace rayx {
 
-enum class RAYX_API DesignPlane {
+enum class DesignPlane {
     XY,
     XZ,
 };
@@ -18,6 +18,8 @@ template <typename T>
 struct DesignPlaneOf;
 
 // clang-format off
+//
+// XY
 template <> struct DesignPlaneOf<ArtificialSource>      { static constexpr DesignPlane value = DesignPlane::XY; };
 template <> struct DesignPlaneOf<ProjectorSource>       { static constexpr DesignPlane value = DesignPlane::XY; };
 template <> struct DesignPlaneOf<SimpleUndulatorSource> { static constexpr DesignPlane value = DesignPlane::XY; };
@@ -27,7 +29,7 @@ template <> struct DesignPlaneOf<InputSource>           { static constexpr Desig
 template <> struct DesignPlaneOf<DetectorBehavior>      { static constexpr DesignPlane value = DesignPlane::XY; };
 template <> struct DesignPlaneOf<AbsorbBehaviour>       { static constexpr DesignPlane value = DesignPlane::XY; };
 template <> struct DesignPlaneOf<TransmitBehaviour>     { static constexpr DesignPlane value = DesignPlane::XY; };
-
+// XZ
 template <> struct DesignPlaneOf<ReflectBehaviour>      { static constexpr DesignPlane value = DesignPlane::XZ; };
 template <> struct DesignPlaneOf<RzpBehavior>           { static constexpr DesignPlane value = DesignPlane::XZ; };
 template <> struct DesignPlaneOf<GratingBehavior>       { static constexpr DesignPlane value = DesignPlane::XZ; };
@@ -39,14 +41,14 @@ constexpr DesignPlane designPlane_v = DesignPlaneOf<T>::value;
 
 }  // namespace detail
 
-RAYX_API DesignPlane getDesignPlane(const Source& source) {
+DesignPlane getDesignPlane(const Source& source) {
     return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, source);
 }
 
-RAYX_API DesignPlane getDesignPlane(const Behavior& behavior) {
+DesignPlane getDesignPlane(const Behavior& behavior) {
     return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, behavior);
 }
 
-RAYX_API DesignPlane getDesignPlane(const SurfaceElement& element) { return getDesignPlane(element.behavior); }
+DesignPlane getDesignPlane(const SurfaceElement& element) { return getDesignPlane(element.behavior); }
 
-}  // namespace rayx::design
+}  // namespace rayx

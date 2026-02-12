@@ -2,7 +2,9 @@
 
 #include <algorithm>
 
-namespace rayx::detail::host {
+#include "Design/Beamline.h"
+
+namespace rayx::detail {
 
 // TODO: implement using TranslateNode and RotateNode
 
@@ -46,4 +48,4 @@ namespace rayx::detail::host {
 //     return getLocalGlobalTransform(node.getWorldSpacePosition(), node.getWorldSpaceRotation(), designPlane);
 // }
 
-}  // namespace rayx::detail::host
+}  // namespace rayx::detail

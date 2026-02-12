@@ -13,19 +13,13 @@
 #include "Source.h"
 #include "Translation.h"
 
-namespace rayx::design {
+namespace rayx {
 
 struct SourceNode;
 struct ElementNode;
 struct TranslateNode;
 struct RotateNode;
 struct Beamline;
-
-enum class SubBeamlineBehavior {
-    Reference,
-    CopyNodes,
-    CopyNodesSourcesElements,
-};
 
 class Node {
   public:
@@ -131,4 +125,4 @@ struct Beamline : Node {
     std::shared_ptr<Beamline> copyNodesAndObjects(std::string_view name) const;
 };
 
-}  // namespace rayx::design
+}  // namespace rayx

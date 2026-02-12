@@ -10,8 +10,8 @@
 
 namespace {
 
-using DeviceType = rayx::trace::DeviceConfig::DeviceType;
-using Device     = rayx::trace::DeviceConfig::Device;
+using DeviceType = rayx::DeviceConfig::DeviceType;
+using Device     = rayx::DeviceConfig::Device;
 using Index      = Device::Index;
 using Score      = Device::Score;
 
@@ -111,7 +111,7 @@ std::string deviceTypeToString(DeviceType deviceType) {
 
 }  // unnamed namespace
 
-namespace rayx::trace {
+namespace rayx {
 
 DeviceConfig::DeviceConfig(DeviceType fetchedDeviceType) : devices(getAvailableDevices(fetchedDeviceType)), m_fetchedDeviceType(fetchedDeviceType) {}
 
@@ -204,4 +204,4 @@ DeviceConfig::DeviceType DeviceConfig::availableDeviceTypes() {
     return deviceType;
 }
 
-}  // namespace rayx::trace
+}  // namespace rayx

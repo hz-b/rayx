@@ -5,17 +5,18 @@
 // TODO
 // #include "Throw.h"
 
-namespace rayx::trace {
+namespace rayx {
 
 // TODO: doc this enum and all its members
 enum class EventType : uint32_t {
-    Uninitialized = 0,
-    Emitted       = 1,
-    HitElement    = 2,
-    FatalError    = 3,
-    Absorbed      = 4,
-    BeyondHorizon = 5,
-    TooManyEvents = 6,
+    Uninitialized     = 0,
+    Emitted           = 1,
+    HitElement        = 2,
+    FatalError        = 3,
+    AbsorbedFrontFace = 4,
+    AbsorbedBackFace  = 7,
+    BeyondHorizon     = 5,
+    TooManyEvents     = 6,
 };
 
 RAYX_FN_ACC inline bool isRayTerminated(const EventType eventType) {
@@ -70,4 +71,4 @@ RAYX_FN_ACC inline void terminateRay(EventType& __restrict dstEventType, const E
 //     static_cast<std::underlying_type_t<EventTypeMask>>(eventType));
 // }
 
-}  // namespace rayx::trace
+}  // namespace rayx

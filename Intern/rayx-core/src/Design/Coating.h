@@ -4,28 +4,32 @@
 
 #include "Material.h"
 
-namespace rayx::design {
+namespace rayx {
 
 struct CoatingLayer {
-    Material material = Material::Au;
-    double thickness  = 0.0;
-    double roughness  = 0.0;
+    CoatingLayer(Material material, double thickness) {
+        this->material(material);
+        this->thickness(thickness);
+    }
+
+    RAYX_PROPERTY(CoatingLayer, Material, material);
+    RAYX_VALIDATED_PROPERTY(CoatingLayer, double, thickness, detail::validateGreaterZero);
+    RAYX_VALIDATED_PROPERTY(CoatingLayer, double, roughness, detail::validateGreaterEqualZero) = 0.0;
 };
 
 struct PeriodicCoating {
-    std::vector<CoatingLayer> layers = {CoatingLayer()};
-    int numPeriods                   = 1;
+    PeriodicCoating(std::vector<CoatingLayer> layers) { this->layers(layers); }
+
+    RAYX_VALIDATED_PROPERTY(PeriodicCoating, std::vector<CoatingLayer>, layers, detail::validateVectorSizeGreaterZero);
+    RAYX_VALIDATED_PROPERTY(PeriodicCoating, int, numPeriods, detail::validateGreaterZero) = 1;
+
+    // optional bottom layer (e.g., adhesion layer)
+    RAYX_NESTED_PROPERTY(PeriodicCoating, std::optional<CoatingLayer>, bottomLayer);
+    // optional top layer (e.g., protective layer)
+    RAYX_NESTED_PROPERTY(PeriodicCoating, std::optional<CoatingLayer>, topLayer);
 };
 
-struct Coating {
-    PeriodicCoating periodicCoating;
-
-    /// Optional bottom layer (e.g., adhesion layer)
-    std::optional<CoatingLayer> bottomLayer;
-    /// Optional top layer (e.g., protective layer)
-    std::optional<CoatingLayer> topLayer;
-};
-
+using Coating = std::variant<PeriodicCoating>;
 // TODO: consider implementing depth-graded coatings (distributions: power-law, linear, exponential)
 
-}  // namespace rayx::design
+}  // namespace rayx

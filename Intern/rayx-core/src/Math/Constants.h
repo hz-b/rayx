@@ -4,13 +4,14 @@
 
 #include "Core.h"
 
-namespace rayx::math::constants {
+namespace rayx::constants {
 
 /// inverse nanometer-electron volt relationship / reziprocal factor
 constexpr double inv_nm_to_evolt = 1239.841984332002622;
 
-constexpr double pi = 3.14159265358979323846264338327950;
-// 141592653589793238462643383279502884197169399
+constexpr double pi = std::numbers::pi;
+// constexpr double pi = 3.14159265358979323846264338327950;
+// 3.141592653589793238462643383279502884197169399
 
 // DipoleSource Constants
 
@@ -50,4 +51,4 @@ constexpr double electron_radius = 2.8179403205e-6;  // classical electron radiu
 // constexpr double ELECTRON_RADIUS = (ELEMENTARY_CHARGE / (SPEED_OF_LIGHT * SPEED_OF_LIGHT)) * 1.e9;  // Classical
 // electron radius in nm
 
-}  // namespace rayx::math::constants
+}  // namespace rayx::constants

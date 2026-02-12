@@ -7,78 +7,85 @@
 #include "Coating.h"
 #include "Material.h"
 
-namespace rayx::design {
+namespace rayx {
 
-enum class BehindRayBehavior {
+/// Behavior of element when a ray hits the back side of the element (i.e., the side opposite to the normal direction).
+enum class BackFaceBehavior {
     Ignore,
     Absorb,
 };
 
-/// Ray does not interact with the element, but records detection.
-struct DetectBehavior {
-    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
-};
+/// Ray does not interact with the element, but records `HitElement` event.
+struct DetectBehavior {};
 
-// /// Ray does not interact with the element.
-// struct IgnoreBehavior {};
+/// Ray gets absorbed and records `AbsorbedFrontFace` event.
+struct AbsorbBehavior {};
 
-struct AbsorbBehavior {
-    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
-};
+// TODO: this is essentially useless, because its the same as if the element was not there at all.
+/// Ray does not interact with the element and records no events.
+struct IgnoreBehavior {};
 
 struct ReflectBehavior {
-    Material substrate = Material::Si;
-    // double substrateRoughness = 0.0; // TODO: currently not supported
-    std::optional<Coating> coating      = std::nullopt;
-    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
+    ReflectBehavior(Material substrate) { this->substrate(substrate); }
+
+    RAYX_PROPERTY(ReflectBehavior, Material, substrate);
+    // RAYX_PROPERTY(ReflectBehavior, double, substrateRoughness) = 0.0; // TODO: currently not supported
+    RAYX_NESTED_PROPERTY(ReflectBehavior, std::optional<Coating>, coating);
 };
 
 struct TransmitBehavior {
-    Material substrate                  = Material::C;
-    double substrateThickness           = 0.1;
-    double substrateRoughness           = 0.0;
-    std::optional<Coating> coating      = std::nullopt;
-    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
+    TransmitBehavior(Material substrate, double substrateThickness) {
+        this->substrate(substrate);
+        this->substrateThickness(substrateThickness);
+    }
+
+    RAYX_PROPERTY(TransmitBehavior, Material, substrate);
+    RAYX_VALIDATED_PROPERTY(TransmitBehavior, double, substrateThickness, detail::validateGreaterZero);
+    RAYX_VALIDATED_PROPERTY(TransmitBehavior, double, substrateRoughness, detail::validateGreaterEqualZero) = 0.0;
+    RAYX_NESTED_PROPERTY(TransmitBehavior, std::optional<Coating>, coating);
 };
 
 struct GratingBehavior {
-    std::array<double, 6> vls           = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  // VLS coefficients
-    double lineDensity                  = 0.0;                             // lines per mm
-    int orderOfDiffraction              = 1;                               // the diffraction order, usually 1
-    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
+    GratingBehavior(double lineDensity) { this->lineDensity(lineDensity); }
+
+    RAYX_VALIDATED_PROPERTY(GratingBehavior, double, lineDensity, detail::validateGreaterZero);               // lines per mm
+    RAYX_PROPERTY(GratingBehavior, int, orderOfDiffraction)              = 1;                                 // the diffraction order, usually 1
+    RAYX_PROPERTY(GratingBehavior, std::array<double RAYX_COMMA 6>, vls) = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };  // VLS coefficients
 };
 
 struct RzpBehavior {
-    int imageType                            = 0;
-    int rzpType                              = 0;
-    int derivationMethod                     = 0;
-    int designOrderOfDiffraction             = 1;
-    int orderOfDiffraction                   = 1;
-    int additionalOrder                      = 0;
-    double designWavelength                  = 0.0;
-    double fresnelZOffset                    = 0.0;
-    double designSagittalEntranceArmLength   = 0.0;
-    double designSagittalExitArmLength       = 0.0;
-    double designMeridionalEntranceArmLength = 0.0;
-    double designMeridionalExitArmLength     = 0.0;
-    double designAlphaAngle                  = 0.0;
-    double designBetaAngle                   = 0.0;
-    BehindRayBehavior behindRayBehavior      = BehindRayBehavior::Absorb;
+    // TODO: find out which properties need validation
+    // TODO: find out which properties can use more specific types (e.g., enums, units)
+    RAYX_PROPERTY(RzpBehavior, int, imageType)                            = 0;
+    RAYX_PROPERTY(RzpBehavior, int, rzpType)                              = 0;
+    RAYX_PROPERTY(RzpBehavior, int, derivationMethod)                     = 0;
+    RAYX_PROPERTY(RzpBehavior, int, designOrderOfDiffraction)             = 1;
+    RAYX_PROPERTY(RzpBehavior, int, orderOfDiffraction)                   = 1;
+    RAYX_PROPERTY(RzpBehavior, int, additionalOrder)                      = 0;
+    RAYX_PROPERTY(RzpBehavior, double, designWavelength)                  = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, fresnelZOffset)                    = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, designSagittalEntranceArmLength)   = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, designSagittalExitArmLength)       = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, designMeridionalEntranceArmLength) = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, designMeridionalExitArmLength)     = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, designAlphaAngle)                  = 0.0;
+    RAYX_PROPERTY(RzpBehavior, double, designBetaAngle)                   = 0.0;
 };
 
 struct CrystalBehavior {
-    double dSpacing2                    = 0.0;
-    double unitCellVolume               = 0.0;
-    double offsetAngle                  = 0.0;
-    double structureFactorReF0          = 0.0;
-    double structureFactorImF0          = 0.0;
-    double structureFactorReFH          = 0.0;
-    double structureFactorImFH          = 0.0;
-    double structureFactorReFHC         = 0.0;
-    double structureFactorImFHC         = 0.0;
-    BehindRayBehavior behindRayBehavior = BehindRayBehavior::Absorb;
+    // TODO: find out which properties need validation
+    // TODO: find out which properties can use more specific types (e.g., enums, units)
+    RAYX_PROPERTY(CrystalBehavior, double, dSpacing2)            = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, unitCellVolume)       = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, offsetAngle)          = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, structureFactorReF0)  = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, structureFactorImF0)  = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, structureFactorReFH)  = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, structureFactorImFH)  = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, structureFactorReFHC) = 0.0;
+    RAYX_PROPERTY(CrystalBehavior, double, structureFactorImFHC) = 0.0;
 };
 
 using Behavior = std::variant<DetectBehavior, AbsorbBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
 
-}  // namespace rayx::design
+}  // namespace rayx

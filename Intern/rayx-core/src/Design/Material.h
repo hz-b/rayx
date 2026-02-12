@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 
-namespace rayx::design {
+namespace rayx {
 
 // TODO: add strings for materials consisting of multiple atomic elements
 
@@ -13,4 +13,4 @@ enum class Material {
 #undef X
 };
 
-}  // namespace rayx::design
+}  // namespace rayx

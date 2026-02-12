@@ -5,7 +5,7 @@
 #include "Core.h"
 #include "Design/Beamline.h"
 
-namespace rayx::detail::host {
+namespace rayx::detail {
 
 struct RAYX_API LocalGlobalTransform {
     glm::dmat4 globalToLocal;
@@ -40,4 +40,4 @@ struct RAYX_API LocalGlobalTransform {
 //  */
 // RAYX_API LocalGlobalTransform getLocalGlobalTransform(const Beamline& node);
 
-}  // namespace rayx::detail::host
+}  // namespace rayx::detail

@@ -1,180 +1,73 @@
 #include "Design/Beamline.h"
 
-using namespace rayx::design;
-using namespace rayx::design::literals;
-using namespace rayx::math;
+using namespace rayx;
+using namespace rayx::literals;
 
 std::shared_ptr<Beamline> createMetrixBeamline() {
-    auto U41_318eV = PointSource{
-        .numRays = 1 << 20,
-        .rayOrigin = {
-            .x = GaussianDistribution<double>{.standardDeviation = 0.076},
-            .y = GaussianDistribution<double>{.standardDeviation = 0.027},
-            .z = WhiteNoiseDistribution<double>{.range = 1.0},
-        },
-        .rayAngle = {
-            .x = GaussianDistribution<Angle>{.standardDeviation = 0.078_rad},  // TODO: check
-            .y = GaussianDistribution<Angle>{.standardDeviation = 0.04_rad},
-        },
-        .rayPhotonEnergy = 318.0_eV,
-        .rayPolarization = Stokes{1, 1, 0, 0},
-    };
+    ////////////////////////////////////////////////////////////
+    // define source and elements with their properties
+    ////////////////////////////////////////////////////////////
 
-    auto ASBL = SurfaceElement{
-        .area = RectangularArea{
-            .width  = 100,
-            .height = 100,
-        },
-        .behavior = AbsorbBehavior{},
-        .aperture = DiffractiveAperture{
-            .area = RectangularArea{
-                .width  = 2,
-                .height = 2,
-            },
-        },
-    };
+    auto U41_318eV = PointSource(318.0_eV)
+                         .rayOrigin({
+                             GaussianDistribution<double>(0.0, 0.076),
+                             GaussianDistribution<double>(0.0, 0.027),
+                             WhiteNoiseDistribution<double>(0.0, 1.0),
+                         })
+                         .rayAngle({
+                             GaussianDistribution<Angle>(0.0_rad, 0.078),  // TODO: check
+                             GaussianDistribution<Angle>(0.0_rad, 0.04),
+                         });
 
-    auto M1Cylinder = SurfaceElement{
-        .area = RectangularArea{
-             .width  = 20,
-             .height = 320,
-         },
-         .behavior = ReflectBehavior{
-             .substrate = Material::Au,
-         },
-         .curvature = CylindricalCurvature{
-             .direction         = CylinderDirection::ShortRadiusRho,
-             .radius            = 174.21,
-             .grazingIncAngle   = 1.75_rad,  // TODO: why would we need the grazing inc angle for a curvature?
-             .entranceArmLength = 12000,     // TODO: why is this the exact distance to the source?
-             .exitArmLength     = 3750,
-         },
-         .slopeError = SlopeError{
-             .saggital   = 1.01,
-             .meridional = 0.16,
-         }
-    };
+    auto ASBL = SurfaceElement(RectangularArea(100, 100), AbsorbBehavior()).aperture(DiffractiveAperture(RectangularArea(2, 2)));
 
-    auto EntranceSlit = SurfaceElement{
-        .area = RectangularArea{
-            .width  = 100,
-            .height = 100,
-        },
-        .behavior = AbsorbBehavior{},
-        .aperture = DiffractiveAperture{
-            .area = RectangularArea{
-                .width  = 10,
-                .height = 10,
-            },
-        },
-    };
+    auto M1Cylinder = SurfaceElement(RectangularArea(20, 320), ReflectBehavior(Material::Au))
+                          .curvature(CylindricalCurvature()
+                                         .direction(CylinderDirection::ShortRadiusRho)
+                                         .radius(174.21)
+                                         .grazingIncAngle(1.75_rad)
+                                         .entranceArmLength(12000)
+                                         .exitArmLength(3750))
+                          .slopeError(SlopeError().saggital(1.01).meridional(0.16));
 
-    auto E1 = SurfaceElement{
-        .area = RectangularArea{
-            .width  = 20,
-            .height = 390,
-        },
-        .behavior = ReflectBehavior{
-            .substrate = Material::Au,
-        },
-        .curvature = EllipticalCurvature{
-            .shortHalfAxisB        = 302.721702601,
-            .longHalfAxisA         = 20750,
-            .entranceArmLength     = 39600,
-            .exitArmLength         = 1900,
-            .designGrazingIncAngle = 2.00735_rad,
-            .figureRotation        = FigureRotation::Plane,
-            .parameterA11          = 1,
-        },
-        .slopeError = SlopeError{
-            .saggital   = 0.037,
-            .meridional = 0.023,
-        },
-    };
+    auto EntranceSlit = SurfaceElement(RectangularArea(100, 100), AbsorbBehavior()).aperture(DiffractiveAperture(RectangularArea(10, 10)));
 
-    auto E2 = SurfaceElement{
-        .area =
-            RectangularArea{
-                .width  = 20,
-                .height = 390,
-            },
-        .behavior =
-            ReflectBehavior{
-                .substrate = Material::Au,
-            },
-        .curvature =
-            EllipticalCurvature{
-                .shortHalfAxisB        = 97.1560870104,
-                .longHalfAxisA         = 4375,
-                .entranceArmLength     = 7750,
-                .exitArmLength         = 1000,
-                .designGrazingIncAngle = 2.00735_rad,
-                .figureRotation        = FigureRotation::Plane,
-                .parameterA11          = 1,
-            },
-        .slopeError =
-            SlopeError{
-                .saggital   = 0.045,
-                .meridional = 0.024,
-            },
-    };
+    auto E1 = SurfaceElement(RectangularArea(20, 390), ReflectBehavior(Material::Au))
+                  .curvature(EllipticalCurvature()
+                                 .shortHalfAxisB(302.721702601)
+                                 .longHalfAxisA(20750)
+                                 .entranceArmLength(39600)
+                                 .exitArmLength(1900)
+                                 .designGrazingIncAngle(2.00735_rad)
+                                 .figureRotation(FigureRotation::Plane)
+                                 .parameterA11(1))
+                  .slopeError(SlopeError().saggital(0.037).meridional(0.023));
 
-    auto PlaneMirror = SurfaceElement{
-        .area =
-            RectangularArea{
-                .width  = 20,
-                .height = 310,
-            },
-        .behavior =
-            ReflectBehavior{
-                .substrate = Material::Au,
-            },
-        .slopeError =
-            SlopeError{
-                .saggital   = 0.084,
-                .meridional = 0.023,
-            },
-    };
+    auto E2 = SurfaceElement(RectangularArea(20, 390), ReflectBehavior(Material::Au))
+                  .curvature(EllipticalCurvature()
+                                 .shortHalfAxisB(97.1560870104)
+                                 .longHalfAxisA(4375)
+                                 .entranceArmLength(7750)
+                                 .exitArmLength(1000)
+                                 .designGrazingIncAngle(2.00735_rad)
+                                 .figureRotation(FigureRotation::Plane)
+                                 .parameterA11(1))
+                  .slopeError(SlopeError().saggital(0.045).meridional(0.024));
 
-    auto SphericalGrating = SurfaceElement{
-        .area =
-            RectangularArea{
-                .width  = 20,
-                .height = 100,
-            },
-        .behavior =
-            GratingBehavior{
-                .lineDensity        = 1199.918,
-                .orderOfDiffraction = 1,
-            },
-        .slopeError =
-            SlopeError{
-                .saggital   = 0.124,
-                .meridional = 0.102,
-            },
-    };
+    auto PlaneMirror =
+        SurfaceElement(RectangularArea(20, 310), ReflectBehavior(Material::Au)).slopeError(SlopeError().saggital(0.084).meridional(0.023));
 
-    auto ExitSlit = SurfaceElement{
-        .area =
-            RectangularArea{
-                .width  = 100,
-                .height = 100,
-            },
-        .behavior = AbsorbBehavior{},
-        .aperture =
-            DiffractiveAperture{
-                .area =
-                    RectangularArea{
-                        .width  = 20,
-                        .height = 0.1,
-                    },
-            },
-    };
+    auto SphericalGrating =
+        SurfaceElement(RectangularArea(20, 100), GratingBehavior(1199.918)).slopeError(SlopeError().saggital(0.124).meridional(0.102));
 
-    auto ImagePlane = SurfaceElement{
-        .area     = UnlimitedArea{},
-        .behavior = DetectBehavior{},
-    };
+    auto ExitSlit = SurfaceElement(RectangularArea(100, 100), AbsorbBehavior()).aperture(DiffractiveAperture(RectangularArea(20, 0.1)));
+
+    auto ImagePlane = SurfaceElement{UnlimitedArea(), DetectBehavior()};
+
+    ////////////////////////////////////////////////////////////
+    // compose metrix beamline using source and elements
+    // placed at the correct positions and orientations
+    ////////////////////////////////////////////////////////////
 
     auto metrix = std::make_shared<Beamline>("METRIX");
 
