@@ -26,7 +26,7 @@ struct AbsorbBehavior {};
 struct IgnoreBehavior {};
 
 struct ReflectBehavior {
-    ReflectBehavior(Material substrate) { this->substrate(substrate); }
+    constexpr ReflectBehavior(Material substrate) { this->substrate(substrate); }
 
     RAYX_PROPERTY(ReflectBehavior, Material, substrate);
     // RAYX_PROPERTY(ReflectBehavior, double, substrateRoughness) = 0.0; // TODO: currently not supported
@@ -34,7 +34,7 @@ struct ReflectBehavior {
 };
 
 struct TransmitBehavior {
-    TransmitBehavior(Material substrate, double substrateThickness) {
+    constexpr TransmitBehavior(Material substrate, double substrateThickness) {
         this->substrate(substrate);
         this->substrateThickness(substrateThickness);
     }
@@ -46,7 +46,7 @@ struct TransmitBehavior {
 };
 
 struct GratingBehavior {
-    GratingBehavior(double lineDensity) { this->lineDensity(lineDensity); }
+    constexpr GratingBehavior(double lineDensity) { this->lineDensity(lineDensity); }
 
     RAYX_VALIDATED_PROPERTY(GratingBehavior, double, lineDensity, detail::validateGreaterZero);               // lines per mm
     RAYX_PROPERTY(GratingBehavior, int, orderOfDiffraction)              = 1;                                 // the diffraction order, usually 1

@@ -14,19 +14,19 @@ concept ArithmeticStrongTypedef = requires(T t) {
 
 // Base case: arithmetic primitives
 template <typename T>
-auto unwrapArithmeticStrongTypedefIfPossible(T&& value) {
+constexpr auto unwrapArithmeticStrongTypedefIfPossible(T&& value) {
     return value;
 }
 
 // Strong typedefs with value() method
 template <ArithmeticStrongTypedef T>
-auto unwrapArithmeticStrongTypedefIfPossible(T&& value) {
+constexpr auto unwrapArithmeticStrongTypedefIfPossible(T&& value) {
     return value.value();
 }
 
 // Variants of strong typedefs
 template <ArithmeticStrongTypedef... Ts>
-auto unwrapArithmeticStrongTypedefIfPossible(const std::variant<Ts...>& value) {
+constexpr auto unwrapArithmeticStrongTypedefIfPossible(const std::variant<Ts...>& value) {
     return std::visit([](auto&& arg) { return unwrapArithmeticStrongTypedefIfPossible(arg); }, value);
 }
 

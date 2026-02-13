@@ -12,7 +12,7 @@
 namespace rayx {
 
 struct SurfaceElement {
-    SurfaceElement(Area area, Behavior behavior) : m_area(area), m_behavior(behavior) {}
+    constexpr SurfaceElement(Area area, Behavior behavior) : m_area(area), m_behavior(behavior) {}
 
     RAYX_NESTED_PROPERTY(SurfaceElement, Area, area);
     RAYX_NESTED_PROPERTY(SurfaceElement, Behavior, behavior);

@@ -14,10 +14,10 @@ struct UnitVec3 {
     constexpr UnitVec3(glm::dvec3 vec) : m_vec(vec) { detail::validateEqual("UnitVec3", "length", glm::length(vec), 1.0); }
     constexpr UnitVec3(double x, double y, double z) : UnitVec3(glm::dvec3(x, y, z)) {}
 
-    double x() const { return m_vec.x; }
-    double y() const { return m_vec.y; }
-    double z() const { return m_vec.z; }
-    glm::dvec3 toVec3() const { return m_vec; }
+    constexpr double x() const { return m_vec.x; }
+    constexpr double y() const { return m_vec.y; }
+    constexpr double z() const { return m_vec.z; }
+    constexpr glm::dvec3 toVec3() const { return m_vec; }
 
   private:
     glm::dvec3 m_vec;
@@ -58,48 +58,48 @@ using Rotation = std::variant<RotationAroundAxis, RotationBase, glm::dmat3>;
 
 namespace rayx {
 
-inline RotationAroundAxis toRotationAroundAxis(const RotationAroundAxis& rotation) { return rotation; }
+constexpr inline RotationAroundAxis toRotationAroundAxis(const RotationAroundAxis& rotation) { return rotation; }
 
-inline RotationAroundAxis toRotationAroundAxis(const RotationBase& rotation) {
+constexpr inline RotationAroundAxis toRotationAroundAxis(const RotationBase& rotation) {
     const auto quat = glm::quat_cast(glm::dmat3(rotation.right().toVec3(), rotation.up().toVec3(), rotation.forward().toVec3()));
     return RotationAroundAxis(Rad{glm::angle(quat)}, glm::axis(quat));
 }
 
-inline RotationAroundAxis toRotationAroundAxis(const glm::dmat3& rotation) {
+constexpr inline RotationAroundAxis toRotationAroundAxis(const glm::dmat3& rotation) {
     const auto quat = glm::quat_cast(rotation);
     return RotationAroundAxis(Rad{glm::angle(quat)}, glm::axis(quat));
 }
 
-inline RotationAroundAxis toRotationAroundAxis(const Rotation& rotation) {
+constexpr inline RotationAroundAxis toRotationAroundAxis(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationAroundAxis(arg); }, rotation);
 }
 
-inline RotationBase toRotationBase(const RotationBase& rotation) { return rotation; }
+constexpr inline RotationBase toRotationBase(const RotationBase& rotation) { return rotation; }
 
-inline RotationBase toRotationBase(const RotationAroundAxis& rotation) {
+constexpr inline RotationBase toRotationBase(const RotationAroundAxis& rotation) {
     const auto quat = glm::angleAxis(toRad(rotation.angle()).value(), rotation.axis().toVec3());
     const auto mat  = glm::mat3_cast(quat);
     return RotationBase(mat[0], mat[1], mat[2]);
 }
 
-inline RotationBase toRotationBase(const glm::dmat3& rotation) { return RotationBase(rotation[0], rotation[1], rotation[2]); }
+constexpr inline RotationBase toRotationBase(const glm::dmat3& rotation) { return RotationBase(rotation[0], rotation[1], rotation[2]); }
 
-inline RotationBase toRotationBase(const Rotation& rotation) {
+constexpr inline RotationBase toRotationBase(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationBase(arg); }, rotation);
 }
 
-inline glm::dmat3 toMatrix(const glm::dmat3& rotation) { return rotation; }
+constexpr inline glm::dmat3 toMatrix(const glm::dmat3& rotation) { return rotation; }
 
-inline glm::dmat3 toMatrix(const RotationBase& rotation) {
+constexpr inline glm::dmat3 toMatrix(const RotationBase& rotation) {
     return glm::dmat3(rotation.right().toVec3(), rotation.up().toVec3(), rotation.forward().toVec3());
 }
 
-inline glm::dmat3 toMatrix(const RotationAroundAxis& rotation) {
+constexpr inline glm::dmat3 toMatrix(const RotationAroundAxis& rotation) {
     const auto quat = glm::angleAxis(toRad(rotation.angle()).value(), rotation.axis().toVec3());
     return glm::mat3_cast(quat);
 }
 
-inline glm::dmat3 toMatrix(const Rotation& rotation) {
+constexpr inline glm::dmat3 toMatrix(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toMatrix(arg); }, rotation);
 }
 
@@ -111,19 +111,19 @@ inline glm::dmat3 toMatrix(const Rotation& rotation) {
 
 #include <ostream>
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::UnitVec3& unitVec) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::UnitVec3& unitVec) {
     return os << "{" << unitVec.x() << ", " << unitVec.y() << ", " << unitVec.z() << "}";
 }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::RotationAroundAxis& rotation) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::RotationAroundAxis& rotation) {
     return os << "{angle=" << rotation.angle() << ", axis=" << rotation.axis() << "}";
 }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::RotationBase& rotation) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::RotationBase& rotation) {
     return os << "{right=" << rotation.right() << ", up=" << rotation.up() << ", forward=" << rotation.forward() << "}";
 }
 
-inline std::ostream& operator<<(std::ostream& os, const glm::dmat3& rotation) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const glm::dmat3& rotation) {
     os << "[";
     for (int i = 0; i < 3; i++) {
         os << "{" << rotation[i][0] << ", " << rotation[i][1] << ", " << rotation[i][2] << "}";
@@ -133,7 +133,7 @@ inline std::ostream& operator<<(std::ostream& os, const glm::dmat3& rotation) {
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::Rotation& rotation) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::Rotation& rotation) {
     return std::visit([&os](const auto& arg) -> std::ostream& { return os << arg; }, rotation);
 }
 

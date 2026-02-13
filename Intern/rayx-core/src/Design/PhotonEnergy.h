@@ -32,19 +32,19 @@ using PhotonEnergy = std::variant<WaveLength, ElectronVolt>;
 
 namespace rayx {
 
-inline WaveLength toWaveLength(const WaveLength wavelength) { return wavelength; }
+constexpr inline WaveLength toWaveLength(const WaveLength wavelength) { return wavelength; }
 
-inline WaveLength toWaveLength(const ElectronVolt energy) { return WaveLength{constants::inv_nm_to_evolt / energy.value()}; }
+constexpr inline WaveLength toWaveLength(const ElectronVolt energy) { return WaveLength{constants::inv_nm_to_evolt / energy.value()}; }
 
-inline WaveLength toWaveLength(const PhotonEnergy energy) {
+constexpr inline WaveLength toWaveLength(const PhotonEnergy energy) {
     return std::visit([](auto&& arg) { return toWaveLength(arg); }, energy);
 }
 
-inline ElectronVolt toElectronVolt(const ElectronVolt energy) { return energy; }
+constexpr inline ElectronVolt toElectronVolt(const ElectronVolt energy) { return energy; }
 
-inline ElectronVolt toElectronVolt(const WaveLength wavelength) { return ElectronVolt{constants::inv_nm_to_evolt / wavelength.value()}; }
+constexpr inline ElectronVolt toElectronVolt(const WaveLength wavelength) { return ElectronVolt{constants::inv_nm_to_evolt / wavelength.value()}; }
 
-inline ElectronVolt toElectronVolt(const PhotonEnergy energy) {
+constexpr inline ElectronVolt toElectronVolt(const PhotonEnergy energy) {
     return std::visit([](auto&& arg) { return toElectronVolt(arg); }, energy);
 }
 
@@ -56,9 +56,9 @@ inline ElectronVolt toElectronVolt(const PhotonEnergy energy) {
 
 namespace rayx::literals {
 
-inline WaveLength operator"" _nm(long double value) { return WaveLength{static_cast<double>(value)}; }
+constexpr inline WaveLength operator"" _nm(long double value) { return WaveLength{static_cast<double>(value)}; }
 
-inline ElectronVolt operator"" _eV(long double value) { return ElectronVolt{static_cast<double>(value)}; }
+constexpr inline ElectronVolt operator"" _eV(long double value) { return ElectronVolt{static_cast<double>(value)}; }
 
 }  // namespace rayx::literals
 
@@ -68,17 +68,17 @@ inline ElectronVolt operator"" _eV(long double value) { return ElectronVolt{stat
 
 #include <ostream>
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::WaveLength wavelength) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::WaveLength wavelength) {
     os << wavelength.value() << "(nm)";
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::ElectronVolt energy) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::ElectronVolt energy) {
     os << energy.value() << "(eV)";
     return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::PhotonEnergy energy) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::PhotonEnergy energy) {
     return std::visit([&os](const auto& arg) -> std::ostream& { return os << arg; }, energy);
 }
 

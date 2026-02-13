@@ -13,7 +13,7 @@ namespace rayx {
 
 template <typename T>
 struct SeparateValues {
-    SeparateValues(const T center, const T range, const int numValues) : m_center(center), m_range(range) { this->numValues(numValues); }
+    constexpr SeparateValues(const T center, const T range, const int numValues) : m_center(center), m_range(range) { this->numValues(numValues); }
 
     RAYX_NESTED_PROPERTY(SeparateValues, T, center);
     RAYX_NESTED_PROPERTY(SeparateValues, T, range);
@@ -22,7 +22,7 @@ struct SeparateValues {
 
 template <typename T>
 struct WhiteNoiseDistribution {
-    WhiteNoiseDistribution(const T center, const T range) : m_center(center), m_range(range) {}
+    constexpr WhiteNoiseDistribution(const T center, const T range) : m_center(center), m_range(range) {}
 
     RAYX_NESTED_PROPERTY(WhiteNoiseDistribution, T, center);
     RAYX_NESTED_PROPERTY(WhiteNoiseDistribution, T, range);
@@ -30,7 +30,7 @@ struct WhiteNoiseDistribution {
 
 template <typename T>
 struct GaussianDistribution {
-    GaussianDistribution(const T mean, const double standardDeviation) : m_mean(mean) { this->standardDeviation(standardDeviation); }
+    constexpr GaussianDistribution(const T mean, const double standardDeviation) : m_mean(mean) { this->standardDeviation(standardDeviation); }
 
     RAYX_NESTED_PROPERTY(GaussianDistribution, T, mean);
     // standard deviation is treated as the same type as mean
@@ -39,12 +39,14 @@ struct GaussianDistribution {
 
 template <typename T>
 struct BakedDistribution {
-    BakedDistribution(std::vector<T> values, std::optional<std::vector<T>> weights = std::nullopt) { this->valuesAndWeights(values, weights); }
+    constexpr BakedDistribution(std::vector<T> values, std::optional<std::vector<T>> weights = std::nullopt) {
+        this->valuesAndWeights(values, weights);
+    }
 
     const std::vector<T>& values() const { return m_values; }
     const std::optional<std::vector<T>>& weights() const { return m_weights; }
 
-    BakedDistribution& valuesAndWeights(std::vector<T> value, std::optional<std::vector<T>> weights = std::nullopt) {
+    constexpr BakedDistribution& valuesAndWeights(std::vector<T> value, std::optional<std::vector<T>> weights = std::nullopt) {
         if (weights) detail::validateVectorSizesEqual("BakedDistribution", "values", value, "weights", *weights);
         m_values  = value;
         m_weights = weights;
@@ -63,8 +65,8 @@ using Distribution = std::variant<T, SeparateValues<T>, WhiteNoiseDistribution<T
 
 template <typename T>
 struct Distribution2D {
-    Distribution2D() = default;
-    Distribution2D(const Distribution<T> horizontal, const Distribution<T> vertical) : m_horizontal(horizontal), m_vertical(vertical) {}
+    constexpr Distribution2D() = default;
+    constexpr Distribution2D(const Distribution<T> horizontal, const Distribution<T> vertical) : m_horizontal(horizontal), m_vertical(vertical) {}
 
     RAYX_NESTED_PROPERTY(Distribution2D, Distribution<T>, horizontal);
     RAYX_NESTED_PROPERTY(Distribution2D, Distribution<T>, vertical);
@@ -72,8 +74,8 @@ struct Distribution2D {
 
 template <typename T>
 struct Distribution3D {
-    Distribution3D() = default;
-    Distribution3D(const Distribution<T> horizontal, const Distribution<T> vertical, const Distribution<T> depth)
+    constexpr Distribution3D() = default;
+    constexpr Distribution3D(const Distribution<T> horizontal, const Distribution<T> vertical, const Distribution<T> depth)
         : m_horizontal(horizontal), m_vertical(vertical), m_depth(depth) {}
 
     RAYX_NESTED_PROPERTY(Distribution3D, Distribution<T>, horizontal);

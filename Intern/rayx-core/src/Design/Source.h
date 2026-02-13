@@ -22,7 +22,7 @@ constexpr Distribution3D<double> rayOrigin = Distribution3D<double>().horizontal
 }  // namespace defaults
 
 struct PointSource {
-    PointSource(Distribution<PhotonEnergy> rayPhotonEnergy) : m_rayPhotonEnergy(rayPhotonEnergy) {}
+    constexpr PointSource(Distribution<PhotonEnergy> rayPhotonEnergy) : m_rayPhotonEnergy(rayPhotonEnergy) {}
 
     RAYX_VALIDATED_PROPERTY(PointSource, int, numRays, detail::validateGreaterZero) = defaults::numRays;
     RAYX_NESTED_PROPERTY(PointSource, Distribution3D<double>, rayOrigin)            = defaults::rayOrigin;
@@ -32,7 +32,7 @@ struct PointSource {
 };
 
 struct MatrixSource {
-    MatrixSource(Distribution<PhotonEnergy> rayPhotonEnergy, double width, double height)
+    constexpr MatrixSource(Distribution<PhotonEnergy> rayPhotonEnergy, double width, double height)
         : m_width(width), m_height(height), m_rayPhotonEnergy(rayPhotonEnergy) {
         validate_width();
         validate_height();
@@ -48,7 +48,7 @@ struct MatrixSource {
 };
 
 struct CircleSource {
-    CircleSource(Distribution<PhotonEnergy> rayPhotonEnergy, SeparateValues<double> circleRadius)
+    constexpr CircleSource(Distribution<PhotonEnergy> rayPhotonEnergy, SeparateValues<double> circleRadius)
         : m_circleRadius(circleRadius), m_rayPhotonEnergy(rayPhotonEnergy) {}
 
     RAYX_VALIDATED_PROPERTY(CircleSource, int, numRays, detail::validateGreaterZero) = defaults::numRays;
@@ -63,7 +63,7 @@ enum class UndulatorSigmaType { Standard, Accurate };
 // TODO: sensible defaults
 // TODO: sensible validation
 struct SimpleUndulatorSource {
-    SimpleUndulatorSource(Distribution<PhotonEnergy> rayPhotonEnergy) : m_rayPhotonEnergy(rayPhotonEnergy) {}
+    constexpr SimpleUndulatorSource(Distribution<PhotonEnergy> rayPhotonEnergy) : m_rayPhotonEnergy(rayPhotonEnergy) {}
 
     RAYX_VALIDATED_PROPERTY(SimpleUndulatorSource, int, numRays, detail::validateGreaterZero) = defaults::numRays;
     RAYX_PROPERTY(SimpleUndulatorSource, UndulatorSigmaType, sigmaType)                       = UndulatorSigmaType::Standard;
@@ -80,7 +80,7 @@ struct SimpleUndulatorSource {
 // TODO: sensible defaults
 // TODO: sensible validation
 struct PixelSource {
-    PixelSource(Distribution<PhotonEnergy> rayPhotonEnergy, double width, double height)
+    constexpr PixelSource(Distribution<PhotonEnergy> rayPhotonEnergy, double width, double height)
         : m_width(width), m_height(height), m_rayPhotonEnergy(rayPhotonEnergy) {
         validate_width();
         validate_height();
@@ -101,7 +101,7 @@ enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 // TODO: sensible defaults
 // TODO: sensible validation
 struct DipoleSource {
-    DipoleSource(Distribution<PhotonEnergy> rayPhotonEnergy) : m_rayPhotonEnergy(rayPhotonEnergy) {}
+    constexpr DipoleSource(Distribution<PhotonEnergy> rayPhotonEnergy) : m_rayPhotonEnergy(rayPhotonEnergy) {}
 
     RAYX_VALIDATED_PROPERTY(DipoleSource, int, numRays, detail::validateGreaterZero)        = defaults::numRays;
     RAYX_PROPERTY(DipoleSource, double, bendingRadius)                                      = 1.0;

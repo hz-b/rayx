@@ -8,8 +8,10 @@
 
 namespace rayx {
 
+struct UnlimitedArea {};
+
 struct RectangularArea {
-    RectangularArea(double width, double height) {
+    constexpr RectangularArea(double width, double height) {
         this->width(width);
         this->height(height);
     }
@@ -19,7 +21,7 @@ struct RectangularArea {
 };
 
 struct EllipticalArea {
-    EllipticalArea(double horizontalDiameter, double verticalDiameter) {
+    constexpr EllipticalArea(double horizontalDiameter, double verticalDiameter) {
         this->horizontalDiameter(horizontalDiameter);
         this->verticalDiameter(verticalDiameter);
     }
@@ -29,7 +31,7 @@ struct EllipticalArea {
 };
 
 struct TrapezoidalArea {
-    TrapezoidalArea(double topWidth, double bottomWidth, double height) {
+    constexpr TrapezoidalArea(double topWidth, double bottomWidth, double height) {
         this->topWidth(topWidth);
         this->bottomWidth(bottomWidth);
         this->height(height);
@@ -45,8 +47,6 @@ struct TrapezoidalArea {
 //     std::vector<glm::dvec2> points;
 // };
 
-struct UnlimitedArea {};
-
-using Area = std::variant<RectangularArea, EllipticalArea, TrapezoidalArea, UnlimitedArea>;
+using Area = std::variant<UnlimitedArea, RectangularArea, EllipticalArea, TrapezoidalArea>;
 
 }  // namespace rayx

@@ -7,7 +7,7 @@
 namespace rayx {
 
 struct CoatingLayer {
-    CoatingLayer(Material material, double thickness) {
+    constexpr CoatingLayer(Material material, double thickness) {
         this->material(material);
         this->thickness(thickness);
     }
@@ -18,7 +18,7 @@ struct CoatingLayer {
 };
 
 struct PeriodicCoating {
-    PeriodicCoating(std::vector<CoatingLayer> layers) { this->layers(layers); }
+    constexpr PeriodicCoating(std::vector<CoatingLayer> layers) { this->layers(layers); }
 
     RAYX_VALIDATED_PROPERTY(PeriodicCoating, std::vector<CoatingLayer>, layers, detail::validateVectorSizeGreaterZero);
     RAYX_VALIDATED_PROPERTY(PeriodicCoating, int, numPeriods, detail::validateGreaterZero) = 1;

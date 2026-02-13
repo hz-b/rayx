@@ -11,7 +11,7 @@ using ApertureArea            = std::variant<RectangularArea, EllipticalArea, Tr
 using DiffractiveApertureArea = std::variant<RectangularArea, EllipticalArea>;
 
 struct NonDiffractiveAperture {
-    NonDiffractiveAperture(ApertureArea area) : m_area(area) {}
+    constexpr NonDiffractiveAperture(ApertureArea area) : m_area(area) {}
 
     RAYX_NESTED_PROPERTY(NonDiffractiveAperture, ApertureArea, area);
     RAYX_NESTED_PROPERTY(NonDiffractiveAperture, std::optional<ApertureArea>,
@@ -19,7 +19,7 @@ struct NonDiffractiveAperture {
 };
 
 struct DiffractiveAperture {
-    DiffractiveAperture(DiffractiveApertureArea area) : m_area(area) {}
+    constexpr DiffractiveAperture(DiffractiveApertureArea area) : m_area(area) {}
 
     RAYX_NESTED_PROPERTY(DiffractiveAperture, DiffractiveApertureArea, area);
     RAYX_NESTED_PROPERTY(DiffractiveAperture, std::optional<ApertureArea>,

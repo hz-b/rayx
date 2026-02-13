@@ -41,14 +41,14 @@ constexpr DesignPlane designPlane_v = DesignPlaneOf<T>::value;
 
 }  // namespace detail
 
-DesignPlane getDesignPlane(const Source& source) {
+constexpr DesignPlane getDesignPlane(const Source& source) {
     return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, source);
 }
 
-DesignPlane getDesignPlane(const Behavior& behavior) {
+constexpr DesignPlane getDesignPlane(const Behavior& behavior) {
     return std::visit([]<typename T>(const T&) { return detail::designPlane_v<T>; }, behavior);
 }
 
-DesignPlane getDesignPlane(const SurfaceElement& element) { return getDesignPlane(element.behavior); }
+constexpr DesignPlane getDesignPlane(const SurfaceElement& element) { return getDesignPlane(element.behavior); }
 
 }  // namespace rayx

@@ -30,10 +30,10 @@ struct Stokes {
                               "the relation I^2 = Q^2 + U^2 + V^2");
     }
 
-    double I() const { return m_I; }
-    double Q() const { return m_Q; }
-    double U() const { return m_U; }
-    double V() const { return m_V; }
+    constexpr double I() const { return m_I; }
+    constexpr double Q() const { return m_Q; }
+    constexpr double U() const { return m_U; }
+    constexpr double V() const { return m_V; }
 
   private:
     double m_I;  ///< Total intensity (I)
@@ -52,7 +52,7 @@ using Polarization = std::variant<Stokes, LocalElectricField>;
 
 namespace rayx {
 
-inline Stokes toStokes(const LocalElectricField field) {
+constexpr inline Stokes toStokes(const LocalElectricField field) {
     const auto mag   = glm::dvec2(std::abs(field.x), std::abs(field.y));
     const auto theta = glm::dvec2(std::arg(field.x), std::arg(field.y));
 
@@ -60,15 +60,15 @@ inline Stokes toStokes(const LocalElectricField field) {
                   2.0 * mag.x * mag.y * std::sin(theta.x - theta.y));
 }
 
-inline Stokes toStokes(const Stokes& stokes) { return stokes; }
+constexpr inline Stokes toStokes(const Stokes& stokes) { return stokes; }
 
-inline Stokes toStokes(const Polarization& polarization) {
+constexpr inline Stokes toStokes(const Polarization& polarization) {
     return std::visit([](const auto& pol) { return toStokes(pol); }, polarization);
 }
 
-inline LocalElectricField toLocalElectricField(const LocalElectricField& field) { return field; }
+constexpr inline LocalElectricField toLocalElectricField(const LocalElectricField& field) { return field; }
 
-inline LocalElectricField toLocalElectricField(const Stokes stokes) {
+constexpr inline LocalElectricField toLocalElectricField(const Stokes stokes) {
     const auto x_real  = std::sqrt((stokes.I() + stokes.Q()) / 2.0);
     const auto y_mag   = std::sqrt((stokes.I() - stokes.Q()) / 2.0);
     const auto y_theta = -1.0 * std::atan2(stokes.V(), stokes.U());
@@ -76,7 +76,7 @@ inline LocalElectricField toLocalElectricField(const Stokes stokes) {
     return LocalElectricField({x_real, 0}, y);
 }
 
-inline LocalElectricField toLocalElectricField(const Polarization& polarization) {
+constexpr inline LocalElectricField toLocalElectricField(const Polarization& polarization) {
     return std::visit([](const auto& pol) { return toLocalElectricField(pol); }, polarization);
 }
 
@@ -104,11 +104,11 @@ constexpr inline double intensity(const Polarization& polarization) {
 
 #include <ostream>
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::Stokes stokes) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::Stokes stokes) {
     return os << "{I=" << stokes.I() << ", Q=" << stokes.Q() << ", U=" << stokes.U() << ", V=" << stokes.V() << "}";
 }
 
-inline std::ostream& operator<<(std::ostream& os, const rayx::Polarization polarization) {
+constexpr inline std::ostream& operator<<(std::ostream& os, const rayx::Polarization polarization) {
     return std::visit([&os](const auto& pol) -> std::ostream& { return os << pol; }, polarization);
 }
 
