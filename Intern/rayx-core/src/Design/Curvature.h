@@ -89,7 +89,9 @@ struct CylindricalCurvature {
 };
 
 struct SphericalCurvature {
-    RAYX_PROPERTY(SphericalCurvature, double, radius) = 0.0;
+    SphericalCurvature(double radius) : m_radius(radius) {}
+
+    RAYX_PROPERTY(SphericalCurvature, double, radius);
 };
 
 enum class ParabolicCurvatureType { Collimate, Focussing };

@@ -57,8 +57,9 @@ std::shared_ptr<Beamline> createMetrixBeamline() {
     auto PlaneMirror =
         SurfaceElement(RectangularArea(20, 310), ReflectBehavior(Material::Au)).slopeError(SlopeError().saggital(0.084).meridional(0.023));
 
-    auto SphericalGrating =
-        SurfaceElement(RectangularArea(20, 100), GratingBehavior(1199.918)).slopeError(SlopeError().saggital(0.124).meridional(0.102));
+    auto SphericalGrating = SurfaceElement(RectangularArea(20, 100), GratingBehavior(1199.918))
+                                .curvature(SphericalCurvature(109791))
+                                .slopeError(SlopeError().saggital(0.124).meridional(0.102));
 
     auto ExitSlit = SurfaceElement(RectangularArea(100, 100), AbsorbBehavior()).aperture(DiffractiveAperture(RectangularArea(20, 0.1)));
 
