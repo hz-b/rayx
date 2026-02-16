@@ -10,8 +10,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "StrongTypedef.h"
-
 namespace rayx::detail {
 
 ////////////////////////////////////////////////////////////
@@ -100,21 +98,33 @@ constexpr void validateVectorSizesEqual(const std::string_view typeName, const s
 
 }  // namespace rayx::detail
 
-////////////////////////////////////////////////////////////
-// macros for properties
-//
-// avoids code duplication
-// ensures validation
-// ensures consistent error messages
-// validation and nesting can not be used together, as validation requires the getter to return by value, while nesting
-// requires the getter to return by reference
-////////////////////////////////////////////////////////////
-
 namespace rayx::detail {
 
+// properties
+// - all members of design layer structs/classes must be properties
+//   this allows us to enforce consistent
+//   - convetions
+//   - validation
+//   - error messages
+//   - code duplication.
+// - a property can either be validatable or nestable
+//
+// validatable properties
+// - must be returned by value by the getter, as validation is performed in the setter.
+//   returning by reference would allow bypassing validation and thus is not allowed for validated properties.
+// - allowed types:
+//   - arithmetic types (bool, int, double, etc.)
+//   - enum types
+//   - std::array
+//   - std::vector
+//   - std::optional of arithmetic, enum, std::array or std::vector types
+//
+// nestable properties
+// - must be returned by reference by the getter, as nesting requires the user to be able to modify the nested properties.
+//   returning by value would not allow modifying the already existing instance of the nested property
+// - allows any type that is not a validatable property
+
 // helper trait to determine which types are allowed to be validated
-// all validated proerties must be returned by value by the getter, as validation is performed in the setter.
-// returning by reference would allow bypassing validation and thus is not allowed for validated properties.
 template <typename T>
 struct is_property_validatable : std::false_type {};
 
@@ -123,62 +133,56 @@ template <typename T>
     requires std::is_arithmetic_v<T> || std::is_enum_v<T>
 struct is_property_validatable<T> : std::true_type {};
 
-// all std::optional of arithmetic and enum types can safely be returned by value
-template <typename T>
-    requires std::is_arithmetic_v<T> || std::is_enum_v<T>
-struct is_property_validatable<std::optional<T>> : std::true_type {};
-
 // by convention all std::vector properties are returned by value
 template <typename T>
 struct is_property_validatable<std::vector<T>> : std::true_type {};
-
-// std::vector is allowed to be optional
-template <typename T>
-struct is_property_validatable<std::optional<std::vector<T>>> : std::true_type {};
 
 // by convention all std::array properties are returned by value
 template <typename T, std::size_t N>
 struct is_property_validatable<std::array<T, N>> : std::true_type {};
 
-// std::array is allowed to be optional
-template <typename T, std::size_t N>
-struct is_property_validatable<std::optional<std::array<T, N>>> : std::true_type {};
+// all std::optional of validatable types are also validatable
+template <typename T>
+    requires is_property_validatable<T>::value
+struct is_property_validatable<std::optional<T>> : std::true_type {};
 
+/// test T for being a validatable property type
 template <typename T>
 constexpr bool is_property_validatable_v = is_property_validatable<T>::value;
 
 // helper trait to determine which types are allowed to be nested
-// all nestable properties must be returned by reference by the getter,
-// as nesting requires the user to be able to modify the nested properties.
-// this is only the possible if no validation is performed in the setter.
 template <typename T>
-struct is_property_nestable : std::true_type {};
+struct is_property_nestable : std::false_type {};
 
-// by convention all std::vector properties are not nestable
+// explicitly allow all types that are not validatable to be nested, as they cannot be returned by value and thus must be returned by reference
+// allow all arithmetic and enum types to be nested, when they do not require validation
 template <typename T>
-struct is_property_nestable<std::vector<T>> : std::false_type {};
+    requires (!is_property_validatable_v<T> || std::is_arithmetic_v<T> || std::is_enum_v<T>)
+struct is_property_nestable<T> : std::true_type {};
 
-// std::vector is not allowed to be optional, as it is already not nestable
-template <typename T>
-struct is_property_nestable<std::optional<std::vector<T>>> : std::false_type {};
-
-// by convention all std::array properties are not nestable
-template <typename T, std::size_t N>
-struct is_property_nestable<std::array<T, N>> : std::false_type {};
-
-// std::array is not allowed to be optional, as it is already not nestable
-template <typename T, std::size_t N>
-struct is_property_nestable<std::optional<std::array<T, N>>> : std::false_type {};
-
+/// test T for being a nestable property type
 template <typename T>
 constexpr bool is_property_nestable_v = is_property_nestable<T>::value;
 
 }  // namespace rayx::detail
 
+////////////////////////////////////////////////////////////
+// macros for properties
+//
+// avoids code duplication
+// ensures consistent validation
+// ensures consistent error messages
+////////////////////////////////////////////////////////////
+
 #define RAYX_COMMA ,
 
 // TODO: maybe we do not need RAYX_PROPERTY and just use RAYX_NESTED_PROPERTY for primitives. returning by reference is
 // not that dangerous anyways
+
+/// defines a property with the given name and type in the given class.
+/// the property must be validatable, otherwise use RAYX_NESTED_PROPERTY.
+/// this macro is basically the same as RAYX_VALIDATED_PROPERTY, but without validation.
+/// it is useful for properties that do not require validation.
 #define RAYX_PROPERTY(classType, propertyType, propertyName)                                            \
     static_assert(detail::is_property_validatable_v<propertyType>,                                      \
                   "RAYX_PROPERTY only supports arithmetic, enum, std::vector and std::optional types"); \
@@ -193,34 +197,37 @@ constexpr bool is_property_nestable_v = is_property_nestable<T>::value;
   private:                                                                                              \
     propertyType m_##propertyName
 
-#define RAYX_VALIDATED_PROPERTY(classType, propertyType, propertyName, validationFunc)                                \
-    static_assert(detail::is_property_validatable_v<propertyType>,                                                    \
-                  "RAYX_PROPERTY only supports arithmetic, enum, std::vector and std::optional types");               \
-                                                                                                                      \
-  public:                                                                                                             \
-    constexpr propertyType propertyName() const { return m_##propertyName; }                                          \
-    constexpr classType& propertyName(propertyType value) {                                                           \
-        validationFunc(#classType, #propertyName, detail::unwrapArithmeticStrongTypedefIfPossible(value));            \
-        m_##propertyName = std::move(value);                                                                          \
-        return *this;                                                                                                 \
-    }                                                                                                                 \
-                                                                                                                      \
-  private:                                                                                                            \
-    constexpr void validate_##propertyName() {                                                                        \
-        validationFunc(#classType, #propertyName, detail::unwrapArithmeticStrongTypedefIfPossible(m_##propertyName)); \
-    }                                                                                                                 \
+/// defines a property with the given name and type in the given class.
+/// the property must be validatable, otherwise use RAYX_NESTED_PROPERTY.
+/// the setter performs validation using the given validation function.
+#define RAYX_VALIDATED_PROPERTY(classType, propertyType, propertyName, validationFunc)                                        \
+    static_assert(detail::is_property_validatable_v<propertyType>,                                                            \
+                  "RAYX_PROPERTY only supports arithmetic, enum, std::vector and std::optional types");                       \
+                                                                                                                              \
+  public:                                                                                                                     \
+    constexpr propertyType propertyName() const { return m_##propertyName; }                                                  \
+    constexpr classType& propertyName(propertyType value) {                                                                   \
+        validationFunc(#classType, #propertyName, value);                                                     \
+        m_##propertyName = std::move(value);                                                                                  \
+        return *this;                                                                                                         \
+    }                                                                                                                         \
+                                                                                                                              \
+  private:                                                                                                                    \
+    constexpr void validate_##propertyName() { validationFunc(#classType, #propertyName, m_##propertyName); } \
     propertyType m_##propertyName
 
-#define RAYX_NESTED_PROPERTY(classType, propertyType, propertyName)                                                         \
-    static_assert(detail::is_property_nestable_v<propertyType>, "RAYX_NESTED_PROPERTY does not support std::vector types"); \
-                                                                                                                            \
-  public:                                                                                                                   \
-    constexpr const propertyType& propertyName() const { return m_##propertyName; }                                         \
-    constexpr propertyType& propertyName() { return m_##propertyName; }                                                     \
-    constexpr classType& propertyName(propertyType value) {                                                                 \
-        m_##propertyName = std::move(value);                                                                                \
-        return *this;                                                                                                       \
-    }                                                                                                                       \
-                                                                                                                            \
-  private:                                                                                                                  \
+/// defines a property with the given name and type in the given class.
+/// the property must be nestable, otherwise use RAYX_PROPERTY.
+#define RAYX_NESTED_PROPERTY(classType, propertyType, propertyName)                                                                        \
+    static_assert(detail::is_property_nestable_v<propertyType>, "RAYX_NESTED_PROPERTY does not support std::vector and std::array types"); \
+                                                                                                                                           \
+  public:                                                                                                                                  \
+    constexpr const propertyType& propertyName() const { return m_##propertyName; }                                                        \
+    constexpr propertyType& propertyName() { return m_##propertyName; }                                                                    \
+    constexpr classType& propertyName(propertyType value) {                                                                                \
+        m_##propertyName = std::move(value);                                                                                               \
+        return *this;                                                                                                                      \
+    }                                                                                                                                      \
+                                                                                                                                           \
+  private:                                                                                                                                 \
     propertyType m_##propertyName

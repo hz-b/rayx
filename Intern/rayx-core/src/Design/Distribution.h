@@ -1,13 +1,6 @@
 #pragma once
 
-#include "Angle.h"
-#include "Area.h"
-#include "Coating.h"
-#include "Curvature.h"
-#include "Material.h"
-#include "Polarization.h"
 #include "Property.h"
-#include "Rotation.h"
 
 namespace rayx {
 
@@ -30,11 +23,16 @@ struct WhiteNoiseDistribution {
 
 template <typename T>
 struct GaussianDistribution {
-    constexpr GaussianDistribution(const T mean, const double standardDeviation) : m_mean(mean) { this->standardDeviation(standardDeviation); }
+    constexpr GaussianDistribution(const T mean, const T standardDeviation) : m_mean(mean), m_standardDeviation(standardDeviation) {}
 
     RAYX_NESTED_PROPERTY(GaussianDistribution, T, mean);
-    // standard deviation is treated as the same type as mean
-    RAYX_VALIDATED_PROPERTY(GaussianDistribution, double, standardDeviation, detail::validateGreaterEqualZero);
+
+    // actually standardDeviation must be greater zero,
+    // but we allow zero for the degenerate case of a delta distribution,
+    // and we allow negative values to be taken the absolute of
+    // TODO: add validation to ensure that the standard deviation is greater zero
+    // this is not yet possible because we can not impose extra validation steps on a property, yet
+    RAYX_NESTED_PROPERTY(GaussianDistribution, T, standardDeviation);
 };
 
 template <typename T>
@@ -61,7 +59,7 @@ struct BakedDistribution {
 };
 
 template <typename T>
-using Distribution = std::variant<T, SeparateValues<T>, WhiteNoiseDistribution<T>, GaussianDistribution<T>, std::shared_ptr<BakedDistribution<T>>>;
+using Distribution = std::variant<T, SeparateValues<T>, WhiteNoiseDistribution<T>, GaussianDistribution<T>, BakedDistribution<T>>;
 
 template <typename T>
 struct Distribution2D {

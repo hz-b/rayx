@@ -1,13 +1,11 @@
 #pragma once
 
 #include "Design/PhotonEnergy.h"
+#include "ToModel.h"
 
-namespace rayx::host::detail {
+namespace rayx::detail {
 
-double toHost(const design::ElectronVolt energy) { return design::toElectronVolt(energy).value; }
+inline double toModel(const ElectronVolt electronVolt) { return toElectronVolt(electronVolt).value(); }
+inline double toModel(const WaveLength waveLength) { return toElectronVolt(waveLength).value(); }
 
-double toHost(const design::WaveLength waveLength) { return design::toElectronVolt(waveLength).value; }
-
-double toHost(const design::PhotonEnergy photonEnergy) { return design::toElectronVolt(photonEnergy).value; }
-
-}  // namespace rayx::host::detail
+}

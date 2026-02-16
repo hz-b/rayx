@@ -1,15 +1,11 @@
 #pragma once
 
-namespace rayx::host::detail {
+#include "Design/Polarization.h"
+#include "ToModel.h"
 
-inline math::LocalElectricField toHost(const design::Stokes& stokes) { return math::toLocalElectricField(stokes); }
+namespace rayx::detail {
 
-inline math::LocalElectricField toHost(const design::LocalElectricField& localElectricField) {
-    return math::toLocalElectricField(localElectricField);
+inline LocalElectricField toModel(const Stokes& stokes) { return toLocalElectricField(stokes); }
+inline LocalElectricField toModel(const LocalElectricField& localElectricField) { return toLocalElectricField(localElectricField); }
+
 }
-
-inline math::LocalElectricField toHost(const design::Polarization& polarization) {
-    return std::visit([](const auto& pol) { return toHost(pol); }, polarization);
-}
-
-}  // namespace rayx::host::detail

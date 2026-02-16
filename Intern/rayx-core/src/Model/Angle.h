@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Design/Angle.h"
+#include "ToModel.h"
 
 namespace rayx::detail {
 
-inline double toDevice(const Deg degrees) { return toRad(degrees).value(); }
-inline double toDevice(const Rad radians) { return toRad(radians).value(); }
-inline double toDevice(const Angle angle) { return toRad(angle).value(); }
+inline double toModel(const Deg deg) { return toRad(deg).value(); }
+inline double toModel(const Rad rad) { return rad.value(); }
 
-}  // namespace rayx::detail::host
+}

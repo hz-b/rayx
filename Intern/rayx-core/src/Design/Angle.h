@@ -11,16 +11,22 @@
 
 namespace rayx {
 
+// NOT TODO: the settter of Deg could receive a Deg instead of double.
+// this enforces the user to be explicit about the unit when using the setter
+// consifer overloading the setter of Deg for Rad and Angle
+// above apply for Rad as well
+// nah, this conflicts with python set semantics. x = 45.0 sets the value 45 to Deg x, when x = rayx.Deg(45.0) sets the objects containing the value
+// 45 we need a way to distinguish between these two cases, thus we need the double setter, to enable the first case
 struct Deg {
     constexpr Deg() : m_value(0.0) {}
-    constexpr Deg(double value) : m_value(value) {}
+    constexpr Deg(const double value) : m_value(value) {}
 
     RAYX_PROPERTY(Deg, double, value);
 };
 
 struct Rad {
     constexpr Rad() : m_value(0.0) {}
-    constexpr Rad(double value) : m_value(value) {}
+    constexpr Rad(const double value) : m_value(value) {}
 
     RAYX_PROPERTY(Rad, double, value);
 };
@@ -36,17 +42,13 @@ using Angle = std::variant<Deg, Rad>;
 namespace rayx {
 
 constexpr inline Rad toRad(const Rad rad) { return rad; }
-
 constexpr inline Rad toRad(const Deg deg) { return Rad{deg.value() * std::numbers::pi / 180.0}; }
-
 constexpr inline Rad toRad(const Angle angle) {
     return std::visit([](auto&& arg) { return toRad(arg); }, angle);
 }
 
 constexpr inline Deg toDeg(const Rad rad) { return Deg{rad.value() * 180.0 / std::numbers::pi}; }
-
 constexpr inline Deg toDeg(const Deg deg) { return deg; }
-
 constexpr inline Deg toDeg(const Angle angle) {
     return std::visit([](auto&& arg) { return toDeg(arg); }, angle);
 }
@@ -60,7 +62,6 @@ constexpr inline Deg toDeg(const Angle angle) {
 namespace rayx::literals {
 
 constexpr inline Deg operator"" _deg(long double value) { return Deg{static_cast<double>(value)}; }
-
 constexpr inline Rad operator"" _rad(long double value) { return Rad{static_cast<double>(value)}; }
 
 }  // namespace rayx::literals

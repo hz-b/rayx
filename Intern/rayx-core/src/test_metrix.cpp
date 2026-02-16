@@ -15,8 +15,8 @@ std::shared_ptr<Beamline> createMetrixBeamline() {
                              WhiteNoiseDistribution<double>(0.0, 1.0),
                          })
                          .rayAngle({
-                             GaussianDistribution<Angle>(0.0_rad, 0.078),  // TODO: check
-                             GaussianDistribution<Angle>(0.0_rad, 0.04),
+                             GaussianDistribution<Angle>(0.0_rad, 0.078_rad),
+                             GaussianDistribution<Angle>(0.0_rad, 0.04_rad),
                          });
 
     auto ASBL = SurfaceElement(RectangularArea(100, 100), AbsorbBehavior()).aperture(DiffractiveAperture(RectangularArea(2, 2)));
