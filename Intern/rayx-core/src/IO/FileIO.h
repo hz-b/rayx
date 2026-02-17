@@ -18,6 +18,4 @@ std::optional<std::vector<uint32_t>> readFileAlign32(const std::string& filename
 
 void RAYX_API writeFile(const std::vector<uint8_t>& data, const std::string& filename, const uint32_t count = 0);
 
-
-
 }  // namespace rayx
