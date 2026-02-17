@@ -25,6 +25,8 @@ class Node {
   public:
     virtual ~Node() = 0;
 
+    std::string name;
+
     ////////////////////////////////////////////////////////////
     // modifiers
     ////////////////////////////////////////////////////////////
@@ -47,11 +49,6 @@ class Node {
 
   protected:
     Node() = default;
-
-    std::string name;
-    Transform transform;
-    ObjectPtr object = nullptr;
-    std::vector<std::shared_ptr<Node>> children;
 };
 
 // struct EmptyNode : Node {};
