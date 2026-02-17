@@ -22,7 +22,10 @@ inline auto toModel(const std::array<T, N>& arr) {
     return result;
 }
 
-inline auto toModel(const std::vector<double>& vec) { return vec; }
+template <std::size_t N>
+inline auto toModel<double, N>(const std::array<double, N>& arr) {
+    return arr;
+}
 
 template <typename T>
 inline auto toModel(const std::vector<T>& vec) {
@@ -32,10 +35,16 @@ inline auto toModel(const std::vector<T>& vec) {
     return result;
 }
 
-template <typename T>
-inline auto toModel(const std::optional<T>& opt) -> std::optional<decltype(toModel(*opt))> {
-    if (opt) return toModel(*opt);
-    return std::nullopt;
+template <>
+inline auto toModel<double>(const std::vector<double>& vec) {
+    return vec;
 }
+
+template <typename... Ts>
+inline auto toModel(const std::variant<Ts...>& var) {
+    return std::visit([](const auto& arg) { return toModel(arg); }, var);
+}
+
+// TODO: std::optional ?
 
 }  // namespace rayx::detail

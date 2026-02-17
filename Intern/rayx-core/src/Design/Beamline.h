@@ -26,38 +26,23 @@ struct TranslateNode;
 struct RotateNode;
 struct Beamline;
 
-struct Node {
-    virtual ~Node()                                                   = 0;
-    virtual std::weak_ptr<Node> weak_from_this_base()                 = 0;
-    virtual std::weak_ptr<const Node> weak_from_this_base() const     = 0;
-    virtual std::shared_ptr<Node> shared_from_this_base()             = 0;
-    virtual std::shared_ptr<const Node> shared_from_this_base() const = 0;
+class Node {
+  public:
+    virtual ~Node() = 0;
 
-    std::string name() const { return m_name; }
-    void name(std::string_view name);
+    std::string name;
 
     ////////////////////////////////////////////////////////////
     // accessors
     ////////////////////////////////////////////////////////////
 
-    bool isOrphan() const;
-    std::shared_ptr<Node> parent() const { return m_parent.lock(); }
-    std::vector<std::shared_ptr<Node>> children() const { return m_children; }
+    std::shared_ptr<Node> getNode(std::string_view name) const;
+    std::shared_ptr<Node> operator[](std::string_view name) const;
 
-    // iteration
-    //
-    // adding nodes during traversal is not allowed
-    TraverseAction ctraverse(std::function<TraverseAction(const std::shared_ptr<Node>&)> func) const;
-    // iterate backward in order to allow the user to delete nodes along the way
-    TraverseAction traverse(std::function<TraverseAction(std::shared_ptr<Node>)> func);
-
-    // object accessors
-    int objectId() const;
-
-    // transform accessors
-    glm::dvec3 absolutePosition() const;
-    glm::dmat3 absoluteRotation() const;
-    glm::dmat4 absoluteTransform() const;
+    SourcePtr getSource(std::string_view name) const;
+    ElementPtr getElement(std::string_view name) const;
+    std::shared_ptr<Rotation> getRotation(std::string_view name) const;
+    std::shared_ptr<Translation> getTranslation(std::string_view name) const;
 
     ////////////////////////////////////////////////////////////
     // modifiers
@@ -70,75 +55,74 @@ struct Node {
     std::shared_ptr<Node> append(Rotation rotation);
     std::shared_ptr<Node> append(std::string_view name, Rotation rotation);
 
-    void release();
+    std::shared_ptr<Beamline> append(std::string_view name, std::shared_ptr<Beamline> beamline);
+
+    void remove(std::string_view name);
 
   protected:
-    Node(std::string_view name) : m_name(name) {}
-
-    std::string m_name;
-    std::vector<std::shared_ptr<Node>> m_children;
-    std::weak_ptr<Node> m_parent;
-
-  private:
-    std::shared_ptr<const Beamline> beamline() const;
-    std::shared_ptr<Beamline> beamline();
+    std::vector<std::shared_ptr<Node>> children;
 };
 
-struct ObjectNode : Node, std::enable_shared_from_this<ObjectNode> {
-    ObjectNode(std::string_view name, ObjectPtr object) : Node(name) { this->object(object); }
+struct EmptyNode : Node {};
 
-    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
-    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
-    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
-    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
+struct SourceNode : Node {
+    SourcePtr source;
 
-    RAYX_VALIDATED_PROPERTY(ObjectNode, ObjectPtr, object, detail::validateNotNull);
+    // TODO: distance to preceeding source or element based on the beam coords.
+    // NOTE: beam coords = direction and rotation around direction
+    //
+    // this can be done by tracing a single ray and figuring the beam coords after the last source / element.
+    // effectively the successive node will be in beam coords.
+    // -> we have to respect the rotation around the beam, that can change on every hit or when the source is rotateed
+    // does this only make sense if the last node was a source or element?
+    // -> a translation or rotation could make sense, when applyed to the beam coords. might be confusing though
+    //
+    // doing this requires a source that emits the ray from its coordinates. options to pick the source
+    // -> when going up the tree, use first encountered source
+    // -> when going up the tree, use last encountered source
+    // -> use a specific source (most versatile approach). to simplifiy the api, the beamline building process could
+    // assume/enforce a source as root node and then use that unless specified explicitly
+    //
+    // there are two potentially useful implementations. i think both have their use cases, so maybe we want to
+    // implement both
+    /// convert local beam coordinates to relative rotation -> append rotate node
+    /// this way, future mutations that would affect the beam coords, DO NOT affect the relative rotation
+    /// error detection can occur immediately
+    // RotateNode& appendRotateToBeAlongBeamCoordsImmediate(std::string_view name = {});
+    /// evaluate local beam coordinates just before tracing, and convert to relative rotation that is only used in the
+    /// tracer this way, future mutations that would affect the beam coords, DO affect the relative rotation error
+    /// detection can occur when trying to trace
+    // RotateToBeamCoordsNode& appendRotateToBeamCoordsDeferred(std::string_view name = {);
 };
 
-struct TranslateNode : Node, std::enable_shared_from_this<TranslateNode> {
-    TranslateNode(std::string_view name, Translation translation) : Node(name), translation(translation) {}
-
-    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
-    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
-    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
-    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
-
-    Translation translation;
+struct ElementNode : Node {
+    ElementPtr element;
 };
 
-struct RotateNode : Node, std::enable_shared_from_this<RotateNode> {
-    RotateNode(std::string_view name, Rotation rotation) : Node(name), rotation(rotation) {}
-
-    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
-    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
-    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
-    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
-
-    Rotation rotation;
+struct TranslateNode : Node {
+    std::shared_ptr<Translation> translation;
 };
 
-struct ObjectInfo {
-    std::shared_ptr<ObjectNode> node;
-    int objectId;
+struct RotateNode : Node {
+    std::shared_ptr<Rotation> rotation;
 };
 
-struct Beamline : Node, std::enable_shared_from_this<Beamline> {
-    Beamline(std::string_view name) : Node(name) {}
+struct AlongBeamCoordsRotateNode : Node {
+    SourcePtr source;
+};
 
-    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
-    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
-    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
-    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
+struct Beamline : Node {
+    Beamline(std::string_view name) { this->name = name; }
 
-    ////////////////////////////////////////////////////////////
-    // node accessors
-    ////////////////////////////////////////////////////////////
+    glm::dvec3 getNodeAbsolutePosition(std::string_view name) const;
+    RotationAroundAxis getNodeAbsoluteRotation(std::string_view name) const;
+    std::vector<std::tuple<int, std::string>> getObjectIds() const;
+    int getNodeSourceId(std::string_view name) const;
+    int getNodeElementId(std::string_view name) const;
+    int getNodeObjectId(std::string_view name) const;
 
-    // tree accessors
-    std::shared_ptr<Node> findNode(std::string_view nodeName) const;
-    std::optional<ObjectPtr> findObject(std::string_view nodeName) const;
-    std::vector<std::shared_ptr<Node>> allNodes() const;
-    std::vector<ObjectInfo> allObjects() const;
+    std::shared_ptr<Beamline> copyNodes(std::string_view name) const;
+    std::shared_ptr<Beamline> copyNodesAndObjects(std::string_view name) const;
 };
 
 }  // namespace rayx
