@@ -25,20 +25,6 @@ class Node {
   public:
     virtual ~Node() = 0;
 
-    std::string name;
-
-    ////////////////////////////////////////////////////////////
-    // accessors
-    ////////////////////////////////////////////////////////////
-
-    std::shared_ptr<Node> getNode(std::string_view name) const;
-    std::shared_ptr<Node> operator[](std::string_view name) const;
-
-    SourcePtr getSource(std::string_view name) const;
-    ElementPtr getElement(std::string_view name) const;
-    std::shared_ptr<Rotation> getRotation(std::string_view name) const;
-    std::shared_ptr<Translation> getTranslation(std::string_view name) const;
-
     ////////////////////////////////////////////////////////////
     // modifiers
     ////////////////////////////////////////////////////////////
@@ -55,15 +41,20 @@ class Node {
     std::shared_ptr<RotateNode> append(Rotation rotation);
     std::shared_ptr<RotateNode> append(std::string_view name, Rotation rotation);
 
-    std::shared_ptr<Beamline> append(std::string_view name, std::shared_ptr<Beamline> beamline);
+    // std::shared_ptr<Beamline> append(std::string_view name, std::shared_ptr<Beamline> beamline);
 
-    void remove(std::string_view name);
+    std::shared_ptr<Node> remove(std::string_view name);
 
   protected:
+    Node() = default;
+
+    std::string name;
+    Transform transform;
+    ObjectPtr object = nullptr;
     std::vector<std::shared_ptr<Node>> children;
 };
 
-struct EmptyNode : Node {};
+// struct EmptyNode : Node {};
 
 struct SourceNode : Node {
     SourcePtr source;
@@ -107,12 +98,22 @@ struct RotateNode : Node {
     std::shared_ptr<Rotation> rotation;
 };
 
-struct AlongBeamCoordsRotateNode : Node {
-    SourcePtr source;
-};
-
 struct Beamline : Node {
     Beamline(std::string_view name) { this->name = name; }
+
+    ////////////////////////////////////////////////////////////
+    // accessors
+    ////////////////////////////////////////////////////////////
+
+    std::shared_ptr<Node> find(std::string_view name) const;
+    std::shared_ptr<Node> operator[](std::string_view name) const;
+
+    ////////////////////////////////////////////////////////////
+    // modifiers
+    ////////////////////////////////////////////////////////////
+
+    std::shared_ptr<Node> getNodeAbsolutePath(std::string_view absolutePath) const;
+    int getObjectIdAbsolutePath(std::string_view absolutePath) const;
 
     glm::dvec3 getNodeAbsolutePosition(std::string_view name) const;
     RotationAroundAxis getNodeAbsoluteRotation(std::string_view name) const;

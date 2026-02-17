@@ -1,4 +1,4 @@
-#include "Design/Beamline.h"
+#include "test_metrix.h"
 
 using namespace rayx;
 using namespace rayx::literals;
@@ -117,6 +117,8 @@ std::shared_ptr<Beamline> createMetrixBeamline() {
                               {0.0091050966862335, 0.9975639933723643, -0.0691605114304122},
                               {-0.1302082334946503, 0.0697572872679162, 0.9890296946013423}})
         ->append("ImagePlane", ImagePlane);
+
+    auto imagePlane = std::get<std::shared_ptr<SurfaceElement>>(dynamic_cast<std::shared_ptr<ElementNode>(metrix->find("ImagePlane"))->element);
 
     return metrix;
 }

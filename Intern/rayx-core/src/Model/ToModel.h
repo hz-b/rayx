@@ -19,7 +19,7 @@ inline auto toModel(const std::array<T, N>& arr) {
 }
 
 template <std::size_t N>
-inline auto toModel<double, N>(const std::array<double, N>& arr) {
+inline auto toModel(const std::array<double, N>& arr) {
     return arr;
 }
 
@@ -31,8 +31,7 @@ inline auto toModel(const std::vector<T>& vec) {
     return result;
 }
 
-template <>
-inline auto toModel<double>(const std::vector<double>& vec) {
+inline auto toModel(const std::vector<double>& vec) {
     return vec;
 }
 
