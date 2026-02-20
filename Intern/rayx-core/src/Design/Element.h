@@ -22,7 +22,4 @@ struct SurfaceElement {
     RAYX_PROPERTY(SurfaceElement, BackFaceBehavior, backFaceBehavior) = BackFaceBehavior::Absorb;
 };
 
-using Element    = std::variant<SurfaceElement>;
-using ElementPtr = std::variant<std::shared_ptr<SurfaceElement>>;
-
 }  // namespace rayx

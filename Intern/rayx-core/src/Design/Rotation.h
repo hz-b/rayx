@@ -88,19 +88,23 @@ constexpr inline RotationBase toRotationBase(const Rotation& rotation) {
     return std::visit([](auto&& arg) { return toRotationBase(arg); }, rotation);
 }
 
-constexpr inline glm::dmat3 toMatrix(const glm::dmat3& rotation) { return rotation; }
+constexpr inline glm::dmat3 toMatrix3x3(const glm::dmat3& rotation) { return rotation; }
 
-constexpr inline glm::dmat3 toMatrix(const RotationBase& rotation) {
+constexpr inline glm::dmat3 toMatrix3x3(const RotationBase& rotation) {
     return glm::dmat3(rotation.right().toVec3(), rotation.up().toVec3(), rotation.forward().toVec3());
 }
 
-constexpr inline glm::dmat3 toMatrix(const RotationAroundAxis& rotation) {
+constexpr inline glm::dmat3 toMatrix3x3(const RotationAroundAxis& rotation) {
     const auto quat = glm::angleAxis(toRad(rotation.angle()).value(), rotation.axis().toVec3());
     return glm::mat3_cast(quat);
 }
 
-constexpr inline glm::dmat3 toMatrix(const Rotation& rotation) {
-    return std::visit([](auto&& arg) { return toMatrix(arg); }, rotation);
+constexpr inline glm::dmat3 toMatrix3x3(const Rotation& rotation) {
+    return std::visit([](auto&& arg) { return toMatrix3x3(arg); }, rotation);
+}
+
+constexpr inline glm::dmat4 toMatrix4x4(const Rotation& rotation) {
+    return glm::dmat4(std::visit([](auto&& arg) { return glm::dmat4(toMatrix3x3(arg)); }, rotation));
 }
 
 }  // namespace rayx

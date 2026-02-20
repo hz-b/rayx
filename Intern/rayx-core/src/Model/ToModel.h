@@ -31,9 +31,7 @@ inline auto toModel(const std::vector<T>& vec) {
     return result;
 }
 
-inline auto toModel(const std::vector<double>& vec) {
-    return vec;
-}
+inline auto toModel(const std::vector<double>& vec) { return vec; }
 
 template <typename... Ts>
 inline auto toModel(const std::variant<Ts...>& var) {

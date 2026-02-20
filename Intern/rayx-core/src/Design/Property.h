@@ -4,10 +4,12 @@
 #include <format>
 #include <glm/glm.hpp>
 #include <limits>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace rayx::detail {
@@ -96,11 +98,20 @@ constexpr void validateVectorSizesEqual(const std::string_view typeName, const s
     }
 }
 
+template <typename... Ts>
+constexpr void validateNotNull(const std::string_view typeName, const std::string_view propertyName,
+                               const std::variant<std::shared_ptr<Ts>...> variantPtr, const std::optional<std::string_view> note = std::nullopt) {
+    auto hasValue = std::visit([&]<typename T>(const std::shared_ptr<T>& ptr) { return static_cast<bool>(ptr); }, variantPtr);
+    if (!hasValue) [[unlikely]] {
+        throw std::invalid_argument(std::format("error: pointer property `{}` of `{}` cannot be null{}", propertyName, typeName, formatNote(note)));
+    }
+}
+
 }  // namespace rayx::detail
 
 namespace rayx::detail {
 
-// properties
+// what is a property?
 // - all members of design layer structs/classes must be properties
 //   this allows us to enforce consistent
 //   - convetions
@@ -118,6 +129,8 @@ namespace rayx::detail {
 //   - std::array
 //   - std::vector
 //   - std::optional of arithmetic, enum, std::array or std::vector types
+//   - std::shared_ptr
+//   - std::variant<std::shared_ptr...>
 //
 // nestable properties
 // - must be returned by reference by the getter, as nesting requires the user to be able to modify the nested properties.
@@ -146,6 +159,14 @@ template <typename T>
     requires is_property_validatable<T>::value
 struct is_property_validatable<std::optional<T>> : std::true_type {};
 
+// pointers are ok to be passed by value
+template <typename T>
+struct is_property_validatable<std::shared_ptr<T>> : std::true_type {};
+
+// variants of pointers are ok to be passed by value
+template <typename... Ts>
+struct is_property_validatable<std::variant<std::shared_ptr<Ts>...>> : std::true_type {};
+
 /// test T for being a validatable property type
 template <typename T>
 constexpr bool is_property_validatable_v = is_property_validatable<T>::value;
@@ -157,7 +178,7 @@ struct is_property_nestable : std::false_type {};
 // explicitly allow all types that are not validatable to be nested, as they cannot be returned by value and thus must be returned by reference
 // allow all arithmetic and enum types to be nested, when they do not require validation
 template <typename T>
-    requires (!is_property_validatable_v<T> || std::is_arithmetic_v<T> || std::is_enum_v<T>)
+    requires(!is_property_validatable_v<T> || std::is_arithmetic_v<T> || std::is_enum_v<T>)
 struct is_property_nestable<T> : std::true_type {};
 
 /// test T for being a nestable property type
@@ -200,19 +221,19 @@ constexpr bool is_property_nestable_v = is_property_nestable<T>::value;
 /// defines a property with the given name and type in the given class.
 /// the property must be validatable, otherwise use RAYX_NESTED_PROPERTY.
 /// the setter performs validation using the given validation function.
-#define RAYX_VALIDATED_PROPERTY(classType, propertyType, propertyName, validationFunc)                                        \
-    static_assert(detail::is_property_validatable_v<propertyType>,                                                            \
-                  "RAYX_PROPERTY only supports arithmetic, enum, std::vector and std::optional types");                       \
-                                                                                                                              \
-  public:                                                                                                                     \
-    constexpr propertyType propertyName() const { return m_##propertyName; }                                                  \
-    constexpr classType& propertyName(propertyType value) {                                                                   \
+#define RAYX_VALIDATED_PROPERTY(classType, propertyType, propertyName, validationFunc)                        \
+    static_assert(detail::is_property_validatable_v<propertyType>,                                            \
+                  "RAYX_PROPERTY only supports arithmetic, enum, std::vector and std::optional types");       \
+                                                                                                              \
+  public:                                                                                                     \
+    constexpr propertyType propertyName() const { return m_##propertyName; }                                  \
+    constexpr classType& propertyName(propertyType value) {                                                   \
         validationFunc(#classType, #propertyName, value);                                                     \
-        m_##propertyName = std::move(value);                                                                                  \
-        return *this;                                                                                                         \
-    }                                                                                                                         \
-                                                                                                                              \
-  private:                                                                                                                    \
+        m_##propertyName = std::move(value);                                                                  \
+        return *this;                                                                                         \
+    }                                                                                                         \
+                                                                                                              \
+  private:                                                                                                    \
     constexpr void validate_##propertyName() { validationFunc(#classType, #propertyName, m_##propertyName); } \
     propertyType m_##propertyName
 

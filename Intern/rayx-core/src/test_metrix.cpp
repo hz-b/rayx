@@ -118,5 +118,10 @@ std::shared_ptr<Beamline> createMetrixBeamline() {
                               {-0.1302082334946503, 0.0697572872679162, 0.9890296946013423}})
         ->append("ImagePlane", ImagePlane);
 
+    // auto imagePlane = std::get<std::shared_ptr<SurfaceElement>>(std::dynamic_pointer_cast<ElementNode>(metrix->find("ImagePlane"))->element);
+    // auto imagePlane = std::get<std::shared_ptr<SurfaceElement>>(metrix->find("ImagePlane")->object());
+    // auto imagePlane = std::get<std::shared_ptr<SurfaceElement>(std::dynamic_pointer_cast<ObjectNode>(metrix->findNode("ImagePlane"))->object);
+    auto imagePlane = std::get<std::shared_ptr<SurfaceElement>>(*metrix->findObject("ImagePlane"));
+
     return metrix;
 }

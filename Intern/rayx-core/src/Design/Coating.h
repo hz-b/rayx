@@ -6,6 +6,8 @@
 
 namespace rayx {
 
+// TODO: depending on the tracer implementation, the maximum numbe of layers may be limited. then a validation should be added
+
 struct CoatingLayer {
     constexpr CoatingLayer(Material material, double thickness) {
         this->material(material);

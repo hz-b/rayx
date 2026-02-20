@@ -42,7 +42,8 @@ struct TransmitBehavior {
     RAYX_PROPERTY(TransmitBehavior, Material, substrate);
     RAYX_VALIDATED_PROPERTY(TransmitBehavior, double, substrateThickness, detail::validateGreaterZero);
     RAYX_VALIDATED_PROPERTY(TransmitBehavior, double, substrateRoughness, detail::validateGreaterEqualZero) = 0.0;
-    RAYX_NESTED_PROPERTY(TransmitBehavior, std::optional<Coating>, coating);
+    // TODO: implement multilayer foil
+    // RAYX_NESTED_PROPERTY(TransmitBehavior, std::optional<Coating>, coating);
 };
 
 struct GratingBehavior {

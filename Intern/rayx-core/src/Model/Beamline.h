@@ -5,16 +5,12 @@
 
 namespace rayx::detail::model {
 
-struct Beamline {
+struct Beamline {};
 
-};
-
-}
+}  // namespace rayx::detail::model
 
 namespace rayx::detail {
 
-inline model::Beamline toModel(const Beamline& beamline) {
-    return model::Beamline();
-}
+inline model::Beamline toModel(const Beamline& beamline) { return model::Beamline(); }
 
-}
+}  // namespace rayx::detail
