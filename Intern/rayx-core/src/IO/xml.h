@@ -2,7 +2,6 @@
 
 #include <array>
 #include <filesystem>
-#include <glm.hpp>
 #include <optional>
 #include <rapidxml.hpp>
 #include <vector>
@@ -10,13 +9,13 @@
 #include "Angle.h"
 #include "Beamline/Definitions.h"
 #include "Beamline/EnergyDistribution.h"
-#include "Element/Coating.h"
-#include "Element/Cutout.h"
-#include "Element/Surface.h"
-#include "Material/Material.h"
-#include "Shader/Constants.h"
-#include "Shader/LightSources/LightSource.h"
-#include "Shader/SlopeError.h"
+#include "Design/Coating.h"
+#include "Design/Cutout.h"
+#include "Design/Surface.h"
+#include "Design/Material.h"
+#include "Math/Constants.h"
+#include "Design/Source.h"
+#include "Design/SlopeError.h"
 
 namespace rayx {
 

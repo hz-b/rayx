@@ -121,7 +121,7 @@ void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::fil
 // `collection` may either be a <beamline> or a <group>.
 // the group-context represents the stack of groups within which we currently are.
 // Whenever we look into a group, this group has to be pushed onto the group context stack. And when we are done, it will be popped again.
-void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, const std::filesystem::path& filepath) {
+std::shared_ptr<Beamline> handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, const std::filesystem::path& filepath) {
     // Iterating through XML objects
     for (rapidxml::xml_node<>* object = collection->first_node(); object; object = object->next_sibling()) {
         if (strcmp(object->name(), "object") == 0) {
@@ -141,7 +141,7 @@ void handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, cons
 }
 
 // This is the central function to load RML files.
-Beamline importBeamline(const std::filesystem::path& filepath) {
+std::shared_ptr<Beamline> importBeamline(const std::filesystem::path& filepath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     // first implementation: stringstreams are slow; this might need
     // optimization
@@ -163,14 +163,13 @@ Beamline importBeamline(const std::filesystem::path& filepath) {
     RAYX_VERB << "RML Version: " << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
 
-    Group root;
+    auto beamline = std::make_shared<Beamline>("BEAMLINE");
 
     // go through all objects of the file, and parse them.
     // The group context stores the set of group in which the algorithm currently "is".
     // For each group we call handleObjectCollection recursively, and push the group onto the group context stack.
-    handleObjectCollection(xml_beamline, root, filepath);
+    return handleObjectCollection(xml_beamline, filepath);
 
-    return root;
 }
 
 }  // namespace rayx
