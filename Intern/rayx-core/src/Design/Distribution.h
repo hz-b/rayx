@@ -37,14 +37,14 @@ struct GaussianDistribution {
 
 template <typename T>
 struct BakedDistribution {
-    constexpr BakedDistribution(std::vector<T> values, std::optional<std::vector<T>> weights = std::nullopt) {
+    constexpr BakedDistribution(std::vector<T> values, std::optional<std::vector<double>> weights = std::nullopt) {
         this->valuesAndWeights(values, weights);
     }
 
     const std::vector<T>& values() const { return m_values; }
-    const std::optional<std::vector<T>>& weights() const { return m_weights; }
+    const std::optional<std::vector<double>>& weights() const { return m_weights; }
 
-    constexpr BakedDistribution& valuesAndWeights(std::vector<T> value, std::optional<std::vector<T>> weights = std::nullopt) {
+    constexpr BakedDistribution& valuesAndWeights(std::vector<T> value, std::optional<std::vector<double>> weights = std::nullopt) {
         if (weights) detail::validateVectorSizesEqual("BakedDistribution", "values", value, "weights", *weights);
         m_values  = value;
         m_weights = weights;
@@ -55,7 +55,7 @@ struct BakedDistribution {
 
   private:
     std::vector<T> m_values;
-    std::optional<std::vector<T>> m_weights;
+    std::optional<std::vector<double>> m_weights;
 };
 
 template <typename T>

@@ -4,7 +4,7 @@
 
 namespace rayx::detail {
 
-device::QuadricCurvature toDeviceQuadric(const CylindricalCurvature& curvature) {
+model::QuadricCurvature toModelQuadric(const CylindricalCurvature& curvature) {
     auto cyl_direction     = curvature.direction();
     auto radius            = curvature.radius();
     auto incidence         = toRad(curvature.grazingIncAngle()).value();
@@ -35,7 +35,7 @@ device::QuadricCurvature toDeviceQuadric(const CylindricalCurvature& curvature) 
         }
     }
 
-    return device::QuadricCurvature{
+    return model::QuadricCurvature{
         .icurv = icurv,
         .a11   = a11,
         .a12   = 0,
@@ -50,8 +50,8 @@ device::QuadricCurvature toDeviceQuadric(const CylindricalCurvature& curvature) 
     };
 }
 
-device::QuadricCurvature toDeviceQuadric(const SphericalCurvature& curvature) {
-    return device::QuadricCurvature{
+model::QuadricCurvature toModelQuadric(const SphericalCurvature& curvature) {
+    return model::QuadricCurvature{
         .icurv = 1,
         .a11   = 1,
         .a12   = 0,
@@ -66,7 +66,7 @@ device::QuadricCurvature toDeviceQuadric(const SphericalCurvature& curvature) {
     };
 }
 
-device::QuadricCurvature toDeviceQuadric(const ParabolicCurvature& curvature) {
+model::QuadricCurvature toModelQuadric(const ParabolicCurvature& curvature) {
     auto ArmLength      = curvature.armLength();
     auto parameterP     = curvature.parameterP();
     auto parameterPType = curvature.parameterPType();
@@ -88,7 +88,7 @@ device::QuadricCurvature toDeviceQuadric(const ParabolicCurvature& curvature) {
     a34 = -parameterP;
     a44 = std::pow(y0, 2) - 2 * parameterP * z0 - std::pow(parameterP, 2);
     //---------------------------- Serialization -------------------------------
-    return device::QuadricCurvature{
+    return model::QuadricCurvature{
         .icurv = 1,
         .a11   = a11,
         .a12   = 0,
@@ -103,7 +103,7 @@ device::QuadricCurvature toDeviceQuadric(const ParabolicCurvature& curvature) {
     };
 }
 
-device::QuadricCurvature toDeviceQuadric(const ConicalCurvature& curvature) {
+model::QuadricCurvature toModelQuadric(const ConicalCurvature& curvature) {
     double incidence         = toRad(curvature.grazingIncAngle()).value();
     double entranceArmLength = curvature.entranceArmLength();
     double exitArmLength     = curvature.exitArmLength();
@@ -143,7 +143,7 @@ device::QuadricCurvature toDeviceQuadric(const ConicalCurvature& curvature) {
         a24 = -upstreamRadius_R;
     }
 
-    return device::QuadricCurvature{
+    return model::QuadricCurvature{
         .icurv = icurv,
         .a11   = a11,
         .a12   = 0,
@@ -158,7 +158,7 @@ device::QuadricCurvature toDeviceQuadric(const ConicalCurvature& curvature) {
     };
 }
 
-device::QuadricCurvature toDeviceQuadric(const EllipticalCurvature& curvature) {
+model::QuadricCurvature toModelQuadric(const EllipticalCurvature& curvature) {
     auto entranceArmLength = curvature.entranceArmLength();
     auto exitArmLength     = curvature.exitArmLength();
 
@@ -217,7 +217,7 @@ device::QuadricCurvature toDeviceQuadric(const EllipticalCurvature& curvature) {
     auto a34 = std::pow(shortHalfAxisB / longHalfAxisA, 2) * z0 * std::cos(tangentAngle) - y0 * std::sin(tangentAngle);
     auto a44 = -std::pow(shortHalfAxisB, 2) + std::pow(y0, 2) + std::pow(z0 * shortHalfAxisB / longHalfAxisA, 2);
 
-    return device::QuadricCurvature{
+    return model::QuadricCurvature{
         .icurv = 1,
         .a11   = a11,
         .a12   = 0,
@@ -232,8 +232,8 @@ device::QuadricCurvature toDeviceQuadric(const EllipticalCurvature& curvature) {
     };
 }
 
-device::QuadricCurvature toDeviceQuadric(const QuadricCurvature& curvature) {
-    return device::QuadricCurvature{
+model::QuadricCurvature toModelQuadric(const QuadricCurvature& curvature) {
+    return model::QuadricCurvature{
         .icurv = curvature.icurv(),
         .a11   = curvature.a11(),
         .a12   = curvature.a12(),
@@ -248,16 +248,16 @@ device::QuadricCurvature toDeviceQuadric(const QuadricCurvature& curvature) {
     };
 }
 
-device::ToroidialCurvature toDeviceToroidial(const ToroidialCurvature& curvature) {
-    return device::ToroidialCurvature{
+model::ToroidialCurvature toModelToroidial(const ToroidialCurvature& curvature) {
+    return model::ToroidialCurvature{
         .longRadius  = curvature.longRadius(),
         .shortRadius = curvature.shortRadius(),
         .toroidType  = curvature.toroidType(),
     };
 }
 
-device::CubicCurvature toDeviceCubic(const CubicCurvature& curvature) {
-    return device::CubicCurvature{
+model::CubicCurvature toModelCubic(const CubicCurvature& curvature) {
+    return model::CubicCurvature{
         .a11 = curvature.a11(),
         .a12 = curvature.a12(),
         .a13 = curvature.a13(),
@@ -280,17 +280,17 @@ device::CubicCurvature toDeviceCubic(const CubicCurvature& curvature) {
     };
 }
 
-// 2 copies. first convert to device specific curvature, then convert to device curvature variant
-device::Curvature toDevice(const QuadricCurvature& curvature) { return toDeviceQuadric(curvature); }
-device::Curvature toDevice(const ToroidialCurvature& curvature) { return toDeviceToroidial(curvature); }
-device::Curvature toDevice(const CubicCurvature& curvature) { return toDeviceCubic(curvature); }
-device::Curvature toDevice(const CylindricalCurvature& curvature) { return toDeviceQuadric(curvature); }
-device::Curvature toDevice(const SphericalCurvature& curvature) { return toDeviceQuadric(curvature); }
-device::Curvature toDevice(const ParabolicCurvature& curvature) { return toDeviceQuadric(curvature); }
-device::Curvature toDevice(const ConicalCurvature& curvature) { return toDeviceQuadric(curvature); }
-device::Curvature toDevice(const EllipticalCurvature& curvature) { return toDeviceQuadric(curvature); }
-device::Curvature toDevice(const Curvature& curvature) {
-    return std::visit([](const auto& curv) { return toDevice(curv); }, curvature);
+// makes 2 copies. first convert to device specific curvature, then convert to device curvature variant
+model::Curvature toModel(const QuadricCurvature& curvature) { return toModelQuadric(curvature); }
+model::Curvature toModel(const ToroidialCurvature& curvature) { return toModelToroidial(curvature); }
+model::Curvature toModel(const CubicCurvature& curvature) { return toModelCubic(curvature); }
+model::Curvature toModel(const CylindricalCurvature& curvature) { return toModelQuadric(curvature); }
+model::Curvature toModel(const SphericalCurvature& curvature) { return toModelQuadric(curvature); }
+model::Curvature toModel(const ParabolicCurvature& curvature) { return toModelQuadric(curvature); }
+model::Curvature toModel(const ConicalCurvature& curvature) { return toModelQuadric(curvature); }
+model::Curvature toModel(const EllipticalCurvature& curvature) { return toModelQuadric(curvature); }
+model::Curvature toModel(const Curvature& curvature) {
+    return std::visit([](const auto& curv) { return toModel(curv); }, curvature);
 }
 
 }  // namespace rayx::detail

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Design/Curvature.h"
+#include "ToModel.h"
 
-namespace rayx::detail {
-
-namespace device {
+namespace rayx::detail::model {
 
 struct QuadricCurvature {
     int icurv;
@@ -50,8 +49,10 @@ struct CubicCurvature {
 
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
 
-}  // namespace device
+}  // namespace rayx::detail::model
 
-device::Curvature toDevice(const Curvature& curvature);
+namespace rayx::detail {
+
+model::Curvature toModel(const Curvature& curvature);
 
 }  // namespace rayx::detail
