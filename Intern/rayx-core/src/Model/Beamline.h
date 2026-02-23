@@ -5,6 +5,7 @@
 
 #include "Element.h"
 #include "Source.h"
+#include "Design/Beamline.h"
 
 namespace rayx::detail::model {
 
@@ -33,3 +34,9 @@ struct Beamline {
 };
 
 }  // namespace rayx::detail::model
+
+namespace rayx::detail {
+
+model::Beamline toModel(const Beamline& beamline);
+
+}  // namespace rayx::detail
