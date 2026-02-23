@@ -49,8 +49,8 @@ struct TransmitBehavior {
 struct GratingBehavior {
     constexpr GratingBehavior(double lineDensity) { this->lineDensity(lineDensity); }
 
+    RAYX_PROPERTY(GratingBehavior, int, orderOfDiffraction) = 1;                                              // the diffraction order, usually 1
     RAYX_VALIDATED_PROPERTY(GratingBehavior, double, lineDensity, detail::validateGreaterZero);               // lines per mm
-    RAYX_PROPERTY(GratingBehavior, int, orderOfDiffraction)              = 1;                                 // the diffraction order, usually 1
     RAYX_PROPERTY(GratingBehavior, std::array<double RAYX_COMMA 6>, vls) = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };  // VLS coefficients
 };
 

@@ -126,4 +126,6 @@ struct InputSource {
     RAYX_NESTED_PROPERTY(InputSource, std::optional<Polarization>, rayPolarization) = defaults::polarization;
 };
 
+using Source = std::variant<PointSource, MatrixSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
+
 }  // namespace rayx

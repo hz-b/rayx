@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <variant>
 #include <vector>
 
 namespace rayx::detail {
@@ -9,6 +8,11 @@ namespace rayx::detail {
 inline int toModel(const int value) { return value; }
 
 inline double toModel(const double value) { return value; }
+
+template <std::size_t N>
+inline auto toModel(const std::array<double, N>& arr) {
+    return arr;
+}
 
 template <typename T, std::size_t N>
 inline auto toModel(const std::array<T, N>& arr) {
@@ -18,10 +22,7 @@ inline auto toModel(const std::array<T, N>& arr) {
     return result;
 }
 
-template <std::size_t N>
-inline auto toModel(const std::array<double, N>& arr) {
-    return arr;
-}
+inline auto toModel(const std::vector<double>& vec) { return vec; }
 
 template <typename T>
 inline auto toModel(const std::vector<T>& vec) {
@@ -31,13 +32,15 @@ inline auto toModel(const std::vector<T>& vec) {
     return result;
 }
 
-inline auto toModel(const std::vector<double>& vec) { return vec; }
-
-template <typename... Ts>
-inline auto toModel(const std::variant<Ts...>& var) {
-    return std::visit([](const auto& arg) { return toModel(arg); }, var);
+template <typename T>
+inline auto toModel(const std::optional<T>& opt) -> std::optional<decltype(toModel(*opt))> {
+    if (opt) return toModel(*opt);
+    return std::nullopt;
 }
 
-// TODO: std::optional ?
+template <typename ...Ts>
+inline auto toModel(const std::variant<Ts...>& var) {
+    return std::visit([](const auto& value) { return toModel(value); }, var);
+}
 
 }  // namespace rayx::detail

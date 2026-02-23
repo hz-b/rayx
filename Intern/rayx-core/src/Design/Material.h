@@ -8,7 +8,7 @@ namespace rayx {
 // TODO: add strings for materials consisting of multiple atomic elements
 
 enum class Material {
-#define X(elementName, atomicNumber, atomicWeight, density) elementName,
+#define X(elementName, atomicNumber, atomicWeight, density) elementName = atomicNumber,
 #include "materials.xmacro"
 #undef X
 };

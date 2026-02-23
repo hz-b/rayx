@@ -8,10 +8,6 @@
 
 namespace rayx {
 
-using Source = std::variant<PointSource, MatrixSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
-
-using Element = std::variant<SurfaceElement>;
-
 using Object = std::variant<PointSource, MatrixSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource, SurfaceElement>;
 
 using ObjectPtr =

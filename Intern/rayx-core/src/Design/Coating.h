@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Material.h"
+#include "Property.h"
 
 namespace rayx {
 
@@ -31,7 +32,7 @@ struct PeriodicCoating {
     RAYX_NESTED_PROPERTY(PeriodicCoating, std::optional<CoatingLayer>, topLayer);
 };
 
-using Coating = std::variant<PeriodicCoating>;
 // TODO: consider implementing depth-graded coatings (distributions: power-law, linear, exponential)
+using Coating = PeriodicCoating;
 
 }  // namespace rayx

@@ -27,7 +27,11 @@ struct RotateNode;
 struct Beamline;
 
 struct Node {
-    virtual ~Node() = 0;
+    virtual ~Node()                                                   = 0;
+    virtual std::weak_ptr<Node> weak_from_this_base()                 = 0;
+    virtual std::weak_ptr<const Node> weak_from_this_base() const     = 0;
+    virtual std::shared_ptr<Node> shared_from_this_base()             = 0;
+    virtual std::shared_ptr<const Node> shared_from_this_base() const = 0;
 
     std::string name() const { return m_name; }
     void name(std::string_view name);
@@ -36,20 +40,19 @@ struct Node {
     // accessors
     ////////////////////////////////////////////////////////////
 
+    bool isOrphan() const;
     std::shared_ptr<Node> parent() const { return m_parent.lock(); }
     std::vector<std::shared_ptr<Node>> children() const { return m_children; }
 
     // iteration
     //
     // adding nodes during traversal is not allowed
-    void ctraverse(std::function<void(const std::shared_ptr<Node>&)> func) const;
     TraverseAction ctraverse(std::function<TraverseAction(const std::shared_ptr<Node>&)> func) const;
     // iterate backward in order to allow the user to delete nodes along the way
-    void traverse(std::function<void(std::shared_ptr<Node>)> func);
     TraverseAction traverse(std::function<TraverseAction(std::shared_ptr<Node>)> func);
 
     // object accessors
-    std::optional<int> objectId() const;
+    int objectId() const;
 
     // transform accessors
     glm::dvec3 absolutePosition() const;
@@ -77,18 +80,40 @@ struct Node {
     std::weak_ptr<Node> m_parent;
 
   private:
-    std::shared_ptr<Beamline> beamline() const;
+    std::shared_ptr<const Beamline> beamline() const;
+    std::shared_ptr<Beamline> beamline();
 };
 
 struct ObjectNode : Node, std::enable_shared_from_this<ObjectNode> {
+    ObjectNode(std::string_view name, ObjectPtr object) : Node(name) { this->object(object); }
+
+    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
+    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
+    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
+    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
+
     RAYX_VALIDATED_PROPERTY(ObjectNode, ObjectPtr, object, detail::validateNotNull);
 };
 
 struct TranslateNode : Node, std::enable_shared_from_this<TranslateNode> {
+    TranslateNode(std::string_view name, Translation translation) : Node(name), translation(translation) {}
+
+    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
+    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
+    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
+    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
+
     Translation translation;
 };
 
 struct RotateNode : Node, std::enable_shared_from_this<RotateNode> {
+    RotateNode(std::string_view name, Rotation rotation) : Node(name), rotation(rotation) {}
+
+    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
+    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
+    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
+    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
+
     Rotation rotation;
 };
 
@@ -99,6 +124,11 @@ struct ObjectInfo {
 
 struct Beamline : Node, std::enable_shared_from_this<Beamline> {
     Beamline(std::string_view name) : Node(name) {}
+
+    std::weak_ptr<Node> weak_from_this_base() { return weak_from_this(); }
+    std::weak_ptr<const Node> weak_from_this_base() const { return weak_from_this(); }
+    std::shared_ptr<Node> shared_from_this_base() { return shared_from_this(); }
+    std::shared_ptr<const Node> shared_from_this_base() const { return shared_from_this(); }
 
     ////////////////////////////////////////////////////////////
     // node accessors

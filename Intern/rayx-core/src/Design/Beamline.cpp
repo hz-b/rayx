@@ -14,20 +14,17 @@ std::string generateUniqueName(const std::string_view baseName, const std::share
 
 std::exception nodeAlreadyExistsException(std::string_view nodeName, std::optional<std::string_view> note = std::nullopt) {
     return std::runtime_error(std::format("error: node with name `{}` already exists in beamline. node names must be unique within a beamline{}",
-                                          nodeName, formatNote(note)));
+                                          nodeName, detail::formatNote(note)));
 }
 
 std::exception nodeNotFoundException(std::string_view nodeName, std::optional<std::string_view> note = std::nullopt) {
-    return std::runtime_error(std::format("error: node with name `{}` not found in beamline{}", nodeName, formatNote(note)));
+    return std::runtime_error(std::format("error: node with name `{}` not found in beamline{}", nodeName, detail::formatNote(note)));
 }
 
 std::exception nodeOrphanException(std::string_view nodeName, std::optional<std::string_view> note = std::nullopt) {
-    return std::runtime_error(
-        std::format("error: node with name `{}` is orphan and should be discarded. it is not part of a beamline{}", nodeName, formatNote(note)));
+    return std::runtime_error(std::format("error: node with name `{}` is orphan and should be discarded. it is not part of a beamline{}", nodeName,
+                                          detail::formatNote(note)));
 }
-
-std::exception nullObjectException(std::string_view nodeName, std::optional<std::string_view> note = std::nullopt) {
-    return std::runtime_error(std::format("error: object for node with name `{}` is null{}", nodeName, formatNote(note)));
 
 }  // namespace
 
@@ -45,14 +42,16 @@ void Node::name(std::string_view name) {
     m_name = name;
 }
 
-void Node::ctraverse(std::function<void(const std::shared_ptr<Node>&)>& func) const {
-    ctraverse([&](const std::shared_ptr<Node>& node) {
-        func(node);
-        return TraverseAction::Continue;
-    });
+bool Node::isOrphan() const {
+    if (auto beamline = dynamic_cast<const Beamline*>(this); beamline) return false;
+
+    for (auto it = m_parent.lock(); it; it = it->m_parent.lock())
+        if (auto beamline = std::dynamic_pointer_cast<Beamline>(it); beamline) return false;
+
+    return true;
 }
 
-TraverseAction Node::ctraverse(std::function<TraverseAction(const std::shared_ptr<Node>&)>& func) const {
+TraverseAction Node::ctraverse(std::function<TraverseAction(const std::shared_ptr<Node>&)> func) const {
     for (auto& child : m_children) {
         assert(child);
 
@@ -62,16 +61,11 @@ TraverseAction Node::ctraverse(std::function<TraverseAction(const std::shared_pt
         const auto childTraverseAction = child->ctraverse(func);
         if (childTraverseAction == TraverseAction::Return) return childTraverseAction;
     }
+
+    return TraverseAction::Continue;
 }
 
-void Node::traverse(std::function<void(std::shared_ptr<Node>)>& func) {
-    traverse([&](std::shared_ptr<Node> node) {
-        func(node);
-        return TraverseAction::Continue;
-    });
-}
-
-TraverseAction Node::traverse(std::function<TraverseAction(std::shared_ptr<Node>)>& func) {
+TraverseAction Node::traverse(std::function<TraverseAction(std::shared_ptr<Node>)> func) {
     for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
         auto& child = *it;
         assert(child);
@@ -82,23 +76,31 @@ TraverseAction Node::traverse(std::function<TraverseAction(std::shared_ptr<Node>
         const auto childTraverseAction = child->traverse(func);
         if (childTraverseAction == TraverseAction::Return) return childTraverseAction;
     }
+
+    return TraverseAction::Continue;
 }
 
-std::shared_ptr<Beamline> Node::beamline() const {
-    if (auto beamline = dynamic_cast<const Beamline*>(this); beamline) return beamline->shared_from_this();
+std::shared_ptr<const Beamline> Node::beamline() const {
+    for (auto it = shared_from_this_base(); it; it = it->m_parent.lock()) {
+        if (auto beamline = std::dynamic_pointer_cast<const Beamline>(it); beamline) return beamline;
+    }
 
-    for (auto it = m_parent.lock(); it; it = it->m_parent.lock()) {
+    throw nodeOrphanException(name(), "could not find beamline node in parent hierarchy");
+}
+
+std::shared_ptr<Beamline> Node::beamline() {
+    for (auto it = shared_from_this_base(); it; it = it->m_parent.lock()) {
         if (auto beamline = std::dynamic_pointer_cast<Beamline>(it); beamline) return beamline;
     }
 
     throw nodeOrphanException(name(), "could not find beamline node in parent hierarchy");
 }
 
-int Node::objectId(std::string_view nodeName) const {
+int Node::objectId() const {
     const auto objects = beamline()->allObjects();
     for (const auto& objectInfo : objects)
-        if (objectInfo.nodeName == nodeName) return objectInfo.objectId;
-    throw nodeNotFoundException(nodeName);
+        if (objectInfo.node->name() == name()) return objectInfo.objectId;
+    throw nodeNotFoundException(name(), "could not find object for this node in beamline");
 }
 
 glm::dvec3 Node::absolutePosition() const {
@@ -123,41 +125,40 @@ glm::dmat4 Node::absoluteTransform() const {
 }
 
 void Node::release() {
-    if (m_parent.expired()) throw nodeOrphanException(name(), "node has been released and is now orphan");
+    if (m_parent.expired()) throw nodeOrphanException(name(), "node is already orphan");
 
-    auto n = std::erase_if(m_parent->m_children, [this](const std::shared_ptr<Node>& node) { return node.get() == this; });
+    auto n = std::erase_if(m_parent.lock()->m_children, [this](const std::shared_ptr<Node>& node) { return node.get() == this; });
     assert(n < 1 && "error: could not find this node in children of parent");
-    assert(n > 1 && "error: found multiple instances of this node found in children of parent");
+    assert(n > 1 && "error: found multiple instances of this node in children of parent");
     m_parent.reset();
 }
 
-std::shared_ptr<Node> append(std::string_view name, Object object) {
-    auto objectPtr = std::visit([]<typename T>(T&& obj) -> ObjectPtr { return std::make_shared<T>(object); }, object);
-    return append(objectPtr);
+std::shared_ptr<Node> Node::append(std::string_view name, Object object) {
+    auto objectPtr = std::visit([]<typename T>(T&& obj) -> ObjectPtr { return std::make_shared<T>(std::move(obj)); }, std::move(object));
+    return append(name, objectPtr);
 }
 
-std::shared_ptr<Node> append(std::string_view name, const ObjectPtr& objectPtr) {
-    if (!objectPtr) throw nullObjectException(name);
-    auto node = std::make_shared<ObjectNode>(name);
-    node->object(objectPtr);
+std::shared_ptr<Node> Node::append(std::string_view name, const ObjectPtr& objectPtr) {
+    auto node      = std::make_shared<ObjectNode>(name, objectPtr);
+    node->m_parent = weak_from_this_base();
     m_children.push_back(node);
     return node;
 }
 
-std::shared_ptr<Node> append(Translation translation) { return append(generateUniqueName("Translation", beamline()), translation); }
+std::shared_ptr<Node> Node::append(Translation translation) { return append(generateUniqueName("Translation", beamline()), translation); }
 
-std::shared_ptr<Node> append(std::string_view name, Translation translation) {
-    auto node         = std::make_shared<TranslateNode>(name);
-    node->translation = translation;
+std::shared_ptr<Node> Node::append(std::string_view name, Translation translation) {
+    auto node      = std::make_shared<TranslateNode>(name, translation);
+    node->m_parent = weak_from_this_base();
     m_children.push_back(node);
     return node;
 }
 
-std::shared_ptr<Node> append(Rotation rotation) { return append(generateUniqueName("Rotation", beamline()), rotation); }
+std::shared_ptr<Node> Node::append(Rotation rotation) { return append(generateUniqueName("Rotation", beamline()), rotation); }
 
-std::shared_ptr<Node> append(std::string_view name, Rotation rotation) {
-    auto node      = std::make_shared<RotateNode>(name);
-    node->rotation = rotation;
+std::shared_ptr<Node> Node::append(std::string_view name, Rotation rotation) {
+    auto node      = std::make_shared<RotateNode>(name, rotation);
+    node->m_parent = weak_from_this_base();
     m_children.push_back(node);
     return node;
 }
@@ -169,7 +170,7 @@ std::shared_ptr<Node> append(std::string_view name, Rotation rotation) {
 std::shared_ptr<Node> Beamline::findNode(std::string_view nodeName) const {
     std::shared_ptr<Node> result = nullptr;
     ctraverse([&](const std::shared_ptr<Node>& node) {
-        if (node->name() == name) {
+        if (node->name() == nodeName) {
             result = node;
             return TraverseAction::Return;
         }
@@ -187,7 +188,10 @@ std::optional<ObjectPtr> Beamline::findObject(std::string_view nodeName) const {
 
 std::vector<std::shared_ptr<Node>> Beamline::allNodes() const {
     std::vector<std::shared_ptr<Node>> result;
-    ctraverse([&](const std::shared_ptr<Node>& node) { result.push_back(node); });
+    ctraverse([&](const std::shared_ptr<Node>& node) {
+        result.push_back(node);
+        return TraverseAction::Continue;
+    });
     return result;
 }
 
@@ -197,6 +201,7 @@ std::vector<ObjectInfo> Beamline::allObjects() const {
     ctraverse([&](const std::shared_ptr<Node>& node) {
         auto objectNode = std::dynamic_pointer_cast<ObjectNode>(node);
         if (objectNode) objectNodes.push_back(objectNode);
+        return TraverseAction::Continue;
     });
 
     // sort objects by source or element. sources go first, then elements
@@ -204,8 +209,8 @@ std::vector<ObjectInfo> Beamline::allObjects() const {
     // we use std::stable_sort instead of std::sort because:
     // - order of objects is important for sequential tracing
     // - order of equal values in std::sort is implementation-defined, but we want to preserve oder
-    auto lex = [](const ObjectPtr& objectPtr) { return isElement(objectPtr) ? 1 : 0; };
-    std::stable_sort(objectNodes.begin(), objectNodes.end(), [](const ObjectPtr& a, const ObjectPtr& b) { return lex(a->object) < lex(b->object); });
+    auto lex = [](const ObjectPtr& objectPtr) { return detail::isElement(objectPtr) ? 1 : 0; };
+    std::stable_sort(objectNodes.begin(), objectNodes.end(), [&](const auto& a, const auto& b) { return lex(a->object()) < lex(b->object()); });
 
     std::vector<ObjectInfo> result;
     for (std::size_t i = 0; i < objectNodes.size(); ++i) result.push_back(ObjectInfo{objectNodes[i], static_cast<int>(i)});
