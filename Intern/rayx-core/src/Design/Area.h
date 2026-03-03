@@ -43,6 +43,10 @@ struct TrapezoidalArea {
 };
 
 // TODO: implement
+// a way to define the cutout
+
+
+// TODO: implement
 // struct ConvexPolygonalArea {
 //     std::vector<glm::dvec2> points;
 // };
