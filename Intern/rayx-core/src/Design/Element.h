@@ -11,6 +11,18 @@
 
 namespace rayx {
 
+enum ElementType {
+    SurfaceElement,
+    PointSource,
+    MatrixSource,
+    CircleSource,
+    SimpleUndulatorSource,
+    PixelSource,
+    DipoleSource,
+    InputSource,
+};
+
+
 struct SurfaceElement {
     constexpr SurfaceElement(Area area, Behavior behavior) : m_area(area), m_behavior(behavior) {}
 

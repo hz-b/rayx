@@ -6,9 +6,9 @@
 #include <rapidxml.hpp>
 #include <vector>
 
-#include "Angle.h"
-#include "Beamline/Definitions.h"
-#include "Beamline/EnergyDistribution.h"
+#include "Design/Angle.h"
+#include "Design/Definitions.h"
+#include "Design/EnergyDistribution.h"
 #include "Design/Coating.h"
 #include "Design/Cutout.h"
 #include "Design/Surface.h"
@@ -60,8 +60,8 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out);
 bool paramEnergyDistribution(const rapidxml::xml_node<>* node, const std::filesystem::path& rmlFile, EnergyDistribution* out);
 bool paramMultilayer(const rapidxml::xml_node<>* node, Coating* out);
 
-std::optional<glm::dvec4> paramPosition(const rapidxml::xml_node<>* node);
-std::optional<glm::dmat4x4> paramOrientation(const rapidxml::xml_node<>* node);
+std::optional<glm::dvec3> paramPosition(const rapidxml::xml_node<>* node);
+std::optional<glm::dmat3x3> paramOrientation(const rapidxml::xml_node<>* node);
 
 bool paramElectronEnergyOrientation(const rapidxml::xml_node<>* node, ElectronEnergyOrientation* out);
 bool paramSourcePulseType(const rapidxml::xml_node<>* node, SourcePulseType* out);
@@ -229,6 +229,6 @@ struct RAYX_API Parser {
 /// we might want to add an abstract superclass DesignObject.
 /// DesignObject would have child classes xml::Parser and gui::ObjectBuilder or something.
 /// This superclass DesignObject could mostly keep the API of the xml::Parser, to make the transition trivial.
-using DesignObject = xml::Parser;
+using Object = xml::Parser;
 
 }  // namespace rayx

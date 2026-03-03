@@ -8,7 +8,34 @@
 
 namespace rayx {
 
-// String conversion functions
+
+SurfaceElementType stringToSurfaceElementType(const std::string& str);
+std::string surfaceElementTypeToString(SurfaceElementType type);
+
+// no sources in SurfaceElementType, as they are not SurfaceElements
+enum class SurfaceElementType {
+    Crystal,
+    CylinderMirror,
+    ImagePlane,
+    ParaboloidMirror,
+    PlaneGrating,
+    ReflectionZoneplate,
+    Slit,
+    EllipsoidMirror,
+    ConeMirror,
+    ExpertsMirror,
+    PlaneMirror,
+    CylinderMirror,
+    ImagePlane,
+    Paraboloid,
+    RzpSphere,
+    SphereMirror,
+    SphereGrating,
+    ToroidMirror,
+    ToroidGrating,
+    Foil,
+    Aperature,
+};
 
 // SpreadType conversion
 const std::map<SpreadType, std::string> SpreadTypeToString = {
@@ -117,53 +144,96 @@ const std::map<std::string, Material> StringToMaterial = {
 };
 
 // ElementType conversion
-const std::map<ElementType, std::string> ElementTypeToString = {{ElementType::CircleSource, "Circle Source"},
-                                                                {ElementType::CylinderMirror, "Cylinder"},
-                                                                {ElementType::ImagePlane, "ImagePlane"},
-                                                                {ElementType::MatrixSource, "Matrix Source"},
-                                                                {ElementType::ParaboloidMirror, "Paraboloid"},
-                                                                {ElementType::PlaneGrating, "Plane Grating"},
-                                                                {ElementType::PointSource, "Point Source"},
-                                                                {ElementType::ReflectionZoneplate, "Reflection Zoneplate"},
-                                                                {ElementType::SimpleUndulatorSource, "Simple Undulator"},
-                                                                {ElementType::Slit, "Slit"},
-                                                                {ElementType::Sphere, "Sphere"},
-                                                                {ElementType::ConeMirror, "Cone"},
-                                                                {ElementType::ExpertsMirror, "Experts Optics"},
-                                                                {ElementType::PlaneMirror, "Plane Mirror"},
-                                                                {ElementType::SphereGrating, "Spherical Grating"},
-                                                                {ElementType::SphereMirror, "Sphere Mirror"},
-                                                                {ElementType::ToroidMirror, "Toroid"},
-                                                                {ElementType::ToroidGrating, "Toroidal Grating"},
-                                                                {ElementType::DipoleSource, "Dipole Source"},
-                                                                {ElementType::PixelSource, "Pixel Source"},
-                                                                {ElementType::EllipsoidMirror, "Ellipsoid"},
-                                                                {ElementType::Crystal, "Crystal"},
-                                                                {ElementType::Foil, "Foil"}};
-const std::map<std::string, ElementType> StringToElementType = {{"Circle Source", ElementType::CircleSource},
-                                                                {"Cylinder", ElementType::CylinderMirror},
-                                                                {"ImagePlane", ElementType::ImagePlane},
-                                                                {"Matrix Source", ElementType::MatrixSource},
-                                                                {"Paraboloid", ElementType::ParaboloidMirror},
-                                                                {"Plane Grating", ElementType::PlaneGrating},
-                                                                {"Point Source", ElementType::PointSource},
-                                                                {"Reflection Zoneplate", ElementType::ReflectionZoneplate},
-                                                                {"Simple Undulator", ElementType::SimpleUndulatorSource},
-                                                                {"Slit", ElementType::Slit},
-                                                                {"Sphere", ElementType::Sphere},
-                                                                {"Cone", ElementType::ConeMirror},
-                                                                {"Experts Optics", ElementType::ExpertsMirror},
-                                                                {"Plane Mirror", ElementType::PlaneMirror},
-                                                                {"Spherical Grating", ElementType::SphereGrating},
-                                                                {"Sphere Mirror", ElementType::SphereMirror},
-                                                                {"Toroid", ElementType::ToroidMirror},
-                                                                {"Toroidal Grating", ElementType::ToroidGrating},
-                                                                {"Dipole Source", ElementType::DipoleSource},
-                                                                {"Dipole", ElementType::DipoleSource},  // legacy rml
-                                                                {"Pixel Source", ElementType::PixelSource},
-                                                                {"Ellipsoid", ElementType::EllipsoidMirror},
-                                                                {"Crystal", ElementType::Crystal},
-                                                                {"Foil", ElementType::Foil}};
+const std::map<SurfaceElementType, std::string> SurfaceElementTypeToString = {
+                                                                {SurfaceElementType::CylinderMirror, "Cylinder"},
+                                                                {SurfaceElementType::ImagePlane, "ImagePlane"},
+                                                                {SurfaceElementType::ParaboloidMirror, "Paraboloid"},
+                                                                {SurfaceElementType::PlaneGrating, "Plane Grating"},
+                                                                {SurfaceElementType::ReflectionZoneplate, "Reflection Zoneplate"},
+                                                                {SurfaceElementType::Slit, "Slit"},
+                                                                {SurfaceElementType::SphereMirror, "Sphere"},
+                                                                {SurfaceElementType::ConeMirror, "Cone"},
+                                                                {SurfaceElementType::ExpertsMirror, "Experts Optics"},
+                                                                {SurfaceElementType::PlaneMirror, "Plane Mirror"},
+                                                                {SurfaceElementType::SphereGrating, "Spherical Grating"},
+                                                                {SurfaceElementType::SphereMirror, "Sphere Mirror"},
+                                                                {SurfaceElementType::ToroidMirror, "Toroid"},
+                                                                {SurfaceElementType::ToroidGrating, "Toroidal Grating"},
+                                                                {SurfaceElementType::EllipsoidMirror, "Ellipsoid"},
+                                                                {SurfaceElementType::Crystal, "Crystal"},
+                                                                {SurfaceElementType::Foil, "Foil"},
+                                                                {SurfaceElementType::Aperature, "Aperature"}};
+
+const std::map<Object, std::string> ObjectToString = {{CircleSource, "Circle Source"},
+                                                                {CylinderMirror, "Cylinder"},
+                                                                {ImagePlane, "ImagePlane"},
+                                                                {MatrixSource, "Matrix Source"},
+                                                                {ParaboloidMirror, "Paraboloid"},
+                                                                {PlaneGrating, "Plane Grating"},
+                                                                {PointSource, "Point Source"},
+                                                                {ReflectionZoneplate, "Reflection Zoneplate"},
+                                                                {SimpleUndulatorSource, "Simple Undulator"},
+                                                                {Slit, "Slit"},
+                                                                {Sphere, "Sphere"},
+                                                                {ConeMirror, "Cone"},
+                                                                {ExpertsMirror, "Experts Optics"},
+                                                                {PlaneMirror, "Plane Mirror"},
+                                                                {SphereGrating, "Spherical Grating"},
+                                                                {SphereMirror, "Sphere Mirror"},
+                                                                {ToroidMirror, "Toroid"},
+                                                                {ToroidGrating, "Toroidal Grating"},
+                                                                {DipoleSource, "Dipole Source"},
+                                                                {PixelSource, "Pixel Source"},
+                                                                {EllipsoidMirror, "Ellipsoid"},
+                                                                {Crystal, "Crystal"},
+                                                                {Foil, "Foil"}};
+
+const std::map<std::string, SurfaceElementType> StringToSurfaceElementType = {
+                                                                {"Cylinder", SurfaceElementType::CylinderMirror},
+                                                                {"ImagePlane", SurfaceElementType::ImagePlane},
+                                                                {"Paraboloid", SurfaceElementType::ParaboloidMirror},
+                                                                {"Plane Grating", SurfaceElementType::PlaneGrating},
+                                                                {"Reflection Zoneplate", SurfaceElementType::ReflectionZoneplate},
+                                                                {"Slit", SurfaceElementType::Slit},
+                                                                {"Sphere", SurfaceElementType::SphereMirror},
+                                                                {"Cone", SurfaceElementType::ConeMirror},
+                                                                {"Experts Optics", SurfaceElementType::ExpertsMirror},
+                                                                {"Plane Mirror", SurfaceElementType::PlaneMirror},
+                                                                {"Spherical Grating", SurfaceElementType::SphereGrating},
+                                                                {"Sphere Mirror", SurfaceElementType::SphereMirror},
+                                                                {"Toroid", SurfaceElementType::ToroidMirror},
+                                                                {"Toroidal Grating", SurfaceElementType::ToroidGrating},
+                                                                {"Ellipsoid", SurfaceElementType::EllipsoidMirror},
+                                                                {"Crystal", SurfaceElementType::Crystal},
+                                                                {"Foil", SurfaceElementType::Foil}
+                                                                {"Aperature", SurfaceElementType::Aperature}};
+                                                                
+
+
+const std::map<std::string, Object> StringToObjectType = {{"Circle Source", CircleSource},
+                                                                {"Cylinder", SurfaceElement},
+                                                                {"ImagePlane", SurfaceElement},
+                                                                {"Matrix Source", MatrixSource},
+                                                                {"Paraboloid", SurfaceElement},
+                                                                {"Plane Grating", SurfaceElement},
+                                                                {"Point Source", PointSource},
+                                                                {"Reflection Zoneplate", SurfaceElement},
+                                                                {"Simple Undulator", SimpleUndulatorSource},
+                                                                {"Slit", SurfaceElement},
+                                                                {"Sphere", SurfaceElement},
+                                                                {"Cone", SurfaceElement},
+                                                                {"Experts Optics", SurfaceElement},
+                                                                {"Plane Mirror", SurfaceElement},
+                                                                {"Spherical Grating", SurfaceElement},
+                                                                {"Sphere Mirror", SurfaceElement},
+                                                                {"Toroid", SurfaceElement},
+                                                                {"Toroidal Grating", SurfaceElement},
+                                                                {"Dipole Source", DipoleSource},
+                                                                {"Dipole", DipoleSource},  // legacy rml
+                                                                {"Pixel Source", PixelSource},
+                                                                {"Ellipsoid", SurfaceElement},
+                                                                {"Crystal", SurfaceElement},
+                                                                {"Foil", SurfaceElement}};
 
 const std::map<std::string, EventType> StringToEventType = {
     {"Uninitialized", EventType::Uninitialized}, {"Emitted", EventType::Emitted},   {"HitElement", EventType::HitElement},

@@ -9,131 +9,180 @@
 #include "Design/Beamline.h"
 #include "Design/Element.h"
 #include "xml.h"
+#include "BeamlineObjectBuilder.h"
 
 using rayx::ElementType;
 
-void parseElement(rayx::xml::Parser parser, rayx::DesignElement* de) {
-    switch (parser.type()) {
-        case ElementType::ImagePlane:
-            getImageplane(parser, de);
+enum class SurfaceElementType {
+    Crystal,
+    CylinderMirror,
+    ImagePlane,
+    ParaboloidMirror,
+    PlaneGrating,
+    ReflectionZoneplate,
+    Slit,
+    EllipsoidMirror,
+    ConeMirror,
+    ExpertsMirror,
+    PlaneMirror,
+    CylinderMirror,
+    ImagePlane,
+    Paraboloid,
+    RzpSphere,
+    SphereMirror,
+    SphereGrating,
+    ToroidMirror,
+    ToroidGrating,
+    Foil,
+    Aperature,
+};
+
+
+
+void parseElement(rayx::xml::Parser parser, ElementNode& element) {
+
+    SurfaceElement se;
+
+    SurfaceElementType type = StringToSurfaceElementType(parser.name());
+
+    switch (type) {
+        case ImagePlane:
+            makeImagePlane(parser, se);
             break;
-        case ElementType::ConeMirror:
-            getCone(parser, de);
+        case Slit:
+            makeSlit(parser, se);
             break;
-        case ElementType::Crystal:
-            getCrystal(parser, de);
+        case CylinderMirror:
+            makeCylinderMirror(parser, se);
             break;
-        case ElementType::CylinderMirror:
-            getCylinder(parser, de);
+        case ParaboloidMirror:
+            makeParaboloidMirror(parser, se);
             break;
-        case ElementType::EllipsoidMirror:
-            getEllipsoid(parser, de);
+        case PlaneGrating:
+            makePlaneGrating(parser, se);
             break;
-        case ElementType::ExpertsMirror:
-            getExpertsOptics(parser, de);
+        case ReflectionZoneplate:
+            makeReflectionZoneplate(parser, se);
             break;
-        case ElementType::Foil:
-            getFoil(parser, de);
+        case SphereMirror:
+            makeSphereMirror(parser, se);
             break;
-        case ElementType::ParaboloidMirror:
-            getParaboloid(parser, de);
+        case ConeMirror:
+            makeConeMirror(parser, se);
             break;
-        case ElementType::PlaneGrating:
-            getPlaneGrating(parser, de);
+        case ExpertsMirror:
+            makeExpertsMirror(parser, se);
             break;
-        case ElementType::PlaneMirror:
-            getPlaneMirror(parser, de);
+        case PlaneMirror:
+            makePlaneMirror(parser, se);
             break;
-        case ElementType::ReflectionZoneplate:
-            getRZP(parser, de);
+        case ToroidMirror:
+            makeToroidMirror(parser, se);
             break;
-        case ElementType::Slit:
-            getSlit(parser, de);
+        case ToroidGrating:
+            makeToroidGrating(parser, se);
             break;
-        case ElementType::SphereGrating:
-            getSphereGrating(parser, de);
+        case EllipsoidMirror:
+            makeEllipsoidMirror(parser, se);
             break;
-        case ElementType::Sphere:
-        case ElementType::SphereMirror:
-            getSphereMirror(parser, de);
+        case Crystal:
+            makeCrystal(parser, se);
             break;
-        case ElementType::ToroidMirror:
-            getToroidMirror(parser, de);
+        case Foil:
+            makeFoil(parser, se);
             break;
-        case ElementType::ToroidGrating:
-            getToroidalGrating(parser, de);
+        case Aperture:
+            makeAperture(parser, se);
             break;
         default:
-            RAYX_LOG << "Could not classify beamline object with Name: " << parser.name()
-                     << "; Type: " << static_cast<int>(parser.type());  // TODO: write type as string not enum id
-            break;
+            RAYX_EXIT << "unknown element type \"" << parser.name() << "\"";
     }
+
+    Area area = makeArea(parser);
+
+    Behavior behavior = makeBehavior(parser);
+    
+    se.area(area);
+    se.behavior(behavior);
+
+    makeOptionalCurvature(parser, se);
+    makeOptionalAperture(parser, se);
+    makeOptionalSlopeError(parser, se);
+
 }
 
 namespace rayx {
 
-void addBeamlineObjectFromXML(rapidxml::xml_node<>* node, Group& group, std::filesystem::path filepath) {
-    rayx::xml::Parser parser(node, filepath);
-    ElementType type = parser.type();
-
-    std::unique_ptr<DesignSource> ds = std::make_unique<DesignSource>();
-    ds->m_elementParameters          = Map();
-
-    std::unique_ptr<DesignElement> de = std::make_unique<DesignElement>();
-    de->m_elementParameters           = Map();
+void addBeamlineObjectFromXML(rapidxml::xml_node<>* XmlNode, Node& BlNode, std::filesystem::path filepath) {
+    rayx::xml::Parser parser(XmlNode, filepath);
+    Object type = parser.type();
 
     bool isSource = true;
     switch (type) {
-        case ElementType::PointSource:
-            setPointSource(parser, ds.get());
+        case PointSource:
+            SourceNode source;
+            setPointSource(parser, source);
             break;
-        case ElementType::MatrixSource:
-            setMatrixSource(parser, ds.get());
+        case MatrixSource:
+            SourceNode source;
+            setMatrixSource(parser, source);
             break;
-        case ElementType::DipoleSource:
-            setDipoleSource(parser, ds.get());
+        case DipoleSource:
+            SourceNode source;
+            setDipoleSource(parser, source);
             break;
-        case ElementType::PixelSource:
-            setPixelSource(parser, ds.get());
+        case PixelSource:
+            SourceNode source;
+            setPixelSource(parser, source);
             break;
-        case ElementType::CircleSource:
-            setCircleSource(parser, ds.get());
+        case CircleSource:
+            SourceNode source;
+            setCircleSource(parser, source);
             break;
-        case ElementType::SimpleUndulatorSource:
-            setSimpleUndulatorSource(parser, ds.get());
+        case SimpleUndulatorSource:
+            SourceNode source;
+            setSimpleUndulatorSource(parser, source);
+            break;
+        case SurfaceElement:
+            ElementNode element;
+            parseElement(parser, element);
+            isSource = false;
             break;
         default:
-            isSource = false;
+             RAYX_LOG << "Could not classify beamline object with Name: " << parser.name()
+                     << "; Type: " << static_cast<int>(parser.type());  // TODO: write type as string not enum id
             break;
     }
 
     // TODO: could likely be made nicer
     if (isSource) {
-        group.addChild(std::move(ds));
+        BlNode.append(std::move(ds));
     } else {
-        parseElement(parser, de.get());
-        group.addChild(std::move(de));
+        BlNode.append(std::move(de));
     }
 }
 
 // `collection` is an xml object, over whose children-objects we want to
 // iterate in order to add them to the beamline.
 // `collection` may either be a <beamline> or a <group>.
-// the group-context represents the stack of groups within which we currently are.
-// Whenever we look into a group, this group has to be pushed onto the group context stack. And when we are done, it will be popped again.
-std::shared_ptr<Beamline> handleObjectCollection(rapidxml::xml_node<>* collection, Group& group, const std::filesystem::path& filepath) {
+// the beamline-context represents the stack of beamlines within which we currently are.
+// Whenever we look into a beamline, this beamline has to be pushed onto the beamline context stack. And when we are done, it will be popped again.
+void handleObjectCollection(rapidxml::xml_node<>* collection, Node& parent, const std::filesystem::path& filepath) {
     // Iterating through XML objects
+
     for (rapidxml::xml_node<>* object = collection->first_node(); object; object = object->next_sibling()) {
         if (strcmp(object->name(), "object") == 0) {
-            addBeamlineObjectFromXML(object, group, filepath);
-        } else if (strcmp(object->name(), "group") == 0) {
-            auto groupOpt = xml::parseGroup(object);
-            if (!groupOpt) { RAYX_EXIT << "parseGroup failed!"; }
-            std::unique_ptr<Group> nestedGroup = std::make_unique<Group>(std::move(*groupOpt));
+            makeRotationAndTranslation(collection, parent);
 
-            // Recursively parse all objects from within the group.
-            handleObjectCollection(object, *nestedGroup, filepath);
-            group.addChild(std::move(nestedGroup));
+            addBeamlineObjectFromXML(object, parent, filepath);
+        } else if (strcmp(object->name(), "group") == 0) {   
+            makeRotationAndTranslation(collection, parent);
+
+            std::unique_ptr<Node> nestedNode = std::make_unique<Node>(std::move(*groupOpt));
+
+            // Recursively parse all objects from within the beamline.
+            handleObjectCollection(object, *nestedNode, filepath);
+            parent.append(nestedNode);
         } else if (strcmp(object->name(), "param") != 0) {
             RAYX_EXIT << "received weird object->name(): " << object->name();
         }
@@ -141,7 +190,7 @@ std::shared_ptr<Beamline> handleObjectCollection(rapidxml::xml_node<>* collectio
 }
 
 // This is the central function to load RML files.
-std::shared_ptr<Beamline> importBeamline(const std::filesystem::path& filepath) {
+Node importBeamline(const std::filesystem::path& filepath) {
     RAYX_PROFILE_FUNCTION_STDOUT();
     // first implementation: stringstreams are slow; this might need
     // optimization
@@ -162,13 +211,16 @@ std::shared_ptr<Beamline> importBeamline(const std::filesystem::path& filepath) 
 
     RAYX_VERB << "RML Version: " << doc.first_node("lab")->first_node("version")->value();
     rapidxml::xml_node<>* xml_beamline = doc.first_node("lab")->first_node("beamline");
-
-    auto beamline = std::make_shared<Beamline>("BEAMLINE");
+    
+    auto name = xml_beamline->first_node("name")->value();
+    
+    Node root(name);
 
     // go through all objects of the file, and parse them.
-    // The group context stores the set of group in which the algorithm currently "is".
-    // For each group we call handleObjectCollection recursively, and push the group onto the group context stack.
-    return handleObjectCollection(xml_beamline, filepath);
+    // The beamline context stores the set of beamline in which the algorithm currently "is".
+    // For each beamline we call handleObjectCollection recursively, and push the beamline onto the beamline context stack.
+    handleObjectCollection(xml_beamline, root, filepath);
+    return root;
 
 }
 
