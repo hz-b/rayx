@@ -1,4 +1,5 @@
 #include "test_metrix.h"
+#include "Model/ToModel/ToModel.h"
 
 using namespace rayx;
 using namespace rayx::literals;
@@ -122,6 +123,9 @@ std::shared_ptr<Beamline> createMetrixBeamline() {
     // auto imagePlane = std::get<std::shared_ptr<SurfaceElement>>(metrix->find("ImagePlane")->object());
     // auto imagePlane = std::get<std::shared_ptr<SurfaceElement>(std::dynamic_pointer_cast<ObjectNode>(metrix->findNode("ImagePlane"))->object);
     auto imagePlane = std::get<std::shared_ptr<SurfaceElement>>(*metrix->findObject("ImagePlane"));
+
+    // test toModel conversion
+    [[maybe_unused]] const auto model = detail::toModel(*metrix);
 
     return metrix;
 }
