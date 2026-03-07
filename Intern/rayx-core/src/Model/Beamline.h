@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Design/Beamline.h"
+#include <string>
+#include <vector>
+
 #include "Element.h"
 #include "Source.h"
 
@@ -31,9 +33,3 @@ struct Beamline {
 };
 
 }  // namespace rayx::detail::model
-
-namespace rayx::detail {
-
-model::Beamline toModel(const Beamline& beamline);
-
-}  // namespace rayx::detail

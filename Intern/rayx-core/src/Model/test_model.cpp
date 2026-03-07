@@ -1,5 +1,0 @@
-// #include "Distribution.h"
-// #include "Curvature.h"
-// #include "Angle.h"
-// #include "Polarization.h"
-// #include "PhotonEnergy.h"

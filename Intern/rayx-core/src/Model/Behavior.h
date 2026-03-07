@@ -1,7 +1,10 @@
 #pragma once
 
+#include <variant>
+#include <array>
+
 #include "Coating.h"
-#include "Design/Behavior.h"
+#include "Common/Material.h"
 
 namespace rayx::detail::model {
 
@@ -41,7 +44,7 @@ struct TransmitBehavior {
 struct GratingBehavior {
     int orderOfDiffraction; /* the diffraction order, usually 1 */
     double lineDensity;     // lines per mm
-    double vls[6];          // VLS coefficients
+    std::array<double, 6> vls;          // VLS coefficients
 };
 
 struct RzpBehavior {
@@ -77,9 +80,3 @@ using Behavior =
     std::variant<DetectBehavior, AbsorbBehavior, IgnoreBehavior, ReflectBehavior, TransmitBehavior, GratingBehavior, RzpBehavior, CrystalBehavior>;
 
 }  // namespace rayx::detail::model
-
-namespace rayx::detail {
-
-model::Behavior toModel(const Behavior& behavior);
-
-}

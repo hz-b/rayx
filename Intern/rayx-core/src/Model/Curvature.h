@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Design/Curvature.h"
-#include "ToModel.h"
+#include <variant>
+
+#include "Common/Enums.h"
 
 namespace rayx::detail::model {
 
@@ -50,9 +51,3 @@ struct CubicCurvature {
 using Curvature = std::variant<QuadricCurvature, ToroidialCurvature, CubicCurvature>;
 
 }  // namespace rayx::detail::model
-
-namespace rayx::detail {
-
-model::Curvature toModel(const Curvature& curvature);
-
-}  // namespace rayx::detail

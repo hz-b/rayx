@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Design/Coating.h"
-#include "ToModel.h"
+#include <vector>
+
+#include "Common/Material.h"
 
 namespace rayx::detail::model {
 
@@ -13,9 +14,3 @@ struct Coating {
 };
 
 }  // namespace rayx::detail::model
-
-namespace rayx::detail {
-
-model::Coating toModel(const std::optional<Coating>& optCoating);
-
-}

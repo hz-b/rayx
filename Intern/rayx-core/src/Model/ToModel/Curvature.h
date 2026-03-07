@@ -1,15 +1,19 @@
-#include "Curvature.h"
+#pragma once
 
-#include <cmath>
+#include "Angle.h"
+#include "Design/Curvature.h"
+#include "Model/Curvature.h"
+#include "ToModelTrait.h"
+#include "Enums.h"
 
 namespace rayx::detail {
 
-model::QuadricCurvature toModelQuadric(const CylindricalCurvature& curvature) {
-    auto cyl_direction     = curvature.direction();
-    auto radius            = curvature.radius();
-    auto incidence         = toRad(curvature.grazingIncAngle()).value();
-    auto entranceArmLength = curvature.entranceArmLength();
-    auto exitArmLength     = curvature.exitArmLength();
+inline model::QuadricCurvature toModelQuadric(const CylindricalCurvature& curvature) {
+    auto cyl_direction     = toModel(curvature.direction());
+    auto radius            = toModel(curvature.radius());
+    auto incidence         = toModel(curvature.grazingIncAngle());
+    auto entranceArmLength = toModel(curvature.entranceArmLength());
+    auto exitArmLength     = toModel(curvature.exitArmLength());
 
     double a11 = 0, a33 = 0, a24 = 0;
     if (cyl_direction == CylinderDirection::LongRadiusR) {  // X-DIR
@@ -50,7 +54,7 @@ model::QuadricCurvature toModelQuadric(const CylindricalCurvature& curvature) {
     };
 }
 
-model::QuadricCurvature toModelQuadric(const SphericalCurvature& curvature) {
+inline model::QuadricCurvature toModelQuadric(const SphericalCurvature& curvature) {
     return model::QuadricCurvature{
         .icurv = 1,
         .a11   = 1,
@@ -59,20 +63,20 @@ model::QuadricCurvature toModelQuadric(const SphericalCurvature& curvature) {
         .a14   = 0,
         .a22   = 1,
         .a23   = 0,
-        .a24   = -curvature.radius(),
+        .a24   = -toModel(curvature.radius()),
         .a33   = 1,
         .a34   = 0,
         .a44   = 0,
     };
 }
 
-model::QuadricCurvature toModelQuadric(const ParabolicCurvature& curvature) {
-    auto ArmLength      = curvature.armLength();
-    auto parameterP     = curvature.parameterP();
-    auto parameterPType = curvature.parameterPType();
+inline model::QuadricCurvature toModelQuadric(const ParabolicCurvature& curvature) {
+    auto ArmLength      = toModel(curvature.armLength());
+    auto parameterP     = toModel(curvature.parameterP());
+    auto parameterPType = toModel(curvature.parameterPType());
 
-    auto grazingIncAngle = toRad(curvature.grazingIncAngle()).value();
-    auto a11             = curvature.parameterA11();
+    auto grazingIncAngle = toModel(curvature.grazingIncAngle());
+    auto a11             = toModel(curvature.parameterA11());
 
     double a24, a34, a44, y0, z0;
     //---------- Calculation will be outsourced ----------------
@@ -103,12 +107,12 @@ model::QuadricCurvature toModelQuadric(const ParabolicCurvature& curvature) {
     };
 }
 
-model::QuadricCurvature toModelQuadric(const ConicalCurvature& curvature) {
-    double incidence         = toRad(curvature.grazingIncAngle()).value();
-    double entranceArmLength = curvature.entranceArmLength();
-    double exitArmLength     = curvature.exitArmLength();
+inline model::QuadricCurvature toModelQuadric(const ConicalCurvature& curvature) {
+    double incidence         = toModel(curvature.grazingIncAngle());
+    double entranceArmLength = toModel(curvature.entranceArmLength());
+    double exitArmLength     = toModel(curvature.exitArmLength());
 
-    double zl = curvature.totalLength();
+    double zl = toModel(curvature.totalLength());
 
     double ra = entranceArmLength;
     double rb = exitArmLength;
@@ -158,13 +162,13 @@ model::QuadricCurvature toModelQuadric(const ConicalCurvature& curvature) {
     };
 }
 
-model::QuadricCurvature toModelQuadric(const EllipticalCurvature& curvature) {
-    auto entranceArmLength = curvature.entranceArmLength();
-    auto exitArmLength     = curvature.exitArmLength();
+inline model::QuadricCurvature toModelQuadric(const EllipticalCurvature& curvature) {
+    auto entranceArmLength = toModel(curvature.entranceArmLength());
+    auto exitArmLength     = toModel(curvature.exitArmLength());
 
-    auto shortHalfAxisB     = curvature.shortHalfAxisB();
-    auto longHalfAxisA      = curvature.longHalfAxisA();
-    auto designGrazingAngle = toRad(curvature.designGrazingIncAngle()).value();
+    auto shortHalfAxisB     = toModel(curvature.shortHalfAxisB());
+    auto longHalfAxisA      = toModel(curvature.longHalfAxisA());
+    auto designGrazingAngle = toModel(curvature.designGrazingIncAngle());
 
     // if design angle not given, take incidenceAngle
     // calc y0
@@ -194,10 +198,10 @@ model::QuadricCurvature toModelQuadric(const EllipticalCurvature& curvature) {
     double mt = 0;  // tangent slope
     if (longHalfAxisA > 0.0 && y0 < 0.0) { mt = std::pow(shortHalfAxisB / longHalfAxisA, 2) * z0 / y0; }
 
-    auto figureRotation = curvature.figureRotation();
+    auto figureRotation = toModel(curvature.figureRotation());
 
     // calculate a11
-    auto a11 = curvature.parameterA11();
+    auto a11 = toModel(curvature.parameterA11());
     if (figureRotation == FigureRotation::Yes) {
         a11 = 1;
     } else if (figureRotation == FigureRotation::Plane) {
@@ -232,65 +236,99 @@ model::QuadricCurvature toModelQuadric(const EllipticalCurvature& curvature) {
     };
 }
 
-model::QuadricCurvature toModelQuadric(const QuadricCurvature& curvature) {
+inline model::QuadricCurvature toModelQuadric(const QuadricCurvature& curvature) {
     return model::QuadricCurvature{
-        .icurv = curvature.icurv(),
-        .a11   = curvature.a11(),
-        .a12   = curvature.a12(),
-        .a13   = curvature.a13(),
-        .a14   = curvature.a14(),
-        .a22   = curvature.a22(),
-        .a23   = curvature.a23(),
-        .a24   = curvature.a24(),
-        .a33   = curvature.a33(),
-        .a34   = curvature.a34(),
-        .a44   = curvature.a44(),
+        .icurv = toModel(curvature.icurv()),
+        .a11   = toModel(curvature.a11()),
+        .a12   = toModel(curvature.a12()),
+        .a13   = toModel(curvature.a13()),
+        .a14   = toModel(curvature.a14()),
+        .a22   = toModel(curvature.a22()),
+        .a23   = toModel(curvature.a23()),
+        .a24   = toModel(curvature.a24()),
+        .a33   = toModel(curvature.a33()),
+        .a34   = toModel(curvature.a34()),
+        .a44   = toModel(curvature.a44()),
     };
 }
 
-model::ToroidialCurvature toModelToroidial(const ToroidialCurvature& curvature) {
+inline model::ToroidialCurvature toModelToroidial(const ToroidialCurvature& curvature) {
     return model::ToroidialCurvature{
-        .longRadius  = curvature.longRadius(),
-        .shortRadius = curvature.shortRadius(),
-        .toroidType  = curvature.toroidType(),
+        .longRadius  = toModel(curvature.longRadius()),
+        .shortRadius = toModel(curvature.shortRadius()),
+        .toroidType  = toModel(curvature.toroidType()),
     };
 }
 
-model::CubicCurvature toModelCubic(const CubicCurvature& curvature) {
+inline model::CubicCurvature toModelCubic(const CubicCurvature& curvature) {
     return model::CubicCurvature{
-        .a11 = curvature.a11(),
-        .a12 = curvature.a12(),
-        .a13 = curvature.a13(),
-        .a14 = curvature.a14(),
-        .a22 = curvature.a22(),
-        .a23 = curvature.a23(),
-        .a24 = curvature.a24(),
-        .a33 = curvature.a33(),
-        .a34 = curvature.a34(),
-        .a44 = curvature.a44(),
+        .a11 = toModel(curvature.a11()),
+        .a12 = toModel(curvature.a12()),
+        .a13 = toModel(curvature.a13()),
+        .a14 = toModel(curvature.a14()),
+        .a22 = toModel(curvature.a22()),
+        .a23 = toModel(curvature.a23()),
+        .a24 = toModel(curvature.a24()),
+        .a33 = toModel(curvature.a33()),
+        .a34 = toModel(curvature.a34()),
+        .a44 = toModel(curvature.a44()),
 
-        .b12 = curvature.b12(),
-        .b13 = curvature.b13(),
-        .b21 = curvature.b21(),
-        .b23 = curvature.b23(),
-        .b31 = curvature.b31(),
-        .b32 = curvature.b32(),
+        .b12 = toModel(curvature.b12()),
+        .b13 = toModel(curvature.b13()),
+        .b21 = toModel(curvature.b21()),
+        .b23 = toModel(curvature.b23()),
+        .b31 = toModel(curvature.b31()),
+        .b32 = toModel(curvature.b32()),
 
-        .psi = curvature.psi(),
+        .psi = toModel(curvature.psi()),
     };
 }
 
-// makes 2 copies. first convert to device specific curvature, then convert to device curvature variant
-model::Curvature toModel(const QuadricCurvature& curvature) { return toModelQuadric(curvature); }
-model::Curvature toModel(const ToroidialCurvature& curvature) { return toModelToroidial(curvature); }
-model::Curvature toModel(const CubicCurvature& curvature) { return toModelCubic(curvature); }
-model::Curvature toModel(const CylindricalCurvature& curvature) { return toModelQuadric(curvature); }
-model::Curvature toModel(const SphericalCurvature& curvature) { return toModelQuadric(curvature); }
-model::Curvature toModel(const ParabolicCurvature& curvature) { return toModelQuadric(curvature); }
-model::Curvature toModel(const ConicalCurvature& curvature) { return toModelQuadric(curvature); }
-model::Curvature toModel(const EllipticalCurvature& curvature) { return toModelQuadric(curvature); }
-model::Curvature toModel(const Curvature& curvature) {
-    return std::visit([](const auto& curv) { return toModel(curv); }, curvature);
-}
+template <>
+struct ToModel<QuadricCurvature> {
+    static model::Curvature apply(const QuadricCurvature& curvature) { return toModelQuadric(curvature); }
+};
+
+template <>
+struct ToModel<ToroidialCurvature> {
+    static model::Curvature apply(const ToroidialCurvature& curvature) { return toModelToroidial(curvature); }
+};
+
+template <>
+struct ToModel<CubicCurvature> {
+    static model::Curvature apply(const CubicCurvature& curvature) { return toModelCubic(curvature); }
+};
+
+template <>
+struct ToModel<CylindricalCurvature> {
+    static model::Curvature apply(const CylindricalCurvature& curvature) { return toModelQuadric(curvature); }
+};
+
+template <>
+struct ToModel<SphericalCurvature> {
+    static model::Curvature apply(const SphericalCurvature& curvature) { return toModelQuadric(curvature); }
+};
+
+template <>
+struct ToModel<ParabolicCurvature> {
+    static model::Curvature apply(const ParabolicCurvature& curvature) { return toModelQuadric(curvature); }
+};
+
+template <>
+struct ToModel<ConicalCurvature> {
+    static model::Curvature apply(const ConicalCurvature& curvature) { return toModelQuadric(curvature); }
+};
+
+template <>
+struct ToModel<EllipticalCurvature> {
+    static model::Curvature apply(const EllipticalCurvature& curvature) { return toModelQuadric(curvature); }
+};
+
+template <>
+struct ToModel<Curvature> {
+    static model::Curvature apply(const Curvature& curvature) {
+        return std::visit([](const auto& curv) { return toModel(curv); }, curvature);
+    }
+};
 
 }  // namespace rayx::detail

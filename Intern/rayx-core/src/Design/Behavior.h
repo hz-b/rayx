@@ -5,15 +5,9 @@
 #include <variant>
 
 #include "Coating.h"
-#include "Material.h"
+#include "Common/Material.h"
 
 namespace rayx {
-
-/// Behavior of element when a ray hits the back side of the element (i.e., the side opposite to the normal direction).
-enum class BackFaceBehavior {
-    Ignore,
-    Absorb,
-};
 
 /// Ray does not interact with the element, but records `HitElement` event.
 struct DetectBehavior {};

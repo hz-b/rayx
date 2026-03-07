@@ -1,10 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <variant>
 
 #include "Area.h"
-#include "Design/Aperture.h"
-#include "ToModel.h"
 
 namespace rayx::detail::model {
 
@@ -24,11 +23,3 @@ struct DiffractiveAperture {
 using Aperture = std::variant<model::NonDiffractiveAperture, model::DiffractiveAperture>;
 
 }  // namespace rayx::detail::model
-
-namespace rayx::detail {
-
-model::NonDiffractiveAperture toModel(const NonDiffractiveAperture& aperture);
-model::DiffractiveAperture toModel(const DiffractiveAperture& aperture);
-model::Aperture toModel(const Aperture& aperture);
-
-}  // namespace rayx::detail

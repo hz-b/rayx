@@ -58,8 +58,6 @@ struct CircleSource {
     RAYX_NESTED_PROPERTY(CircleSource, Polarization, rayPolarization) = defaults::polarization;
 };
 
-enum class UndulatorSigmaType { Standard, Accurate };
-
 // TODO: sensible defaults
 // TODO: sensible validation
 struct SimpleUndulatorSource {
@@ -95,8 +93,6 @@ struct PixelSource {
     RAYX_NESTED_PROPERTY(PixelSource, Polarization, polarization)                         = defaults::polarization;
     RAYX_NESTED_PROPERTY(PixelSource, Distribution<PhotonEnergy>, rayPhotonEnergy);
 };
-
-enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
 
 // TODO: sensible defaults
 // TODO: sensible validation

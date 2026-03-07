@@ -3,6 +3,7 @@
 #include <variant>
 
 #include "Angle.h"
+#include "Common/Enums.h"
 
 namespace rayx {
 
@@ -23,11 +24,6 @@ struct QuadricCurvature {
     RAYX_PROPERTY(QuadricCurvature, double, a33);
     RAYX_PROPERTY(QuadricCurvature, double, a34);
     RAYX_PROPERTY(QuadricCurvature, double, a44);
-};
-
-enum class ToroidType {
-    Convex,
-    Concave,
 };
 
 struct ToroidialCurvature {

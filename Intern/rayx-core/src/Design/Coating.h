@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Material.h"
+#include "Common/Material.h"
 #include "Property.h"
 
 namespace rayx {

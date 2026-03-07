@@ -1,7 +1,11 @@
 #pragma once
 
-#include "Design/Source.h"
+#include <optional>
+#include <variant>
+
 #include "Distribution.h"
+#include "Math/ElectricField.h"
+#include "Trace/Rays.h"
 
 namespace rayx::detail::model {
 
@@ -80,17 +84,3 @@ struct InputSource {
 using Source = std::variant<PointSource, MatrixSource, CircleSource, SimpleUndulatorSource, PixelSource, DipoleSource, InputSource>;
 
 }  // namespace rayx::detail::model
-
-namespace rayx::detail {
-
-// all the overloads for sources are put here, to avoid an extra copy, when calling toModel with an already unwrapped Source
-model::PointSource toModel(const PointSource& source);
-model::MatrixSource toModel(const MatrixSource& source);
-model::CircleSource toModel(const CircleSource& source);
-model::SimpleUndulatorSource toModel(const SimpleUndulatorSource& source);
-model::PixelSource toModel(const PixelSource& source);
-model::DipoleSource toModel(const DipoleSource& source);
-model::InputSource toModel(const InputSource& source);
-model::Source toModel(const Source& source);
-
-}  // namespace rayx::detail
