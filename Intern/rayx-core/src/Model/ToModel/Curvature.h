@@ -40,6 +40,7 @@ inline model::QuadricCurvature toModelQuadric(const CylindricalCurvature& curvat
     }
 
     return model::QuadricCurvature{
+    return model::QuadricCurvature{
         .icurv = icurv,
         .a11   = a11,
         .a12   = 0,
@@ -92,6 +93,7 @@ inline model::QuadricCurvature toModelQuadric(const ParabolicCurvature& curvatur
     a34 = -parameterP;
     a44 = std::pow(y0, 2) - 2 * parameterP * z0 - std::pow(parameterP, 2);
     //---------------------------- Serialization -------------------------------
+    return model::QuadricCurvature{
     return model::QuadricCurvature{
         .icurv = 1,
         .a11   = a11,
