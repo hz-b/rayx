@@ -12,13 +12,13 @@
         <meta name="author" content="Helmholtz-Zentrum Berlin für Materialien und Energie (HZB)">
       
       
-        <link rel="canonical" href="https://hz-b.github.io/rayx/latest/Model/BeamlineObjects/">
+        <link rel="canonical" href="https://hz-b.github.io/rayx/latest/Model/05_Quad%28ric%29-function/">
       
       
-        <link rel="prev" href="../User-vs-Model-Parameter/">
+        <link rel="prev" href="../04_Transformation-between-coordinate-systems/">
       
       
-        <link rel="next" href="Beamline-Parameter/">
+        <link rel="next" href="../06_Efficiency/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Beamline Objects - RAYX</title>
+        <title>Quad(ric) Function - RAYX</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#beamline-objects" class="md-skip">
+        <a href="#quadric-function" class="md-skip">
           Skip to content
         </a>
       
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Beamline Objects
+              Quad(ric) Function
             
           </span>
         </div>
@@ -261,7 +261,7 @@
   
     
   
-  Getting Started
+  Introduction
 
         </a>
       </li>
@@ -279,13 +279,13 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../Efficiency/" class="md-tabs__link">
+        <a href="../00_index/" class="md-tabs__link">
           
   
   
     
   
-  User Guide
+  Model
 
         </a>
       </li>
@@ -311,6 +311,38 @@
 
         </a>
       </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../rayxCore/links/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API-Reference
+
+        </a>
+      </li>
+    
+  
+
     
   
 
@@ -440,7 +472,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Introduction
   
 
     
@@ -456,7 +488,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Introduction
   
 
           </label>
@@ -637,14 +669,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Introduction/06-Literature/" class="md-nav__link">
+      <a href="../../Introduction/06-How-to-analyse_rayx_output/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Literature
+    RAYX Output
   
 
     
@@ -665,14 +697,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Introduction/07-Style-Guide/" class="md-nav__link">
+      <a href="../../Introduction/07-Literature/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Style Guide for Programming in RAYX
+    Literature
   
 
     
@@ -722,6 +754,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -748,7 +784,7 @@
   <span class="md-ellipsis">
     
   
-    User Guide
+    Model
   
 
     
@@ -764,7 +800,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    User Guide
+    Model
   
 
           </label>
@@ -777,63 +813,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Efficiency/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Efficiency
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Events/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Events
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Model/" class="md-nav__link">
+      <a href="../00_index/" class="md-nav__link">
         
   
   
@@ -861,14 +841,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../PRNGs-on-the-GPU/" class="md-nav__link">
+      <a href="../000_OpticalElements/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Pseudo Random Number Generators (PRNGs) on the GPU
+    Optical Elements
   
 
     
@@ -889,14 +869,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../Quad%28ric%29-function/" class="md-nav__link">
+      <a href="../001_LightSources/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Quad(ric) Function
+    Light Sources
   
 
     
@@ -917,7 +897,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../Ray-generation/" class="md-nav__link">
+      <a href="../01_User-vs-Model-Parameter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User vs Model Parameter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Ray-generation/" class="md-nav__link">
         
   
   
@@ -945,7 +953,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../Transformation-between-coordinate-systems/" class="md-nav__link">
+      <a href="../03_PRNGs-on-the-GPU/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pseudo Random Number Generators (PRNGs) on the GPU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Transformation-between-coordinate-systems/" class="md-nav__link">
         
   
   
@@ -970,17 +1006,147 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../User-vs-Model-Parameter/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quad(ric) Function
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    User vs Model Parameter
+    Quad(ric) Function
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculation-of-intersection-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calculation of intersection point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-equation-for-second-order-surfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General equation for second order surfaces
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_Efficiency/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficiency
   
 
     
@@ -998,45 +1164,66 @@
                 
   
   
-    
   
   
+    <li class="md-nav__item">
+      <a href="../07_Events/" class="md-nav__link">
+        
   
+  
+  <span class="md-ellipsis">
     
+  
+    Events
+  
+
     
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" checked>
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -1050,17 +1237,11 @@
   
   
 
-            </a>
-            
-              
-              <label class="md-nav__link md-nav__link--active" for="__nav_3_9" id="__nav_3_9_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1071,15 +1252,13 @@
           <ul class="md-nav__list" data-md-scrollfix>
             
               
-            
-              
                 
   
   
   
   
     <li class="md-nav__item">
-      <a href="Beamline-Parameter/" class="md-nav__link">
+      <a href="../BeamlineObjects/01_Beamline-Parameter/" class="md-nav__link">
         
   
   
@@ -1121,8 +1300,6 @@
       
         
       
-        
-      
     
     
     
@@ -1136,10 +1313,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_9_3" id="__nav_3_9_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_11_2" id="__nav_3_11_2_label" tabindex="0">
             
   
   
@@ -1157,8 +1334,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_9_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_11_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1175,7 +1352,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LightSources/Circle-Source/" class="md-nav__link">
+      <a href="../BeamlineObjects/LightSources/Circle-Source/" class="md-nav__link">
         
   
   
@@ -1203,7 +1380,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LightSources/DipoleSource/" class="md-nav__link">
+      <a href="../BeamlineObjects/LightSources/DipoleSource/" class="md-nav__link">
         
   
   
@@ -1231,35 +1408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LightSources/LightSources/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Light Sources
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="LightSources/Matrix-Source/" class="md-nav__link">
+      <a href="../BeamlineObjects/LightSources/Matrix-Source/" class="md-nav__link">
         
   
   
@@ -1287,7 +1436,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LightSources/Pixel-Source/" class="md-nav__link">
+      <a href="../BeamlineObjects/LightSources/Pixel-Source/" class="md-nav__link">
         
   
   
@@ -1315,7 +1464,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LightSources/Point-Source/" class="md-nav__link">
+      <a href="../BeamlineObjects/LightSources/Point-Source/" class="md-nav__link">
         
   
   
@@ -1343,7 +1492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="LightSources/SimpleUndulatorSource/" class="md-nav__link">
+      <a href="../BeamlineObjects/LightSources/SimpleUndulatorSource/" class="md-nav__link">
         
   
   
@@ -1411,8 +1560,6 @@
       
         
       
-        
-      
     
     
     
@@ -1426,10 +1573,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_11_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_9_4" id="__nav_3_9_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_11_3" id="__nav_3_11_3_label" tabindex="0">
             
   
   
@@ -1447,8 +1594,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_9_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9_4">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_11_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_11_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1465,7 +1612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Cone-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Cone-Mirror/" class="md-nav__link">
         
   
   
@@ -1493,7 +1640,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Crystal/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Crystal/" class="md-nav__link">
         
   
   
@@ -1521,7 +1668,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Cylinder-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Cylinder-Mirror/" class="md-nav__link">
         
   
   
@@ -1549,7 +1696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Ellipsoid-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Ellipsoid-Mirror/" class="md-nav__link">
         
   
   
@@ -1577,7 +1724,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Foil/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Foil/" class="md-nav__link">
         
   
   
@@ -1605,7 +1752,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Image-Plane/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Image-Plane/" class="md-nav__link">
         
   
   
@@ -1633,35 +1780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/OpticalElements/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optical Elements
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="OpticalElements/Paraboloid-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Paraboloid-Mirror/" class="md-nav__link">
         
   
   
@@ -1689,7 +1808,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Plane-Grating/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Plane-Grating/" class="md-nav__link">
         
   
   
@@ -1717,7 +1836,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Plane-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Plane-Mirror/" class="md-nav__link">
         
   
   
@@ -1745,7 +1864,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/RZP/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/RZP/" class="md-nav__link">
         
   
   
@@ -1773,7 +1892,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Slit/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Slit/" class="md-nav__link">
         
   
   
@@ -1801,7 +1920,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Sphere-Grating/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Sphere-Grating/" class="md-nav__link">
         
   
   
@@ -1829,7 +1948,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Sphere-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Sphere-Mirror/" class="md-nav__link">
         
   
   
@@ -1857,7 +1976,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Toroid-Grating/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Toroid-Grating/" class="md-nav__link">
         
   
   
@@ -1885,7 +2004,7 @@
   
   
     <li class="md-nav__item">
-      <a href="OpticalElements/Toroid-Mirror/" class="md-nav__link">
+      <a href="../BeamlineObjects/OpticalElements/Toroid-Mirror/" class="md-nav__link">
         
   
   
@@ -1937,10 +2056,6 @@
   
     
     
-      
-        
-      
-        
       
         
       
@@ -2044,6 +2159,8 @@
       
         
       
+        
+      
     
     
     
@@ -2096,6 +2213,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../Tools/07-Style-Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Style Guide for Programming in RAYX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../Tools/Code-Coverage/" class="md-nav__link">
         
   
@@ -2103,7 +2248,7 @@
   <span class="md-ellipsis">
     
   
-    What is Code Coverage:
+    What is Code Coverage
   
 
     
@@ -2415,190 +2560,15 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Vulkan
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Vulkan
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Vulkan/Vulkan/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Vulkan
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Vulkan/Vulkan-Beyond/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Vulkan one stage Compute Pipeline and beyond... A Vulkan Case Study
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Vulkan/Vulkan-Shader-Split/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Vulkan multi-shaderfile support: Shader split
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Vulkan/VulkanTracer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    VulkanTracer (rayx)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
@@ -2621,10 +2591,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -2642,8 +2612,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2689,10 +2659,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
         
           
-          <label class="md-nav__link" for="__nav_4_5_1" id="__nav_4_5_1_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
             
   
   
@@ -2710,8 +2680,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_5_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_5_1">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2787,10 +2757,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_1_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1_2" >
         
           
-          <label class="md-nav__link" for="__nav_4_5_1_2" id="__nav_4_5_1_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_1_2" id="__nav_5_1_2_label" tabindex="0">
             
   
   
@@ -2808,8 +2778,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_5_1_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_5_1_2">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3085,10 +3055,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5_1_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1_3" >
         
           
-          <label class="md-nav__link" for="__nav_4_5_1_3" id="__nav_4_5_1_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_1_3" id="__nav_5_1_3_label" tabindex="0">
             
   
   
@@ -3106,8 +3076,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_5_1_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_5_1_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3419,14 +3389,6 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
   </ul>
 </nav>
@@ -3448,6 +3410,69 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculation-of-intersection-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calculation of intersection point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-equation-for-second-order-surfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General equation for second order surfaces
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3463,7 +3488,7 @@
 
 
   
-    <a href="https://github.com/hz-b/rayx/edit/master/docs/Model/BeamlineObjects/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/hz-b/rayx/edit/master/docs/Model/05_Quad(ric)-function.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -3472,46 +3497,86 @@
     
       
     
-    <a href="https://github.com/hz-b/rayx/raw/master/docs/Model/BeamlineObjects/index.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/hz-b/rayx/raw/master/docs/Model/05_Quad(ric)-function.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="beamline-objects">Beamline Objects<a class="headerlink" href="#beamline-objects" title="Permanent link">&para;</a></h1>
-<p>In the following chapter, you will find extensive information on all the Beamline Objects supported by RAYX.</p>
-<h1 id="supported-objects">Supported Objects<a class="headerlink" href="#supported-objects" title="Permanent link">&para;</a></h1>
-<p>We divide the objects into two categories: Light Sources and Optical Elements. As the name suggests, the Light Sources are the objects that create the ray information, such as their starting position, the direction of the flight path, and the energy the ray is carrying.</p>
-<h3 id="light-sources">Light Sources<a class="headerlink" href="#light-sources" title="Permanent link">&para;</a></h3>
+<h1 id="quadric-function">Quad(ric) Function<a class="headerlink" href="#quadric-function" title="Permanent link">&para;</a></h1>
+<p>Function for calculating the intersection of a ray with the surface of an optical element in 3-dimensional space.</p>
+<h3 id="input">Input:<a class="headerlink" href="#input" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="LightSources/DipoleSource/">Dipole Source</a></li>
-<li><a href="LightSources/Point-Source/">Point Source</a></li>
-<li><a href="LightSources/Matrix-Source/">Matrix Source</a></li>
-<li><a href="LightSources/SimpleUndulatorSource/">Simple Undulator Source</a></li>
-<li><a href="LightSources/Circle-Source/">Circle Source</a></li>
-<li><a href="LightSources/Pixel-Source/">Pixel Source</a></li>
+<li>16 parameters \(a_{11}\) to \(a_{44}\) to define the surface in 3D space with the general equation for second order surfaces. Parameter values for specific surfaces can be found in the <a href="https://it-ed-git.basisit.de/RAY/RAY/-/wikis/uploads/bdcf4515e03b2fccf462c5f0d76052c3/Paper_Schaefers_RAY_Springer_2007.pdf">documentation</a>.</li>
+<li>\(ray = \begin{bmatrix} x_{S'} \\ y_{S'} \\z_{S'} \\ \end{bmatrix} + t \begin{bmatrix} l_{S'} \\ m_{S'}\\ n_{S'} \\ \end{bmatrix}\)</li>
+<li>weight/III (set to 0(python)/-4(Fortran) if ray missed surface, unchanged otherwise)</li>
+<li>icurv: determines the sign in the formula for calculating \(t\), if negative first intersection point, if positive second intersection point.</li>
 </ul>
-<h3 id="optical-elements">Optical Elements<a class="headerlink" href="#optical-elements" title="Permanent link">&para;</a></h3>
+<h3 id="output">Output:<a class="headerlink" href="#output" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="OpticalElements/Image-Plane/">Image Plane</a></li>
-<li><a href="OpticalElements/Plane-Mirror/">Plane Mirror</a></li>
-<li><a href="OpticalElements/Plane-Grating/">Plane Grating</a></li>
-<li><a href="OpticalElements/Cone-Mirror/">Cone Mirror</a></li>
-<li><a href="OpticalElements/Cone-Mirror/">Cone Grating</a></li>
-<li><a href="OpticalElements/Crystal/">Crystal</a></li>
-<li><a href="OpticalElements/Cylinder-Mirror/">Cylindrical Mirror</a></li>
-<li><a href="OpticalElements/Ellipsoid-Mirror/">Ellipsoid Mirror</a></li>
-<li><a href="OpticalElements/Foil/">Foil</a></li>
-<li><a href="OpticalElements/Sphere-Mirror/">Spherical Mirror</a></li>
-<li><a href="OpticalElements/Sphere-Grating/">Spherical Grating</a></li>
-<li><a href="OpticalElements/Toroid-Mirror/">Toroidal Mirror</a></li>
-<li><a href="OpticalElements/Toroid-Grating/">Toroidal Grating</a></li>
-<li><a href="OpticalElements/RZP/">Reflection Zone Plate</a></li>
-<li><a href="OpticalElements/Slit/">Slit</a></li>
-<li><a href="../Quad%28ric%29-function/">Custom Quadric Surface Mirror</a></li>
-<li>Custom Cubic Surface Mirror</li>
+<li>modified ray</li>
+<li>normal at intersection point</li>
+<li>weight/III</li>
 </ul>
+<h3 id="calculation-of-intersection-point">Calculation of intersection point<a class="headerlink" href="#calculation-of-intersection-point" title="Permanent link">&para;</a></h3>
+<p>general equation for second order surfaces:
+\[F(x,y,z) = a_{11}x^2 + a_{22}y^2 + a_{33}z^2 + 2a_{12}xy + 2a_{13}xz + 2a_{23}yz + 2a_{14}x + 2a_{24}y + 2a_{34}z + a_{44}\]</p>
+<p>The intersection is determined by inserting the x, y and z-coordinates of the ray in <span class="arithmatex">\(F(x,y,z)\)</span> and set to zero: <br>
+\[F(x_{S'}+t \cdot l_{S'} ,y_{S'}+t \cdot m_{S'}, z_{S'}+t \cdot n_{S'}) = 0\]</p>
+<p>We obtain a quadratic equation of the form \(0 = a \cdot t^2 + b \cdot t + c\) with variable \(t\) and the following coefficients:</p>
+<p>\[
+\begin{align<em>}
+    a &amp;= a_{11}l_{S'}^2 + a_{22}m_{S'}^2 + a_{33}n_{S'}^2 + 2a_{13}l_{S'}n_{S'} + 2a_{12}l_{S'}m_{S'} + 2a_{23}m_{S'}n_{S'} \\
+    b &amp;= 2a_{11}x_{S'}l_{S'} + 2a_{22}y_{S'}m_{S'} + 2a_{33}z_{S'}n_{S'} \\
+    &amp;+ 2a_{12}y_{S'}l_{S'} + 2a_{12}x_{S'}m_{S'} 
+    + 2a_{13}z_{S'}l_{S'} + 2a_{13}x_{S'}n_{S'} \\
+    &amp;+ 2a_{23}z_{S'}m_{S'} + 2a_{23}y_{S'}n_{S'} 
+    + 2a_{14}l_{S'} + 2a_{24}m_{S'} + 2a_{34}n_{S'} \\
+    c &amp;= a_{11}x_{S'}^2 + a_{22}y_{S'}^2 + a_{33}z_{S'}^2 + 2a_{12}x_{S'}y_{S'} + 2a_{13}x_{S'}z_{S'} + 2a_{23}y_{S'}z_{S'} \\
+    &amp;+ 2a_{14}x_{S'} + 2a_{24}y_{S'} + 2a_{34}z_{S'} + a_{44}
+\end{align</em>}
+\]</p>
+<p>Since a, b and c can simply be calculated, we could solve the equation directly with  \(t = \frac{-b+ICURV \cdot \sqrt{b^2-4ac}}{2a}\) and use \(t\) to find the intersection point. If ICURV is negative, we get the first intersection point with the object (smaller \(t\)). If ICURV is positive we get the second intersection point from when the ray exits the element (larger \(t\)). Some optimizations are applied to this formula in the code. Depending on the largest component in the direction of the ray, it is normalized in x, y or z direction to simplify the ray equation. Thus, there are three cases.</p>
+<h3 id="optimization">Optimization<a class="headerlink" href="#optimization" title="Permanent link">&para;</a></h3>
+<p>Assume \(l_{S'} \geq m_{S'}\) and \(l_{S'} \geq n_{S'}\) (first case). Then, we can divide the direction by \(l_{S'}\), such that it is normalized in x and the y- and z-coordinates are within \([-1,1]\) (I). Moreover, we can translate the origin of the ray along the direction vector towards the origin of the coordinate system until the y-z-plane is hit \((x=0, II)\). Then, we end up with a normalized ray (III), where \(x=t\).</p>
+<p>\[
+\begin{align<em>}
+    ray 
+    &amp;\overset{\text{I}}{=} \begin{bmatrix} x_{S'} \\ y_{S'} \\z_{S'} \\ \end{bmatrix} + t \begin{bmatrix} 1 \\ m_{S'}/l_{S'}\\ n_{S'}/l_{S'} \\ \end{bmatrix} \\
+    &amp;\overset{\text{II}}{=} \begin{bmatrix} x_{S'}-1\cdot x_{S'} \\ y_{S'} - (m_{S'}/l_{S'}) \cdot y_{S'} \\z_{S'} - (n_{S'}/l_{S'}) \cdot z_{S'} \\ \end{bmatrix} + t \begin{bmatrix} 1 \\ m_{S'}/l_{S'}\\ n_{S'}/l_{S'} \\ \end{bmatrix} \\
+    &amp;\overset{\text{III}}{=} \begin{bmatrix} 0 \\ y \\ z \end{bmatrix} + t \begin{bmatrix} 1 \\ a_{ml} \\ a_{nl} \\ \end{bmatrix} 
+\end{align</em>}
+\]</p>
+<p>When we plug this parameterization of the ray into \(F(x,y,z)=0\), some terms in a, b and c are removed (see code).</p>
+<p>Since every term in b contains the factor 2, the equation for calculating t can be simplified:
+\[
+t = \frac{-2\frac{b}{2} +ICURV \cdot \sqrt{(2\frac{b}{2})^2 - 4ac}}{2a} \\ = \frac{-2\frac{b}{2} +ICURV \cdot 2\sqrt{(\frac{b}{2})^2 - ac}}{2a} \\ = \frac{-\frac{b}{2} +ICURV \cdot \sqrt{(\frac{b}{2})^2 - ac}}{a}
+\]</p>
+<p>In the code the factor 2 is left out of the equation for \(b\) from the beginning. Thus, what is called \(b\) in the code is actually \(\frac{b}{2}\).</p>
+<p>If the term in the root is negative there is no intersection and weight is set to 0 (or III to -4 in fortran). 
+Otherwise it is checked whether the factor a is much smaller than \(c\). Then, the divisor is very small or zero which can cause problems with the division. In that case, \(a \cdot t^2\) is removed from the quadratic equation \(a \cdot t^2 + b \cdot t + c\) which thus yields \(t=x=- \frac{c}{b}\) or \(t=x= \frac{c}{2b}\) in the code since the factor \(2\) is excluded from \(b\) (<a href="https://www.cs.uaf.edu/2012/spring/cs481/section/0/lecture/01_26_ray_intersections.html">see also</a> (Ray Quadric Intersection)). 
+If \(a\) is not much smaller than \(c\), \(t\) is calculated with the simplified equation above. Subsequently, \(t (=x)\) is plugged into the modified ray equation and the intersection point is calculated.</p>
+<p>The other two cases for when \(y\) or \(z\) are the largest component of the direction of the ray are similar.</p>
+<p>The partial derivatives of \(F(x,y,z)\) form the normal vector \(f_{x,y,z}\) of the surface. Inserting the calculated intersection point into the normal vector yields the normal of the surface at this specific point. The intersection point is set to be the new origin of the ray. The ray direction \((l_{S'},m_{S'},n_{S'})\) remains unchanged.</p>
+<h3 id="general-equation-for-second-order-surfaces">General equation for second order surfaces<a class="headerlink" href="#general-equation-for-second-order-surfaces" title="Permanent link">&para;</a></h3>
+<p>The equation can describe the surface of several elements in a similar way as a circle with radius 1 can be described in 2D as \(x^2 + y^2 -1 = 0\). Elements that can be described by this general equation include sphere, ellipsoid, plane, cone, cylinder, paraboloid. These are so called quadric surfaces. Surfaces that cannot be described by any quadratic function include for example the torus.
+The equation refers to a right-handed coordinate system with the center of the optical element in the origin. The element's surface is the x-z-plane and the y-axis is the normal vector. </p>
+<p>\[
+\begin{align<em>}
+    F(x,y,z) &amp;= \vec{x}^TA\vec{x} \\
+    \vec{x} = \begin{bmatrix} x \\ y \\ z \\ 1 \end{bmatrix}
+    A &amp;= \begin{bmatrix} a_{11} &amp; a_{12} &amp; a_{13} &amp; a_{14} \\
+    a_{21} &amp; a_{22} &amp; a_{23} &amp; a_{24} \\
+    a_{31} &amp; a_{32} &amp; a_{33} &amp; a_{34} \\
+    a_{41} &amp; a_{42} &amp; a_{43} &amp; a_{44} 
+    \end{bmatrix} \\
+    a_{ij} = a_{ji} &amp;\Rightarrow A^T = A
+\end{align</em>}
+\]</p>
+<p>Literature: <br>
+<a href="https://en.wikipedia.org/wiki/Quadric">https://en.wikipedia.org/wiki/Quadric</a> <br>
+<a href="https://www.win.tue.nl/~sterk/Bouwkunde/2db60-chap3.pdf">https://www.win.tue.nl/~sterk/Bouwkunde/2db60-chap3.pdf</a></p>
 
 
 
@@ -3547,7 +3612,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      ©HZB 2025
+      ©HZB 2026
     </div>
   
   
