@@ -1,0 +1,15 @@
+#pragma once
+
+namespace rayx {
+
+using Translation = glm::dvec3;
+
+constexpr inline glm::dmat4 toMatrix4x4(const Translation& translation) {
+    glm::dmat4 mat(1.0);
+    mat[3][0] = translation.x;
+    mat[3][1] = translation.y;
+    mat[3][2] = translation.z;
+    return mat;
+}
+
+}  // namespace rayx

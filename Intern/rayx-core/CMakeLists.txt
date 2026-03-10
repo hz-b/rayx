@@ -192,7 +192,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    ${PROJECT_SOURCE_DIR}/../../Extern/glm/glm/
+    ${PROJECT_SOURCE_DIR}/../../Extern/glm/
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
     ${PROJECT_SOURCE_DIR}/../../Extern/alpaka/include/
 )
@@ -240,6 +240,31 @@ add_custom_command(
     COMMENT "Copying Scripts directory to build output directory..."
 )
 # -----------------
+
+# TODO: generate rayx.h
+# ignore all files inside `detail` folder
+# ---- Generate rayx.h ----
+# file(GLOB_RECURSE header_files
+#     ${PROJECT_SOURCE_DIR}/src/Math/*.h
+#     ${PROJECT_SOURCE_DIR}/src/IO/*.h
+#     ${PROJECT_SOURCE_DIR}/src/Trace/*.h
+#     ${PROJECT_SOURCE_DIR}/src/Detail/*.h
+# )
+# foreach(f ${header_files})
+#     message("processing ${f}")
+#     file(RELATIVE_PATH fr "${PROJECT_SOURCE_DIR}/src" ${f})
+#     list(APPEND rayx_h "#include \"${fr}\"\n")
+#     list(APPEND rayx_h "namespace rayx {\n")
+#         list(APPEND rayx_h "\tusing namespace rayx::detail;\n")
+#         list(APPEND rayx_h "\tusing namespace rayx::math;\n")
+#         list(APPEND rayx_h "\tusing namespace rayx::io;\n")
+#         list(APPEND rayx_h "\tusing namespace rayx::trace;\n")
+#     list(APPEND rayx_h "}\n")
+#     list(APPEND rayx_h "using namespace rayx;\n")
+# endforeach()
+# file(WRITE "include/rayx.h" ${rayx_h})
+# target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
+# -------------------------
 
 # ---- CPack ----
 if(APPLE OR UNIX)
