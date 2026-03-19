@@ -38,12 +38,7 @@ std::vector<Device> fetchAvailableDevicesForDeviceType(const DeviceType deviceTy
         const auto score = static_cast<Device::Score>(props.m_multiProcessorCount);
         const auto index = static_cast<Device::Index>(i);
 
-        const auto device = DeviceFactory::createDevice(
-            deviceType,
-            alpaka::getName(dev),
-            score,
-            index
-        );
+        const auto device = DeviceFactory::createDevice(deviceType, alpaka::getName(dev), score, index);
 
         devices.push_back(device);
     }

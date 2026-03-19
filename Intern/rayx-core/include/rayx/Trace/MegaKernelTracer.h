@@ -36,14 +36,14 @@ class MegaKernelTracer : public DeviceTracer {
     MegaKernelTracer(const Device::Index deviceIndex) : m_deviceIndex(deviceIndex) {}
 
     Rays trace(model::Beamline beamline, const TraceOptions& options) override {
-        const auto numSources             = beamline.sources.size();
-        const auto numElements            = beamline.elements.size();
-        const auto numObjects             = numSources + numElements;
-        const auto maxEvents              = getMaxEvents(options.traceMode, numObjects);
+        const auto numSources       = beamline.sources.size();
+        const auto numElements      = beamline.elements.size();
+        const auto numObjects       = numSources + numElements;
+        const auto maxEvents        = getMaxEvents(options.traceMode, numObjects);
         const auto objectRecordMask = toRawObjectMask(options.objectRecordMask, numObjects);
-        const auto attrRecordMask         = options.attrRecordMask;
+        const auto attrRecordMask   = options.attrRecordMask;
         const auto batchSize        = options.batchSize ? *options.batchSize : DEFAULT_BATCH_SIZE;
-        const auto isSequential           = std::holds_alternative<SequentialTraceModeType>(options.traceMode);
+        const auto isSequential     = std::holds_alternative<SequentialTraceModeType>(options.traceMode);
         throw unimplementedCodePathException();
     }
 

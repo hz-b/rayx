@@ -6,10 +6,10 @@
 #include <variant>
 #include <vector>
 
+#include "DeviceTracer.h"
 #include "ObjectMask.h"
 #include "Rays.h"
 #include "rayx/Core.h"
-#include "DeviceTracer.h"
 
 namespace rayx {
 

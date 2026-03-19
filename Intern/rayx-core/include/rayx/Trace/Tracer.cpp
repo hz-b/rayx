@@ -51,7 +51,8 @@ Tracer::Tracer(const Device& device) { m_deviceTracer = createDeviceTracer(devic
 
 Rays Tracer::trace(const Beamline& beamline, const TraceOptions& options) {
     auto rays = m_deviceTracer->trace(detail::toModel(beamline), options);
-    assert(rays.isValid() && "one or more recorded attributes have different number of items. this should never happen, please report to the developers.");
+    assert(rays.isValid() &&
+           "one or more recorded attributes have different number of items. this should never happen, please report to the developers.");
     return rays;  // rvo
 }
 
