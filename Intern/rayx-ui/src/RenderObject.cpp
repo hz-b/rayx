@@ -44,9 +44,9 @@ RenderObject::RenderObject(RenderObject&& other) noexcept
 RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
     if (this != &other) {
         if (m_Device.device() != other.m_Device.device()) {
-            // If this warning is thrown you hopefully know what you're doing. I would not recommend using multiple devices.
-            // If you don't know what's going on, you need to check why the devices are different.
-            // If unhandled this will result in bugs and/or crashes.
+            // If this warning is thrown you hopefully know what you're doing. I would not recommend using multiple
+            // devices. If you don't know what's going on, you need to check why the devices are different. If unhandled
+            // this will result in bugs and/or crashes.
             RAYX_WARN << "Cannot transfer ownership of resources between logical devices. Failing gracefully.";
             return *this;
         }

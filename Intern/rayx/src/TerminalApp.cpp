@@ -239,7 +239,8 @@ rayx::Rays TerminalApp::traceBeamline(const rayx::Beamline& beamline, const rayx
 
     if (m_cliArgs.sortByObjectId) {
         if (!(attrRecordMask & rayx::RayAttrMask::ObjectId))
-            RAYX_WARN << "Cannot sort by object_id, because object_id is not recorded. Please add object_id to the attribute record mask.";
+            RAYX_WARN << "Cannot sort by object_id, because object_id is not recorded. Please add object_id to the "
+                         "attribute record mask.";
 
         rays = rays.sortByObjectId();
     }

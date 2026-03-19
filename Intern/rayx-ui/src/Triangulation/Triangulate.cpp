@@ -391,7 +391,8 @@ PolygonSimple calculateOutlineFromCutout(const rayx::Cutout& cutout, std::vector
 }
 
 void planarTriangulation(const rayx::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
-    // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the opening)
+    // The slit behaviour needs special attention, since it is basically three cutouts (the slit, the beamstop and the
+    // opening)
     PolygonComplex poly;
     compiled.m_behaviour.visit([&]<typename T>(const T& behaviour) {
         if constexpr (std::is_same_v<T, rayx::Behaviour::Slit>) {

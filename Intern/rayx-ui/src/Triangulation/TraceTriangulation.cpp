@@ -47,9 +47,10 @@ std::vector<std::vector<Ray>> createRayGrid(size_t size, double width, double le
 }
 
 /**
- * This function takes an OpticalElement and a Device object as input. It employs a grid of rays, created based on the dimensions of the element's
- * cutout. Using CPU-based ray tracing, it computes the intersections between rays and the optical element's surface within the cutout. The ray
- * intersections are then grouped into triangles based on the grid, and a RenderObject representing these triangles is returned.
+ * This function takes an OpticalElement and a Device object as input. It employs a grid of rays, created based on the
+ * dimensions of the element's cutout. Using CPU-based ray tracing, it computes the intersections between rays and the
+ * optical element's surface within the cutout. The ray intersections are then grouped into triangles based on the grid,
+ * and a RenderObject representing these triangles is returned.
  */
 void traceTriangulation(const rayx::OpticalElement compiled, std::vector<TextureVertex>& vertices, std::vector<uint32_t>& indices) {
     using DeviceType = rayx::DeviceConfig::DeviceType;

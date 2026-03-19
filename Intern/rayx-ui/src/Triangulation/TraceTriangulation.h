@@ -7,14 +7,16 @@
 #include "RenderObject.h"
 
 /**
- * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for visualization.
+ * @brief Traces the path of rays through an OpticalElement using a grid-based approach, and returns a RenderObject for
+ * visualization.
  * @param element The optical element through which rays are traced. It contains details about its surface,
  *                cutout, and behavior.
  * @param device  The Device object used for rendering the final output.
  *
  * @return RenderObject containing the vertices and indices needed for rendering the triangulated rays.
  *
- * @note This function uses the rayx::MegaKernelTracer for ray tracing and relies on a grid-based approach for tracing rays.
+ * @note This function uses the rayx::MegaKernelTracer for ray tracing and relies on a grid-based approach for tracing
+ * rays.
  *
  * Example usage:
  * @code{cpp}

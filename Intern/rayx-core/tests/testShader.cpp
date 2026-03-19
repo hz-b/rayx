@@ -1129,8 +1129,8 @@ TEST_F(TestSuite, testInterceptReflectPartiallyPolarizing) {
         const auto amplitude              = calcReflectAmplitude(incidentAngle, refractAngle, iorI, refractIor);
         const auto expected_reflect_field = ElectricField(
             // p polarized part
-            // the value from the y component of the incident field is now carried in the x compnent, due to a 90 degrees reflection
-            // the amplitude is negated due to a 180 degrees phase shift
+            // the value from the y component of the incident field is now carried in the x compnent, due to a 90
+            // degrees reflection the amplitude is negated due to a 180 degrees phase shift
             -amplitude.p * incidentElectricField.y,
 
             // y component is now 0

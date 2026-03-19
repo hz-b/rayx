@@ -4,7 +4,8 @@ TEST_F(TestSuite, allBeamlineObjects) {
     rayx::Beamline bl = loadBeamline("allBeamlineObjects");
     // Point, Circle, Dipole, Matrix, Pixel, simple Undulator
     CHECK_EQ(bl.numSources(), 6);
-    // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating, sphere mirror, rzp, image plane
+    // Cone, Cylinder, Ellipsoid, Paraboloid, plane mirror, toroid, slit, sphere grating, plane grating, sphere mirror,
+    // rzp, image plane
     CHECK_EQ(bl.numElements(), 12);
 }
 
