@@ -35,6 +35,7 @@ function(alpaka_source)
     endif()
 endfunction()
 
+
 # ---- Code Coverage ----
 option(BUILD_WITH_COV "Add Code Coverage to build" TRUE)
 
@@ -43,21 +44,18 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_BUILD_TYPE STREQUAL "Debug" 
     message("Building with llvm-cov support")
 endif()
 
-# -----------------------
 
 # ---- Add tests ----
 if(RAYX_BUILD_RAYX_TESTS)
     add_subdirectory(tests)
 endif()
 
-# -------------------
 
 # ---- Project ----
 project(rayx-core VERSION ${RAYX_VERSION})
-file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE SOURCE ${PROJECT_SOURCE_DIR}/include/rayx/*.cpp)
 file(GLOB_RECURSE ALPAKA_SOURCE
-    ${PROJECT_SOURCE_DIR}/src/Shader/*.cpp
-    ${PROJECT_SOURCE_DIR}/src/Tracer/*.cpp
+    ${PROJECT_SOURCE_DIR}/include/rayx/Trace/*.cpp
 )
 
 if(RAYX_STATIC_LIB)
@@ -69,7 +67,7 @@ endif()
 
 alpaka_target(${PROJECT_NAME})
 alpaka_source(${ALPAKA_SOURCE})
-# -----------------
+
 
 # -----OpenMP--------
 find_package(OpenMP)
@@ -83,7 +81,6 @@ else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_OMP)
 endif()
 
-# -------------------
 
 # ---- Warnings ----
 if(MSVC)
@@ -125,10 +122,8 @@ else()
     endif()
 endif()
 
-# ------------------
 
 # ---- Disable H5 ----
-
 if(RAYX_H5_ENABLED)
     target_link_libraries(${PROJECT_NAME} PUBLIC ${RAYX_HDF5_LIBRARIES})
     target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${RAYX_HDF5_INCLUDE_DIRS})
@@ -137,7 +132,6 @@ else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC NO_H5)
 endif()
 
-# -------------
 
 # ---- Defines ----
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -173,24 +167,72 @@ target_compile_definitions(${PROJECT_NAME}
 if(alpaka_ACC_GPU_CUDA_ENABLE OR alpaka_ACC_GPU_HIP_ENABLE)
     if(alpaka_ACC_GPU_CUDA_ENABLE)
         target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-        target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CUDA_ENABLED)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_GPU_CUDA_ENABLED)
     endif()
     if(alpaka_ACC_GPU_HIP_ENABLE)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_HIP_ENABLED)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_GPU_HIP_ENABLED)
     endif()
 else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_NO_GPU_TRACER)
 endif()
 # Same for OpenMP
+if(alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CPU_SEQ_ENABLED)
+endif()
 if(alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_OPENMP_ENABLED)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC RAYX_CPU_OMP_ENABLED)
 endif()
 
-# -----------------
+
+# ---- Config.h ----
+# set git revision
+set(git_revision "unknown")
+find_package(Git)
+if(GIT_FOUND)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE git_revision
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  message(STATUS "GIT hash: ${git_revision}")
+else()
+  message(STATUS "GIT not found. Unble to determine git hash.")
+endif()
+# set timestamp
+if(DEFINED ENV{SOURCE_DATE_EPOCH})
+    set(build_timestamp "(unavailable due to reproducible build)")
+else()
+    string(TIMESTAMP build_timestamp "%Y-%m-%d %H:%M:%S" UTC)
+endif()
+message(STATUS "Build timestamp: ${build_timestamp}")
+# set versions and fallback to 0 if not set
+set(RAYX_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+if("${RAYX_VERSION_MAJOR}" STREQUAL "")
+    set(RAYX_VERSION_MAJOR 0)
+endif()
+set(RAYX_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+if("${RAYX_VERSION_MINOR}" STREQUAL "")
+    set(RAYX_VERSION_MINOR 0)
+endif()
+set(RAYX_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+if("${RAYX_VERSION_PATCH}" STREQUAL "")
+    set(RAYX_VERSION_PATCH 0)
+endif()
+set(RAYX_VERSION_TWEAK "${PROJECT_VERSION_TWEAK}")
+if("${RAYX_VERSION_TWEAK}" STREQUAL "")
+    set(RAYX_VERSION_TWEAK 0)
+endif()
+# configure the file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/rayx/Config.h @ONLY)
+# include it so it can be used
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include/rayx)
+
 
 # ---- Dependencies ----
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${PROJECT_SOURCE_DIR}/../../Extern/glm/
     ${PROJECT_SOURCE_DIR}/../../Extern/rapidxml-1.13/
@@ -201,7 +243,6 @@ if(RAYX_H5_ENABLED)
     target_link_libraries(${PROJECT_NAME} PUBLIC HighFive::HighFive)
 endif()
 
-# ------------------------
 
 # ---- Data ----
 # Define the source and destination paths
@@ -220,7 +261,7 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${DATA_SRC_DIR} ${DATA_DST_DIR}
     COMMENT "Copying Data directory to build output directory..."
 )
-# -----------------
+
 
 # ---- Scripts ----
 # Define the source and destination paths
@@ -239,7 +280,6 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy ${SCRIPT_SRC_DIR} ${SCRIPT_DST_DIR}
     COMMENT "Copying Scripts directory to build output directory..."
 )
-# -----------------
 
 # TODO: generate rayx.h
 # ignore all files inside `detail` folder
@@ -264,7 +304,7 @@ add_custom_command(
 # endforeach()
 # file(WRITE "include/rayx.h" ${rayx_h})
 # target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
-# -------------------------
+
 
 # ---- CPack ----
 if(APPLE OR UNIX)
@@ -288,4 +328,3 @@ install(DIRECTORY ${RAYX_SOURCE_DIR}/Scripts
         DESTINATION ${INSTALL_DATA_DIR})
 include(InstallRequiredSystemLibraries)
 include(CPack)
-# -----------------

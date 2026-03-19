@@ -1,0 +1,11 @@
+#pragma once
+
+#include <string>
+
+constexpr std::string_view RAYX_GIT_REVISION = "@git_revision@";
+constexpr std::string_view RAYX_BUILD_TIMESTAMP = "@build_timestamp@";
+constexpr int RAYX_VERSION_MAJOR = @RAYX_VERSION_MAJOR@;
+constexpr int RAYX_VERSION_MINOR = @RAYX_VERSION_MINOR@;
+constexpr int RAYX_VERSION_PATCH = @RAYX_VERSION_PATCH@;
+constexpr int RAYX_VERSION_TWEAK = @RAYX_VERSION_TWEAK@;
+constexpr std::string_view RAYX_VERSION_STRING = "@PROJECT_VERSION@";
