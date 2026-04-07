@@ -15,13 +15,6 @@ struct NKEntry {
     double m_k;
 };
 
-/// This struct represents one line of a .NKP file.
-struct PalikEntry {
-    double m_energy;
-    double m_n;
-    double m_k;
-};
-
 /// This struct represents one line of a .nff file.
 struct NffEntry {
     double m_energy;
@@ -57,7 +50,7 @@ RAYX_FN_ACC NKEntry RAYX_API getMolecEntry(int index, int material, const int* m
 // returns dvec2 to represent a complex number
 RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const int* materialIndices, const double* materialTable);
 
-// linear interpolation 
+// linear interpolation
 // helper function to interpolate MaterialTable entries. assumes that 'energy' is between 'low' and 'high'!
 RAYX_FN_ACC NKEntry RAYX_API interpolateMaterialTableEntry(NKEntry low, NKEntry high, double energy);
 
