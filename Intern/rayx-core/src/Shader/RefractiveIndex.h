@@ -59,6 +59,6 @@ RAYX_FN_ACC complex::Complex RAYX_API getRefractiveIndex(double energy, int mate
 
 // linear interpolation 
 // helper function to interpolate MaterialTable entries. assumes that 'energy' is between 'low' and 'high'!
-RAYX_FN_ACC NKEntry interpolateMaterialTableEntry(NKEntry low, NKEntry high, double energy);
+RAYX_FN_ACC NKEntry RAYX_API interpolateMaterialTableEntry(NKEntry low, NKEntry high, double energy);
 
 }  // namespace rayx
