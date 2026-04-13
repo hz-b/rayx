@@ -20,7 +20,7 @@ Next to its position and orientation, an OpticalElement is classified by three p
 
 Behavior determines what happens to a ray once it hits the OpticalElement.
 Such a "hit" might result in absorbtion, reflection or the ray might pass through the OpticalElement.
-Typical examples of Behaviours are Mirror, Grating, Slit and [RZP](./RZP.md).
+Typical examples of Behaviours are Mirror, Grating, Slit and [RZP](BeamlineObjects/OpticalElements/RZP.md).
 
 Behaviours are defined in the Shared/Behaviour.h file.
 Each Behaviour has a "behave" function (eg. behaveMirror, behaveSlit, ...) that translates the incoming ray to the outgoing ray.
@@ -99,7 +99,7 @@ The Slit for example uses three Cutouts, one for the ray-absorbing shape around 
 
 The Coating describes the Layers a Mirror or Grating can have: No Layer, Single Layer or Multilayer. 
 
-
+/wastebox.png', but the targe
 ### Ray-OpticalElement collision
 
 When checking whether a ray collides with an OpticalElement, we first convert the Ray to the element coordinate system of the ray.
@@ -125,4 +125,4 @@ Therefore, we use the `icurv` parameter to determine whether the quadric is conc
 This suffices since we calculate all intersection points with elements.
 When two intersections occur, the `icurv` parameter informs us which intersection point to select.
 
-![image](../../../res/wastebox.png)
+![image](../res/wastebox.png)
