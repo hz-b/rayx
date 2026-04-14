@@ -99,7 +99,6 @@ The Slit for example uses three Cutouts, one for the ray-absorbing shape around 
 
 The Coating describes the Layers a Mirror or Grating can have: No Layer, Single Layer or Multilayer. 
 
-/wastebox.png', but the targe
 ### Ray-OpticalElement collision
 
 When checking whether a ray collides with an OpticalElement, we first convert the Ray to the element coordinate system of the ray.
