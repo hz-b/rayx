@@ -3578,7 +3578,7 @@ In the context of RAYX a beamline consists of two types of elements:</p>
 <h3 id="behavior">Behavior<a class="headerlink" href="#behavior" title="Permanent link">&para;</a></h3>
 <p>Behavior determines what happens to a ray once it hits the OpticalElement.
 Such a "hit" might result in absorbtion, reflection or the ray might pass through the OpticalElement.
-Typical examples of Behaviours are Mirror, Grating, Slit and <a href="./RZP.md">RZP</a>.</p>
+Typical examples of Behaviours are Mirror, Grating, Slit and <a href="../BeamlineObjects/OpticalElements/RZP/">RZP</a>.</p>
 <p>Behaviours are defined in the Shared/Behaviour.h file.
 Each Behaviour has a "behave" function (eg. behaveMirror, behaveSlit, ...) that translates the incoming ray to the outgoing ray.
 These functions are gathered in the behave.comp file.</p>
@@ -3661,7 +3661,7 @@ This is, where the behaviour comes into play to calculate the continuing path of
 Therefore, we use the <code>icurv</code> parameter to determine whether the quadric is concave or convex.
 This suffices since we calculate all intersection points with elements.
 When two intersections occur, the <code>icurv</code> parameter informs us which intersection point to select.</p>
-<p><img alt="image" src="../../../res/wastebox.png" /></p>
+<p><img alt="image" src="../../res/wastebox.png" /></p>
 
 
 
