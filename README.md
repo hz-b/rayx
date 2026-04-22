@@ -4,7 +4,7 @@
 <table>
   <tr>
     <td>
-      <img src="./docs/res/rayx-logo.png" alt="RAYX Logo" width="600">
+      <img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/rayx-logo.png" alt="RAYX Logo" width="600">
     </td>
     <td>
       <strong>RAYX</strong> is a powerful, multi-component simulation platform designed to streamline the design and optimization of beamlines in synchrotron light source facilities. At the core of the platform is <i>rayx-core</i>, a high-performance library that delivers precise light tracing capabilities on both CPUs and GPUs. This core library ensures that users can achieve detailed and accurate simulations at high speeds, making it an ideal solution for complex beamline designs.
@@ -16,11 +16,11 @@ To simplify the usage of _rayx-core_, the platform includes rayx, a command-line
 
 ## RAYX vs RAY-UI
 
-RAYX offers several advanced features, including: 
-- Global (not sequential) tracing of beamlines 
-- GPU utilization for accelerated tracing performance 
-- A dedicated mode for tracing multiple beamlines with ease 
-- Objects in RAYX can be grouped for simplified group transformations 
+RAYX offers several advanced features, including:
+- Global (not sequential) tracing of beamlines
+- GPU utilization for accelerated tracing performance
+- A dedicated mode for tracing multiple beamlines with ease
+- Objects in RAYX can be grouped for simplified group transformations
 - A GUI for intuitive beamline design
 
 ## Installing or Building RAYX
@@ -35,7 +35,7 @@ For additional information, please visit our [Wiki](https://hz-b.github.io/rayx/
 ### RAYX Python Bindings
 [![Repository](https://img.shields.io/badge/Repository-blue?logo=github)](https://github.com/hz-b/rayx-python)
 
-<img src="./docs/res/readme/python-bindings.png" alt="RAYX-Python Bindings">
+<img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/readme/python-bindings.png" alt="RAYX-Python Bindings">
 
 To simplify the integration of RAYX into Python-based workflows, we provide Python bindings that allow direct simulation results. The figure above illustrates the simulated output at each element of a beamline using the *RAYX Python Bindings* and *Matplotlib*.
 
@@ -43,16 +43,16 @@ To add RAYX to your Python project simply install the package by typing: ```pip 
 
 ### RAYX-WebApp
 
-[![Repository](https://img.shields.io/badge/Repository-blue?logo=github)](https://github.com/win-vid/rayx-webapp)
+[![Repository](https://img.shields.io/badge/Repository-blue?logo=github)](https://github.com/hz-b/rayx-webapp)
 
-<img src="./docs/res/readme/rayx-webapp.gif" alt="RAYX WebApp">
+<img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/readme/rayx-webapp.gif" alt="RAYX WebApp">
 
-A lightweight Flask-based web application for visualizing <a href="https://github.com/hz-b/rayx">RAYX beamline simulations</a> .
+A lightweight Flask-based web application for visualizing <a href="https://github.com/hz-b/rayx">RAYX beamline simulations</a>.
 The web app allows users to upload an `.rml` file, trace the beamline using the *RAYX Python bindings*, and interactively inspect the resulting ray distributions as 2D histograms with per-element breakdowns. 
 
 ### RAYX-UI
 
-<img src="./docs/res/readme/rayx-ui.jpg" alt="RAYX-UI Interface">
+<img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/readme/rayx-ui.jpg" alt="RAYX-UI Interface">
 
 For users who prefer a more visual approach, _rayx-ui_ offers a graphical user interface (GUI) that includes a 3D viewport of the beamline, enabling interactive design and exploration. This GUI provides an intuitive interface to construct and modify beamlines, allowing users to visualize their designs in real-time. _rayx-ui_ not only enhances the design process but also allows users to iteratively optimize configurations based on immediate visual feedback.
 
@@ -69,7 +69,7 @@ DOI: [10.1063/5.0253857](https://doi.org/10.1063/5.0253857)
 
 This publication provides an overview of the software's architecture and capabilities, including GPU acceleration, Python bindings, and GUI support.
 
-### Further Publications
+### Publications using RAYX
 
 * <a href="https://doi.org/10.1107/S1600577524003850">Automated spectrometer alignment via machine learning</a>
 
