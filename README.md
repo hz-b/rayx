@@ -33,9 +33,8 @@ For additional information, please visit our [Wiki](https://hz-b.github.io/rayx/
 ## Built with RAYX
 
 ### RAYX Python Bindings
-[![Repository](https://img.shields.io/badge/Repository-blue?logo=github)](https://github.com/hz-b/rayx-python)
 
-<img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/readme/python-bindings.png" alt="RAYX-Python Bindings">
+![RAYX-Python Bindings](https://raw.githubusercontent.com/hz-b/rayx/master/docs/res/readme/python-bindings.png)
 
 To simplify the integration of RAYX into Python-based workflows, we provide Python bindings that allow direct simulation results. The figure above illustrates the simulated output at each element of a beamline using the *RAYX Python Bindings* and *Matplotlib*.
 
@@ -45,14 +44,14 @@ To add RAYX to your Python project simply install the package by typing: ```pip 
 
 [![Repository](https://img.shields.io/badge/Repository-blue?logo=github)](https://github.com/hz-b/rayx-webapp)
 
-<img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/readme/rayx-webapp.gif" alt="RAYX WebApp">
+![RAYX - WebApp](https://raw.githubusercontent.com/hz-b/rayx/master/docs/res/readme/rayx-webapp.gif)
 
 A lightweight Flask-based web application for visualizing <a href="https://github.com/hz-b/rayx">RAYX beamline simulations</a>.
 The web app allows users to upload an `.rml` file, trace the beamline using the *RAYX Python bindings*, and interactively inspect the resulting ray distributions as 2D histograms with per-element breakdowns. 
 
 ### RAYX-UI
 
-<img src="https://github.com/hz-b/rayx/blob/d1c05005dba41b49a87a4acd7e3e159fd11d51b9/docs/res/readme/rayx-ui.jpg" alt="RAYX-UI Interface">
+![Repository](https://raw.githubusercontent.com/hz-b/rayx/master/docs/res/readme/rayx-ui.jpg)
 
 For users who prefer a more visual approach, _rayx-ui_ offers a graphical user interface (GUI) that includes a 3D viewport of the beamline, enabling interactive design and exploration. This GUI provides an intuitive interface to construct and modify beamlines, allowing users to visualize their designs in real-time. _rayx-ui_ not only enhances the design process but also allows users to iteratively optimize configurations based on immediate visual feedback.
 
