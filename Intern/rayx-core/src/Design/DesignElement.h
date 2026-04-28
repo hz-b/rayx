@@ -52,7 +52,7 @@ class RAYX_API DesignElement : public BeamlineNode {
     Cutout getCutout() const;
     Cutout getGlobalCutout() const;
 
-    void setVLSParameters(const std::array<double, 6>& values);
+    void setVLSParameters(std::array<double, 6> values);
     std::array<double, 6> getVLSParameters() const;
 
     void setExpertsOptics(Surface value);
@@ -204,11 +204,8 @@ class RAYX_API DesignElement : public BeamlineNode {
     void setCrystalType(CrystalType value);
     CrystalType getCrystalType() const;
 
-    void setCrystalMaterial(const std::string& value);
+    void setCrystalMaterial(std::string value);
     std::string getCrystalMaterial() const;
-
-    void setOffsetAngleType(OffsetAngleType value);
-    OffsetAngleType getOffsetAngleType() const;
 
     void setOffsetAngle(Rad value);
     Rad getOffsetAngle() const;
