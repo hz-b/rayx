@@ -195,6 +195,8 @@ Cutout DesignElement::getCutout() const {
             .m_widthB = m_elementParameters["CutoutWidthB"].as_double(),
             .m_length = m_elementParameters["CutoutLength"].as_double(),
         };
+    } else if (type == CutoutType::Unlimited) {
+        return Cutout::Unlimited{};
     } else {
         RAYX_EXIT << "DesignElement::getCutout: Unknown CutoutType: " << static_cast<int>(type) << "!";
         return Cutout::Unlimited{};
@@ -203,7 +205,7 @@ Cutout DesignElement::getCutout() const {
 
 Cutout DesignElement::getGlobalCutout() const { return Cutout::Unlimited{}; }
 
-void DesignElement::setVLSParameters(const std::array<double, 6>& values) {
+void DesignElement::setVLSParameters(std::array<double, 6> values) {
     m_elementParameters["vlsParams"] = Map();
 
     m_elementParameters["vlsParams"]["vlsParameterB2"] = values[0];
@@ -467,7 +469,7 @@ BehaviourType DesignElement::getBehaviourType() const { return m_elementParamete
 void DesignElement::setCrystalType(CrystalType value) { m_elementParameters["crystalType"] = value; }
 CrystalType DesignElement::getCrystalType() const { return m_elementParameters["crystalType"].as_crystalType(); }
 
-void DesignElement::setCrystalMaterial(const std::string& value) { m_elementParameters["crystalMaterial"] = value; }
+void DesignElement::setCrystalMaterial(std::string value) { m_elementParameters["crystalMaterial"] = value; }
 std::string DesignElement::getCrystalMaterial() const { return m_elementParameters["crystalMaterial"].as_string(); }
 
 void DesignElement::setStructureFactorReF0(double value) { m_elementParameters["structureFactorReF0"] = value; }
