@@ -30,8 +30,8 @@ RAYX_FN_ACC OptCollisionPoint getQuadricCollision(const glm::dvec3& __restrict r
 RAYX_FN_ACC OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                 const Surface::Cubic& __restrict cu);
 
-RAYX_FN_ACC OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
-                                                 const Surface::Toroid& __restrict toroid, bool isTriangul);
+RAYX_FN_ACC OptCollisionPoint RAYX_API getToroidCollision(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
+                                                          const Surface::Toroid& __restrict toroid, bool isTriangul);
 
 RAYX_FN_ACC OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeError(const glm::dvec3& __restrict rayPosition,
                                                                                      const glm::dvec3& __restrict rayDirection,
