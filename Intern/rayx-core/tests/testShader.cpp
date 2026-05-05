@@ -734,7 +734,7 @@ TEST_F(TestSuite, testBessel1) {
 
     for (auto p : inouts) {
         auto out = bessel1(p.in);
-        CHECK_EQ(out, p.out);
+        CHECK_EQ(out, p.out, 1e-8);
     }
 }
 

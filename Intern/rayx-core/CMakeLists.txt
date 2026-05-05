@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# ---- Install directories ----
+include(GNUInstallDirs)
+set(INSTALL_DATA_DIR ${CMAKE_INSTALL_DATADIR})
+
 # ---- for files compiled with cuda compiler, prepend -Xcompiler flags ----
 function(prepend_xcompiler FLAG_LIST PREPENDED_FLAG_LIST)
     set(SRC ${${FLAG_LIST}})
@@ -144,7 +148,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(COMPILE_PLATFORM RAYX_PLATFORM_GCC)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(COMPILE_PLATFORM RAYX_PLATFORM_MSVC)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     set(COMPILE_PLATFORM RAYX_PLATFORM_CLANG)
 else()
     message(STATUS "Use undefined compiler: ${CMAKE_CXX_COMPILER_ID}")

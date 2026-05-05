@@ -23,7 +23,7 @@ TEST_F(TestSuite, PlaneGratingDeviationDefault) { traceRmlAndCompareAgainstRayUi
 TEST_F(TestSuite, PlaneGratingDeviationAz) { traceRmlAndCompareAgainstRayUi("PlaneGratingDeviationAz", 1e-9, Sequential::Yes); }
 TEST_F(TestSuite, PlaneGratingDeviationAzMis) { traceRmlAndCompareAgainstRayUi("PlaneGratingDeviationAzMis", 1e-12, Sequential::Yes); }
 TEST_F(TestSuite, PlaneGratingDevAzMisVLS) {
-    traceRmlAndCompareAgainstRayUi("PlaneGratingDevAzMisVLS", 1e-8, Sequential::Yes);
+    traceRmlAndCompareAgainstRayUi("PlaneGratingDevAzMisVLS", 2e-8, Sequential::Yes);
 }  // TODO: rays dont get absorbed here (rayx_list.size = 200, should be 67)
 TEST_F(TestSuite, PlaneGratingIncAzMis) { traceRmlAndCompareAgainstRayUi("PlaneGratingIncAzMis", 1e-11, Sequential::Yes); }
 

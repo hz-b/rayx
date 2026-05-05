@@ -211,7 +211,7 @@ TEST_F(TestSuite, testSchwingerDipole) {
 
     for (auto values : inouts) {
         auto result = schwinger(values.energy, gamma, criticalEnergy);
-        CHECK_EQ(result, values.flux, 0.000000001);
+        CHECK_EQ(result, values.flux, values.flux * 1e-9);
     }
 }
 

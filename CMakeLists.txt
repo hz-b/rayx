@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3")
+    endif()
+endif()
+
 # ---- Project ----
 project(RAYX VERSION 1.1.0)
 if(MSVC)
@@ -28,6 +35,65 @@ option(RAYX_BUILD_RAYX_UI "This option builds the RAYX graphical user interface.
 option(RAYX_BUILD_RAYX_TESTS "This option builds the RAYX test suite." ON)
 option(RAYX_STATIC_LIB "This option builds 'rayx-core' as a static library." OFF)
 # ------------------
+
+# ---- Specific macos compiler options and flags concerning OpenMP ----
+if(APPLE)
+    # Detect installed package manager. MacPorts wins if both are present, since
+    # its layout (libs directly under /opt/local) does not overlap with Homebrew.
+    # CMAKE_SYSTEM_PROCESSOR is only populated after project(), so this lives below it.
+    if(EXISTS "/opt/local/bin/port")
+        set(MACOS_PKG_PREFIX "/opt/local")
+        set(MACOS_PKG_KIND "macports")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+        set(MACOS_PKG_PREFIX "/opt/homebrew")
+        set(MACOS_PKG_KIND "homebrew")
+    else()
+        set(MACOS_PKG_PREFIX "/usr/local")
+        set(MACOS_PKG_KIND "homebrew")
+    endif()
+    message(STATUS "macOS package manager: ${MACOS_PKG_KIND} at ${MACOS_PKG_PREFIX}")
+    set(CMAKE_INSTALL_RPATH "@loader_path;@rpath;${MACOS_PKG_PREFIX}/lib")
+
+    # OpenMP: MacPorts ships libomp directly under /opt/local; Homebrew uses an
+    # opt/<formula> subdirectory.
+    if(MACOS_PKG_KIND STREQUAL "macports")
+        set(OpenMP_INCLUDE_DIR "${MACOS_PKG_PREFIX}/include/libomp")
+        set(OpenMP_LIBRARY "${MACOS_PKG_PREFIX}/lib/libomp.dylib")
+    else()
+        set(OpenMP_INCLUDE_DIR "${MACOS_PKG_PREFIX}/opt/libomp/include")
+        set(OpenMP_LIBRARY "${MACOS_PKG_PREFIX}/opt/libomp/lib/libomp.dylib")
+    endif()
+
+    # Common OpenMP settings
+    set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I${OpenMP_INCLUDE_DIR}")
+    set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${OpenMP_INCLUDE_DIR}")
+    set(OpenMP_C_LIB_NAMES "omp")
+    set(OpenMP_CXX_LIB_NAMES "omp")
+    set(OpenMP_omp_LIBRARY "${OpenMP_LIBRARY}")
+    set(OpenMP_omp_INCLUDE_DIRS "${OpenMP_INCLUDE_DIR}")
+    
+    if(RAYX_ENABLE_OPENMP)
+        find_package(OpenMP REQUIRED)
+        if(OpenMP_CXX_FOUND)
+            message(STATUS "OpenMP found:")
+            message(STATUS "  Include dirs: ${OpenMP_CXX_INCLUDE_DIRS}")
+            message(STATUS "  Libraries: ${OpenMP_CXX_LIBRARIES}")
+        
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+            include_directories(${OpenMP_omp_INCLUDE_DIRS})
+            link_libraries(${OpenMP_omp_LIBRARY})
+        endif()
+    endif()
+    
+    # HDF5: MacPorts installs into /opt/local directly; Homebrew uses opt/hdf5.
+    if(MACOS_PKG_KIND STREQUAL "macports")
+        set(HDF5_ROOT "${MACOS_PKG_PREFIX}")
+    else()
+        set(HDF5_ROOT "${MACOS_PKG_PREFIX}/opt/hdf5")
+    endif()
+    find_package(HDF5 REQUIRED COMPONENTS C HL)
+
+endif()
 
 
 # ---- Build options ----
