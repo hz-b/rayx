@@ -3869,17 +3869,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#function-getoffsetangletype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        function getOffsetAngleType
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#function-getopeningheight" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4738,17 +4727,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#function-setoffsetangletype" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        function setOffsetAngleType
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#function-setopeningheight" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5390,10 +5368,6 @@
 <td style="text-align: left;"><a href="#function-getoffsetangle"><strong>getOffsetAngle</strong></a> () const<br></td>
 </tr>
 <tr>
-<td style="text-align: right;">OffsetAngleType</td>
-<td style="text-align: left;"><a href="#function-getoffsetangletype"><strong>getOffsetAngleType</strong></a> () const<br></td>
-</tr>
-<tr>
 <td style="text-align: right;">double</td>
 <td style="text-align: left;"><a href="#function-getopeningheight"><strong>getOpeningHeight</strong></a> () const<br></td>
 </tr>
@@ -5575,7 +5549,7 @@
 </tr>
 <tr>
 <td style="text-align: right;">void</td>
-<td style="text-align: left;"><a href="#function-setcrystalmaterial"><strong>setCrystalMaterial</strong></a> (const std::string &amp; value) <br></td>
+<td style="text-align: left;"><a href="#function-setcrystalmaterial"><strong>setCrystalMaterial</strong></a> (std::string value) <br></td>
 </tr>
 <tr>
 <td style="text-align: right;">void</td>
@@ -5704,10 +5678,6 @@
 <tr>
 <td style="text-align: right;">void</td>
 <td style="text-align: left;"><a href="#function-setoffsetangle"><strong>setOffsetAngle</strong></a> (<a href="../structrayx_1_1Rad/"><strong>Rad</strong></a> value) <br></td>
-</tr>
-<tr>
-<td style="text-align: right;">void</td>
-<td style="text-align: left;"><a href="#function-setoffsetangletype"><strong>setOffsetAngleType</strong></a> (OffsetAngleType value) <br></td>
 </tr>
 <tr>
 <td style="text-align: right;">void</td>
@@ -5847,7 +5817,7 @@
 </tr>
 <tr>
 <td style="text-align: right;">void</td>
-<td style="text-align: left;"><a href="#function-setvlsparameters"><strong>setVLSParameters</strong></a> (const std::array&lt; double, 6 &gt; &amp; values) <br></td>
+<td style="text-align: left;"><a href="#function-setvlsparameters"><strong>setVLSParameters</strong></a> (std::array&lt; double, 6 &gt; values) <br></td>
 </tr>
 <tr>
 <td style="text-align: right;"></td>
@@ -6221,34 +6191,29 @@
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-getoffsetangletype">function getOffsetAngleType<a class="headerlink" href="#function-getoffsetangletype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="n">OffsetAngleType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOffsetAngleType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
-</span></code></pre></div>
-<hr>
-
 <h3 id="function-getopeningheight">function getOpeningHeight<a class="headerlink" href="#function-getopeningheight" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOpeningHeight</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOpeningHeight</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getopeningshape">function getOpeningShape<a class="headerlink" href="#function-getopeningshape" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="n">CutoutType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOpeningShape</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="n">CutoutType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOpeningShape</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getopeningwidth">function getOpeningWidth<a class="headerlink" href="#function-getopeningwidth" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOpeningWidth</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOpeningWidth</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getorderofdiffraction">function getOrderOfDiffraction<a class="headerlink" href="#function-getorderofdiffraction" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOrderOfDiffraction</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOrderOfDiffraction</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getorientation">function getOrientation<a class="headerlink" href="#function-getorientation" title="Permanent link">&para;</a></h3>
 <p><em>Gets the local orientation (rotation/transform) of this node.</em> 
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="k">virtual</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat4x4</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOrientation</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="k">virtual</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat4x4</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getOrientation</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div></p>
 <p>Each node may have its own transform relative to its parent. </p>
 <p><strong>Returns:</strong></p>
@@ -6257,23 +6222,23 @@
 <hr>
 
 <h3 id="function-getparametera11">function getParameterA11<a class="headerlink" href="#function-getparametera11" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getParameterA11</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getParameterA11</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getparameterp">function getParameterP<a class="headerlink" href="#function-getparameterp" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getParameterP</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getParameterP</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getparameterptype">function getParameterPType<a class="headerlink" href="#function-getparameterptype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getParameterPType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getParameterPType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getposition">function getPosition<a class="headerlink" href="#function-getposition" title="Permanent link">&para;</a></h3>
 <p><em>Gets the local position of this node.</em> 
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="k">virtual</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec4</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getPosition</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="k">virtual</span><span class="w"> </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec4</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getPosition</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div></p>
 <p>Each node may have its own transform relative to its parent. </p>
 <p><strong>Returns:</strong></p>
@@ -6282,686 +6247,679 @@
 <hr>
 
 <h3 id="function-getprofilefile">function getProfileFile<a class="headerlink" href="#function-getprofilefile" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getProfileFile</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getProfileFile</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getprofilekind">function getProfileKind<a class="headerlink" href="#function-getprofilekind" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getProfileKind</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getProfileKind</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getradius">function getRadius<a class="headerlink" href="#function-getradius" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRadius</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRadius</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getradiusdirection">function getRadiusDirection<a class="headerlink" href="#function-getradiusdirection" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="n">CylinderDirection</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRadiusDirection</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="n">CylinderDirection</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRadiusDirection</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getroughnesscoating">function getRoughnessCoating<a class="headerlink" href="#function-getroughnesscoating" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRoughnessCoating</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRoughnessCoating</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getroughnesssubstrate">function getRoughnessSubstrate<a class="headerlink" href="#function-getroughnesssubstrate" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRoughnessSubstrate</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getRoughnessSubstrate</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getshorthalfaxisb">function getShortHalfAxisB<a class="headerlink" href="#function-getshorthalfaxisb" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getShortHalfAxisB</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getShortHalfAxisB</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getshortradius">function getShortRadius<a class="headerlink" href="#function-getshortradius" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getShortRadius</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getShortRadius</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getslopeerror">function getSlopeError<a class="headerlink" href="#function-getslopeerror" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="n">SlopeError</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getSlopeError</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="n">SlopeError</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getSlopeError</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstopheight">function getStopHeight<a class="headerlink" href="#function-getstopheight" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStopHeight</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStopHeight</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstopwidth">function getStopWidth<a class="headerlink" href="#function-getstopwidth" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStopWidth</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStopWidth</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstructurefactorimf0">function getStructureFactorImF0<a class="headerlink" href="#function-getstructurefactorimf0" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorImF0</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorImF0</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstructurefactorimfh">function getStructureFactorImFH<a class="headerlink" href="#function-getstructurefactorimfh" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-68-1"><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorImFH</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorImFH</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstructurefactorimfhc">function getStructureFactorImFHC<a class="headerlink" href="#function-getstructurefactorimfhc" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-69-1"><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorImFHC</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-68-1"><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorImFHC</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstructurefactorref0">function getStructureFactorReF0<a class="headerlink" href="#function-getstructurefactorref0" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-70-1"><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorReF0</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-69-1"><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorReF0</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstructurefactorrefh">function getStructureFactorReFH<a class="headerlink" href="#function-getstructurefactorrefh" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-71-1"><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorReFH</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-70-1"><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorReFH</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getstructurefactorrefhc">function getStructureFactorReFHC<a class="headerlink" href="#function-getstructurefactorrefhc" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-72-1"><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorReFHC</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-71-1"><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getStructureFactorReFHC</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getsurfacecoatingtype">function getSurfaceCoatingType<a class="headerlink" href="#function-getsurfacecoatingtype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-73-1"><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="n">SurfaceCoatingType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getSurfaceCoatingType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-72-1"><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a><span class="n">SurfaceCoatingType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getSurfaceCoatingType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getthicknesscoating">function getThicknessCoating<a class="headerlink" href="#function-getthicknesscoating" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-74-1"><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getThicknessCoating</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-73-1"><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getThicknessCoating</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getthicknesssubstrate">function getThicknessSubstrate<a class="headerlink" href="#function-getthicknesssubstrate" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-75-1"><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getThicknessSubstrate</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-74-1"><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getThicknessSubstrate</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-gettotalheight">function getTotalHeight<a class="headerlink" href="#function-gettotalheight" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-76-1"><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getTotalHeight</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-75-1"><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getTotalHeight</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-gettotallength">function getTotalLength<a class="headerlink" href="#function-gettotallength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-77-1"><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getTotalLength</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-76-1"><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getTotalLength</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-gettotalwidth">function getTotalWidth<a class="headerlink" href="#function-gettotalwidth" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-78-1"><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getTotalWidth</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-77-1"><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getTotalWidth</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-gettype">function getType<a class="headerlink" href="#function-gettype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-79-1"><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="n">ElementType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-78-1"><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a><span class="n">ElementType</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getType</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getunitcellvolume">function getUnitCellVolume<a class="headerlink" href="#function-getunitcellvolume" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-80-1"><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getUnitCellVolume</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-79-1"><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="kt">double</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getUnitCellVolume</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-getvlsparameters">function getVLSParameters<a class="headerlink" href="#function-getvlsparameters" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-81-1"><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getVLSParameters</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-80-1"><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">getVLSParameters</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-iselement">function isElement<a class="headerlink" href="#function-iselement" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-82-1"><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a><span class="kr">inline</span><span class="w"> </span><span class="k">virtual</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">isElement</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">const</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-81-1"><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="kr">inline</span><span class="w"> </span><span class="k">virtual</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">isElement</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="k">const</span>
 </span></code></pre></div>
 <p>Implements <a href="../classrayx_1_1BeamlineNode/#function-iselement"><em>rayx::BeamlineNode::isElement</em></a></p>
 <hr>
 
 <h3 id="function-operator">function operator=<a class="headerlink" href="#function-operator" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-83-1"><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-83-2"><a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span>
-</span><span id="__span-83-3"><a id="__codelineno-83-3" name="__codelineno-83-3" href="#__codelineno-83-3"></a><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">delete</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-82-1"><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-82-2"><a id="__codelineno-82-2" name="__codelineno-82-2" href="#__codelineno-82-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span>
+</span><span id="__span-82-3"><a id="__codelineno-82-3" name="__codelineno-82-3" href="#__codelineno-82-3"></a><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">delete</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-operator_1">function operator=<a class="headerlink" href="#function-operator_1" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-84-1"><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-84-2"><a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a><span class="w">    </span><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">other</span>
-</span><span id="__span-84-3"><a id="__codelineno-84-3" name="__codelineno-84-3" href="#__codelineno-84-3"></a><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-83-1"><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-83-2"><a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a><span class="w">    </span><span class="n">DesignElement</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">other</span>
+</span><span id="__span-83-3"><a id="__codelineno-83-3" name="__codelineno-83-3" href="#__codelineno-83-3"></a><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setadditionalorder">function setAdditionalOrder<a class="headerlink" href="#function-setadditionalorder" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-85-1"><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setAdditionalOrder</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-85-2"><a id="__codelineno-85-2" name="__codelineno-85-2" href="#__codelineno-85-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-85-3"><a id="__codelineno-85-3" name="__codelineno-85-3" href="#__codelineno-85-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-84-1"><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setAdditionalOrder</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-84-2"><a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-84-3"><a id="__codelineno-84-3" name="__codelineno-84-3" href="#__codelineno-84-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setarmlength">function setArmLength<a class="headerlink" href="#function-setarmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-86-1"><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setArmLength</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-86-2"><a id="__codelineno-86-2" name="__codelineno-86-2" href="#__codelineno-86-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-86-3"><a id="__codelineno-86-3" name="__codelineno-86-3" href="#__codelineno-86-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-85-1"><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setArmLength</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-85-2"><a id="__codelineno-85-2" name="__codelineno-85-2" href="#__codelineno-85-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-85-3"><a id="__codelineno-85-3" name="__codelineno-85-3" href="#__codelineno-85-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setazimuthalangle">function setAzimuthalAngle<a class="headerlink" href="#function-setazimuthalangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-87-1"><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setAzimuthalAngle</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-87-2"><a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">r</span>
-</span><span id="__span-87-3"><a id="__codelineno-87-3" name="__codelineno-87-3" href="#__codelineno-87-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-86-1"><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setAzimuthalAngle</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-86-2"><a id="__codelineno-86-2" name="__codelineno-86-2" href="#__codelineno-86-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">r</span>
+</span><span id="__span-86-3"><a id="__codelineno-86-3" name="__codelineno-86-3" href="#__codelineno-86-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setbehaviourtype">function setBehaviourType<a class="headerlink" href="#function-setbehaviourtype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-88-1"><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setBehaviourType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-88-2"><a id="__codelineno-88-2" name="__codelineno-88-2" href="#__codelineno-88-2"></a><span class="w">    </span><span class="n">BehaviourType</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-88-3"><a id="__codelineno-88-3" name="__codelineno-88-3" href="#__codelineno-88-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-87-1"><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setBehaviourType</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-87-2"><a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a><span class="w">    </span><span class="n">BehaviourType</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-87-3"><a id="__codelineno-87-3" name="__codelineno-87-3" href="#__codelineno-87-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcalcradius">function setCalcRadius<a class="headerlink" href="#function-setcalcradius" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-89-1"><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCalcRadius</span><span class="w"> </span><span class="p">()</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-88-1"><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCalcRadius</span><span class="w"> </span><span class="p">()</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcalcradiusdeviationangle">function setCalcRadiusDeviationAngle<a class="headerlink" href="#function-setcalcradiusdeviationangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-90-1"><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCalcRadiusDeviationAngle</span><span class="w"> </span><span class="p">()</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-89-1"><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCalcRadiusDeviationAngle</span><span class="w"> </span><span class="p">()</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcentralbeamstop">function setCentralBeamstop<a class="headerlink" href="#function-setcentralbeamstop" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-91-1"><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCentralBeamstop</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-91-2"><a id="__codelineno-91-2" name="__codelineno-91-2" href="#__codelineno-91-2"></a><span class="w">    </span><span class="n">CentralBeamstop</span><span class="w"> </span><span class="n">d</span>
-</span><span id="__span-91-3"><a id="__codelineno-91-3" name="__codelineno-91-3" href="#__codelineno-91-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-90-1"><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCentralBeamstop</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-90-2"><a id="__codelineno-90-2" name="__codelineno-90-2" href="#__codelineno-90-2"></a><span class="w">    </span><span class="n">CentralBeamstop</span><span class="w"> </span><span class="n">d</span>
+</span><span id="__span-90-3"><a id="__codelineno-90-3" name="__codelineno-90-3" href="#__codelineno-90-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcrystalmaterial">function setCrystalMaterial<a class="headerlink" href="#function-setcrystalmaterial" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-92-1"><a id="__codelineno-92-1" name="__codelineno-92-1" href="#__codelineno-92-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCrystalMaterial</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-92-2"><a id="__codelineno-92-2" name="__codelineno-92-2" href="#__codelineno-92-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-92-3"><a id="__codelineno-92-3" name="__codelineno-92-3" href="#__codelineno-92-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-91-1"><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCrystalMaterial</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-91-2"><a id="__codelineno-91-2" name="__codelineno-91-2" href="#__codelineno-91-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-91-3"><a id="__codelineno-91-3" name="__codelineno-91-3" href="#__codelineno-91-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcrystaltype">function setCrystalType<a class="headerlink" href="#function-setcrystaltype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-93-1"><a id="__codelineno-93-1" name="__codelineno-93-1" href="#__codelineno-93-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCrystalType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-93-2"><a id="__codelineno-93-2" name="__codelineno-93-2" href="#__codelineno-93-2"></a><span class="w">    </span><span class="n">CrystalType</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-93-3"><a id="__codelineno-93-3" name="__codelineno-93-3" href="#__codelineno-93-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-92-1"><a id="__codelineno-92-1" name="__codelineno-92-1" href="#__codelineno-92-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCrystalType</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-92-2"><a id="__codelineno-92-2" name="__codelineno-92-2" href="#__codelineno-92-2"></a><span class="w">    </span><span class="n">CrystalType</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-92-3"><a id="__codelineno-92-3" name="__codelineno-92-3" href="#__codelineno-92-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcurvaturetype">function setCurvatureType<a class="headerlink" href="#function-setcurvaturetype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-94-1"><a id="__codelineno-94-1" name="__codelineno-94-1" href="#__codelineno-94-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCurvatureType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-94-2"><a id="__codelineno-94-2" name="__codelineno-94-2" href="#__codelineno-94-2"></a><span class="w">    </span><span class="n">CurvatureType</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-94-3"><a id="__codelineno-94-3" name="__codelineno-94-3" href="#__codelineno-94-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-93-1"><a id="__codelineno-93-1" name="__codelineno-93-1" href="#__codelineno-93-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCurvatureType</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-93-2"><a id="__codelineno-93-2" name="__codelineno-93-2" href="#__codelineno-93-2"></a><span class="w">    </span><span class="n">CurvatureType</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-93-3"><a id="__codelineno-93-3" name="__codelineno-93-3" href="#__codelineno-93-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setcutout">function setCutout<a class="headerlink" href="#function-setcutout" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-95-1"><a id="__codelineno-95-1" name="__codelineno-95-1" href="#__codelineno-95-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCutout</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-95-2"><a id="__codelineno-95-2" name="__codelineno-95-2" href="#__codelineno-95-2"></a><span class="w">    </span><span class="n">Cutout</span><span class="w"> </span><span class="n">c</span>
-</span><span id="__span-95-3"><a id="__codelineno-95-3" name="__codelineno-95-3" href="#__codelineno-95-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-94-1"><a id="__codelineno-94-1" name="__codelineno-94-1" href="#__codelineno-94-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setCutout</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-94-2"><a id="__codelineno-94-2" name="__codelineno-94-2" href="#__codelineno-94-2"></a><span class="w">    </span><span class="n">Cutout</span><span class="w"> </span><span class="n">c</span>
+</span><span id="__span-94-3"><a id="__codelineno-94-3" name="__codelineno-94-3" href="#__codelineno-94-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setdspacing2">function setDSpacing2<a class="headerlink" href="#function-setdspacing2" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-96-1"><a id="__codelineno-96-1" name="__codelineno-96-1" href="#__codelineno-96-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDSpacing2</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-96-2"><a id="__codelineno-96-2" name="__codelineno-96-2" href="#__codelineno-96-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-96-3"><a id="__codelineno-96-3" name="__codelineno-96-3" href="#__codelineno-96-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-95-1"><a id="__codelineno-95-1" name="__codelineno-95-1" href="#__codelineno-95-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDSpacing2</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-95-2"><a id="__codelineno-95-2" name="__codelineno-95-2" href="#__codelineno-95-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-95-3"><a id="__codelineno-95-3" name="__codelineno-95-3" href="#__codelineno-95-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setdesignalphaangle">function setDesignAlphaAngle<a class="headerlink" href="#function-setdesignalphaangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-97-1"><a id="__codelineno-97-1" name="__codelineno-97-1" href="#__codelineno-97-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignAlphaAngle</span><span class="w"> </span><span class="p">(</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-96-1"><a id="__codelineno-96-1" name="__codelineno-96-1" href="#__codelineno-96-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignAlphaAngle</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-96-2"><a id="__codelineno-96-2" name="__codelineno-96-2" href="#__codelineno-96-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-96-3"><a id="__codelineno-96-3" name="__codelineno-96-3" href="#__codelineno-96-3"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-setdesignbetaangle">function setDesignBetaAngle<a class="headerlink" href="#function-setdesignbetaangle" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-97-1"><a id="__codelineno-97-1" name="__codelineno-97-1" href="#__codelineno-97-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignBetaAngle</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-97-2"><a id="__codelineno-97-2" name="__codelineno-97-2" href="#__codelineno-97-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-97-3"><a id="__codelineno-97-3" name="__codelineno-97-3" href="#__codelineno-97-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignbetaangle">function setDesignBetaAngle<a class="headerlink" href="#function-setdesignbetaangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-98-1"><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignBetaAngle</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-98-2"><a id="__codelineno-98-2" name="__codelineno-98-2" href="#__codelineno-98-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdesignenergy">function setDesignEnergy<a class="headerlink" href="#function-setdesignenergy" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-98-1"><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignEnergy</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-98-2"><a id="__codelineno-98-2" name="__codelineno-98-2" href="#__codelineno-98-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-98-3"><a id="__codelineno-98-3" name="__codelineno-98-3" href="#__codelineno-98-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignenergy">function setDesignEnergy<a class="headerlink" href="#function-setdesignenergy" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-99-1"><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignEnergy</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-99-2"><a id="__codelineno-99-2" name="__codelineno-99-2" href="#__codelineno-99-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdesigngrazingincangle">function setDesignGrazingIncAngle<a class="headerlink" href="#function-setdesigngrazingincangle" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-99-1"><a id="__codelineno-99-1" name="__codelineno-99-1" href="#__codelineno-99-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignGrazingIncAngle</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-99-2"><a id="__codelineno-99-2" name="__codelineno-99-2" href="#__codelineno-99-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-99-3"><a id="__codelineno-99-3" name="__codelineno-99-3" href="#__codelineno-99-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesigngrazingincangle">function setDesignGrazingIncAngle<a class="headerlink" href="#function-setdesigngrazingincangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-100-1"><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignGrazingIncAngle</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-100-2"><a id="__codelineno-100-2" name="__codelineno-100-2" href="#__codelineno-100-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdesignmeridionalentrancearmlength">function setDesignMeridionalEntranceArmLength<a class="headerlink" href="#function-setdesignmeridionalentrancearmlength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-100-1"><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignMeridionalEntranceArmLength</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-100-2"><a id="__codelineno-100-2" name="__codelineno-100-2" href="#__codelineno-100-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-100-3"><a id="__codelineno-100-3" name="__codelineno-100-3" href="#__codelineno-100-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignmeridionalentrancearmlength">function setDesignMeridionalEntranceArmLength<a class="headerlink" href="#function-setdesignmeridionalentrancearmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-101-1"><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignMeridionalEntranceArmLength</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setdesignmeridionalexitarmlength">function setDesignMeridionalExitArmLength<a class="headerlink" href="#function-setdesignmeridionalexitarmlength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-101-1"><a id="__codelineno-101-1" name="__codelineno-101-1" href="#__codelineno-101-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignMeridionalExitArmLength</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-101-2"><a id="__codelineno-101-2" name="__codelineno-101-2" href="#__codelineno-101-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-101-3"><a id="__codelineno-101-3" name="__codelineno-101-3" href="#__codelineno-101-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignmeridionalexitarmlength">function setDesignMeridionalExitArmLength<a class="headerlink" href="#function-setdesignmeridionalexitarmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-102-1"><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignMeridionalExitArmLength</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-102-2"><a id="__codelineno-102-2" name="__codelineno-102-2" href="#__codelineno-102-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdesignorderofdiffraction">function setDesignOrderOfDiffraction<a class="headerlink" href="#function-setdesignorderofdiffraction" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-102-1"><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignOrderOfDiffraction</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-102-2"><a id="__codelineno-102-2" name="__codelineno-102-2" href="#__codelineno-102-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-102-3"><a id="__codelineno-102-3" name="__codelineno-102-3" href="#__codelineno-102-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignorderofdiffraction">function setDesignOrderOfDiffraction<a class="headerlink" href="#function-setdesignorderofdiffraction" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-103-1"><a id="__codelineno-103-1" name="__codelineno-103-1" href="#__codelineno-103-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignOrderOfDiffraction</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-103-2"><a id="__codelineno-103-2" name="__codelineno-103-2" href="#__codelineno-103-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdesignplane">function setDesignPlane<a class="headerlink" href="#function-setdesignplane" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-103-1"><a id="__codelineno-103-1" name="__codelineno-103-1" href="#__codelineno-103-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignPlane</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-103-2"><a id="__codelineno-103-2" name="__codelineno-103-2" href="#__codelineno-103-2"></a><span class="w">    </span><span class="n">DesignPlane</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-103-3"><a id="__codelineno-103-3" name="__codelineno-103-3" href="#__codelineno-103-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignplane">function setDesignPlane<a class="headerlink" href="#function-setdesignplane" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-104-1"><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignPlane</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-104-2"><a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a><span class="w">    </span><span class="n">DesignPlane</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdesignsagittalentrancearmlength">function setDesignSagittalEntranceArmLength<a class="headerlink" href="#function-setdesignsagittalentrancearmlength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-104-1"><a id="__codelineno-104-1" name="__codelineno-104-1" href="#__codelineno-104-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignSagittalEntranceArmLength</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-104-2"><a id="__codelineno-104-2" name="__codelineno-104-2" href="#__codelineno-104-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-104-3"><a id="__codelineno-104-3" name="__codelineno-104-3" href="#__codelineno-104-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignsagittalentrancearmlength">function setDesignSagittalEntranceArmLength<a class="headerlink" href="#function-setdesignsagittalentrancearmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-105-1"><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignSagittalEntranceArmLength</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setdesignsagittalexitarmlength">function setDesignSagittalExitArmLength<a class="headerlink" href="#function-setdesignsagittalexitarmlength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-105-1"><a id="__codelineno-105-1" name="__codelineno-105-1" href="#__codelineno-105-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignSagittalExitArmLength</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-105-2"><a id="__codelineno-105-2" name="__codelineno-105-2" href="#__codelineno-105-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-105-3"><a id="__codelineno-105-3" name="__codelineno-105-3" href="#__codelineno-105-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdesignsagittalexitarmlength">function setDesignSagittalExitArmLength<a class="headerlink" href="#function-setdesignsagittalexitarmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-106-1"><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDesignSagittalExitArmLength</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-106-2"><a id="__codelineno-106-2" name="__codelineno-106-2" href="#__codelineno-106-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdeviationangle">function setDeviationAngle<a class="headerlink" href="#function-setdeviationangle" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-106-1"><a id="__codelineno-106-1" name="__codelineno-106-1" href="#__codelineno-106-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDeviationAngle</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-106-2"><a id="__codelineno-106-2" name="__codelineno-106-2" href="#__codelineno-106-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-106-3"><a id="__codelineno-106-3" name="__codelineno-106-3" href="#__codelineno-106-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdeviationangle">function setDeviationAngle<a class="headerlink" href="#function-setdeviationangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-107-1"><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDeviationAngle</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-107-2"><a id="__codelineno-107-2" name="__codelineno-107-2" href="#__codelineno-107-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setdistancepreceding">function setDistancePreceding<a class="headerlink" href="#function-setdistancepreceding" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-107-1"><a id="__codelineno-107-1" name="__codelineno-107-1" href="#__codelineno-107-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDistancePreceding</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-107-2"><a id="__codelineno-107-2" name="__codelineno-107-2" href="#__codelineno-107-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
 </span><span id="__span-107-3"><a id="__codelineno-107-3" name="__codelineno-107-3" href="#__codelineno-107-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setdistancepreceding">function setDistancePreceding<a class="headerlink" href="#function-setdistancepreceding" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-108-1"><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setDistancePreceding</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-108-2"><a id="__codelineno-108-2" name="__codelineno-108-2" href="#__codelineno-108-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
+<h3 id="function-setentrancearmlength">function setEntranceArmLength<a class="headerlink" href="#function-setentrancearmlength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-108-1"><a id="__codelineno-108-1" name="__codelineno-108-1" href="#__codelineno-108-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setEntranceArmLength</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-108-2"><a id="__codelineno-108-2" name="__codelineno-108-2" href="#__codelineno-108-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-108-3"><a id="__codelineno-108-3" name="__codelineno-108-3" href="#__codelineno-108-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setentrancearmlength">function setEntranceArmLength<a class="headerlink" href="#function-setentrancearmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-109-1"><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setEntranceArmLength</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setexitarmlength">function setExitArmLength<a class="headerlink" href="#function-setexitarmlength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-109-1"><a id="__codelineno-109-1" name="__codelineno-109-1" href="#__codelineno-109-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setExitArmLength</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-109-2"><a id="__codelineno-109-2" name="__codelineno-109-2" href="#__codelineno-109-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-109-3"><a id="__codelineno-109-3" name="__codelineno-109-3" href="#__codelineno-109-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setexitarmlength">function setExitArmLength<a class="headerlink" href="#function-setexitarmlength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-110-1"><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setExitArmLength</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-110-2"><a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setexpertscubic">function setExpertsCubic<a class="headerlink" href="#function-setexpertscubic" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-110-1"><a id="__codelineno-110-1" name="__codelineno-110-1" href="#__codelineno-110-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setExpertsCubic</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-110-2"><a id="__codelineno-110-2" name="__codelineno-110-2" href="#__codelineno-110-2"></a><span class="w">    </span><span class="n">Surface</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-110-3"><a id="__codelineno-110-3" name="__codelineno-110-3" href="#__codelineno-110-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setexpertscubic">function setExpertsCubic<a class="headerlink" href="#function-setexpertscubic" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-111-1"><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setExpertsCubic</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setexpertsoptics">function setExpertsOptics<a class="headerlink" href="#function-setexpertsoptics" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-111-1"><a id="__codelineno-111-1" name="__codelineno-111-1" href="#__codelineno-111-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setExpertsOptics</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-111-2"><a id="__codelineno-111-2" name="__codelineno-111-2" href="#__codelineno-111-2"></a><span class="w">    </span><span class="n">Surface</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-111-3"><a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setexpertsoptics">function setExpertsOptics<a class="headerlink" href="#function-setexpertsoptics" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-112-1"><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setExpertsOptics</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-112-2"><a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="w">    </span><span class="n">Surface</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setfigurerotation">function setFigureRotation<a class="headerlink" href="#function-setfigurerotation" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-112-1"><a id="__codelineno-112-1" name="__codelineno-112-1" href="#__codelineno-112-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setFigureRotation</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-112-2"><a id="__codelineno-112-2" name="__codelineno-112-2" href="#__codelineno-112-2"></a><span class="w">    </span><span class="n">FigureRotation</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-112-3"><a id="__codelineno-112-3" name="__codelineno-112-3" href="#__codelineno-112-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setfigurerotation">function setFigureRotation<a class="headerlink" href="#function-setfigurerotation" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-113-1"><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setFigureRotation</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-113-2"><a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a><span class="w">    </span><span class="n">FigureRotation</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setfresnelzoffset">function setFresnelZOffset<a class="headerlink" href="#function-setfresnelzoffset" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-113-1"><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setFresnelZOffset</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-113-2"><a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-113-3"><a id="__codelineno-113-3" name="__codelineno-113-3" href="#__codelineno-113-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setfresnelzoffset">function setFresnelZOffset<a class="headerlink" href="#function-setfresnelzoffset" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-114-1"><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setFresnelZOffset</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-114-2"><a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setgrazingincangle">function setGrazingIncAngle<a class="headerlink" href="#function-setgrazingincangle" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-114-1"><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setGrazingIncAngle</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-114-2"><a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-114-3"><a id="__codelineno-114-3" name="__codelineno-114-3" href="#__codelineno-114-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setgrazingincangle">function setGrazingIncAngle<a class="headerlink" href="#function-setgrazingincangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-115-1"><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setGrazingIncAngle</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-115-2"><a id="__codelineno-115-2" name="__codelineno-115-2" href="#__codelineno-115-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setimagetype">function setImageType<a class="headerlink" href="#function-setimagetype" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-115-1"><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setImageType</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-115-2"><a id="__codelineno-115-2" name="__codelineno-115-2" href="#__codelineno-115-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-115-3"><a id="__codelineno-115-3" name="__codelineno-115-3" href="#__codelineno-115-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setimagetype">function setImageType<a class="headerlink" href="#function-setimagetype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-116-1"><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setImageType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-116-2"><a id="__codelineno-116-2" name="__codelineno-116-2" href="#__codelineno-116-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setlinedensity">function setLineDensity<a class="headerlink" href="#function-setlinedensity" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-116-1"><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setLineDensity</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-116-2"><a id="__codelineno-116-2" name="__codelineno-116-2" href="#__codelineno-116-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-116-3"><a id="__codelineno-116-3" name="__codelineno-116-3" href="#__codelineno-116-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setlinedensity">function setLineDensity<a class="headerlink" href="#function-setlinedensity" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-117-1"><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setLineDensity</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setlonghalfaxisa">function setLongHalfAxisA<a class="headerlink" href="#function-setlonghalfaxisa" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-117-1"><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setLongHalfAxisA</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-117-2"><a id="__codelineno-117-2" name="__codelineno-117-2" href="#__codelineno-117-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-117-3"><a id="__codelineno-117-3" name="__codelineno-117-3" href="#__codelineno-117-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setlonghalfaxisa">function setLongHalfAxisA<a class="headerlink" href="#function-setlonghalfaxisa" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-118-1"><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setLongHalfAxisA</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setlongradius">function setLongRadius<a class="headerlink" href="#function-setlongradius" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-118-1"><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setLongRadius</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-118-2"><a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-118-3"><a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setlongradius">function setLongRadius<a class="headerlink" href="#function-setlongradius" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-119-1"><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setLongRadius</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-119-2"><a id="__codelineno-119-2" name="__codelineno-119-2" href="#__codelineno-119-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setmaterial">function setMaterial<a class="headerlink" href="#function-setmaterial" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-119-1"><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setMaterial</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-119-2"><a id="__codelineno-119-2" name="__codelineno-119-2" href="#__codelineno-119-2"></a><span class="w">    </span><span class="n">Material</span><span class="w"> </span><span class="n">m</span>
 </span><span id="__span-119-3"><a id="__codelineno-119-3" name="__codelineno-119-3" href="#__codelineno-119-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setmaterial">function setMaterial<a class="headerlink" href="#function-setmaterial" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-120-1"><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setMaterial</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-120-2"><a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a><span class="w">    </span><span class="n">Material</span><span class="w"> </span><span class="n">m</span>
+<h3 id="function-setmaterialcoating">function setMaterialCoating<a class="headerlink" href="#function-setmaterialcoating" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-120-1"><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setMaterialCoating</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-120-2"><a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a><span class="w">    </span><span class="n">Material</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-120-3"><a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setmaterialcoating">function setMaterialCoating<a class="headerlink" href="#function-setmaterialcoating" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-121-1"><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setMaterialCoating</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-121-2"><a id="__codelineno-121-2" name="__codelineno-121-2" href="#__codelineno-121-2"></a><span class="w">    </span><span class="n">Material</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setmultilayercoating">function setMultilayerCoating<a class="headerlink" href="#function-setmultilayercoating" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-121-1"><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setMultilayerCoating</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-121-2"><a id="__codelineno-121-2" name="__codelineno-121-2" href="#__codelineno-121-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Coating</span><span class="o">::</span><span class="n">MultilayerCoating</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">coating</span>
 </span><span id="__span-121-3"><a id="__codelineno-121-3" name="__codelineno-121-3" href="#__codelineno-121-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setmultilayercoating">function setMultilayerCoating<a class="headerlink" href="#function-setmultilayercoating" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-122-1"><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setMultilayerCoating</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-122-2"><a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Coating</span><span class="o">::</span><span class="n">MultilayerCoating</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">coating</span>
-</span><span id="__span-122-3"><a id="__codelineno-122-3" name="__codelineno-122-3" href="#__codelineno-122-3"></a><span class="p">)</span><span class="w"> </span>
-</span></code></pre></div>
-<hr>
-
 <h3 id="function-setname">function setName<a class="headerlink" href="#function-setname" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-123-1"><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setName</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-123-2"><a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span>
-</span><span id="__span-123-3"><a id="__codelineno-123-3" name="__codelineno-123-3" href="#__codelineno-123-3"></a><span class="p">)</span><span class="w"> </span><span class="k">override</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-122-1"><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setName</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-122-2"><a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">s</span>
+</span><span id="__span-122-3"><a id="__codelineno-122-3" name="__codelineno-122-3" href="#__codelineno-122-3"></a><span class="p">)</span><span class="w"> </span><span class="k">override</span>
 </span></code></pre></div>
 <p>Implements <a href="../classrayx_1_1BeamlineNode/#function-setname"><em>rayx::BeamlineNode::setName</em></a></p>
 <hr>
 
 <h3 id="function-setoffsetangle">function setOffsetAngle<a class="headerlink" href="#function-setoffsetangle" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-124-1"><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOffsetAngle</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-124-2"><a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-124-3"><a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a><span class="p">)</span><span class="w"> </span>
-</span></code></pre></div>
-<hr>
-
-<h3 id="function-setoffsetangletype">function setOffsetAngleType<a class="headerlink" href="#function-setoffsetangletype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-125-1"><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOffsetAngleType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-125-2"><a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a><span class="w">    </span><span class="n">OffsetAngleType</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-125-3"><a id="__codelineno-125-3" name="__codelineno-125-3" href="#__codelineno-125-3"></a><span class="p">)</span><span class="w"> </span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-123-1"><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOffsetAngle</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-123-2"><a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a><span class="w">    </span><span class="n">Rad</span><span class="w"> </span><span class="n">value</span>
+</span><span id="__span-123-3"><a id="__codelineno-123-3" name="__codelineno-123-3" href="#__codelineno-123-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
 <h3 id="function-setopeningheight">function setOpeningHeight<a class="headerlink" href="#function-setopeningheight" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-126-1"><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOpeningHeight</span><span class="w"> </span><span class="p">(</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-124-1"><a id="__codelineno-124-1" name="__codelineno-124-1" href="#__codelineno-124-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOpeningHeight</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-124-2"><a id="__codelineno-124-2" name="__codelineno-124-2" href="#__codelineno-124-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
+</span><span id="__span-124-3"><a id="__codelineno-124-3" name="__codelineno-124-3" href="#__codelineno-124-3"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-setopeningshape">function setOpeningShape<a class="headerlink" href="#function-setopeningshape" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-125-1"><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOpeningShape</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-125-2"><a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a><span class="w">    </span><span class="n">CutoutType</span><span class="w"> </span><span class="n">shape</span>
+</span><span id="__span-125-3"><a id="__codelineno-125-3" name="__codelineno-125-3" href="#__codelineno-125-3"></a><span class="p">)</span><span class="w"> </span>
+</span></code></pre></div>
+<hr>
+
+<h3 id="function-setopeningwidth">function setOpeningWidth<a class="headerlink" href="#function-setopeningwidth" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-126-1"><a id="__codelineno-126-1" name="__codelineno-126-1" href="#__codelineno-126-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOpeningWidth</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-126-2"><a id="__codelineno-126-2" name="__codelineno-126-2" href="#__codelineno-126-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
 </span><span id="__span-126-3"><a id="__codelineno-126-3" name="__codelineno-126-3" href="#__codelineno-126-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setopeningshape">function setOpeningShape<a class="headerlink" href="#function-setopeningshape" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-127-1"><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOpeningShape</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-127-2"><a id="__codelineno-127-2" name="__codelineno-127-2" href="#__codelineno-127-2"></a><span class="w">    </span><span class="n">CutoutType</span><span class="w"> </span><span class="n">shape</span>
+<h3 id="function-setorderofdiffraction">function setOrderOfDiffraction<a class="headerlink" href="#function-setorderofdiffraction" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-127-1"><a id="__codelineno-127-1" name="__codelineno-127-1" href="#__codelineno-127-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOrderOfDiffraction</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-127-2"><a id="__codelineno-127-2" name="__codelineno-127-2" href="#__codelineno-127-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-127-3"><a id="__codelineno-127-3" name="__codelineno-127-3" href="#__codelineno-127-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setopeningwidth">function setOpeningWidth<a class="headerlink" href="#function-setopeningwidth" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-128-1"><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOpeningWidth</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-128-2"><a id="__codelineno-128-2" name="__codelineno-128-2" href="#__codelineno-128-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
+<h3 id="function-setorientation">function setOrientation<a class="headerlink" href="#function-setorientation" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-128-1"><a id="__codelineno-128-1" name="__codelineno-128-1" href="#__codelineno-128-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOrientation</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-128-2"><a id="__codelineno-128-2" name="__codelineno-128-2" href="#__codelineno-128-2"></a><span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat4x4</span><span class="w"> </span><span class="n">o</span>
 </span><span id="__span-128-3"><a id="__codelineno-128-3" name="__codelineno-128-3" href="#__codelineno-128-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setorderofdiffraction">function setOrderOfDiffraction<a class="headerlink" href="#function-setorderofdiffraction" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-129-1"><a id="__codelineno-129-1" name="__codelineno-129-1" href="#__codelineno-129-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOrderOfDiffraction</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-129-2"><a id="__codelineno-129-2" name="__codelineno-129-2" href="#__codelineno-129-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setparametera11">function setParameterA11<a class="headerlink" href="#function-setparametera11" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-129-1"><a id="__codelineno-129-1" name="__codelineno-129-1" href="#__codelineno-129-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setParameterA11</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-129-2"><a id="__codelineno-129-2" name="__codelineno-129-2" href="#__codelineno-129-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-129-3"><a id="__codelineno-129-3" name="__codelineno-129-3" href="#__codelineno-129-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setorientation">function setOrientation<a class="headerlink" href="#function-setorientation" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-130-1"><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setOrientation</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-130-2"><a id="__codelineno-130-2" name="__codelineno-130-2" href="#__codelineno-130-2"></a><span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">dmat4x4</span><span class="w"> </span><span class="n">o</span>
+<h3 id="function-setparameterp">function setParameterP<a class="headerlink" href="#function-setparameterp" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-130-1"><a id="__codelineno-130-1" name="__codelineno-130-1" href="#__codelineno-130-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setParameterP</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-130-2"><a id="__codelineno-130-2" name="__codelineno-130-2" href="#__codelineno-130-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-130-3"><a id="__codelineno-130-3" name="__codelineno-130-3" href="#__codelineno-130-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setparametera11">function setParameterA11<a class="headerlink" href="#function-setparametera11" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-131-1"><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setParameterA11</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setparameterptype">function setParameterPType<a class="headerlink" href="#function-setparameterptype" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-131-1"><a id="__codelineno-131-1" name="__codelineno-131-1" href="#__codelineno-131-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setParameterPType</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-131-2"><a id="__codelineno-131-2" name="__codelineno-131-2" href="#__codelineno-131-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-131-3"><a id="__codelineno-131-3" name="__codelineno-131-3" href="#__codelineno-131-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setparameterp">function setParameterP<a class="headerlink" href="#function-setparameterp" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-132-1"><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setParameterP</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-132-2"><a id="__codelineno-132-2" name="__codelineno-132-2" href="#__codelineno-132-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setposition">function setPosition<a class="headerlink" href="#function-setposition" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-132-1"><a id="__codelineno-132-1" name="__codelineno-132-1" href="#__codelineno-132-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setPosition</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-132-2"><a id="__codelineno-132-2" name="__codelineno-132-2" href="#__codelineno-132-2"></a><span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec4</span><span class="w"> </span><span class="n">p</span>
 </span><span id="__span-132-3"><a id="__codelineno-132-3" name="__codelineno-132-3" href="#__codelineno-132-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setparameterptype">function setParameterPType<a class="headerlink" href="#function-setparameterptype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-133-1"><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setParameterPType</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setprofilefile">function setProfileFile<a class="headerlink" href="#function-setprofilefile" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-133-1"><a id="__codelineno-133-1" name="__codelineno-133-1" href="#__codelineno-133-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setProfileFile</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-133-2"><a id="__codelineno-133-2" name="__codelineno-133-2" href="#__codelineno-133-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-133-3"><a id="__codelineno-133-3" name="__codelineno-133-3" href="#__codelineno-133-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setposition">function setPosition<a class="headerlink" href="#function-setposition" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-134-1"><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setPosition</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-134-2"><a id="__codelineno-134-2" name="__codelineno-134-2" href="#__codelineno-134-2"></a><span class="w">    </span><span class="n">glm</span><span class="o">::</span><span class="n">dvec4</span><span class="w"> </span><span class="n">p</span>
+<h3 id="function-setprofilekind">function setProfileKind<a class="headerlink" href="#function-setprofilekind" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-134-1"><a id="__codelineno-134-1" name="__codelineno-134-1" href="#__codelineno-134-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setProfileKind</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-134-2"><a id="__codelineno-134-2" name="__codelineno-134-2" href="#__codelineno-134-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-134-3"><a id="__codelineno-134-3" name="__codelineno-134-3" href="#__codelineno-134-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setprofilefile">function setProfileFile<a class="headerlink" href="#function-setprofilefile" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-135-1"><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setProfileFile</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setradius">function setRadius<a class="headerlink" href="#function-setradius" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-135-1"><a id="__codelineno-135-1" name="__codelineno-135-1" href="#__codelineno-135-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRadius</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-135-2"><a id="__codelineno-135-2" name="__codelineno-135-2" href="#__codelineno-135-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-135-3"><a id="__codelineno-135-3" name="__codelineno-135-3" href="#__codelineno-135-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setprofilekind">function setProfileKind<a class="headerlink" href="#function-setprofilekind" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-136-1"><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setProfileKind</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-136-2"><a id="__codelineno-136-2" name="__codelineno-136-2" href="#__codelineno-136-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setradiusdirection">function setRadiusDirection<a class="headerlink" href="#function-setradiusdirection" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-136-1"><a id="__codelineno-136-1" name="__codelineno-136-1" href="#__codelineno-136-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRadiusDirection</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-136-2"><a id="__codelineno-136-2" name="__codelineno-136-2" href="#__codelineno-136-2"></a><span class="w">    </span><span class="n">CylinderDirection</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-136-3"><a id="__codelineno-136-3" name="__codelineno-136-3" href="#__codelineno-136-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setradius">function setRadius<a class="headerlink" href="#function-setradius" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-137-1"><a id="__codelineno-137-1" name="__codelineno-137-1" href="#__codelineno-137-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRadius</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setroughnesscoating">function setRoughnessCoating<a class="headerlink" href="#function-setroughnesscoating" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-137-1"><a id="__codelineno-137-1" name="__codelineno-137-1" href="#__codelineno-137-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRoughnessCoating</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-137-2"><a id="__codelineno-137-2" name="__codelineno-137-2" href="#__codelineno-137-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-137-3"><a id="__codelineno-137-3" name="__codelineno-137-3" href="#__codelineno-137-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setradiusdirection">function setRadiusDirection<a class="headerlink" href="#function-setradiusdirection" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-138-1"><a id="__codelineno-138-1" name="__codelineno-138-1" href="#__codelineno-138-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRadiusDirection</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-138-2"><a id="__codelineno-138-2" name="__codelineno-138-2" href="#__codelineno-138-2"></a><span class="w">    </span><span class="n">CylinderDirection</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setroughnesssubstrate">function setRoughnessSubstrate<a class="headerlink" href="#function-setroughnesssubstrate" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-138-1"><a id="__codelineno-138-1" name="__codelineno-138-1" href="#__codelineno-138-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRoughnessSubstrate</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-138-2"><a id="__codelineno-138-2" name="__codelineno-138-2" href="#__codelineno-138-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-138-3"><a id="__codelineno-138-3" name="__codelineno-138-3" href="#__codelineno-138-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setroughnesscoating">function setRoughnessCoating<a class="headerlink" href="#function-setroughnesscoating" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-139-1"><a id="__codelineno-139-1" name="__codelineno-139-1" href="#__codelineno-139-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRoughnessCoating</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setshorthalfaxisb">function setShortHalfAxisB<a class="headerlink" href="#function-setshorthalfaxisb" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-139-1"><a id="__codelineno-139-1" name="__codelineno-139-1" href="#__codelineno-139-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setShortHalfAxisB</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-139-2"><a id="__codelineno-139-2" name="__codelineno-139-2" href="#__codelineno-139-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-139-3"><a id="__codelineno-139-3" name="__codelineno-139-3" href="#__codelineno-139-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setroughnesssubstrate">function setRoughnessSubstrate<a class="headerlink" href="#function-setroughnesssubstrate" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-140-1"><a id="__codelineno-140-1" name="__codelineno-140-1" href="#__codelineno-140-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setRoughnessSubstrate</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setshortradius">function setShortRadius<a class="headerlink" href="#function-setshortradius" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-140-1"><a id="__codelineno-140-1" name="__codelineno-140-1" href="#__codelineno-140-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setShortRadius</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-140-2"><a id="__codelineno-140-2" name="__codelineno-140-2" href="#__codelineno-140-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-140-3"><a id="__codelineno-140-3" name="__codelineno-140-3" href="#__codelineno-140-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setshorthalfaxisb">function setShortHalfAxisB<a class="headerlink" href="#function-setshorthalfaxisb" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-141-1"><a id="__codelineno-141-1" name="__codelineno-141-1" href="#__codelineno-141-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setShortHalfAxisB</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-141-2"><a id="__codelineno-141-2" name="__codelineno-141-2" href="#__codelineno-141-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setslopeerror">function setSlopeError<a class="headerlink" href="#function-setslopeerror" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-141-1"><a id="__codelineno-141-1" name="__codelineno-141-1" href="#__codelineno-141-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setSlopeError</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-141-2"><a id="__codelineno-141-2" name="__codelineno-141-2" href="#__codelineno-141-2"></a><span class="w">    </span><span class="n">SlopeError</span><span class="w"> </span><span class="n">s</span>
 </span><span id="__span-141-3"><a id="__codelineno-141-3" name="__codelineno-141-3" href="#__codelineno-141-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setshortradius">function setShortRadius<a class="headerlink" href="#function-setshortradius" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-142-1"><a id="__codelineno-142-1" name="__codelineno-142-1" href="#__codelineno-142-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setShortRadius</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-142-2"><a id="__codelineno-142-2" name="__codelineno-142-2" href="#__codelineno-142-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setstopheight">function setStopHeight<a class="headerlink" href="#function-setstopheight" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-142-1"><a id="__codelineno-142-1" name="__codelineno-142-1" href="#__codelineno-142-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStopHeight</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-142-2"><a id="__codelineno-142-2" name="__codelineno-142-2" href="#__codelineno-142-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">height</span>
 </span><span id="__span-142-3"><a id="__codelineno-142-3" name="__codelineno-142-3" href="#__codelineno-142-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setslopeerror">function setSlopeError<a class="headerlink" href="#function-setslopeerror" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-143-1"><a id="__codelineno-143-1" name="__codelineno-143-1" href="#__codelineno-143-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setSlopeError</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-143-2"><a id="__codelineno-143-2" name="__codelineno-143-2" href="#__codelineno-143-2"></a><span class="w">    </span><span class="n">SlopeError</span><span class="w"> </span><span class="n">s</span>
+<h3 id="function-setstopwidth">function setStopWidth<a class="headerlink" href="#function-setstopwidth" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-143-1"><a id="__codelineno-143-1" name="__codelineno-143-1" href="#__codelineno-143-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStopWidth</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-143-2"><a id="__codelineno-143-2" name="__codelineno-143-2" href="#__codelineno-143-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
 </span><span id="__span-143-3"><a id="__codelineno-143-3" name="__codelineno-143-3" href="#__codelineno-143-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstopheight">function setStopHeight<a class="headerlink" href="#function-setstopheight" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-144-1"><a id="__codelineno-144-1" name="__codelineno-144-1" href="#__codelineno-144-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStopHeight</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-144-2"><a id="__codelineno-144-2" name="__codelineno-144-2" href="#__codelineno-144-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">height</span>
+<h3 id="function-setstructurefactorimf0">function setStructureFactorImF0<a class="headerlink" href="#function-setstructurefactorimf0" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-144-1"><a id="__codelineno-144-1" name="__codelineno-144-1" href="#__codelineno-144-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorImF0</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-144-2"><a id="__codelineno-144-2" name="__codelineno-144-2" href="#__codelineno-144-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-144-3"><a id="__codelineno-144-3" name="__codelineno-144-3" href="#__codelineno-144-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstopwidth">function setStopWidth<a class="headerlink" href="#function-setstopwidth" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-145-1"><a id="__codelineno-145-1" name="__codelineno-145-1" href="#__codelineno-145-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStopWidth</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-145-2"><a id="__codelineno-145-2" name="__codelineno-145-2" href="#__codelineno-145-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
+<h3 id="function-setstructurefactorimfh">function setStructureFactorImFH<a class="headerlink" href="#function-setstructurefactorimfh" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-145-1"><a id="__codelineno-145-1" name="__codelineno-145-1" href="#__codelineno-145-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorImFH</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-145-2"><a id="__codelineno-145-2" name="__codelineno-145-2" href="#__codelineno-145-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-145-3"><a id="__codelineno-145-3" name="__codelineno-145-3" href="#__codelineno-145-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstructurefactorimf0">function setStructureFactorImF0<a class="headerlink" href="#function-setstructurefactorimf0" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-146-1"><a id="__codelineno-146-1" name="__codelineno-146-1" href="#__codelineno-146-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorImF0</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setstructurefactorimfhc">function setStructureFactorImFHC<a class="headerlink" href="#function-setstructurefactorimfhc" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-146-1"><a id="__codelineno-146-1" name="__codelineno-146-1" href="#__codelineno-146-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorImFHC</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-146-2"><a id="__codelineno-146-2" name="__codelineno-146-2" href="#__codelineno-146-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-146-3"><a id="__codelineno-146-3" name="__codelineno-146-3" href="#__codelineno-146-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstructurefactorimfh">function setStructureFactorImFH<a class="headerlink" href="#function-setstructurefactorimfh" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-147-1"><a id="__codelineno-147-1" name="__codelineno-147-1" href="#__codelineno-147-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorImFH</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setstructurefactorref0">function setStructureFactorReF0<a class="headerlink" href="#function-setstructurefactorref0" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-147-1"><a id="__codelineno-147-1" name="__codelineno-147-1" href="#__codelineno-147-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorReF0</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-147-2"><a id="__codelineno-147-2" name="__codelineno-147-2" href="#__codelineno-147-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-147-3"><a id="__codelineno-147-3" name="__codelineno-147-3" href="#__codelineno-147-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstructurefactorimfhc">function setStructureFactorImFHC<a class="headerlink" href="#function-setstructurefactorimfhc" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-148-1"><a id="__codelineno-148-1" name="__codelineno-148-1" href="#__codelineno-148-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorImFHC</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setstructurefactorrefh">function setStructureFactorReFH<a class="headerlink" href="#function-setstructurefactorrefh" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-148-1"><a id="__codelineno-148-1" name="__codelineno-148-1" href="#__codelineno-148-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorReFH</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-148-2"><a id="__codelineno-148-2" name="__codelineno-148-2" href="#__codelineno-148-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-148-3"><a id="__codelineno-148-3" name="__codelineno-148-3" href="#__codelineno-148-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstructurefactorref0">function setStructureFactorReF0<a class="headerlink" href="#function-setstructurefactorref0" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-149-1"><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorReF0</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setstructurefactorrefhc">function setStructureFactorReFHC<a class="headerlink" href="#function-setstructurefactorrefhc" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-149-1"><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorReFHC</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-149-2"><a id="__codelineno-149-2" name="__codelineno-149-2" href="#__codelineno-149-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-149-3"><a id="__codelineno-149-3" name="__codelineno-149-3" href="#__codelineno-149-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstructurefactorrefh">function setStructureFactorReFH<a class="headerlink" href="#function-setstructurefactorrefh" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-150-1"><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorReFH</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-150-2"><a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setsurfacecoatingtype">function setSurfaceCoatingType<a class="headerlink" href="#function-setsurfacecoatingtype" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-150-1"><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setSurfaceCoatingType</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-150-2"><a id="__codelineno-150-2" name="__codelineno-150-2" href="#__codelineno-150-2"></a><span class="w">    </span><span class="n">SurfaceCoatingType</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-150-3"><a id="__codelineno-150-3" name="__codelineno-150-3" href="#__codelineno-150-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setstructurefactorrefhc">function setStructureFactorReFHC<a class="headerlink" href="#function-setstructurefactorrefhc" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-151-1"><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setStructureFactorReFHC</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-setthicknesscoating">function setThicknessCoating<a class="headerlink" href="#function-setthicknesscoating" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-151-1"><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setThicknessCoating</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-151-2"><a id="__codelineno-151-2" name="__codelineno-151-2" href="#__codelineno-151-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-151-3"><a id="__codelineno-151-3" name="__codelineno-151-3" href="#__codelineno-151-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setsurfacecoatingtype">function setSurfaceCoatingType<a class="headerlink" href="#function-setsurfacecoatingtype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-152-1"><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setSurfaceCoatingType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-152-2"><a id="__codelineno-152-2" name="__codelineno-152-2" href="#__codelineno-152-2"></a><span class="w">    </span><span class="n">SurfaceCoatingType</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-setthicknesssubstrate">function setThicknessSubstrate<a class="headerlink" href="#function-setthicknesssubstrate" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-152-1"><a id="__codelineno-152-1" name="__codelineno-152-1" href="#__codelineno-152-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setThicknessSubstrate</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-152-2"><a id="__codelineno-152-2" name="__codelineno-152-2" href="#__codelineno-152-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-152-3"><a id="__codelineno-152-3" name="__codelineno-152-3" href="#__codelineno-152-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setthicknesscoating">function setThicknessCoating<a class="headerlink" href="#function-setthicknesscoating" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-153-1"><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setThicknessCoating</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-153-2"><a id="__codelineno-153-2" name="__codelineno-153-2" href="#__codelineno-153-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-settotalheight">function setTotalHeight<a class="headerlink" href="#function-settotalheight" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-153-1"><a id="__codelineno-153-1" name="__codelineno-153-1" href="#__codelineno-153-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setTotalHeight</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-153-2"><a id="__codelineno-153-2" name="__codelineno-153-2" href="#__codelineno-153-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
 </span><span id="__span-153-3"><a id="__codelineno-153-3" name="__codelineno-153-3" href="#__codelineno-153-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setthicknesssubstrate">function setThicknessSubstrate<a class="headerlink" href="#function-setthicknesssubstrate" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-154-1"><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setThicknessSubstrate</span><span class="w"> </span><span class="p">(</span>
+<h3 id="function-settotallength">function setTotalLength<a class="headerlink" href="#function-settotallength" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-154-1"><a id="__codelineno-154-1" name="__codelineno-154-1" href="#__codelineno-154-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setTotalLength</span><span class="w"> </span><span class="p">(</span>
 </span><span id="__span-154-2"><a id="__codelineno-154-2" name="__codelineno-154-2" href="#__codelineno-154-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-154-3"><a id="__codelineno-154-3" name="__codelineno-154-3" href="#__codelineno-154-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-settotalheight">function setTotalHeight<a class="headerlink" href="#function-settotalheight" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-155-1"><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setTotalHeight</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-155-2"><a id="__codelineno-155-2" name="__codelineno-155-2" href="#__codelineno-155-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">d</span>
+<h3 id="function-settotalwidth">function setTotalWidth<a class="headerlink" href="#function-settotalwidth" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-155-1"><a id="__codelineno-155-1" name="__codelineno-155-1" href="#__codelineno-155-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setTotalWidth</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-155-2"><a id="__codelineno-155-2" name="__codelineno-155-2" href="#__codelineno-155-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">width</span>
 </span><span id="__span-155-3"><a id="__codelineno-155-3" name="__codelineno-155-3" href="#__codelineno-155-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-settotallength">function setTotalLength<a class="headerlink" href="#function-settotallength" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-156-1"><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setTotalLength</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-156-2"><a id="__codelineno-156-2" name="__codelineno-156-2" href="#__codelineno-156-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
+<h3 id="function-settype">function setType<a class="headerlink" href="#function-settype" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-156-1"><a id="__codelineno-156-1" name="__codelineno-156-1" href="#__codelineno-156-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setType</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-156-2"><a id="__codelineno-156-2" name="__codelineno-156-2" href="#__codelineno-156-2"></a><span class="w">    </span><span class="n">ElementType</span><span class="w"> </span><span class="n">s</span>
 </span><span id="__span-156-3"><a id="__codelineno-156-3" name="__codelineno-156-3" href="#__codelineno-156-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-settotalwidth">function setTotalWidth<a class="headerlink" href="#function-settotalwidth" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-157-1"><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setTotalWidth</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-157-2"><a id="__codelineno-157-2" name="__codelineno-157-2" href="#__codelineno-157-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">width</span>
+<h3 id="function-setunitcellvolume">function setUnitCellVolume<a class="headerlink" href="#function-setunitcellvolume" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-157-1"><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setUnitCellVolume</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-157-2"><a id="__codelineno-157-2" name="__codelineno-157-2" href="#__codelineno-157-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
 </span><span id="__span-157-3"><a id="__codelineno-157-3" name="__codelineno-157-3" href="#__codelineno-157-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-settype">function setType<a class="headerlink" href="#function-settype" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-158-1"><a id="__codelineno-158-1" name="__codelineno-158-1" href="#__codelineno-158-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setType</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-158-2"><a id="__codelineno-158-2" name="__codelineno-158-2" href="#__codelineno-158-2"></a><span class="w">    </span><span class="n">ElementType</span><span class="w"> </span><span class="n">s</span>
+<h3 id="function-setvlsparameters">function setVLSParameters<a class="headerlink" href="#function-setvlsparameters" title="Permanent link">&para;</a></h3>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-158-1"><a id="__codelineno-158-1" name="__codelineno-158-1" href="#__codelineno-158-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setVLSParameters</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-158-2"><a id="__codelineno-158-2" name="__codelineno-158-2" href="#__codelineno-158-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">values</span>
 </span><span id="__span-158-3"><a id="__codelineno-158-3" name="__codelineno-158-3" href="#__codelineno-158-3"></a><span class="p">)</span><span class="w"> </span>
 </span></code></pre></div>
 <hr>
 
-<h3 id="function-setunitcellvolume">function setUnitCellVolume<a class="headerlink" href="#function-setunitcellvolume" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-159-1"><a id="__codelineno-159-1" name="__codelineno-159-1" href="#__codelineno-159-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setUnitCellVolume</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-159-2"><a id="__codelineno-159-2" name="__codelineno-159-2" href="#__codelineno-159-2"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span>
-</span><span id="__span-159-3"><a id="__codelineno-159-3" name="__codelineno-159-3" href="#__codelineno-159-3"></a><span class="p">)</span><span class="w"> </span>
-</span></code></pre></div>
-<hr>
-
-<h3 id="function-setvlsparameters">function setVLSParameters<a class="headerlink" href="#function-setvlsparameters" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-160-1"><a id="__codelineno-160-1" name="__codelineno-160-1" href="#__codelineno-160-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::</span><span class="n">setVLSParameters</span><span class="w"> </span><span class="p">(</span>
-</span><span id="__span-160-2"><a id="__codelineno-160-2" name="__codelineno-160-2" href="#__codelineno-160-2"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="w"> </span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">values</span>
-</span><span id="__span-160-3"><a id="__codelineno-160-3" name="__codelineno-160-3" href="#__codelineno-160-3"></a><span class="p">)</span><span class="w"> </span>
-</span></code></pre></div>
-<hr>
-
 <h3 id="function-designelement">function ~DesignElement<a class="headerlink" href="#function-designelement" title="Permanent link">&para;</a></h3>
-<div class="language-C++ highlight"><pre><span></span><code><span id="__span-161-1"><a id="__codelineno-161-1" name="__codelineno-161-1" href="#__codelineno-161-1"></a><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::~</span><span class="n">DesignElement</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span>
+<div class="language-C++ highlight"><pre><span></span><code><span id="__span-159-1"><a id="__codelineno-159-1" name="__codelineno-159-1" href="#__codelineno-159-1"></a><span class="n">rayx</span><span class="o">::</span><span class="n">DesignElement</span><span class="o">::~</span><span class="n">DesignElement</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span>
 </span></code></pre></div>
 <hr>
 
