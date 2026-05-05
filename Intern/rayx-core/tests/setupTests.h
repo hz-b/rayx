@@ -242,8 +242,16 @@ class TestSuite : public testing::Test {
 
         // Choose Hardware
         using DeviceType      = DeviceConfig::DeviceType;
-        const auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
-        tracer                = std::make_unique<Tracer>(DeviceConfig(deviceType).enableBestDevice());
+        auto deviceType = cpu ? DeviceType::Cpu : DeviceType::Gpu;
+
+        // Try to create config with requested device type
+        auto config = DeviceConfig(deviceType);
+        if (config.devices.empty()) {
+            // Fall back to CPU if requested type has no available devices
+            RAYX_LOG << "No GPU devices available, falling back to CPU.";
+            config = DeviceConfig(DeviceType::Cpu);
+        }
+        tracer = std::make_unique<Tracer>(config.enableBestDevice());
     }
 
     // called before every test invocation.

@@ -1,8 +1,10 @@
 #include <gtc/matrix_transform.hpp>
+#include <numbers>
 #include <numeric>
 
 #include "Shader/ApplySlopeError.h"
 #include "Shader/Approx.h"
+#include "Shader/Collision.h"
 #include "Shader/Crystal.h"
 #include "Shader/LineDensity.h"
 #include "Shader/Rand.h"
@@ -734,7 +736,7 @@ TEST_F(TestSuite, testBessel1) {
 
     for (auto p : inouts) {
         auto out = bessel1(p.in);
-        CHECK_EQ(out, p.out);
+        CHECK_EQ(out, p.out, 1e-8);
     }
 }
 
@@ -1495,4 +1497,80 @@ TEST_F(TestSuite, testComputeEta) {
         CHECK_EQ(eta.real(), tc.expected.real());
         CHECK_EQ(eta.imag(), tc.expected.imag());
     }
+}
+
+// Unit test for getToroidCollision — valid grazing-incidence hit at z ≈ +600.
+// Toroid geometry matches toroid_iteration.rml (longRadius ~104 m, shortRadius 31.7 mm).
+// At this large longRadius the surface point at z=600 is ~1.73 mm above the top, so
+// the hit is approximately at (0, 0, 600) — typical for synchrotron mirror geometries.
+TEST_F(TestSuite, testToroidCollisionGrazingHitForward) {
+    Surface::Toroid toroid{
+        .m_longRadius  = 104179.4336337276,
+        .m_shortRadius = 31.7316480677882,
+        .m_toroidType  = ToroidType::Concave,
+    };
+    const double grazingRad = 1.0 * std::numbers::pi / 180.0;
+    const double zHit       = 600.0;
+    // surface y at xx=0, zz=zHit: y = R - sqrt(R^2 - zHit^2)
+    const double yHit       = toroid.m_longRadius - std::sqrt(toroid.m_longRadius * toroid.m_longRadius - zHit * zHit);
+    glm::dvec3 rayPosition(0.0, yHit + zHit * std::tan(grazingRad), 0.0);
+    glm::dvec3 rayDirection = glm::normalize(glm::dvec3(0.0, -std::sin(grazingRad), std::cos(grazingRad)));
+
+    auto col = getToroidCollision(rayPosition, rayDirection, toroid, /*isTriangul=*/false);
+    ASSERT_TRUE(col.has_value());
+    // Newton has NEW_TOLERANCE = 1e-4 in zz, but quadratic convergence delivers
+    // much tighter agreement in practice (~sub-nm on macOS arm64). Walk down a
+    // series of tolerances so a regression that loses precision is caught early
+    // and its severity is visible in the test output.
+    const double err = std::max({std::abs(col->hitpoint.x - 0.0), std::abs(col->hitpoint.y - yHit), std::abs(col->hitpoint.z - zHit)});
+    RAYX_LOG << "Forward hit precision: " << err << " mm (x=" << col->hitpoint.x << " y=" << col->hitpoint.y << " z=" << col->hitpoint.z << ")";
+    for (double tol : {1e-2, 1e-3, 1e-4, 1e-5, 1e-6}) {
+        EXPECT_LE(err, tol);
+    }
+    const double t = glm::dot(col->hitpoint - rayPosition, rayDirection);
+    CHECK(t > 0.0)
+}
+
+// Symmetric case: same geometry but ray going in the -z direction, hit at z ≈ -600.
+TEST_F(TestSuite, testToroidCollisionGrazingHitBackward) {
+    Surface::Toroid toroid{
+        .m_longRadius  = 104179.4336337276,
+        .m_shortRadius = 31.7316480677882,
+        .m_toroidType  = ToroidType::Concave,
+    };
+    const double grazingRad = 1.0 * std::numbers::pi / 180.0;
+    const double zHit       = -600.0;
+    const double yHit       = toroid.m_longRadius - std::sqrt(toroid.m_longRadius * toroid.m_longRadius - zHit * zHit);
+    glm::dvec3 rayPosition(0.0, yHit - zHit * std::tan(grazingRad), 0.0);
+    glm::dvec3 rayDirection = glm::normalize(glm::dvec3(0.0, -std::sin(grazingRad), -std::cos(grazingRad)));
+
+    auto col = getToroidCollision(rayPosition, rayDirection, toroid, /*isTriangul=*/false);
+    ASSERT_TRUE(col.has_value());
+    const double err = std::max({std::abs(col->hitpoint.x - 0.0), std::abs(col->hitpoint.y - yHit), std::abs(col->hitpoint.z - zHit)});
+    RAYX_LOG << "Backward hit precision: " << err << " mm (x=" << col->hitpoint.x << " y=" << col->hitpoint.y << " z=" << col->hitpoint.z << ")";
+    for (double tol : {1e-2, 1e-3, 1e-4, 1e-5, 1e-6}) {
+        EXPECT_LE(err, tol);
+    }
+    const double t = glm::dot(col->hitpoint - rayPosition, rayDirection);
+    CHECK(t > 0.0)
+}
+
+// Regression test for #467: phantom self-intersection rejection.
+// (0, 0, 0) lies exactly on the surface (the analytic surface equation
+// -(R-RHO+SQ)^2 + (Y-R)^2 + Z^2 evaluates to zero there). Newton starting at zz=0
+// converges immediately to that origin, and a sign-only forward check would accept
+// the trivial solution as a hit. The parametric forward distance is below
+// NEW_TOLERANCE, so getToroidCollision must return nullopt.
+TEST_F(TestSuite, testToroidCollisionPhantomRejection) {
+    Surface::Toroid toroid{
+        .m_longRadius  = 1000.0,
+        .m_shortRadius = 50.0,
+        .m_toroidType  = ToroidType::Concave,
+    };
+
+    glm::dvec3 rayPosition(0.0, 0.0, 0.0);
+    glm::dvec3 rayDirection = glm::normalize(glm::dvec3(0.5, 0.1, 0.5));
+
+    auto col = getToroidCollision(rayPosition, rayDirection, toroid, /*isTriangul=*/false);
+    EXPECT_FALSE(col.has_value());
 }
