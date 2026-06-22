@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+    open-pull-requests-limit: 10
+    # open one grouped pr instead of one per dependency
+    groups:
+      actions:
+        patterns:
+          - "*"
