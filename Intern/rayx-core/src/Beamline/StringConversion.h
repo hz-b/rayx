@@ -39,8 +39,8 @@ const std::map<std::string, ElectronEnergyOrientation> StringToElectronEnergyOri
     {"Clockwise", ElectronEnergyOrientation::Clockwise}, {"Counterclockwise", ElectronEnergyOrientation::Counterclockwise}};
 
 // EnergySpreadUnit conversion
-const std::map<EnergySpreadUnit, std::string> EnergySpreadUnitToString = {{EnergySpreadUnit::EU_PERCENT, "Percent"}, {EnergySpreadUnit::EU_eV, "eV"}};
-const std::map<std::string, EnergySpreadUnit> StringToEnergySpreadUnit = {{"Percent", EnergySpreadUnit::EU_PERCENT}, {"eV", EnergySpreadUnit::EU_eV}};
+const std::map<EnergySpreadUnit, std::string> EnergySpreadUnitToString = {{EnergySpreadUnit::EU_eV, "eV"}, {EnergySpreadUnit::EU_PERCENT, "Percent"}};
+const std::map<std::string, EnergySpreadUnit> StringToEnergySpreadUnit = {{"eV", EnergySpreadUnit::EU_eV}, {"Percent", EnergySpreadUnit::EU_PERCENT}};
 
 // RZPType conversion
 const std::map<RZPType, std::string> RZPTypeToString = {{RZPType::Elliptical, "Elliptical"}, {RZPType::Meriodional, "Meriodional"}};

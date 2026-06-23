@@ -11,6 +11,17 @@
 
 namespace rayx {
 
+namespace {
+EnergySpreadUnit parseEnergySpreadUnitOrDefault(xml::Parser parser) {
+    int energySpreadUnit = 0;
+    if (!xml::paramInt(parser.node, "energySpreadUnit", &energySpreadUnit)) {
+        return EnergySpreadUnit::EU_eV;
+    }
+
+    return static_cast<EnergySpreadUnit>(energySpreadUnit);
+}
+}  // unnamed namespace
+
 void setAllMandatory(xml::Parser parser, DesignSource* ds) {
     ds->setName(parser.name());
     ds->setType(parser.type());
@@ -28,6 +39,7 @@ void setDefaultEnergy(xml::Parser parser, DesignSource* ds) {
     } else {
         ds->setEnergy(parser.parsePhotonEnergy());
         ds->setEnergySpread(parser.parseEnergySpread());
+        ds->setEnergySpreadUnit(parseEnergySpreadUnitOrDefault(parser));
         if (ds->getEnergySpreadType() == SpreadType::SeparateEnergies) ds->setNumberOfSeparateEnergies(parser.parseNumberOfSeparateEnergies());
     }
 }
@@ -84,7 +96,7 @@ void setDipoleSource(xml::Parser parser, DesignSource* ds) {
     ds->setSourceWidth(parser.parseSourceWidth());
     ds->setVerEBeamDivergence(parser.parseVerEbeamDivergence());
     ds->setEnergy(parser.parsePhotonEnergy());
-    ds->setEnergySpreadUnit(parser.parseEnergySpreadUnit());
+    ds->setEnergySpreadUnit(parseEnergySpreadUnitOrDefault(parser));
     ds->setEnergyDistributionType(parser.parseEnergyDistributionType());
     ds->setHorDivergence(parser.parseHorDiv());
 }

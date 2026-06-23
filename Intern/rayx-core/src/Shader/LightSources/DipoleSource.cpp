@@ -374,7 +374,7 @@ DipoleSource::DipoleSource(const DesignSource& dSource)
       m_verEbeamDivergence(dSource.getVerEBeamDivergence()),
       // m_bandwidth(1.0e-3),
       // m_photonWaveLength(hvlam(m_photonEnergy)),
-      m_energySpread(dSource.getEnergySpread()),
+      m_energySpread(dSource.getEnergySpreadInEv()),
       m_horDivergence(dSource.getHorDivergence()) {
     auto rand       = Rand(randomUint());
     m_gamma         = calcGamma(m_electronEnergy);
