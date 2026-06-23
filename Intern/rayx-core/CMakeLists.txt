@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-# ---- Install directories ----
-include(GNUInstallDirs)
-set(INSTALL_DATA_DIR ${CMAKE_INSTALL_DATADIR})
-
 # ---- for files compiled with cuda compiler, prepend -Xcompiler flags ----
 function(prepend_xcompiler FLAG_LIST PREPENDED_FLAG_LIST)
     set(SRC ${${FLAG_LIST}})

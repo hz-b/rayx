@@ -64,35 +64,28 @@ if(APPLE)
         set(OpenMP_LIBRARY "${MACOS_PKG_PREFIX}/opt/libomp/lib/libomp.dylib")
     endif()
 
-    # Common OpenMP settings
+    # Hints for FindOpenMP. The system AppleClang/Homebrew clang needs the
+    # -Xpreprocessor invocation and an explicit libomp path. These are only
+    # hints: the actual find_package(OpenMP) call lives in Extern/CMakeLists.txt,
+    # where it is gated by RAYX_ENABLE_OPENMP / RAYX_REQUIRE_OPENMP and linked
+    # via the OpenMP::OpenMP_CXX target. We deliberately do not call
+    # find_package here, nor add global compile/link flags, to keep the option
+    # semantics intact and avoid linking libomp twice.
     set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I${OpenMP_INCLUDE_DIR}")
     set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${OpenMP_INCLUDE_DIR}")
     set(OpenMP_C_LIB_NAMES "omp")
     set(OpenMP_CXX_LIB_NAMES "omp")
     set(OpenMP_omp_LIBRARY "${OpenMP_LIBRARY}")
     set(OpenMP_omp_INCLUDE_DIRS "${OpenMP_INCLUDE_DIR}")
-    
-    if(RAYX_ENABLE_OPENMP)
-        find_package(OpenMP REQUIRED)
-        if(OpenMP_CXX_FOUND)
-            message(STATUS "OpenMP found:")
-            message(STATUS "  Include dirs: ${OpenMP_CXX_INCLUDE_DIRS}")
-            message(STATUS "  Libraries: ${OpenMP_CXX_LIBRARIES}")
-        
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-            include_directories(${OpenMP_omp_INCLUDE_DIRS})
-            link_libraries(${OpenMP_omp_LIBRARY})
-        endif()
-    endif()
-    
-    # HDF5: MacPorts installs into /opt/local directly; Homebrew uses opt/hdf5.
+
+    # HDF5 hint: MacPorts installs into /opt/local directly; Homebrew uses
+    # opt/hdf5. The actual find_package(HDF5) is done in Extern/CMakeLists.txt
+    # (gated by RAYX_ENABLE_H5 / RAYX_REQUIRE_H5); HDF5_ROOT is inherited there.
     if(MACOS_PKG_KIND STREQUAL "macports")
         set(HDF5_ROOT "${MACOS_PKG_PREFIX}")
     else()
         set(HDF5_ROOT "${MACOS_PKG_PREFIX}/opt/hdf5")
     endif()
-    find_package(HDF5 REQUIRED COMPONENTS C HL)
-
 endif()
 
 
