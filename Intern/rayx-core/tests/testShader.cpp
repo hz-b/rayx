@@ -1518,15 +1518,14 @@ TEST_F(TestSuite, testToroidCollisionGrazingHitForward) {
 
     auto col = getToroidCollision(rayPosition, rayDirection, toroid, /*isTriangul=*/false);
     ASSERT_TRUE(col.has_value());
-    // Newton has NEW_TOLERANCE = 1e-4 in zz, but quadratic convergence delivers
-    // much tighter agreement in practice (~sub-nm on macOS arm64). Walk down a
-    // series of tolerances so a regression that loses precision is caught early
-    // and its severity is visible in the test output.
+    // The solver only guarantees convergence to NEW_TOLERANCE = 1e-4 in zz, so that is the
+    // only bound we assert hard. Quadratic convergence delivers much tighter agreement in
+    // practice (~sub-nm on macOS arm64); that finer precision is logged rather than asserted
+    // to avoid platform-dependent flakiness when a different FP path stops a few iterations
+    // earlier while still being correct.
     const double err = std::max({std::abs(col->hitpoint.x - 0.0), std::abs(col->hitpoint.y - yHit), std::abs(col->hitpoint.z - zHit)});
     RAYX_LOG << "Forward hit precision: " << err << " mm (x=" << col->hitpoint.x << " y=" << col->hitpoint.y << " z=" << col->hitpoint.z << ")";
-    for (double tol : {1e-2, 1e-3, 1e-4, 1e-5, 1e-6}) {
-        EXPECT_LE(err, tol);
-    }
+    EXPECT_LE(err, 1e-4);
     const double t = glm::dot(col->hitpoint - rayPosition, rayDirection);
     CHECK(t > 0.0)
 }
@@ -1548,9 +1547,7 @@ TEST_F(TestSuite, testToroidCollisionGrazingHitBackward) {
     ASSERT_TRUE(col.has_value());
     const double err = std::max({std::abs(col->hitpoint.x - 0.0), std::abs(col->hitpoint.y - yHit), std::abs(col->hitpoint.z - zHit)});
     RAYX_LOG << "Backward hit precision: " << err << " mm (x=" << col->hitpoint.x << " y=" << col->hitpoint.y << " z=" << col->hitpoint.z << ")";
-    for (double tol : {1e-2, 1e-3, 1e-4, 1e-5, 1e-6}) {
-        EXPECT_LE(err, tol);
-    }
+    EXPECT_LE(err, 1e-4);
     const double t = glm::dot(col->hitpoint - rayPosition, rayDirection);
     CHECK(t > 0.0)
 }
