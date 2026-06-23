@@ -1,0 +1,101 @@
+name: testMacOS
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - 'v*'
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  BUILD_TYPE: Release
+  MACOSX_DEPLOYMENT_TARGET: "13.3"
+
+jobs:
+  build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies (Homebrew)
+        run: |
+          brew update
+          brew install cmake boost gtk+3 hdf5 libomp llvm make zlib
+
+      - name: Add Homebrew to PATH
+        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
+
+      - name: Add Homebrew LLVM to PATH
+        run: echo "/opt/homebrew/opt/llvm/bin" >> $GITHUB_PATH
+
+      - name: Set Xcode toolchain as default
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Ensure system linker is used
+        run: echo "LD=/usr/bin/ld" >> $GITHUB_ENV
+
+      - name: Configure Homebrew clang (symlink for easier access)
+        run: |
+          brew unlink llvm && brew link llvm --force --overwrite
+
+      - name: Symlink system ld for Homebrew clang
+        run: |
+          ln -sf /usr/bin/ld /opt/homebrew/bin/ld
+          ln -sf /usr/bin/ld /opt/homebrew/opt/llvm/bin/ld
+
+      - name: Configure CMake with Homebrew clang and OpenMP support
+        env:
+          LDFLAGS: "-L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/zlib/lib"
+          CPPFLAGS: "-I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/zlib/include"
+          PKG_CONFIG_PATH: "/opt/homebrew/opt/zlib/lib/pkgconfig:/opt/homebrew/lib/pkgconfig"
+          CC: "/opt/homebrew/opt/llvm/bin/clang"
+          CXX: "/opt/homebrew/opt/llvm/bin/clang++"
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DCMAKE_MACOSX_RPATH=ON \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=${{env.MACOSX_DEPLOYMENT_TARGET}} \
+            -DCMAKE_INSTALL_RPATH="@loader_path;@rpath" \
+            -DCMAKE_PREFIX_PATH="/opt/homebrew/opt/hdf5;/opt/homebrew/opt/zlib;/opt/homebrew/opt/libomp" \
+            -DHDF5_ROOT=/opt/homebrew/opt/hdf5 \
+            -DZLIB_ROOT=/opt/homebrew/opt/zlib \
+            -DZLIB_INCLUDE_DIR=/opt/homebrew/opt/zlib/include \
+            -DZLIB_LIBRARY=/opt/homebrew/opt/zlib/lib/libz.dylib \
+            -DRAYX_WERROR=ON \
+            -DRAYX_REQUIRE_CUDA=OFF \
+            -DRAYX_ENABLE_CUDA=OFF \
+            -DRAYX_BUILD_RAYX_UI=OFF \
+            -DRAYX_BUILD_RAYX_CLI=ON \
+            -DRAYX_BUILD_RAYX_TESTS=ON \
+            -DCMAKE_C_COMPILER="$CC" \
+            -DCMAKE_CXX_COMPILER="$CXX" \
+            -DCMAKE_CXX_FLAGS="-stdlib=libc++ -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include -I/opt/homebrew/opt/zlib/include" \
+            -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/zlib/lib -lomp -lz"
+
+      - name: Build
+        run: |
+          cmake --build build --config ${{env.BUILD_TYPE}}
+
+      - name: Run
+        working-directory: ${{github.workspace}}
+        run: |
+          ./build/bin/release/rayx -x -c -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
+          ./build/bin/release/rayx -x    -m 1 -i Intern/rayx-core/tests/input/BoringImagePlane.rml
+          git checkout -- Intern/rayx-core/tests/input/BoringImagePlane.csv
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build/bin/release
+        run: ./rayx-core-tst -x
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RAYX-macOS-${{env.BUILD_TYPE}}
+          path: ${{github.workspace}}/build/bin/release

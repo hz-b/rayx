@@ -184,20 +184,20 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
             y1 = y - aml * (x - xx);
             z1 = z - anl * (x - xx);
 
-            double func = (2 * ((x1 - xx) * an - al * z1) * cu.m_a23 - (2 * cu.m_a24 + cu.m_b12 * pow(float(xx), 2.0)) * al +
+            double func = (2 * ((x1 - xx) * an - al * z1) * cu.m_a23 - (2 * cu.m_a24 + cu.m_b12 * pow(xx, 2.0)) * al +
                            ((x1 - xx) * am - al * y1) * (cu.m_a22 + cu.m_b21 * xx)) *
                           ((x1 - xx) * am - al * y1);
-            func = func + pow(float(((x1 - xx) * an - al * z1)), 2.0) * cu.m_a33;
-            func = func - ((x1 - xx) * an - al * z1) * (2 * cu.m_a34 + cu.m_b13 * pow(float(xx), 2.0) * al + cu.m_a44 * pow(float(al), 2.0));
+            func = func + pow(((x1 - xx) * an - al * z1), 2.0) * cu.m_a33;
+            func = func - ((x1 - xx) * an - al * z1) * (2 * cu.m_a34 + cu.m_b13 * pow(xx, 2.0) * al + cu.m_a44 * pow(al, 2.0));
             func = (func -
                     (2 * ((x1 - xx) * an - al * z1) * cu.m_a13 - (cu.m_a11 * xx + 2 * cu.m_a14) * al + 2 * ((x1 - xx) * am - al * y1) * cu.m_a12) *
                         al * xx) *
                    al;
-            func = (func - (pow(float(((x1 - xx) * am - al * y1)), 2.0) * cu.m_b23 +
+            func = (func - (pow(((x1 - xx) * am - al * y1), 2.0) * cu.m_b23 +
                             ((x1 - xx) * am - al * y1) * ((x1 - xx) * an - al * z1) * cu.m_b32 - ((x1 - xx) * an - al * z1) * al * cu.m_b31 * xx) *
-                               ((x1 - xx) * an - al * z1) / pow(float(al), 3));
+                               ((x1 - xx) * an - al * z1) / pow(al, 3));
 
-            double dfunc = (2 * ((x1 - xx) * an - al * z1) * cu.m_a23 - (2 * cu.m_a24 + cu.m_b12 * pow(float(xx), 2)) * al +
+            double dfunc = (2 * ((x1 - xx) * an - al * z1) * cu.m_a23 - (2 * cu.m_a24 + cu.m_b12 * pow(xx, 2)) * al +
                             ((x1 - xx) * am - al * y1) * (cu.m_a22 + cu.m_b21 * xx)) *
                            am;
             dfunc = dfunc - (2 * (cu.m_a12 * am + cu.m_a13 * an) + cu.m_a11 * al) * al * xx;
@@ -207,15 +207,15 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
                 dfunc * al + ((cu.m_a22 + cu.m_b21 * xx) * am + 2 * (cu.m_a23 * an + al * cu.m_b12 * xx) - ((x1 - xx) * am - al * y1) * cu.m_b21) *
                                  ((x1 - xx) * am - al * y1);
             dfunc = (dfunc + 2 * ((x1 - xx) * an - al * z1) * (cu.m_a33 * an + al * cu.m_b13 * xx) -
-                     (2 * cu.m_a34 + cu.m_b13 * pow(float(xx), 2)) * al * an) *
+                     (2 * cu.m_a34 + cu.m_b13 * pow(xx, 2)) * al * an) *
                     al;
             dfunc = (dfunc - ((((x1 - xx) * an - al * z1) * (al * cu.m_b31 + am * cu.m_b32) - al * an * cu.m_b31 * xx +
                                ((x1 - xx) * am - al * y1) * (2 * am * cu.m_b23 + an * cu.m_b32)) *
                                   ((x1 - xx) * an - al * z1) +
-                              (pow(float(((x1 - xx) * am - al * y1)), 2) * cu.m_b23 +
+                              (pow(((x1 - xx) * am - al * y1), 2) * cu.m_b23 +
                                ((x1 - xx) * am - al * y1) * ((x1 - xx) * an - al * z1) * cu.m_b32 - ((x1 - xx) * an - al * z1) * al * cu.m_b31 * xx) *
                                   an));
-            dfunc = dfunc / pow(float(al), 3);
+            dfunc = dfunc / pow(al, 3);
 
             if (glm::abs(dfunc) < 0.001) { dfunc = 0.001; }
 
@@ -246,33 +246,33 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
                            ((y1 - yy) * al - am * x1) * (cu.m_a11 + cu.m_b12 * yy)) *
                           ((y1 - yy) * al - am * x1);
             func = func + (((y1 - yy) * an - am * z1) * cu.m_a33 - 2 * (cu.m_a23 * yy + cu.m_a34) * am) * ((y1 - yy) * an - am * z1) +
-                   (2 * cu.m_a24 * yy + cu.m_a44 + cu.m_a22 * pow(float(yy), 2) * pow(float(am), 2));
+                   (2 * cu.m_a24 * yy + cu.m_a44 + cu.m_a22 * pow(yy, 2) * pow(am, 2));
             func = func * am +
-                   ((((y1 - yy) * an - am * z1) * cu.m_b32 - am * cu.m_b23 * yy) * am * yy - pow(float((y1 - yy) * al - am * x1), 2) * cu.m_b13) *
+                   ((((y1 - yy) * an - am * z1) * cu.m_b32 - am * cu.m_b23 * yy) * am * yy - pow((y1 - yy) * al - am * x1, 2) * cu.m_b13) *
                        ((y1 - yy) * an - am * z1);
-            func = func - (pow(float(((y1 - yy) * an - am * z1)), 2) * cu.m_b31 + pow(float(am), 2) * cu.m_b21 * pow(float(yy), 2)) *
+            func = func - (pow(((y1 - yy) * an - am * z1), 2) * cu.m_b31 + pow(am, 2) * cu.m_b21 * pow(yy, 2)) *
                               ((y1 - yy) * al - am * x1);
-            func = func / pow(float(am), 3);
+            func = func / pow(am, 3);
 
-            double dfunc = (pow(float((y1 - yy) * an - am * z1), 2) * cu.m_b31 + pow(float(am), 2) * cu.m_b21 * pow(float(yy), 2) * al +
-                            2 * (((y1 - yy) * an - am * z1) * an * cu.m_b31 - pow(float(am), 2)) * cu.m_b21 * yy) *
+            double dfunc = (pow((y1 - yy) * an - am * z1, 2) * cu.m_b31 + pow(am, 2) * cu.m_b21 * pow(yy, 2) * al +
+                            2 * (((y1 - yy) * an - am * z1) * an * cu.m_b31 - pow(am, 2)) * cu.m_b21 * yy) *
                            ((y1 - yy) * al - am * x1);
             dfunc =
                 dfunc -
-                ((((y1 - yy) * an - am * z1) * cu.m_b32 - am * cu.m_b23 * yy) * am * yy - pow(float((y1 - yy) * al - am * x1), 2) * cu.m_b13) * an;
+                ((((y1 - yy) * an - am * z1) * cu.m_b32 - am * cu.m_b23 * yy) * am * yy - pow((y1 - yy) * al - am * x1, 2) * cu.m_b13) * an;
             dfunc = dfunc + (2 * ((y1 - yy) * al - am * x1) * al * cu.m_b13 - (am * cu.m_b23 + an * cu.m_b32) * am * yy +
                              (((y1 - yy) * an - am * z1) * cu.m_b32 - am * cu.m_b23 * yy) * am) *
                                 ((y1 - yy) * an - am * z1);
             dfunc = dfunc - (((cu.m_a11 + cu.m_b12 * yy) * al + 2 * (cu.m_a12 * am + cu.m_a13 * an) - ((y1 - yy) * al - am * x1) * cu.m_b12) *
                                  ((y1 - yy) * al - am * x1) -
-                             2 * (cu.m_a22 * pow(float(am), 2) * yy + cu.m_a23 * pow(float(am), 2) * z1 - cu.m_a23 * am * an * y1 +
-                                  2 * cu.m_a23 * am * an * yy + cu.m_a24 * pow(float(am), 2) + cu.m_a33 * am * an * z1 -
-                                  cu.m_a33 * pow(float(an), 2) * y1 + cu.m_a33 * pow(float(an), 2) * yy + cu.m_a34 * am * an) +
+                             2 * (cu.m_a22 * pow(am, 2) * yy + cu.m_a23 * pow(am, 2) * z1 - cu.m_a23 * am * an * y1 +
+                                  2 * cu.m_a23 * am * an * yy + cu.m_a24 * pow(am, 2) + cu.m_a33 * am * an * z1 -
+                                  cu.m_a33 * pow(an, 2) * y1 + cu.m_a33 * pow(an, 2) * yy + cu.m_a34 * am * an) +
                              (2 * (((y1 - yy) * an - am * z1) * cu.m_a13 - (cu.m_a12 * yy + cu.m_a14) * am) +
                               ((y1 - yy) * al - am * x1) * (cu.m_a11 + cu.m_b12 * yy)) *
                                  al) *
                                 am;
-            dfunc = dfunc / pow(float(am), 3);
+            dfunc = dfunc / pow(am, 3);
 
             if (glm::abs(dfunc) < 0.001) { dfunc = 0.001; }
 
@@ -302,29 +302,29 @@ OptCollisionPoint getCubicCollision(const glm::dvec3& __restrict rayPosition, co
             double func = ((2 * (((z1 - zz) * am - an * y1) * cu.m_a12 - (cu.m_a13 * zz + cu.m_a14) * an) + ((z1 - zz) * al - an * x1) * cu.m_a11) *
                                ((z1 - zz) * al - an * x1) +
                            (((z1 - zz) * am - an * y1) * cu.m_a22 - 2 * (cu.m_a23 * zz + cu.m_a24) * an) * ((z1 - zz) * am - an * y1) +
-                           (2 * cu.m_a34 * zz + cu.m_a44 + cu.m_a33 * pow(float(zz), 2)) * pow(float(an), 2)) *
+                           (2 * cu.m_a34 * zz + cu.m_a44 + cu.m_a33 * pow(zz, 2)) * pow(an, 2)) *
                           an;
-            func = func - ((((z1 - zz) * am - an * y1) * cu.m_b12 - an * cu.m_b13 * zz) * pow(float(((z1 - zz) * al - an * x1)), 2) -
+            func = func - ((((z1 - zz) * am - an * y1) * cu.m_b12 - an * cu.m_b13 * zz) * pow(((z1 - zz) * al - an * x1), 2) -
                            (((z1 - zz) * am - an * y1) * cu.m_b23 - an * cu.m_b32 * zz) * ((z1 - zz) * am - an * y1) * an * zz +
-                           (pow(float(((z1 - zz) * am - an * y1)), 2) * cu.m_b21 + pow(float(an), 2) * cu.m_b31 * pow(float(zz), 2)) *
+                           (pow(((z1 - zz) * am - an * y1), 2) * cu.m_b21 + pow(an, 2) * cu.m_b31 * pow(zz, 2)) *
                                ((z1 - zz) * al - an * x1));
-            func = func / pow(float(an), 3);
+            func = func / pow(an, 3);
 
             double dfunc = (((z1 - zz) * am - an * y1) * cu.m_a22 - 2 * (cu.m_a23 * zz + cu.m_a24) * an) * am +
                            (2 * (cu.m_a12 * am + cu.m_a13 * an) + cu.m_a11 * al) * ((z1 - zz) * al - an * x1);
-            dfunc = dfunc + ((z1 - zz) * am - an * y1) * (cu.m_a22 * am + 2 * cu.m_a23 * an) - 2 * (cu.m_a33 * zz + cu.m_a34) * pow(float(an), 2);
+            dfunc = dfunc + ((z1 - zz) * am - an * y1) * (cu.m_a22 * am + 2 * cu.m_a23 * an) - 2 * (cu.m_a33 * zz + cu.m_a34) * pow(an, 2);
             dfunc = (dfunc +
                      (2 * (((z1 - zz) * am - an * y1) * cu.m_a12 - (cu.m_a13 * zz + cu.m_a14) * an) + ((z1 - zz) * al - an * x1) * cu.m_a11) * al) *
                     an;
             dfunc = dfunc - (2 *
-                                 (((z1 - zz) * am - an * y1) * am * cu.m_b21 - pow(float(an), 2) * cu.m_b31 * zz +
+                                 (((z1 - zz) * am - an * y1) * am * cu.m_b21 - pow(an, 2) * cu.m_b31 * zz +
                                   (((z1 - zz) * am - an * y1) * cu.m_b12 - an * cu.m_b13 * zz) * al) *
                                  ((z1 - zz) * al - an * x1) +
-                             (pow(float(((z1 - zz) * am - an * y1)), 2) * cu.m_b21 + pow(float(an), 2) * cu.m_b31 * pow(float(zz), 2)) * al +
-                             pow(float(((z1 - zz) * al - an * x1)), 2) * (am * cu.m_b12 + an * cu.m_b13) -
+                             (pow(((z1 - zz) * am - an * y1), 2) * cu.m_b21 + pow(an, 2) * cu.m_b31 * pow(zz, 2)) * al +
+                             pow(((z1 - zz) * al - an * x1), 2) * (am * cu.m_b12 + an * cu.m_b13) -
                              ((z1 - zz) * am - an * y1) * (am * cu.m_b23 + an * cu.m_b32) * an * zz +
                              (((z1 - zz) * am - an * y1) * cu.m_b23 - an * cu.m_b32 * zz) * (am * z1 - 2 * am * zz - an * y1) * an);
-            dfunc = (-dfunc) / pow(float(an), 3);
+            dfunc = (-dfunc) / pow(an, 3);
 
             if (glm::abs(dfunc) < 0.001) { dfunc = 0.001; }
 
@@ -426,7 +426,11 @@ OptCollisionPoint getToroidCollision(const glm::dvec3& __restrict rayPosition, c
     // Note that multiplying the rays direction with -1 SHOULD totally have an effect on the collision detection - in most cases this 180° rotation
     // will make the ray point away from the toroid, and hence preventing a Collision completely. The above code however, is unaffected when
     // multiplying the ray direction with -1. Due to it having no effect on `glm::dvec3 normalized_dir = glm::dvec3(rayDirection) / rayDirection.z;`
-    if (dot(rayToHitpoint, rayDirection) <= 0.0) return std::nullopt;
+    //
+    // Use NEW_TOLERANCE as minimum forward distance: a sign-only check (> 0) accepts solutions that fall within the Newton residual on
+    // the wrong side of the ray origin, producing phantom self-intersections. Requiring t > NEW_TOLERANCE rejects exactly those cases.
+    const double t = dot(rayToHitpoint, rayDirection) / dot(rayDirection, rayDirection);
+    if (t <= NEW_TOLERANCE) return std::nullopt;
 
     return col;
 }

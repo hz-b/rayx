@@ -193,8 +193,14 @@ inline std::vector<double> formatAsVec(T) {
 }
 
 inline std::vector<double> formatAsVec(int arg) { return {static_cast<double>(arg)}; }
+inline std::vector<double> formatAsVec(long arg) { return {static_cast<double>(arg)}; }
 inline std::vector<double> formatAsVec(RandCounter arg) { return {static_cast<double>(arg)}; }
 inline std::vector<double> formatAsVec(EventType arg) { return {static_cast<double>(arg)}; }
+// Catch remaining integral types (e.g. size_t) not already covered above.
+// size_t == unsigned long on Linux (same as RandCounter) but differs on macOS arm64.
+template <typename T>
+    requires(std::is_integral_v<T> && !std::is_same_v<T, int> && !std::is_same_v<T, RandCounter>)
+inline std::vector<double> formatAsVec(T arg) { return {static_cast<double>(arg)}; }
 inline std::vector<double> formatAsVec(double arg) { return {arg}; }
 inline std::vector<double> formatAsVec(complex::Complex arg) { return {arg.real(), arg.imag()}; }
 
