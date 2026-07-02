@@ -184,7 +184,22 @@ void DesignSource::setEnergySpread(double value) { m_elementParameters["energySp
 double DesignSource::getEnergySpread() const { return m_elementParameters["energySpread"].as_double(); }
 
 void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { m_elementParameters["energySpreadUnit"] = value; }
-EnergySpreadUnit DesignSource::getEnergySpreadUnit() const { return m_elementParameters["energySpreadUnit"].as_energySpreadUnit(); }
+EnergySpreadUnit DesignSource::getEnergySpreadUnit() const {
+    if (!m_elementParameters.hasKey("energySpreadUnit")) {
+        return EnergySpreadUnit::EU_eV;
+    }
+
+    return m_elementParameters["energySpreadUnit"].as_energySpreadUnit();
+}
+
+double DesignSource::getEnergySpreadInEv() const {
+    const double energySpread = getEnergySpread();
+    if (getEnergySpreadUnit() == EnergySpreadUnit::EU_PERCENT) {
+        return getEnergy() * energySpread / 100.0;
+    }
+
+    return energySpread;
+}
 
 void DesignSource::setEnergyDistributionType(EnergyDistributionType value) { m_elementParameters["energyDistributionType"] = value; }
 EnergyDistributionType DesignSource::getEnergyDistributionType() const {
@@ -217,7 +232,7 @@ EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
         en              = EnergyDistributionVariant(df);
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         double photonEnergy = m_elementParameters["energy"].as_double();
-        double energySpread = m_elementParameters["energySpread"].as_double();
+        double energySpread = getEnergySpreadInEv();
 
         if (spreadType == SpreadType::SoftEdge) {
             if (energySpread == 0) { energySpread = 1; }

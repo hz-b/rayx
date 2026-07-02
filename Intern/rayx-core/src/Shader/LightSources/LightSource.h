@@ -15,7 +15,7 @@ namespace rayx {
 
 enum class SourceDist { Uniform, Gaussian, Thirds, Circle };  // SourceDist::Thirds represents PixelSource Footprint
 enum class ElectronEnergyOrientation { Clockwise, Counterclockwise };
-enum class EnergySpreadUnit { EU_PERCENT, EU_eV };
+enum class EnergySpreadUnit { EU_eV, EU_PERCENT };
 enum class SigmaType { ST_STANDARD, ST_ACCURATE };
 enum class SourcePulseType { None };
 

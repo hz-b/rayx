@@ -8,6 +8,11 @@ void checkEnergyDistribution(const Rays& rays, double photonEnergy, double energ
     for (const auto energy : rays.energy) { CHECK_IN(energy, photonEnergy - energySpread, photonEnergy + energySpread); }
 }
 
+void checkEnergyDistributionWindow(const Rays& rays, double minEnergy, double maxEnergy) {
+    CHECK(rays.energy.size() > 0);
+    for (const auto energy : rays.energy) { CHECK_IN(energy, minEnergy, maxEnergy); }
+}
+
 void checkZDistribution(const Rays& rays, double center, double spread) {
     CHECK(rays.position_z.size() > 0);
     for (const auto position_z : rays.position_z) { CHECK_IN(position_z, center - spread, center + spread); }
@@ -51,6 +56,10 @@ TEST_F(TestSuite, MatrixSourceTracedRayUI) {
 
 TEST_F(TestSuite, PointSourceHardEdge) { checkEnergyDistribution(traceRml("PointSourceHardEdge", RayAttrMask::Energy), 120.97, 12.1); }
 
+TEST_F(TestSuite, PointSourceHardEdgePercentUnit) {
+    checkEnergyDistributionWindow(traceRml("PointSourceHardEdgePercent", RayAttrMask::Energy), 95.0, 105.0);
+}
+
 TEST_F(TestSuite, PointSourceSoftEdge) { checkEnergyDistribution(traceRml("PointSourceSoftEdge", RayAttrMask::Energy), 151, 6); }
 
 TEST_F(TestSuite, MatrixSourceEnergyDistribution) { checkEnergyDistribution(traceRml("PointSourceSoftEdge", RayAttrMask::Energy), 151, 6); }
@@ -60,6 +69,10 @@ TEST_F(TestSuite, DipoleSourcePosition) {
 }
 
 TEST_F(TestSuite, DipoleEnergyDistribution) { checkEnergyDistribution(traceRml("dipole_energySpread", RayAttrMask::Energy), 1000, 23000); }
+
+TEST_F(TestSuite, DipoleEnergyDistributionPercentUnit) {
+    checkEnergyDistributionWindow(traceRml("dipole_energySpread_percent", RayAttrMask::Energy), 950.0, 1050.0);
+}
 
 TEST_F(TestSuite, PixelPositionTest) {
     const auto [beamline, rays] =

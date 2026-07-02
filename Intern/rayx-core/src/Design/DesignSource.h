@@ -83,6 +83,7 @@ class RAYX_API DesignSource : public BeamlineNode {
 
     void setEnergySpreadUnit(EnergySpreadUnit value);
     EnergySpreadUnit getEnergySpreadUnit() const;
+    double getEnergySpreadInEv() const;
 
     void setElectronEnergy(double value);
     double getElectronEnergy() const;
