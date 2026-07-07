@@ -8,7 +8,8 @@
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(__APPLE__)
-#include <cassert>
+#include <climits>
+#include <mach-o/dyld.h>
 #else
 #include <limits.h>
 #include <unistd.h>
@@ -63,8 +64,13 @@ std::filesystem::path ResourceHandler::getExecutablePath() {
         buffer.resize(buffer.size() * 2);
     }
 
-#else
-    static_assert(false, "macOS support is not implemented yet");
+#elif defined(__APPLE__)
+    std::vector<char> buffer(PATH_MAX);
+    uint32_t size = buffer.size();
+    if (_NSGetExecutablePath(buffer.data(), &size) != 0) {
+        buffer.resize(size);
+        _NSGetExecutablePath(buffer.data(), &size);
+    }
 #endif
     return std::filesystem::path(buffer.data());
 }
@@ -112,7 +118,11 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
     if (fileExists(path)) return found(path);
 
 #elif defined(__APPLE__)
-    static_assert(false, "macOS support is not implemented yet");
+    // Look next to the executable
+    std::filesystem::path execDir = getExecutablePath().parent_path();
+    std::filesystem::path path    = execDir / relativePath;
+    RAYX_VERB << "\tlooking at " << path;
+    if (fileExists(path)) return found(path);
 
 #endif
     // Not found -> empty path

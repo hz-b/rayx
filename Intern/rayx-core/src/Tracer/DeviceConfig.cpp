@@ -1,6 +1,7 @@
 #include "DeviceConfig.h"
 
 #include <algorithm>
+#include <iterator>
 #include <alpaka/alpaka.hpp>
 #include <ranges>
 #include <sstream>
