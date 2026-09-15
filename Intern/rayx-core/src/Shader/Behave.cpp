@@ -212,6 +212,12 @@ void behaveMirror(detail::Ray& __restrict ray, const CollisionPoint& __restrict 
 RAYX_FN_ACC
 void behaveFoil(detail::Ray& __restrict ray, const Behaviour::Foil& __restrict foil, const CollisionPoint& __restrict col, const int material,
                 const int* __restrict materialIndices, const double* __restrict materialTable) {
+    constexpr int ideal_material = -2;  // Material::REFLECTIVE
+    if (material == ideal_material) {
+        ray.order = 0;
+        return;
+    }
+
     const auto indexVacuum   = complex::Complex(1., 0.);
     const auto indexMaterial = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
 

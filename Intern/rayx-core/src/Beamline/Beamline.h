@@ -138,6 +138,10 @@ class RAYX_API Group : public BeamlineNode {
      */
     std::vector<OpticalElementAndTransform> compileElements() const;
 
+    /// Replaces elements whose materials lack table data over the source energy range with
+    /// ideal geometric behaviour. Only the passed compiled copy is modified.
+    void verifyMaterialCoverage(std::vector<OpticalElementAndTransform>& compiledElements, const MaterialTables& tables) const;
+
     // TODO: why would we need this? ray-ui uses this function
     /**
      * @brief Gathers the world positions of all light sources within a Group hierarchy.

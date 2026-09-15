@@ -90,6 +90,34 @@ TEST_F(TestSuite, idealReflectorIgnoresLeftoverCoating) {
     EXPECT_GT(rays.size(), 0) << "trace should produce rays";
 }
 
+TEST_F(TestSuite, verifyPatchesUncoveredMaterial) {
+    // When an element's material data does not cover the source energy range, the
+    // compiled copy is patched to ideal geometric behaviour. Here a real Carbon
+    // mirror is traced at 60 keV, past the end of every carbon table (Palik
+    // 4.8-30 eV, NFF 29.3-30 keV, Cromer 5-50 keV), so it must be patched to
+    // REFLECTIVE + SubstrateOnly.
+    auto beamline = loadBeamline("MirrorUncoveredMaterial");
+
+    auto elements = beamline.compileElements();
+    ASSERT_EQ(elements.size(), 1u);
+    CHECK_EQ(elements[0].element.m_material, static_cast<int>(Material::C));
+
+    // run the coverage check on the compiled copy
+    beamline.verifyMaterialCoverage(elements, beamline.calcMinimalMaterialTables());
+
+    // original model must be unchanged
+    auto elementsOriginal = beamline.compileElements();
+    CHECK_EQ(elementsOriginal[0].element.m_material, static_cast<int>(Material::C));
+
+    // compiled tracing copy must now be ideal
+    CHECK_EQ(elements[0].element.m_material, static_cast<int>(Material::REFLECTIVE));
+    CHECK(elements[0].element.m_coating.is<Coating::SubstrateOnly>());
+
+    // and the trace must complete without a material-lookup assertion
+    const auto rays = traceRml("MirrorUncoveredMaterial", RayAttrMask::Position);
+    EXPECT_GT(rays.size(), 0);
+}
+
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
@@ -274,4 +302,19 @@ TEST_F(TestSuite, elementTypeStringMappings) {
         EXPECT_EQ(backward->second, e);
     }
     EXPECT_EQ(ElementTypeToString.size(), static_cast<size_t>(ElementType::Count));
+}
+
+TEST_F(TestSuite, coverageIgnoresElementsWithoutMaterialLookups) {
+    // A white band at 100 eV with spread 200 covers [0, 200] eV, and no table has data
+    // at 0 eV. The only element is an ImagePlane, whose behaviour never looks up a
+    // refractive index, so it must keep its material rather than be patched.
+    auto beamline = loadBeamline("MatrixSource_distr_seeded");
+
+    auto elements = beamline.compileElements();
+    ASSERT_EQ(elements.size(), 1u);
+    const auto materialBefore = elements[0].element.m_material;
+
+    beamline.verifyMaterialCoverage(elements, beamline.calcMinimalMaterialTables());
+
+    CHECK_EQ(elements[0].element.m_material, materialBefore);
 }

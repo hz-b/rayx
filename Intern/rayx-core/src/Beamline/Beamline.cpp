@@ -1,12 +1,17 @@
 #include "Beamline.h"
 
+#include <algorithm>
+#include <limits>
+#include <optional>
 #include <sstream>
 #include <stack>
 #include <stdexcept>
+#include <type_traits>
 
 #include "Debug/Instrumentor.h"
 #include "Design/DesignElement.h"
 #include "Design/DesignSource.h"
+#include "Shader/RefractiveIndex.h"
 
 namespace rayx {
 
@@ -319,6 +324,127 @@ std::vector<OpticalElementAndTransform> Group::compileElements() const {
     // Start recursion at this group
     recurse(recurse, *this, glm::dvec4(0, 0, 0, 1), glm::dmat4(1.0));
     return elements;
+}
+
+namespace {
+
+/// returns the [min, max] energy covered by one energy distribution, if bounded.
+std::optional<std::pair<double, double>> energyRangeOf(const EnergyDistributionVariant& en) {
+    return std::visit(
+        [](const auto& value) -> std::optional<std::pair<double, double>> {
+            using T = std::decay_t<decltype(value)>;
+            if constexpr (std::is_same_v<T, DatFile>) {
+                if (value.m_Lines.empty()) return std::nullopt;
+                double lo = std::numeric_limits<double>::max();
+                double hi = std::numeric_limits<double>::lowest();
+                for (const auto& e : value.m_Lines) {
+                    lo = std::min(lo, e.m_energy);
+                    hi = std::max(hi, e.m_energy);
+                }
+                return std::make_pair(lo, hi);
+            } else if constexpr (std::is_same_v<T, HardEdge>) {
+                return std::make_pair(value.m_centerEnergy - value.m_energySpread / 2.0, value.m_centerEnergy + value.m_energySpread / 2.0);
+            } else if constexpr (std::is_same_v<T, SeparateEnergies>) {
+                return std::make_pair(value.m_centerEnergy - value.m_energySpread / 2.0, value.m_centerEnergy + value.m_energySpread / 2.0);
+            } else if constexpr (std::is_same_v<T, SoftEdge>) {
+                // a Gaussian is technically unbounded; use the central +/- 5 sigma window
+                const double sigma = value.m_sigma > 0 ? value.m_sigma : 1.0;
+                return std::make_pair(value.m_centerEnergy - 5.0 * sigma, value.m_centerEnergy + 5.0 * sigma);
+            }
+            return std::nullopt;
+        },
+        en);
+}
+
+/// whether the material tables of `material` cover the whole [lo, hi] energy range.
+bool materialCoversRange(int material, const MaterialTables& tables, double lo, double hi) {
+    if (material < 1 || material > 140) return true;  // vacuum/ideal reflectors need no data
+    const int* idx    = tables.indices.data();
+    const double* tab = tables.materials.data();
+
+    if (material <= 92) {
+        if (getPalikEntryCount(material, idx) > 0) {
+            auto first = getPalikEntry(0, material, idx, tab);
+            auto last  = getPalikEntry(getPalikEntryCount(material, idx) - 1, material, idx, tab);
+            if (first.m_energy <= lo && hi <= last.m_energy) return true;
+        }
+        if (getNffEntryCount(material, idx) > 0) {
+            auto first = getNffEntry(0, material, idx, tab);
+            auto last  = getNffEntry(getNffEntryCount(material, idx) - 1, material, idx, tab);
+            if (first.m_energy <= lo && hi <= last.m_energy) return true;
+        }
+        if (getCromerEntryCount(material, idx) > 0) {
+            auto first = getCromerEntry(0, material, idx, tab);
+            auto last  = getCromerEntry(getCromerEntryCount(material, idx) - 1, material, idx, tab);
+            if (first.m_energy <= lo && hi <= last.m_energy) return true;
+        }
+    } else {
+        if (getMolecEntryCount(material, idx) > 0) {
+            auto first = getMolecEntry(0, material, idx, tab);
+            auto last  = getMolecEntry(getMolecEntryCount(material, idx) - 1, material, idx, tab);
+            if (first.m_energy <= lo && hi <= last.m_energy) return true;
+        }
+    }
+    return false;
+}
+
+/// all materials that the given compiled element may perform lookups with.
+std::vector<int> materialsOf(const OpticalElement& element) {
+    std::vector<int> mats;
+
+    // only behaveMirror and behaveFoil call getRefractiveIndex; every other behaviour
+    // ignores the material entirely
+    if (!element.m_behaviour.is<Behaviour::Mirror>() && !element.m_behaviour.is<Behaviour::Foil>()) return mats;
+
+    if (element.m_material >= 1 && element.m_material <= 140) mats.push_back(element.m_material);
+
+    element.m_coating.visit([&](const auto& coating) {
+        using T = std::decay_t<decltype(coating)>;
+        if constexpr (std::is_same_v<T, Coating::OneCoating>) {
+            if (coating.material >= 1 && coating.material <= 140) mats.push_back(coating.material);
+        } else if constexpr (std::is_same_v<T, Coating::MultilayerCoating>) {
+            for (int i = 0; i < coating.numLayers; ++i) {
+                if (coating.material[i] >= 1 && coating.material[i] <= 140) mats.push_back(coating.material[i]);
+            }
+        }
+    });
+    return mats;
+}
+
+}  // unnamed namespace
+
+void Group::verifyMaterialCoverage(std::vector<OpticalElementAndTransform>& compiledElements, const MaterialTables& tables) const {
+    double energyLo = std::numeric_limits<double>::max();
+    double energyHi = std::numeric_limits<double>::lowest();
+    for (const auto* source : getSources()) {
+        // GenRays skips these too
+        if (source->getType() == ElementType::RayListSource) continue;
+        auto range = energyRangeOf(source->getEnergyDistribution());
+        if (!range) continue;
+        energyLo = std::min(energyLo, range->first);
+        energyHi = std::max(energyHi, range->second);
+    }
+    if (energyLo > energyHi) return;
+
+    for (size_t i = 0; i < compiledElements.size(); i++) {
+        auto& element = compiledElements[i].element;
+        bool covered  = true;
+        for (const auto material : materialsOf(element)) {
+            if (!materialCoversRange(material, tables, energyLo, energyHi)) {
+                covered = false;
+                break;
+            }
+        }
+        if (covered) continue;
+
+        bool isFoil = element.m_behaviour.is<Behaviour::Foil>();
+        RAYX_WARN << "material data for element " << i << " (" << (isFoil ? "foil" : "element") << ") does not cover the source energy range ["
+                  << energyLo << ", " << energyHi << "] eV; compiling it with ideal geometric behaviour "
+                  << (isFoil ? "(100% transmission)" : "(100% reflection)") << " instead";
+
+        element.m_material = static_cast<int>(Material::REFLECTIVE);
+        element.m_coating  = Coating::SubstrateOnly{};
+    }
 }
 
 std::vector<const DesignElement*> Group::getElements() const {
