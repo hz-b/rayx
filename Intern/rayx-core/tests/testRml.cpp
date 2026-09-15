@@ -77,6 +77,24 @@ TEST_F(TestSuite, testEnergyDistributionHardEdge) {
     }
 }
 
+TEST_F(TestSuite, idealReflectorIgnoresLeftoverCoating) {
+    // `reflectivityType=0` (ideal 100%) must be authoritative. The
+    // RML file contains leftover multilayer coating parameters (surfaceCoating=2,
+    // materialCoating1=Ta, ...) that are disabled by RAY-UI (`enabled="F"`), but
+    // RAYX must ignore the `enabled` flag and honor reflectivityType instead.
+    // The element must compile as an ideal reflector (REFLECTIVE) with
+    // SubstrateOnly coating, so the tracer never does a refractive-index lookup.
+    auto beamline = loadBeamline("IdealReflectorLeftoverCoating");
+
+    const auto mirror = beamline.compileElements()[0].element;
+    CHECK_EQ(mirror.m_material, static_cast<int>(Material::REFLECTIVE));
+    CHECK(mirror.m_coating.is<Coating::SubstrateOnly>());
+
+    // the trace must complete without touching the (disabled) multilayer coating
+    const auto rays = traceRml("IdealReflectorLeftoverCoating", RayAttrMask::Position);
+    EXPECT_GT(rays.size(), 0) << "trace should produce rays";
+}
+
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 

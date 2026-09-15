@@ -147,17 +147,21 @@ void behaveMirror(detail::Ray& __restrict ray, const CollisionPoint& __restrict 
     const auto reflect_vec  = glm::reflect(incident_vec, col.normal);
     ray.direction           = reflect_vec;
 
+    constexpr int ideal_material = -2;  // Material::REFLECTIVE
+    if (material == ideal_material) {
+        ray.order = 0;
+        return;
+    }
+
     if (coating.is<Coating::SubstrateOnly>()) {
-        if (material != -2) {
-            constexpr int vacuum_material = -1;
-            const auto vacuum_ior         = getRefractiveIndex(ray.energy, vacuum_material, materialIndices, materialTable);
-            const auto substrate_ior      = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
+        constexpr int vacuum_material = -1;
+        const auto vacuum_ior         = getRefractiveIndex(ray.energy, vacuum_material, materialIndices, materialTable);
+        const auto substrate_ior      = getRefractiveIndex(ray.energy, material, materialIndices, materialTable);
 
-            const auto reflect_field = interceptReflect(ray.electric_field, incident_vec, reflect_vec, col.normal, vacuum_ior, substrate_ior);
+        const auto reflect_field = interceptReflect(ray.electric_field, incident_vec, reflect_vec, col.normal, vacuum_ior, substrate_ior);
 
-            ray.electric_field = reflect_field;
-            ray.order          = 0;
-        }
+        ray.electric_field = reflect_field;
+        ray.order          = 0;
     } else if (coating.is<Coating::OneCoating>()) {
         Coating::OneCoating oneCoating = coating.get<Coating::OneCoating>();
 
