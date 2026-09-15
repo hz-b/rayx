@@ -318,3 +318,16 @@ TEST_F(TestSuite, coverageIgnoresElementsWithoutMaterialLookups) {
 
     CHECK_EQ(elements[0].element.m_material, materialBefore);
 }
+
+TEST_F(TestSuite, behaviourTypeStringMappings) {
+    for (int i = 0; i < static_cast<int>(BehaviourType::Count); ++i) {
+        const auto b       = static_cast<BehaviourType>(i);
+        const auto forward = BehaviourTypeToString.find(b);
+        ASSERT_NE(forward, BehaviourTypeToString.end());
+        const auto backward = StringToBehaviourType.find(forward->second);
+        ASSERT_NE(backward, StringToBehaviourType.end());
+        EXPECT_EQ(backward->second, b);
+    }
+    EXPECT_EQ(BehaviourTypeToString.size(), static_cast<size_t>(BehaviourType::Count));
+    EXPECT_EQ(StringToBehaviourType.size(), static_cast<size_t>(BehaviourType::Count));
+}
