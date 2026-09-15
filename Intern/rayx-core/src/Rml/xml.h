@@ -10,6 +10,7 @@
 #include "Angle.h"
 #include "Beamline/Definitions.h"
 #include "Beamline/EnergyDistribution.h"
+#include "Debug/Debug.h"
 #include "Element/Coating.h"
 #include "Element/Cutout.h"
 #include "Element/Surface.h"
@@ -171,11 +172,32 @@ struct RAYX_API Parser {
     inline double parsePhotonFlux() const { return parseDouble("photonFlux"); }
     inline double parsePhotonEnergy() const { return parseDouble("photonEnergy"); }
     inline double parseEnergySpread() const { return parseDouble("energySpread"); }
-    inline SpreadType parseEnergySpreadType() const { return static_cast<SpreadType>(parseInt("energySpreadType")); }
+
+    /// Decodes RAY-UI's `energySpreadType`: 0 = white band, 1 = exactly three
+    /// energies. Any other value is unsupported. RAYX's own richer distributions
+    /// are reachable through the programmatic API only.
+    inline SpreadType decodeRayUiEnergySpreadType(int* numberOfEnergies = nullptr) const {
+        int rayUiSpreadType = 0;
+        if (!paramInt(node, "energySpreadType", &rayUiSpreadType)) {
+            // no energySpreadType given: RAY-UI's default is the white band.
+            rayUiSpreadType = 0;
+        }
+
+        switch (rayUiSpreadType) {
+            case 0:  // RAY-UI "white band"
+                return SpreadType::HardEdge;
+            case 1:  // RAY-UI "three energies"
+                if (numberOfEnergies) { *numberOfEnergies = 3; }
+                return SpreadType::SeparateEnergies;
+            default:
+                RAYX_EXIT << "unsupported RAY-UI energySpreadType value " << rayUiSpreadType << " (supported: 0 = white band, 1 = three energies)";
+                return SpreadType::HardEdge;
+        }
+    }
+
     inline EnergyDistributionType parseEnergyDistributionType() const {
         return static_cast<EnergyDistributionType>(parseInt("energyDistributionType"));
     }
-    inline int parseNumberOfSeparateEnergies() const { return parseInt("SeparateEnergies"); }
     inline int parseNumOfEquidistantCircles() const { return static_cast<int>(parseDouble("numberCircles")); }
     inline Rad parseMaxOpeningAngle() const { return parseDouble("maximumOpeningAngle") / 1000.0; }
     inline Rad parseMinOpeningAngle() const { return parseDouble("minimumOpeningAngle") / 1000.0; }

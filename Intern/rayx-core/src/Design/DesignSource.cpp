@@ -215,7 +215,6 @@ double DesignSource::getPhotonFlux() const { return m_elementParameters["photonF
 
 EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
     EnergyDistributionVariant en;
-    SpreadType spreadType                         = m_elementParameters["energyDistribution"].as_energySpreadType();
     EnergyDistributionType energyDistributionType = m_elementParameters["energyDistributionType"].as_energyDistributionType();
 
     if (energyDistributionType == EnergyDistributionType::File) {
@@ -224,11 +223,12 @@ EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
         DatFile df;
         DatFile::load(filename, &df);
 
-        df.m_continuous = (spreadType == SpreadType::SoftEdge ? true : false);
+        df.m_continuous = false;
         en              = EnergyDistributionVariant(df);
     } else if (energyDistributionType == EnergyDistributionType::Values) {
-        double photonEnergy = m_elementParameters["energy"].as_double();
-        double energySpread = getEnergySpreadInEv();
+        SpreadType spreadType = m_elementParameters["energyDistribution"].as_energySpreadType();
+        double photonEnergy   = m_elementParameters["energy"].as_double();
+        double energySpread   = getEnergySpreadInEv();
 
         if (spreadType == SpreadType::SoftEdge) {
             if (energySpread == 0) { energySpread = 1; }

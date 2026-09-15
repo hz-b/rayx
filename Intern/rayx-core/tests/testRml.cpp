@@ -46,21 +46,16 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(correct, m);
 }
 
-TEST_F(TestSuite, testEnergyDistributionSeparateEnergies) {
-    const auto rays = traceRml("PointSourceSeparateEnergies", RayAttrMask::Energy);
+TEST_F(TestSuite, testEnergyDistributionThreeEnergies) {
+    // RAY-UI `energySpreadType=1` -> exactly three energies. Center 100,
+    // spread 200 => spikes at 0, 100 and 200.
+    const auto rays = traceRml("PointSourceThreeEnergies", RayAttrMask::Energy);
     expectAtLeastOnce(rays.energy, {
                                        0.0,
-                                       50.0,
                                        100.0,
-                                       150.0,
                                        200.0,
                                    });
-}
-
-// TODO: this test does not really test anything
-TEST_F(TestSuite, testEnergyDistributionSoftEdge) {
-    const auto rays = traceRml("PointSourceSoftEdgeEnergy", RayAttrMask::Energy);
-    expectDifferentValues(rays.energy);
+    for (const auto e : rays.energy) { EXPECT_NEAR(e, std::round(e / 100.0) * 100.0, 1e-6) << "unexpected energy " << e; }
 }
 
 // TODO: this test does not really test anything

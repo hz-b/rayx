@@ -7,6 +7,7 @@
 
 #include "Beamline/Beamline.h"
 #include "Core.h"
+#include "Debug/Debug.h"
 #include "Element/Cutout.h"
 
 namespace rayx {
@@ -30,16 +31,19 @@ void setAllMandatory(xml::Parser parser, DesignSource* ds) {
 
 void setDefaultEnergy(xml::Parser parser, DesignSource* ds) {
     ds->setEnergyDistributionType(parser.parseEnergyDistributionType());
-    ds->setEnergySpreadType(parser.parseEnergySpreadType());
 
     if (ds->getEnergyDistributionType() == EnergyDistributionType::File) {
+        // RAY-UI treats the value-based spread parameters as irrelevant in file mode.
         ds->setEnergyDistributionFile(parser.parseEnergyDistributionFile().generic_string());
-    } else {
-        ds->setEnergy(parser.parsePhotonEnergy());
-        ds->setEnergySpread(parser.parseEnergySpread());
-        ds->setEnergySpreadUnit(parseEnergySpreadUnitOrDefault(parser));
-        if (ds->getEnergySpreadType() == SpreadType::SeparateEnergies) ds->setNumberOfSeparateEnergies(parser.parseNumberOfSeparateEnergies());
+        return;
     }
+
+    int numberOfEnergies = -1;
+    ds->setEnergySpreadType(parser.decodeRayUiEnergySpreadType(&numberOfEnergies));
+    ds->setEnergy(parser.parsePhotonEnergy());
+    ds->setEnergySpread(parser.parseEnergySpread());
+    ds->setEnergySpreadUnit(parseEnergySpreadUnitOrDefault(parser));
+    if (numberOfEnergies > 0) ds->setNumberOfSeparateEnergies(numberOfEnergies);
 }
 
 void setDefaultOrientation(xml::Parser parser, DesignSource* ds) {
@@ -84,7 +88,13 @@ void setMatrixSource(xml::Parser parser, DesignSource* ds) {
 void setDipoleSource(xml::Parser parser, DesignSource* ds) {
     setAllMandatory(parser, ds);
 
-    ds->setEnergySpreadType(parser.parseEnergySpreadType());
+    // The dipole derives its spectrum from the electron beam; RAY-UI's spread type does not apply.
+    int rayUiSpreadType = 0;
+    if (xml::paramInt(parser.node, "energySpreadType", &rayUiSpreadType) && rayUiSpreadType != 0) {
+        RAYX_WARN << "dipole source \"" << parser.name() << "\": energySpreadType=" << rayUiSpreadType
+                  << " does not apply to dipole sources and is ignored; the spectrum is derived from the electron beam";
+    }
+    ds->setEnergySpreadType(SpreadType::HardEdge);
     ds->setPhotonFlux(parser.parsePhotonFlux());
     ds->setElectronEnergyOrientation(parser.parseElectronEnergyOrientation());
     ds->setElectronEnergy(parser.parseElectronEnergy());
