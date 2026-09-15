@@ -20,11 +20,11 @@ bool CromerTable::load(const char* element, CromerTable* out) {
 
     std::string line;
 
-    // ignore first three lines
-    for (int i = 0; i < 3; i++) { std::getline(s, line); }
+    // header: title, then (Z, A, RHO)
+    for (int i = 0; i < 2; i++) { std::getline(s, line); }
 
-    // line 4..EOF
-    for (uint32_t lineidx = 4; std::getline(s, line); lineidx++) {
+    // line 3..EOF
+    for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
         if (line.empty()) { continue; }
 
         CromerEntry e{};

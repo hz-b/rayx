@@ -133,7 +133,7 @@ MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
                 continue;
             }
 
-            glm::dvec2 massAndRho = getAtomicMassAndRho(i);
+            glm::dvec2 massAndRho = getAtomicMassAndRho(getMaterialAtomicNumber(mats[i]));
             double mass           = massAndRho.x;
             double rho            = massAndRho.y;
 

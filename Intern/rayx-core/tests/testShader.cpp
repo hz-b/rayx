@@ -1299,26 +1299,44 @@ TEST_F(TestSuite, testCromer) {
     auto mat = createMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getCromerEntryCount(Cu, mat.indices.data()), 450);
+    // Data/CROMER/CU.f12: 2 header lines (title + Z/A/RHO) + 451 data rows. The
+    // loader used to skip 3 header lines and dropped the first data row
+    // (5000 eV); it now keeps all 451 rows.
+    CHECK_EQ(getCromerEntryCount(Cu, mat.indices.data()), 451);
 
     auto Cu0 = getCromerEntry(0, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu0.m_n, 0.99993129425779392);
-    CHECK_EQ(Cu0.m_k, 3.2004831386280501e-06);
+    CHECK_EQ(Cu0.m_energy, 5000.0);
+    CHECK_EQ(Cu0.m_n, 0.99993342922935391);
+    CHECK_EQ(Cu0.m_k, 3.2070579228173849e-06);
 
     auto Cu10 = getCromerEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_n, 0.99995253087645009);
-    CHECK_EQ(Cu10.m_k, 1.6309738816600895e-06);
+    CHECK_EQ(Cu10.m_energy, 6000.0);
+    CHECK_EQ(Cu10.m_n, 0.9999543023157943);
+    CHECK_EQ(Cu10.m_k, 1.6148365858662492e-06);
+
+    // last row, so that an off-by-one at the end of the file is caught too
+    auto CuLast = getCromerEntry(getCromerEntryCount(Cu, mat.indices.data()) - 1, Cu, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(CuLast.m_energy, 50000.0);
+    CHECK_EQ(CuLast.m_n, 0.99999931802343112);
+    CHECK_EQ(CuLast.m_k, 4.0788096271962073e-09);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 450);
+    CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 451);
 
     auto Au0 = getCromerEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_n, 0.9998671803664767);
-    CHECK_EQ(Au0.m_k, 2.5731785003604815e-05);
+    CHECK_EQ(Au0.m_energy, 5000.0);
+    CHECK_EQ(Au0.m_n, 0.99987677875535519);
+    CHECK_EQ(Au0.m_k, 2.4617125243957802e-05);
 
     auto Au10 = getCromerEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_n, 0.99990668810059347);
-    CHECK_EQ(Au10.m_k, 1.3728198124046697e-05);
+    CHECK_EQ(Au10.m_energy, 6000.0);
+    CHECK_EQ(Au10.m_n, 0.99991389456606627);
+    CHECK_EQ(Au10.m_k, 1.2991958334119804e-05);
+
+    auto AuLast = getCromerEntry(getCromerEntryCount(Au, mat.indices.data()) - 1, Au, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(AuLast.m_energy, 50000.0);
+    CHECK_EQ(AuLast.m_n, 0.99999871748564573);
+    CHECK_EQ(AuLast.m_k, 2.4515945328918635e-08);
 }
 
 // test molec tables
