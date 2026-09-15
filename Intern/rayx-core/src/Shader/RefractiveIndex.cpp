@@ -173,21 +173,25 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
             int low  = 0;                                                // <= energy
             int high = getNffEntryCount(material, materialIndices) - 1;  // >= energy
 
-            // binary search
-            while (high - low > 1) {
-                int center           = (low + high) / 2;
-                NKEntry center_entry = getNffEntry(center, material, materialIndices, materialTable);
-                if (energy < center_entry.m_energy) {
-                    high = center;
-                } else {
-                    low = center;
-                }
-            }
             NKEntry low_entry  = getNffEntry(low, material, materialIndices, materialTable);
             NKEntry high_entry = getNffEntry(high, material, materialIndices, materialTable);
-            NKEntry entry      = interpolateMaterialTableEntry(low_entry, high_entry, energy);
-            // RAYX_VERB << "Using NffEntry: energy=" << entry.m_energy << " n=" << entry.m_n << " k=" << entry.m_k;
-            return complex::Complex(entry.m_n, entry.m_k);
+
+            if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {
+                // binary search
+                while (high - low > 1) {
+                    int center           = (low + high) / 2;
+                    NKEntry center_entry = getNffEntry(center, material, materialIndices, materialTable);
+                    if (energy < center_entry.m_energy) {
+                        high = center;
+                    } else {
+                        low = center;
+                    }
+                }
+                NKEntry low_entry  = getNffEntry(low, material, materialIndices, materialTable);
+                NKEntry high_entry = getNffEntry(high, material, materialIndices, materialTable);
+                NKEntry entry      = interpolateMaterialTableEntry(low_entry, high_entry, energy);
+                return complex::Complex(entry.m_n, entry.m_k);
+            }
         }
 
         // get refractive index with Cromer table
@@ -195,20 +199,25 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
             int low  = 0;                                                   // <= energy
             int high = getCromerEntryCount(material, materialIndices) - 1;  // >= energy
 
-            // binary search
-            while (high - low > 1) {
-                int center           = (low + high) / 2;
-                NKEntry center_entry = getCromerEntry(center, material, materialIndices, materialTable);
-                if (energy < center_entry.m_energy) {
-                    high = center;
-                } else {
-                    low = center;
-                }
-            }
             NKEntry low_entry  = getCromerEntry(low, material, materialIndices, materialTable);
             NKEntry high_entry = getCromerEntry(high, material, materialIndices, materialTable);
-            NKEntry entry      = interpolateMaterialTableEntry(low_entry, high_entry, energy);
-            return complex::Complex(entry.m_n, entry.m_k);
+
+            if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {
+                // binary search
+                while (high - low > 1) {
+                    int center           = (low + high) / 2;
+                    NKEntry center_entry = getCromerEntry(center, material, materialIndices, materialTable);
+                    if (energy < center_entry.m_energy) {
+                        high = center;
+                    } else {
+                        low = center;
+                    }
+                }
+                NKEntry low_entry  = getCromerEntry(low, material, materialIndices, materialTable);
+                NKEntry high_entry = getCromerEntry(high, material, materialIndices, materialTable);
+                NKEntry entry      = interpolateMaterialTableEntry(low_entry, high_entry, energy);
+                return complex::Complex(entry.m_n, entry.m_k);
+            }
         }
     } else if (material > 92 && material <= 140) {
         // molecules are not supported yet
@@ -216,26 +225,30 @@ complex::Complex RAYX_API getRefractiveIndex(double energy, int material, const 
             int low  = 0;                                                  // <= energy
             int high = getMolecEntryCount(material, materialIndices) - 1;  // >= energy
 
-            // binary search
-            while (high - low > 1) {
-                int center           = (low + high) / 2;
-                NKEntry center_entry = getMolecEntry(center, material, materialIndices, materialTable);
-                if (energy < center_entry.m_energy) {
-                    high = center;
-                } else {
-                    low = center;
-                }
-            }
-
             NKEntry low_entry  = getMolecEntry(low, material, materialIndices, materialTable);
             NKEntry high_entry = getMolecEntry(high, material, materialIndices, materialTable);
-            NKEntry entry      = interpolateMaterialTableEntry(low_entry, high_entry, energy);
-            // RAYX_VERB << "Using MolecEntry: energy=" << entry.m_energy << " n=" << entry.m_n << " k=" << entry.m_k;
-            return complex::Complex(entry.m_n, entry.m_k);
+
+            if (low_entry.m_energy <= energy && energy <= high_entry.m_energy) {
+                // binary search
+                while (high - low > 1) {
+                    int center           = (low + high) / 2;
+                    NKEntry center_entry = getMolecEntry(center, material, materialIndices, materialTable);
+                    if (energy < center_entry.m_energy) {
+                        high = center;
+                    } else {
+                        low = center;
+                    }
+                }
+
+                NKEntry low_entry  = getMolecEntry(low, material, materialIndices, materialTable);
+                NKEntry high_entry = getMolecEntry(high, material, materialIndices, materialTable);
+                NKEntry entry      = interpolateMaterialTableEntry(low_entry, high_entry, energy);
+                return complex::Complex(entry.m_n, entry.m_k);
+            }
         }
     }
 
-    _throw("getRefractiveIndex: no matching entry found!");
+    _throw("getRefractiveIndex: no matching entry found for material %d at energy %f eV (out of range?)", material, energy);
     return complex::Complex(-1.0, -1.0);
 }
 
