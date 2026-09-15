@@ -22,12 +22,13 @@ bool MolecTable::load(const char* element, MolecTable* out) {
 
     std::string line;
 
-    // ignore first line
+    // header: Emin/Emax/NoPoints, title, then (Z, A, RHO)
+    std::getline(s, line);
     std::getline(s, line);
     std::getline(s, line);
 
-    // line 2..EOF
-    for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
+    // line 4..EOF
+    for (uint32_t lineidx = 4; std::getline(s, line); lineidx++) {
         if (line.empty()) { continue; }
 
         NKEntry e{};

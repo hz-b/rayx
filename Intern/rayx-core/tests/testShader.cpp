@@ -1344,26 +1344,42 @@ TEST_F(TestSuite, testMolec) {
     auto mat = createMaterialTables({Material::B4C, Material::SiC});
 
     int B4C = static_cast<int>(Material::B4C);
-    CHECK_EQ(getMolecEntryCount(B4C, mat.indices.data()), 750);
+    // Data/MOLEC/B4C.NKM: 3 header lines + 1000 data rows. The metadata
+    // (Z A RHO) line used to be read as data, and entries were counted /4
+    // instead of /3. Now: 1000 entries, first row is real data.
+    CHECK_EQ(getMolecEntryCount(B4C, mat.indices.data()), 1000);
 
     auto B4C0 = getMolecEntry(0, B4C, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(B4C0.m_n, 55.250999999999998);
-    CHECK_EQ(B4C0.m_k, 2.52);
+    CHECK_EQ(B4C0.m_energy, 30.00169358);
+    CHECK_EQ(B4C0.m_n, 0.69406964);
+    CHECK_EQ(B4C0.m_k, 0.129);
 
     auto B4C10 = getMolecEntry(10, B4C, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(B4C10.m_n, 0.098400000000000001);
-    CHECK_EQ(B4C10.m_k, 33.341799629999997);
+    CHECK_EQ(B4C10.m_n, 0.73412871);
+    CHECK_EQ(B4C10.m_k, 0.103);
+
+    // last row, so that an off-by-one at the end of the file is caught too
+    auto B4CLast = getMolecEntry(getMolecEntryCount(B4C, mat.indices.data()) - 1, B4C, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(B4CLast.m_energy, 100005.6461);
+    CHECK_EQ(B4CLast.m_n, 0.99999995);
 
     int SiC = static_cast<int>(Material::SiC);
-    CHECK_EQ(getMolecEntryCount(SiC, mat.indices.data()), 124);
+    // Data/MOLEC/SIC.NKM: 3 header lines + 165 data rows.
+    CHECK_EQ(getMolecEntryCount(SiC, mat.indices.data()), 165);
 
     auto SiC0 = getMolecEntry(0, SiC, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(SiC0.m_n, 40.096499999999999);
-    CHECK_EQ(SiC0.m_k, 3.2200000000000002);
+    CHECK_EQ(SiC0.m_energy, 0.6199);
+    CHECK_EQ(SiC0.m_n, 2.572);
+    CHECK_EQ(SiC0.m_k, 0.000398);
 
     auto SiC10 = getMolecEntry(10, SiC, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(SiC10.m_n, 0.46400000000000002);
-    CHECK_EQ(SiC10.m_k, 5.7999999999999998);
+    CHECK_EQ(SiC10.m_n, 3.27);
+    CHECK_EQ(SiC10.m_k, 0.304);
+
+    auto SiCLast = getMolecEntry(getMolecEntryCount(SiC, mat.indices.data()) - 1, SiC, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(SiCLast.m_energy, 1000.0);
+    CHECK_EQ(SiCLast.m_n, 0.9992701);
+    CHECK_EQ(SiCLast.m_k, 0.0000513);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {

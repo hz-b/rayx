@@ -56,10 +56,9 @@ int RAYX_API getCromerEntryCount(const int material, const int* materialIndices)
 RAYX_FN_ACC
 int RAYX_API getMolecEntryCount(const int material, const int* materialIndices) {
     int m = material - 1;  // in [0, 132]
-    // the offset of 399 (== number of materials * 3), skips the palik, nff, and cromer tables and
+    // the offset of 399 (== number of materials * 3) skips the palik, nff, and cromer tables and
     // reaches into the molec table. the rest of the logic is as above.
-    // RAYX_VERB << "Getting MolecEntryCount for material " << material << materialIndices[399 + m + 1] << " - " << materialIndices[399 + m];
-    return (materialIndices[399 + m + 1] - materialIndices[399 + m]) / 4;
+    return (materialIndices[399 + m + 1] - materialIndices[399 + m]) / 3;
 }
 
 // Indexes into the palik table of a particular material at a given index.
@@ -112,8 +111,8 @@ RAYX_FN_ACC
 NKEntry RAYX_API getMolecEntry(int index, int material, const int* __restrict materialIndices, const double* __restrict materialTable) {
     int m = material - 1;  // in [0, 132]
     // materialIndices[399+m] is the start of the Molec table of material m.
-    // 4*index skips 'index'-many entries.
-    int i = materialIndices[399 + m] + 4 * index;
+    // 3*index skips 'index'-many entries.
+    int i = materialIndices[399 + m] + 3 * index;
 
     NKEntry e;
     e.m_energy = materialTable[i];
