@@ -38,6 +38,11 @@ bool NffTable::load(const char* element, NffTable* out) {
             RAYX_WARN << "Failed to parse NffTable\"" << element << "\", at line " << lineidx << ": \"" << line << "\"";
             return false;
         }
+
+        // "-9999" marks f1 as unavailable in the .nff format
+        if (e.m_f1 == -9999.0) { continue; }
+
+        out->m_Lines.push_back(e);
     }
 
     out->m_element = element;

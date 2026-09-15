@@ -1261,34 +1261,37 @@ TEST_F(TestSuite, testPalik) {
 }
 
 TEST_F(TestSuite, testNff) {
-    auto mat = createMaterialTables({Material::Cu, Material::Au});
+    auto mat = createMaterialTables({Material::Cu, Material::Ta});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 0);
+    // Data/nff/cu.nff has 437 valid data rows (f1 != -9999); the header line is
+    // not data. NffTable::load must skip f1 == -9999 rows and push every valid
+    // row into the material table.
+    CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 437);
 
     auto Cu0 = getNffEntry(0, Cu, mat.indices.data(), mat.materials.data());
-
-    CHECK_EQ(Cu0.m_energy, 5100.0);
-    CHECK_EQ(Cu0.m_n, 0.99993129425779392);
-    CHECK_EQ(Cu0.m_k, 3.2004831386280501e-06);
+    // data taken from Data/nff/cu.nff, first valid row
+    CHECK_EQ(Cu0.m_energy, 29.3);
+    CHECK_EQ(Cu0.m_n, 0.8943529435103218);
+    CHECK_EQ(Cu0.m_k, 0.32037767597642824);
 
     auto Cu10 = getNffEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_energy, 6100);
-    CHECK_EQ(Cu10.m_n, 0.99995253087645009);
-    CHECK_EQ(Cu10.m_k, 1.6309738816600895e-06);
+    CHECK_EQ(Cu10.m_energy, 34.3993);
+    CHECK_EQ(Cu10.m_n, 0.8616177866631747);
+    CHECK_EQ(Cu10.m_k, 0.24172368070136221);
 
-    int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getNffEntryCount(Au, mat.indices.data()), 0);
+    // Ta relies on NFF data (Data/nff/ta.nff); the regression target is Ta at
+    // ~70 eV. 659 valid rows, first valid row at 19.2107 eV.
+    int Ta = static_cast<int>(Material::Ta);
+    CHECK_EQ(getNffEntryCount(Ta, mat.indices.data()), 659);
 
-    auto Au0 = getNffEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_energy, 5100.0);
-    CHECK_EQ(Au0.m_n, 0.99993129425779392);
-    CHECK_EQ(Au0.m_k, 3.2004831386280501e-06);
+    auto Ta0 = getNffEntry(0, Ta, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(Ta0.m_energy, 19.2107);
+    CHECK_EQ(Ta0.m_n, 0.5813629178912815);  // f1=4.04977, f2=6.35265, mass=180.9479, rho=16.624
+    CHECK_EQ(Ta0.m_k, 0.6566928145692102);
 
-    auto Au10 = getNffEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_energy, 6100);
-    CHECK_EQ(Au10.m_n, 0.99995253087645009);
-    CHECK_EQ(Au10.m_k, 1.6309738816600895e-06);
+    // getRefractiveIndex at ~70 eV (the energy used by the UE112 beamline)
+    CHECK_EQ(getRefractiveIndex(70.1844, Ta, mat.indices.data(), mat.materials.data()), glm::dvec2(0.9032723513831681, 0.059221162673493616), 1e-8);
 }
 
 // test cromer tables
