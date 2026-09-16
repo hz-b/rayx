@@ -223,8 +223,7 @@ EnergyDistributionVariant DesignSource::getEnergyDistribution() const {
         DatFile df;
         DatFile::load(filename, &df);
 
-        df.m_continuous = false;
-        en              = EnergyDistributionVariant(df);
+        en = EnergyDistributionVariant(df);
     } else if (energyDistributionType == EnergyDistributionType::Values) {
         SpreadType spreadType = m_elementParameters["energyDistribution"].as_energySpreadType();
         double photonEnergy   = m_elementParameters["energy"].as_double();

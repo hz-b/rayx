@@ -53,15 +53,15 @@ RAYX_FN_ACC double selectEnergy(const EnergyDistributionList& __restrict energyD
     const auto r    = rand.randomDouble() * energyDistributionList.weightSum;
     const int index = binarySearchPrefix(energyDistributionList.prefixWeights, energyDistributionList.size, r);
 
-    if (energyDistributionList.continous) {
-        const auto centerEnergy = energyDistributionList.energies[index];
-        if (index < energyDistributionList.size - 1)
-            return rand.randomDoubleInRange(centerEnergy, energyDistributionList.energies[index + 1]);
-        else
-            return centerEnergy;
-    } else {
-        return energyDistributionList.energies[index];
-    }
+    // Each node owns the bin spanning to the midpoints of its neighbours, with the
+    // outer edges clamped to the tabulated range. Matches RAY-UI's nearest-node
+    // sampling of a .DAT energy distribution (EnergySampler::finalizeTable).
+    const double* __restrict e = energyDistributionList.energies;
+    const int last             = energyDistributionList.size - 1;
+    const double lo            = (index == 0) ? e[0] : 0.5 * (e[index - 1] + e[index]);
+    const double hi            = (index == last) ? e[last] : 0.5 * (e[index] + e[index + 1]);
+
+    return rand.randomDoubleInRange(lo, hi);
 }
 
 RAYX_FN_ACC double selectEnergy(const EnergyDistributionDataVariant& __restrict energyDistribution, Rand& __restrict rand) {

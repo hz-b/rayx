@@ -12,18 +12,15 @@ TEST_F(TestSuite, allBeamlineObjects) {
 TEST_F(TestSuite, loadDatFile) {
     const auto rays = traceRml("loadDatFile", RayAttrMask::Energy);
     writeCsvUsingFilename(rays, "loadDatFile.rayx");
-    using namespace testing;
-    EXPECT_THAT(rays.energy, Each(AnyOf(12, 15, 17)));
-}
 
-TEST_F(TestSuite, loadDatFile2) {
-    const auto rays = traceRml("loadDatFile2", RayAttrMask::Energy);
-    writeCsvUsingFilename(rays, "loadDatFile2.rayx");
+    // The .DAT gives weight 1 to the nodes at 12, 15 and 17. Each node owns the bin
+    // spanning to its neighbours' midpoints, so the rays land in [11.5, 12.5],
+    // [14.5, 15.5] and [16.5, 17.5].
     using namespace testing;
-    EXPECT_THAT(rays.energy, Each(AllOf(Ge(12), Le(18))));
-    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(12), Le(13))));
-    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(15), Le(16))));
-    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(17), Le(18))));
+    EXPECT_THAT(rays.energy, Each(AnyOf(AllOf(Ge(11.5), Le(12.5)), AllOf(Ge(14.5), Le(15.5)), AllOf(Ge(16.5), Le(17.5)))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(11.5), Le(12.5))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(14.5), Le(15.5))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(16.5), Le(17.5))));
 }
 
 TEST_F(TestSuite, loadGroups) {
