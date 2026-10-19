@@ -114,7 +114,9 @@ git submodule update --recursive --init
 [ ! -d "$build" ] && mkdir -p "$build"
 
 # re-run CMake only if config changed
-if [ ! -f "$build/conf" ] || [[ "$(cat $build/conf)" != "$conf_args" ]]; then
+# the build type is part of the stamp, otherwise switching --release on/off would not reconfigure
+conf_stamp="mode=$mode$conf_args"
+if [ ! -f "$build/conf" ] || [[ "$(cat $build/conf)" != "$conf_stamp" ]]; then
     echo > "$build/conf"
 
     if [ "$enable_cuda" != "1" ]; then
@@ -132,7 +134,7 @@ if [ ! -f "$build/conf" ] || [[ "$(cat $build/conf)" != "$conf_args" ]]; then
       $conf_args \
       -B "$build" -G Ninja
 
-    echo "$conf_args" > "$build/conf"
+    echo "$conf_stamp" > "$build/conf"
 fi
 
 # build the chosen target
