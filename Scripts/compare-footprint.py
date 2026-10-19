@@ -23,16 +23,29 @@ def in_plane(a, b, c):
     return cols[kept[0]], cols[kept[1]], "xyz"[kept[0]], "xyz"[kept[1]]
 
 
+RAYX_FIELD = [f"electric_field_{a} ({p})" for a in "xyz" for p in ("real", "imag")]
+RAYX_NEEDED = ["position_x", "position_y", "position_z", "object_id"] + RAYX_FIELD
+
+
 def read_rayx(path, obj):
+    """The CSV only holds the attributes in the record mask, so look columns up by name."""
     xa, ya, za, ii = [], [], [], []
     with open(path) as f:
-        next(f)
+        header = [s.strip() for s in next(f).split(",")]
+        missing = [n for n in RAYX_NEEDED if n not in header]
+        if missing:
+            sys.exit(f"{path}: missing column(s) {', '.join(missing)}; "
+                     "re-export with these attributes recorded")
+        col = {n: header.index(n) for n in RAYX_NEEDED}
+        field = [col[n] for n in RAYX_FIELD]
         for line in f:
             c = [s.strip() for s in line.split(",")]
-            if len(c) < 20 or c[17] != str(obj):
+            if len(c) < len(header) or c[col["object_id"]] != str(obj):
                 continue
-            xa.append(float(c[2])); ya.append(float(c[3])); za.append(float(c[4]))
-            ii.append(sum(float(c[k]) ** 2 for k in (8, 9, 10, 11, 12, 13)))
+            xa.append(float(c[col["position_x"]]))
+            ya.append(float(c[col["position_y"]]))
+            za.append(float(c[col["position_z"]]))
+            ii.append(sum(float(c[k]) ** 2 for k in field))
     if not xa:
         return [], [], [], "", ""
     u, v, au, av = in_plane(xa, ya, za)
