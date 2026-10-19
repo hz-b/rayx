@@ -22,7 +22,8 @@ void traceSequential(const int gid, const ConstState& __restrict constState, Mut
                                  constState.objectRecordMask, ray.object_id, constState.attrRecordMask);
     ray.path_event_id += stored ? 1 : 0;
 
-    rayMatrixMult(constState.objectTransforms[ray.object_id].m_inTrans, ray.position, ray.direction, ray.electric_field);
+    // rays are in the local frame of the object they were emitted from, so transform them to world coordinates
+    rayMatrixMult(constState.objectTransforms[ray.object_id].m_outTrans, ray.position, ray.direction, ray.electric_field);
 
     for (int elementIndex = 0; elementIndex < constState.numElements; ++elementIndex) {
         if (isRayTerminated(ray.event_type)) break;
@@ -66,7 +67,8 @@ void traceNonSequential(const int gid, const ConstState& __restrict constState, 
     ray.path_event_id += stored ? 1 : 0;
 
     // TODO: object_id from previous beamline is not correct for this beamline
-    rayMatrixMult(constState.objectTransforms[ray.object_id].m_inTrans, ray.position, ray.direction, ray.electric_field);
+    // rays are in the local frame of the object they were emitted from, so transform them to world coordinates
+    rayMatrixMult(constState.objectTransforms[ray.object_id].m_outTrans, ray.position, ray.direction, ray.electric_field);
 
     // one slot per ray is reserved for the source event, so only maxEvents - 1 remain for elements
     const int maxElementEvents = constState.maxEvents - 1;
