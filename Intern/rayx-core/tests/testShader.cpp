@@ -1291,7 +1291,7 @@ TEST_F(TestSuite, testNff) {
     CHECK_EQ(Au10.m_k, 1.6309738816600895e-06);
 }
 
-// test cromer tables 
+// test cromer tables
 TEST_F(TestSuite, testCromer) {
     auto mat = createMaterialTables({Material::Cu, Material::Au});
 
@@ -1310,7 +1310,7 @@ TEST_F(TestSuite, testCromer) {
     CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 450);
 
     auto Au0 = getCromerEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_n,  0.9998671803664767);
+    CHECK_EQ(Au0.m_n, 0.9998671803664767);
     CHECK_EQ(Au0.m_k, 2.5731785003604815e-05);
 
     auto Au10 = getCromerEntry(10, Au, mat.indices.data(), mat.materials.data());
@@ -1318,8 +1318,7 @@ TEST_F(TestSuite, testCromer) {
     CHECK_EQ(Au10.m_k, 1.3728198124046697e-05);
 }
 
-
-// test molec tables 
+// test molec tables
 TEST_F(TestSuite, testMolec) {
     auto mat = createMaterialTables({Material::B4C, Material::SiC});
 
@@ -1338,7 +1337,7 @@ TEST_F(TestSuite, testMolec) {
     CHECK_EQ(getMolecEntryCount(SiC, mat.indices.data()), 124);
 
     auto SiC0 = getMolecEntry(0, SiC, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(SiC0.m_n,  40.096499999999999);
+    CHECK_EQ(SiC0.m_n, 40.096499999999999);
     CHECK_EQ(SiC0.m_k, 3.2200000000000002);
 
     auto SiC10 = getMolecEntry(10, SiC, mat.indices.data(), mat.materials.data());

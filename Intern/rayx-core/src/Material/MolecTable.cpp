@@ -18,9 +18,7 @@ bool MolecTable::load(const char* element, MolecTable* out) {
     RAYX_VERB << "Loading MolecTable from " << f;
     std::ifstream s(f);
 
-    if (s.fail()) {
-        return false;
-    }
+    if (s.fail()) { return false; }
 
     std::string line;
 
@@ -30,9 +28,7 @@ bool MolecTable::load(const char* element, MolecTable* out) {
 
     // line 2..EOF
     for (uint32_t lineidx = 3; std::getline(s, line); lineidx++) {
-        if (line.empty()) {
-            continue;
-        }
+        if (line.empty()) { continue; }
 
         NKEntry e{};
 #if defined(WIN32)

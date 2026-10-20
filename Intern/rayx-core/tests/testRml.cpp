@@ -1,3 +1,4 @@
+#include "Beamline/StringConversion.h"
 #include "setupTests.h"
 
 TEST_F(TestSuite, allBeamlineObjects) {
@@ -86,13 +87,21 @@ TEST_F(TestSuite, testParaboloidQuad) {
     CHECK_EQ(0, parabo.m_a12);
     CHECK_EQ(0, parabo.m_a13);
     CHECK_EQ(0, parabo.m_a14);
-    CHECK_EQ(1, parabo.m_a22);
-    CHECK_EQ(0, parabo.m_a23);
-    CHECK_EQ(-3765.641, parabo.m_a24, 0.001);
-    CHECK_EQ(0, parabo.m_a33);
-    CHECK_EQ(663.984, parabo.m_a34, 0.001);
+    // the quadric is rotated about x by the tangent angle so the surface is tangent to the
+    // element's xz plane at the pole; a34 == 0 is what expresses that tangency
+    CHECK_EQ(0.969846, parabo.m_a22, 1e-6);
+    CHECK_EQ(0.171010, parabo.m_a23, 1e-6);
+    CHECK_EQ(-3823.733, parabo.m_a24, 0.001);
+    CHECK_EQ(0.030154, parabo.m_a33, 1e-6);
+    CHECK_EQ(0, parabo.m_a34, 1e-9);
     CHECK_EQ(-2.3283e-10, parabo.m_a44, 0.001);
     CHECK_EQ(1, parabo.m_icurv);
+
+    // surface normal at the element origin points along -y: the surface is tangent there
+    const auto normal = glm::normalize(glm::dvec3(2 * parabo.m_a14, 2 * parabo.m_a24, 2 * parabo.m_a34));
+    CHECK_EQ(0.0, normal.x, 1e-12);
+    CHECK_EQ(-1.0, normal.y, 1e-12);
+    CHECK_EQ(0.0, normal.z, 1e-12);
 }
 
 TEST_F(TestSuite, testSphereQuad) {
@@ -240,4 +249,16 @@ TEST_F(TestSuite, groupTransform2) {
 
     CHECK_EQ(orientationCorrect, orientationResult);
     CHECK_EQ(positionCorrect, positionResult);
+}
+
+TEST_F(TestSuite, elementTypeStringMappings) {
+    for (int i = 0; i < static_cast<int>(ElementType::Count); ++i) {
+        const auto e       = static_cast<ElementType>(i);
+        const auto forward = ElementTypeToString.find(e);
+        ASSERT_NE(forward, ElementTypeToString.end());
+        const auto backward = StringToElementType.find(forward->second);
+        ASSERT_NE(backward, StringToElementType.end());
+        EXPECT_EQ(backward->second, e);
+    }
+    EXPECT_EQ(ElementTypeToString.size(), static_cast<size_t>(ElementType::Count));
 }

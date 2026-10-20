@@ -16,22 +16,16 @@ bool CromerTable::load(const char* element, CromerTable* out) {
     RAYX_VERB << "Loading CromerTable from " << f;
     std::ifstream s(f);
 
-    if (s.fail()) {
-        return false;
-    }
+    if (s.fail()) { return false; }
 
     std::string line;
 
     // ignore first three lines
-    for (int i = 0; i < 3; i++) {
-        std::getline(s, line);
-    }
+    for (int i = 0; i < 3; i++) { std::getline(s, line); }
 
     // line 4..EOF
     for (uint32_t lineidx = 4; std::getline(s, line); lineidx++) {
-        if (line.empty()) {
-            continue;
-        }
+        if (line.empty()) { continue; }
 
         CromerEntry e{};
 #if defined(WIN32)
@@ -50,4 +44,4 @@ bool CromerTable::load(const char* element, CromerTable* out) {
     return true;
 }
 
-}  // namespace RAYX
+}  // namespace rayx

@@ -139,7 +139,9 @@ const std::map<ElementType, std::string> ElementTypeToString = {{ElementType::Ci
                                                                 {ElementType::PixelSource, "Pixel Source"},
                                                                 {ElementType::EllipsoidMirror, "Ellipsoid"},
                                                                 {ElementType::Crystal, "Crystal"},
-                                                                {ElementType::Foil, "Foil"}};
+                                                                {ElementType::Foil, "Foil"},
+                                                                {ElementType::RayListSource, "Ray List Source"},
+                                                                {ElementType::Undefined, "Undefined"}};
 const std::map<std::string, ElementType> StringToElementType = {{"Circle Source", ElementType::CircleSource},
                                                                 {"Cylinder", ElementType::CylinderMirror},
                                                                 {"ImagePlane", ElementType::ImagePlane},
@@ -163,7 +165,9 @@ const std::map<std::string, ElementType> StringToElementType = {{"Circle Source"
                                                                 {"Pixel Source", ElementType::PixelSource},
                                                                 {"Ellipsoid", ElementType::EllipsoidMirror},
                                                                 {"Crystal", ElementType::Crystal},
-                                                                {"Foil", ElementType::Foil}};
+                                                                {"Foil", ElementType::Foil},
+                                                                {"Ray List Source", ElementType::RayListSource},
+                                                                {"Undefined", ElementType::Undefined}};
 
 const std::map<std::string, EventType> StringToEventType = {
     {"Uninitialized", EventType::Uninitialized}, {"Emitted", EventType::Emitted},   {"HitElement", EventType::HitElement},

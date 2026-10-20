@@ -51,7 +51,9 @@ Texture::Texture(Texture&& other) noexcept
       m_memory(other.m_memory),
       m_view(other.m_view),
       m_sampler(other.m_sampler),
-      m_layout(other.m_layout) {
+      m_layout(other.m_layout),
+      m_usageFlags(other.m_usageFlags),
+      m_aspectFlags(other.m_aspectFlags) {
     // Invalidate the source object to prevent double deletion
     other.m_image   = VK_NULL_HANDLE;
     other.m_memory  = VK_NULL_HANDLE;
@@ -65,13 +67,15 @@ Texture& Texture::operator=(Texture&& other) noexcept {
         cleanup();
 
         // Copy data
-        m_extent  = other.m_extent;
-        m_format  = other.m_format;
-        m_image   = other.m_image;
-        m_memory  = other.m_memory;
-        m_view    = other.m_view;
-        m_sampler = other.m_sampler;
-        m_layout  = other.m_layout;
+        m_extent      = other.m_extent;
+        m_format      = other.m_format;
+        m_image       = other.m_image;
+        m_memory      = other.m_memory;
+        m_view        = other.m_view;
+        m_sampler     = other.m_sampler;
+        m_layout      = other.m_layout;
+        m_usageFlags  = other.m_usageFlags;
+        m_aspectFlags = other.m_aspectFlags;
 
         // Invalidate the source object
         other.m_image   = VK_NULL_HANDLE;

@@ -6,11 +6,11 @@
 #include <strings.h>
 #endif
 
+#include "CromerTable.h"
 #include "Debug/Debug.h"
+#include "MolecTable.h"
 #include "NffTable.h"
 #include "PalikTable.h"
-#include "CromerTable.h"
-#include "MolecTable.h"
 
 namespace rayx {
 
@@ -76,9 +76,7 @@ MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
     MaterialTables out;
 
     auto mats = allNormalMaterials();
-    if (mats.size() != 133) {
-        RAYX_EXIT << "unexpected number of materials. this is a bug.";
-    }
+    if (mats.size() != 133) { RAYX_EXIT << "unexpected number of materials. this is a bug."; }
 
     // add palik table content
     for (size_t i = 0; i < mats.size(); i++) {
@@ -86,9 +84,7 @@ MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
         if (relevantMaterials[i]) {
             PalikTable t;
 
-            if (!PalikTable::load(getMaterialName(mats[i]), &t)) {
-                RAYX_VERB << "could not load PalikTable!";
-            }
+            if (!PalikTable::load(getMaterialName(mats[i]), &t)) { RAYX_VERB << "could not load PalikTable!"; }
 
             for (auto x : t.m_Lines) {
                 out.materials.push_back(x.m_energy);
@@ -105,22 +101,20 @@ MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
         if (relevantMaterials[i]) {
             NffTable t;
 
-            if (!NffTable::load(getMaterialName(mat), &t)) {
-                RAYX_VERB << "could not load NffTable!";
-            }
+            if (!NffTable::load(getMaterialName(mat), &t)) { RAYX_VERB << "could not load NffTable!"; }
 
             glm::dvec2 massAndRho = getAtomicMassAndRho(getMaterialAtomicNumber(mat));
-            double mass = massAndRho.x;
-            double rho = massAndRho.y;
+            double mass           = massAndRho.x;
+            double rho            = massAndRho.y;
 
             for (auto x : t.m_Lines) {
                 double en = x.m_energy;
-                double n = 1 - (415.252 * rho * x.m_f1) / (en * en * mass);
-                double k = (415.252 * rho * x.m_f2) / (en * en * mass);
+                double n  = 1 - (415.252 * rho * x.m_f1) / (en * en * mass);
+                double k  = (415.252 * rho * x.m_f2) / (en * en * mass);
                 NKEntry nk;
                 nk.m_energy = en;
-                nk.m_n = n;
-                nk.m_k = k;
+                nk.m_n      = n;
+                nk.m_k      = k;
                 out.materials.push_back(nk.m_energy);
                 out.materials.push_back(nk.m_n);
                 out.materials.push_back(nk.m_k);
@@ -140,29 +134,28 @@ MaterialTables loadMaterialTables(std::array<bool, 133> relevantMaterials) {
             }
 
             glm::dvec2 massAndRho = getAtomicMassAndRho(i);
-            double mass = massAndRho.x;
-            double rho = massAndRho.y;
+            double mass           = massAndRho.x;
+            double rho            = massAndRho.y;
 
             for (auto x : t.m_Lines) {
                 double en = x.m_energy;
-                double n = 1 - (415.252 * rho * x.m_f1) / (en * en * mass);
-                double k = (415.252 * rho * x.m_f2) / (en * en * mass);
+                double n  = 1 - (415.252 * rho * x.m_f1) / (en * en * mass);
+                double k  = (415.252 * rho * x.m_f2) / (en * en * mass);
                 NKEntry nk;
                 nk.m_energy = en;
-                nk.m_n = n;
-                nk.m_k = k;
+                nk.m_n      = n;
+                nk.m_k      = k;
                 out.materials.push_back(nk.m_energy);
                 out.materials.push_back(nk.m_n);
                 out.materials.push_back(nk.m_k);
             }
         }
     }
-    
-    
+
     // add molec table content now
     for (size_t i = 0; i < mats.size(); i++) {
         out.indices.push_back(out.materials.size());
-        if(relevantMaterials[i]) {   
+        if (relevantMaterials[i]) {
             MolecTable t;
             if (!MolecTable::load(getMaterialName(mats[i]), &t)) {
                 RAYX_VERB << "could not load MolecTable!";
@@ -208,4 +201,4 @@ glm::dvec2 getAtomicMassAndRho(int material) {
     return glm::dvec2(0.0, 0.0);
 }
 
-}  // namespace RAYX
+}  // namespace rayx

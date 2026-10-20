@@ -209,13 +209,10 @@ struct RAYX_API Parser {
     inline double parseRoughnessSubstrate() const { return parseDouble("roughnessSubstrate"); }
     inline double parseDensitySubstrate() const { return parseDouble("densitySubstrate"); }
 
-    inline SurfaceCoatingType parseSurfaceCoatingType() const { 
-        if (parseInt("surfaceCoating") == 3) {
-            return SurfaceCoatingType::MultipleCoatings;
-        }
+    inline SurfaceCoatingType parseSurfaceCoatingType() const {
+        if (parseInt("surfaceCoating") == 3) { return SurfaceCoatingType::MultipleCoatings; }
         return static_cast<SurfaceCoatingType>(parseInt("surfaceCoating"));
     }  // 0 = substrate only, 1 = one coating, 2 = multiple coatings
-    
 
     // the XML node of the object you intend to parse.
     rapidxml::xml_node<>* node;

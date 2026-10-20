@@ -215,21 +215,15 @@ bool paramVls(const rapidxml::xml_node<>* node, std::array<double, 6>* out) {
     return true;
 }
 
-
-double Parser::parseThicknessCoating() const { 
-    if(!xml::paramDouble(node, "thicknessCoating", nullptr)) {
-        return Parser::parseDouble("thicknessCoating1"); 
-    }
-    return Parser::parseDouble("thicknessCoating"); 
+double Parser::parseThicknessCoating() const {
+    if (!xml::paramDouble(node, "thicknessCoating", nullptr)) { return Parser::parseDouble("thicknessCoating1"); }
+    return Parser::parseDouble("thicknessCoating");
 }
 
-double Parser::parseRoughnessCoating() const { 
-    if(!xml::paramDouble(node, "roughnessCoating", nullptr)) {
-        return Parser::parseDouble("roughnessCoating1"); 
-    }
-    return Parser::parseDouble("roughnessCoating"); 
+double Parser::parseRoughnessCoating() const {
+    if (!xml::paramDouble(node, "roughnessCoating", nullptr)) { return Parser::parseDouble("roughnessCoating1"); }
+    return Parser::parseDouble("roughnessCoating");
 }
-
 
 bool paramRAYUICoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoating* out) {
     if (!node || !out) { return false; }
@@ -237,16 +231,14 @@ bool paramRAYUICoating(const rapidxml::xml_node<>* node, Coating::MultilayerCoat
     // Root für die Layer bestimmen: entweder 'node' selbst oder <param id="Coating">
 
     int numberLayer = 0;
-    if (!paramInt(node, "numberLayer", &numberLayer)) {
-        return false;
-    }
+    if (!paramInt(node, "numberLayer", &numberLayer)) { return false; }
     out->numLayers = numberLayer;
 
     for (int i = 0; i < numberLayer; ++i) {
-        std::string materialParam   = "materialCoating" + std::to_string(i + 1);
-        std::string thicknessParam  = "thicknessCoating" + std::to_string(i + 1);
-        std::string roughnessParam  = "roughnessCoating" + std::to_string(i + 1);
-        const char* materialStr     = nullptr;
+        std::string materialParam  = "materialCoating" + std::to_string(i + 1);
+        std::string thicknessParam = "thicknessCoating" + std::to_string(i + 1);
+        std::string roughnessParam = "roughnessCoating" + std::to_string(i + 1);
+        const char* materialStr    = nullptr;
         if (!paramStr(node, materialParam.c_str(), &materialStr)) {
             RAYX_VERB << "Layer " << i + 1 << " is missing a <material> element.";
             return false;

@@ -26,4 +26,4 @@ struct CromerTable {
     // double interpolate(double x) const;
 };
 
-}  // namespace RAYX
+}  // namespace rayx

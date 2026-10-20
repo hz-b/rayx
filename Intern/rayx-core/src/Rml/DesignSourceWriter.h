@@ -14,9 +14,7 @@ namespace rayx {
 namespace {
 EnergySpreadUnit parseEnergySpreadUnitOrDefault(xml::Parser parser) {
     int energySpreadUnit = 0;
-    if (!xml::paramInt(parser.node, "energySpreadUnit", &energySpreadUnit)) {
-        return EnergySpreadUnit::EU_eV;
-    }
+    if (!xml::paramInt(parser.node, "energySpreadUnit", &energySpreadUnit)) { return EnergySpreadUnit::EU_eV; }
 
     return static_cast<EnergySpreadUnit>(energySpreadUnit);
 }

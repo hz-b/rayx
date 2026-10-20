@@ -185,18 +185,14 @@ double DesignSource::getEnergySpread() const { return m_elementParameters["energ
 
 void DesignSource::setEnergySpreadUnit(EnergySpreadUnit value) { m_elementParameters["energySpreadUnit"] = value; }
 EnergySpreadUnit DesignSource::getEnergySpreadUnit() const {
-    if (!m_elementParameters.hasKey("energySpreadUnit")) {
-        return EnergySpreadUnit::EU_eV;
-    }
+    if (!m_elementParameters.hasKey("energySpreadUnit")) { return EnergySpreadUnit::EU_eV; }
 
     return m_elementParameters["energySpreadUnit"].as_energySpreadUnit();
 }
 
 double DesignSource::getEnergySpreadInEv() const {
     const double energySpread = getEnergySpread();
-    if (getEnergySpreadUnit() == EnergySpreadUnit::EU_PERCENT) {
-        return getEnergy() * energySpread / 100.0;
-    }
+    if (getEnergySpreadUnit() == EnergySpreadUnit::EU_PERCENT) { return getEnergy() * energySpread / 100.0; }
 
     return energySpread;
 }
