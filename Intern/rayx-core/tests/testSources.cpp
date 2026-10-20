@@ -289,3 +289,59 @@ TEST_F(TestSuite, testRayListSource) {
     auto allAttrExceptPathEventId = exclude(RayAttrMask::All, RayAttrMask::PathEventId);
     compare(rays.filterByObjectId(0), inputRays, allAttrExceptPathEventId, DEFAULT_TOLERANCE);
 }
+
+namespace {
+// mean position and direction of the rays recorded on the ImagePlane (object 1), in its local frame
+std::pair<glm::dvec3, glm::dvec3> imagePlaneCentroid(const Beamline& beamline, Sequential seq) {
+    const auto rays = tracer->trace(beamline, seq, ObjectMask::all(), RayAttrMask::All).filterByObjectId(1);
+    CHECK(rays.size() > 0);
+    glm::dvec3 pos(0), dir(0);
+    for (int i = 0; i < rays.size(); ++i) {
+        pos += glm::dvec3(rays.position_x[i], rays.position_y[i], rays.position_z[i]);
+        dir += glm::dvec3(rays.direction_x[i], rays.direction_y[i], rays.direction_z[i]);
+    }
+    return {pos / double(rays.size()), dir / double(rays.size())};
+}
+}  // namespace
+
+// the world pose of a light source has to be applied like that of an optical element (local -> world), not inverted
+TEST_F(TestSuite, SourceWorldPoseIsApplied) {
+    const double a = 1e-3;  // 1 mrad
+
+    for (const auto seq : {Sequential::Yes, Sequential::No}) {
+        const auto [p0, d0] = imagePlaneCentroid(loadBeamline("SourcePose"), seq);
+
+        // source moved by x = +5 mm
+        {
+            auto bl = loadBeamline("SourcePose");
+            bl.findSourceByName("Source")->setPosition(glm::dvec4(5, 0, 0, 1));
+            const auto [p, d] = imagePlaneCentroid(bl, seq);
+            CHECK_EQ(p.x - p0.x, 5.0, 1e-2);
+            CHECK_EQ(p.z - p0.z, 0.0, 1e-2);
+            CHECK_EQ(d.x - d0.x, 0.0, 1e-6);
+        }
+
+        // source and ImagePlane moved rigidly by x = +5 mm
+        {
+            auto bl = loadBeamline("SourcePose");
+            bl.findSourceByName("Source")->setPosition(glm::dvec4(5, 0, 0, 1));
+            bl.findElementByName("ImagePlane")->setPosition(glm::dvec4(5, 0, 1000, 1));
+            const auto [p, d] = imagePlaneCentroid(bl, seq);
+            CHECK_EQ(p.x - p0.x, 0.0, 1e-2);
+            CHECK_EQ(p.z - p0.z, 0.0, 1e-2);
+            CHECK_EQ(d.x - d0.x, 0.0, 1e-6);
+        }
+
+        // source rotated by +1 mrad about y, so that the beam axis tilts towards +x
+        {
+            auto bl        = loadBeamline("SourcePose");
+            glm::dmat4x4 o = glm::dmat4x4(1.0);
+            o[0]           = glm::dvec4(std::cos(a), 0, -std::sin(a), 0);
+            o[2]           = glm::dvec4(std::sin(a), 0, std::cos(a), 0);
+            bl.findSourceByName("Source")->setOrientation(o);
+            const auto [p, d] = imagePlaneCentroid(bl, seq);
+            CHECK_EQ(p.x - p0.x, 1.0, 1e-2);
+            CHECK_EQ(d.x - d0.x, a, 1e-5);
+        }
+    }
+}

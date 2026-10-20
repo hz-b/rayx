@@ -244,9 +244,21 @@ Surface makeParaboloid(const DesignElement& dele) {
     y0 = ArmLength * sin1;
     z0 = ArmLength * cos1 * sign;
 
-    a24 = -y0;
-    a34 = -parameterP;
     a44 = pow(y0, 2) - 2 * parameterP * z0 - pow(parameterP, 2);
+
+    // The paraboloid is built with its axis along z, which leaves the surface tilted by the
+    // grazing angle at the pole. Rotate it about x so the surface is tangent to the element's
+    // xz plane there, as makeEllipsoid does. RAY-UI applies the equivalent rotation through its
+    // tangentAngle (= sign * grazingIncAngle) in the element transform instead.
+    const double alpha = -sign * grazingIncAngle.rad;
+    const double sa    = sin(alpha);
+    const double ca    = cos(alpha);
+
+    const double a22 = ca * ca;
+    const double a23 = sa * ca;
+    a24              = -y0 * ca + parameterP * sa;
+    const double a33 = sa * sa;
+    a34              = -y0 * sa - parameterP * ca;
     //---------------------------- Serialization -------------------------------
     return Surface::Quadric{
         .m_icurv = 1,
@@ -254,10 +266,10 @@ Surface makeParaboloid(const DesignElement& dele) {
         .m_a12   = 0,
         .m_a13   = 0,
         .m_a14   = 0,
-        .m_a22   = 1.0,
-        .m_a23   = 0,
+        .m_a22   = a22,
+        .m_a23   = a23,
         .m_a24   = a24,
-        .m_a33   = 0,
+        .m_a33   = a33,
         .m_a34   = a34,
         .m_a44   = a44,
     };

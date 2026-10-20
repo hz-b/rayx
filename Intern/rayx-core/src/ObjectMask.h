@@ -88,8 +88,10 @@ class RAYX_API ObjectIndexMask {
 
     void setShouldRecordObject(int object_id, bool value) {
         const auto numSources = static_cast<int>(m_sourceMask.size());
-        if (object_id < numSources) m_sourceMask.at(object_id) = value;
-        m_elementMask.at(object_id - numSources) = value;
+        if (object_id < numSources)
+            m_sourceMask.at(object_id) = value;
+        else
+            m_elementMask.at(object_id - numSources) = value;
     }
 
   private:

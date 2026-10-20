@@ -82,7 +82,8 @@ void RenderObject::rebuild(const std::vector<VertexVariant> vertices, const std:
 }
 
 void RenderObject::updateTexture(const std::filesystem::path& path) {
-    m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT, {0, 0});
+    m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_ASPECT_COLOR_BIT,
+                        {0, 0});
     m_Texture.updateFromPath(path);
 
     createDescriptorSet();
@@ -91,7 +92,8 @@ void RenderObject::updateTexture(const std::filesystem::path& path) {
 void RenderObject::updateTexture(const unsigned char* data, uint32_t width, uint32_t height) {
     if (data == nullptr) RAYX_EXIT << "Texture data is null";
 
-    m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT, {width, height});
+    m_Texture = Texture(m_Device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_ASPECT_COLOR_BIT,
+                        {width, height});
     m_Texture.updateFromData(data, width, height);
 
     createDescriptorSet();

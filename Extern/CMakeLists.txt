@@ -103,5 +103,26 @@ if(RAYX_BUILD_RAYX_UI)
     add_library(portable_file_dialogs INTERFACE)
     target_include_directories(portable_file_dialogs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/portable-file-dialogs)
 
+    # rayx-ui only needs SDL for the window, input and the Vulkan surface. The imgui backend
+    # also polls gamepads, so joystick (and HIDAPI, which SDL 3.2 needs to link joystick) stays on.
+    set(SDL_AUDIO OFF)
+    set(SDL_CAMERA OFF)
+    set(SDL_GPU OFF)
+    set(SDL_RENDER OFF)
+    set(SDL_HAPTIC OFF)
+    set(SDL_POWER OFF)
+    set(SDL_SENSOR OFF)
+    set(SDL_DIALOG OFF)
+    set(SDL_TEST_LIBRARY OFF)
+
+    # hide SDL's configure checks and option summary; warnings and errors still show.
+    # `cmake --log-level=STATUS` takes precedence and brings them back.
+    set(CMAKE_MESSAGE_LOG_LEVEL NOTICE)
     add_subdirectory(SDL EXCLUDE_FROM_ALL)
+    unset(CMAKE_MESSAGE_LOG_LEVEL)
+
+    # third-party code, its warnings are not ours to fix
+    if(TARGET SDL3-shared AND NOT MSVC)
+        target_compile_options(SDL3-shared PRIVATE -w)
+    endif()
 endif()

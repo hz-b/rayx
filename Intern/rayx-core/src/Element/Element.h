@@ -43,6 +43,7 @@ enum class ElementType {
     CircleSource,
     SimpleUndulatorSource,
     RayListSource,
+    Count,  // must stay last
 };
 
 /**

@@ -110,8 +110,11 @@ struct Resources {
 
         // beamline elements
         // TODO: this should be two arrays, one of elements, one for transforms
-        const auto elementsAndTransforms = group.compileElements();
-        auto elements                    = std::vector<OpticalElement>(elementsAndTransforms.size());
+        auto elementsAndTransforms = group.compileElements();
+
+        group.verifyMaterialCoverage(elementsAndTransforms, materialTables);
+
+        auto elements = std::vector<OpticalElement>(elementsAndTransforms.size());
         std::transform(elementsAndTransforms.begin(), elementsAndTransforms.end(), elements.begin(),
                        [](const OpticalElementAndTransform& e) { return e.element; });
         const auto numElements = static_cast<int>(elements.size());

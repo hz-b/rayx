@@ -1261,89 +1261,125 @@ TEST_F(TestSuite, testPalik) {
 }
 
 TEST_F(TestSuite, testNff) {
-    auto mat = createMaterialTables({Material::Cu, Material::Au});
+    auto mat = createMaterialTables({Material::Cu, Material::Ta});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 0);
+    // Data/nff/cu.nff has 437 valid data rows (f1 != -9999); the header line is
+    // not data. NffTable::load must skip f1 == -9999 rows and push every valid
+    // row into the material table.
+    CHECK_EQ(getNffEntryCount(Cu, mat.indices.data()), 437);
 
     auto Cu0 = getNffEntry(0, Cu, mat.indices.data(), mat.materials.data());
-
-    CHECK_EQ(Cu0.m_energy, 5100.0);
-    CHECK_EQ(Cu0.m_n, 0.99993129425779392);
-    CHECK_EQ(Cu0.m_k, 3.2004831386280501e-06);
+    // data taken from Data/nff/cu.nff, first valid row
+    CHECK_EQ(Cu0.m_energy, 29.3);
+    CHECK_EQ(Cu0.m_n, 0.8943529435103218);
+    CHECK_EQ(Cu0.m_k, 0.32037767597642824);
 
     auto Cu10 = getNffEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_energy, 6100);
-    CHECK_EQ(Cu10.m_n, 0.99995253087645009);
-    CHECK_EQ(Cu10.m_k, 1.6309738816600895e-06);
+    CHECK_EQ(Cu10.m_energy, 34.3993);
+    CHECK_EQ(Cu10.m_n, 0.8616177866631747);
+    CHECK_EQ(Cu10.m_k, 0.24172368070136221);
 
-    int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getNffEntryCount(Au, mat.indices.data()), 0);
+    // Ta relies on NFF data (Data/nff/ta.nff); the regression target is Ta at
+    // ~70 eV. 659 valid rows, first valid row at 19.2107 eV.
+    int Ta = static_cast<int>(Material::Ta);
+    CHECK_EQ(getNffEntryCount(Ta, mat.indices.data()), 659);
 
-    auto Au0 = getNffEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_energy, 5100.0);
-    CHECK_EQ(Au0.m_n, 0.99993129425779392);
-    CHECK_EQ(Au0.m_k, 3.2004831386280501e-06);
+    auto Ta0 = getNffEntry(0, Ta, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(Ta0.m_energy, 19.2107);
+    CHECK_EQ(Ta0.m_n, 0.5813629178912815);  // f1=4.04977, f2=6.35265, mass=180.9479, rho=16.624
+    CHECK_EQ(Ta0.m_k, 0.6566928145692102);
 
-    auto Au10 = getNffEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_energy, 6100);
-    CHECK_EQ(Au10.m_n, 0.99995253087645009);
-    CHECK_EQ(Au10.m_k, 1.6309738816600895e-06);
+    // getRefractiveIndex at ~70 eV (the energy used by the UE112 beamline)
+    CHECK_EQ(getRefractiveIndex(70.1844, Ta, mat.indices.data(), mat.materials.data()), glm::dvec2(0.9032723513831681, 0.059221162673493616), 1e-8);
 }
 
-// test cromer tables 
+// test cromer tables
 TEST_F(TestSuite, testCromer) {
     auto mat = createMaterialTables({Material::Cu, Material::Au});
 
     int Cu = static_cast<int>(Material::Cu);
-    CHECK_EQ(getCromerEntryCount(Cu, mat.indices.data()), 450);
+    // Data/CROMER/CU.f12: 2 header lines (title + Z/A/RHO) + 451 data rows. The
+    // loader used to skip 3 header lines and dropped the first data row
+    // (5000 eV); it now keeps all 451 rows.
+    CHECK_EQ(getCromerEntryCount(Cu, mat.indices.data()), 451);
 
     auto Cu0 = getCromerEntry(0, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu0.m_n, 0.99993129425779392);
-    CHECK_EQ(Cu0.m_k, 3.2004831386280501e-06);
+    CHECK_EQ(Cu0.m_energy, 5000.0);
+    CHECK_EQ(Cu0.m_n, 0.99993342922935391);
+    CHECK_EQ(Cu0.m_k, 3.2070579228173849e-06);
 
     auto Cu10 = getCromerEntry(10, Cu, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Cu10.m_n, 0.99995253087645009);
-    CHECK_EQ(Cu10.m_k, 1.6309738816600895e-06);
+    CHECK_EQ(Cu10.m_energy, 6000.0);
+    CHECK_EQ(Cu10.m_n, 0.9999543023157943);
+    CHECK_EQ(Cu10.m_k, 1.6148365858662492e-06);
+
+    // last row, so that an off-by-one at the end of the file is caught too
+    auto CuLast = getCromerEntry(getCromerEntryCount(Cu, mat.indices.data()) - 1, Cu, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(CuLast.m_energy, 50000.0);
+    CHECK_EQ(CuLast.m_n, 0.99999931802343112);
+    CHECK_EQ(CuLast.m_k, 4.0788096271962073e-09);
 
     int Au = static_cast<int>(Material::Au);
-    CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 450);
+    CHECK_EQ(getCromerEntryCount(Au, mat.indices.data()), 451);
 
     auto Au0 = getCromerEntry(0, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au0.m_n,  0.9998671803664767);
-    CHECK_EQ(Au0.m_k, 2.5731785003604815e-05);
+    CHECK_EQ(Au0.m_energy, 5000.0);
+    CHECK_EQ(Au0.m_n, 0.99987677875535519);
+    CHECK_EQ(Au0.m_k, 2.4617125243957802e-05);
 
     auto Au10 = getCromerEntry(10, Au, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(Au10.m_n, 0.99990668810059347);
-    CHECK_EQ(Au10.m_k, 1.3728198124046697e-05);
+    CHECK_EQ(Au10.m_energy, 6000.0);
+    CHECK_EQ(Au10.m_n, 0.99991389456606627);
+    CHECK_EQ(Au10.m_k, 1.2991958334119804e-05);
+
+    auto AuLast = getCromerEntry(getCromerEntryCount(Au, mat.indices.data()) - 1, Au, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(AuLast.m_energy, 50000.0);
+    CHECK_EQ(AuLast.m_n, 0.99999871748564573);
+    CHECK_EQ(AuLast.m_k, 2.4515945328918635e-08);
 }
 
-
-// test molec tables 
+// test molec tables
 TEST_F(TestSuite, testMolec) {
     auto mat = createMaterialTables({Material::B4C, Material::SiC});
 
     int B4C = static_cast<int>(Material::B4C);
-    CHECK_EQ(getMolecEntryCount(B4C, mat.indices.data()), 750);
+    // Data/MOLEC/B4C.NKM: 3 header lines + 1000 data rows. The metadata
+    // (Z A RHO) line used to be read as data, and entries were counted /4
+    // instead of /3. Now: 1000 entries, first row is real data.
+    CHECK_EQ(getMolecEntryCount(B4C, mat.indices.data()), 1000);
 
     auto B4C0 = getMolecEntry(0, B4C, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(B4C0.m_n, 55.250999999999998);
-    CHECK_EQ(B4C0.m_k, 2.52);
+    CHECK_EQ(B4C0.m_energy, 30.00169358);
+    CHECK_EQ(B4C0.m_n, 0.69406964);
+    CHECK_EQ(B4C0.m_k, 0.129);
 
     auto B4C10 = getMolecEntry(10, B4C, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(B4C10.m_n, 0.098400000000000001);
-    CHECK_EQ(B4C10.m_k, 33.341799629999997);
+    CHECK_EQ(B4C10.m_n, 0.73412871);
+    CHECK_EQ(B4C10.m_k, 0.103);
+
+    // last row, so that an off-by-one at the end of the file is caught too
+    auto B4CLast = getMolecEntry(getMolecEntryCount(B4C, mat.indices.data()) - 1, B4C, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(B4CLast.m_energy, 100005.6461);
+    CHECK_EQ(B4CLast.m_n, 0.99999995);
 
     int SiC = static_cast<int>(Material::SiC);
-    CHECK_EQ(getMolecEntryCount(SiC, mat.indices.data()), 124);
+    // Data/MOLEC/SIC.NKM: 3 header lines + 165 data rows.
+    CHECK_EQ(getMolecEntryCount(SiC, mat.indices.data()), 165);
 
     auto SiC0 = getMolecEntry(0, SiC, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(SiC0.m_n,  40.096499999999999);
-    CHECK_EQ(SiC0.m_k, 3.2200000000000002);
+    CHECK_EQ(SiC0.m_energy, 0.6199);
+    CHECK_EQ(SiC0.m_n, 2.572);
+    CHECK_EQ(SiC0.m_k, 0.000398);
 
     auto SiC10 = getMolecEntry(10, SiC, mat.indices.data(), mat.materials.data());
-    CHECK_EQ(SiC10.m_n, 0.46400000000000002);
-    CHECK_EQ(SiC10.m_k, 5.7999999999999998);
+    CHECK_EQ(SiC10.m_n, 3.27);
+    CHECK_EQ(SiC10.m_k, 0.304);
+
+    auto SiCLast = getMolecEntry(getMolecEntryCount(SiC, mat.indices.data()) - 1, SiC, mat.indices.data(), mat.materials.data());
+    CHECK_EQ(SiCLast.m_energy, 1000.0);
+    CHECK_EQ(SiCLast.m_n, 0.9992701);
+    CHECK_EQ(SiCLast.m_k, 0.0000513);
 }
 
 TEST_F(TestSuite, testRefractiveIndex) {

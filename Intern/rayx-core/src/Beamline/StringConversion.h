@@ -77,16 +77,12 @@ const std::map<std::string, CurvatureType> StringToCurvatureType = {
     {"Quadric", CurvatureType::Quadric},     {"RzpSphere", CurvatureType::RzpSphere}};
 
 // BehaviourType conversion
-const std::map<BehaviourType, std::string> BehaviourTypeToString = {{BehaviourType::Mirror, "Mirror"},
-                                                                    {BehaviourType::Grating, "Grating"},
-                                                                    {BehaviourType::Slit, "Slit"},
-                                                                    {BehaviourType::Rzp, "Rzp"},
-                                                                    {BehaviourType::ImagePlane, "ImagePlane"}};
-const std::map<std::string, BehaviourType> StringToBehaviourType = {{"Mirror", BehaviourType::Mirror},
-                                                                    {"Grating", BehaviourType::Grating},
-                                                                    {"Slit", BehaviourType::Slit},
-                                                                    {"Rzp", BehaviourType::Rzp},
-                                                                    {"ImagePlane", BehaviourType::ImagePlane}};
+const std::map<BehaviourType, std::string> BehaviourTypeToString = {
+    {BehaviourType::Mirror, "Mirror"},         {BehaviourType::Grating, "Grating"}, {BehaviourType::Slit, "Slit"}, {BehaviourType::Rzp, "Rzp"},
+    {BehaviourType::ImagePlane, "ImagePlane"}, {BehaviourType::Crystal, "Crystal"}, {BehaviourType::Foil, "Foil"}};
+const std::map<std::string, BehaviourType> StringToBehaviourType = {
+    {"Mirror", BehaviourType::Mirror},         {"Grating", BehaviourType::Grating}, {"Slit", BehaviourType::Slit}, {"Rzp", BehaviourType::Rzp},
+    {"ImagePlane", BehaviourType::ImagePlane}, {"Crystal", BehaviourType::Crystal}, {"Foil", BehaviourType::Foil}};
 // FigureRotation conversion
 const std::map<FigureRotation, std::string> FigureRotationToString = {
     {FigureRotation::Yes, "Yes"}, {FigureRotation::Plane, "Plane"}, {FigureRotation::A11, "A11"}};
@@ -139,7 +135,9 @@ const std::map<ElementType, std::string> ElementTypeToString = {{ElementType::Ci
                                                                 {ElementType::PixelSource, "Pixel Source"},
                                                                 {ElementType::EllipsoidMirror, "Ellipsoid"},
                                                                 {ElementType::Crystal, "Crystal"},
-                                                                {ElementType::Foil, "Foil"}};
+                                                                {ElementType::Foil, "Foil"},
+                                                                {ElementType::RayListSource, "Ray List Source"},
+                                                                {ElementType::Undefined, "Undefined"}};
 const std::map<std::string, ElementType> StringToElementType = {{"Circle Source", ElementType::CircleSource},
                                                                 {"Cylinder", ElementType::CylinderMirror},
                                                                 {"ImagePlane", ElementType::ImagePlane},
@@ -163,7 +161,9 @@ const std::map<std::string, ElementType> StringToElementType = {{"Circle Source"
                                                                 {"Pixel Source", ElementType::PixelSource},
                                                                 {"Ellipsoid", ElementType::EllipsoidMirror},
                                                                 {"Crystal", ElementType::Crystal},
-                                                                {"Foil", ElementType::Foil}};
+                                                                {"Foil", ElementType::Foil},
+                                                                {"Ray List Source", ElementType::RayListSource},
+                                                                {"Undefined", ElementType::Undefined}};
 
 const std::map<std::string, EventType> StringToEventType = {
     {"Uninitialized", EventType::Uninitialized}, {"Emitted", EventType::Emitted},   {"HitElement", EventType::HitElement},

@@ -176,7 +176,6 @@ struct GenRays {
                             .energies      = alpaka::getPtrNative(*d_energyDistributionListEnergies[index]),
                             .weightSum     = weightSum,
                             .size          = size,
-                            .continous     = value.m_continuous,
                         };
                     }
 

@@ -506,7 +506,7 @@ OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayP
 RAYX_FN_ACC
 OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection, const OpticalElement* __restrict elements,
                                                   const ObjectTransform* __restrict objectTransforms, const int numSources, const int numElements,
-                                                  Rand& __restrict rand) {
+                                                  Rand& __restrict rand, const int skipPlanarElement) {
     // global coordinates of first intersection point of ray among all elements in beamline
     OptCollisionPoint best_col = std::nullopt;
 
@@ -524,6 +524,9 @@ OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::d
     // Find intersection point through all elements
     for (int elementIndex = 0; elementIndex < numElements; ++elementIndex) {
         const auto& element = elements[elementIndex];
+
+        // a plane just hit cannot be hit again before another element deflects the ray
+        if (elementIndex == skipPlanarElement && element.m_surface.is<Surface::Plane>()) continue;
 
         rayMatrixMult(objectTransforms[elementIndex + numSources].m_inTrans, rayPosition, rayDirection);
 
