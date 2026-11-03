@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../res/rayx-logo_48x48.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -29,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -3757,11 +3757,11 @@
 </tr>
 <tr>
 <td style="text-align: right;"></td>
-<td style="text-align: left;"><a href="#function-rays-33"><strong>Rays</strong></a> (<a href="./"><strong>Rays</strong></a> &amp;&amp;) = default<br></td>
+<td style="text-align: left;"><a href="#function-rays-33"><strong>Rays</strong></a> (Rays &amp;&amp;) = default<br></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a> &amp;</td>
-<td style="text-align: left;"><a href="#function-append"><strong>append</strong></a> (const <a href="./"><strong>Rays</strong></a> &amp; other) <br><em>Append another</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instance to this one.</em></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a> &amp;</td>
+<td style="text-align: left;"><a href="#function-append"><strong>append</strong></a> (const <a href="./#function-rays-13"><strong>Rays</strong></a> &amp; other) <br><em>Append another</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instance to this one.</em></td>
 </tr>
 <tr>
 <td style="text-align: right;">RayAttrMask</td>
@@ -3772,7 +3772,7 @@
 <td style="text-align: left;"><a href="#function-contains"><strong>contains</strong></a> (const RayAttrMask attr) const<br><em>Check if a specific attribute is recorded in this</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instance.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-copy"><strong>copy</strong></a> () const<br><em>Create a copy of the</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instance. This function is an explicit copy of the</em><a href="./"><em><strong>Rays</strong></em></a> <em>instance to avoid accidental costly copies. If you want to return a</em><a href="./"><em><strong>Rays</strong></em></a> <em>instance from a function, you should make use of RVO/NRVO optimizations, instead of using this function.</em></td>
 </tr>
 <tr>
@@ -3800,19 +3800,19 @@
 <td style="text-align: left;"><a href="#function-empty"><strong>empty</strong></a> () const<br><em>Check if the ray list is empty.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-filter"><strong>filter</strong></a> (Pred pred) const<br></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a> &amp;</td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a> &amp;</td>
 <td style="text-align: left;"><a href="#function-filterbyattrmask"><strong>filterByAttrMask</strong></a> (const RayAttrMask mask) <br><em>Filter the rays to only include those with attributes specified in the given mask. This operation modifies the current</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instance in place.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-filterbylasteventinpath"><strong>filterByLastEventInPath</strong></a> () const<br><em>Filter the rays to only include the final event of each unique path. The final event is determined by the maximum path_event_id for each path_id.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-filterbyobjectid"><strong>filterByObjectId</strong></a> (const int object_id) const<br><em>Filter the rays to only include those that interacted with a specific object.</em></td>
 </tr>
 <tr>
@@ -3824,8 +3824,8 @@
 <td style="text-align: left;"><a href="#function-numpaths"><strong>numPaths</strong></a> () const<br><em>Get the number of unique paths in the ray list.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a> &amp;</td>
-<td style="text-align: left;"><a href="#function-operator_1"><strong>operator=</strong></a> (<a href="./"><strong>Rays</strong></a> &amp;&amp;) = default<br></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a> &amp;</td>
+<td style="text-align: left;"><a href="#function-operator_1"><strong>operator=</strong></a> (<a href="./#function-rays-13"><strong>Rays</strong></a> &amp;&amp;) = default<br></td>
 </tr>
 <tr>
 <td style="text-align: right;">RAYX_X_MACRO_RAY_ATTR glm::dvec3</td>
@@ -3840,15 +3840,15 @@
 <td style="text-align: left;"><a href="#function-size"><strong>size</strong></a> () const<br><em>Get the number of events in the ray list.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-sort"><strong>sort</strong></a> (Compare comp) const<br></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-sortbyobjectid"><strong>sortByObjectId</strong></a> () const<br><em>Sort rays by object_id, so that rays interacting with the same object are grouped together.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
 <td style="text-align: left;"><a href="#function-sortbypathidandpatheventid"><strong>sortByPathIdAndPathEventId</strong></a> () const<br><em>Sort rays by path_id and then by path_event_id, so that rays belonging to the same path are grouped together, and within each path, rays are ordered by their event sequence.</em></td>
 </tr>
 </tbody>
@@ -3863,8 +3863,8 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a></td>
-<td style="text-align: left;"><a href="#function-concat"><strong>concat</strong></a> (const std::vector&lt; <a href="./"><strong>Rays</strong></a> &gt; &amp; rays_list) <br><em>Concatenate multiple</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instances into a single</em><a href="./"><em><strong>Rays</strong></em></a> <em>instance. This is more efficient than using repeated</em><a href="./#function-append"><em><strong>append()</strong></em></a> <em>calls.</em></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a></td>
+<td style="text-align: left;"><a href="#function-concat"><strong>concat</strong></a> (const std::vector&lt; <a href="./#function-rays-13"><strong>Rays</strong></a> &gt; &amp; rays_list) <br><em>Concatenate multiple</em> <a href="./"><em><strong>Rays</strong></em></a> <em>instances into a single</em><a href="./"><em><strong>Rays</strong></em></a> <em>instance. This is more efficient than using repeated</em><a href="./#function-append"><em><strong>append()</strong></em></a> <em>calls.</em></td>
 </tr>
 </tbody>
 </table>
@@ -3879,11 +3879,11 @@
 <tbody>
 <tr>
 <td style="text-align: right;"></td>
-<td style="text-align: left;"><a href="#function-rays-13"><strong>Rays</strong></a> (const <a href="./"><strong>Rays</strong></a> &amp;) = default<br><em>Private copy constructor to prevent accidental copies.</em></td>
+<td style="text-align: left;"><a href="#function-rays-13"><strong>Rays</strong></a> (const Rays &amp;) = default<br><em>Private copy constructor to prevent accidental copies.</em></td>
 </tr>
 <tr>
-<td style="text-align: right;"><a href="./"><strong>Rays</strong></a> &amp;</td>
-<td style="text-align: left;"><a href="#function-operator"><strong>operator=</strong></a> (const <a href="./"><strong>Rays</strong></a> &amp;) = default<br><em>Private assignment operator to prevent accidental copies.</em></td>
+<td style="text-align: right;"><a href="./#function-rays-13"><strong>Rays</strong></a> &amp;</td>
+<td style="text-align: left;"><a href="#function-operator"><strong>operator=</strong></a> (const <a href="./#function-rays-13"><strong>Rays</strong></a> &amp;) = default<br><em>Private assignment operator to prevent accidental copies.</em></td>
 </tr>
 </tbody>
 </table>
@@ -4212,10 +4212,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.tabs", "navigation.indexes", "navigation.top", "navigation.tabs.sticky", "navigation.sections"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.code.annotate", "content.action.edit", "content.action.view", "navigation.tabs", "navigation.indexes", "navigation.top", "navigation.tabs.sticky", "navigation.sections"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
       
         <script src="../../js/mathjax.js"></script>
       
