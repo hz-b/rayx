@@ -64,6 +64,16 @@ void Renderer::freeCommandBuffers() {
 VkCommandBuffer Renderer::beginFrame() {
     assert(!m_isFrameStarted && "Can't call beginFrame while already in progress");
 
+    // Resync the swapchain with the window's current size before acquiring an image. The window can be resized (e.g. by the compositor
+    // tiling or fullscreening it) without a Vulkan present call ever observing VK_ERROR_OUT_OF_DATE_KHR/VK_SUBOPTIMAL_KHR in between, which
+    // would otherwise leave the swapchain rendering at a stale size while ImGui and input already use the live size.
+    int width = 0, height = 0;
+    SDL_GetWindowSize(m_Window.window(), &width, &height);
+    if (width > 0 && height > 0 &&
+        (static_cast<uint32_t>(width) != m_SwapChain->getExtent().width || static_cast<uint32_t>(height) != m_SwapChain->getExtent().height)) {
+        recreateSwapChain();
+    }
+
     auto result = m_SwapChain->acquireNextImage(&m_currentImageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
@@ -91,8 +101,7 @@ void Renderer::endFrame() {
     std::vector<VkCommandBuffer> submitCommandBuffers = {commandBuffer};
 
     VkResult result = m_SwapChain->submitCommandBuffers(submitCommandBuffers, m_currentImageIndex);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_Window.wasWindowResized()) {
-        m_Window.resetWindowResizedFlag();
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         recreateSwapChain();
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");

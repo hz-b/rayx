@@ -20,6 +20,11 @@ namespace rayx {
  */
 
 void getSurfaceCoating(xml::Parser parser, DesignElement* de) {
+    if (parser.parseMaterial() == Material::REFLECTIVE) {
+        de->setSurfaceCoatingType(SurfaceCoatingType::SubstrateOnly);
+        return;
+    }
+
     if (parser.parseSurfaceCoatingType() == SurfaceCoatingType::SubstrateOnly) {
         de->setSurfaceCoatingType(parser.parseSurfaceCoatingType());
         return;

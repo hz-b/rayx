@@ -78,7 +78,7 @@ std::filesystem::path ResourceHandler::getFullPath(const std::filesystem::path& 
     };
 
     {
-        std::shared_lock lock(m_lookUpPathsMutex); // lock lookUpPaths
+        std::shared_lock lock(m_lookUpPathsMutex);  // lock lookUpPaths
         // First, check in user-defined lookup paths
         for (const auto& lookupPath : lookUpPaths) {
             std::filesystem::path path = lookupPath / baseDir / relativePath;

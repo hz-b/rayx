@@ -175,8 +175,9 @@ void Application::run() {
                         }
                     } else {
                         for (auto ray : m_rays) {
-                            size_t id = static_cast<size_t>(ray.back().m_lastElement);
-                            if (id > m_Beamline->numElements()) {
+                            // a negative id is an event at a source, which every RML has
+                            int id = ray.back().m_lastElement;
+                            if (id >= static_cast<int>(m_Beamline->numElements())) {
                                 m_UIParams.showH5NotExistPopup = true;
                                 break;
                             }

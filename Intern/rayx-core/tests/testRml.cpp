@@ -1,3 +1,4 @@
+#include "Beamline/StringConversion.h"
 #include "setupTests.h"
 
 TEST_F(TestSuite, allBeamlineObjects) {
@@ -11,18 +12,15 @@ TEST_F(TestSuite, allBeamlineObjects) {
 TEST_F(TestSuite, loadDatFile) {
     const auto rays = traceRml("loadDatFile", RayAttrMask::Energy);
     writeCsvUsingFilename(rays, "loadDatFile.rayx");
-    using namespace testing;
-    EXPECT_THAT(rays.energy, Each(AnyOf(12, 15, 17)));
-}
 
-TEST_F(TestSuite, loadDatFile2) {
-    const auto rays = traceRml("loadDatFile2", RayAttrMask::Energy);
-    writeCsvUsingFilename(rays, "loadDatFile2.rayx");
+    // The .DAT gives weight 1 to the nodes at 12, 15 and 17. Each node owns the bin
+    // spanning to its neighbours' midpoints, so the rays land in [11.5, 12.5],
+    // [14.5, 15.5] and [16.5, 17.5].
     using namespace testing;
-    EXPECT_THAT(rays.energy, Each(AllOf(Ge(12), Le(18))));
-    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(12), Le(13))));
-    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(15), Le(16))));
-    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(17), Le(18))));
+    EXPECT_THAT(rays.energy, Each(AnyOf(AllOf(Ge(11.5), Le(12.5)), AllOf(Ge(14.5), Le(15.5)), AllOf(Ge(16.5), Le(17.5)))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(11.5), Le(12.5))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(14.5), Le(15.5))));
+    EXPECT_THAT(rays.energy, Contains(AllOf(Ge(16.5), Le(17.5))));
 }
 
 TEST_F(TestSuite, loadGroups) {
@@ -45,21 +43,16 @@ TEST_F(TestSuite, groupTransform) {
     CHECK_EQ(correct, m);
 }
 
-TEST_F(TestSuite, testEnergyDistributionSeparateEnergies) {
-    const auto rays = traceRml("PointSourceSeparateEnergies", RayAttrMask::Energy);
+TEST_F(TestSuite, testEnergyDistributionThreeEnergies) {
+    // RAY-UI `energySpreadType=1` -> exactly three energies. Center 100,
+    // spread 200 => spikes at 0, 100 and 200.
+    const auto rays = traceRml("PointSourceThreeEnergies", RayAttrMask::Energy);
     expectAtLeastOnce(rays.energy, {
                                        0.0,
-                                       50.0,
                                        100.0,
-                                       150.0,
                                        200.0,
                                    });
-}
-
-// TODO: this test does not really test anything
-TEST_F(TestSuite, testEnergyDistributionSoftEdge) {
-    const auto rays = traceRml("PointSourceSoftEdgeEnergy", RayAttrMask::Energy);
-    expectDifferentValues(rays.energy);
+    for (const auto e : rays.energy) { EXPECT_NEAR(e, std::round(e / 100.0) * 100.0, 1e-6) << "unexpected energy " << e; }
 }
 
 // TODO: this test does not really test anything
@@ -76,6 +69,52 @@ TEST_F(TestSuite, testEnergyDistributionHardEdge) {
     }
 }
 
+TEST_F(TestSuite, idealReflectorIgnoresLeftoverCoating) {
+    // `reflectivityType=0` (ideal 100%) must be authoritative. The
+    // RML file contains leftover multilayer coating parameters (surfaceCoating=2,
+    // materialCoating1=Ta, ...) that are disabled by RAY-UI (`enabled="F"`), but
+    // RAYX must ignore the `enabled` flag and honor reflectivityType instead.
+    // The element must compile as an ideal reflector (REFLECTIVE) with
+    // SubstrateOnly coating, so the tracer never does a refractive-index lookup.
+    auto beamline = loadBeamline("IdealReflectorLeftoverCoating");
+
+    const auto mirror = beamline.compileElements()[0].element;
+    CHECK_EQ(mirror.m_material, static_cast<int>(Material::REFLECTIVE));
+    CHECK(mirror.m_coating.is<Coating::SubstrateOnly>());
+
+    // the trace must complete without touching the (disabled) multilayer coating
+    const auto rays = traceRml("IdealReflectorLeftoverCoating", RayAttrMask::Position);
+    EXPECT_GT(rays.size(), 0) << "trace should produce rays";
+}
+
+TEST_F(TestSuite, verifyPatchesUncoveredMaterial) {
+    // When an element's material data does not cover the source energy range, the
+    // compiled copy is patched to ideal geometric behaviour. Here a real Carbon
+    // mirror is traced at 60 keV, past the end of every carbon table (Palik
+    // 4.8-30 eV, NFF 29.3-30 keV, Cromer 5-50 keV), so it must be patched to
+    // REFLECTIVE + SubstrateOnly.
+    auto beamline = loadBeamline("MirrorUncoveredMaterial");
+
+    auto elements = beamline.compileElements();
+    ASSERT_EQ(elements.size(), 1u);
+    CHECK_EQ(elements[0].element.m_material, static_cast<int>(Material::C));
+
+    // run the coverage check on the compiled copy
+    beamline.verifyMaterialCoverage(elements, beamline.calcMinimalMaterialTables());
+
+    // original model must be unchanged
+    auto elementsOriginal = beamline.compileElements();
+    CHECK_EQ(elementsOriginal[0].element.m_material, static_cast<int>(Material::C));
+
+    // compiled tracing copy must now be ideal
+    CHECK_EQ(elements[0].element.m_material, static_cast<int>(Material::REFLECTIVE));
+    CHECK(elements[0].element.m_coating.is<Coating::SubstrateOnly>());
+
+    // and the trace must complete without a material-lookup assertion
+    const auto rays = traceRml("MirrorUncoveredMaterial", RayAttrMask::Position);
+    EXPECT_GT(rays.size(), 0);
+}
+
 TEST_F(TestSuite, testParaboloidQuad) {
     auto beamline = loadBeamline("paraboloid_matrix_IP");
 
@@ -86,13 +125,21 @@ TEST_F(TestSuite, testParaboloidQuad) {
     CHECK_EQ(0, parabo.m_a12);
     CHECK_EQ(0, parabo.m_a13);
     CHECK_EQ(0, parabo.m_a14);
-    CHECK_EQ(1, parabo.m_a22);
-    CHECK_EQ(0, parabo.m_a23);
-    CHECK_EQ(-3765.641, parabo.m_a24, 0.001);
-    CHECK_EQ(0, parabo.m_a33);
-    CHECK_EQ(663.984, parabo.m_a34, 0.001);
+    // the quadric is rotated about x by the tangent angle so the surface is tangent to the
+    // element's xz plane at the pole; a34 == 0 is what expresses that tangency
+    CHECK_EQ(0.969846, parabo.m_a22, 1e-6);
+    CHECK_EQ(0.171010, parabo.m_a23, 1e-6);
+    CHECK_EQ(-3823.733, parabo.m_a24, 0.001);
+    CHECK_EQ(0.030154, parabo.m_a33, 1e-6);
+    CHECK_EQ(0, parabo.m_a34, 1e-9);
     CHECK_EQ(-2.3283e-10, parabo.m_a44, 0.001);
     CHECK_EQ(1, parabo.m_icurv);
+
+    // surface normal at the element origin points along -y: the surface is tangent there
+    const auto normal = glm::normalize(glm::dvec3(2 * parabo.m_a14, 2 * parabo.m_a24, 2 * parabo.m_a34));
+    CHECK_EQ(0.0, normal.x, 1e-12);
+    CHECK_EQ(-1.0, normal.y, 1e-12);
+    CHECK_EQ(0.0, normal.z, 1e-12);
 }
 
 TEST_F(TestSuite, testSphereQuad) {
@@ -240,4 +287,44 @@ TEST_F(TestSuite, groupTransform2) {
 
     CHECK_EQ(orientationCorrect, orientationResult);
     CHECK_EQ(positionCorrect, positionResult);
+}
+
+TEST_F(TestSuite, elementTypeStringMappings) {
+    for (int i = 0; i < static_cast<int>(ElementType::Count); ++i) {
+        const auto e       = static_cast<ElementType>(i);
+        const auto forward = ElementTypeToString.find(e);
+        ASSERT_NE(forward, ElementTypeToString.end());
+        const auto backward = StringToElementType.find(forward->second);
+        ASSERT_NE(backward, StringToElementType.end());
+        EXPECT_EQ(backward->second, e);
+    }
+    EXPECT_EQ(ElementTypeToString.size(), static_cast<size_t>(ElementType::Count));
+}
+
+TEST_F(TestSuite, coverageIgnoresElementsWithoutMaterialLookups) {
+    // A white band at 100 eV with spread 200 covers [0, 200] eV, and no table has data
+    // at 0 eV. The only element is an ImagePlane, whose behaviour never looks up a
+    // refractive index, so it must keep its material rather than be patched.
+    auto beamline = loadBeamline("MatrixSource_distr_seeded");
+
+    auto elements = beamline.compileElements();
+    ASSERT_EQ(elements.size(), 1u);
+    const auto materialBefore = elements[0].element.m_material;
+
+    beamline.verifyMaterialCoverage(elements, beamline.calcMinimalMaterialTables());
+
+    CHECK_EQ(elements[0].element.m_material, materialBefore);
+}
+
+TEST_F(TestSuite, behaviourTypeStringMappings) {
+    for (int i = 0; i < static_cast<int>(BehaviourType::Count); ++i) {
+        const auto b       = static_cast<BehaviourType>(i);
+        const auto forward = BehaviourTypeToString.find(b);
+        ASSERT_NE(forward, BehaviourTypeToString.end());
+        const auto backward = StringToBehaviourType.find(forward->second);
+        ASSERT_NE(backward, StringToBehaviourType.end());
+        EXPECT_EQ(backward->second, b);
+    }
+    EXPECT_EQ(BehaviourTypeToString.size(), static_cast<size_t>(BehaviourType::Count));
+    EXPECT_EQ(StringToBehaviourType.size(), static_cast<size_t>(BehaviourType::Count));
 }

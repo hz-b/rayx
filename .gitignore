@@ -28,6 +28,7 @@ CMakeCache.txm
 cmake.check_cache
 imgui.ini
 *.h5
+*.testCsv.csv
 
 # VSCode Debugger files
 results.json

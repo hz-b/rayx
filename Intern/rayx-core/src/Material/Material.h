@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
-#include <vector>
 #include <glm.hpp>
+#include <vector>
 
 #include "Core.h"
 

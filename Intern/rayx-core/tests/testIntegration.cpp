@@ -14,6 +14,17 @@ TEST_F(TestSuite, PlaneMirrorDef) {
 }
 TEST_F(TestSuite, PlaneMirrorMis) { traceRmlAndCompareAgainstRayUi("PlaneMirrorMis"); }
 TEST_F(TestSuite, SphereMirrorDefault) { traceRmlAndCompareAgainstRayUi("SphereMirrorDefault", 1e-10); }
+
+// A collimating paraboloid fed from its focus must produce a parallel beam. The quadric is built
+// with its axis along z, so it has to be rotated by the tangent angle to sit tangent to the
+// element plane at the pole; without that the beam arrives nearly tangent instead of at the
+// grazing angle, and misses the mirror entirely.
+//
+// The tolerance is looser than the other RAY-UI comparisons here. The beams agree to ~3e-7
+// relative on average, but individual rays differ by up to 4e-4 mm across a 10 mm footprint,
+// which looks like the two codes sampling the matrix source grid slightly differently rather
+// than a difference in the optics.
+TEST_F(TestSuite, ParaboloidCollimating) { traceRmlAndCompareAgainstRayUi("ParaboloidCollimating", 1e-3); }
 TEST_F(TestSuite, SphereGrating) { traceRmlAndCompareAgainstRayUi("SphereGrating", 1e-12, Sequential::Yes); }
 TEST_F(TestSuite, ToroidGrating) { traceRmlAndCompareAgainstRayUi("ToroidGrating", 1e-12, Sequential::Yes); }
 

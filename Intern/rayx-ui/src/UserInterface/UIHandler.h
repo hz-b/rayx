@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 
+#include <memory>
 #include <string>
 
 #include "BeamlineDesignHandler.h"
@@ -10,6 +11,10 @@
 #include "GraphicsCore/Device.h"
 #include "GraphicsCore/Swapchain.h"
 #include "Settings.h"
+
+namespace pfd {
+class open_file;
+}
 
 class UIHandler {
   public:
@@ -44,6 +49,10 @@ class UIHandler {
 
     bool m_showRMLNotExistPopup = false;
     bool m_loadh5withRML        = true;
+
+    // Non-null while the native "open file" dialog is open; the dialog spawns an external process (zenity/kdialog) and must be polled
+    // rather than blocked on, otherwise the main loop stalls and the compositor reports the window as unresponsive.
+    std::unique_ptr<pfd::open_file> m_openFileDialog;
 
     VkRenderPass m_RenderPass;
     VkDescriptorPool m_DescriptorPool;

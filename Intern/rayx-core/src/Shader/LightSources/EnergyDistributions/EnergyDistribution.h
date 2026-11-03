@@ -12,7 +12,6 @@ struct EnergyDistributionList {
     double* __restrict energies;
     double weightSum;
     int size;
-    bool continous;
 };
 
 struct EnergyDistributionDataBase {

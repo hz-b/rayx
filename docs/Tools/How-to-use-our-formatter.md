@@ -6,6 +6,18 @@ In RAYX we decided on using a formatter to keep our code clean and organized. He
 
 We use clang-format for this purpose. The style is defined in the .clang-format file in the project root. As you can see in the file, our style is based on the Google C++ style. Remember: the formatter just completes our style guide and doesn't replace it.
 
+### Which clang-format version
+
+The tree is formatted with **clang-format 19**, and `./format.sh` is a no-op against it.
+
+This is worth knowing because several options we use — notably `AllowShortBlocksOnASingleLine`
+and the `AlignConsecutive*` family — changed behaviour between releases, so a different version
+reports drift that isn't real. A newer clang-format will want to reformat files that are already
+correct, and committing that makes the next person's version disagree in turn.
+
+Nothing enforces this: no CI job checks formatting, and you are not required to install 19. If
+your version disagrees, prefer leaving the file alone over reformatting it.
+
 ## Visual Studio Code
 
 If you are using Visual Studio Code you can use the C/C++ extension for formatting. It includes the clang-format binary so you just need to change a few settings to configure it correctly. You can see the changes (highlighted in red) in the following screenshots:

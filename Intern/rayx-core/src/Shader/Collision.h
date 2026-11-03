@@ -41,8 +41,14 @@ RAYX_FN_ACC OptCollisionPoint RAYX_API findCollisionInElementCoordsWithoutSlopeE
 RAYX_FN_ACC OptCollisionPoint findCollisionInElementCoords(const glm::dvec3& __restrict rayPosition, const glm::dvec3& __restrict rayDirection,
                                                            const OpticalElement& __restrict element, Rand& __restrict rand);
 
+/// `skipPlanarElement` is the index of the element the ray last hit, or negative if it has not
+/// hit one yet. A straight line crosses a plane at most once and nothing between two elements
+/// changes the ray's direction, so a consecutive second hit on a planar surface is always
+/// numerical and that element is skipped. Curved surfaces can legitimately be hit twice in a
+/// row and are never skipped.
 RAYX_FN_ACC OptCollisionWithElement findCollisionWithElements(glm::dvec3 rayPosition, glm::dvec3 rayDirection,
                                                               const OpticalElement* __restrict elements, const ObjectTransform* __restrict,
-                                                              const int numSources, const int numElements, Rand& __restrict rand);
+                                                              const int numSources, const int numElements, Rand& __restrict rand,
+                                                              const int skipPlanarElement);
 
 }  // namespace rayx

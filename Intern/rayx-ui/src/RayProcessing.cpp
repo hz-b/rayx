@@ -85,6 +85,9 @@ std::vector<Line> getRays(const BundleHistory& rayCache, const rayx::Beamline& b
         glm::vec4 rayLastPos = sourceWorldPositions[static_cast<size_t>(rayHist[0].m_sourceID)];
 
         for (const Ray& event : rayHist) {
+            // events at a source carry object_id < numSources, so m_lastElement is negative;
+            // the line already starts at the source position
+            if (event.m_lastElement < 0) continue;
             if (event.m_lastElement >= static_cast<int>(beamline.numElements())) {
                 RAYX_EXIT << "Trying to access out-of-bounds index with element ID: " << event.m_lastElement;
             }
@@ -112,7 +115,7 @@ void sortRaysByElement(const BundleHistory& rays, std::vector<std::vector<Ray>>&
     for (const auto& rayBundle : rays) {
         for (const auto& ray : rayBundle) {
             if (ray.m_lastElement >= static_cast<int>(numElements)) { continue; }
-            if (ray.m_lastElement < 0) RAYX_EXIT << "encountered event with element id: " << ray.m_lastElement;
+            if (ray.m_lastElement < 0) { continue; }  // event at a source, belongs to no element
             sortedRays[static_cast<size_t>(ray.m_lastElement)].push_back(ray);
         }
     }

@@ -22,7 +22,8 @@ void traceSequential(const int gid, const ConstState& __restrict constState, Mut
                                  constState.objectRecordMask, ray.object_id, constState.attrRecordMask);
     ray.path_event_id += stored ? 1 : 0;
 
-    rayMatrixMult(constState.objectTransforms[ray.object_id].m_inTrans, ray.position, ray.direction, ray.electric_field);
+    // rays are in the local frame of the object they were emitted from, so transform them to world coordinates
+    rayMatrixMult(constState.objectTransforms[ray.object_id].m_outTrans, ray.position, ray.direction, ray.electric_field);
 
     for (int elementIndex = 0; elementIndex < constState.numElements; ++elementIndex) {
         if (isRayTerminated(ray.event_type)) break;
@@ -66,13 +67,17 @@ void traceNonSequential(const int gid, const ConstState& __restrict constState, 
     ray.path_event_id += stored ? 1 : 0;
 
     // TODO: object_id from previous beamline is not correct for this beamline
-    rayMatrixMult(constState.objectTransforms[ray.object_id].m_inTrans, ray.position, ray.direction, ray.electric_field);
+    // rays are in the local frame of the object they were emitted from, so transform them to world coordinates
+    rayMatrixMult(constState.objectTransforms[ray.object_id].m_outTrans, ray.position, ray.direction, ray.electric_field);
 
-    for (int hitIndex = 0; hitIndex < constState.maxEvents; ++hitIndex) {
+    // one slot per ray is reserved for the source event, so only maxEvents - 1 remain for elements
+    const int maxElementEvents = constState.maxEvents - 1;
+
+    for (int hitIndex = 0; hitIndex < maxElementEvents; ++hitIndex) {
         if (isRayTerminated(ray.event_type)) break;
 
         const auto col = findCollisionWithElements(ray.position, ray.direction, constState.elements, constState.objectTransforms,
-                                                   constState.numSources, constState.numElements, ray.rand);
+                                                   constState.numSources, constState.numElements, ray.rand, ray.object_id - constState.numSources);
 
         // no element was hit. tracing is done!
         if (!col) break;
@@ -91,10 +96,10 @@ void traceNonSequential(const int gid, const ConstState& __restrict constState, 
         behave(ray, col->point, element, constState.materialIndices, constState.materialTable);
 
         // check if the number of events exceed capacity. if so, set event type to TooManyEvents
-        if (hitIndex == constState.maxEvents - 1 && !isRayTerminated(ray.event_type)) {
+        if (hitIndex == maxElementEvents - 1 && !isRayTerminated(ray.event_type)) {
             // still something to hit?
             if (findCollisionWithElements(ray.position, ray.direction, constState.elements, constState.objectTransforms, constState.numSources,
-                                          constState.numElements, ray.rand))
+                                          constState.numElements, ray.rand, ray.object_id - constState.numSources))
                 ray.event_type = EventType::TooManyEvents;
         }
 

@@ -313,9 +313,17 @@ void UIHandler::showSceneEditorWindow(UIParameters& uiParams) {
     // RAYX_PROFILE_FUNCTION_STDOUT();
     ImGui::Begin("Beamline Design");
 
-    if (ImGui::Button("Open File Dialog")) {
-        const std::vector<std::string> results =
-            pfd::open_file("Open Beamline File", "", {"RML Beamline Files", "*.rml *.xml"}, pfd::opt::none).result();
+    if (ImGui::Button("Open File Dialog") && !m_openFileDialog) {
+        m_openFileDialog = std::make_unique<pfd::open_file>("Open Beamline File", "", std::vector<std::string>{"RML Beamline Files", "*.rml *.xml"},
+                                                              pfd::opt::none);
+    }
+
+    // Poll without blocking; the dialog runs as an external process (zenity/kdialog), and blocking on result() here would stall the
+    // whole main loop for as long as the dialog stays open.
+    if (m_openFileDialog && m_openFileDialog->ready(0)) {
+        const std::vector<std::string> results = m_openFileDialog->result();
+        m_openFileDialog.reset();
+
         if (!results.empty()) {
             const std::string rmlPath = results[0];
 #ifndef NO_H5
