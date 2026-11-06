@@ -1,4 +1,3 @@
-from asyncore import write
 from logging import RootLogger
 import xml.etree.ElementTree as ET
 import os
